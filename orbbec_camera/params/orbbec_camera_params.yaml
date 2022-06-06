@@ -1,0 +1,20 @@
+orbbec_camera_node:
+  ros__parameters:
+    color_width: 640
+    color_height: 480
+    color_fps: 30
+    color_frame_id: "color_frame"
+    color_optical_frame_id: "color_optical_frame"
+    ir_width: 640
+    ir_height: 480
+    ir_fps: 30
+    ir_frame_id: "ir_frame"
+    ir_optical_frame_id: "ir_optical_frame"
+    depth_width: 640
+    depth_height: 480
+    depth_fps: 30
+    depth_frame_id: "depth_frame"
+    depth_optical_frame_id: "depth_optical_frame"
+    publish_tf: true
+    align_depth: true
+    tf_publish_rate: 10.0

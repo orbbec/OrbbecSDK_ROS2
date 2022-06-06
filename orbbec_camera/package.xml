@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>orbbec_camera</name>
+  <version>0.0.1</version>
+  <description>Orbbec Camera package</description>
+  <maintainer email="weikang@todo.todo">weikang</maintainer>
+  <license>TODO: License declaration</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>ament_lint_auto</depend>
+  <depend>ament_lint_common</depend>
+  <depend>ament_index_cpp</depend>
+  <depend>image_transport</depend>
+  <depend>rclcpp_components</depend>
+  <depend>cv_bridge</depend>
+  <depend>orbbec_camera_msgs</depend>
+  <depend> builtin_interfaces</depend>
+  <depend>rclcpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>std_srvs</depend>
+  <depend>tf2</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_sensor_msgs</depend>
+  <depend>tf2_msgs</depend>
+  <depend>ORBBEC_SDK</depend>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

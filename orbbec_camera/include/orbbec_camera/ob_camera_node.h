@@ -37,7 +37,7 @@
 #include "libobsensor/ObSensor.hpp"
 
 #include "orbbec_camera_msgs/msg/device_info.hpp"
-#include "orbbec_camera_msgs/srv/get_device_list.hpp"
+#include "orbbec_camera_msgs/srv/get_device_info.hpp"
 #include "orbbec_camera_msgs/msg/extrinsics.hpp"
 #include "orbbec_camera_msgs/msg/metadata.hpp"
 #include "orbbec_camera_msgs/srv/get_int32.hpp"
@@ -70,7 +70,7 @@
       .str()
 
 namespace orbbec_camera {
-using GetDeviceList = orbbec_camera_msgs::srv::GetDeviceList;
+using GetDeviceInfo = orbbec_camera_msgs::srv::GetDeviceInfo;
 using Extrinsics = orbbec_camera_msgs::msg::Extrinsics;
 using SetInt32 = orbbec_camera_msgs::srv::SetInt32;
 using GetInt32 = orbbec_camera_msgs::srv::GetInt32;
@@ -174,6 +174,10 @@ class OBCameraNode {
                           const std::shared_ptr<SetInt32::Request>& request,
                           std::shared_ptr<SetInt32::Response>& response);
 
+  void getDeviceInfoCallback(const std::shared_ptr<rmw_request_id_t>& request_header,
+                             const std::shared_ptr<GetDeviceInfo::Request>& request,
+                             std::shared_ptr<GetDeviceInfo::Response>& response);
+
   void publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set, const rclcpp::Time& t);
 
   void publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_set, const rclcpp::Time& t);
@@ -249,7 +253,7 @@ class OBCameraNode {
   OBD2CTransform extrinsics_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr toggle_sensors_srv_;
   orbbec_camera_msgs::msg::DeviceInfo device_info_;
-  rclcpp::Service<GetDeviceList>::SharedPtr get_device_list_srv;
+  rclcpp::Service<GetDeviceInfo>::SharedPtr get_device_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_laser_enable_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_ldp_enable_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_floor_enable_srv_;

@@ -18,7 +18,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/DeviceInfo.msg"
   "msg/Extrinsics.msg"
   "msg/Metadata.msg"
-  "srv/GetDeviceList.srv"
+  "srv/GetDeviceInfo.srv"
   "srv/GetCameraInfo.srv"
   "srv/GetInt32.srv"
   "srv/SetInt32.srv"

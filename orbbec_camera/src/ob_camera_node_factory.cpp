@@ -94,13 +94,15 @@ void OBCameraNodeFactory::getDevice(const std::shared_ptr<ob::DeviceList> &list)
     auto dev = list->getDevice(i);
     if (dev != nullptr) {
       device_ = dev;
-      RCLCPP_INFO_STREAM(logger_, "get device name " << dev->getDeviceInfo()->name());
-      RCLCPP_INFO_STREAM(logger_, "get device pid " << dev->getDeviceInfo()->pid());
-      RCLCPP_INFO_STREAM(logger_, "get device vid " << dev->getDeviceInfo()->vid());
+      RCLCPP_INFO_STREAM(logger_, "device name " << dev->getDeviceInfo()->name());
+      RCLCPP_INFO_STREAM(logger_, "device pid " << dev->getDeviceInfo()->pid());
+      RCLCPP_INFO_STREAM(logger_, "device vid " << dev->getDeviceInfo()->vid());
+      RCLCPP_INFO_STREAM(logger_, "device serial_name " << dev->getDeviceInfo()->serialNumber());
       RCLCPP_INFO_STREAM(logger_,
-                         "get device serial_name " << dev->getDeviceInfo()->serialNumber());
-      RCLCPP_INFO_STREAM(logger_,
-                         "get device firmware version " << dev->getDeviceInfo()->firmwareVersion());
+                         "device firmware version " << dev->getDeviceInfo()->firmwareVersion());
+      RCLCPP_INFO_STREAM(logger_, "device supported min sdk version "
+                                      << dev->getDeviceInfo()->supportedMinSdkVersion());
+      RCLCPP_INFO_STREAM(logger_, "device hardware version " << dev->getDeviceInfo()->hardwareVersion());
     }
   }
 }

@@ -93,6 +93,12 @@ void OBCameraNode::setupCameraCtrlServices() {
                                   std::shared_ptr<SetInt32::Response> response) {
         setWhiteBalanceCallback(request_header, request, response);
       });
+  get_device_srv_ = node_->create_service<GetDeviceInfo>(
+      "get_device_info", [this](const std::shared_ptr<rmw_request_id_t> request_header,
+                                const std::shared_ptr<GetDeviceInfo::Request> request,
+                                std::shared_ptr<GetDeviceInfo::Response> response) {
+        getDeviceInfoCallback(request_header, request, response);
+      });
 }
 
 void OBCameraNode::setExposureCallback(const std::shared_ptr<SetInt32::Request>& request,
@@ -361,6 +367,29 @@ void OBCameraNode::getExposureCallback(const std::shared_ptr<GetInt32::Request>&
   } catch (const std::exception& e) {
     response->message = e.what();
   } catch (...) {
+    response->message = "unknown error";
+  }
+}
+void OBCameraNode::getDeviceInfoCallback(const std::shared_ptr<rmw_request_id_t>& request_header,
+                                         const std::shared_ptr<GetDeviceInfo::Request>& request,
+                                         std::shared_ptr<GetDeviceInfo::Response>& response) {
+  try {
+    auto device_info = device_->getDeviceInfo();
+    response->info.name = device_info->name();
+    response->info.pid = device_info->pid();
+    response->info.vid = device_info->vid();
+    response->info.serial_number = device_info->serialNumber();
+    response->info.firmware_version = device_info->firmwareVersion();
+    response->info.supported_min_sdk_version = device_info->supportedMinSdkVersion();
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->success = false;
+    response->message = e.getMessage();
+  } catch (const std::exception& e) {
+    response->success = false;
+    response->message = e.what();
+  } catch (...) {
+    response->success = false;
     response->message = "unknown error";
   }
 }

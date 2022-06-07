@@ -114,12 +114,16 @@ void OBCameraNode::setExposureCallback(const std::shared_ptr<SetInt32::Request>&
         RCLCPP_ERROR(logger_, "%s NOT a video stream", __FUNCTION__);
         break;
     }
+    response->success = true;
   } catch (const ob::Error& e) {
+    response->success = false;
     response->message = e.getMessage();
   } catch (const std::exception& e) {
+    response->success = false;
     response->message = e.what();
   } catch (...) {
     RCLCPP_ERROR(logger_, "%s unknown error %d", __FUNCTION__, __LINE__);
+    response->success = false;
     response->message = "unknown error";
   }
 }
@@ -171,11 +175,15 @@ void OBCameraNode::setGainCallback(const std::shared_ptr<SetInt32 ::Request>& re
         RCLCPP_ERROR(logger_, "%s NOT a video stream", __FUNCTION__);
         break;
     }
+    response->success = true;
   } catch (const ob::Error& e) {
+    response->success = false;
     response->message = e.getMessage();
   } catch (const std::exception& e) {
+    response->success = false;
     response->message = e.what();
   } catch (...) {
+    response->success = false;
     response->message = "unknown error";
   }
 }
@@ -199,12 +207,15 @@ void OBCameraNode::setWhiteBalanceCallback(const std::shared_ptr<rmw_request_id_
                                            std::shared_ptr<SetInt32 ::Response>& response) {
   try {
     device_->setIntProperty(OB_PROP_COLOR_WHITE_BALANCE_INT, request->data);
+    response->success = true;
   } catch (const ob::Error& e) {
     response->message = e.getMessage();
   } catch (const std::exception& e) {
     response->message = e.what();
+    response->success = false;
   } catch (...) {
     response->message = "unknown error";
+    response->success = false;
   }
 }
 
@@ -216,23 +227,30 @@ void OBCameraNode::setAutoExposureCallback(
   try {
     switch (stream) {
       case OB_STREAM_IR:
+        response->success = false;
         response->message = "IR not support set auto exposure";
         break;
       case OB_STREAM_DEPTH:
         device_->setIntProperty(OB_PROP_DEPTH_AUTO_EXPOSURE_BOOL, request->data);
+        response->success = true;
         break;
       case OB_STREAM_COLOR:
         device_->setIntProperty(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, request->data);
+        response->success = true;
         break;
       default:
         RCLCPP_ERROR(logger_, "%s NOT a video stream", __FUNCTION__);
+        response->success = false;
+        response->message = "NOT a video stream";
         break;
     }
   } catch (const ob::Error& e) {
+    response->success = false;
     response->message = e.getMessage();
   } catch (const std::exception& e) {
     response->message = e.what();
   } catch (...) {
+    response->success = false;
     response->message = "unknown error";
   }
 }
@@ -245,11 +263,15 @@ void OBCameraNode::setFanModeCallback(const std::shared_ptr<rmw_request_id_t>& r
   bool fan_mode = request->data;
   try {
     device_->setBoolProperty(OB_PROP_FAN_WORK_MODE_INT, fan_mode);
+    response->success = true;
   } catch (const ob::Error& e) {
+    response->success = false;
     response->message = e.getMessage();
   } catch (const std::exception& e) {
+    response->success = false;
     response->message = e.what();
   } catch (...) {
+    response->success = false;
     response->message = "unknown error";
   }
 }
@@ -263,11 +285,15 @@ void OBCameraNode::setFloorEnableCallback(
   bool floor_enable = request->data;
   try {
     device_->setBoolProperty(OB_PROP_FLOOD_BOOL, floor_enable);
+    response->success = true;
   } catch (const ob::Error& e) {
+    response->success = false;
     response->message = e.getMessage();
   } catch (const std::exception& e) {
+    response->success = false;
     response->message = e.what();
   } catch (...) {
+    response->success = false;
     response->message = "unknown error";
   }
 }
@@ -299,11 +325,15 @@ void OBCameraNode::setLdpEnableCallback(
   bool ldp_enable = request->data;
   try {
     device_->setBoolProperty(OB_PROP_LDP_BOOL, ldp_enable);
+    response->success = true;
   } catch (const ob::Error& e) {
+    response->success = false;
     response->message = e.getMessage();
   } catch (const std::exception& e) {
+    response->success = false;
     response->message = e.what();
   } catch (...) {
+    response->success = false;
     response->message = "unknown error";
   }
 }

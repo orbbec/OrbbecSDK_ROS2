@@ -174,9 +174,6 @@ class OBCameraNode {
 
   void frameSetCallback(std::shared_ptr<ob::FrameSet> frame_set);
 
-  void publishFrame(std::shared_ptr<ob::Frame> frame, const rclcpp::Time& t,
-                    const stream_index_pair& stream);
-
   void publishColorFrame(std::shared_ptr<ob::ColorFrame> frame, const rclcpp::Time& t);
 
   void publishDepthFrame(std::shared_ptr<ob::DepthFrame> frame, const rclcpp::Time& t);

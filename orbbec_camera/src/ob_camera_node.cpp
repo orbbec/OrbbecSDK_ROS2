@@ -6,6 +6,7 @@
 #include "orbbec_camera/utils.h"
 namespace orbbec_camera {
 using namespace std::chrono_literals;
+
 OBCameraNode::OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> device)
     : node_(node), device_(device), logger_(node->get_logger()) {
   static_tf_broadcaster_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(node);
@@ -207,7 +208,7 @@ void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set,
     }
   }
   if (frame_set->depthFrame() != nullptr && frame_set->colorFrame() != nullptr) {
-    //publishColorPointCloud(frame_set, t);
+    // publishColorPointCloud(frame_set, t);
     publishDepthPointCloud(frame_set, t);
 
   } else if (frame_set->depthFrame() != nullptr) {
@@ -240,9 +241,9 @@ void OBCameraNode::publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   for (size_t point_idx = 0; point_idx < point_size; point_idx++, points++) {
     bool valid_pixel(points->z > 0);
     if (valid_pixel) {
-      *iter_x = points->x / 1000.0;
-      *iter_y = points->y / 1000.0;
-      *iter_z = points->z / 1000.0;
+      *iter_x = static_cast<float>(points->x / 1000.0);
+      *iter_y = static_cast<float>(points->y / 1000.0);
+      *iter_z = static_cast<float>(points->z / 1000.0);
 
       ++iter_x;
       ++iter_y;
@@ -251,8 +252,7 @@ void OBCameraNode::publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_se
     }
   }
   point_cloud_msg_.header.stamp = t;
-  point_cloud_msg_.header.frame_id = "camera_link";
-  // TODO: fill frame_id
+  point_cloud_msg_.header.frame_id = optical_frame_id_[COLOR];
   point_cloud_publisher_->publish(point_cloud_msg_);
 }
 
@@ -301,23 +301,24 @@ void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_se
     }
   }
   point_cloud_msg_.header.stamp = t;
-  point_cloud_msg_.header.frame_id = "camera_link";
+  point_cloud_msg_.header.frame_id = optical_frame_id_[COLOR];
   point_cloud_publisher_->publish(point_cloud_msg_);
 }
 void OBCameraNode::frameSetCallback(std::shared_ptr<ob::FrameSet> frame_set) {
-  // FIXME:
   auto nano_sec = static_cast<uint64_t>(frame_set->timeStampUs() * 1e3);
   rclcpp::Time t = rclcpp::Time(0, nano_sec);
-  stream_index_pair sip;
-  if (auto color_frame = frame_set->colorFrame()) {
+  auto color_frame = frame_set->colorFrame();
+  auto depth_frame = frame_set->depthFrame();
+  auto ir_frame = frame_set->irFrame();
+  if (color_frame && enable_[COLOR]) {
     publishColorFrame(color_frame, t);
   }
-  if (auto depth_frame = frame_set->depthFrame()) {
+  if (depth_frame && enable_[DEPTH]) {
     publishDepthFrame(depth_frame, t);
   }
-  //  if (auto ir_frame = frame_set->irFrame()) {
-  //    publishFrame(ir_frame, t, IR0);
-  //  }
+  if (ir_frame && enable_[IR0]) {
+    publishIRFrame(ir_frame, t);
+  }
   publishPointCloud(frame_set, t);
 }
 std::optional<OBCameraParam> OBCameraNode::findCameraParam() {
@@ -441,7 +442,7 @@ void OBCameraNode::publishColorFrame(std::shared_ptr<ob::ColorFrame> frame, cons
   img->height = height;
   img->is_bigendian = false;
   img->step = width * unit_step_size_[stream];
-  img->header.frame_id = depth_aligned_frame_id_[stream];
+  img->header.frame_id = optical_frame_id_[COLOR];
   img->header.stamp = t;
   image_publisher.publish(img);
 }
@@ -476,13 +477,44 @@ void OBCameraNode::publishDepthFrame(std::shared_ptr<ob::DepthFrame> frame, cons
   img->height = height;
   img->is_bigendian = false;
   img->step = width * unit_step_size_[stream];
-  img->header.frame_id = depth_aligned_frame_id_[stream];
+  img->header.frame_id = optical_frame_id_[COLOR];
   img->header.stamp = t;
   image_publisher.publish(img);
 }
 
-void OBCameraNode::publishIRFrame(std::shared_ptr<ob::IRFrame> frame, const rclcpp::Time& t) {}
+void OBCameraNode::publishIRFrame(std::shared_ptr<ob::IRFrame> frame, const rclcpp::Time& t) {
+  RCLCPP_INFO_STREAM(logger_, "publish depth frame");
+  auto width = frame->width();
+  auto height = frame->height();
+  auto stream = IR0;
+  RCLCPP_INFO_STREAM(logger_, "stream " << magic_enum::enum_name(stream.first)
+                                        << " get image width " << width << ", height " << height
+                                        << ", format " << magic_enum::enum_name(frame->format()));
+  auto& image = images_[stream];
+  if (image.size() != cv::Size(width, height)) {
+    image.create(height, width, image.type());
+  }
+  image.data = (uint8_t*)frame->data();
+  auto& camera_info_publisher = camera_info_publishers_.at(stream);
+  auto& image_publisher = image_publishers_.at(stream);
+  auto& cam_info = camera_infos_.at(stream);
+  if (cam_info.width != width) {
+    RCLCPP_ERROR(logger_, "cam info error");
+    cam_info.height = height;
+    cam_info.width = width;
+  }
+  cam_info.header.stamp = t;
+  camera_info_publisher->publish(cam_info);
+  sensor_msgs::msg::Image::SharedPtr img;
+  img = cv_bridge::CvImage(std_msgs::msg::Header(), encoding_.at(stream), image).toImageMsg();
 
-void OBCameraNode::publishFrame(std::shared_ptr<ob::Frame> frame, const rclcpp::Time& t,
-                                const stream_index_pair& stream) {}
+  img->width = width;
+  img->height = height;
+  img->is_bigendian = false;
+  img->step = width * unit_step_size_[stream];
+  img->header.frame_id = optical_frame_id_[COLOR];
+  img->header.stamp = t;
+  image_publisher.publish(img);
+}
+
 }  // namespace orbbec_camera

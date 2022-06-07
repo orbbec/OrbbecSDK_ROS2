@@ -209,7 +209,6 @@ void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set,
   }
   if (frame_set->depthFrame() != nullptr && frame_set->colorFrame() != nullptr) {
     publishColorPointCloud(frame_set, t);
-    // publishDepthPointCloud(frame_set, t);
   }
   //  } else if (frame_set->depthFrame() != nullptr) {
   //    publishDepthPointCloud(frame_set, t);
@@ -222,6 +221,7 @@ void OBCameraNode::publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   auto frame = point_cloud_filter_.process(frame_set);
   size_t point_size = frame->dataSize() / sizeof(OBPoint);
   auto* points = (OBPoint*)frame->data();
+  CHECK_NOTNULL(points);
   sensor_msgs::PointCloud2Modifier modifier(point_cloud_msg_);
   modifier.setPointCloud2FieldsByString(1, "xyz");
   modifier.resize(point_size);
@@ -262,6 +262,7 @@ void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   auto frame = point_cloud_filter_.process(frame_set);
   size_t point_size = frame->dataSize() / sizeof(OBColorPoint);
   auto* points = (OBColorPoint*)frame->data();
+  CHECK_NOTNULL(points);
   sensor_msgs::PointCloud2Modifier modifier(point_cloud_msg_);
   modifier.setPointCloud2FieldsByString(2, "xyz", "rgb");
   modifier.resize(point_size);

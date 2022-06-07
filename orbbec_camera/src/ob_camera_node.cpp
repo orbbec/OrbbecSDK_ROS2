@@ -67,13 +67,6 @@ void OBCameraNode::setupDevices() {
       enable_[stream_index] = false;
     }
   }
-
-  auto camera_param_list = device_->getCalibrationCameraParamList();
-  for (size_t i = 0; i < camera_param_list->count(); i++) {
-    auto camera_param = camera_param_list->getCameraParam(i);
-    RCLCPP_ERROR_STREAM(logger_, "param \n" << camera_param);
-    camera_params_.emplace_back(camera_param);
-  }
 }
 
 void OBCameraNode::setupProfiles() {
@@ -188,14 +181,17 @@ void OBCameraNode::setupPublishers() {
 
 void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set,
                                      const rclcpp::Time& t) {
+#if 0
   static int cnt = 0;
   const std::string home_dir = std::getenv("HOME");
   const std::string pc_file_name = home_dir + "/pc/point_cloud.ply";
-  auto camera_param = findCameraParam();
-  CHECK(camera_param.has_value());
   if ((++cnt) % 20 == 0) {
     if (frame_set->depthFrame() != nullptr && frame_set->colorFrame() != nullptr) {
       RCLCPP_INFO_STREAM(logger_, "has rgb pc");
+      auto depth_frame = frame_set->depthFrame();
+      auto color_frame = frame_set->colorFrame();
+      auto camera_param = findCameraParam(color_frame->width(), color_frame->height(),
+                                          depth_frame->width(), depth_frame->height());
       point_cloud_filter_.setCameraParam(*camera_param);
       point_cloud_filter_.setCreatePointFormat(OB_FORMAT_RGB_POINT);
       auto frame = point_cloud_filter_.process(frame_set);
@@ -207,12 +203,13 @@ void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set,
       savePointsToPly(frame, pc_file_name);
     }
   }
+#endif
   if (frame_set->depthFrame() != nullptr && frame_set->colorFrame() != nullptr) {
+    auto start = rclcpp::Clock().now();
     publishColorPointCloud(frame_set, t);
+    auto end = rclcpp::Clock().now();
+    RCLCPP_INFO_STREAM(logger_, "process point cloud cost " << (end - start).seconds());
   }
-  //  } else if (frame_set->depthFrame() != nullptr) {
-  //    publishDepthPointCloud(frame_set, t);
-  //  }
 }
 
 void OBCameraNode::publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_set,
@@ -258,6 +255,11 @@ void OBCameraNode::publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_se
 
 void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_set,
                                           const rclcpp::Time& t) {
+  auto depth_frame = frame_set->depthFrame();
+  auto color_frame = frame_set->colorFrame();
+  auto camera_param = findCameraParam(color_frame->width(), color_frame->height(),
+                                      depth_frame->width(), depth_frame->height());
+  point_cloud_filter_.setCameraParam(*camera_param);
   point_cloud_filter_.setCreatePointFormat(OB_FORMAT_RGB_POINT);
   auto frame = point_cloud_filter_.process(frame_set);
   size_t point_size = frame->dataSize() / sizeof(OBColorPoint);
@@ -266,8 +268,8 @@ void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   sensor_msgs::PointCloud2Modifier modifier(point_cloud_msg_);
   modifier.setPointCloud2FieldsByString(2, "xyz", "rgb");
   modifier.resize(point_size);
-  point_cloud_msg_.width = width_[DEPTH];
-  point_cloud_msg_.height = height_[DEPTH];
+  point_cloud_msg_.width = color_frame->width();
+  point_cloud_msg_.height = color_frame->height();
   std::string format_str = "rgb";
 
   point_cloud_msg_.point_step =
@@ -306,24 +308,38 @@ void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   point_cloud_publisher_->publish(point_cloud_msg_);
 }
 void OBCameraNode::frameSetCallback(std::shared_ptr<ob::FrameSet> frame_set) {
+  auto start = rclcpp::Clock().now();
   auto nano_sec = static_cast<uint64_t>(frame_set->timeStampUs() * 1e3);
   rclcpp::Time t = rclcpp::Time(0, nano_sec);
   auto color_frame = frame_set->colorFrame();
   auto depth_frame = frame_set->depthFrame();
   auto ir_frame = frame_set->irFrame();
   if (color_frame && enable_[COLOR]) {
+    auto color_start = rclcpp::Clock().now();
     publishColorFrame(color_frame, t);
+    RCLCPP_INFO_STREAM(
+        logger_, "publishColorFrame cost " << (rclcpp::Clock().now() - color_start).seconds());
   }
   if (depth_frame && enable_[DEPTH]) {
+    auto depth_start = rclcpp::Clock().now();
     publishDepthFrame(depth_frame, t);
+    RCLCPP_INFO_STREAM(
+        logger_, "publishDepthFrame cost " << (rclcpp::Clock().now() - depth_start).seconds());
   }
   if (ir_frame && enable_[IR0]) {
+    auto ir_start = rclcpp::Clock().now();
     publishIRFrame(ir_frame, t);
+    RCLCPP_INFO_STREAM(logger_,
+                       "publishIRFrame cost " << (rclcpp::Clock().now() - ir_start).seconds());
   }
   publishPointCloud(frame_set, t);
+  auto end = rclcpp::Clock().now();
+  RCLCPP_INFO_STREAM(logger_, "frameSetCallback cost " << (end - start).seconds());
 }
-std::optional<OBCameraParam> OBCameraNode::findCameraParam() {
-  for (auto param : camera_params_) {
+std::optional<OBCameraParam> OBCameraNode::findDefaultCameraParam() {
+  auto camera_params = device_->getCalibrationCameraParamList();
+  for (size_t i = 0; i < camera_params->count(); i++) {
+    auto param = camera_params->getCameraParam(i);
     int depth_w = param.depthIntrinsic.width;
     int depth_h = param.depthIntrinsic.height;
     int color_w = param.rgbIntrinsic.width;
@@ -335,8 +351,70 @@ std::optional<OBCameraParam> OBCameraNode::findCameraParam() {
   }
   return {};
 }
+
+std::optional<OBCameraParam> OBCameraNode::findStreamDefaultCameraParam(
+    const stream_index_pair& stream) {
+  uint32_t width = width_[stream];
+  uint32_t height = height_[stream];
+  auto camera_params = device_->getCalibrationCameraParamList();
+  for (size_t i = 0; i < camera_params->count(); i++) {
+    auto param = camera_params->getCameraParam(i);
+    OBCameraIntrinsic intrinsic;
+    if (stream.first == OB_STREAM_COLOR) {
+      intrinsic = param.rgbIntrinsic;
+    } else if (stream.first == OB_STREAM_DEPTH) {
+      intrinsic = param.depthIntrinsic;
+    } else {
+      return {};
+    }
+    if (width * intrinsic.height == height * intrinsic.width) {
+      return param;
+    }
+  }
+  return {};
+}
+
+std::optional<OBCameraParam> OBCameraNode::findStreamCameraParam(const stream_index_pair& stream,
+                                                                 uint32_t width, uint32_t height) {
+  auto camera_params = device_->getCalibrationCameraParamList();
+  for (size_t i = 0; i < camera_params->count(); i++) {
+    auto param = camera_params->getCameraParam(i);
+    OBCameraIntrinsic intrinsic;
+    if (stream.first == OB_STREAM_COLOR) {
+      intrinsic = param.rgbIntrinsic;
+    } else if (stream.first == OB_STREAM_DEPTH) {
+      intrinsic = param.depthIntrinsic;
+    } else {
+      return {};
+    }
+    if (width * intrinsic.height == height * intrinsic.width) {
+      return param;
+    }
+  }
+  return {};
+}
+
+std::optional<OBCameraParam> OBCameraNode::findCameraParam(uint32_t color_width,
+                                                           uint32_t color_height,
+                                                           uint32_t depth_width,
+                                                           uint32_t depth_height) {
+  auto camera_params = device_->getCalibrationCameraParamList();
+  for (size_t i = 0; i < camera_params->count(); i++) {
+    auto param = camera_params->getCameraParam(i);
+    int depth_w = param.depthIntrinsic.width;
+    int depth_h = param.depthIntrinsic.height;
+    int color_w = param.rgbIntrinsic.width;
+    int color_h = param.rgbIntrinsic.height;
+    if ((depth_w * depth_height == depth_h * depth_width) &&
+        (color_w * color_height == color_h * color_width)) {
+      return param;
+    }
+  }
+  return {};
+}
+
 void OBCameraNode::updateStreamCalibData() {
-  auto param = findCameraParam();
+  auto param = findDefaultCameraParam();
   CHECK(param.has_value());
   camera_infos_[DEPTH] = convertToCameraInfo(param->depthIntrinsic, param->depthDistortion);
   camera_infos_[COLOR] = convertToCameraInfo(param->rgbIntrinsic, param->rgbDistortion);
@@ -366,7 +444,7 @@ void OBCameraNode::calcAndPublishStaticTransform() {
   zero_rot.setRPY(0.0, 0.0, 0.0);
   quaternion_optical.setRPY(-M_PI / 2, 0.0, -M_PI / 2);
   std::vector<float> zero_trans = {0, 0, 0};
-  auto camera_param = findCameraParam();
+  auto camera_param = findDefaultCameraParam();
   CHECK(camera_param.has_value());
   auto ex = camera_param->transform;
   auto Q = rotationMatrixToQuaternion(ex.rot);
@@ -410,7 +488,6 @@ void OBCameraNode::publishDynamicTransforms() {
 }
 
 void OBCameraNode::publishColorFrame(std::shared_ptr<ob::ColorFrame> frame, const rclcpp::Time& t) {
-  RCLCPP_INFO_STREAM(logger_, "publish color frame");
   format_convert_filter.setFormatConvertType(FORMAT_I420_TO_RGB888);
   frame = format_convert_filter.process(frame)->as<ob::ColorFrame>();
   format_convert_filter.setFormatConvertType(FORMAT_RGB888_TO_BGR);
@@ -418,9 +495,6 @@ void OBCameraNode::publishColorFrame(std::shared_ptr<ob::ColorFrame> frame, cons
   auto width = frame->width();
   auto height = frame->height();
   auto stream = COLOR;
-  RCLCPP_INFO_STREAM(logger_, "stream " << magic_enum::enum_name(stream.first)
-                                        << " get image width " << width << ", height " << height
-                                        << ", format " << magic_enum::enum_name(frame->format()));
   auto& image = images_[stream];
   if (image.size() != cv::Size(width, height)) {
     image.create(height, width, image.type());
@@ -449,13 +523,9 @@ void OBCameraNode::publishColorFrame(std::shared_ptr<ob::ColorFrame> frame, cons
 }
 
 void OBCameraNode::publishDepthFrame(std::shared_ptr<ob::DepthFrame> frame, const rclcpp::Time& t) {
-  RCLCPP_INFO_STREAM(logger_, "publish depth frame");
   auto width = frame->width();
   auto height = frame->height();
   auto stream = DEPTH;
-  RCLCPP_INFO_STREAM(logger_, "stream " << magic_enum::enum_name(stream.first)
-                                        << " get image width " << width << ", height " << height
-                                        << ", format " << magic_enum::enum_name(frame->format()));
   auto& image = images_[stream];
   if (image.size() != cv::Size(width, height)) {
     image.create(height, width, image.type());
@@ -484,13 +554,9 @@ void OBCameraNode::publishDepthFrame(std::shared_ptr<ob::DepthFrame> frame, cons
 }
 
 void OBCameraNode::publishIRFrame(std::shared_ptr<ob::IRFrame> frame, const rclcpp::Time& t) {
-  RCLCPP_INFO_STREAM(logger_, "publish depth frame");
   auto width = frame->width();
   auto height = frame->height();
   auto stream = IR0;
-  RCLCPP_INFO_STREAM(logger_, "stream " << magic_enum::enum_name(stream.first)
-                                        << " get image width " << width << ", height " << height
-                                        << ", format " << magic_enum::enum_name(frame->format()));
   auto& image = images_[stream];
   if (image.size() != cv::Size(width, height)) {
     image.create(height, width, image.type());

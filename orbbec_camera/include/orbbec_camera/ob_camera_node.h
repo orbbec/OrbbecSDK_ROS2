@@ -120,7 +120,15 @@ class OBCameraNode {
 
   void publishStaticTransforms();
 
-  std::optional<OBCameraParam> findCameraParam();
+  std::optional<OBCameraParam> findDefaultCameraParam();
+
+  std::optional<OBCameraParam> findStreamDefaultCameraParam(const stream_index_pair& stream);
+
+  std::optional<OBCameraParam> findStreamCameraParam(const stream_index_pair& stream, uint32_t width,
+                                               uint32_t height);
+
+  std::optional<OBCameraParam> findCameraParam(uint32_t color_width, uint32_t color_height,
+                                               uint32_t depth_width, uint32_t depth_height);
 
   void getExposureCallback(const std::shared_ptr<GetInt32::Request>& request,
                            std::shared_ptr<GetInt32::Response>& response,
@@ -238,7 +246,6 @@ class OBCameraNode {
   sensor_msgs::msg::PointCloud2 point_cloud_msg_;
 
   rclcpp::Publisher<Extrinsics>::SharedPtr extrinsics_publisher_;
-  std::vector<OBCameraParam> camera_params_;
   OBD2CTransform extrinsics_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr toggle_sensors_srv_;
   orbbec_camera_msgs::msg::DeviceInfo device_info_;

@@ -1,6 +1,6 @@
 /**************************************************************************/
 /*                                                                        */
-/* Copyright (c) 2013-2021 Orbbec 3D Technology, Inc                      */
+/* Copyright (c) 2013-2022 Orbbec 3D Technology, Inc                      */
 /*                                                                        */
 /* PROPRIETARY RIGHTS of Orbbec 3D Technology are involved in the         */
 /* subject matter of this material. All manufacturing, reproduction, use, */
@@ -28,13 +28,6 @@
 /* Return version in "X.Y.Z" format */
 #define OB_ROS_VERSION_STR \
   (VAR_ARG_STRING(OB_ROS_MAJOR_VERSION.OB_ROS_MINOR_VERSION.OB_ROS_PATCH_VERSION))
-
-#define ROS_DEBUG(...) RCLCPP_DEBUG(_logger, __VA_ARGS__)
-#define ROS_INFO(...) RCLCPP_INFO(_logger, __VA_ARGS__)
-#define ROS_WARN(...) RCLCPP_WARN(_logger, __VA_ARGS__)
-#define ROS_ERROR(...) RCLCPP_ERROR(_logger, __VA_ARGS__)
-
-#
 
 namespace orbbec_camera {
 

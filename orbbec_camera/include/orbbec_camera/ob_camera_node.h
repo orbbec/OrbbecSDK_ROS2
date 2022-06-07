@@ -1,6 +1,6 @@
 /**************************************************************************/
 /*                                                                        */
-/* Copyright (c) 2013-2021 Orbbec 3D Technology, Inc                      */
+/* Copyright (c) 2013-2022 Orbbec 3D Technology, Inc                      */
 /*                                                                        */
 /* PROPRIETARY RIGHTS of Orbbec 3D Technology are involved in the         */
 /* subject matter of this material. All manufacturing, reproduction, use, */

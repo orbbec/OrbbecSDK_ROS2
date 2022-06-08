@@ -18,9 +18,10 @@
 namespace orbbec_camera {
 class Parameters {
  public:
-  Parameters(rclcpp::Node* node);
+  explicit Parameters(rclcpp::Node* node);
   ~Parameters();
-  rclcpp::ParameterValue setParam(const std::string& param_name, rclcpp::ParameterValue initial_value,
+  rclcpp::ParameterValue setParam(const std::string& param_name,
+                                  rclcpp::ParameterValue initial_value,
                                   const std::function<void(const rclcpp::Parameter&)>& func =
                                       std::function<void(const rclcpp::Parameter&)>(),
                                   const rcl_interfaces::msg::ParameterDescriptor& descriptor =

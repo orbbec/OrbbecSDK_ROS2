@@ -95,10 +95,12 @@ class OBCameraNode {
  public:
   OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> device,
                std::shared_ptr<Parameters> parameters);
+
   template <class T>
-  void setNgetNodeParameter(T& param, const std::string& param_name, const T& default_value,
-                            const rcl_interfaces::msg::ParameterDescriptor& parameter_descriptor =
-                                rcl_interfaces::msg::ParameterDescriptor()); // set and get parameter
+  void setNgetNodeParameter(
+      T& param, const std::string& param_name, const T& default_value,
+      const rcl_interfaces::msg::ParameterDescriptor& parameter_descriptor =
+          rcl_interfaces::msg::ParameterDescriptor());  // set and get parameter
 
   ~OBCameraNode();
 

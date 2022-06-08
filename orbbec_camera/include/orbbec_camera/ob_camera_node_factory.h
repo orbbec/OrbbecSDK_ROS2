@@ -30,8 +30,12 @@ class OBCameraNodeFactory : public rclcpp::Node {
 
  private:
   void init();
+
   void startDevice();
+
   void getDevice(const std::shared_ptr<ob::DeviceList>& list);
+
+  void updateDeviceInfo();
 
   void deviceConnectCallback(const std::shared_ptr<ob::DeviceList>& device_list);
 
@@ -44,12 +48,13 @@ class OBCameraNodeFactory : public rclcpp::Node {
   rclcpp::Logger logger_;
   std::unique_ptr<OBCameraNode> ob_camera_node_;
   std::shared_ptr<ob::Device> device_;
+  std::shared_ptr<ob::DeviceInfo> device_info_;
   std::atomic_bool is_alive_{false};
   std::thread query_thread_;
   std::string serial_number_;
   std::string usb_port_id_;
-  double reconnect_timeout_;
-  double wait_for_device_timeout_;
+  double reconnect_timeout_ = 0.0;
+  double wait_for_device_timeout_ = 0.0;
   std::shared_ptr<Parameters> parameters_;
 };
 }  // namespace orbbec_camera

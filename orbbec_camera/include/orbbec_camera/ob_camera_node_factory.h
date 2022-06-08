@@ -16,6 +16,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include "ob_camera_node.h"
 #include "utils.h"
+#include "dynamic_params.h"
 
 #include "libobsensor/ObSensor.hpp"
 
@@ -25,7 +26,7 @@ class OBCameraNodeFactory : public rclcpp::Node {
   explicit OBCameraNodeFactory(const rclcpp::NodeOptions& node_options = rclcpp::NodeOptions());
   OBCameraNodeFactory(const std::string& node_name, const std::string& ns,
                       const rclcpp::NodeOptions& node_options = rclcpp::NodeOptions());
-  ~OBCameraNodeFactory() override ;
+  ~OBCameraNodeFactory() override;
 
  private:
   void init();
@@ -49,6 +50,7 @@ class OBCameraNodeFactory : public rclcpp::Node {
   std::string usb_port_id_;
   double reconnect_timeout_;
   double wait_for_device_timeout_;
+  std::shared_ptr<Parameters> parameters_;
 };
 }  // namespace orbbec_camera
 

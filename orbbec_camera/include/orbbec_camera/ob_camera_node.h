@@ -44,6 +44,7 @@
 #include "orbbec_camera_msgs/srv/set_int32.hpp"
 
 #include "orbbec_camera/constants.h"
+#include "orbbec_camera/dynamic_params.h"
 
 #define STREAM_NAME(sip)                                                                       \
   (static_cast<std::ostringstream&&>(std::ostringstream()                                      \
@@ -89,9 +90,16 @@ const stream_index_pair ACCEL{OB_STREAM_ACCEL, 0};
 const std::vector<stream_index_pair> IMAGE_STREAMS = {DEPTH, IR0, COLOR};
 
 const std::vector<stream_index_pair> HID_STREAMS = {GYRO, ACCEL};
+
 class OBCameraNode {
  public:
-  OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> device);
+  OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> device,
+               std::shared_ptr<Parameters> parameters);
+  template <class T>
+  void setNgetNodeParameter(T& param, const std::string& param_name, const T& default_value,
+                            const rcl_interfaces::msg::ParameterDescriptor& parameter_descriptor =
+                                rcl_interfaces::msg::ParameterDescriptor()); // set and get parameter
+
   ~OBCameraNode();
 
   void clean();
@@ -197,6 +205,7 @@ class OBCameraNode {
  private:
   rclcpp::Node* node_;
   std::shared_ptr<ob::Device> device_;
+  std::shared_ptr<Parameters> parameters_;
   rclcpp::Logger logger_;
   std::atomic_bool is_running_{false};
   std::unique_ptr<ob::Pipeline> pipeline_;

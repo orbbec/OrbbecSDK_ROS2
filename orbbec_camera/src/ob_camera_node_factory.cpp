@@ -1,3 +1,15 @@
+/**************************************************************************/
+/*                                                                        */
+/* Copyright (c) 2013-2022 Orbbec 3D Technology, Inc                      */
+/*                                                                        */
+/* PROPRIETARY RIGHTS of Orbbec 3D Technology are involved in the         */
+/* subject matter of this material. All manufacturing, reproduction, use, */
+/* and sales rights pertaining to this subject matter are governed by the */
+/* license agreement. The recipient of this software implicitly accepts   */
+/* the terms of the license.                                              */
+/*                                                                        */
+/**************************************************************************/
+
 #include "orbbec_camera/ob_camera_node_factory.h"
 namespace orbbec_camera {
 OBCameraNodeFactory::OBCameraNodeFactory(const rclcpp::NodeOptions &node_options)
@@ -23,6 +35,7 @@ OBCameraNodeFactory::~OBCameraNodeFactory() {
 void OBCameraNodeFactory::init() {
   ctx_->setLoggerSeverity(OB_LOG_SEVERITY_NONE);
   is_alive_.store(true);
+  parameters_ = std::make_shared<Parameters>(this);
   serial_number_ = declare_parameter<std::string>("serial_number", "");
   query_thread_ = std::thread([=]() {
     std::chrono::milliseconds timespan(static_cast<int>(reconnect_timeout_ * 1e3));
@@ -85,20 +98,20 @@ void OBCameraNodeFactory::deviceDisconnectCallback(
   CHECK_NOTNULL(device_list);
   ob_camera_node_.reset(nullptr);
   device_.reset();
-//  try {
-//    for (size_t i = 0; i < device_list->deviceCount(); i++) {
-//      auto dev = device_list->getDevice(i);
-//      std::string sn1 = dev->getDeviceInfo()->serialNumber();
-//      std::string sn2 = device_->getDeviceInfo()->serialNumber();
-//      if (sn1 == sn2) {
-//        RCLCPP_ERROR(logger_, "The device with SN %s was disconnected!", sn1.c_str());
-//        ob_camera_node_.reset(nullptr);
-//        device_.reset();
-//      }
-//    }
-//  } catch (const ob::Error &e) {
-//    RCLCPP_ERROR_STREAM(logger_, e.getMessage());
-//  }
+  //  try {
+  //    for (size_t i = 0; i < device_list->deviceCount(); i++) {
+  //      auto dev = device_list->getDevice(i);
+  //      std::string sn1 = dev->getDeviceInfo()->serialNumber();
+  //      std::string sn2 = device_->getDeviceInfo()->serialNumber();
+  //      if (sn1 == sn2) {
+  //        RCLCPP_ERROR(logger_, "The device with SN %s was disconnected!", sn1.c_str());
+  //        ob_camera_node_.reset(nullptr);
+  //        device_.reset();
+  //      }
+  //    }
+  //  } catch (const ob::Error &e) {
+  //    RCLCPP_ERROR_STREAM(logger_, e.getMessage());
+  //  }
 }
 
 void OBCameraNodeFactory::printDeviceInfo(const std::shared_ptr<ob::DeviceInfo> &device_info) {
@@ -143,6 +156,6 @@ void OBCameraNodeFactory::startDevice() {
     ob_camera_node_.reset();
   }
   CHECK_NOTNULL(device_);
-  ob_camera_node_ = std::make_unique<OBCameraNode>(this, device_);
+  ob_camera_node_ = std::make_unique<OBCameraNode>(this, device_, parameters_);
 }
 }  // namespace orbbec_camera

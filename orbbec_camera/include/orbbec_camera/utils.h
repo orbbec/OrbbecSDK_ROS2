@@ -14,14 +14,14 @@
 #include <ostream>
 #include <glog/logging.h>
 #include <magic_enum.hpp>
-#include "libobsensor/ObSensor.hpp"
 #include <Eigen/Dense>
 #include <tf2/LinearMath/Quaternion.h>
 #include <rclcpp/rclcpp.hpp>
 
+#include "libobsensor/ObSensor.hpp"
 #include "sensor_msgs/distortion_models.hpp"
 #include "sensor_msgs/msg/camera_info.hpp"
-#include <orbbec_camera_msgs/msg/extrinsics.hpp>
+#include "orbbec_camera_msgs/msg/extrinsics.hpp"
 
 namespace orbbec_camera {
 sensor_msgs::msg::CameraInfo convertToCameraInfo(OBCameraIntrinsic intrinsic,

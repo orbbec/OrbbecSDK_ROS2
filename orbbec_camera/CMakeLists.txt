@@ -42,9 +42,11 @@ if (NOT ORBBEC_SDK_FOUND)
 endif ()
 
 add_library(${PROJECT_NAME} SHARED
-  src/device_ctrl_service.cpp
+  src/dynamic_params.cpp
   src/ob_camera_node_factory.cpp
   src/ob_camera_node.cpp
+  src/ros_param_backend.cpp
+  src/ros_service.cpp
   src/utils.cpp
   )
 

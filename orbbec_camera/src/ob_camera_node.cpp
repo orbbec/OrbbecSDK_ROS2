@@ -1,3 +1,15 @@
+/**************************************************************************/
+/*                                                                        */
+/* Copyright (c) 2013-2022 Orbbec 3D Technology, Inc                      */
+/*                                                                        */
+/* PROPRIETARY RIGHTS of Orbbec 3D Technology are involved in the         */
+/* subject matter of this material. All manufacturing, reproduction, use, */
+/* and sales rights pertaining to this subject matter are governed by the */
+/* license agreement. The recipient of this software implicitly accepts   */
+/* the terms of the license.                                              */
+/*                                                                        */
+/**************************************************************************/
+
 #include "orbbec_camera/ob_camera_node.h"
 #include <rclcpp/rclcpp.hpp>
 #include <thread>
@@ -7,8 +19,9 @@
 namespace orbbec_camera {
 using namespace std::chrono_literals;
 
-OBCameraNode::OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> device)
-    : node_(node), device_(device), logger_(node->get_logger()) {
+OBCameraNode::OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> device,
+                           std::shared_ptr<Parameters> parameters)
+    : node_(node), device_(device), parameters_(parameters), logger_(node->get_logger()) {
   static_tf_broadcaster_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(node);
   dynamic_tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(node);
   // FIXME:
@@ -36,6 +49,21 @@ OBCameraNode::OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> devic
   compression_params_.push_back(cv::IMWRITE_PNG_STRATEGY_DEFAULT);
   setupTopics();
   startPipeline();
+}
+
+template <class T>
+void OBCameraNode::setNgetNodeParameter(
+    T& param, const std::string& param_name, const T& default_value,
+    const rcl_interfaces::msg::ParameterDescriptor& parameter_descriptor) {
+  try {
+    param = parameters_
+                ->setParam(param_name, rclcpp::ParameterValue(default_value),
+                           std::function<void(const rclcpp::Parameter&)>(), parameter_descriptor)
+                .get<T>();
+  } catch (const rclcpp::ParameterTypeException& ex) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to set parameter: " << param_name << ". " << ex.what());
+    throw;
+  }
 }
 
 OBCameraNode::~OBCameraNode() { clean(); }
@@ -136,26 +164,25 @@ void OBCameraNode::startPipeline() {
 void OBCameraNode::getParameters() {
   for (auto stream_index : IMAGE_STREAMS) {
     std::string param_name = stream_name_[stream_index.first] + "_width";
-    width_[stream_index] = node_->declare_parameter<int>(param_name, IMAGE_WIDTH);
+    setNgetNodeParameter(width_[stream_index], param_name, IMAGE_WIDTH);
     param_name = stream_name_[stream_index.first] + "_height";
-    height_[stream_index] = node_->declare_parameter<int>(param_name, IMAGE_HEIGHT);
+    setNgetNodeParameter(height_[stream_index], param_name, IMAGE_HEIGHT);
     param_name = stream_name_[stream_index.first] + "_fps";
-    fps_[stream_index] = node_->declare_parameter<int>(param_name, IMAGE_FPS);
+    setNgetNodeParameter(fps_[stream_index], param_name, IMAGE_FPS);
     param_name = "enable_" + stream_name_[stream_index.first];
-    enable_[stream_index] = node_->declare_parameter<bool>(param_name, true);
+    setNgetNodeParameter(enable_[stream_index], param_name, true);
     param_name = stream_name_[stream_index.first] + "_frame_id";
     std::string default_frame_id = "camera_" + stream_name_[stream_index.first] + "_frame";
-    frame_id_[stream_index] = node_->declare_parameter<std::string>(param_name, default_frame_id);
+    setNgetNodeParameter(frame_id_[stream_index], param_name, default_frame_id);
     std::string default_optical_frame_id =
         "camera_" + stream_name_[stream_index.first] + "_optical_frame";
     param_name = stream_name_[stream_index.first] + "_optical_frame_id";
-    optical_frame_id_[stream_index] =
-        node_->declare_parameter<std::string>(param_name, default_optical_frame_id);
+    setNgetNodeParameter(optical_frame_id_[stream_index], param_name, default_optical_frame_id);
     depth_aligned_frame_id_[stream_index] = stream_name_[OB_STREAM_COLOR] + "_optical_frame";
   }
-  publish_tf_ = node_->declare_parameter<bool>("publish_tf", true);
-  align_depth_ = node_->declare_parameter<bool>("align_depth", true);
-  tf_publish_rate_ = node_->declare_parameter<double>("tf_publish_rate", 10.0);
+  setNgetNodeParameter(publish_tf_, "publish_tf", true);
+  setNgetNodeParameter(align_depth_, "align_depth", true);
+  setNgetNodeParameter(tf_publish_rate_, "tf_publish_rate", 10.0);
 }
 
 void OBCameraNode::setupTopics() {

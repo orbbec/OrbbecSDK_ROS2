@@ -21,8 +21,9 @@ OBCameraNodeFactory::~OBCameraNodeFactory() {
   }
 }
 void OBCameraNodeFactory::init() {
+  ctx_->setLoggerSeverity(OB_LOG_SEVERITY_NONE);
   is_alive_.store(true);
-  serial_number_ = declare_parameter<std::string>("serial_number", "BX4NC10000S");
+  serial_number_ = declare_parameter<std::string>("serial_number", "");
   query_thread_ = std::thread([=]() {
     std::chrono::milliseconds timespan(static_cast<int>(reconnect_timeout_ * 1e3));
     rclcpp::Time first_try_time = this->now();
@@ -61,6 +62,10 @@ void OBCameraNodeFactory::init() {
 
 void OBCameraNodeFactory::deviceConnectCallback(
     const std::shared_ptr<ob::DeviceList> &device_list) {
+  if (device_list->deviceCount() == 0) {
+    return;
+  }
+  RCLCPP_ERROR_STREAM(logger_, "deviceConnectCallback");
   CHECK_NOTNULL(device_list);
   if (!device_) {
     getDevice(device_list);
@@ -73,13 +78,38 @@ void OBCameraNodeFactory::deviceConnectCallback(
 
 void OBCameraNodeFactory::deviceDisconnectCallback(
     const std::shared_ptr<ob::DeviceList> &device_list) {
-  CHECK_NOTNULL(device_list);
-  auto dev = device_list->getDeviceBySN(serial_number_.c_str());
-  if (dev) {
-    RCLCPP_ERROR_STREAM(logger_, "The device has been disconnected!");
-    ob_camera_node_.reset(nullptr);
-    device_.reset();
+  if (device_list->deviceCount() == 0) {
+    return;
   }
+  RCLCPP_ERROR_STREAM(logger_, "deviceDisconnectCallback");
+  CHECK_NOTNULL(device_list);
+  ob_camera_node_.reset(nullptr);
+  device_.reset();
+//  try {
+//    for (size_t i = 0; i < device_list->deviceCount(); i++) {
+//      auto dev = device_list->getDevice(i);
+//      std::string sn1 = dev->getDeviceInfo()->serialNumber();
+//      std::string sn2 = device_->getDeviceInfo()->serialNumber();
+//      if (sn1 == sn2) {
+//        RCLCPP_ERROR(logger_, "The device with SN %s was disconnected!", sn1.c_str());
+//        ob_camera_node_.reset(nullptr);
+//        device_.reset();
+//      }
+//    }
+//  } catch (const ob::Error &e) {
+//    RCLCPP_ERROR_STREAM(logger_, e.getMessage());
+//  }
+}
+
+void OBCameraNodeFactory::printDeviceInfo(const std::shared_ptr<ob::DeviceInfo> &device_info) {
+  RCLCPP_INFO_STREAM(logger_, "name " << device_info->name());
+  RCLCPP_INFO_STREAM(logger_, "pid " << device_info->pid());
+  RCLCPP_INFO_STREAM(logger_, "vid " << device_info->vid());
+  RCLCPP_INFO_STREAM(logger_, "serial_name " << device_info->serialNumber());
+  RCLCPP_INFO_STREAM(logger_, "firmware version " << device_info->firmwareVersion());
+  RCLCPP_INFO_STREAM(logger_,
+                     "supported min sdk version " << device_info->supportedMinSdkVersion());
+  RCLCPP_INFO_STREAM(logger_, "hardware version " << device_info->hardwareVersion());
 }
 
 void OBCameraNodeFactory::getDevice(const std::shared_ptr<ob::DeviceList> &list) {
@@ -90,19 +120,20 @@ void OBCameraNodeFactory::getDevice(const std::shared_ptr<ob::DeviceList> &list)
     RCLCPP_WARN_STREAM(logger_, "No orbbec devices were found!");
     return;
   }
-  for (size_t i = 0; i < list->deviceCount(); i++) {
-    auto dev = list->getDevice(i);
-    if (dev != nullptr) {
-      device_ = dev;
-      RCLCPP_INFO_STREAM(logger_, "device name " << dev->getDeviceInfo()->name());
-      RCLCPP_INFO_STREAM(logger_, "device pid " << dev->getDeviceInfo()->pid());
-      RCLCPP_INFO_STREAM(logger_, "device vid " << dev->getDeviceInfo()->vid());
-      RCLCPP_INFO_STREAM(logger_, "device serial_name " << dev->getDeviceInfo()->serialNumber());
-      RCLCPP_INFO_STREAM(logger_,
-                         "device firmware version " << dev->getDeviceInfo()->firmwareVersion());
-      RCLCPP_INFO_STREAM(logger_, "device supported min sdk version "
-                                      << dev->getDeviceInfo()->supportedMinSdkVersion());
-      RCLCPP_INFO_STREAM(logger_, "device hardware version " << dev->getDeviceInfo()->hardwareVersion());
+  if (serial_number_.empty()) {
+    for (size_t i = 0; i < list->deviceCount(); i++) {
+      auto dev = list->getDevice(i);
+      if (dev != nullptr) {
+        device_ = dev;
+        printDeviceInfo(device_->getDeviceInfo());
+      }
+    }
+  } else {
+    device_ = list->getDeviceBySN(serial_number_.c_str());
+    if (device_ == nullptr) {
+      RCLCPP_ERROR_STREAM(logger_, "can not found device with SN " << serial_number_);
+    } else {
+      printDeviceInfo(device_->getDeviceInfo());
     }
   }
 }

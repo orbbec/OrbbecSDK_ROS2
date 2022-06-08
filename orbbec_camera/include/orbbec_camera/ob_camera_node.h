@@ -94,6 +94,8 @@ class OBCameraNode {
   OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> device);
   ~OBCameraNode();
 
+  void clean();
+
  private:
   void setupDevices();
 
@@ -124,8 +126,8 @@ class OBCameraNode {
 
   std::optional<OBCameraParam> findStreamDefaultCameraParam(const stream_index_pair& stream);
 
-  std::optional<OBCameraParam> findStreamCameraParam(const stream_index_pair& stream, uint32_t width,
-                                               uint32_t height);
+  std::optional<OBCameraParam> findStreamCameraParam(const stream_index_pair& stream,
+                                                     uint32_t width, uint32_t height);
 
   std::optional<OBCameraParam> findCameraParam(uint32_t color_width, uint32_t color_height,
                                                uint32_t depth_width, uint32_t depth_height);

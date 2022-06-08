@@ -36,6 +36,8 @@ class OBCameraNodeFactory : public rclcpp::Node {
 
   void deviceDisconnectCallback(const std::shared_ptr<ob::DeviceList>& device_list);
 
+  void printDeviceInfo(const std::shared_ptr<ob::DeviceInfo>& device_info);
+
  private:
   std::unique_ptr<ob::Context> ctx_;
   rclcpp::Logger logger_;

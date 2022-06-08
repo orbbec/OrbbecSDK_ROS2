@@ -38,10 +38,17 @@ OBCameraNode::OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> devic
   startPipeline();
 }
 
-OBCameraNode::~OBCameraNode() {
+OBCameraNode::~OBCameraNode() { clean(); }
+
+void OBCameraNode::clean() {
+  RCLCPP_WARN_STREAM(logger_, "Do destroy ~OBCameraNode");
+  is_running_.store(false);
   if (tf_thread_->joinable()) {
     tf_thread_->join();
   }
+  RCLCPP_WARN_STREAM(logger_, "stop pipeline");
+  pipeline_->stop();
+  RCLCPP_WARN_STREAM(logger_, "Destroy ~OBCameraNode DONE");
 }
 
 void OBCameraNode::setupDevices() {
@@ -181,6 +188,7 @@ void OBCameraNode::setupPublishers() {
 
 void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
 #if 0
+  // NOTE: This block code only for debug, it will be crazy slowly
   static int cnt = 0;
   const std::string home_dir = std::getenv("HOME");
   const std::string pc_file_name = home_dir + "/pc/point_cloud.ply";
@@ -195,11 +203,6 @@ void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
       point_cloud_filter_.setCreatePointFormat(OB_FORMAT_RGB_POINT);
       auto frame = point_cloud_filter_.process(frame_set);
       saveRGBPointsToPly(frame, pc_file_name);
-    } else if (frame_set->depthFrame() != nullptr) {
-      RCLCPP_INFO_STREAM(logger_, "has depth pc");
-      point_cloud_filter_.setCreatePointFormat(OB_FORMAT_POINT);
-      auto frame = point_cloud_filter_.process(frame_set);
-      savePointsToPly(frame, pc_file_name);
     }
   }
 #endif
@@ -207,7 +210,6 @@ void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
     auto start = rclcpp::Clock().now();
     publishColorPointCloud(frame_set);
     auto end = rclcpp::Clock().now();
-    RCLCPP_INFO_STREAM(logger_, "process point cloud cost " << (end - start).seconds());
   }
 }
 
@@ -307,32 +309,19 @@ void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   point_cloud_publisher_->publish(point_cloud_msg_);
 }
 void OBCameraNode::frameSetCallback(std::shared_ptr<ob::FrameSet> frame_set) {
-  auto start = rclcpp::Clock().now();
-  rclcpp::Time t = rclcpp::Clock().now();
   auto color_frame = frame_set->colorFrame();
   auto depth_frame = frame_set->depthFrame();
   auto ir_frame = frame_set->irFrame();
   if (color_frame && enable_[COLOR]) {
-    auto color_start = rclcpp::Clock().now();
     publishColorFrame(color_frame);
-    RCLCPP_INFO_STREAM(
-        logger_, "publishColorFrame cost " << (rclcpp::Clock().now() - color_start).seconds());
   }
   if (depth_frame && enable_[DEPTH]) {
-    auto depth_start = rclcpp::Clock().now();
     publishDepthFrame(depth_frame);
-    RCLCPP_INFO_STREAM(
-        logger_, "publishDepthFrame cost " << (rclcpp::Clock().now() - depth_start).seconds());
   }
   if (ir_frame && enable_[IR0]) {
-    auto ir_start = rclcpp::Clock().now();
     publishIRFrame(ir_frame);
-    RCLCPP_INFO_STREAM(logger_,
-                       "publishIRFrame cost " << (rclcpp::Clock().now() - ir_start).seconds());
   }
   publishPointCloud(frame_set);
-  auto end = rclcpp::Clock().now();
-  RCLCPP_INFO_STREAM(logger_, "frameSetCallback cost " << (end - start).seconds());
 }
 std::optional<OBCameraParam> OBCameraNode::findDefaultCameraParam() {
   auto camera_params = device_->getCalibrationCameraParamList();

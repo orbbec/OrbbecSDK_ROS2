@@ -178,19 +178,19 @@ class OBCameraNode {
                              const std::shared_ptr<GetDeviceInfo::Request>& request,
                              std::shared_ptr<GetDeviceInfo::Response>& response);
 
-  void publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set, const rclcpp::Time& t);
+  void publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set);
 
   void publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_set, const rclcpp::Time& t);
 
-  void publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_set, const rclcpp::Time& t);
+  void publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_set);
 
   void frameSetCallback(std::shared_ptr<ob::FrameSet> frame_set);
 
-  void publishColorFrame(std::shared_ptr<ob::ColorFrame> frame, const rclcpp::Time& t);
+  void publishColorFrame(std::shared_ptr<ob::ColorFrame> frame);
 
-  void publishDepthFrame(std::shared_ptr<ob::DepthFrame> frame, const rclcpp::Time& t);
+  void publishDepthFrame(std::shared_ptr<ob::DepthFrame> frame);
 
-  void publishIRFrame(std::shared_ptr<ob::IRFrame> frame, const rclcpp::Time& t);
+  void publishIRFrame(std::shared_ptr<ob::IRFrame> frame);
 
  private:
   rclcpp::Node* node_;

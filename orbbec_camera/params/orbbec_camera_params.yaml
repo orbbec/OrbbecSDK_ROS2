@@ -1,4 +1,4 @@
-orbbec_camera_node:
+/**:
   ros__parameters:
     color_width: 640
     color_height: 480

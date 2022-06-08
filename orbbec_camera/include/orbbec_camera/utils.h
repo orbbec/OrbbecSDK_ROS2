@@ -17,6 +17,7 @@
 #include "libobsensor/ObSensor.hpp"
 #include <Eigen/Dense>
 #include <tf2/LinearMath/Quaternion.h>
+#include <rclcpp/rclcpp.hpp>
 
 #include "sensor_msgs/distortion_models.hpp"
 #include "sensor_msgs/msg/camera_info.hpp"
@@ -34,9 +35,9 @@ tf2::Quaternion rotationMatrixToQuaternion(const float rotation[9]);
 
 std::ostream& operator<<(std::ostream& os, const OBCameraParam& rhs);
 
-std::string strToLowercase(const std::string &str);
-
 orbbec_camera_msgs::msg::Extrinsics obExtrinsicsToMsg(const OBD2CTransform& extrinsics,
                                                       const std::string& frame_id);
+
+rclcpp::Time frameTimeStampToROSTime(uint64_t ms);
 
 }  // namespace orbbec_camera

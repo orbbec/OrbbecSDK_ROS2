@@ -179,8 +179,7 @@ void OBCameraNode::setupPublishers() {
       "extrinsic", rclcpp::QoS{1}.transient_local());
 }
 
-void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set,
-                                     const rclcpp::Time& t) {
+void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
 #if 0
   static int cnt = 0;
   const std::string home_dir = std::getenv("HOME");
@@ -206,7 +205,7 @@ void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set,
 #endif
   if (frame_set->depthFrame() != nullptr && frame_set->colorFrame() != nullptr) {
     auto start = rclcpp::Clock().now();
-    publishColorPointCloud(frame_set, t);
+    publishColorPointCloud(frame_set);
     auto end = rclcpp::Clock().now();
     RCLCPP_INFO_STREAM(logger_, "process point cloud cost " << (end - start).seconds());
   }
@@ -253,8 +252,7 @@ void OBCameraNode::publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   point_cloud_publisher_->publish(point_cloud_msg_);
 }
 
-void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_set,
-                                          const rclcpp::Time& t) {
+void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
   auto depth_frame = frame_set->depthFrame();
   auto color_frame = frame_set->colorFrame();
   auto camera_param = findCameraParam(color_frame->width(), color_frame->height(),
@@ -303,36 +301,36 @@ void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_se
       ++valid_count;
     }
   }
-  point_cloud_msg_.header.stamp = t;
+  auto timestamp = frameTimeStampToROSTime(depth_frame->systemTimeStamp());
+  point_cloud_msg_.header.stamp = timestamp;
   point_cloud_msg_.header.frame_id = optical_frame_id_[COLOR];
   point_cloud_publisher_->publish(point_cloud_msg_);
 }
 void OBCameraNode::frameSetCallback(std::shared_ptr<ob::FrameSet> frame_set) {
   auto start = rclcpp::Clock().now();
-  auto nano_sec = static_cast<uint64_t>(frame_set->timeStampUs() * 1e3);
-  rclcpp::Time t = rclcpp::Time(0, nano_sec);
+  rclcpp::Time t = rclcpp::Clock().now();
   auto color_frame = frame_set->colorFrame();
   auto depth_frame = frame_set->depthFrame();
   auto ir_frame = frame_set->irFrame();
   if (color_frame && enable_[COLOR]) {
     auto color_start = rclcpp::Clock().now();
-    publishColorFrame(color_frame, t);
+    publishColorFrame(color_frame);
     RCLCPP_INFO_STREAM(
         logger_, "publishColorFrame cost " << (rclcpp::Clock().now() - color_start).seconds());
   }
   if (depth_frame && enable_[DEPTH]) {
     auto depth_start = rclcpp::Clock().now();
-    publishDepthFrame(depth_frame, t);
+    publishDepthFrame(depth_frame);
     RCLCPP_INFO_STREAM(
         logger_, "publishDepthFrame cost " << (rclcpp::Clock().now() - depth_start).seconds());
   }
   if (ir_frame && enable_[IR0]) {
     auto ir_start = rclcpp::Clock().now();
-    publishIRFrame(ir_frame, t);
+    publishIRFrame(ir_frame);
     RCLCPP_INFO_STREAM(logger_,
                        "publishIRFrame cost " << (rclcpp::Clock().now() - ir_start).seconds());
   }
-  publishPointCloud(frame_set, t);
+  publishPointCloud(frame_set);
   auto end = rclcpp::Clock().now();
   RCLCPP_INFO_STREAM(logger_, "frameSetCallback cost " << (end - start).seconds());
 }
@@ -487,7 +485,7 @@ void OBCameraNode::publishDynamicTransforms() {
   }
 }
 
-void OBCameraNode::publishColorFrame(std::shared_ptr<ob::ColorFrame> frame, const rclcpp::Time& t) {
+void OBCameraNode::publishColorFrame(std::shared_ptr<ob::ColorFrame> frame) {
   format_convert_filter.setFormatConvertType(FORMAT_I420_TO_RGB888);
   frame = format_convert_filter.process(frame)->as<ob::ColorFrame>();
   format_convert_filter.setFormatConvertType(FORMAT_RGB888_TO_BGR);
@@ -508,7 +506,8 @@ void OBCameraNode::publishColorFrame(std::shared_ptr<ob::ColorFrame> frame, cons
     cam_info.height = height;
     cam_info.width = width;
   }
-  cam_info.header.stamp = t;
+  auto timestamp = frameTimeStampToROSTime(frame->systemTimeStamp());
+  cam_info.header.stamp = timestamp;
   camera_info_publisher->publish(cam_info);
   sensor_msgs::msg::Image::SharedPtr img;
   img = cv_bridge::CvImage(std_msgs::msg::Header(), encoding_.at(stream), image).toImageMsg();
@@ -518,11 +517,11 @@ void OBCameraNode::publishColorFrame(std::shared_ptr<ob::ColorFrame> frame, cons
   img->is_bigendian = false;
   img->step = width * unit_step_size_[stream];
   img->header.frame_id = optical_frame_id_[COLOR];
-  img->header.stamp = t;
+  img->header.stamp = timestamp;
   image_publisher.publish(img);
 }
 
-void OBCameraNode::publishDepthFrame(std::shared_ptr<ob::DepthFrame> frame, const rclcpp::Time& t) {
+void OBCameraNode::publishDepthFrame(std::shared_ptr<ob::DepthFrame> frame) {
   auto width = frame->width();
   auto height = frame->height();
   auto stream = DEPTH;
@@ -539,7 +538,8 @@ void OBCameraNode::publishDepthFrame(std::shared_ptr<ob::DepthFrame> frame, cons
     cam_info.height = height;
     cam_info.width = width;
   }
-  cam_info.header.stamp = t;
+  auto timestamp = frameTimeStampToROSTime(frame->systemTimeStamp());
+  cam_info.header.stamp = timestamp;
   camera_info_publisher->publish(cam_info);
   sensor_msgs::msg::Image::SharedPtr img;
   img = cv_bridge::CvImage(std_msgs::msg::Header(), encoding_.at(stream), image).toImageMsg();
@@ -549,11 +549,11 @@ void OBCameraNode::publishDepthFrame(std::shared_ptr<ob::DepthFrame> frame, cons
   img->is_bigendian = false;
   img->step = width * unit_step_size_[stream];
   img->header.frame_id = optical_frame_id_[COLOR];
-  img->header.stamp = t;
+  img->header.stamp = timestamp;
   image_publisher.publish(img);
 }
 
-void OBCameraNode::publishIRFrame(std::shared_ptr<ob::IRFrame> frame, const rclcpp::Time& t) {
+void OBCameraNode::publishIRFrame(std::shared_ptr<ob::IRFrame> frame) {
   auto width = frame->width();
   auto height = frame->height();
   auto stream = IR0;
@@ -570,7 +570,8 @@ void OBCameraNode::publishIRFrame(std::shared_ptr<ob::IRFrame> frame, const rclc
     cam_info.height = height;
     cam_info.width = width;
   }
-  cam_info.header.stamp = t;
+  auto timestamp = frameTimeStampToROSTime(frame->systemTimeStamp());
+  cam_info.header.stamp = timestamp;
   camera_info_publisher->publish(cam_info);
   sensor_msgs::msg::Image::SharedPtr img;
   img = cv_bridge::CvImage(std_msgs::msg::Header(), encoding_.at(stream), image).toImageMsg();
@@ -580,7 +581,7 @@ void OBCameraNode::publishIRFrame(std::shared_ptr<ob::IRFrame> frame, const rclc
   img->is_bigendian = false;
   img->step = width * unit_step_size_[stream];
   img->header.frame_id = optical_frame_id_[COLOR];
-  img->header.stamp = t;
+  img->header.stamp = timestamp;
   image_publisher.publish(img);
 }
 

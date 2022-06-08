@@ -109,13 +109,6 @@ std::ostream &operator<<(std::ostream &os, const OBCameraParam &rhs) {
   os << "height : " << rgb_intrinsic.height << "\n";
   return os;
 }
-std::string strToLowercase(const std::string &str) {
-  std::string ret;
-  for (char ch : str) {
-    ret += tolower(ch);
-  }
-  return ret;
-}
 
 orbbec_camera_msgs::msg::Extrinsics obExtrinsicsToMsg(const OBD2CTransform &extrinsics,
                                                       const std::string &frame_id) {
@@ -129,5 +122,13 @@ orbbec_camera_msgs::msg::Extrinsics obExtrinsicsToMsg(const OBD2CTransform &extr
 
   msg.header.frame_id = frame_id;
   return msg;
+}
+
+rclcpp::Time frameTimeStampToROSTime(uint64_t ms) {
+  auto total = static_cast<uint64_t>(ms * 1e6);
+  uint64_t sec = total / 1000000000;
+  uint64_t  nano_sec = total % 1000000000;
+  rclcpp::Time stamp(sec, nano_sec);
+  return stamp;
 }
 }  // namespace orbbec_camera

@@ -37,7 +37,7 @@ OBCameraNode::OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> devic
   stream_name_[OB_STREAM_IR] = "ir";
   unit_step_size_[INFRA0] = sizeof(uint8_t);
 
-  format_[COLOR] = OB_FORMAT_I420;
+  format_[COLOR] = OB_FORMAT_YUYV;
   image_format_[OB_STREAM_COLOR] = CV_8UC3;
   encoding_[COLOR] = sensor_msgs::image_encodings::BGR8;
   stream_name_[OB_STREAM_COLOR] = "color";
@@ -222,11 +222,22 @@ void OBCameraNode::setupPublishers() {
 }
 
 void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
-  if (publish_rgb_point_cloud_ && frame_set->depthFrame() != nullptr &&
-      frame_set->colorFrame() != nullptr) {
-    publishColorPointCloud(frame_set);
-  } else if (frame_set->depthFrame() != nullptr) {
-    publishDepthPointCloud(frame_set);
+  if (point_cloud_publisher_->get_subscription_count() == 0) {
+    return;
+  }
+  try {
+    if (publish_rgb_point_cloud_ && frame_set->depthFrame() != nullptr &&
+        frame_set->colorFrame() != nullptr) {
+      publishColorPointCloud(frame_set);
+    } else if (frame_set->depthFrame() != nullptr) {
+      publishDepthPointCloud(frame_set);
+    }
+  } catch (const ob::Error& e) {
+    RCLCPP_ERROR_STREAM(logger_, e.getMessage());
+  } catch (const std::exception& e) {
+    RCLCPP_ERROR_STREAM(logger_, e.what());
+  } catch (...) {
+    RCLCPP_ERROR_STREAM(logger_, "publishPointCloud with unknown error");
   }
 }
 

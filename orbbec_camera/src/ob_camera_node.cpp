@@ -122,16 +122,18 @@ void OBCameraNode::setupProfiles() {
 
       auto selected_profile =
           profiles->getVideoStreamProfile(width_[elem], height_[elem], format_[elem], fps_[elem]);
-      auto default_profile = profiles->getVideoStreamProfile();
+      auto default_profile =
+          profiles->getVideoStreamProfile(width_[elem], height_[elem], format_[elem]);
       if (!selected_profile) {
         RCLCPP_WARN_STREAM(logger_, "Given stream configuration is not supported by the device! "
                                         << " Stream: " << magic_enum::enum_name(elem.first)
                                         << ", Stream Index: " << elem.second
                                         << ", Width: " << width_[elem]
                                         << ", Height: " << height_[elem] << ", FPS: " << fps_[elem]
-                                        << ", Format: " << format_[elem]);
+                                        << ", Format: " << magic_enum::enum_name(format_[elem]));
         if (default_profile) {
           RCLCPP_WARN_STREAM(logger_, "Using default profile instead.");
+          RCLCPP_WARN_STREAM(logger_, "default FPS " << default_profile->fps());
           selected_profile = default_profile;
         } else {
           RCLCPP_ERROR_STREAM(
@@ -226,9 +228,10 @@ void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
     return;
   }
   try {
-    if (publish_rgb_point_cloud_ && frame_set->depthFrame() != nullptr &&
-        frame_set->colorFrame() != nullptr) {
-      publishColorPointCloud(frame_set);
+    if(publish_rgb_point_cloud_) {
+      if (frame_set->depthFrame() != nullptr && frame_set->colorFrame() != nullptr) {
+        publishColorPointCloud(frame_set);
+      }
     } else if (frame_set->depthFrame() != nullptr) {
       publishDepthPointCloud(frame_set);
     }

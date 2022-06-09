@@ -14,12 +14,12 @@
     enable_ir: false
     depth_width: 640
     depth_height: 480
-    depth_fps: 30
+    depth_fps: 25
     depth_frame_id: "depth_frame"
     depth_optical_frame_id: "depth_optical_frame"
     enable_depth: true
     publish_tf: true
     align_depth: true
     tf_publish_rate: 10.0
-    publish_rgb_point_cloud : false
+    publish_rgb_point_cloud : true
     d2c_mode : "hw"

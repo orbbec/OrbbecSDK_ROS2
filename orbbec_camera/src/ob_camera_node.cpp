@@ -218,7 +218,7 @@ void OBCameraNode::setupPublishers() {
         node_->create_publisher<CameraInfo>(topic, rclcpp::QoS{1}.best_effort());
   }
   extrinsics_publisher_ = node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
-      "extrinsic", rclcpp::QoS{1}.transient_local());
+      "extrinsic/depth_to_color", rclcpp::QoS{1}.transient_local());
 }
 
 void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
@@ -460,7 +460,7 @@ void OBCameraNode::calcAndPublishStaticTransform() {
   publishStaticTF(tf_timestamp, zero_trans, quaternion_optical, frame_id_[DEPTH],
                   optical_frame_id_[DEPTH]);
   publishStaticTF(tf_timestamp, zero_trans, zero_rot, "camera_link", frame_id_[DEPTH]);
-  extrinsics_publisher_->publish(obExtrinsicsToMsg(ex, frame_id_[COLOR]));
+  extrinsics_publisher_->publish(obExtrinsicsToMsg(ex, "depth_to_color_extrinsics"));
 }
 
 void OBCameraNode::publishStaticTransforms() {

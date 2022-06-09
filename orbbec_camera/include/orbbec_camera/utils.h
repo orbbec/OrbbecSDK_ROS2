@@ -40,4 +40,6 @@ orbbec_camera_msgs::msg::Extrinsics obExtrinsicsToMsg(const OBD2CTransform& extr
 
 rclcpp::Time frameTimeStampToROSTime(uint64_t ms);
 
+std::string getObSDKVersion();
+
 }  // namespace orbbec_camera

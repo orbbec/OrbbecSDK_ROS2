@@ -139,8 +139,16 @@ orbbec_camera_msgs::msg::Extrinsics obExtrinsicsToMsg(const OBD2CTransform &extr
 rclcpp::Time frameTimeStampToROSTime(uint64_t ms) {
   auto total = static_cast<uint64_t>(ms * 1e6);
   uint64_t sec = total / 1000000000;
-  uint64_t  nano_sec = total % 1000000000;
+  uint64_t nano_sec = total % 1000000000;
   rclcpp::Time stamp(sec, nano_sec);
   return stamp;
 }
+std::string getObSDKVersion() {
+  int major = ob::Version::getMajor();
+  int minor = ob::Version::getMinor();
+  int patch = ob::Version::getPatch();
+  std::string version = std::to_string(major) + std::to_string(minor) + std::to_string(patch);
+  return version;
+}
+
 }  // namespace orbbec_camera

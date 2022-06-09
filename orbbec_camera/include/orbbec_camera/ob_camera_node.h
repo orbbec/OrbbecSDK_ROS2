@@ -41,6 +41,7 @@
 #include "orbbec_camera_msgs/msg/extrinsics.hpp"
 #include "orbbec_camera_msgs/msg/metadata.hpp"
 #include "orbbec_camera_msgs/srv/get_int32.hpp"
+#include "orbbec_camera_msgs/srv/get_string.hpp"
 #include "orbbec_camera_msgs/srv/set_int32.hpp"
 
 #include "orbbec_camera/constants.h"
@@ -75,6 +76,7 @@ using GetDeviceInfo = orbbec_camera_msgs::srv::GetDeviceInfo;
 using Extrinsics = orbbec_camera_msgs::msg::Extrinsics;
 using SetInt32 = orbbec_camera_msgs::srv::SetInt32;
 using GetInt32 = orbbec_camera_msgs::srv::GetInt32;
+using GetString = orbbec_camera_msgs::srv::GetString;
 
 typedef std::pair<ob_stream_type, int> stream_index_pair;
 
@@ -190,6 +192,10 @@ class OBCameraNode {
                              const std::shared_ptr<GetDeviceInfo::Request>& request,
                              std::shared_ptr<GetDeviceInfo::Response>& response);
 
+  void getApiVersion(const std::shared_ptr<rmw_request_id_t>& request_header,
+                     const std::shared_ptr<GetString::Request>& request,
+                     std::shared_ptr<GetString::Response>& response);
+
   void publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set);
 
   void publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_set);
@@ -253,6 +259,7 @@ class OBCameraNode {
   std::map<stream_index_pair, rclcpp::Service<SetInt32>::SharedPtr> set_gain_srv_;
   rclcpp::Service<GetInt32>::SharedPtr get_white_balance_srv_;  // only rgb
   rclcpp::Service<SetInt32>::SharedPtr set_white_balance_srv_;
+  rclcpp::Service<GetString>::SharedPtr get_api_version_srv_;
   std::map<stream_index_pair, rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr>
       set_auto_exposure_srv_;  // only rgb color
 

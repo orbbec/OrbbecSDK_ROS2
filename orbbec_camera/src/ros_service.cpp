@@ -12,6 +12,7 @@
 
 #include "orbbec_camera/ob_camera_node.h"
 #include <rclcpp/rclcpp.hpp>
+#include <nlohmann/json.hpp>
 #include <thread>
 
 #include "orbbec_camera/utils.h"
@@ -110,6 +111,12 @@ void OBCameraNode::setupCameraCtrlServices() {
                                 const std::shared_ptr<GetDeviceInfo::Request> request,
                                 std::shared_ptr<GetDeviceInfo::Response> response) {
         getDeviceInfoCallback(request_header, request, response);
+      });
+  get_api_version_srv_ = node_->create_service<GetString>(
+      "get_api_version", [this](const std::shared_ptr<rmw_request_id_t> request_header,
+                                const std::shared_ptr<GetString::Request> request,
+                                std::shared_ptr<GetString::Response> response) {
+        getApiVersion(request_header, request, response);
       });
 }
 
@@ -393,6 +400,29 @@ void OBCameraNode::getDeviceInfoCallback(const std::shared_ptr<rmw_request_id_t>
     response->info.serial_number = device_info->serialNumber();
     response->info.firmware_version = device_info->firmwareVersion();
     response->info.supported_min_sdk_version = device_info->supportedMinSdkVersion();
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->success = false;
+    response->message = e.getMessage();
+  } catch (const std::exception& e) {
+    response->success = false;
+    response->message = e.what();
+  } catch (...) {
+    response->success = false;
+    response->message = "unknown error";
+  }
+}
+void OBCameraNode::getApiVersion(const std::shared_ptr<rmw_request_id_t>& request_header,
+                                 const std::shared_ptr<GetString::Request>& request,
+                                 std::shared_ptr<GetString::Response>& response) {
+  try {
+    auto device_info = device_->getDeviceInfo();
+    nlohmann::json data;
+    data["firmware_version"] = device_info->firmwareVersion();
+    data["supported_min_sdk_version"] = device_info->supportedMinSdkVersion();
+    data["ros_sdk_version"] = OB_ROS_VERSION_STR;
+    data["ob_sdk_version"] = getObSDKVersion();
+    response->data = data.dump(2);
     response->success = true;
   } catch (const ob::Error& e) {
     response->success = false;

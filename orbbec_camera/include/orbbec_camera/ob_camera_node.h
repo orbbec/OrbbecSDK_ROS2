@@ -82,14 +82,14 @@ typedef std::pair<ob_stream_type, int> stream_index_pair;
 
 const stream_index_pair COLOR{OB_STREAM_COLOR, 0};
 const stream_index_pair DEPTH{OB_STREAM_DEPTH, 0};
-const stream_index_pair IR0{OB_STREAM_IR, 0};
-const stream_index_pair IR1{OB_STREAM_IR, 1};
-const stream_index_pair IR2{OB_STREAM_IR, 2};
+const stream_index_pair INFRA0{OB_STREAM_IR, 0};
+const stream_index_pair INFRA1{OB_STREAM_IR, 1};
+const stream_index_pair INFRA2{OB_STREAM_IR, 2};
 
 const stream_index_pair GYRO{OB_STREAM_GYRO, 0};
 const stream_index_pair ACCEL{OB_STREAM_ACCEL, 0};
 
-const std::vector<stream_index_pair> IMAGE_STREAMS = {DEPTH, IR0, COLOR};
+const std::vector<stream_index_pair> IMAGE_STREAMS = {DEPTH, INFRA0, COLOR};
 
 const std::vector<stream_index_pair> HID_STREAMS = {GYRO, ACCEL};
 

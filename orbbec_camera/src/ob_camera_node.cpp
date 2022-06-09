@@ -31,11 +31,11 @@ OBCameraNode::OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> devic
   encoding_[DEPTH] = sensor_msgs::image_encodings::TYPE_16UC1;
   stream_name_[OB_STREAM_DEPTH] = "depth";
   unit_step_size_[DEPTH] = sizeof(uint16_t);
-  format_[IR0] = OB_FORMAT_Y16;
+  format_[INFRA0] = OB_FORMAT_Y16;
   image_format_[OB_STREAM_IR] = CV_16UC1;
-  encoding_[IR0] = sensor_msgs::image_encodings::MONO16;
+  encoding_[INFRA0] = sensor_msgs::image_encodings::MONO16;
   stream_name_[OB_STREAM_IR] = "ir";
-  unit_step_size_[IR0] = sizeof(uint8_t);
+  unit_step_size_[INFRA0] = sizeof(uint8_t);
 
   format_[COLOR] = OB_FORMAT_I420;
   image_format_[OB_STREAM_COLOR] = CV_8UC3;
@@ -332,7 +332,7 @@ void OBCameraNode::frameSetCallback(std::shared_ptr<ob::FrameSet> frame_set) {
   if (depth_frame && enable_[DEPTH]) {
     publishDepthFrame(depth_frame);
   }
-  if (ir_frame && enable_[IR0]) {
+  if (ir_frame && enable_[INFRA0]) {
     publishIRFrame(ir_frame);
   }
   publishPointCloud(frame_set);
@@ -419,7 +419,7 @@ void OBCameraNode::updateStreamCalibData() {
   CHECK(param.has_value());
   camera_infos_[DEPTH] = convertToCameraInfo(param->depthIntrinsic, param->depthDistortion);
   camera_infos_[COLOR] = convertToCameraInfo(param->rgbIntrinsic, param->rgbDistortion);
-  camera_infos_[IR0] = camera_infos_[DEPTH];
+  camera_infos_[INFRA0] = camera_infos_[DEPTH];
 }
 
 void OBCameraNode::publishStaticTF(const rclcpp::Time& t, const std::vector<float>& trans,
@@ -559,7 +559,7 @@ void OBCameraNode::publishDepthFrame(std::shared_ptr<ob::DepthFrame> frame) {
 void OBCameraNode::publishIRFrame(std::shared_ptr<ob::IRFrame> frame) {
   auto width = frame->width();
   auto height = frame->height();
-  auto stream = IR0;
+  auto stream = INFRA0;
   auto& image = images_[stream];
   if (image.size() != cv::Size(width, height)) {
     image.create(height, width, image.type());

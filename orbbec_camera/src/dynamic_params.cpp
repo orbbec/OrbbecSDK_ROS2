@@ -36,9 +36,13 @@ Parameters::Parameters(rclcpp::Node *node)
       });
 }
 
-Parameters::~Parameters() {
+Parameters::~Parameters() noexcept {
   for (auto const &param : param_functions_) {
-    node_->undeclare_parameter(param.first);
+    try {
+      node_->undeclare_parameter(param.first);
+    } catch (const rclcpp::exceptions::InvalidParameterTypeException &e) {
+      RCLCPP_ERROR_STREAM(logger_, e.what());
+    }
   }
 }
 

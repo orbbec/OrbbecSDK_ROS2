@@ -21,3 +21,5 @@
     publish_tf: true
     align_depth: true
     tf_publish_rate: 10.0
+    publish_rgb_point_cloud : false
+    d2c_mode : "hw"

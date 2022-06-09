@@ -52,7 +52,7 @@ OBCameraNode::OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> devic
 }
 
 template <class T>
-void OBCameraNode::setNgetNodeParameter(
+void OBCameraNode::setAndGetNodeParameter(
     T& param, const std::string& param_name, const T& default_value,
     const rcl_interfaces::msg::ParameterDescriptor& parameter_descriptor) {
   try {
@@ -106,7 +106,6 @@ void OBCameraNode::setupDevices() {
 
 void OBCameraNode::setupProfiles() {
   config_ = std::make_shared<ob::Config>();
-  config_->setAlignMode(ALIGN_D2C_HW_MODE);
   for (const auto& elem : IMAGE_STREAMS) {
     if (enable_[elem]) {
       const auto& sensor = sensors_[elem];
@@ -155,6 +154,13 @@ void OBCameraNode::setupProfiles() {
 }
 
 void OBCameraNode::startPipeline() {
+  if (d2c_mode_ == "sw") {
+    config_->setAlignMode(ALIGN_D2C_SW_MODE);
+  } else if (d2c_mode_ == "hw") {
+    config_->setAlignMode(ALIGN_D2C_HW_MODE);
+  } else {
+    config_->setAlignMode(ALIGN_DISABLE);
+  }
   pipeline_ = std::make_unique<ob::Pipeline>(device_);
   pipeline_->start(config_, [this](std::shared_ptr<ob::FrameSet> frame_set) {
     frameSetCallback(std::move(frame_set));
@@ -164,25 +170,27 @@ void OBCameraNode::startPipeline() {
 void OBCameraNode::getParameters() {
   for (auto stream_index : IMAGE_STREAMS) {
     std::string param_name = stream_name_[stream_index.first] + "_width";
-    setNgetNodeParameter(width_[stream_index], param_name, IMAGE_WIDTH);
+    setAndGetNodeParameter(width_[stream_index], param_name, IMAGE_WIDTH);
     param_name = stream_name_[stream_index.first] + "_height";
-    setNgetNodeParameter(height_[stream_index], param_name, IMAGE_HEIGHT);
+    setAndGetNodeParameter(height_[stream_index], param_name, IMAGE_HEIGHT);
     param_name = stream_name_[stream_index.first] + "_fps";
-    setNgetNodeParameter(fps_[stream_index], param_name, IMAGE_FPS);
+    setAndGetNodeParameter(fps_[stream_index], param_name, IMAGE_FPS);
     param_name = "enable_" + stream_name_[stream_index.first];
-    setNgetNodeParameter(enable_[stream_index], param_name, true);
+    setAndGetNodeParameter(enable_[stream_index], param_name, true);
     param_name = stream_name_[stream_index.first] + "_frame_id";
     std::string default_frame_id = "camera_" + stream_name_[stream_index.first] + "_frame";
-    setNgetNodeParameter(frame_id_[stream_index], param_name, default_frame_id);
+    setAndGetNodeParameter(frame_id_[stream_index], param_name, default_frame_id);
     std::string default_optical_frame_id =
         "camera_" + stream_name_[stream_index.first] + "_optical_frame";
     param_name = stream_name_[stream_index.first] + "_optical_frame_id";
-    setNgetNodeParameter(optical_frame_id_[stream_index], param_name, default_optical_frame_id);
+    setAndGetNodeParameter(optical_frame_id_[stream_index], param_name, default_optical_frame_id);
     depth_aligned_frame_id_[stream_index] = stream_name_[OB_STREAM_COLOR] + "_optical_frame";
   }
-  setNgetNodeParameter(publish_tf_, "publish_tf", true);
-  setNgetNodeParameter(align_depth_, "align_depth", true);
-  setNgetNodeParameter(tf_publish_rate_, "tf_publish_rate", 10.0);
+  setAndGetNodeParameter(publish_tf_, "publish_tf", true);
+  setAndGetNodeParameter(align_depth_, "align_depth", true);
+  setAndGetNodeParameter(tf_publish_rate_, "tf_publish_rate", 10.0);
+  setAndGetNodeParameter(publish_rgb_point_cloud_, "publish_rgb_point_cloud", false);
+  setAndGetNodeParameter(d2c_mode_, "d2c_mode_", DEFAULT_D2C_MODE);
 }
 
 void OBCameraNode::setupTopics() {
@@ -214,35 +222,19 @@ void OBCameraNode::setupPublishers() {
 }
 
 void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
-#if 0
-  // NOTE: This block code only for debug, it will be crazy slowly
-  static int cnt = 0;
-  const std::string home_dir = std::getenv("HOME");
-  const std::string pc_file_name = home_dir + "/pc/point_cloud.ply";
-  if ((++cnt) % 20 == 0) {
-    if (frame_set->depthFrame() != nullptr && frame_set->colorFrame() != nullptr) {
-      RCLCPP_INFO_STREAM(logger_, "has rgb pc");
-      auto depth_frame = frame_set->depthFrame();
-      auto color_frame = frame_set->colorFrame();
-      auto camera_param = findCameraParam(color_frame->width(), color_frame->height(),
-                                          depth_frame->width(), depth_frame->height());
-      point_cloud_filter_.setCameraParam(*camera_param);
-      point_cloud_filter_.setCreatePointFormat(OB_FORMAT_RGB_POINT);
-      auto frame = point_cloud_filter_.process(frame_set);
-      saveRGBPointsToPly(frame, pc_file_name);
-    }
-  }
-#endif
-  if (frame_set->depthFrame() != nullptr && frame_set->colorFrame() != nullptr) {
-    auto start = rclcpp::Clock().now();
+  if (publish_rgb_point_cloud_ && frame_set->depthFrame() != nullptr &&
+      frame_set->colorFrame() != nullptr) {
     publishColorPointCloud(frame_set);
-    auto end = rclcpp::Clock().now();
+  } else if (frame_set->depthFrame() != nullptr) {
+    publishDepthPointCloud(frame_set);
   }
 }
 
-void OBCameraNode::publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_set,
-                                          const rclcpp::Time& t) {
+void OBCameraNode::publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
+  auto camera_param = pipeline_->getCameraParam();
+  point_cloud_filter_.setCameraParam(camera_param);
   point_cloud_filter_.setCreatePointFormat(OB_FORMAT_POINT);
+  auto depth_frame = frame_set->depthFrame();
   auto frame = point_cloud_filter_.process(frame_set);
   size_t point_size = frame->dataSize() / sizeof(OBPoint);
   auto* points = (OBPoint*)frame->data();
@@ -250,13 +242,8 @@ void OBCameraNode::publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   sensor_msgs::PointCloud2Modifier modifier(point_cloud_msg_);
   modifier.setPointCloud2FieldsByString(1, "xyz");
   modifier.resize(point_size);
-  point_cloud_msg_.width = width_[DEPTH];
-  point_cloud_msg_.height = height_[DEPTH];
-  std::string format_str = "intensity";
-
-  point_cloud_msg_.point_step =
-      addPointField(point_cloud_msg_, format_str.c_str(), 1, sensor_msgs::msg::PointField::FLOAT32,
-                    point_cloud_msg_.point_step);
+  point_cloud_msg_.width = depth_frame->width();
+  point_cloud_msg_.height = depth_frame->height();
   point_cloud_msg_.row_step = point_cloud_msg_.width * point_cloud_msg_.point_step;
   point_cloud_msg_.data.resize(point_cloud_msg_.height * point_cloud_msg_.row_step);
   sensor_msgs::PointCloud2Iterator<float> iter_x(point_cloud_msg_, "x");
@@ -269,15 +256,15 @@ void OBCameraNode::publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_se
       *iter_x = static_cast<float>(points->x / 1000.0);
       *iter_y = static_cast<float>(points->y / 1000.0);
       *iter_z = static_cast<float>(points->z / 1000.0);
-
       ++iter_x;
       ++iter_y;
       ++iter_z;
       ++valid_count;
     }
   }
-  point_cloud_msg_.header.stamp = t;
-  point_cloud_msg_.header.frame_id = optical_frame_id_[COLOR];
+  auto timestamp = frameTimeStampToROSTime(depth_frame->systemTimeStamp());
+  point_cloud_msg_.header.stamp = timestamp;
+  point_cloud_msg_.header.frame_id = optical_frame_id_[DEPTH];
   point_cloud_publisher_->publish(point_cloud_msg_);
 }
 

@@ -97,7 +97,7 @@ class OBCameraNode {
                std::shared_ptr<Parameters> parameters);
 
   template <class T>
-  void setNgetNodeParameter(
+  void setAndGetNodeParameter(
       T& param, const std::string& param_name, const T& default_value,
       const rcl_interfaces::msg::ParameterDescriptor& parameter_descriptor =
           rcl_interfaces::msg::ParameterDescriptor());  // set and get parameter
@@ -192,7 +192,7 @@ class OBCameraNode {
 
   void publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set);
 
-  void publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_set, const rclcpp::Time& t);
+  void publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_set);
 
   void publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_set);
 
@@ -224,6 +224,8 @@ class OBCameraNode {
   std::map<stream_index_pair, std::string> depth_aligned_frame_id_;
   std::string base_frame_id_;
   bool align_depth_;
+  bool publish_rgb_point_cloud_;
+  std::string d2c_mode_;  // sw, hw, none
   std::map<stream_index_pair, std::string> qos_;
   std::map<stream_index_pair, std::string> info_qos_;
   std::map<stream_index_pair, ob_format> format_;
@@ -263,7 +265,6 @@ class OBCameraNode {
   sensor_msgs::msg::PointCloud2 point_cloud_msg_;
 
   rclcpp::Publisher<Extrinsics>::SharedPtr extrinsics_publisher_;
-  OBD2CTransform extrinsics_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr toggle_sensors_srv_;
   orbbec_camera_msgs::msg::DeviceInfo device_info_;
   rclcpp::Service<GetDeviceInfo>::SharedPtr get_device_srv_;
@@ -272,7 +273,6 @@ class OBCameraNode {
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_floor_enable_srv_;
   rclcpp::Service<SetInt32>::SharedPtr set_fan_mode_srv_;
   std::vector<geometry_msgs::msg::TransformStamped> static_tf_msgs_;
-  std::mutex tf_lock_;
   std::shared_ptr<std::thread> tf_thread_;
   std::condition_variable tf_cv_;
   double tf_publish_rate_;

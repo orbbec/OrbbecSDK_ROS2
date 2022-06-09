@@ -43,7 +43,7 @@ const double DIAGNOSTICS_PERIOD = 0;  // Static transform
 
 const int IMAGE_WIDTH = 640;
 const int IMAGE_HEIGHT = 480;
-const double IMAGE_FPS = 30;
+const double IMAGE_FPS = 30.0;
 
 const std::string IMAGE_QOS = "SYSTEM_DEFAULT";
 const std::string DEFAULT_QOS = "DEFAULT";
@@ -88,6 +88,6 @@ const std::string DEFAULT_ALIGNED_DEPTH_TO_FISHEYE_FRAME_ID =
 const std::string DEFAULT_UNITE_IMU_METHOD = "";
 const std::string DEFAULT_FILTERS = "";
 const std::string DEFAULT_TOPIC_ODOM_IN = "";
-
+const std::string DEFAULT_D2C_MODE = "sw"; // sw = software mode, hw=hardware mode, none,
 const float ROS_DEPTH_SCALE = 0.001;
 }  // namespace orbbec_camera

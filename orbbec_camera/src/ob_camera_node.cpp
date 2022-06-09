@@ -488,11 +488,38 @@ void OBCameraNode::publishDynamicTransforms() {
   }
 }
 
+bool OBCameraNode::rbgFormatConvertRGB888(std::shared_ptr<ob::ColorFrame> frame) {
+  switch (frame->format()) {
+    case OB_FORMAT_I420:
+      format_convert_filter_.setFormatConvertType(FORMAT_I420_TO_RGB888);
+      break;
+    case OB_FORMAT_MJPG:
+      format_convert_filter_.setFormatConvertType(FORMAT_MJPEG_TO_RGB888);
+      break;
+    case OB_FORMAT_YUYV:
+      format_convert_filter_.setFormatConvertType(FORMAT_YUYV_TO_RGB888);
+      break;
+    case OB_FORMAT_NV21:
+      format_convert_filter_.setFormatConvertType(FORMAT_NV21_TO_RGB888);
+      break;
+    case OB_FORMAT_NV12:
+      format_convert_filter_.setFormatConvertType(FORMAT_NV12_TO_RGB888);
+      break;
+    default:
+      return false;
+  }
+  return true;
+}
+
 void OBCameraNode::publishColorFrame(std::shared_ptr<ob::ColorFrame> frame) {
-  format_convert_filter.setFormatConvertType(FORMAT_I420_TO_RGB888);
-  frame = format_convert_filter.process(frame)->as<ob::ColorFrame>();
-  format_convert_filter.setFormatConvertType(FORMAT_RGB888_TO_BGR);
-  frame = format_convert_filter.process(frame)->as<ob::ColorFrame>();
+  if (!rbgFormatConvertRGB888(frame)) {
+    RCLCPP_ERROR_STREAM(
+        logger_, "can not convert " << magic_enum::enum_name(frame->format()) << " to RGB888");
+    return;
+  }
+  frame = format_convert_filter_.process(frame)->as<ob::ColorFrame>();
+  format_convert_filter_.setFormatConvertType(FORMAT_RGB888_TO_BGR);
+  frame = format_convert_filter_.process(frame)->as<ob::ColorFrame>();
   auto width = frame->width();
   auto height = frame->height();
   auto stream = COLOR;

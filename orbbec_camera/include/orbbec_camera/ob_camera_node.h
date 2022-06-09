@@ -206,6 +206,8 @@ class OBCameraNode {
 
   void publishColorFrame(std::shared_ptr<ob::ColorFrame> frame);
 
+  bool rbgFormatConvertRGB888(std::shared_ptr<ob::ColorFrame> frame);
+
   void publishDepthFrame(std::shared_ptr<ob::DepthFrame> frame);
 
   void publishIRFrame(std::shared_ptr<ob::IRFrame> frame);
@@ -243,7 +245,7 @@ class OBCameraNode {
   std::map<stream_index_pair, std::string> encoding_;
   std::map<stream_index_pair, int> unit_step_size_;
   std::vector<int> compression_params_;
-  ob::FormatConvertFilter format_convert_filter;
+  ob::FormatConvertFilter format_convert_filter_;
 
   std::map<ob_frame_type, bool> is_first_frame_;
 

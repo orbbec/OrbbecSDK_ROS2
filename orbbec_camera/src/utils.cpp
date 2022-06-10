@@ -144,10 +144,10 @@ rclcpp::Time frameTimeStampToROSTime(uint64_t ms) {
   return stamp;
 }
 std::string getObSDKVersion() {
-  int major = ob::Version::getMajor();
-  int minor = ob::Version::getMinor();
-  int patch = ob::Version::getPatch();
-  std::string version = std::to_string(major) + std::to_string(minor) + std::to_string(patch);
+  std::string major = std::to_string(ob::Version::getMajor());
+  std::string minor = std::to_string(ob::Version::getMinor());
+  std::string patch = std::to_string(ob::Version::getPatch());
+  std::string version = major + "." + minor + "." + patch;
   return version;
 }
 

@@ -30,7 +30,7 @@ sudo apt-get  install ros-galactic-desktop
 sudo apt-get install python3-colcon-common-extensions
 
 ```
->>If your ROS2 command can not auto complete, please put blow 2 lines in your `.bashrc`
+>>If your ROS2 command does not auto-complete, put the following two lines into your `.bashrc`
 or `.zshrc`
 
 ```bash
@@ -100,3 +100,55 @@ ros2 topic list
 ros2 service list
 ros2 param list
 ```
+
+---
+
+## Camera control && Information service
+
+---
+
+* Show depth to color extrinsic
+
+```bash
+ros2 topic echo --qos-durability=transient_local /camera/extrinsic/depth_to_color  --qos-profile=services_default
+```
+* Get device info 
+
+```bash 
+ros2 service call /camera/get_device_info orbbec_camera_msgs/srv/GetDeviceInfo "{}"
+```
+* Get SDK version
+
+```bash
+ros2 service call /camera/get_sdk_version orbbec_camera_msgs/srv/GetString "{}"
+
+```
+
+* Get exposure
+
+```bash
+ros2 service call /camera/get_color_exposure orbbec_camera_msgs/srv/GetInt32 "{}"
+```
+> If your check `ir` or `depth`, please change ` /camera/get_color_exposure`
+to  `/camera/get_ir_exposure` or `/camera/get_depth_exposure`, Same below.
+
+* Get gain
+
+```bash
+ros2 service call /camera/get_color_gain orbbec_camera_msgs/srv/GetInt32 "{}"
+```
+* Get white balance 
+
+```bash
+ros2 service call /camera/get_white_balance orbbec_camera_msgs/srv/GetInt32 "{}"
+* ```
+* Set auto exposure 
+
+```bash
+ros2 service call /camera/set_color_auto_exposure std_srvs/srv/SetBool '{data: false}'
+```
+
+* Set white balance 
+```bash
+ros2 service call /camera/set_white_balance orbbec_camera_msgs/srv/SetInt32 '{data: 4600}'
+* ```

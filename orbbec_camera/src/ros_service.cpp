@@ -17,6 +17,7 @@
 
 #include "orbbec_camera/utils.h"
 namespace orbbec_camera {
+
 void OBCameraNode::setupCameraCtrlServices() {
   using std_srvs::srv::SetBool;
   for (auto stream_index : IMAGE_STREAMS) {
@@ -113,10 +114,10 @@ void OBCameraNode::setupCameraCtrlServices() {
         getDeviceInfoCallback(request_header, request, response);
       });
   get_api_version_srv_ = node_->create_service<GetString>(
-      "get_api_version", [this](const std::shared_ptr<rmw_request_id_t> request_header,
+      "get_sdk_version", [this](const std::shared_ptr<rmw_request_id_t> request_header,
                                 const std::shared_ptr<GetString::Request> request,
                                 std::shared_ptr<GetString::Response> response) {
-        getApiVersion(request_header, request, response);
+        getSDKVersion(request_header, request, response);
       });
 }
 
@@ -172,11 +173,15 @@ void OBCameraNode::getGainCallback(const std::shared_ptr<GetInt32::Request>& req
         RCLCPP_ERROR(logger_, " %s NOT a video stream", __FUNCTION__);
         break;
     }
+    response->success = true;
   } catch (ob::Error& e) {
+    response->success = false;
     response->message = e.getMessage();
   } catch (const std::exception& e) {
+    response->success = false;
     response->message = e.what();
   } catch (...) {
+    response->success = false;
     response->message = "unknown error";
   }
 }
@@ -218,11 +223,15 @@ void OBCameraNode::getWhiteBalanceCallback(const std::shared_ptr<rmw_request_id_
                                            std::shared_ptr<GetInt32::Response>& response) {
   try {
     response->data = device_->getIntProperty(OB_PROP_COLOR_WHITE_BALANCE_INT);
+    response->success = true;
   } catch (const ob::Error& e) {
+    response->success = false;
     response->message = e.getMessage();
   } catch (const std::exception& e) {
+    response->success = false;
     response->message = e.what();
   } catch (...) {
+    response->success = false;
     response->message = "unknown error";
   }
 }
@@ -332,12 +341,16 @@ void OBCameraNode::setLaserEnableCallback(
   bool laser_enable = request->data;
   try {
     device_->setBoolProperty(OB_PROP_LASER_BOOL, laser_enable);
+    response->success = true;
   } catch (const ob::Error& e) {
     response->message = e.getMessage();
+    response->success = false;
   } catch (const std::exception& e) {
     response->message = e.what();
+    response->success = false;
   } catch (...) {
     response->message = "unknown error";
+    response->success = false;
   }
 }
 
@@ -362,6 +375,7 @@ void OBCameraNode::setLdpEnableCallback(
     response->message = "unknown error";
   }
 }
+
 void OBCameraNode::getExposureCallback(const std::shared_ptr<GetInt32::Request>& request,
                                        std::shared_ptr<GetInt32 ::Response>& response,
                                        const stream_index_pair& stream_index) {
@@ -381,14 +395,19 @@ void OBCameraNode::getExposureCallback(const std::shared_ptr<GetInt32::Request>&
         RCLCPP_ERROR(logger_, " %s NOT a video stream", __FUNCTION__);
         break;
     }
+    response->success = true;
   } catch (const ob::Error& e) {
     response->message = e.getMessage();
+    response->success = false;
   } catch (const std::exception& e) {
     response->message = e.what();
+    response->success = false;
   } catch (...) {
     response->message = "unknown error";
+    response->success = false;
   }
 }
+
 void OBCameraNode::getDeviceInfoCallback(const std::shared_ptr<rmw_request_id_t>& request_header,
                                          const std::shared_ptr<GetDeviceInfo::Request>& request,
                                          std::shared_ptr<GetDeviceInfo::Response>& response) {
@@ -412,7 +431,8 @@ void OBCameraNode::getDeviceInfoCallback(const std::shared_ptr<rmw_request_id_t>
     response->message = "unknown error";
   }
 }
-void OBCameraNode::getApiVersion(const std::shared_ptr<rmw_request_id_t>& request_header,
+
+void OBCameraNode::getSDKVersion(const std::shared_ptr<rmw_request_id_t>& request_header,
                                  const std::shared_ptr<GetString::Request>& request,
                                  std::shared_ptr<GetString::Response>& response) {
   try {

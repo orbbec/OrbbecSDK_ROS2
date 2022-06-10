@@ -141,7 +141,8 @@ ros2 service call /camera/get_color_gain orbbec_camera_msgs/srv/GetInt32 "{}"
 
 ```bash
 ros2 service call /camera/get_white_balance orbbec_camera_msgs/srv/GetInt32 "{}"
-* ```
+```
+
 * Set auto exposure 
 
 ```bash

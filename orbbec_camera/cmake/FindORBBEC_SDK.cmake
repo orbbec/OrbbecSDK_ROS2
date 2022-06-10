@@ -4,9 +4,8 @@ message("*                 Find Orbbec SDK                 *")
 message("*                                                 *")
 message("***************************************************")
 
-set(ORBBEC_SDK_DIR "${CMAKE_CURRENT_SOURCE_DIR}/orbbec")
 
-find_path(ORBBEC_SDK_INCLUDE_DIR "libobsensor/ObSensor.hpp" "${ORBBEC_SDK_DIR}/include")
+find_path(ORBBEC_SDK_INCLUDE_DIR "libobsensor/ObSensor.hpp" "/usr/local/include" "/usr/include")
 message("include:\n${ORBBEC_SDK_INCLUDE_DIR}")
 
 execute_process(COMMAND uname -m OUTPUT_VARIABLE MACHINES)
@@ -34,7 +33,7 @@ endif ()
 
 message(STATUS "ORRBEC : ${HOST_PLATFORM}")
 
-set(ORBBEC_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/orbbec/lib/${HOST_PLATFORM}")
+set(ORBBEC_LIB_PATH "/usr/local/lib" "/usr/lib")
 
 message("Orbbec lib path: ${ORBBEC_LIB_PATH}")
 

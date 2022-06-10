@@ -152,4 +152,4 @@ ros2 service call /camera/set_color_auto_exposure std_srvs/srv/SetBool '{data: f
 * Set white balance 
 ```bash
 ros2 service call /camera/set_white_balance orbbec_camera_msgs/srv/SetInt32 '{data: 4600}'
-* ```
+```

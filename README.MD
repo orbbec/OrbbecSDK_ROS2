@@ -157,16 +157,19 @@ ros2 service call /camera/get_white_balance orbbec_camera_msgs/srv/GetInt32 '{}'
 ros2 service call /camera/set_color_auto_exposure std_srvs/srv/SetBool '{data: false}'
 ```
 
-* Set white balance 
+* Set white balance
+
 ```bash
 ros2 service call /camera/set_white_balance orbbec_camera_msgs/srv/SetInt32 '{data: 4600}'
 ```
 * Set laser enable
+
 ```bash
 ros2 service call  /camera/set_laser_enable std_srvs/srv/SetBool "{data: true}" 
 * ```
 
 * toggle sensor 
+
 ```bash
 ros2 service call  /camera/toggle_ir std_srvs/srv/SetBool "{data : true}"
 * ```

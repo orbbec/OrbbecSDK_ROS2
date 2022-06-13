@@ -3,20 +3,20 @@
     color_width: 640
     color_height: 480
     color_fps: 30
-    color_frame_id: "color_frame"
-    color_optical_frame_id: "color_optical_frame"
+    color_frame_id: "color_frame2"
+    color_optical_frame_id: "color_optical_frame2"
     enable_color: true
     ir_width: 640
     ir_height: 480
     ir_fps: 30
-    ir_frame_id: "ir_frame"
-    ir_optical_frame_id: "ir_optical_frame"
+    ir_frame_id: "ir_frame2"
+    ir_optical_frame_id: "ir_optical_frame2"
     enable_ir: false
     depth_width: 640
     depth_height: 480
     depth_fps: 25
-    depth_frame_id: "depth_frame"
-    depth_optical_frame_id: "depth_optical_frame"
+    depth_frame_id: "depth_frame2"
+    depth_optical_frame_id: "depth_optical_frame2"
     enable_depth: true
     publish_tf: true
     tf_publish_rate: 10.0
@@ -24,6 +24,6 @@
     wait_for_device_timeout: 120.0
     reconnect_timeout: 6.0
     d2c_mode: "hw"
-    serial_number: ""
+    serial_number: "BX2H611003M"
     camera_link_frame_id: "camera2_link"
     ob_log_level: "none"

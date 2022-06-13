@@ -22,47 +22,53 @@ void OBCameraNode::setupCameraCtrlServices() {
   using std_srvs::srv::SetBool;
   for (auto stream_index : IMAGE_STREAMS) {
     auto stream_name = stream_name_[stream_index.first];
-    if (enable_[stream_index]) {
-      std::string service_name = "get_" + stream_name + "_exposure";
-      get_exposure_srv_[stream_index] = node_->create_service<GetInt32>(
-          service_name,
-          [this, stream_index = stream_index](const std::shared_ptr<GetInt32::Request> request,
-                                              std::shared_ptr<GetInt32::Response> response) {
-            getExposureCallback(request, response, stream_index);
-          });
+    std::string service_name = "get_" + stream_name + "_exposure";
+    get_exposure_srv_[stream_index] = node_->create_service<GetInt32>(
+        service_name,
+        [this, stream_index = stream_index](const std::shared_ptr<GetInt32::Request> request,
+                                            std::shared_ptr<GetInt32::Response> response) {
+          getExposureCallback(request, response, stream_index);
+        });
 
-      service_name = "set_" + stream_name + "_exposure";
-      set_exposure_srv_[stream_index] = node_->create_service<SetInt32>(
-          service_name,
-          [this, stream_index = stream_index](const std::shared_ptr<SetInt32::Request> request,
-                                              std::shared_ptr<SetInt32::Response> response) {
-            setExposureCallback(request, response, stream_index);
-          });
-      service_name = "get_" + stream_name + "_gain";
-      get_gain_srv_[stream_index] = node_->create_service<GetInt32>(
-          service_name,
-          [this, stream_index = stream_index](const std::shared_ptr<GetInt32::Request> request,
-                                              std::shared_ptr<GetInt32::Response> response) {
-            getGainCallback(request, response, stream_index);
-          });
+    service_name = "set_" + stream_name + "_exposure";
+    set_exposure_srv_[stream_index] = node_->create_service<SetInt32>(
+        service_name,
+        [this, stream_index = stream_index](const std::shared_ptr<SetInt32::Request> request,
+                                            std::shared_ptr<SetInt32::Response> response) {
+          setExposureCallback(request, response, stream_index);
+        });
+    service_name = "get_" + stream_name + "_gain";
+    get_gain_srv_[stream_index] = node_->create_service<GetInt32>(
+        service_name,
+        [this, stream_index = stream_index](const std::shared_ptr<GetInt32::Request> request,
+                                            std::shared_ptr<GetInt32::Response> response) {
+          getGainCallback(request, response, stream_index);
+        });
 
-      service_name = "set_" + stream_name + "_gain";
-      set_gain_srv_[stream_index] = node_->create_service<SetInt32>(
+    service_name = "set_" + stream_name + "_gain";
+    set_gain_srv_[stream_index] = node_->create_service<SetInt32>(
+        service_name,
+        [this, stream_index = stream_index](const std::shared_ptr<SetInt32::Request> request,
+                                            std::shared_ptr<SetInt32::Response> response) {
+          setGainCallback(request, response, stream_index);
+        });
+    if (stream_index.first == OB_STREAM_COLOR || stream_index.first == OB_STREAM_DEPTH) {
+      service_name = "set_" + stream_name + "_auto_exposure";
+      set_auto_exposure_srv_[stream_index] = node_->create_service<SetBool>(
           service_name,
-          [this, stream_index = stream_index](const std::shared_ptr<SetInt32::Request> request,
-                                              std::shared_ptr<SetInt32::Response> response) {
-            setGainCallback(request, response, stream_index);
+          [this, stream_index = stream_index](const std::shared_ptr<SetBool::Request> request,
+                                              std::shared_ptr<SetBool::Response> response) {
+            setAutoExposureCallback(request, response, stream_index);
           });
-      if (stream_index.first == OB_STREAM_COLOR || stream_index.first == OB_STREAM_DEPTH) {
-        service_name = "set_" + stream_name + "_auto_exposure";
-        set_auto_exposure_srv_[stream_index] = node_->create_service<SetBool>(
-            service_name,
-            [this, stream_index = stream_index](const std::shared_ptr<SetBool::Request> request,
-                                                std::shared_ptr<SetBool::Response> response) {
-              setAutoExposureCallback(request, response, stream_index);
-            });
-      }
     }
+    service_name = "toggle_" + stream_name;
+
+    toggle_sensor_srv_[stream_index] = node_->create_service<SetBool>(
+        service_name,
+        [this, stream_index = stream_index](const std::shared_ptr<SetBool::Request> request,
+                                            std::shared_ptr<SetBool::Response> response) {
+          toggleSensorCallback(request, response, stream_index);
+        });
   }
   set_fan_mode_srv_ = node_->create_service<SetInt32>(
       "set_fan_mode", [this](const std::shared_ptr<SetInt32::Request> request,
@@ -441,6 +447,51 @@ void OBCameraNode::getSDKVersion(const std::shared_ptr<GetString::Request>& requ
   } catch (...) {
     response->success = false;
     response->message = "unknown error";
+  }
+}
+
+void OBCameraNode::toggleSensorCallback(const std::shared_ptr<SetBool::Request>& request,
+                                        std::shared_ptr<SetBool::Response>& response,
+                                        const stream_index_pair& stream_index) {
+  std::string msg;
+  if (request->data) {
+    if (enable_[stream_index]) {
+      msg = stream_name_[stream_index.first] + " Already ON";
+    }
+    RCLCPP_INFO_STREAM(logger_, "toggling sensor " << stream_name_[stream_index.first] << " ON");
+
+  } else {
+    if (!enable_[stream_index]) {
+      msg = stream_name_[stream_index.first] + " Already OFF";
+    }
+    RCLCPP_INFO_STREAM(logger_, "toggling sensor " << stream_name_[stream_index.first] << " OFF");
+  }
+  if (!msg.empty()) {
+    RCLCPP_ERROR_STREAM(logger_, msg);
+    response->success = false;
+    response->message = msg;
+    return;
+  }
+  response->success = toggleSensor(stream_index, request->data, response->message);
+}
+
+bool OBCameraNode::toggleSensor(const stream_index_pair& stream_index, bool enabled,
+                                std::string& msg) {
+  try {
+    pipeline_->stop();
+    enable_[stream_index] = enabled;
+    setupProfiles();
+    startPipeline();
+    return true;
+  } catch (const ob::Error& e) {
+    msg = e.getMessage();
+    return false;
+  } catch (const std::exception& e) {
+    msg = e.what();
+    return false;
+  } catch (...) {
+    msg = "unknown error";
+    return false;
   }
 }
 }  // namespace orbbec_camera

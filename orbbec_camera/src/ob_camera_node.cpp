@@ -105,6 +105,9 @@ void OBCameraNode::setupDevices() {
 }
 
 void OBCameraNode::setupProfiles() {
+  if (config_ != nullptr) {
+    config_.reset();
+  }
   config_ = std::make_shared<ob::Config>();
   for (const auto& elem : IMAGE_STREAMS) {
     if (enable_[elem]) {
@@ -165,6 +168,9 @@ void OBCameraNode::startPipeline() {
   } else {
     config_->setAlignMode(ALIGN_DISABLE);
     align_depth_ = false;
+  }
+  if (pipeline_ != nullptr) {
+    pipeline_.reset();
   }
   pipeline_ = std::make_unique<ob::Pipeline>(device_);
   pipeline_->start(config_, [this](std::shared_ptr<ob::FrameSet> frame_set) {

@@ -65,7 +65,7 @@ sudo ldconfig
 Install `ORBBEC_SDK`,First remove old one if you have installed, **BE CAREFUL**
 
 ```bash
-# remove old(If you have already installed
+# remove old If you have already installed
 cd /usr/local/lib/
 sudo rm libOrbbecSDK.so* # BE CAREFUL
 sudo rm libpostfilter.so

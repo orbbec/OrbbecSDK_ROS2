@@ -84,6 +84,12 @@ cd ../include
 sudo cp -frd libobsensor /usr/local/include
 sudo ldconfig
 ```
+
+Other dependencies
+
+```bash
+sudo apt install libgoogle-glog-dev libgflags-dev nlohmann-json3-dev
+```
 ---
 
 ## Getting start

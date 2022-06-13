@@ -25,55 +25,49 @@ void OBCameraNode::setupCameraCtrlServices() {
     if (enable_[stream_index]) {
       std::string service_name = "get_" + stream_name + "_exposure";
       get_exposure_srv_[stream_index] = node_->create_service<GetInt32>(
-          service_name, [this, stream_index = stream_index](
-                            const std::shared_ptr<rmw_request_id_t> request_header,
-                            const std::shared_ptr<GetInt32::Request> request,
-                            std::shared_ptr<GetInt32::Response> response) {
+          service_name,
+          [this, stream_index = stream_index](const std::shared_ptr<GetInt32::Request> request,
+                                              std::shared_ptr<GetInt32::Response> response) {
             getExposureCallback(request, response, stream_index);
           });
 
       service_name = "set_" + stream_name + "_exposure";
       set_exposure_srv_[stream_index] = node_->create_service<SetInt32>(
-          service_name, [this, stream_index = stream_index](
-                            const std::shared_ptr<rmw_request_id_t> request_header,
-                            const std::shared_ptr<SetInt32::Request> request,
-                            std::shared_ptr<SetInt32::Response> response) {
+          service_name,
+          [this, stream_index = stream_index](const std::shared_ptr<SetInt32::Request> request,
+                                              std::shared_ptr<SetInt32::Response> response) {
             setExposureCallback(request, response, stream_index);
           });
       service_name = "get_" + stream_name + "_gain";
       get_gain_srv_[stream_index] = node_->create_service<GetInt32>(
-          service_name, [this, stream_index = stream_index](
-                            const std::shared_ptr<rmw_request_id_t> request_header,
-                            const std::shared_ptr<GetInt32::Request> request,
-                            std::shared_ptr<GetInt32::Response> response) {
+          service_name,
+          [this, stream_index = stream_index](const std::shared_ptr<GetInt32::Request> request,
+                                              std::shared_ptr<GetInt32::Response> response) {
             getGainCallback(request, response, stream_index);
           });
 
       service_name = "set_" + stream_name + "_gain";
       set_gain_srv_[stream_index] = node_->create_service<SetInt32>(
-          service_name, [this, stream_index = stream_index](
-                            const std::shared_ptr<rmw_request_id_t> request_header,
-                            const std::shared_ptr<SetInt32::Request> request,
-                            std::shared_ptr<SetInt32::Response> response) {
+          service_name,
+          [this, stream_index = stream_index](const std::shared_ptr<SetInt32::Request> request,
+                                              std::shared_ptr<SetInt32::Response> response) {
             setGainCallback(request, response, stream_index);
           });
       if (stream_index.first == OB_STREAM_COLOR || stream_index.first == OB_STREAM_DEPTH) {
         service_name = "set_" + stream_name + "_auto_exposure";
         set_auto_exposure_srv_[stream_index] = node_->create_service<SetBool>(
-            service_name, [this, stream_index = stream_index](
-                              const std::shared_ptr<rmw_request_id_t> request_header,
-                              const std::shared_ptr<SetBool::Request> request,
-                              std::shared_ptr<SetBool::Response> response) {
+            service_name,
+            [this, stream_index = stream_index](const std::shared_ptr<SetBool::Request> request,
+                                                std::shared_ptr<SetBool::Response> response) {
               setAutoExposureCallback(request, response, stream_index);
             });
       }
     }
   }
   set_fan_mode_srv_ = node_->create_service<SetInt32>(
-      "set_fan_mode", [this](const std::shared_ptr<rmw_request_id_t> request_header,
-                             const std::shared_ptr<SetInt32::Request> request,
+      "set_fan_mode", [this](const std::shared_ptr<SetInt32::Request> request,
                              std::shared_ptr<SetInt32::Response> response) {
-        setFanModeCallback(request_header, request, response);
+        setFanModeCallback(request, response);
       });
   set_floor_enable_srv_ = node_->create_service<SetBool>(
       "set_floor_enable", [this](const std::shared_ptr<rmw_request_id_t> request_header,
@@ -95,30 +89,25 @@ void OBCameraNode::setupCameraCtrlServices() {
       });
 
   get_white_balance_srv_ = node_->create_service<GetInt32>(
-      "get_white_balance", [this](const std::shared_ptr<rmw_request_id_t> request_header,
-                                  const std::shared_ptr<GetInt32::Request> request,
+      "get_white_balance", [this](const std::shared_ptr<GetInt32::Request> request,
                                   std::shared_ptr<GetInt32::Response> response) {
-        getWhiteBalanceCallback(request_header, request, response);
+        getWhiteBalanceCallback(request, response);
       });
 
   set_white_balance_srv_ = node_->create_service<SetInt32>(
-      "set_white_balance", [this](const std::shared_ptr<rmw_request_id_t> request_header,
-                                  const std::shared_ptr<SetInt32::Request> request,
+      "set_white_balance", [this](const std::shared_ptr<SetInt32::Request> request,
                                   std::shared_ptr<SetInt32::Response> response) {
-        setWhiteBalanceCallback(request_header, request, response);
+        setWhiteBalanceCallback(request, response);
       });
   get_device_srv_ = node_->create_service<GetDeviceInfo>(
-      "get_device_info", [this](const std::shared_ptr<rmw_request_id_t> request_header,
-                                const std::shared_ptr<GetDeviceInfo::Request> request,
+      "get_device_info", [this](const std::shared_ptr<GetDeviceInfo::Request> request,
                                 std::shared_ptr<GetDeviceInfo::Response> response) {
-        getDeviceInfoCallback(request_header, request, response);
+        getDeviceInfoCallback(request, response);
       });
-  get_api_version_srv_ = node_->create_service<GetString>(
-      "get_sdk_version", [this](const std::shared_ptr<rmw_request_id_t> request_header,
-                                const std::shared_ptr<GetString::Request> request,
-                                std::shared_ptr<GetString::Response> response) {
-        getSDKVersion(request_header, request, response);
-      });
+  get_sdk_version_srv_ = node_->create_service<GetString>(
+      "get_sdk_version",
+      [this](const std::shared_ptr<GetString::Request> request,
+             std::shared_ptr<GetString::Response> response) { getSDKVersion(request, response); });
 }
 
 void OBCameraNode::setExposureCallback(const std::shared_ptr<SetInt32::Request>& request,
@@ -157,6 +146,7 @@ void OBCameraNode::setExposureCallback(const std::shared_ptr<SetInt32::Request>&
 void OBCameraNode::getGainCallback(const std::shared_ptr<GetInt32::Request>& request,
                                    std::shared_ptr<GetInt32::Response>& response,
                                    const stream_index_pair& stream_index) {
+  (void)request;
   auto stream = stream_index.first;
   try {
     switch (stream) {
@@ -218,9 +208,9 @@ void OBCameraNode::setGainCallback(const std::shared_ptr<SetInt32 ::Request>& re
   }
 }
 
-void OBCameraNode::getWhiteBalanceCallback(const std::shared_ptr<rmw_request_id_t>& request_header,
-                                           const std::shared_ptr<GetInt32::Request>& request,
+void OBCameraNode::getWhiteBalanceCallback(const std::shared_ptr<GetInt32::Request>& request,
                                            std::shared_ptr<GetInt32::Response>& response) {
+  (void)request;
   try {
     response->data = device_->getIntProperty(OB_PROP_COLOR_WHITE_BALANCE_INT);
     response->success = true;
@@ -236,8 +226,7 @@ void OBCameraNode::getWhiteBalanceCallback(const std::shared_ptr<rmw_request_id_
   }
 }
 
-void OBCameraNode::setWhiteBalanceCallback(const std::shared_ptr<rmw_request_id_t>& request_header,
-                                           const std::shared_ptr<SetInt32 ::Request>& request,
+void OBCameraNode::setWhiteBalanceCallback(const std::shared_ptr<SetInt32 ::Request>& request,
                                            std::shared_ptr<SetInt32 ::Response>& response) {
   try {
     device_->setIntProperty(OB_PROP_COLOR_WHITE_BALANCE_INT, request->data);
@@ -289,10 +278,8 @@ void OBCameraNode::setAutoExposureCallback(
   }
 }
 
-void OBCameraNode::setFanModeCallback(const std::shared_ptr<rmw_request_id_t>& request_header,
-                                      const std::shared_ptr<SetInt32::Request>& request,
+void OBCameraNode::setFanModeCallback(const std::shared_ptr<SetInt32::Request>& request,
                                       std::shared_ptr<SetInt32::Response>& response) {
-  (void)request_header;
   (void)response;
   bool fan_mode = request->data;
   try {
@@ -379,6 +366,7 @@ void OBCameraNode::setLdpEnableCallback(
 void OBCameraNode::getExposureCallback(const std::shared_ptr<GetInt32::Request>& request,
                                        std::shared_ptr<GetInt32 ::Response>& response,
                                        const stream_index_pair& stream_index) {
+  (void)request;
   auto stream = stream_index.first;
   try {
     switch (stream) {
@@ -408,9 +396,9 @@ void OBCameraNode::getExposureCallback(const std::shared_ptr<GetInt32::Request>&
   }
 }
 
-void OBCameraNode::getDeviceInfoCallback(const std::shared_ptr<rmw_request_id_t>& request_header,
-                                         const std::shared_ptr<GetDeviceInfo::Request>& request,
+void OBCameraNode::getDeviceInfoCallback(const std::shared_ptr<GetDeviceInfo::Request>& request,
                                          std::shared_ptr<GetDeviceInfo::Response>& response) {
+  (void)request;
   try {
     auto device_info = device_->getDeviceInfo();
     response->info.name = device_info->name();
@@ -432,9 +420,9 @@ void OBCameraNode::getDeviceInfoCallback(const std::shared_ptr<rmw_request_id_t>
   }
 }
 
-void OBCameraNode::getSDKVersion(const std::shared_ptr<rmw_request_id_t>& request_header,
-                                 const std::shared_ptr<GetString::Request>& request,
+void OBCameraNode::getSDKVersion(const std::shared_ptr<GetString::Request>& request,
                                  std::shared_ptr<GetString::Response>& response) {
+  (void)request;
   try {
     auto device_info = device_->getDeviceInfo();
     nlohmann::json data;

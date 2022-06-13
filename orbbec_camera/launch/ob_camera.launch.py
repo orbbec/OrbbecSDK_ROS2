@@ -4,9 +4,9 @@ from ament_index_python import get_package_share_directory
 
 
 def generate_launch_description():
-    params_config_path = (
+    ob_params_file = (
         get_package_share_directory("orbbec_camera")
-        + "/params/orbbec_camera_params.yaml"
+        + "/params/ob_camera_params.yaml"
     )
     return LaunchDescription(
         [
@@ -16,7 +16,7 @@ def generate_launch_description():
                 name="camera",
                 executable="orbbec_camera_node",
                 output="screen",
-                parameters=[params_config_path],
+                parameters=[ob_params_file],
             ),
         ]
     )

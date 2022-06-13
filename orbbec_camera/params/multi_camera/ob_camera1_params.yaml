@@ -1,4 +1,4 @@
-/**:
+/camera1/camera1:
   ros__parameters:
     color_width: 640
     color_height: 480
@@ -19,7 +19,11 @@
     depth_optical_frame_id: "depth_optical_frame"
     enable_depth: true
     publish_tf: true
-    align_depth: true
     tf_publish_rate: 10.0
-    publish_rgb_point_cloud : true
-    d2c_mode : "hw"
+    publish_rgb_point_cloud: true
+    wait_for_device_timeout: 120.0
+    reconnect_timeout: 6.0
+    d2c_mode: "hw"
+    serial_number: ""
+    camera_link_frame_id: "camera1_link"
+    ob_log_level: "none"

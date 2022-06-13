@@ -158,10 +158,13 @@ void OBCameraNode::setupProfiles() {
 void OBCameraNode::startPipeline() {
   if (d2c_mode_ == "sw") {
     config_->setAlignMode(ALIGN_D2C_SW_MODE);
+    align_depth_ = true;
   } else if (d2c_mode_ == "hw") {
     config_->setAlignMode(ALIGN_D2C_HW_MODE);
+    align_depth_ = true;
   } else {
     config_->setAlignMode(ALIGN_DISABLE);
+    align_depth_ = false;
   }
   pipeline_ = std::make_unique<ob::Pipeline>(device_);
   pipeline_->start(config_, [this](std::shared_ptr<ob::FrameSet> frame_set) {
@@ -189,17 +192,17 @@ void OBCameraNode::getParameters() {
     depth_aligned_frame_id_[stream_index] = stream_name_[OB_STREAM_COLOR] + "_optical_frame";
   }
   setAndGetNodeParameter(publish_tf_, "publish_tf", true);
-  setAndGetNodeParameter(align_depth_, "align_depth", true);
   setAndGetNodeParameter(tf_publish_rate_, "tf_publish_rate", 10.0);
   setAndGetNodeParameter(publish_rgb_point_cloud_, "publish_rgb_point_cloud", false);
   setAndGetNodeParameter(d2c_mode_, "d2c_mode_", DEFAULT_D2C_MODE);
+  setAndGetNodeParameter(camera_link_frame_id_, "camera_link_frame_id", DEFAULT_BASE_FRAME_ID);
 }
 
 void OBCameraNode::setupTopics() {
   getParameters();
   setupDevices();
-  updateStreamCalibData();
   setupProfiles();
+  setupDefaultStreamCalibData();
   setupCameraCtrlServices();
   setupPublishers();
   publishStaticTransforms();
@@ -228,7 +231,7 @@ void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
     return;
   }
   try {
-    if(publish_rgb_point_cloud_) {
+    if (publish_rgb_point_cloud_) {
       if (frame_set->depthFrame() != nullptr && frame_set->colorFrame() != nullptr) {
         publishColorPointCloud(frame_set);
       }
@@ -268,7 +271,7 @@ void OBCameraNode::publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_se
     bool valid_pixel(points->z > 0);
     if (valid_pixel) {
       *iter_x = static_cast<float>(points->x / 1000.0);
-      *iter_y = static_cast<float>(points->y / 1000.0);
+      *iter_y = -static_cast<float>(points->y / 1000.0);
       *iter_z = static_cast<float>(points->z / 1000.0);
       ++iter_x;
       ++iter_y;
@@ -316,7 +319,7 @@ void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_se
     bool valid_pixel(points->z > 0);
     if (valid_pixel) {
       *iter_x = static_cast<float>(points->x / 1000.0);
-      *iter_y = static_cast<float>(points->y / 1000.0);
+      *iter_y = -static_cast<float>(points->y / 1000.0);
       *iter_z = static_cast<float>(points->z / 1000.0);
       *iter_r = static_cast<uint8_t>(points->r);
       *iter_g = static_cast<uint8_t>(points->g);
@@ -336,6 +339,7 @@ void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   point_cloud_msg_.header.frame_id = optical_frame_id_[COLOR];
   point_cloud_publisher_->publish(point_cloud_msg_);
 }
+
 void OBCameraNode::frameSetCallback(std::shared_ptr<ob::FrameSet> frame_set) {
   auto color_frame = frame_set->colorFrame();
   auto depth_frame = frame_set->depthFrame();
@@ -351,6 +355,7 @@ void OBCameraNode::frameSetCallback(std::shared_ptr<ob::FrameSet> frame_set) {
   }
   publishPointCloud(frame_set);
 }
+
 std::optional<OBCameraParam> OBCameraNode::findDefaultCameraParam() {
   auto camera_params = device_->getCalibrationCameraParamList();
   for (size_t i = 0; i < camera_params->count(); i++) {
@@ -428,11 +433,18 @@ std::optional<OBCameraParam> OBCameraNode::findCameraParam(uint32_t color_width,
   return {};
 }
 
-void OBCameraNode::updateStreamCalibData() {
+void OBCameraNode::setupDefaultStreamCalibData() {
   auto param = findDefaultCameraParam();
-  CHECK(param.has_value());
-  camera_infos_[DEPTH] = convertToCameraInfo(param->depthIntrinsic, param->depthDistortion);
-  camera_infos_[COLOR] = convertToCameraInfo(param->rgbIntrinsic, param->rgbDistortion);
+  if (!param.has_value()) {
+    RCLCPP_WARN_STREAM(logger_, "Not Found default camera parameter");
+    return;
+  }
+  updateStreamCalibData(*param);
+}
+
+void OBCameraNode::updateStreamCalibData(const OBCameraParam& param) {
+  camera_infos_[DEPTH] = convertToCameraInfo(param.depthIntrinsic, param.depthDistortion);
+  camera_infos_[COLOR] = convertToCameraInfo(param.rgbIntrinsic, param.rgbDistortion);
   camera_infos_[INFRA0] = camera_infos_[DEPTH];
 }
 
@@ -468,12 +480,12 @@ void OBCameraNode::calcAndPublishStaticTransform() {
   rclcpp::Time tf_timestamp = node_->now();
 
   publishStaticTF(tf_timestamp, trans, Q, frame_id_[DEPTH], frame_id_[COLOR]);
-  publishStaticTF(tf_timestamp, trans, Q, "camera_link", frame_id_[COLOR]);
+  publishStaticTF(tf_timestamp, trans, Q, camera_link_frame_id_, frame_id_[COLOR]);
   publishStaticTF(tf_timestamp, zero_trans, quaternion_optical, frame_id_[COLOR],
                   optical_frame_id_[COLOR]);
   publishStaticTF(tf_timestamp, zero_trans, quaternion_optical, frame_id_[DEPTH],
                   optical_frame_id_[DEPTH]);
-  publishStaticTF(tf_timestamp, zero_trans, zero_rot, "camera_link", frame_id_[DEPTH]);
+  publishStaticTF(tf_timestamp, zero_trans, zero_rot, camera_link_frame_id_, frame_id_[DEPTH]);
   extrinsics_publisher_->publish(obExtrinsicsToMsg(ex, "depth_to_color_extrinsics"));
 }
 
@@ -485,6 +497,7 @@ void OBCameraNode::publishStaticTransforms() {
     static_tf_broadcaster_->sendTransform(static_tf_msgs_);
   }
 }
+
 void OBCameraNode::publishDynamicTransforms() {
   RCLCPP_WARN(logger_, "Publishing dynamic camera transforms (/tf) at %g Hz", tf_publish_rate_);
   std::mutex mu;
@@ -545,8 +558,9 @@ void OBCameraNode::publishColorFrame(std::shared_ptr<ob::ColorFrame> frame) {
   auto& camera_info_publisher = camera_info_publishers_.at(stream);
   auto& image_publisher = image_publishers_.at(stream);
   auto& cam_info = camera_infos_.at(stream);
-  if (cam_info.width != width) {
+  if (cam_info.width != width || cam_info.height != height) {
     RCLCPP_ERROR(logger_, "cam info error");
+    updateStreamCalibData(pipeline_->getCameraParam());
     cam_info.height = height;
     cam_info.width = width;
   }
@@ -577,8 +591,9 @@ void OBCameraNode::publishDepthFrame(std::shared_ptr<ob::DepthFrame> frame) {
   auto& camera_info_publisher = camera_info_publishers_.at(stream);
   auto& image_publisher = image_publishers_.at(stream);
   auto& cam_info = camera_infos_.at(stream);
-  if (cam_info.width != width) {
+  if (cam_info.width != width || cam_info.height != height) {
     RCLCPP_ERROR(logger_, "cam info error");
+    updateStreamCalibData(pipeline_->getCameraParam());
     cam_info.height = height;
     cam_info.width = width;
   }
@@ -592,7 +607,11 @@ void OBCameraNode::publishDepthFrame(std::shared_ptr<ob::DepthFrame> frame) {
   img->height = height;
   img->is_bigendian = false;
   img->step = width * unit_step_size_[stream];
-  img->header.frame_id = optical_frame_id_[COLOR];
+  if (align_depth_) {
+    img->header.frame_id = optical_frame_id_[COLOR];
+  } else {
+    img->header.frame_id = optical_frame_id_[DEPTH];
+  }
   img->header.stamp = timestamp;
   image_publisher.publish(img);
 }
@@ -609,8 +628,9 @@ void OBCameraNode::publishIRFrame(std::shared_ptr<ob::IRFrame> frame) {
   auto& camera_info_publisher = camera_info_publishers_.at(stream);
   auto& image_publisher = image_publishers_.at(stream);
   auto& cam_info = camera_infos_.at(stream);
-  if (cam_info.width != width) {
+  if (cam_info.width != width || cam_info.height != height) {
     RCLCPP_ERROR(logger_, "cam info error");
+    updateStreamCalibData(pipeline_->getCameraParam());
     cam_info.height = height;
     cam_info.width = width;
   }
@@ -624,7 +644,11 @@ void OBCameraNode::publishIRFrame(std::shared_ptr<ob::IRFrame> frame) {
   img->height = height;
   img->is_bigendian = false;
   img->step = width * unit_step_size_[stream];
-  img->header.frame_id = optical_frame_id_[COLOR];
+  if (align_depth_) {
+    img->header.frame_id = optical_frame_id_[COLOR];
+  } else {
+    img->header.frame_id = optical_frame_id_[DEPTH];
+  }
   img->header.stamp = timestamp;
   image_publisher.publish(img);
 }

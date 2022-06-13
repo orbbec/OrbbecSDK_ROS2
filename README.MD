@@ -62,30 +62,44 @@ sudo make install
 sudo ldconfig
 ```
 
-Install `ORBBEC_SDK`
+Install `ORBBEC_SDK`,First remove old one if you have installed, **BE CAREFUL**
 
 ```bash
+# remove old(If you have already installed
+cd /usr/local/lib/
+sudo rm libOrbbecSDK.so* # BE CAREFUL
+sudo rm libpostfilter.so
+cd /usr/local/include/
+sudo rm -fr libobsensor
+
+# install
 cd orbbec_camera/dependencies
 tar -xzvf sensor_sdk_v1.2.8_linux.tar.gz
 cd SDK/lib
-sudo cp libOrbbecSDK.so.1.2.8  libpostfilter.so /usr/local/lib
+sudo cp libOrbbecSDK.so.1.2.8  /usr/local/lib
+sudo cp  libpostfilter.so /usr/local/lib
 sudo ln -s /usr/local/lib/libOrbbecSDK.so.1.2.8 /usr/local/lib/libOrbbecSDK.so.1.2
 sudo ln -s /usr/local/lib/libOrbbecSDK.so.1.2.8 /usr/local/lib/libOrbbecSDK.so
 cd ../include 
 sudo cp -frd libobsensor /usr/local/include
 sudo ldconfig
 ```
-Build
+---
+
+## Getting start
+
+---
 
 ```bash
 cd ~/ros2_ws/
-colcon build --event-handlers console_direct+
+# build release, Default is Debug
+colcon build --event-handlers console_direct+ -DCMAKE_BUILD_TYPE=Release
 ```
 Launch camera node 
 * On terminal 1
 ```bash 
 . ./install/setup.bash 
-ros2 launch orbbec_camera orbbec.launch.py
+ros2 launch orbbec_camera ob_camera.launch.py
 ```
 * On terminal 2
 
@@ -101,12 +115,6 @@ ros2 service list
 ros2 param list
 ```
 
----
-
-## Camera control && Information service
-
----
-
 * Show depth to color extrinsic
 
 ```bash
@@ -115,19 +123,19 @@ ros2 topic echo --qos-durability=transient_local /camera/extrinsic/depth_to_colo
 * Get device info 
 
 ```bash 
-ros2 service call /camera/get_device_info orbbec_camera_msgs/srv/GetDeviceInfo "{}"
+ros2 service call /camera/get_device_info orbbec_camera_msgs/srv/GetDeviceInfo '{}'
 ```
 * Get SDK version
 
 ```bash
-ros2 service call /camera/get_sdk_version orbbec_camera_msgs/srv/GetString "{}"
+ros2 service call /camera/get_sdk_version orbbec_camera_msgs/srv/GetString '{}'
 
 ```
 
 * Get exposure
 
 ```bash
-ros2 service call /camera/get_color_exposure orbbec_camera_msgs/srv/GetInt32 "{}"
+ros2 service call /camera/get_color_exposure orbbec_camera_msgs/srv/GetInt32 '{}'
 ```
 > If your check `ir` or `depth`, please change ` /camera/get_color_exposure`
 to  `/camera/get_ir_exposure` or `/camera/get_depth_exposure`, Same below.
@@ -135,12 +143,12 @@ to  `/camera/get_ir_exposure` or `/camera/get_depth_exposure`, Same below.
 * Get gain
 
 ```bash
-ros2 service call /camera/get_color_gain orbbec_camera_msgs/srv/GetInt32 "{}"
+ros2 service call /camera/get_color_gain orbbec_camera_msgs/srv/GetInt32 '{}'
 ```
 * Get white balance 
 
 ```bash
-ros2 service call /camera/get_white_balance orbbec_camera_msgs/srv/GetInt32 "{}"
+ros2 service call /camera/get_white_balance orbbec_camera_msgs/srv/GetInt32 '{}'
 ```
 
 * Set auto exposure 
@@ -153,3 +161,7 @@ ros2 service call /camera/set_color_auto_exposure std_srvs/srv/SetBool '{data: f
 ```bash
 ros2 service call /camera/set_white_balance orbbec_camera_msgs/srv/SetInt32 '{data: 4600}'
 ```
+
+---
+## Known issues
+* TODO:

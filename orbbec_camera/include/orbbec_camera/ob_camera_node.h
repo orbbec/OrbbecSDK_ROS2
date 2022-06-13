@@ -123,7 +123,9 @@ class OBCameraNode {
 
   void setupPublishers();
 
-  void updateStreamCalibData();
+  void setupDefaultStreamCalibData();
+
+  void updateStreamCalibData(const OBCameraParam& param);
 
   void publishStaticTF(const rclcpp::Time& t, const std::vector<float>& trans,
                        const tf2::Quaternion& q, const std::string& from, const std::string& to);
@@ -160,12 +162,10 @@ class OBCameraNode {
                        std::shared_ptr<SetInt32::Response>& response,
                        const stream_index_pair& stream_index);
 
-  void getWhiteBalanceCallback(const std::shared_ptr<rmw_request_id_t>& request_header,
-                               const std::shared_ptr<GetInt32::Request>& request,
+  void getWhiteBalanceCallback(const std::shared_ptr<GetInt32::Request>& request,
                                std::shared_ptr<GetInt32::Response>& response);
 
-  void setWhiteBalanceCallback(const std::shared_ptr<rmw_request_id_t>& request_header,
-                               const std::shared_ptr<SetInt32 ::Request>& request,
+  void setWhiteBalanceCallback(const std::shared_ptr<SetInt32 ::Request>& request,
                                std::shared_ptr<SetInt32 ::Response>& response);
 
   void setAutoExposureCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
@@ -184,16 +184,13 @@ class OBCameraNode {
                             const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
                             std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
 
-  void setFanModeCallback(const std::shared_ptr<rmw_request_id_t>& request_header,
-                          const std::shared_ptr<SetInt32::Request>& request,
+  void setFanModeCallback(const std::shared_ptr<SetInt32::Request>& request,
                           std::shared_ptr<SetInt32::Response>& response);
 
-  void getDeviceInfoCallback(const std::shared_ptr<rmw_request_id_t>& request_header,
-                             const std::shared_ptr<GetDeviceInfo::Request>& request,
+  void getDeviceInfoCallback(const std::shared_ptr<GetDeviceInfo::Request>& request,
                              std::shared_ptr<GetDeviceInfo::Response>& response);
 
-  void getSDKVersion(const std::shared_ptr<rmw_request_id_t>& request_header,
-                     const std::shared_ptr<GetString::Request>& request,
+  void getSDKVersion(const std::shared_ptr<GetString::Request>& request,
                      std::shared_ptr<GetString::Response>& response);
 
   void publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set);
@@ -218,8 +215,8 @@ class OBCameraNode {
   std::shared_ptr<Parameters> parameters_;
   rclcpp::Logger logger_;
   std::atomic_bool is_running_{false};
-  std::unique_ptr<ob::Pipeline> pipeline_;
-  std::shared_ptr<ob::Config> config_;
+  std::unique_ptr<ob::Pipeline> pipeline_ = nullptr;
+  std::shared_ptr<ob::Config> config_ = nullptr;
   std::map<stream_index_pair, std::shared_ptr<ob::Sensor>> sensors_;
   std::map<stream_index_pair, ob_camera_intrinsic> stream_intrinsics_;
   std::map<stream_index_pair, sensor_msgs::msg::CameraInfo> camera_infos_;
@@ -230,8 +227,8 @@ class OBCameraNode {
   std::map<stream_index_pair, std::string> frame_id_;
   std::map<stream_index_pair, std::string> optical_frame_id_;
   std::map<stream_index_pair, std::string> depth_aligned_frame_id_;
-  std::string base_frame_id_;
-  bool align_depth_;
+  std::string camera_link_frame_id_;
+  bool align_depth_ = false;
   bool publish_rgb_point_cloud_;
   std::string d2c_mode_;  // sw, hw, none
   std::map<stream_index_pair, std::string> qos_;
@@ -261,7 +258,7 @@ class OBCameraNode {
   std::map<stream_index_pair, rclcpp::Service<SetInt32>::SharedPtr> set_gain_srv_;
   rclcpp::Service<GetInt32>::SharedPtr get_white_balance_srv_;  // only rgb
   rclcpp::Service<SetInt32>::SharedPtr set_white_balance_srv_;
-  rclcpp::Service<GetString>::SharedPtr get_api_version_srv_;
+  rclcpp::Service<GetString>::SharedPtr get_sdk_version_srv_;
   std::map<stream_index_pair, rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr>
       set_auto_exposure_srv_;  // only rgb color
 
@@ -284,6 +281,6 @@ class OBCameraNode {
   std::vector<geometry_msgs::msg::TransformStamped> static_tf_msgs_;
   std::shared_ptr<std::thread> tf_thread_;
   std::condition_variable tf_cv_;
-  double tf_publish_rate_;
+  double tf_publish_rate_ = 10.0;
 };
 }  // namespace orbbec_camera

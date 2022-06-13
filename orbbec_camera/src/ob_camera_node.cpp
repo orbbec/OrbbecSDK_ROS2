@@ -36,8 +36,11 @@ OBCameraNode::OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> devic
   encoding_[INFRA0] = sensor_msgs::image_encodings::MONO16;
   stream_name_[OB_STREAM_IR] = "ir";
   unit_step_size_[INFRA0] = sizeof(uint8_t);
-
-  format_[COLOR] = OB_FORMAT_YUYV;
+  if (device_->getDeviceInfo()->pid() == FEMTO_PID) {
+    format_[COLOR] = OB_FORMAT_I420;
+  } else if (device_->getDeviceInfo()->pid() == ASTRA_PLUS_PID) {
+    format_[COLOR] = OB_FORMAT_YUYV;
+  }
   image_format_[OB_STREAM_COLOR] = CV_8UC3;
   encoding_[COLOR] = sensor_msgs::image_encodings::BGR8;
   stream_name_[OB_STREAM_COLOR] = "color";
@@ -523,6 +526,8 @@ void OBCameraNode::publishDynamicTransforms() {
 
 bool OBCameraNode::rbgFormatConvertRGB888(std::shared_ptr<ob::ColorFrame> frame) {
   switch (frame->format()) {
+    case OB_FORMAT_RGB888:
+      return true;
     case OB_FORMAT_I420:
       format_convert_filter_.setFormatConvertType(FORMAT_I420_TO_RGB888);
       break;

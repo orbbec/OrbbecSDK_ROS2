@@ -88,6 +88,10 @@ const std::string DEFAULT_ALIGNED_DEPTH_TO_FISHEYE_FRAME_ID =
 const std::string DEFAULT_UNITE_IMU_METHOD = "";
 const std::string DEFAULT_FILTERS = "";
 const std::string DEFAULT_TOPIC_ODOM_IN = "";
-const std::string DEFAULT_D2C_MODE = "sw"; // sw = software mode, hw=hardware mode, none,
+const std::string DEFAULT_D2C_MODE = "sw";  // sw = software mode, hw=hardware mode, none,
 const float ROS_DEPTH_SCALE = 0.001;
+
+const int32_t FEMTO_PID = 0x0635;
+const int32_t ASTRA_PLUS_PID = 0x0636;
+
 }  // namespace orbbec_camera

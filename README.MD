@@ -50,6 +50,26 @@ Clone source code
 ```bash
 git clone gitlab@code.orbbec.com.cn:OrbbecSDK/orbbecros2sdk.git
 ```
+
+Install deb dependencies
+
+```bash
+sudo apt install libgflags-dev nlohmann-json3-dev \
+ros-galactic-image-transport ros-galactic-image-publisher
+```
+
+Install glog
+
+```bash
+cd orbbec_camera/dependencies
+tar -xzvf glog-0.6.0.tar.gz
+cd glog-0.6.0
+mkdir build && cd build
+cmake .. && make -j4
+sudo make install
+sudo ldconfig
+```
+
 Install `magic_enum`
 
 ```bash
@@ -85,11 +105,7 @@ sudo cp -frd libobsensor /usr/local/include
 sudo ldconfig
 ```
 
-Other dependencies
 
-```bash
-sudo apt install libgoogle-glog-dev libgflags-dev nlohmann-json3-dev
-```
 ---
 
 ## Getting start

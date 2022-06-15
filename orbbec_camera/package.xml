@@ -12,6 +12,7 @@
   <depend>ament_lint_common</depend>
   <depend>ament_index_cpp</depend>
   <depend>image_transport</depend>
+  <depend>image_publisher</depend>
   <depend>rclcpp_components</depend>
   <depend>cv_bridge</depend>
   <depend>orbbec_camera_msgs</depend>

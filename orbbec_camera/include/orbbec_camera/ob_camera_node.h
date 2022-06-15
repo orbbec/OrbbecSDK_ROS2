@@ -32,8 +32,9 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <std_srvs/srv/set_bool.hpp>
 #include <sensor_msgs/msg/camera_info.hpp>
-#include <image_publisher.h>
 
+#include <image_publisher/image_publisher.hpp>
+#include <image_transport/publisher.hpp>
 #include "libobsensor/ObSensor.hpp"
 
 #include "orbbec_camera_msgs/msg/device_info.hpp"

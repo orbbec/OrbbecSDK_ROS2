@@ -19,6 +19,7 @@ find_package(builtin_interfaces REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(glog REQUIRED)
 find_package(image_transport REQUIRED)
+find_package(image_publisher REQUIRED)
 find_package(magic_enum REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(orbbec_camera_msgs REQUIRED)
@@ -56,6 +57,7 @@ set(dependencies
   cv_bridge
   Eigen3
   image_transport
+  image_publisher
   orbbec_camera_msgs
   ORBBEC_SDK
   rclcpp

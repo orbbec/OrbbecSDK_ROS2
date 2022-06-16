@@ -154,9 +154,10 @@ void OBCameraNode::setupProfiles() {
       images_[elem] =
           cv::Mat(height_[elem], width_[elem], image_format_[elem.first], cv::Scalar(0, 0, 0));
       RCLCPP_INFO_STREAM(
-          logger_, " stream is enabled - width: " << width_[elem] << ", height: " << height_[elem]
-                                                  << ", fps: " << fps_[elem] << ", "
-                                                  << "Format: " << selected_profile->format());
+          logger_, " stream is enabled - width: "
+                       << width_[elem] << ", height: " << height_[elem] << ", fps: " << fps_[elem]
+                       << ", "
+                       << "Format: " << magic_enum::enum_name(selected_profile->format()));
     }
   }
 }

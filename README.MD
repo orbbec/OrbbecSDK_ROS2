@@ -50,6 +50,26 @@ Clone source code
 ```bash
 git clone gitlab@code.orbbec.com.cn:OrbbecSDK/orbbecros2sdk.git
 ```
+
+Install deb dependencies
+
+```bash
+sudo apt install libgflags-dev nlohmann-json3-dev \
+ros-galactic-image-transport ros-galactic-image-publisher
+```
+
+Install glog
+
+```bash
+cd orbbec_camera/dependencies
+tar -xzvf glog-0.6.0.tar.gz
+cd glog-0.6.0
+mkdir build && cd build
+cmake .. && make -j4
+sudo make install
+sudo ldconfig
+```
+
 Install `magic_enum`
 
 ```bash
@@ -65,7 +85,7 @@ sudo ldconfig
 Install `ORBBEC_SDK`,First remove old one if you have installed, **BE CAREFUL**
 
 ```bash
-# remove old(If you have already installed
+# remove old If you have already installed
 cd /usr/local/lib/
 sudo rm libOrbbecSDK.so* # BE CAREFUL
 sudo rm libpostfilter.so
@@ -84,6 +104,8 @@ cd ../include
 sudo cp -frd libobsensor /usr/local/include
 sudo ldconfig
 ```
+
+
 ---
 
 ## Getting start
@@ -157,11 +179,22 @@ ros2 service call /camera/get_white_balance orbbec_camera_msgs/srv/GetInt32 '{}'
 ros2 service call /camera/set_color_auto_exposure std_srvs/srv/SetBool '{data: false}'
 ```
 
-* Set white balance 
+* Set white balance
+
 ```bash
 ros2 service call /camera/set_white_balance orbbec_camera_msgs/srv/SetInt32 '{data: 4600}'
 ```
+* Set laser enable
 
+```bash
+ros2 service call  /camera/set_laser_enable std_srvs/srv/SetBool "{data: true}" 
+* ```
+
+* toggle sensor 
+
+```bash
+ros2 service call  /camera/toggle_ir std_srvs/srv/SetBool "{data : true}"
+* ```
 ---
 ## Known issues
 * TODO:

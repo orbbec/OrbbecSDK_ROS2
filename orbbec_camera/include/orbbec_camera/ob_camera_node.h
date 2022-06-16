@@ -32,8 +32,9 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <std_srvs/srv/set_bool.hpp>
 #include <sensor_msgs/msg/camera_info.hpp>
-#include <image_publisher.h>
 
+#include <image_publisher/image_publisher.hpp>
+#include <image_transport/publisher.hpp>
 #include "libobsensor/ObSensor.hpp"
 
 #include "orbbec_camera_msgs/msg/device_info.hpp"
@@ -77,6 +78,7 @@ using Extrinsics = orbbec_camera_msgs::msg::Extrinsics;
 using SetInt32 = orbbec_camera_msgs::srv::SetInt32;
 using GetInt32 = orbbec_camera_msgs::srv::GetInt32;
 using GetString = orbbec_camera_msgs::srv::GetString;
+using SetBool = std_srvs::srv::SetBool;
 
 typedef std::pair<ob_stream_type, int> stream_index_pair;
 
@@ -193,6 +195,12 @@ class OBCameraNode {
   void getSDKVersion(const std::shared_ptr<GetString::Request>& request,
                      std::shared_ptr<GetString::Response>& response);
 
+  void toggleSensorCallback(const std::shared_ptr<SetBool::Request>& request,
+                            std::shared_ptr<SetBool::Response>& response,
+                            const stream_index_pair& stream_index);
+
+  bool toggleSensor(const stream_index_pair& stream_index, bool enabled, std::string& msg);
+
   void publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set);
 
   void publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_set);
@@ -256,6 +264,7 @@ class OBCameraNode {
   std::map<stream_index_pair, rclcpp::Service<SetInt32>::SharedPtr> set_exposure_srv_;
   std::map<stream_index_pair, rclcpp::Service<GetInt32>::SharedPtr> get_gain_srv_;
   std::map<stream_index_pair, rclcpp::Service<SetInt32>::SharedPtr> set_gain_srv_;
+  std::map<stream_index_pair, rclcpp::Service<SetBool>::SharedPtr> toggle_sensor_srv_;
   rclcpp::Service<GetInt32>::SharedPtr get_white_balance_srv_;  // only rgb
   rclcpp::Service<SetInt32>::SharedPtr set_white_balance_srv_;
   rclcpp::Service<GetString>::SharedPtr get_sdk_version_srv_;

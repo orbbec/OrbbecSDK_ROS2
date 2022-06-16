@@ -12,6 +12,9 @@
 
 #pragma once
 
+#include <string>
+#include <cstdlib>
+
 #define OB_ROS_MAJOR_VERSION 1
 #define OB_ROS_MINOR_VERSION 0
 #define OB_ROS_PATCH_VERSION 1
@@ -88,6 +91,13 @@ const std::string DEFAULT_ALIGNED_DEPTH_TO_FISHEYE_FRAME_ID =
 const std::string DEFAULT_UNITE_IMU_METHOD = "";
 const std::string DEFAULT_FILTERS = "";
 const std::string DEFAULT_TOPIC_ODOM_IN = "";
-const std::string DEFAULT_D2C_MODE = "sw"; // sw = software mode, hw=hardware mode, none,
+const std::string DEFAULT_D2C_MODE = "sw";  // sw = software mode, hw=hardware mode, none,
 const float ROS_DEPTH_SCALE = 0.001;
+
+const int32_t FEMTO_OW_PID = 0x0638;
+const int32_t FEMTO_LIVE_PID = 0x0668;
+const int32_t FEMTO_PID = 0x0635;
+const int32_t ASTRA_PLUS_PID = 0x0636;
+const int32_t ASTRA_PLUS_S_PID = 0x0637;
+
 }  // namespace orbbec_camera

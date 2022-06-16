@@ -18,7 +18,6 @@ OBCameraNodeFactory::OBCameraNodeFactory(const rclcpp::NodeOptions &node_options
       logger_(this->get_logger()) {
   init();
 }
-
 OBCameraNodeFactory::OBCameraNodeFactory(const std::string &node_name, const std::string &ns,
                                          const rclcpp::NodeOptions &node_options)
     : Node(node_name, ns, node_options),
@@ -33,10 +32,8 @@ OBCameraNodeFactory::~OBCameraNodeFactory() {
     query_thread_.join();
   }
 }
-
 void OBCameraNodeFactory::init() {
-  ob_log_level_ = declare_parameter<std::string>("ob_log_level", "none");
-  ctx_->setLoggerSeverity(obLogSeverityFromString(ob_log_level_));
+  ctx_->setLoggerSeverity(OB_LOG_SEVERITY_NONE);
   is_alive_.store(true);
   parameters_ = std::make_shared<Parameters>(this);
   serial_number_ = declare_parameter<std::string>("serial_number", "");
@@ -126,21 +123,6 @@ void OBCameraNodeFactory::printDeviceInfo(const std::shared_ptr<ob::DeviceInfo> 
   RCLCPP_INFO_STREAM(logger_, "hardware version " << device_info->hardwareVersion());
 }
 
-OBLogSeverity OBCameraNodeFactory::obLogSeverityFromString(const std::string &log_level) {
-  if (log_level == "debug") {
-    return OB_LOG_SEVERITY_DEBUG;
-  } else if (log_level == "info") {
-    return OB_LOG_SEVERITY_INFO;
-  } else if (log_level == "warn" || log_level == "warning") {
-    return OB_LOG_SEVERITY_WARN;
-  } else if (log_level == "fatal" || log_level == "error") {
-    return OB_LOG_SEVERITY_FATAL;
-  } else {
-    // Default None
-    return OB_LOG_SEVERITY_NONE;
-  }
-}
-
 void OBCameraNodeFactory::getDevice(const std::shared_ptr<ob::DeviceList> &list) {
   if (device_) {
     return;
@@ -161,6 +143,18 @@ void OBCameraNodeFactory::getDevice(const std::shared_ptr<ob::DeviceList> &list)
   } else {
     device_ = list->getDeviceBySN(serial_number_.c_str());
     if (device_ == nullptr) {
+      std::string lower_sn;
+      std::transform(serial_number_.begin(), serial_number_.end(), std::back_inserter(lower_sn),
+                     [](auto ch) {
+                       return isalpha(ch) ? tolower(ch) : static_cast<int>(ch);
+                     });
+      device_ = list->getDeviceBySN(lower_sn.c_str());
+    }
+    if (device_ == nullptr) {
+      for (size_t i = 0; i < list->deviceCount(); i++) {
+        auto sn = list->serialNumber(i);
+        RCLCPP_ERROR_STREAM(logger_, "found device with SN " << sn);
+      }
       RCLCPP_ERROR_STREAM(logger_, "can not found device with SN " << serial_number_);
     } else {
       printDeviceInfo(device_->getDeviceInfo());

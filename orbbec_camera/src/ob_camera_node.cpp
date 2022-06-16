@@ -36,10 +36,14 @@ OBCameraNode::OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> devic
   encoding_[INFRA0] = sensor_msgs::image_encodings::MONO16;
   stream_name_[OB_STREAM_IR] = "ir";
   unit_step_size_[INFRA0] = sizeof(uint8_t);
-  if (device_->getDeviceInfo()->pid() == FEMTO_PID) {
+  const auto device_pid = device_->getDeviceInfo()->pid();
+  if (device_pid == FEMTO_PID || device_pid == FEMTO_LIVE_PID || device_pid == FEMTO_OW_PID) {
     format_[COLOR] = OB_FORMAT_I420;
-  } else if (device_->getDeviceInfo()->pid() == ASTRA_PLUS_PID) {
+  } else if (device_pid == ASTRA_PLUS_PID || device_pid == ASTRA_PLUS_S_PID) {
     format_[COLOR] = OB_FORMAT_YUYV;
+  } else {
+    // default RGB888
+    format_[COLOR] = OB_FORMAT_RGB888;
   }
   image_format_[OB_STREAM_COLOR] = CV_8UC3;
   encoding_[COLOR] = sensor_msgs::image_encodings::BGR8;
@@ -241,7 +245,8 @@ void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
     return;
   }
   try {
-    if (publish_rgb_point_cloud_) {
+    if (publish_rgb_point_cloud_ &&
+        (format_[COLOR] == OB_FORMAT_YUYV || format_[COLOR] == OB_FORMAT_I420)) {
       if (frame_set->depthFrame() != nullptr && frame_set->colorFrame() != nullptr) {
         publishColorPointCloud(frame_set);
       }

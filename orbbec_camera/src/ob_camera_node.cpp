@@ -208,7 +208,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter(publish_tf_, "publish_tf", true);
   setAndGetNodeParameter(tf_publish_rate_, "tf_publish_rate", 10.0);
   setAndGetNodeParameter(publish_rgb_point_cloud_, "publish_rgb_point_cloud", false);
-  setAndGetNodeParameter(d2c_mode_, "d2c_mode_", DEFAULT_D2C_MODE);
+  setAndGetNodeParameter(d2c_mode_, "d2c_mode", DEFAULT_D2C_MODE);
   setAndGetNodeParameter(camera_link_frame_id_, "camera_link_frame_id", DEFAULT_BASE_FRAME_ID);
 }
 

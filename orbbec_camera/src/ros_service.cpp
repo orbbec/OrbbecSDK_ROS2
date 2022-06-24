@@ -52,15 +52,14 @@ void OBCameraNode::setupCameraCtrlServices() {
                                             std::shared_ptr<SetInt32::Response> response) {
           setGainCallback(request, response, stream_index);
         });
-    if (stream_index.first == OB_STREAM_COLOR || stream_index.first == OB_STREAM_DEPTH) {
-      service_name = "set_" + stream_name + "_auto_exposure";
-      set_auto_exposure_srv_[stream_index] = node_->create_service<SetBool>(
-          service_name,
-          [this, stream_index = stream_index](const std::shared_ptr<SetBool::Request> request,
-                                              std::shared_ptr<SetBool::Response> response) {
-            setAutoExposureCallback(request, response, stream_index);
-          });
-    }
+    service_name = "set_" + stream_name + "_auto_exposure";
+    set_auto_exposure_srv_[stream_index] = node_->create_service<SetBool>(
+        service_name,
+        [this, stream_index = stream_index](const std::shared_ptr<SetBool::Request> request,
+                                            std::shared_ptr<SetBool::Response> response) {
+          setAutoExposureCallback(request, response, stream_index);
+        });
+
     service_name = "toggle_" + stream_name;
 
     toggle_sensor_srv_[stream_index] = node_->create_service<SetBool>(
@@ -104,6 +103,16 @@ void OBCameraNode::setupCameraCtrlServices() {
       "set_white_balance", [this](const std::shared_ptr<SetInt32::Request> request,
                                   std::shared_ptr<SetInt32::Response> response) {
         setWhiteBalanceCallback(request, response);
+      });
+  get_auto_white_balance_srv_ = node_->create_service<GetInt32>(
+      "get_white_balance", [this](const std::shared_ptr<GetInt32::Request> request,
+                                  std::shared_ptr<GetInt32::Response> response) {
+        getAutoWhiteBalanceCallback(request, response);
+      });
+  set_auto_white_balance_srv_ = node_->create_service<SetBool>(
+      "set_white_balance", [this](const std::shared_ptr<SetBool::Request> request,
+                                  std::shared_ptr<SetBool::Response> response) {
+        setAutoWhiteBalanceCallback(request, response);
       });
   get_device_srv_ = node_->create_service<GetDeviceInfo>(
       "get_device_info", [this](const std::shared_ptr<GetDeviceInfo::Request> request,
@@ -245,6 +254,39 @@ void OBCameraNode::setWhiteBalanceCallback(const std::shared_ptr<SetInt32 ::Requ
   } catch (...) {
     response->message = "unknown error";
     response->success = false;
+  }
+}
+
+void OBCameraNode::getAutoWhiteBalanceCallback(const std::shared_ptr<GetInt32::Request>& request,
+                                               std::shared_ptr<GetInt32::Response>& response) {
+  (void)request;
+  try {
+    response->data = device_->getBoolProperty(OB_PROP_COLOR_AUTO_WHITE_BALANCE_BOOL);
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->success = false;
+    response->message = e.getMessage();
+  } catch (const std::exception& e) {
+    response->message = e.what();
+  } catch (...) {
+    response->success = false;
+    response->message = "unknown error";
+  }
+}
+
+void OBCameraNode::setAutoWhiteBalanceCallback(const std::shared_ptr<SetBool::Request>& request,
+                                               std::shared_ptr<SetBool::Response>& response) {
+  try {
+    device_->setBoolProperty(OB_PROP_COLOR_AUTO_WHITE_BALANCE_BOOL, request->data);
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->success = false;
+    response->message = e.getMessage();
+  } catch (const std::exception& e) {
+    response->message = e.what();
+  } catch (...) {
+    response->success = false;
+    response->message = "unknown error";
   }
 }
 

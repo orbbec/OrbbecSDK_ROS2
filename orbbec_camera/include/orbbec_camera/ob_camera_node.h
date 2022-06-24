@@ -170,6 +170,12 @@ class OBCameraNode {
   void setWhiteBalanceCallback(const std::shared_ptr<SetInt32 ::Request>& request,
                                std::shared_ptr<SetInt32 ::Response>& response);
 
+  void getAutoWhiteBalanceCallback(const std::shared_ptr<GetInt32::Request>& request,
+                                   std::shared_ptr<GetInt32::Response>& response);
+
+  void setAutoWhiteBalanceCallback(const std::shared_ptr<SetBool::Request>& request,
+                                   std::shared_ptr<SetBool ::Response>& response);
+
   void setAutoExposureCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
                                std::shared_ptr<std_srvs::srv::SetBool::Response>& response,
                                const stream_index_pair& stream_index);
@@ -242,6 +248,7 @@ class OBCameraNode {
   std::map<stream_index_pair, std::string> qos_;
   std::map<stream_index_pair, std::string> info_qos_;
   std::map<stream_index_pair, ob_format> format_;
+  std::map<stream_index_pair, std::string> format_str_;
   std::map<ob_stream_type, int> image_format_;
   std::map<stream_index_pair, std::vector<std::shared_ptr<ob::VideoStreamProfile>>>
       enabled_profiles_;
@@ -267,6 +274,8 @@ class OBCameraNode {
   std::map<stream_index_pair, rclcpp::Service<SetBool>::SharedPtr> toggle_sensor_srv_;
   rclcpp::Service<GetInt32>::SharedPtr get_white_balance_srv_;  // only rgb
   rclcpp::Service<SetInt32>::SharedPtr set_white_balance_srv_;
+  rclcpp::Service<GetInt32>::SharedPtr get_auto_white_balance_srv_;  // only rgb
+  rclcpp::Service<SetBool>::SharedPtr set_auto_white_balance_srv_;
   rclcpp::Service<GetString>::SharedPtr get_sdk_version_srv_;
   std::map<stream_index_pair, rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr>
       set_auto_exposure_srv_;  // only rgb color

@@ -226,6 +226,8 @@ void OBCameraNode::setupPublishers() {
   using PointCloud2 = sensor_msgs::msg::PointCloud2;
   using CameraInfo = sensor_msgs::msg::CameraInfo;
   point_cloud_publisher_ = node_->create_publisher<PointCloud2>(
+      "depth/color/points", rclcpp::QoS{1}.best_effort().keep_last(1));
+  depth_point_cloud_publisher_ = node_->create_publisher<PointCloud2>(
       "depth/points", rclcpp::QoS{1}.best_effort().keep_last(1));
   for (const auto& stream_index : IMAGE_STREAMS) {
     std::string name = stream_name_[stream_index.first];
@@ -240,16 +242,13 @@ void OBCameraNode::setupPublishers() {
 }
 
 void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
-  if (point_cloud_publisher_->get_subscription_count() == 0) {
-    return;
-  }
   try {
-    if (publish_rgb_point_cloud_ &&
-        (format_[COLOR] == OB_FORMAT_YUYV || format_[COLOR] == OB_FORMAT_I420)) {
+    if (align_depth_ && (format_[COLOR] == OB_FORMAT_YUYV || format_[COLOR] == OB_FORMAT_I420)) {
       if (frame_set->depthFrame() != nullptr && frame_set->colorFrame() != nullptr) {
         publishColorPointCloud(frame_set);
       }
-    } else if (frame_set->depthFrame() != nullptr) {
+    }
+    if (frame_set->depthFrame() != nullptr) {
       publishDepthPointCloud(frame_set);
     }
   } catch (const ob::Error& e) {
@@ -262,6 +261,9 @@ void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
 }
 
 void OBCameraNode::publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
+  if (depth_point_cloud_publisher_->get_subscription_count() == 0) {
+    return;
+  }
   auto camera_param = pipeline_->getCameraParam();
   point_cloud_filter_.setCameraParam(camera_param);
   point_cloud_filter_.setCreatePointFormat(OB_FORMAT_POINT);
@@ -300,10 +302,13 @@ void OBCameraNode::publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   point_cloud_msg_.width = valid_count;
   point_cloud_msg_.height = 1;
   modifier.resize(valid_count);
-  point_cloud_publisher_->publish(point_cloud_msg_);
+  depth_point_cloud_publisher_->publish(point_cloud_msg_);
 }
 
 void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
+  if (point_cloud_publisher_->get_subscription_count() == 0) {
+    return;
+  }
   auto depth_frame = frame_set->depthFrame();
   auto color_frame = frame_set->colorFrame();
   auto camera_param = pipeline_->getCameraParam();
@@ -483,6 +488,7 @@ void OBCameraNode::setupDefaultStreamCalibData() {
   auto param = findDefaultCameraParam();
   if (!param.has_value()) {
     RCLCPP_WARN_STREAM(logger_, "Not Found default camera parameter");
+    align_depth_ = false;
     return;
   } else {
     updateStreamCalibData(*param);
@@ -608,7 +614,7 @@ void OBCameraNode::publishColorFrame(std::shared_ptr<ob::ColorFrame> frame) {
   }
   image.data = (uint8_t*)frame->data();
   auto timestamp = frameTimeStampToROSTime(frame->systemTimeStamp());
-  if(camera_infos_.count(stream)) {
+  if (camera_infos_.count(stream)) {
     auto& cam_info = camera_infos_.at(stream);
     if (cam_info.width != width || cam_info.height != height) {
       updateStreamCalibData(pipeline_->getCameraParam());

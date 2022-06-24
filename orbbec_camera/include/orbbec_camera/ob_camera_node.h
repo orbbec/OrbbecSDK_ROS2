@@ -288,6 +288,8 @@ class OBCameraNode {
   std::shared_ptr<tf2_ros::TransformBroadcaster> dynamic_tf_broadcaster_;
   std::vector<geometry_msgs::msg::TransformStamped> tf_msgs;
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr point_cloud_publisher_;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr depth_point_cloud_publisher_;
+
   ob::PointCloudFilter point_cloud_filter_;
   sensor_msgs::msg::PointCloud2 point_cloud_msg_;
 

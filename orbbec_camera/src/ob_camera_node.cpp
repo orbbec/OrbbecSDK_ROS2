@@ -40,7 +40,7 @@ OBCameraNode::OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> devic
   if (device_pid == FEMTO_PID || device_pid == FEMTO_LIVE_PID || device_pid == FEMTO_OW_PID) {
     format_[COLOR] = OB_FORMAT_I420;
   } else if (device_pid == ASTRA_PLUS_PID || device_pid == ASTRA_PLUS_S_PID) {
-    format_[COLOR] = OB_FORMAT_YUYV;
+    format_[COLOR] = OB_FORMAT_MJPG;
   } else {
     // default RGB888
     format_[COLOR] = OB_FORMAT_RGB888;
@@ -226,8 +226,8 @@ void OBCameraNode::setupPublishers() {
   static_tf_broadcaster_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(node_);
   using PointCloud2 = sensor_msgs::msg::PointCloud2;
   using CameraInfo = sensor_msgs::msg::CameraInfo;
-  point_cloud_publisher_ =
-      node_->create_publisher<PointCloud2>("depth/points", rclcpp::QoS{1}.best_effort());
+  point_cloud_publisher_ = node_->create_publisher<PointCloud2>(
+      "depth/points", rclcpp::QoS{1}.best_effort().keep_last(1));
   for (const auto& stream_index : IMAGE_STREAMS) {
     std::string name = stream_name_[stream_index.first];
     std::string topic = name + "/image_raw";
@@ -297,6 +297,10 @@ void OBCameraNode::publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   auto timestamp = frameTimeStampToROSTime(depth_frame->systemTimeStamp());
   point_cloud_msg_.header.stamp = timestamp;
   point_cloud_msg_.header.frame_id = optical_frame_id_[DEPTH];
+  point_cloud_msg_.is_dense = true;
+  point_cloud_msg_.width = valid_count;
+  point_cloud_msg_.height = 1;
+  modifier.resize(valid_count);
   point_cloud_publisher_->publish(point_cloud_msg_);
 }
 
@@ -330,6 +334,7 @@ void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   sensor_msgs::PointCloud2Iterator<uint8_t> iter_g(point_cloud_msg_, "g");
   sensor_msgs::PointCloud2Iterator<uint8_t> iter_b(point_cloud_msg_, "b");
   size_t valid_count = 0;
+
   for (size_t point_idx = 0; point_idx < point_size; point_idx++, points++) {
     bool valid_pixel(points->z > 0);
     if (valid_pixel) {
@@ -352,6 +357,10 @@ void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   auto timestamp = frameTimeStampToROSTime(depth_frame->systemTimeStamp());
   point_cloud_msg_.header.stamp = timestamp;
   point_cloud_msg_.header.frame_id = optical_frame_id_[COLOR];
+  point_cloud_msg_.is_dense = true;
+  point_cloud_msg_.width = valid_count;
+  point_cloud_msg_.height = 1;
+  modifier.resize(valid_count);
   point_cloud_publisher_->publish(point_cloud_msg_);
 }
 

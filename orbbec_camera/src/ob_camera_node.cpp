@@ -583,7 +583,6 @@ void OBCameraNode::publishColorFrame(std::shared_ptr<ob::ColorFrame> frame) {
   auto& image_publisher = image_publishers_.at(stream);
   auto& cam_info = camera_infos_.at(stream);
   if (cam_info.width != width || cam_info.height != height) {
-    RCLCPP_ERROR(logger_, "cam info error");
     updateStreamCalibData(pipeline_->getCameraParam());
     cam_info.height = height;
     cam_info.width = width;
@@ -616,7 +615,6 @@ void OBCameraNode::publishDepthFrame(std::shared_ptr<ob::DepthFrame> frame) {
   auto& image_publisher = image_publishers_.at(stream);
   auto& cam_info = camera_infos_.at(stream);
   if (cam_info.width != width || cam_info.height != height) {
-    RCLCPP_ERROR(logger_, "cam info error");
     updateStreamCalibData(pipeline_->getCameraParam());
     cam_info.height = height;
     cam_info.width = width;
@@ -632,7 +630,7 @@ void OBCameraNode::publishDepthFrame(std::shared_ptr<ob::DepthFrame> frame) {
   img->is_bigendian = false;
   img->step = width * unit_step_size_[stream];
   if (align_depth_) {
-    img->header.frame_id = optical_frame_id_[COLOR];
+    img->header.frame_id = depth_aligned_frame_id_[DEPTH];
   } else {
     img->header.frame_id = optical_frame_id_[DEPTH];
   }
@@ -653,7 +651,6 @@ void OBCameraNode::publishIRFrame(std::shared_ptr<ob::IRFrame> frame) {
   auto& image_publisher = image_publishers_.at(stream);
   auto& cam_info = camera_infos_.at(stream);
   if (cam_info.width != width || cam_info.height != height) {
-    RCLCPP_ERROR(logger_, "cam info error");
     updateStreamCalibData(pipeline_->getCameraParam());
     cam_info.height = height;
     cam_info.width = width;
@@ -669,7 +666,7 @@ void OBCameraNode::publishIRFrame(std::shared_ptr<ob::IRFrame> frame) {
   img->is_bigendian = false;
   img->step = width * unit_step_size_[stream];
   if (align_depth_) {
-    img->header.frame_id = optical_frame_id_[COLOR];
+    img->header.frame_id = depth_aligned_frame_id_[DEPTH];
   } else {
     img->header.frame_id = optical_frame_id_[DEPTH];
   }

@@ -105,12 +105,12 @@ void OBCameraNode::setupCameraCtrlServices() {
         setWhiteBalanceCallback(request, response);
       });
   get_auto_white_balance_srv_ = node_->create_service<GetInt32>(
-      "get_white_balance", [this](const std::shared_ptr<GetInt32::Request> request,
+      "get_auto_white_balance", [this](const std::shared_ptr<GetInt32::Request> request,
                                   std::shared_ptr<GetInt32::Response> response) {
         getAutoWhiteBalanceCallback(request, response);
       });
   set_auto_white_balance_srv_ = node_->create_service<SetBool>(
-      "set_white_balance", [this](const std::shared_ptr<SetBool::Request> request,
+      "set_auto_white_balance", [this](const std::shared_ptr<SetBool::Request> request,
                                   std::shared_ptr<SetBool::Response> response) {
         setAutoWhiteBalanceCallback(request, response);
       });

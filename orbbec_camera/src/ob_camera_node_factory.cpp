@@ -145,9 +145,7 @@ void OBCameraNodeFactory::getDevice(const std::shared_ptr<ob::DeviceList> &list)
     if (device_ == nullptr) {
       std::string lower_sn;
       std::transform(serial_number_.begin(), serial_number_.end(), std::back_inserter(lower_sn),
-                     [](auto ch) {
-                       return isalpha(ch) ? tolower(ch) : static_cast<int>(ch);
-                     });
+                     [](auto ch) { return isalpha(ch) ? tolower(ch) : static_cast<int>(ch); });
       device_ = list->getDeviceBySN(lower_sn.c_str());
     }
     if (device_ == nullptr) {

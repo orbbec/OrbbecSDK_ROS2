@@ -147,6 +147,9 @@ class OBCameraNode {
 
   std::optional<OBCameraParam> findCameraParam(uint32_t color_width, uint32_t color_height,
                                                uint32_t depth_width, uint32_t depth_height);
+  std::optional<OBCameraParam> findDepthCameraParam(uint32_t width, uint32_t height);
+
+  std::optional<OBCameraParam> findColorCameraParam(uint32_t width, uint32_t height);
 
   void getExposureCallback(const std::shared_ptr<GetInt32::Request>& request,
                            std::shared_ptr<GetInt32::Response>& response,
@@ -174,7 +177,7 @@ class OBCameraNode {
                                    std::shared_ptr<GetInt32::Response>& response);
 
   void setAutoWhiteBalanceCallback(const std::shared_ptr<SetBool::Request>& request,
-                                   std::shared_ptr<SetBool ::Response>& response);
+                                   std::shared_ptr<SetBool::Response>& response);
 
   void setAutoExposureCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
                                std::shared_ptr<std_srvs::srv::SetBool::Response>& response,

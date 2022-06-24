@@ -116,6 +116,16 @@ void OBCameraNode::setupProfiles() {
     config_.reset();
   }
   config_ = std::make_shared<ob::Config>();
+  if (d2c_mode_ == "sw") {
+    config_->setAlignMode(ALIGN_D2C_SW_MODE);
+    align_depth_ = true;
+  } else if (d2c_mode_ == "hw") {
+    config_->setAlignMode(ALIGN_D2C_HW_MODE);
+    align_depth_ = true;
+  } else {
+    config_->setAlignMode(ALIGN_DISABLE);
+    align_depth_ = false;
+  }
   for (const auto& elem : IMAGE_STREAMS) {
     if (enable_[elem]) {
       const auto& sensor = sensors_[elem];
@@ -158,25 +168,14 @@ void OBCameraNode::setupProfiles() {
       images_[elem] =
           cv::Mat(height_[elem], width_[elem], image_format_[elem.first], cv::Scalar(0, 0, 0));
       RCLCPP_INFO_STREAM(
-          logger_, " stream is enabled - width: "
-                       << width_[elem] << ", height: " << height_[elem] << ", fps: " << fps_[elem]
-                       << ", "
-                       << "Format: " << magic_enum::enum_name(selected_profile->format()));
+          logger_, " stream " << stream_name_[elem.first] << " is enabled - width: " << width_[elem]
+                              << ", height: " << height_[elem] << ", fps: " << fps_[elem] << ", "
+                              << "Format: " << magic_enum::enum_name(selected_profile->format()));
     }
   }
 }
 
 void OBCameraNode::startPipeline() {
-  if (d2c_mode_ == "sw") {
-    config_->setAlignMode(ALIGN_D2C_SW_MODE);
-    align_depth_ = true;
-  } else if (d2c_mode_ == "hw") {
-    config_->setAlignMode(ALIGN_D2C_HW_MODE);
-    align_depth_ = true;
-  } else {
-    config_->setAlignMode(ALIGN_DISABLE);
-    align_depth_ = false;
-  }
   if (pipeline_ != nullptr) {
     pipeline_.reset();
   }
@@ -455,13 +454,39 @@ std::optional<OBCameraParam> OBCameraNode::findCameraParam(uint32_t color_width,
   return {};
 }
 
+std::optional<OBCameraParam> OBCameraNode::findDepthCameraParam(uint32_t width, uint32_t height) {
+  auto camera_params = device_->getCalibrationCameraParamList();
+  for (size_t i = 0; i < camera_params->count(); i++) {
+    auto param = camera_params->getCameraParam(i);
+    int depth_w = param.depthIntrinsic.width;
+    int depth_h = param.depthIntrinsic.height;
+    if (depth_w * height == depth_h * width) {
+      return param;
+    }
+  }
+  return {};
+}
+
+std::optional<OBCameraParam> OBCameraNode::findColorCameraParam(uint32_t width, uint32_t height) {
+  auto camera_params = device_->getCalibrationCameraParamList();
+  for (size_t i = 0; i < camera_params->count(); i++) {
+    auto param = camera_params->getCameraParam(i);
+    int color_w = param.rgbIntrinsic.width;
+    int color_h = param.rgbIntrinsic.height;
+    if (color_w * height == color_h * width) {
+      return param;
+    }
+  }
+  return {};
+}
 void OBCameraNode::setupDefaultStreamCalibData() {
   auto param = findDefaultCameraParam();
   if (!param.has_value()) {
     RCLCPP_WARN_STREAM(logger_, "Not Found default camera parameter");
     return;
+  } else {
+    updateStreamCalibData(*param);
   }
-  updateStreamCalibData(*param);
 }
 
 void OBCameraNode::updateStreamCalibData(const OBCameraParam& param) {
@@ -489,16 +514,20 @@ void OBCameraNode::publishStaticTF(const rclcpp::Time& t, const std::vector<floa
 }
 
 void OBCameraNode::calcAndPublishStaticTransform() {
-  tf2::Quaternion quaternion_optical, zero_rot;
+  tf2::Quaternion quaternion_optical, zero_rot, Q;
+  std::vector<float> trans(3, 0);
   zero_rot.setRPY(0.0, 0.0, 0.0);
   quaternion_optical.setRPY(-M_PI / 2, 0.0, -M_PI / 2);
   std::vector<float> zero_trans = {0, 0, 0};
   auto camera_param = findDefaultCameraParam();
-  CHECK(camera_param.has_value());
-  auto ex = camera_param->transform;
-  auto Q = rotationMatrixToQuaternion(ex.rot);
-  Q = quaternion_optical * Q * quaternion_optical.inverse();
-  std::vector<float> trans = {ex.trans[0], ex.trans[1], ex.trans[2]};
+  if (camera_param.has_value()) {
+    auto ex = camera_param->transform;
+    Q = rotationMatrixToQuaternion(ex.rot);
+    Q = quaternion_optical * Q * quaternion_optical.inverse();
+    extrinsics_publisher_->publish(obExtrinsicsToMsg(ex, "depth_to_color_extrinsics"));
+  } else {
+    Q.setRPY(0, 0, 0);
+  }
   rclcpp::Time tf_timestamp = node_->now();
 
   publishStaticTF(tf_timestamp, trans, Q, frame_id_[DEPTH], frame_id_[COLOR]);
@@ -508,7 +537,6 @@ void OBCameraNode::calcAndPublishStaticTransform() {
   publishStaticTF(tf_timestamp, zero_trans, quaternion_optical, frame_id_[DEPTH],
                   optical_frame_id_[DEPTH]);
   publishStaticTF(tf_timestamp, zero_trans, zero_rot, camera_link_frame_id_, frame_id_[DEPTH]);
-  extrinsics_publisher_->publish(obExtrinsicsToMsg(ex, "depth_to_color_extrinsics"));
 }
 
 void OBCameraNode::publishStaticTransforms() {
@@ -579,17 +607,18 @@ void OBCameraNode::publishColorFrame(std::shared_ptr<ob::ColorFrame> frame) {
     image.create(height, width, image.type());
   }
   image.data = (uint8_t*)frame->data();
-  auto& camera_info_publisher = camera_info_publishers_.at(stream);
-  auto& image_publisher = image_publishers_.at(stream);
-  auto& cam_info = camera_infos_.at(stream);
-  if (cam_info.width != width || cam_info.height != height) {
-    updateStreamCalibData(pipeline_->getCameraParam());
-    cam_info.height = height;
-    cam_info.width = width;
-  }
   auto timestamp = frameTimeStampToROSTime(frame->systemTimeStamp());
-  cam_info.header.stamp = timestamp;
-  camera_info_publisher->publish(cam_info);
+  if(camera_infos_.count(stream)) {
+    auto& cam_info = camera_infos_.at(stream);
+    if (cam_info.width != width || cam_info.height != height) {
+      updateStreamCalibData(pipeline_->getCameraParam());
+      cam_info.height = height;
+      cam_info.width = width;
+    }
+    cam_info.header.stamp = timestamp;
+    auto& camera_info_publisher = camera_info_publishers_.at(stream);
+    camera_info_publisher->publish(cam_info);
+  }
   sensor_msgs::msg::Image::SharedPtr img;
   img = cv_bridge::CvImage(std_msgs::msg::Header(), encoding_.at(stream), image).toImageMsg();
 
@@ -599,6 +628,7 @@ void OBCameraNode::publishColorFrame(std::shared_ptr<ob::ColorFrame> frame) {
   img->step = width * unit_step_size_[stream];
   img->header.frame_id = optical_frame_id_[COLOR];
   img->header.stamp = timestamp;
+  auto& image_publisher = image_publishers_.at(stream);
   image_publisher.publish(img);
 }
 
@@ -611,17 +641,18 @@ void OBCameraNode::publishDepthFrame(std::shared_ptr<ob::DepthFrame> frame) {
     image.create(height, width, image.type());
   }
   image.data = (uint8_t*)frame->data();
-  auto& camera_info_publisher = camera_info_publishers_.at(stream);
-  auto& image_publisher = image_publishers_.at(stream);
-  auto& cam_info = camera_infos_.at(stream);
-  if (cam_info.width != width || cam_info.height != height) {
-    updateStreamCalibData(pipeline_->getCameraParam());
-    cam_info.height = height;
-    cam_info.width = width;
-  }
   auto timestamp = frameTimeStampToROSTime(frame->systemTimeStamp());
-  cam_info.header.stamp = timestamp;
-  camera_info_publisher->publish(cam_info);
+  if (camera_infos_.count(stream)) {
+    auto& cam_info = camera_infos_.at(stream);
+    if (cam_info.width != width || cam_info.height != height) {
+      updateStreamCalibData(pipeline_->getCameraParam());
+      cam_info.height = height;
+      cam_info.width = width;
+    }
+    cam_info.header.stamp = timestamp;
+    auto& camera_info_publisher = camera_info_publishers_.at(stream);
+    camera_info_publisher->publish(cam_info);
+  }
   sensor_msgs::msg::Image::SharedPtr img;
   img = cv_bridge::CvImage(std_msgs::msg::Header(), encoding_.at(stream), image).toImageMsg();
 
@@ -635,6 +666,7 @@ void OBCameraNode::publishDepthFrame(std::shared_ptr<ob::DepthFrame> frame) {
     img->header.frame_id = optical_frame_id_[DEPTH];
   }
   img->header.stamp = timestamp;
+  auto& image_publisher = image_publishers_.at(stream);
   image_publisher.publish(img);
 }
 
@@ -647,17 +679,20 @@ void OBCameraNode::publishIRFrame(std::shared_ptr<ob::IRFrame> frame) {
     image.create(height, width, image.type());
   }
   image.data = (uint8_t*)frame->data();
-  auto& camera_info_publisher = camera_info_publishers_.at(stream);
-  auto& image_publisher = image_publishers_.at(stream);
-  auto& cam_info = camera_infos_.at(stream);
-  if (cam_info.width != width || cam_info.height != height) {
-    updateStreamCalibData(pipeline_->getCameraParam());
-    cam_info.height = height;
-    cam_info.width = width;
-  }
   auto timestamp = frameTimeStampToROSTime(frame->systemTimeStamp());
-  cam_info.header.stamp = timestamp;
-  camera_info_publisher->publish(cam_info);
+  auto& image_publisher = image_publishers_.at(stream);
+  if (camera_infos_.count(stream)) {
+    auto& cam_info = camera_infos_.at(stream);
+    auto& camera_info_publisher = camera_info_publishers_.at(stream);
+
+    if (cam_info.width != width || cam_info.height != height) {
+      updateStreamCalibData(pipeline_->getCameraParam());
+      cam_info.height = height;
+      cam_info.width = width;
+    }
+    cam_info.header.stamp = timestamp;
+    camera_info_publisher->publish(cam_info);
+  }
   sensor_msgs::msg::Image::SharedPtr img;
   img = cv_bridge::CvImage(std_msgs::msg::Header(), encoding_.at(stream), image).toImageMsg();
 

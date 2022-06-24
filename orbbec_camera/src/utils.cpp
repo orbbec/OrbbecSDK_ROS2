@@ -150,5 +150,59 @@ std::string getObSDKVersion() {
   std::string version = major + "." + minor + "." + patch;
   return version;
 }
+OBFormat OBFormatFromString(const std::string &format) {
+  std::string fixed_format;
+  std::transform(format.begin(), format.end(), std::back_inserter(fixed_format),
+                 [](const auto ch) { return std::isalpha(ch) ? toupper(ch) : ch; });
+  if (fixed_format == "YUYV") {
+    return OB_FORMAT_YUYV;
+  } else if (fixed_format == "YUYV2") {
+    return OB_FORMAT_YUY2;
+  } else if (fixed_format == "UYVY") {
+    return OB_FORMAT_UYVY;
+  } else if (fixed_format == "NV12") {
+    return OB_FORMAT_NV12;
+  } else if (fixed_format == "NV21") {
+    return OB_FORMAT_NV21;
+  } else if (fixed_format == "H264") {
+    return OB_FORMAT_H264;
+  } else if (fixed_format == "H265") {
+    return OB_FORMAT_H265;
+  } else if (fixed_format == "Y16") {
+    return OB_FORMAT_Y16;
+  } else if (fixed_format == "Y8") {
+    return OB_FORMAT_Y8;
+  } else if (fixed_format == "Y10") {
+    return OB_FORMAT_Y10;
+  } else if (fixed_format == "Y11") {
+    return OB_FORMAT_Y11;
+  } else if (fixed_format == "Y12") {
+    return OB_FORMAT_Y12;
+  } else if (fixed_format == "GRAY") {
+    return OB_FORMAT_GRAY;
+  } else if (fixed_format == "HEVC") {
+    return OB_FORMAT_HEVC;
+  } else if (fixed_format == "I420") {
+    return OB_FORMAT_I420;
+  } else if (fixed_format == "ACCEL") {
+    return OB_FORMAT_ACCEL;
+  } else if (fixed_format == "GYRO") {
+    return OB_FORMAT_GYRO;
+  } else if (fixed_format == "POINT") {
+    return OB_FORMAT_POINT;
+  } else if (fixed_format == "RGB_POINT") {
+    return OB_FORMAT_RGB_POINT;
+  } else if (fixed_format == "REL") {
+    return OB_FORMAT_RLE;
+  } else if (fixed_format == "RGB888") {
+    return OB_FORMAT_RGB888;
+  } else if (fixed_format == "BGR") {
+    return OB_FORMAT_BGR;
+  } else if (fixed_format == "Y14") {
+    return OB_FORMAT_Y14;
+  } else {
+    return OB_FORMAT_UNKNOWN;
+  }
+}
 
 }  // namespace orbbec_camera

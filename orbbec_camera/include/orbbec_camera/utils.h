@@ -42,4 +42,6 @@ rclcpp::Time frameTimeStampToROSTime(uint64_t ms);
 
 std::string getObSDKVersion();
 
+OBFormat OBFormatFromString(const std::string& format);
+
 }  // namespace orbbec_camera

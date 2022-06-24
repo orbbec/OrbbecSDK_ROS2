@@ -40,7 +40,7 @@ OBCameraNode::OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> devic
   if (device_pid == FEMTO_PID || device_pid == FEMTO_LIVE_PID || device_pid == FEMTO_OW_PID) {
     format_[COLOR] = OB_FORMAT_I420;
   } else if (device_pid == ASTRA_PLUS_PID || device_pid == ASTRA_PLUS_S_PID) {
-    format_[COLOR] = OB_FORMAT_MJPG;
+    format_[COLOR] = OB_FORMAT_YUYV;
   } else {
     // default RGB888
     format_[COLOR] = OB_FORMAT_RGB888;
@@ -307,9 +307,8 @@ void OBCameraNode::publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_se
 void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
   auto depth_frame = frame_set->depthFrame();
   auto color_frame = frame_set->colorFrame();
-  auto camera_param = findCameraParam(color_frame->width(), color_frame->height(),
-                                      depth_frame->width(), depth_frame->height());
-  point_cloud_filter_.setCameraParam(*camera_param);
+  auto camera_param = pipeline_->getCameraParam();
+  point_cloud_filter_.setCameraParam(camera_param);
   point_cloud_filter_.setCreatePointFormat(OB_FORMAT_RGB_POINT);
   auto frame = point_cloud_filter_.process(frame_set);
   size_t point_size = frame->dataSize() / sizeof(OBColorPoint);
@@ -321,7 +320,6 @@ void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   point_cloud_msg_.width = color_frame->width();
   point_cloud_msg_.height = color_frame->height();
   std::string format_str = "rgb";
-
   point_cloud_msg_.point_step =
       addPointField(point_cloud_msg_, format_str.c_str(), 1, sensor_msgs::msg::PointField::FLOAT32,
                     point_cloud_msg_.point_step);

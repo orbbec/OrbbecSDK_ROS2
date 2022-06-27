@@ -35,7 +35,6 @@ find_package(tf2_eigen REQUIRED)
 find_package(tf2_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_sensor_msgs REQUIRED)
-find_package(OpenMP REQUIRED)
 find_package(Threads REQUIRED)
 
 
@@ -98,7 +97,6 @@ target_link_libraries(${PROJECT_NAME}
   Eigen3::Eigen
   glog::glog
   magic_enum::magic_enum
-  OpenMP::OpenMP_CXX
   )
 
 install(TARGETS ${PROJECT_NAME}

@@ -14,7 +14,6 @@
 
 #include <string>
 #include <cstdlib>
-#include <omp.h>
 
 #define THREAD_NUM 4
 

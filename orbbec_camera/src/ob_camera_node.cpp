@@ -27,11 +27,13 @@ OBCameraNode::OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> devic
   // FIXME:
   is_running_.store(true);
   format_[DEPTH] = OB_FORMAT_Y16;
+  format_str_[DEPTH] = "Y16";
   image_format_[OB_STREAM_DEPTH] = CV_16UC1;
   encoding_[DEPTH] = sensor_msgs::image_encodings::TYPE_16UC1;
   stream_name_[OB_STREAM_DEPTH] = "depth";
   unit_step_size_[DEPTH] = sizeof(uint16_t);
   format_[INFRA0] = OB_FORMAT_Y16;
+  format_str_[INFRA0] = "Y16";
   image_format_[OB_STREAM_IR] = CV_16UC1;
   encoding_[INFRA0] = sensor_msgs::image_encodings::MONO16;
   stream_name_[OB_STREAM_IR] = "ir";
@@ -39,11 +41,14 @@ OBCameraNode::OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> devic
   const auto device_pid = device_->getDeviceInfo()->pid();
   if (device_pid == FEMTO_PID || device_pid == FEMTO_LIVE_PID || device_pid == FEMTO_OW_PID) {
     format_[COLOR] = OB_FORMAT_I420;
+    format_str_[COLOR] = "I420";
   } else if (device_pid == ASTRA_PLUS_PID || device_pid == ASTRA_PLUS_S_PID) {
     format_[COLOR] = OB_FORMAT_YUYV;
+    format_str_[COLOR] = "YUYV";
   } else {
     // default RGB888
     format_[COLOR] = OB_FORMAT_RGB888;
+    format_str_[COLOR] = "RGB888";
   }
   image_format_[OB_STREAM_COLOR] = CV_8UC3;
   encoding_[COLOR] = sensor_msgs::image_encodings::BGR8;
@@ -203,6 +208,9 @@ void OBCameraNode::getParameters() {
     param_name = stream_name_[stream_index.first] + "_optical_frame_id";
     setAndGetNodeParameter(optical_frame_id_[stream_index], param_name, default_optical_frame_id);
     depth_aligned_frame_id_[stream_index] = stream_name_[OB_STREAM_COLOR] + "_optical_frame";
+    param_name = stream_name_[stream_index.first] + "_format";
+    setAndGetNodeParameter(format_str_[stream_index], param_name, format_str_[stream_index]);
+    format_[stream_index] = OBFormatFromString(format_str_[stream_index]);
   }
   setAndGetNodeParameter(publish_tf_, "publish_tf", true);
   setAndGetNodeParameter(tf_publish_rate_, "tf_publish_rate", 10.0);

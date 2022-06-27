@@ -20,7 +20,6 @@
     enable_depth: true
     publish_tf: true
     tf_publish_rate: 10.0
-    publish_rgb_point_cloud: true
     wait_for_device_timeout: 120.0
     reconnect_timeout: 6.0
     d2c_mode: "hw"

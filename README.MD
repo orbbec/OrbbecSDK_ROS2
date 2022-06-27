@@ -115,7 +115,7 @@ sudo ldconfig
 ```bash
 cd ~/ros2_ws/
 # build release, Default is Debug
-colcon build --event-handlers console_direct+ -DCMAKE_BUILD_TYPE=Release
+colcon build --event-handlers  console_direct+  --cmake-args  -DCMAKE_BUILD_TYPE=Release
 ```
 Launch camera node 
 * On terminal 1

@@ -298,8 +298,8 @@ void OBCameraNode::setAutoExposureCallback(
   try {
     switch (stream) {
       case OB_STREAM_IR:
-        response->success = false;
-        response->message = "IR not support set auto exposure";
+        response->success = true;
+        device_->setIntProperty(OB_PROP_IR_AUTO_EXPOSURE_BOOL, request->data);
         break;
       case OB_STREAM_DEPTH:
         device_->setIntProperty(OB_PROP_DEPTH_AUTO_EXPOSURE_BOOL, request->data);

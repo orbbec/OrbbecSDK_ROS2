@@ -247,6 +247,7 @@ void OBCameraNode::setupPublishers() {
   }
   extrinsics_publisher_ = node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
       "extrinsic/depth_to_color", rclcpp::QoS{1}.transient_local());
+  ob_point_cloud_publisher_ = std::make_unique<OBPointCloudPublisher>(node_);
 }
 
 void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
@@ -310,7 +311,8 @@ void OBCameraNode::publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   point_cloud_msg_.width = valid_count;
   point_cloud_msg_.height = 1;
   modifier.resize(valid_count);
-  depth_point_cloud_publisher_->publish(point_cloud_msg_);
+  ob_point_cloud_publisher_->pushColorPointCloud(std::move(point_cloud_msg_));
+  // depth_point_cloud_publisher_->publish(point_cloud_msg_);
 }
 
 void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
@@ -327,7 +329,7 @@ void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   auto* points = (OBColorPoint*)frame->data();
   CHECK_NOTNULL(points);
   sensor_msgs::PointCloud2Modifier modifier(point_cloud_msg_);
-  modifier.setPointCloud2FieldsByString(2, "xyz", "rgb");
+  modifier.setPointCloud2FieldsByString(1, "xyz");
   modifier.resize(point_size);
   point_cloud_msg_.width = color_frame->width();
   point_cloud_msg_.height = color_frame->height();
@@ -345,15 +347,15 @@ void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   sensor_msgs::PointCloud2Iterator<uint8_t> iter_b(point_cloud_msg_, "b");
   size_t valid_count = 0;
 
-  for (size_t point_idx = 0; point_idx < point_size; point_idx++, points++) {
-    bool valid_pixel(points->z > 0);
+  for (size_t point_idx = 0; point_idx < point_size; point_idx += 1) {
+    bool valid_pixel((points + point_idx)->z > 0);
     if (valid_pixel) {
-      *iter_x = static_cast<float>(points->x / 1000.0);
-      *iter_y = -static_cast<float>(points->y / 1000.0);
-      *iter_z = static_cast<float>(points->z / 1000.0);
-      *iter_r = static_cast<uint8_t>(points->r);
-      *iter_g = static_cast<uint8_t>(points->g);
-      *iter_b = static_cast<uint8_t>(points->b);
+      *iter_x = static_cast<float>((points + point_idx)->x / 1000.0);
+      *iter_y = -static_cast<float>((points + point_idx)->y / 1000.0);
+      *iter_z = static_cast<float>((points + point_idx)->z / 1000.0);
+      *iter_r = static_cast<uint8_t>((points + point_idx)->r);
+      *iter_g = static_cast<uint8_t>((points + point_idx)->g);
+      *iter_b = static_cast<uint8_t>((points + point_idx)->b);
 
       ++iter_x;
       ++iter_y;
@@ -371,7 +373,8 @@ void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   point_cloud_msg_.width = valid_count;
   point_cloud_msg_.height = 1;
   modifier.resize(valid_count);
-  point_cloud_publisher_->publish(point_cloud_msg_);
+  ob_point_cloud_publisher_->pushColorPointCloud(std::move(point_cloud_msg_));
+  // point_cloud_publisher_->publish(point_cloud_msg_);
 }
 
 void OBCameraNode::frameSetCallback(std::shared_ptr<ob::FrameSet> frame_set) {

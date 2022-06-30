@@ -51,6 +51,7 @@ add_library(${PROJECT_NAME} SHARED
   src/ob_camera_node_factory.cpp
   src/ob_camera_node.cpp
   src/ros_param_backend.cpp
+  src/ob_point_cloud_publisher.cpp
   src/ros_service.cpp
   src/utils.cpp
   )

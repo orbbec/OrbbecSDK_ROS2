@@ -48,6 +48,8 @@
 #include "orbbec_camera/constants.h"
 #include "orbbec_camera/dynamic_params.h"
 
+#include "orbbec_camera/ob_point_cloud_publisher.h"
+
 #define STREAM_NAME(sip)                                                                       \
   (static_cast<std::ostringstream&&>(std::ostringstream()                                      \
                                      << _stream_name[sip.first]                                \
@@ -305,5 +307,6 @@ class OBCameraNode {
   std::shared_ptr<std::thread> tf_thread_;
   std::condition_variable tf_cv_;
   double tf_publish_rate_ = 10.0;
+  std::unique_ptr<OBPointCloudPublisher> ob_point_cloud_publisher_;
 };
 }  // namespace orbbec_camera

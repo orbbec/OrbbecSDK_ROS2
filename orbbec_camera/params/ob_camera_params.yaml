@@ -1,7 +1,7 @@
 /**:
   ros__parameters:
-    color_width: 1280
-    color_height: 720
+    color_width: 1920
+    color_height: 1080
     color_fps: 30.0
     color_frame_id: "color_frame"
     color_optical_frame_id: "color_optical_frame"

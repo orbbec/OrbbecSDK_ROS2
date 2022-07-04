@@ -247,7 +247,6 @@ void OBCameraNode::setupPublishers() {
   }
   extrinsics_publisher_ = node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
       "extrinsic/depth_to_color", rclcpp::QoS{1}.transient_local());
-  ob_point_cloud_publisher_ = std::make_unique<OBPointCloudPublisher>(node_);
 }
 
 void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
@@ -311,8 +310,7 @@ void OBCameraNode::publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   point_cloud_msg_.width = valid_count;
   point_cloud_msg_.height = 1;
   modifier.resize(valid_count);
-  ob_point_cloud_publisher_->pushColorPointCloud(std::move(point_cloud_msg_));
-  // depth_point_cloud_publisher_->publish(point_cloud_msg_);
+  depth_point_cloud_publisher_->publish(point_cloud_msg_);
 }
 
 void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
@@ -373,8 +371,7 @@ void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   point_cloud_msg_.width = valid_count;
   point_cloud_msg_.height = 1;
   modifier.resize(valid_count);
-  ob_point_cloud_publisher_->pushColorPointCloud(std::move(point_cloud_msg_));
-  // point_cloud_publisher_->publish(point_cloud_msg_);
+  point_cloud_publisher_->publish(point_cloud_msg_);
 }
 
 void OBCameraNode::frameSetCallback(std::shared_ptr<ob::FrameSet> frame_set) {

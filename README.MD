@@ -82,30 +82,6 @@ sudo make install
 sudo ldconfig
 ```
 
-Install `ORBBEC_SDK`,First remove old one if you have installed, **BE CAREFUL**
-
-```bash
-# remove old If you have already installed
-cd /usr/local/lib/
-sudo rm libOrbbecSDK.so* # BE CAREFUL
-sudo rm libpostfilter.so
-cd /usr/local/include/
-sudo rm -fr libobsensor
-
-# install
-cd orbbec_camera/dependencies
-tar -xzvf sensor_sdk_v1.2.8_linux.tar.gz
-cd SDK/lib
-sudo cp libOrbbecSDK.so.1.2.8  /usr/local/lib
-sudo cp  libpostfilter.so /usr/local/lib
-sudo ln -s /usr/local/lib/libOrbbecSDK.so.1.2.8 /usr/local/lib/libOrbbecSDK.so.1.2
-sudo ln -s /usr/local/lib/libOrbbecSDK.so.1.2.8 /usr/local/lib/libOrbbecSDK.so
-cd ../include 
-sudo cp -frd libobsensor /usr/local/include
-sudo ldconfig
-```
-
-
 ---
 
 ## Getting start

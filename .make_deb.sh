@@ -6,7 +6,8 @@ sub_dir=(
   orbbec_camera
 )
 
-for pkg in ${sub_dir}; do 
-  cd ${pkg}
+for pkg in "${sub_dir[@]}"; do
+  cd "${pkg}"
   bash .make_deb.sh
+  cd "${CURR_DIR}"
 done

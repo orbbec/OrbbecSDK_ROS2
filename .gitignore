@@ -11,7 +11,9 @@
 *.lo
 *.o
 *.obj
-
+*.deb
+*.ddeb
+debian/
 # Precompiled Headers
 *.gch
 *.pch
@@ -339,6 +341,7 @@ CATKIN_IGNORE
 ### ROS2 ###
 install/
 log/
+.obj-x86_64-linux-gnu/
 
 # Ignore generated docs
 

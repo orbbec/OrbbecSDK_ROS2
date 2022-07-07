@@ -37,14 +37,8 @@ find_package(tf2_ros REQUIRED)
 find_package(tf2_sensor_msgs REQUIRED)
 find_package(Threads REQUIRED)
 
-
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-find_package(ORBBEC_SDK REQUIRED)
-
-if (NOT ORBBEC_SDK_FOUND)
-  message("Could not find Orbbec SDK!")
-endif ()
+set(ORBBEC_LIBS ${CMAKE_CURRENT_SOURCE_DIR}/SDK/lib)
+set(ORBBEC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/SDK/include/)
 
 add_library(${PROJECT_NAME} SHARED
   src/dynamic_params.cpp
@@ -63,7 +57,6 @@ set(dependencies
   image_transport
   image_publisher
   orbbec_camera_msgs
-  ORBBEC_SDK
   rclcpp
   rclcpp_components
   sensor_msgs
@@ -86,7 +79,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
-  ${ORBBEC_SDK_INCLUDE_DIR}
+  ${ORBBEC_INCLUDE_DIR}
   ${OpenCV_INCLUDED_DIRS}
   )
 
@@ -97,6 +90,8 @@ target_link_libraries(${PROJECT_NAME}
   Eigen3::Eigen
   glog::glog
   magic_enum::magic_enum
+  -lOrbbecSDK
+  -L${ORBBEC_LIBS}
   )
 
 install(TARGETS ${PROJECT_NAME}
@@ -125,6 +120,18 @@ install(DIRECTORY
   params
   DESTINATION share/${PROJECT_NAME}/
   )
+install(DIRECTORY
+  ${ORBBEC_INCLUDE_DIR}
+  DESTINATION include
+  )
+
+install(FILES
+  ${ORBBEC_LIBS}/libOrbbecSDK.so
+  ${ORBBEC_LIBS}/libOrbbecSDK.so.1.3
+  ${ORBBEC_LIBS}/libOrbbecSDK.so.1.3.1
+  ${ORBBEC_LIBS}/libpostfilter.so
+  DESTINATION lib
+  )
 
 if (BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -137,8 +144,8 @@ if (BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif ()
 
-ament_export_include_directories(include)
+ament_export_include_directories(include ${ORBBEC_INCLUDE_DIR})
 ament_export_libraries(${PROJECT_NAME})
-ament_export_dependencies(${dependencies})
+ament_export_dependencies(${dependencies} ${ORBBEC_LIBS})
 
 ament_package()

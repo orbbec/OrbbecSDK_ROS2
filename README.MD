@@ -82,6 +82,12 @@ sudo make install
 sudo ldconfig
 ```
 
+Install `99-obsensor-libusb.rules`
+```bash 
+cd orbbec_camera/scripts
+sudo bash install.sh
+sudo udevadm control --reload-rules && sudo udevadm trigger
+```
 ---
 
 ## Getting start

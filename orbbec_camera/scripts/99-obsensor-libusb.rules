@@ -1,0 +1,9 @@
+#  UVC cameras ()
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0635", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Femto"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0638", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Femto-w"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0668", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Femto-live"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0636", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Astra+"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0637", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Astra+s"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0536", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Astra+_rgb"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0537", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Astra+s_rgb"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0660", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="AstraII"

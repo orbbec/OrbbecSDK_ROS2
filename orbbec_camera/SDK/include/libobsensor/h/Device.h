@@ -35,19 +35,19 @@ uint32_t ob_device_list_device_count(ob_device_list *list, ob_error **error);
 
 /**
  *\if English
- * @brief Get device information
+ * @brief Get device name (DEPRECATED)
  *
  * @param[in] list Device list object
  * @param[in] index Device index
  * @param[out] error Log error messages
- * @return ob_device_info* returns device information
+ * @return const char* returns device name
  * \else
- * @brief 获取设备信息
+ * @brief 获取设备名称 (废弃接口)
  *
  * @param[in] list 设备列表对象
  * @param[in] index 设备索引
  * @param[out] error 记录错误信息
- * @return ob_device_info* 返回设备信息
+ * @return const char* 返回设备名称
  * \endif
  */
 const char *ob_device_list_get_device_name(ob_device_list *list, uint32_t index, ob_error **error);
@@ -111,7 +111,7 @@ const char *ob_device_list_get_device_uid(ob_device_list *list, uint32_t index, 
 
 /**
  * \if English
-  * @brief Get the serial number of the specified device
+ * @brief Get the serial number of the specified device
  *
  * @param[in] list Device list object
  * @param[in] index Device index
@@ -533,7 +533,7 @@ ob_property_item ob_device_get_supported_property(ob_device *device, uint32_t in
 
 /**
  * \if English
-  * @brief Check if device property permission is supported
+ * @brief Check if device property permission is supported
  *
  * @param[in] device Device object
  * @param[in] property_id Property id
@@ -885,7 +885,9 @@ void ob_device_write_authorization_code(ob_device *device, const char *auth_code
 
 /**
  * \if English
-  * @brief Get the original parameter list of camera calibration saved in the device. The parameters in the list do not correspond to the current open-stream configuration. You need to select the parameters according to the actual situation, and may need to do scaling, mirroring and other processing. Non-professional users are recommended to use the ob_pipeline_get_camera_param() interface.
+ * @brief Get the original parameter list of camera calibration saved in the device. The parameters in the list do not correspond to the current open-stream
+ * configuration. You need to select the parameters according to the actual situation, and may need to do scaling, mirroring and other processing.
+ * Non-professional users are recommended to use the ob_pipeline_get_camera_param() interface.
  * @param[in] device Device object
  * @param[out] error Log error messages
  *
@@ -903,9 +905,9 @@ ob_camera_param_list *ob_device_get_calibration_camera_param_list(ob_device *dev
 
 /**
  * \if English
-  * @brief Device reboot
- * @attention The device will be disconnected and reconnected. After the device is disconnected, the interface access to the device handle may be abnormal. Please use the ob_delete_device interface to delete the handle directly. 
- *   After the device is reconnected, it can be obtained again.
+ * @brief Device reboot
+ * @attention The device will be disconnected and reconnected. After the device is disconnected, the interface access to the device handle may be abnormal.
+ * Please use the ob_delete_device interface to delete the handle directly. After the device is reconnected, it can be obtained again.
  *
  * @param[in] device Device object
  * @param[out] error Log error messages
@@ -1024,20 +1026,20 @@ const char *ob_device_info_firmware_version(ob_device_info *info, ob_error **err
 
 /**
  * \if English
- * @brief Get usb connection type
+ * @brief Get usb connection type (DEPRECATED)
  *
  * @param[in] info Device Information
  * @param[out] error Log error messages
  * @return char* returns usb connection type
  * \else
- * @brief 获取usb连接类型
+ * @brief 获取usb连接类型 (废弃接口)
  *
  * @param[in] info 设备信息
  * @param[out] error 记录错误信息
  * @return char* 返回usb连接类型
  * \endif
  */
-DEPRECATED const char *ob_device_info_usb_type(ob_device_info *info, ob_error **error);
+const char *ob_device_info_usb_type(ob_device_info *info, ob_error **error);
 
 /**
  * \if English
@@ -1156,7 +1158,7 @@ ob_camera_param ob_camera_param_list_get_param(ob_camera_param_list *param_list,
 
 /**
  * \if English
-  * @brief Delete camera parameter list
+ * @brief Delete camera parameter list
  *
  * @param param_list Camera parameter list
  * @param error Log error messages

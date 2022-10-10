@@ -35,10 +35,10 @@ public:
     const char *getMessage() const noexcept;
 
     /**
-	 * \if English
-	 * @brief Get the exception type of the error, and determine which module is abnormal.
+     * \if English
+     * @brief Get the exception type of the error, and determine which module is abnormal.
      * @return OBExceptionType
-	 * \else
+     * \else
      * @brief 获取该错误的异常类型，判断是具体哪个模块异常。
      * @return OBExceptionType
      */

@@ -32,6 +32,8 @@
 #define DEPRECATED
 #endif
 
+#pragma pack(push, 1)  // struct 1-byte align
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -48,7 +50,7 @@ typedef struct SensorImpl            ob_sensor;
 typedef struct SensorListImpl        ob_sensor_list;
 typedef struct StreamProfileImpl     ob_stream_profile;
 typedef struct StreamProfileListImpl ob_stream_profile_list;
-typedef struct FrameImpl             ob_frame;
+typedef struct CFrameImpl            ob_frame;
 typedef struct FilterImpl            ob_filter;
 typedef struct PipelineImpl          ob_pipeline;
 typedef struct ConfigImpl            ob_config;
@@ -110,15 +112,19 @@ typedef enum {
  * \endif
  */
 typedef enum {
-    OB_EXCEPTION_TYPE_UNKNOWN,                 /**< \if English Unknown error, an error not clearly defined by the SDK \else 未知错误，SDK未明确定义的错误 \endif */
-    OB_EXCEPTION_TYPE_CAMERA_DISCONNECTED,     /**< \if English SDK device disconnection exception \else SDK的设备断开的异常 \endif */
-    OB_EXCEPTION_TYPE_PLATFORM,                /**< \if English An error in the SDK adaptation platform layer means an error in the implementation of a specific system platform \else 在SDK适配平台层错误，代表是具体一个系统平台实现上错误 \endif */
-    OB_EXCEPTION_TYPE_INVALID_VALUE,           /**< \if English Invalid parameter type exception, need to check input parameter \else 无效的参数类型异常，需要检查输入参数 \endif */
+    OB_EXCEPTION_TYPE_UNKNOWN, /**< \if English Unknown error, an error not clearly defined by the SDK \else 未知错误，SDK未明确定义的错误 \endif */
+    OB_EXCEPTION_TYPE_CAMERA_DISCONNECTED, /**< \if English SDK device disconnection exception \else SDK的设备断开的异常 \endif */
+    OB_EXCEPTION_TYPE_PLATFORM, /**< \if English An error in the SDK adaptation platform layer means an error in the implementation of a specific system
+                                   platform \else 在SDK适配平台层错误，代表是具体一个系统平台实现上错误 \endif */
+    OB_EXCEPTION_TYPE_INVALID_VALUE, /**< \if English Invalid parameter type exception, need to check input parameter \else 无效的参数类型异常，需要检查输入参数
+                                        \endif */
     OB_EXCEPTION_TYPE_WRONG_API_CALL_SEQUENCE, /**< \if English Exception caused by API version mismatch\else API版本不匹配带来的异常 \endif */
-    OB_EXCEPTION_TYPE_NOT_IMPLEMENTED,         /**< \if English SDK and firmware have not yet implemented functions \else SDK及固件还未实现功能 \endif */
-    OB_EXCEPTION_TYPE_IO,                      /**< \if English SDK access IO exception error \else SDK访问IO异常错误 \endif */
-    OB_EXCEPTION_TYPE_MEMORY,                  /**< \if English SDK access and use memory errors, which means that the frame fails to allocate memory \else SDK的访问和使用内存错误，代表桢分配内存失败\endif */
-    OB_EXCEPTION_TYPE_UNSUPPORTED_OPERATION,   /**< \if English Unsupported operation type error by SDK or RGBD device \else SDK或RGBD设备不支持的操作类型错误 \endif */
+    OB_EXCEPTION_TYPE_NOT_IMPLEMENTED, /**< \if English SDK and firmware have not yet implemented functions \else SDK及固件还未实现功能 \endif */
+    OB_EXCEPTION_TYPE_IO,              /**< \if English SDK access IO exception error \else SDK访问IO异常错误 \endif */
+    OB_EXCEPTION_TYPE_MEMORY,          /**< \if English SDK access and use memory errors, which means that the frame fails to allocate memory \else
+                                          SDK的访问和使用内存错误，代表桢分配内存失败\endif */
+    OB_EXCEPTION_TYPE_UNSUPPORTED_OPERATION, /**< \if English Unsupported operation type error by SDK or RGBD device \else SDK或RGBD设备不支持的操作类型错误
+                                                \endif */
 } OBExceptionType,
     ob_exception_type;
 
@@ -130,10 +136,12 @@ typedef enum {
  * \endif
  */
 typedef struct ob_error {
-    ob_status         status;          ///< \if English Describe the status code of the error, as compatible with previous customer status code requirements \else 描述错误的状态码，作为兼容之前客户状态码需求 \endif
-    char              message[256];    ///< \if English Describe the detailed error log \else 描述详细的错误日志 \endif
-    char              function[256];   ///< \if English Describe the name of the function where the error occurred \else 描述出现错误的函数名称 \endif
-    char              args[256];       ///< \if English Describes the parameters passed to the function when an error occurs. Used to check whether the parameter is wrong \else 描述出错时，函数传入的参数。用来检查是不是参数错 \endif
+    ob_status status;    ///< \if English Describe the status code of the error, as compatible with previous customer status code requirements \else
+                         ///< 描述错误的状态码，作为兼容之前客户状态码需求 \endif
+    char message[256];   ///< \if English Describe the detailed error log \else 描述详细的错误日志 \endif
+    char function[256];  ///< \if English Describe the name of the function where the error occurred \else 描述出现错误的函数名称 \endif
+    char args[256];  ///< \if English Describes the parameters passed to the function when an error occurs. Used to check whether the parameter is wrong \else
+                     ///< 描述出错时，函数传入的参数。用来检查是不是参数错 \endif
     ob_exception_type exception_type;  ///< \if English The description is the specific error type of the SDK \else 描述是SDK的具体错误类型 \endif
 } ob_error;
 
@@ -162,7 +170,8 @@ typedef enum {
  * \endif
  */
 typedef enum {
-    OB_STREAM_VIDEO = 0, /**< \if English Video stream (infrared, color, depth streams are all video streams) \else 视频流(红外、彩色、深度流都属于视频流) \endif */
+    OB_STREAM_UNKNOWN = -1, /**< \if English Unknown type stream \else 未知类型数据流 \endif */
+    OB_STREAM_VIDEO = 0, /**< \if English Video stream (infrared, color, depth streams are all video streams) \else 视频流(红外、彩色、深度流) \endif */
     OB_STREAM_IR    = 1, /**< \if English IR stream \else 红外流 \endif */
     OB_STREAM_COLOR = 2, /**< \if English color stream \else 彩色流 \endif */
     OB_STREAM_DEPTH = 3, /**< \if English depth stream \else 深度流 \endif */
@@ -179,11 +188,12 @@ typedef enum {
  * \endif
  */
 typedef enum {
-    OB_FRAME_VIDEO  = 0, /**< \if English Describes the Frame type enumeration value \else 视频帧(红外、彩色、深度帧都属于视频帧) \endif */
-    OB_FRAME_IR     = 1, /**< \if English IR frame \else 红外帧 \endif */
-    OB_FRAME_COLOR  = 2, /**< \if English color stream \else 彩色帧 \endif */
-    OB_FRAME_DEPTH  = 3, /**< \if English depth stream \else 深度帧 \endif */
-    OB_FRAME_ACCEL  = 4, /**< \if English Accelerometer data frame \else 加速度计数据帧 \endif */
+    OB_FRAME_UNKNOWN = -1, /**< \if English Unknown type frame \else 未知类型数据帧 \endif */
+    OB_FRAME_VIDEO   = 0,  /**< \if English Describes the Frame type enumeration value \else 视频帧(红外、彩色、深度帧都属于视频帧) \endif */
+    OB_FRAME_IR      = 1,  /**< \if English IR frame \else 红外帧 \endif */
+    OB_FRAME_COLOR   = 2,  /**< \if English color stream \else 彩色帧 \endif */
+    OB_FRAME_DEPTH   = 3,  /**< \if English depth stream \else 深度帧 \endif */
+    OB_FRAME_ACCEL   = 4,  /**< \if English Accelerometer data frame \else 加速度计数据帧 \endif */
     OB_FRAME_SET    = 5, /**< \if English Frame collection (internally contains a variety of data frames) \else 帧集合(内部包含多种数据帧) \endif */
     OB_FRAME_POINTS = 6, /**< \if English point cloud frame \else 点云帧 \endif */
     OB_FRAME_GYRO   = 7, /**< \if English Gyroscope data frame \else 陀螺仪数据帧 \endif */
@@ -198,31 +208,36 @@ typedef enum {
  * \endif
  */
 typedef enum {
-    OB_FORMAT_YUYV      = 0,    /**< \if English YUYV format \else YUYV格式 \endif */
-    OB_FORMAT_YUY2      = 1,    /**< \if English YUY2 format (the actual format is the same as YUYV) \else YUY2格式(实际格式与YUYV相同) \endif */
-    OB_FORMAT_UYVY      = 2,    /**< \if English UYVY format \else UYVY格式 \endif */
-    OB_FORMAT_NV12      = 3,    /**< \if English NV12 format \else NV12格式 \endif */
-    OB_FORMAT_NV21      = 4,    /**< \if English NV21 format \else NV21格式 \endif */
-    OB_FORMAT_MJPG      = 5,    /**< \if English MJPG encoding format \else MJPG编码格式 \endif */
-    OB_FORMAT_H264      = 6,    /**< \if English H.264 encoding format \else H.264编码格式 \endif */
-    OB_FORMAT_H265      = 7,    /**< \if English H.265 encoding format \else H.265编码格式 \endif */
-    OB_FORMAT_Y16       = 8,    /**< \if English Y16 format, single channel 16bit depth \else Y16格式，单通道16bit深度 \endif */
-    OB_FORMAT_Y8        = 9,    /**< \if English Y8 format, single channel 8bit depth \else Y8格式，单通道8bit深度 \endif */
-    OB_FORMAT_Y10       = 10,   /**< \if English Y10 format, single channel 10bit depth (SDK will unpack into Y16 by default) \else Y10格式，单通道10bit深度(SDK默认会解包成Y16) \endif */
-    OB_FORMAT_Y11       = 11,   /**< \if English Y11 format, single channel 11bit depth (SDK will unpack into Y16 by default)\else Y11格式，单通道11bit深度(SDK默认会解包成Y16) \endif */
-    OB_FORMAT_Y12       = 12,   /**< \if English Y12 format, single channel 12bit depth (SDK will unpack into Y16 by default) \else Y12格式，单通道12bit深度(SDK默认会解包成Y16) \endif */
-    OB_FORMAT_GRAY      = 13,   /**< \if English GRAY (the actual format is the same as YUYV) \else GRAY灰度(实际格式与YUYV相同) \endif */
-    OB_FORMAT_HEVC      = 14,   /**< \if English HEVC encoding format (the actual format is the same as H265) \else HEVC编码格式(实际格式与H265相同) \endif */
-    OB_FORMAT_I420      = 15,   /**< \if English I420 format \else I420格式  \endif */
-    OB_FORMAT_ACCEL     = 16,   /**< \if English Acceleration data format \else 加速度数据格式  \endif */
-    OB_FORMAT_GYRO      = 17,   /**< \if English Gyroscope Data Format \else 陀螺仪数据格式  \endif */
-    OB_FORMAT_POINT     = 19,   /**< \if English xyz 3D coordinate point format \else 纯x-y-z三维坐标点格式  \endif */
-    OB_FORMAT_RGB_POINT = 20,   /**< \if English xyz 3D coordinate point format with RGB information \else 带RGB信息的x-y-z三维坐标点格式 \endif */ 
-    OB_FORMAT_RLE       = 21,   /**< \if English RLE pressure test format (SDK will be unpacked into Y16 by default) \else RLE压测格式(SDK默认会解包成Y16) \endif */
-    OB_FORMAT_RGB888    = 22,   /**< \if English RGB888 format \else RGB888格式  \endif */
-    OB_FORMAT_BGR       = 23,   /**< \if English BGR format (actual BRG888) \else BGR格式(实际BRG888) \endif */
-    OB_FORMAT_Y14       = 24,   /**< \if English Y14 format, single channel 14bit depth (SDK will unpack into Y16 by default) \else Y14格式，单通道14bit深度(SDK默认会解包成Y16) \endif */
-    OB_FORMAT_UNKNOWN   = 0xff, /**< \if English unknown format \else 未知格式 \endif */
+    OB_FORMAT_YUYV = 0,  /**< \if English YUYV format \else YUYV格式 \endif */
+    OB_FORMAT_YUY2 = 1,  /**< \if English YUY2 format (the actual format is the same as YUYV) \else YUY2格式(实际格式与YUYV相同) \endif */
+    OB_FORMAT_UYVY = 2,  /**< \if English UYVY format \else UYVY格式 \endif */
+    OB_FORMAT_NV12 = 3,  /**< \if English NV12 format \else NV12格式 \endif */
+    OB_FORMAT_NV21 = 4,  /**< \if English NV21 format \else NV21格式 \endif */
+    OB_FORMAT_MJPG = 5,  /**< \if English MJPG encoding format \else MJPG编码格式 \endif */
+    OB_FORMAT_H264 = 6,  /**< \if English H.264 encoding format \else H.264编码格式 \endif */
+    OB_FORMAT_H265 = 7,  /**< \if English H.265 encoding format \else H.265编码格式 \endif */
+    OB_FORMAT_Y16  = 8,  /**< \if English Y16 format, single channel 16bit depth \else Y16格式，单通道16bit深度 \endif */
+    OB_FORMAT_Y8   = 9,  /**< \if English Y8 format, single channel 8bit depth \else Y8格式，单通道8bit深度 \endif */
+    OB_FORMAT_Y10  = 10, /**< \if English Y10 format, single channel 10bit depth (SDK will unpack into Y16 by default) \else
+                            Y10格式，单通道10bit深度(SDK默认会解包成Y16) \endif */
+    OB_FORMAT_Y11 = 11,  /**< \if English Y11 format, single channel 11bit depth (SDK will unpack into Y16 by default)\else
+                            Y11格式，单通道11bit深度(SDK默认会解包成Y16) \endif */
+    OB_FORMAT_Y12 = 12,  /**< \if English Y12 format, single channel 12bit depth (SDK will unpack into Y16 by default) \else
+                            Y12格式，单通道12bit深度(SDK默认会解包成Y16) \endif */
+    OB_FORMAT_GRAY = 13, /**< \if English GRAY (the actual format is the same as YUYV) \else GRAY灰度(实际格式与YUYV相同) \endif */
+    OB_FORMAT_HEVC = 14, /**< \if English HEVC encoding format (the actual format is the same as H265) \else HEVC编码格式(实际格式与H265相同) \endif */
+    OB_FORMAT_I420      = 15, /**< \if English I420 format \else I420格式  \endif */
+    OB_FORMAT_ACCEL     = 16, /**< \if English Acceleration data format \else 加速度数据格式  \endif */
+    OB_FORMAT_GYRO      = 17, /**< \if English Gyroscope Data Format \else 陀螺仪数据格式  \endif */
+    OB_FORMAT_POINT     = 19, /**< \if English xyz 3D coordinate point format \else 纯x-y-z三维坐标点格式  \endif */
+    OB_FORMAT_RGB_POINT = 20, /**< \if English xyz 3D coordinate point format with RGB information \else 带RGB信息的x-y-z三维坐标点格式 \endif */
+    OB_FORMAT_RLE = 21, /**< \if English RLE pressure test format (SDK will be unpacked into Y16 by default) \else RLE压测格式(SDK默认会解包成Y16) \endif */
+    OB_FORMAT_RGB888 = 22,    /**< \if English RGB888 format \else RGB888格式  \endif */
+    OB_FORMAT_BGR    = 23,    /**< \if English BGR format (actual BRG888) \else BGR格式(实际BRG888) \endif */
+    OB_FORMAT_Y14    = 24,    /**< \if English Y14 format, single channel 14bit depth (SDK will unpack into Y16 by default) \else
+                                 Y14格式，单通道14bit深度(SDK默认会解包成Y16) \endif */
+    OB_FORMAT_BGRA    = 25,   /**< BGRA */
+    OB_FORMAT_UNKNOWN = 0xff, /**< \if English unknown format \else 未知格式 \endif */
 } OBFormat,
     ob_format;
 
@@ -246,7 +261,7 @@ typedef enum {
     ERR_IMAGE_SIZE     = -5, /**< \if English Image file size error \else 镜像文件大小错误 \endif */
     ERR_OTHER          = -6, /**< \if English other errors \else 其他错误 \endif */
     ERR_DDR            = -7, /**< \if English DDR access error \else DDR访问错误 \endif */
-    ERR_TIMEOUT = -8         /**< \if English timeout error \else 超时错误 \endif */
+    ERR_TIMEOUT        = -8  /**< \if English timeout error \else 超时错误 \endif */
 } OBUpgradeState,
     ob_upgrade_state;
 /**
@@ -269,7 +284,7 @@ typedef enum {
 } OBFileTranState,
     ob_file_tran_state;
 
-/** 
+/**
  * \if English
  * @brief data transfer status
  * \else
@@ -297,10 +312,10 @@ typedef enum {
  * \endif
  */
 typedef struct {
-    void *   data;          ///< \if English current block data pointer \else 当前块数据指针 \endif     
-    uint32_t size;          ///< \if English Current block data length \else 当前块数据长度 \endif     
-    uint32_t offset;        ///< \if English The offset of the current data block relative to the complete data \else 当前数据块相对完整数据的偏移 \endif    
-    uint32_t fullDataSize;  ///< \if English full data size \else 完整数据大小 \endif    
+    void    *data;    ///< \if English current block data pointer \else 当前块数据指针 \endif
+    uint32_t size;    ///< \if English Current block data length \else 当前块数据长度 \endif
+    uint32_t offset;  ///< \if English The offset of the current data block relative to the complete data \else 当前数据块相对完整数据的偏移 \endif
+    uint32_t fullDataSize;  ///< \if English full data size \else 完整数据大小 \endif
 } OBDataChunk, ob_data_chunk;
 
 /**
@@ -311,11 +326,11 @@ typedef struct {
  * \endif
  */
 typedef struct {
-    int32_t cur;   ///< \if English current value \else 当前值 \endif    
-    int32_t max;   ///< \if English maximum value \else 最大值 \endif    
-    int32_t min;   ///< \if English minimum value \else 最小值 \endif    
-    int32_t step;  ///< \if English step value \else 步进值 \endif   
-    int32_t def;   ///< \if English Default \else 默认值 \endif   
+    int32_t cur;   ///< \if English current value \else 当前值 \endif
+    int32_t max;   ///< \if English maximum value \else 最大值 \endif
+    int32_t min;   ///< \if English minimum value \else 最小值 \endif
+    int32_t step;  ///< \if English step value \else 步进值 \endif
+    int32_t def;   ///< \if English Default \else 默认值 \endif
 } OBIntPropertyRange, ob_int_property_range;
 
 /**
@@ -326,11 +341,11 @@ typedef struct {
  * \endif
  */
 typedef struct {
-    float cur;   ///< \if English current value \else 当前值 \endif   
-    float max;   ///< \if English maximum value \else 最大值 \endif   
-    float min;   ///< \if English minimum value \else 最小值 \endif   
-    float step;  ///< \if English step value \else 步进值 \endif   
-    float def;   ///< \if English default \else 默认值 \endif   
+    float cur;   ///< \if English current value \else 当前值 \endif
+    float max;   ///< \if English maximum value \else 最大值 \endif
+    float min;   ///< \if English minimum value \else 最小值 \endif
+    float step;  ///< \if English step value \else 步进值 \endif
+    float def;   ///< \if English default \else 默认值 \endif
 } OBFloatPropertyRange, ob_float_property_range;
 
 /**
@@ -342,10 +357,10 @@ typedef struct {
  */
 typedef struct {
     bool cur;   ///< \if English current value \else 当前值 \endif
-    bool max;   ///< \if English maximum value \else 最大值 \endif  
-    bool min;   ///< \if English minimum value \else 最小值 \endif 
-    bool step;  ///< \if English step value \else 步进值 \endif 
-    bool def;   ///< \if English default \else 默认值 \endif 
+    bool max;   ///< \if English maximum value \else 最大值 \endif
+    bool min;   ///< \if English minimum value \else 最小值 \endif
+    bool step;  ///< \if English step value \else 步进值 \endif
+    bool def;   ///< \if English default \else 默认值 \endif
 } OBBoolPropertyRange, ob_bool_property_range;
 
 /**
@@ -356,12 +371,12 @@ typedef struct {
  * \endif
  */
 typedef struct {
-    float   fx;      ///< \if English focal length in x direction \else x方向焦距 \endif  
-    float   fy;      ///< \if English focal length in y direction \else y方向焦距 \endif   
-    float   cx;      ///< \if English Optical center abscissa \else 光心横坐标 \endif   
-    float   cy;      ///< \if English Optical center ordinate \else 光心纵坐标 \endif   
-    int16_t width;   ///< \if English image width \else 图像宽度 \endif   
-    int16_t height;  ///< \if English image height \else 图像高度 \endif  
+    float   fx;      ///< \if English focal length in x direction \else x方向焦距 \endif
+    float   fy;      ///< \if English focal length in y direction \else y方向焦距 \endif
+    float   cx;      ///< \if English Optical center abscissa \else 光心横坐标 \endif
+    float   cy;      ///< \if English Optical center ordinate \else 光心纵坐标 \endif
+    int16_t width;   ///< \if English image width \else 图像宽度 \endif
+    int16_t height;  ///< \if English image height \else 图像高度 \endif
 } OBCameraIntrinsic, ob_camera_intrinsic;
 
 /**
@@ -378,8 +393,8 @@ typedef struct {
     float k4;  ///< \if English Radial distortion factor 4 \else 径向畸变系数4 \endif
     float k5;  ///< \if English Radial distortion factor 5 \else 径向畸变系数5 \endif
     float k6;  ///< \if English Radial distortion factor 6 \else 径向畸变系数6 \endif
-    float p1;  ///< \if English Tangential distortion factor 1 \else 切向畸变系数1 \endif    
-    float p2;  ///< \if English Tangential distortion factor 2 \else 切向畸变系数2 \endif  
+    float p1;  ///< \if English Tangential distortion factor 1 \else 切向畸变系数1 \endif
+    float p2;  ///< \if English Tangential distortion factor 2 \else 切向畸变系数2 \endif
 } OBCameraDistortion, ob_camera_distortion;
 
 /**
@@ -390,8 +405,8 @@ typedef struct {
  * \endif
  */
 typedef struct {
-    float rot[9];    ///< \if English Rotation matrix \else 旋转矩阵，行优先\endif   
-    float trans[3];  ///< \if English transformation matrix \else 变化矩阵 \endif    
+    float rot[9];    ///< \if English Rotation matrix \else 旋转矩阵，行优先\endif
+    float trans[3];  ///< \if English transformation matrix \else 变化矩阵 \endif
 } OBD2CTransform, ob_d2c_transform;
 
 /**
@@ -402,12 +417,12 @@ typedef struct {
  * \endif
  */
 typedef struct {
-    OBCameraIntrinsic  depthIntrinsic;   ///< \if English Depth camera internal parameters \else 深度相机内参 \endif    
-    OBCameraIntrinsic  rgbIntrinsic;     ///< \if English Color camera internal parameters \else 彩色相机内参 \endif    
-    OBCameraDistortion depthDistortion;  ///< \if English Depth camera distortion parameters \else 深度相机畸变参数 \endif   
-    OBCameraDistortion rgbDistortion;    ///< \if English Color camera distortion parameters 1 \else 彩色相机畸变参数 \endif   
-    OBD2CTransform     transform;        ///< \if English rotation/transformation matrix \else 旋转/变换矩阵 \endif   
-    bool               isMirrored;       ///< \if English Whether the image frame corresponding to this group of parameters is mirrored \else 本组参数对应的图像帧是否被镜像 \endif   
+    OBCameraIntrinsic  depthIntrinsic;   ///< \if English Depth camera internal parameters \else 深度相机内参 \endif
+    OBCameraIntrinsic  rgbIntrinsic;     ///< \if English Color camera internal parameters \else 彩色相机内参 \endif
+    OBCameraDistortion depthDistortion;  ///< \if English Depth camera distortion parameters \else 深度相机畸变参数 \endif
+    OBCameraDistortion rgbDistortion;    ///< \if English Color camera distortion parameters 1 \else 彩色相机畸变参数 \endif
+    OBD2CTransform     transform;        ///< \if English rotation/transformation matrix \else 旋转/变换矩阵 \endif
+    bool               isMirrored;  ///< \if English Whether the image frame corresponding to this group of parameters is mirrored \else 本组参数对应的图像帧是否被镜像 \endif
 } OBCameraParam, ob_camera_param;
 
 /**
@@ -432,10 +447,10 @@ typedef enum {
  * \endif
  */
 typedef struct {
-    uint32_t x;       ///< \if English origin coordinate x \else 原点坐标x \endif     
-    uint32_t y;       ///< \if English origin coordinate y \else 原点坐标y \endif     
-    uint32_t width;   ///< \if English rectangle width \else 矩形宽度 \endif     
-    uint32_t height;  ///< \if English rectangle height \else 矩形高度 \endif     
+    uint32_t x;       ///< \if English origin coordinate x \else 原点坐标x \endif
+    uint32_t y;       ///< \if English origin coordinate y \else 原点坐标y \endif
+    uint32_t width;   ///< \if English rectangle width \else 矩形宽度 \endif
+    uint32_t height;  ///< \if English rectangle height \else 矩形高度 \endif
 } OBRect, ob_rect;
 
 /**
@@ -454,6 +469,9 @@ typedef enum {
     FORMAT_RGB888_TO_BGR,      /**< \if English RGB888 to BGR \else RGB888转换为BGR \endif */
     FORMAT_MJPEG_TO_NV21,      /**< \if English MJPG to NV21 \else MJPG转换为NV21 \endif */
     FORMAT_MJPEG_TO_RGB888,    /**< \if English MJPG to RGB888 \else MJPG转换为RGB888 \endif */
+    FORMAT_MJPEG_TO_BGR888,    /**< \if English MJPG to BGR888 \else MJPG转换为BGR888 \endif */
+    FORMAT_MJPEG_TO_BGRA,      /**< \if English MJPG to BGRA \else MJPG转换为BGRA \endif */
+    FORMAT_UYVY_TO_RGB888,     /**< \if English UYVY to RGB888 \else MJPG转换为RGB888 \endif */
 } OBConvertFormat,
     ob_convert_format;
 
@@ -526,24 +544,15 @@ typedef enum {
  * \endif
  */
 typedef struct {
-    float x;  ///< \if English x-direction component \else x方向分量 \endif     
-    float y;  ///< \if English y-direction component \else y方向分量 \endif    
-    float z;  ///< \if English z-direction component \else z方向分量 \endif     
+    float x;  ///< \if English x-direction component \else x方向分量 \endif
+    float y;  ///< \if English y-direction component \else y方向分量 \endif
+    float z;  ///< \if English z-direction component \else z方向分量 \endif
 } OBAccelValue, OBGyroValue, ob_accel_value, ob_gyro_value;
 
 /**
- * \if English
- * @brief Device state enumeration
- * \else
- * @brief 设备状态枚举
- * \endif
+ * @brief 设备状态码
  */
-typedef enum {
-    OB_DEVICE_STATE_NULL        = 0x0000, /**< \if English No status or LOG information update \else 无状态或LOG信息更新 \endif */
-    OPEN_STREAM_OPERATION_ERROR = 0x0001, /**< \if English Open current exception \else 开流异常 \endif */
-    OB_DEVICE_STATE_INFO        = 0x7fff  /**< \if English LOG information update \else LOG信息更新 \endif */
-} OBDeviceState,
-    ob_device_state;
+typedef uint64_t OBDeviceState, ob_device_state;
 
 /**
  * \if English
@@ -553,13 +562,13 @@ typedef enum {
  * \endif
  */
 typedef struct {
-    float cpuTemp;        ///< \if English CPU temperature \else cpu温度 \endif     
-    float irTemp;         ///< \if English IR temperature \else IR温度 \endif     
-    float ldmTemp;        ///< \if English laser temperature \else 激光温度 \endif     
-    float mainBoardTemp;  ///< \if English motherboard temperature \else 主板温度 \endif     
-    float tecTemp;        ///< \if English TEC temperature \else TEC温度 \endif     
-    float imuTemp;        ///< \if English IMU temperature \else IMU温度 \endif     
-    float rgbTemp;        ///< \if English RGB temperature \else RGB温度 \endif     
+    float cpuTemp;        ///< \if English CPU temperature \else cpu温度 \endif
+    float irTemp;         ///< \if English IR temperature \else IR温度 \endif
+    float ldmTemp;        ///< \if English laser temperature \else 激光温度 \endif
+    float mainBoardTemp;  ///< \if English motherboard temperature \else 主板温度 \endif
+    float tecTemp;        ///< \if English TEC temperature \else TEC温度 \endif
+    float imuTemp;        ///< \if English IMU temperature \else IMU温度 \endif
+    float rgbTemp;        ///< \if English RGB temperature \else RGB温度 \endif
 } OBDeviceTemperature, ob_device_temperature, DEVICE_TEMPERATURE;
 
 /**
@@ -598,17 +607,17 @@ typedef enum {
  * \endif
  */
 typedef enum {
-    OB_MEDIA_COLOR_STREAM = 1,   /**< \if English color stream \else 彩色流\endif */ 
+    OB_MEDIA_COLOR_STREAM = 1,   /**< \if English color stream \else 彩色流\endif */
     OB_MEDIA_DEPTH_STREAM = 2,   /**< \if English depth stream \else 深度流 \endif */
     OB_MEDIA_IR_STREAM    = 4,   /**< \if English IR stream \else 红外流 \endif */
     OB_MEDIA_GYRO_STREAM  = 8,   /**< \if English gyro stream \else 陀螺仪数据流 \endif */
-    OB_MEDIA_ACCEL_STREAM = 16,  /**< \if English accel stream \else 加速度计数据流 \endif */ 
-    OB_MEDIA_CAMERA_PARAM = 32,  /**< \if English camera parameter \else 相机参数 \endif */ 
+    OB_MEDIA_ACCEL_STREAM = 16,  /**< \if English accel stream \else 加速度计数据流 \endif */
+    OB_MEDIA_CAMERA_PARAM = 32,  /**< \if English camera parameter \else 相机参数 \endif */
     OB_MEDIA_DEVICE_INFO  = 64,  /**< \if English device information \else 设备信息  \endif */
-    OB_MEDIA_STREAM_INFO  = 128, /**< \if English stream information \else 流信息 \endif */ 
+    OB_MEDIA_STREAM_INFO  = 128, /**< \if English stream information \else 流信息 \endif */
 
     OB_MEDIA_ALL = OB_MEDIA_COLOR_STREAM | OB_MEDIA_DEPTH_STREAM | OB_MEDIA_IR_STREAM | OB_MEDIA_GYRO_STREAM | OB_MEDIA_ACCEL_STREAM | OB_MEDIA_CAMERA_PARAM
-                   | OB_MEDIA_DEVICE_INFO | OB_MEDIA_STREAM_INFO, /**< \if English All media data types \else 所有媒体数据类型 \endif */ 
+                   | OB_MEDIA_DEVICE_INFO | OB_MEDIA_STREAM_INFO, /**< \if English All media data types \else 所有媒体数据类型 \endif */
 } OBMediaType,
     ob_media_type, OB_MEDIA_TYPE;
 
@@ -620,9 +629,9 @@ typedef enum {
  * \endif
  */
 typedef enum {
-    OB_MEDIA_BEGIN = 0, /**< \if English begin \else 开始 \endif */ 
-    OB_MEDIA_PAUSE,     /**< \if English pause \else 暂停 \endif */ 
-    OB_MEDIA_RESUME,    /**< \if English resume \else 继续 \endif */ 
+    OB_MEDIA_BEGIN = 0, /**< \if English begin \else 开始 \endif */
+    OB_MEDIA_PAUSE,     /**< \if English pause \else 暂停 \endif */
+    OB_MEDIA_RESUME,    /**< \if English resume \else 继续 \endif */
     OB_MEDIA_END,       /**< \if English end \else 终止  \endif */
 } OBMediaState,
     ob_media_state, OB_MEDIA_STATE_EM;
@@ -630,9 +639,8 @@ typedef enum {
 /**
  * \if English
  * @brief depth accuracy class
- * @attention The depth accuracy level does not completely determine the depth unit and real accuracy, and the influence of the data packaging format needs to be considered. 
- * The specific unit can be obtained through getValueScale() of DepthFrame
- * \else
+ * @attention The depth accuracy level does not completely determine the depth unit and real accuracy, and the influence of the data packaging format needs to
+ * be considered. The specific unit can be obtained through getValueScale() of DepthFrame \else
  * @brief 深度精度等级
  * @attention 深度精度等级并不完全决定深度的单位和真实精度，需要考虑数据打包格式的影响，
  * 具体单位可通过DepthFrame的getValueScale()获取
@@ -655,7 +663,7 @@ typedef enum {
  * \endif
  */
 typedef enum {
-    OB_TOF_FILTER_RANGE_CLOSE  = 0,   /**< \if English close range \else 近距离范围 \endif */ 
+    OB_TOF_FILTER_RANGE_CLOSE  = 0,   /**< \if English close range \else 近距离范围 \endif */
     OB_TOF_FILTER_RANGE_MIDDLE = 1,   /**< \if English middle range \else 中距离范围  \endif */
     OB_TOF_FILTER_RANGE_LONG   = 2,   /**< \if English long range \else 远距离范围 \endif */
     OB_TOF_FILTER_RANGE_DEBUG  = 100, /**< \if English debug range \else Debug模式  \endif */
@@ -670,9 +678,9 @@ typedef enum {
  * \endif
  */
 typedef struct {
-    float x;  ///< \if English x coordinate \else X坐标 \endif     
-    float y;  ///< \if English y coordinate \else Y坐标 \endif     
-    float z;  ///< \if English z coordinate \else Z坐标 \endif     
+    float x;  ///< \if English x coordinate \else X坐标 \endif
+    float y;  ///< \if English y coordinate \else Y坐标 \endif
+    float z;  ///< \if English z coordinate \else Z坐标 \endif
 } OBPoint, ob_point;
 
 /**
@@ -683,12 +691,12 @@ typedef struct {
  * \endif
  */
 typedef struct {
-    float x;  ///< \if English x coordinate \else X坐标 \endif    
-    float y;  ///< \if English y coordinate \else Y坐标 \endif   
-    float z;  ///< \if English z coordinate \else Z坐标 \endif    
-    float r;  ///< \if English red channel component \else 红色通道分量 \endif    
-    float g;  ///< \if English green channel component \else 绿色通道分量 \endif    
-    float b;  ///< \if English blue channel component\else 蓝色通道分量 \endif    
+    float x;  ///< \if English x coordinate \else X坐标 \endif
+    float y;  ///< \if English y coordinate \else Y坐标 \endif
+    float z;  ///< \if English z coordinate \else Z坐标 \endif
+    float r;  ///< \if English red channel component \else 红色通道分量 \endif
+    float g;  ///< \if English green channel component \else 绿色通道分量 \endif
+    float b;  ///< \if English blue channel component\else 蓝色通道分量 \endif
 } OBColorPoint, ob_color_point;
 
 /**
@@ -699,11 +707,12 @@ typedef struct {
  * \endif
  */
 typedef enum {
-    OB_SYNC_STOP              = 0x00, /**< \if English turn off sync \else 关闭同步 \endif */ 
-    OB_SYNC_SINGLE_MODE       = 0x01, /**< \if English single device mode \else single device模式 \endif */
-    OB_SYNC_ONLINE_HOST_MODE  = 0x02, /**< \if English The single device mode is also the host mode, which is dominated by ir \else single device模式，也是host模式，是ir作主的  \endif */
+    OB_SYNC_STOP             = 0x00,  /**< \if English turn off sync \else 关闭同步 \endif */
+    OB_SYNC_SINGLE_MODE      = 0x01,  /**< \if English single device mode \else single device模式 \endif */
+    OB_SYNC_ONLINE_HOST_MODE = 0x02,  /**< \if English The single device mode is also the host mode, which is dominated by ir \else single
+                                         device模式，也是host模式，是ir作主的  \endif */
     OB_SYNC_ONLINE_SLAVE_MODE = 0x03, /**< \if English slave mode (ext_in --> rgb、tof、ext_out) \else slave模式 (ext_in --> rgb、tof、ext_out)  \endif */
-    OB_SYNC_ONLY_MCU_MODE     = 0x04, /**< \if English MCU as host mode \else mcu作host的模式 \endif */ 
+    OB_SYNC_ONLY_MCU_MODE     = 0x04, /**< \if English MCU as host mode \else mcu作host的模式 \endif */
     OB_SYNC_ONLY_IR_MODE      = 0x05, /**< \if English IR as host mode\else ir作host的模式  \endif */
 } OBSyncMode,
     ob_sync_mode, OB_SYNC_MODE;
@@ -728,14 +737,35 @@ typedef struct {
  * \endif
  */
 typedef struct {
-    OBSyncMode syncMode;       ///< \if English Sync mode \else 同步模式 \endif  
-    uint16_t   tofPhaseDelay;  ///< \if English Tof trigger signal delay us. \else Tof触发信号延时 us \endif  
-    uint16_t   rgbPhaseDelay;  ///< \if English rgb trigger signal delay us \else rgb触发信号延时 us \endif  
-    uint16_t   outPhaseDelay;  ///< \if English Output signal delay us \else 输出信号延时 us \endif  
-    uint16_t   outOCPolarity;  ///< \if English 0: Positive pulse, 1: Negative pulse \else 0:正向脉冲, 1: 负向脉冲 \endif  
-    uint16_t   mcuHostFps;     ///< \if English Trigger frame rate in mcu master mode \else mcu主模式时的触发帧率 \endif  
-    uint16_t   curDevId;       ///< \if English Current device number \else 当前设备编号 \endif  
+    OBSyncMode syncMode;       ///< \if English Sync mode \else 同步模式 \endif
+    uint16_t   tofPhaseDelay;  ///< \if English Tof trigger signal delay us. \else Tof触发信号延时 us \endif
+    uint16_t   rgbPhaseDelay;  ///< \if English rgb trigger signal delay us \else rgb触发信号延时 us \endif
+    uint16_t   outPhaseDelay;  ///< \if English Output signal delay us \else 输出信号延时 us \endif
+    uint16_t   outOCPolarity;  ///< \if English 0: Positive pulse, 1: Negative pulse \else 0:正向脉冲, 1: 负向脉冲 \endif
+    uint16_t   mcuHostFps;     ///< \if English Trigger frame rate in mcu master mode \else mcu主模式时的触发帧率 \endif
+    uint16_t   curDevId;       ///< \if English Current device number \else 当前设备编号 \endif
 } OBMultiDeviceSyncConfig, ob_multi_device_sync_config, OB_MULTI_DEVICE_SYNC_CONFIG;
+
+/**
+ * @brief 网络设备的IP地址配置（ipv4）
+ *
+ */
+typedef struct {
+    uint16_t dhcp;        ///< dhcp 动态ip配置开关; 0:关; 1: 开
+    uint8_t  address[4];  ///< ip地址(大端模式, 如192.168.1.1，则address[0]==192)
+    uint8_t  mask[4];     ///< 子网掩码(大端模式)
+    uint8_t  gateway[4];  ///< 网关(大端模式)
+} OBDeviceIpAddrConfig, ob_device_ip_addr_config, DEVICE_IP_ADDR_CONFIG;
+
+/**
+ * @brief 设备通信模式
+ *
+ */
+typedef enum {
+    OB_COMM_USB = 0x00, /**< USB */
+    OB_COMM_NET = 0x01, /**< 网络 */
+} OBCommunicationType,
+    ob_communication_type, OB_COMMUNICATION_TYPE;
 
 /**
  * \if English
@@ -871,6 +901,16 @@ typedef void (*ob_frame_callback)(ob_frame *frame, void *user_data);
  */
 typedef void (*ob_frameset_callback)(ob_frame *frameset, void *user_data);
 
+/**
+ * @brief 自定义删除回调，当引用计数为0时主动调用
+ * @param buffer 需要被删除的数据
+ * @param context 用户传入的数据
+ *
+ */
+typedef void(ob_frame_destroy_callback)(void *buffer, void *context);
+
 #ifdef __cplusplus
 }
 #endif
+
+#pragma pack(pop)

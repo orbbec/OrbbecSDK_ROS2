@@ -38,9 +38,9 @@ ob_sensor_type ob_sensor_get_type(ob_sensor *sensor, ob_error **error);
  *
  * @param[in] sensor Sensor object
  * @param[out] error Log error messages
- * @return ob_stream_profile** returns a list of stream profiles
+ * @return ob_stream_profile_list* returns a list of stream profiles
  * \else
- * @brief 获取传感器支持的所有流的配置
+ * @brief 获取传感器支持的所有流的配置列表
  *
  * @param[in] sensor 传感器对象
  * @param[out] error 记录错误信息
@@ -119,7 +119,7 @@ void ob_delete_sensor_list(ob_sensor_list *sensor_list, ob_error **error);
 
 /**
  * \if English
-  * @brief Get the number of sensors in the sensor list
+ * @brief Get the number of sensors in the sensor list
  *
  * @param[in] sensor_list  List of sensor objects to delete
  * @param[in] count Number of sensors

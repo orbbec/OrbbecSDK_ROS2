@@ -116,7 +116,7 @@ uint64_t ob_frame_time_stamp_us(ob_frame *frame, ob_error **error);
  * @return uint64_t 返回帧系统时间戳
  * \endif
  */
-uint64_t ob_frame_system_time_stamp(ob_frame *frame, ob_error **error); 
+uint64_t ob_frame_system_time_stamp(ob_frame *frame, ob_error **error);
 
 /**
  * \if English
@@ -142,8 +142,8 @@ void *ob_frame_data(ob_frame *frame, ob_error **error);
  * @param[in] frame Frame object
  * @param[out] error Log error messages
  * @return uint32_t returns the frame data size
- * If it is point cloud data, it returns the number of bytes occupied by all point sets. If you need to find the number of points, you need to divide dataSize by the structure size of the corresponding point type.
- * \else
+ * If it is point cloud data, it returns the number of bytes occupied by all point sets. If you need to find the number of points, you need to divide dataSize
+ * by the structure size of the corresponding point type. \else
  * @brief 获取帧数据大小
  *
  * @param[in] frame 帧对象
@@ -429,6 +429,88 @@ ob_gyro_value ob_gyro_frame_value(ob_frame *frame, ob_error **error);
  * \endif
  */
 float ob_gyro_frame_temperature(ob_frame *frame, ob_error **error);
+
+/**
+ * @brief 增加引用计数
+ *
+ * @param[in] frame 要增加引用计数的帧对象
+ * @param[out] error 记录错误信息
+ */
+void ob_frame_add_ref(ob_frame *frame, ob_error **error);
+
+/**
+ * @brief 创建空的帧对象
+ *
+ * @param[in] frame_format 帧格式
+ * @param[in] width 帧宽度
+ * @param[in] height 帧高度
+ * @param[in] stride_bytes 数据行跨度
+ * @param[in] frame_type 帧类型
+ * @param[out] error 记录错误信息
+ * @return ob_frame* 返回创建的帧对象
+ */
+ob_frame *ob_create_frame(ob_format frame_format, int width, int height, int stride_bytes, ob_frame_type frame_type, ob_error **error);
+
+/**
+ * @brief 根据外部创建的Buffer创建帧对象
+ *
+ * @param[in] frame_format 帧格式
+ * @param[in] frame_width 帧宽度
+ * @param[in] frame_height 帧高度
+ * @param[in] buffer 帧数据
+ * @param[in] buffer_size 帧数据大小
+ * @param[in] buffer_destroy_cb 自定义销毁buffer回调
+ * @param[in] buffer_destroy_context 自定义销毁buffer回调用户数据
+ * @param[out] error 记录错误信息
+ * @return ob_frame* 返回创建的帧对象
+ */
+ob_frame *ob_create_frame_from_buffer(ob_format frame_format, uint32_t frame_width, uint32_t frame_height, uint8_t *buffer, uint32_t buffer_size,
+                                      ob_frame_destroy_callback *buffer_destroy_cb, void *buffer_destroy_context, ob_error **error);
+
+/**
+ * @brief 创建空的帧集合
+ *
+ * @param[out] error 记录错误信息
+ * @return ob_frame* 返回创建的帧集合对象
+ */
+ob_frame *ob_create_frameset(ob_error **error);
+
+/**
+ * @brief push帧
+ *
+ * @param[in] frameset 帧集合对象
+ * @param[in] type	帧类型
+ * @param[in] frame 帧对象
+ * @param[out] error 记录错误信息
+ */
+void ob_frameset_push_frame(ob_frame *frameset, ob_frame_type type, ob_frame *frame, ob_error **error);
+
+/**
+ * @brief 设置帧的系统时间戳
+ *
+ * @param[in] frame 设置的帧对象
+ * @param[in] systemTimestamp 设置的系统时间戳
+ * @param[out] error 记录错误信息
+ */
+void ob_frame_set_system_time_stamp(ob_frame *frame, uint64_t system_timestamp, ob_error **error);
+
+/**
+ * @brief 设置帧的设备时间戳
+ *
+ * @param[in] frame 设置的帧对象
+ * @param[in] deviceTimestamp 设置的设备时间戳
+ * @param[out] error 记录错误信息
+ */
+void ob_frame_set_device_time_stamp(ob_frame *frame, uint64_t device_timestamp, ob_error **error);
+
+/**
+ * @brief 设置帧的设备时间戳
+ *
+ * @param[in] frame 设置的帧对象
+ * @param[in] deviceTimestampUs 设置的设备时间戳（Us）
+ * @param[out] error 记录错误信息
+ */
+void ob_frame_set_device_time_stamp_us(ob_frame *frame, uint64_t device_timestamp_us, ob_error **error);
 
 #ifdef __cplusplus
 }

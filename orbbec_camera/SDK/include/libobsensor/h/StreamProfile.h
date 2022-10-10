@@ -91,7 +91,7 @@ uint32_t ob_video_stream_profile_width(ob_stream_profile *profile, ob_error **er
  * @param[in] profile Stream configuration object, if the configuration is not a video stream configuration, an error will be returned
  * @param[out] error  Log error messages
  * @return uint32_t returns the height of the stream
- * \else 
+ * \else
  * @brief 获取视频流配置的高
  *
  * @param[in] profile 流配置对象, 如果该配置不是视频流配置，将会返错误
@@ -120,7 +120,7 @@ ob_accel_full_scale_range ob_accel_stream_profile_full_scale_range(ob_stream_pro
 
 /**
  * \if English
-  * @brief Get sampling frequency of the accelerometer frame
+ * @brief Get sampling frequency of the accelerometer frame
  *
  * @param[in] profile Stream configuration object, if the configuration is not the accelerometer stream configuration, an error will be returned
  * @param[out] error Log error messages
@@ -154,7 +154,7 @@ ob_gyro_full_scale_range ob_gyro_stream_profile_full_scale_range(ob_stream_profi
 
 /**
  * \if English
- * @brief Get the sampling frequency of the gyro flow configuration 
+ * @brief Get the sampling frequency of the gyro flow configuration
  *
  * @param[in] profile Stream configuration object, if the configuration is not a gyroscope stream configuration, an error will be returned
  * @param[out] error Log error messages
@@ -171,7 +171,8 @@ ob_gyro_sample_rate ob_gyro_stream_profile_sample_rate(ob_stream_profile *profil
 
 /**
  * \if English
- * @brief Match the corresponding ob_stream_profile through the passed parameters. If there are multiple matches, the first one in the list will be returned by default.
+ * @brief Match the corresponding ob_stream_profile through the passed parameters. If there are multiple matches, the first one in the list will be returned by
+ * default.
  *
  * @param profile_list Resolution list
  * @param width Width, if you don't need to add matching conditions, you can pass 0
@@ -200,7 +201,7 @@ ob_stream_profile *ob_stream_profile_list_get_video_stream_profile(ob_stream_pro
  * @brief Get the corresponding StreamProfile by subscripting
  *
  * @param[in] profile_list StreamProfile lists
- * @param[in] index 
+ * @param[in] index
  * @param[out] error Log error messages
  * @return ob_stream_profile* returns the matching profile
  * \else
@@ -248,7 +249,7 @@ void ob_delete_stream_profile_list(ob_stream_profile_list *profile_list, ob_erro
 
 /**
  *\if English
- * @brief Delete stream configuration 
+ * @brief Delete stream configuration
  *
  * @param[in] profile Stream configuration object
  * @param[out] error Log error messages

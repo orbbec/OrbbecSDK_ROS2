@@ -24,7 +24,7 @@ public:
      * \endif
      */
     static int getMajor();
-     /**
+    /**
      * \if English
      * @brief Get the SDK minor version number
      *

@@ -1,10 +1,10 @@
 /* License: Apache 2.0. See LICENSE file in root directory.
    Copyright(c) 2020  Orbbec Corporation. All Rights Reserved. */
 
-/** 
+/**
  * \if English
  * \file ObSensor.hpp
- * \brief  
+ * \brief
  * libobsensor pure C ++ entry document
  * \else
  * \file ObSensor.hpp

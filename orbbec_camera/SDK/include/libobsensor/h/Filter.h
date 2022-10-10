@@ -35,7 +35,7 @@ ob_filter *ob_create_pointcloud_filter(ob_error **error);
 
 /**
  * \if English
-  * @brief PointCloud Filter device camera parameters
+ * @brief PointCloud Filter device camera parameters
  *
  * @param[in] filter pointcloud_filter object
  * @param[in] param Camera parameters
@@ -52,7 +52,7 @@ void ob_pointcloud_filter_set_camera_param(ob_filter *filter, ob_camera_param pa
 
 /**
  * \if English
-  * @brief Set point cloud type parameters
+ * @brief Set point cloud type parameters
  *
  * @param[in] filter pointcloud_filter object
  * @param[in] type Point cloud type: depth point cloud or RGBD point cloud
@@ -81,6 +81,36 @@ void ob_pointcloud_filter_set_point_format(ob_filter *filter, ob_format type, ob
  * \endif
  */
 void ob_pointcloud_filter_set_frame_align_state(ob_filter *filter, bool state, ob_error **error);
+
+/**
+ * \if English
+ * @brief  Set point cloud position data scale ratio
+ * @param[in] filter pointcloud_filter object
+ * @param[in] scale scale ratio
+ * @param[out] error Log error messages
+ * \else
+ * @brief  设置点云数据缩放比例
+ * @param[in] filter pointcloud_filter对象
+ * @param[in] scale 设置点云坐标数据缩放比例
+ * @param[out] error 记录错误信息
+ * \endif
+ */
+void ob_pointcloud_filter_set_position_data_scale(ob_filter *filter, float scale, ob_error **error);
+
+/**
+ * \if English
+ * @brief  Set point cloud color data normalization
+ * @param[in] filter pointcloud_filter object
+ * @param[in] state Whether to normalize
+ * @param[out] error Log error messages
+ * \else
+ * @brief  设置点云颜色数据归一化
+ * @param[in] filter pointcloud_filter对象
+ * @param[in] state 设置点云颜色数据是否归一化
+ * @param[out] error 记录错误信息
+ * \endif
+ */
+void ob_pointcloud_filter_set_color_data_normalization(ob_filter *filter, bool state, ob_error **error);
 
 /**
  * \if English
@@ -118,7 +148,8 @@ void ob_format_convert_filter_set_format(ob_filter *filter, ob_convert_format ty
 
 /**
  * \if English
- * @brief  Filter reset, cache clear, state reset. If the asynchronous interface is used, the processing thread will also be stopped and the pending cache frames will be cleared.
+ * @brief  Filter reset, cache clear, state reset. If the asynchronous interface is used, the processing thread will also be stopped and the pending cache
+ * frames will be cleared.
  *
  * @param[in] filter filter object
  * @param[out] error Log error messages
@@ -157,7 +188,7 @@ ob_frame *ob_filter_process(ob_filter *filter, ob_frame *frame, ob_error **error
  * @brief Filter Set the processing result callback function (asynchronous callback interface)
  *
  * @param[in] filter filter object
- * @param[in] callback 
+ * @param[in] callback
  * @param[in] user_data Arbitrary user data pointer can be passed in and returned from the callback
  * @param[out] error Log error messages
  * \else

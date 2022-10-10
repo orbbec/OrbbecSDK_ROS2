@@ -59,7 +59,7 @@ const char *ob_error_message(ob_error *error);
 const char *ob_error_function(ob_error *error);
 /**
  * \if English
-  * @brief Get error parameters
+ * @brief Get error parameters
  *
  * @param[in] error  Error object
  * @return const char* returns the error parameter

@@ -221,7 +221,7 @@ public:
      * \if English
      * @brief AHB register write
      *
-     * @param reg Register to be written 
+     * @param reg Register to be written
      * @param mask  The mask to be writen
      * @param value The value to be written
      * \else
@@ -374,7 +374,7 @@ public:
     void getRawData(OBPropertyID propertyId, GetDataCallback callback, bool async = false);
 
     /**
-	 * \if English
+     * \if English
      * @brief Set structured data type of device property
      *
      * @param propertyId Property id
@@ -404,7 +404,7 @@ public:
      * @param data 获取的属性数据
      * @param dataSize 获取的属性大小
      * \endif
-     */	
+     */
     void getStructuredData(OBPropertyID propertyId, void *data, uint32_t *dataSize);
 
     /**
@@ -436,19 +436,19 @@ public:
     OBPropertyItem getSupportedProperty(uint32_t index);
 
     /**
-	 * \if English
-	 * @brief Judge property permission support
+     * \if English
+     * @brief Judge property permission support
      *
      * @param propertyId Property id
      * @param permission Types of read and write permissions that need to be interpreted
      * @return bool returns whether it is supported
-	 * \else
+     * \else
      * @brief 判断属性权限支持情况
      *
      * @param propertyId 属性id
      * @param permission 需要判读的读写权限类型
      * @return bool 返回是否支持
-	 * \endif
+     * \endif
      */
     bool isPropertySupported(OBPropertyID propertyId, OBPermissionType permission);
 
@@ -514,8 +514,8 @@ public:
      * \if English
      * @brief Set the device state changed callbacks
      *
-     * @param callback The callback function that is triggered when the device status changes (for example, the frame rate is automatically reduced or the stream is closed due to high temperature, etc.)
-     * \else
+     * @param callback The callback function that is triggered when the device status changes (for example, the frame rate is automatically reduced or the
+     * stream is closed due to high temperature, etc.) \else
      * @brief 设置设备状态改变回调函数
      *
      * @param callback 设备状态改变（如，由于温度过高自动降低帧率或关流等）时触发的回调函数
@@ -548,30 +548,31 @@ public:
     void writeAuthorizationCode(const char *authCodeStr);
 
     /**
-	 * \if English
-	 * @brief Get the original parameter list of camera calibration saved in the device. The parameters in the list do not correspond to the current open-current configuration.
-     * You need to select the parameters according to the actual situation, and may need to do scaling, mirroring and other processing. Non-professional users are recommended to use the Pipeline::getCameraParam() interface.
+     * \if English
+     * @brief Get the original parameter list of camera calibration saved in the device. The parameters in the list do not correspond to the current
+     * open-current configuration. You need to select the parameters according to the actual situation, and may need to do scaling, mirroring and other
+     * processing. Non-professional users are recommended to use the Pipeline::getCameraParam() interface.
      *
      * @return std::shared_ptr<CameraParamList> camera parameter list
-	 * \else
+     * \else
      * @brief 获取设备内保存的相机标定的原始参数列表，列表内参数不与当前开流配置相对应，
      * 需要自行根据实际情况选用参数并可能需要做缩放、镜像等处理。非专业用户建议使用Pipeline::getCameraParam()接口。
      *
      * @return std::shared_ptr<CameraParamList> 相机参数列表
-	 * \endif
+     * \endif
      */
     std::shared_ptr<CameraParamList> getCalibrationCameraParamList();
 
     /**
-	 * \if English
-	 * @brief Device restart
-     * @attention The device will be disconnected and reconnected. After the device is disconnected, the access to the Device object interface may be abnormal. 
+     * \if English
+     * @brief Device restart
+     * @attention The device will be disconnected and reconnected. After the device is disconnected, the access to the Device object interface may be abnormal.
      *   Please delete the object directly and obtain it again after the device is reconnected.
-	 * \else
+     * \else
      * @brief 设备重启
      * @attention 设备会掉线重连，设备掉线后对Device对象接口访问可能会发生异常，请直接删除该对象，
      *   待设备重连后可重新获取。
-	 * \endif
+     * \endif
      */
     void reboot();
 
@@ -674,11 +675,11 @@ public:
 
     /**
      * \if English
-     * @brief Get usb connection type
+     * @brief Get usb connection type (DEPRECATED)
      *
      * @return const char* returns usb connection type
      * \else
-     * @brief 获取usb连接类型
+     * @brief 获取usb连接类型 (废弃接口)
      *
      * @return const char* 返回usb连接类型
      * \endif
@@ -699,54 +700,54 @@ public:
     const char *connectionType();
 
     /**
-	 * \if English
-	 * @brief Get the version number of the hardware
+     * \if English
+     * @brief Get the version number of the hardware
      *
      * @return const char* returns the version number of the hardware
-	 * \else
+     * \else
      * @brief 获取硬件的版本号
      *
      * @return const char* 返回硬件的版本号
-	 * \endif
+     * \endif
      */
     const char *hardwareVersion();
 
     /**
-	 * \if English
-	 * @brief Get the minimum version number of the SDK supported by the device
+     * \if English
+     * @brief Get the minimum version number of the SDK supported by the device
      *
      * @return const char* returns the minimum SDK version number supported by the device
-	 * \else
+     * \else
      * @brief 获取设备支持的SDK最小版本号
      *
      * @return const char* 返回设备支持的SDK最小版本号
-	 * \endif
+     * \endif
      */
     const char *supportedMinSdkVersion();
 
     /**
-	 * \if English
-	 * @brief Get chip type name
+     * \if English
+     * @brief Get chip type name
      *
      * @return const char* returns the chip type name
-	 * \else
+     * \else
      * @brief 获取芯片类型名称
      *
      * @return const char* 返回芯片类型名称
-	 * \endif
+     * \endif
      */
     const char *asicName();
 
     /**
-	 * \if English
-	 * @brief Get device type
+     * \if English
+     * @brief Get device type
      *
      * @return OBDeviceType returns the device type
-	 * \else
+     * \else
      * @brief 获取设备类型
      *
      * @return OBDeviceType 返回设备类型
-	 * \endif
+     * \endif
      */
     OBDeviceType deviceType();
 
@@ -778,18 +779,18 @@ public:
 
     /**
      * \if English
-     * @brief Get the name of the specified device
+     * @brief Get the name of the specified device (DEPRECATED)
      *
      * @param index Device index
      * @return int returns the name of the device
      * \else
-     * @brief 获取指定设备的名称
+     * @brief 获取指定设备的名称 (废弃接口)
      *
      * @param index 设备索引
      * @return int 返回设备的名称
      * \endif
      */
-    const char *name(uint32_t index);
+    DEPRECATED const char *name(uint32_t index);
 
     /**
      * \if English
@@ -832,67 +833,67 @@ public:
      *
      * @param index 设备索引
      * @return const char * 返回设备的uid
-	 * \endif
+     * \endif
      */
     const char *uid(uint32_t index);
 
     /**
-	 * \if English
+     * \if English
      * @brief Get the serial number of the specified device
      *
      * @param index device index
      * @return const char * returns the serial number of the device
-	 * \else
-	 * @brief 获取指定设备的序列号
+     * \else
+     * @brief 获取指定设备的序列号
      *
      * @param index 设备索引
      * @return const char * 返回设备的序列号
-	 * \endif
+     * \endif
      */
     const char *serialNumber(uint32_t index);
 
     /**
-	 * \if English
+     * \if English
      * @brief Get the specified device object from the device list
      * @attention If the device has been acquired and created elsewhere, repeated acquisition will throw an exception
      * @param index index of the device to create
      * @return std::shared_ptr<Device> returns the device object
-	 * \else
+     * \else
      * @brief 从设备列表中获取指定设备对象,
      * @attention 如果设备有在其他地方被获取创建，重复获取将会抛异常
      * @param index 要创建设备的索引
      * @return std::shared_ptr<Device> 返回设备对象
-	 * \endif
+     * \endif
      */
     std::shared_ptr<Device> getDevice(uint32_t index);
 
     /**
-	 * \if English
+     * \if English
      * @brief Get the specified device object from the device list
      * @attention If the device has been acquired and created elsewhere, repeated acquisition will throw an exception
      * @param serialNumber The serial number of the device to be created
      * @return std::shared_ptr<Device> returns the device object
-	 * \else
+     * \else
      * @brief 从设备列表中获取指定设备对象
      * @attention 如果设备有在其他地方被获取创建，重复获取将会抛异常
      * @param serialNumber 要创建设备的序列号
      * @return std::shared_ptr<Device> 返回设备对象
-	 * \endif
+     * \endif
      */
     std::shared_ptr<Device> getDeviceBySN(const char *serialNumber);
 
     /**
-	 * \if English
-	 * @brief Get the specified device object from the device list
+     * \if English
+     * @brief Get the specified device object from the device list
      * @attention If the device has been acquired and created elsewhere, repeated acquisition will throw an exception
      * @param uid If the device has been acquired and created elsewhere, repeated acquisition will throw an exception
      * @return std::shared_ptr<Device> If the device has been acquired and created elsewhere, repeated acquisition will throw an exception
-	 * \else
+     * \else
      * @brief 从设备列表中获取指定设备对象
      * @attention 如果设备有在其他地方被获取创建，重复获取将会抛异常
      * @param uid 要创建设备的uid
      * @return std::shared_ptr<Device> 返回设备对象
-	 * \endif
+     * \endif
      */
     std::shared_ptr<Device> getDeviceByUid(const char *uid);
 };
@@ -905,30 +906,30 @@ public:
     CameraParamList(std::unique_ptr<CameraParamListImpl> impl);
     ~CameraParamList() noexcept;
     /**
-	 * \if English
-	 * @brief Number of camera parameter groups
+     * \if English
+     * @brief Number of camera parameter groups
      *
      * @return uint32_t  returns the number of camera parameter groups
-	 * \else
+     * \else
      * @brief 相机参数组数
      *
      * @return uint32_t  返回相机参数组数
-	 * \endif
+     * \endif
      */
     uint32_t count();
 
     /**
-	 * \if English
-	 * @brief Get camera parameters
+     * \if English
+     * @brief Get camera parameters
      *
      * @param index parameter index
      * @return OBCameraParam returns the corresponding group parameters
-	 * \else
+     * \else
      * @brief 获取相机参数
      *
      * @param index 参数索引
      * @return OBCameraParam 返回对应组参数
-	 * \endif
+     * \endif
      */
     OBCameraParam getCameraParam(uint32_t index);
 };

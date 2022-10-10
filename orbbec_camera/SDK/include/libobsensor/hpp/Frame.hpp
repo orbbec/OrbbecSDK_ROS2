@@ -34,6 +34,9 @@ struct FrameImpl;
 namespace ob {
 class StreamProfile;
 class Filter;
+class FrameHelper;
+
+typedef std::function<void(void *buffer, void *context)> BufferDestroyCallback;
 
 class OB_EXTENSION_API Frame : public std::enable_shared_from_this<Frame> {
 protected:
@@ -97,17 +100,17 @@ public:
     virtual void *data();
 
     /**
-	 * \if English
+     * \if English
      * @brief Get the frame data size
      *
      * @return uint32_t returns the frame data size
-     * If it is point cloud data, it returns the number of bytes occupied by all point sets. If you need to find the number of points, you need to divide the dataSize by the structure size of the corresponding point type.
-	 * \else
+     * If it is point cloud data, it returns the number of bytes occupied by all point sets. If you need to find the number of points, you need to divide the
+     * dataSize by the structure size of the corresponding point type. \else
      * @brief 获取帧数据大小
      *
      * @return uint32_t 返回帧数据的大小
      * 如果是点云数据返回的是所有点集合占的字节数，若需要求出点的个数需要将dataSize除以对应的点类型的结构体大小
-	 * \endif
+     * \endif
      */
     virtual uint32_t dataSize();
 
@@ -188,6 +191,7 @@ public:
 private:
     friend class Filter;
     friend class Recorder;
+    friend class FrameHelper;
 };
 
 class OB_EXTENSION_API VideoFrame : public Frame {
@@ -248,17 +252,17 @@ public:
     uint32_t metadataSize();
 
     /**
-	 * \if English
+     * \if English
      * @brief Get the effective number of pixels (such as Y16 format frame, but only the lower 10 bits are valid bits, and the upper 6 bits are filled with 0)
      * @attention Only valid for Y8/Y10/Y11/Y12/Y14/Y16 format
      *
      * @return uint8_t returns the effective number of pixels in the pixel, or 0 if it is an unsupported format
-	 * \else
+     * \else
      * @brief 获取像素有效位数（如Y16格式帧，每个像素占16bit，但实际只有低10位是有效位，高6位填充0）
      * @attention 仅对Y8/Y10/Y11/Y12/Y14/Y16格式有效
      *
      * @return uint8_t 返回像素有效位数，如果是不支持的格式，返回0
-	 * \endif
+     * \endif
      */
     uint8_t pixelAvailableBitSize();
 };
@@ -457,6 +461,64 @@ public:
      * \endif
      */
     float temperature();
+};
+
+class OB_EXTENSION_API FrameHelper {
+public:
+    FrameHelper();
+    ~FrameHelper();
+    /**
+     * @brief 根据外部创建的Buffer创建帧对象
+     *
+     * @param format 帧对象格式
+     * @param frameWidth 帧对象宽
+     * @param frameHeight 帧对象高
+     * @param buffer 帧对象数据
+     * @param bufferSize 帧对象数据大小
+     * @return std::shared_ptr<Frame> 返回帧对象
+     */
+    static std::shared_ptr<Frame> createFrameFromBuffer(OBFormat format, uint32_t frameWidth, uint32_t frameHeight, uint8_t *buffer, uint32_t bufferSize,
+                                                        BufferDestroyCallback destroyCallback, void *destroyCallbackContext);
+
+    /**
+     * @brief 创建空的帧集合对象
+     *
+     * @return std::shared_ptr<Frame> 返回帧集合对象
+     */
+    static std::shared_ptr<Frame> createFrameSet();
+
+    /**
+     * @brief 往帧集合中填入对应类型的帧
+     *
+     * @param frameSet 帧集合对象
+     * @param frameType 填入帧的类型
+     * @param frame 填入帧的对象
+     */
+    static void pushFrame(std::shared_ptr<Frame> frameSet, OBFrameType frameType, std::shared_ptr<Frame> frame);
+
+    /**
+     * @brief 设置帧的系统时间戳
+     *
+     * @param frame 设置的帧对象
+     * @param systemTimestamp 设置的系统时间戳
+     */
+    static void setFrameSystemTimestamp(std::shared_ptr<Frame> frame, uint64_t systemTimestamp);
+
+    /**
+     * @brief 设置帧的设备时间戳
+     *
+     * @param frame 设置的帧对象
+     * @param deviceTimestamp 设置的设备时间戳
+     */
+    static void setFrameDeviceTimestamp(std::shared_ptr<Frame> frame, uint64_t deviceTimestamp);
+
+    /**
+     * @brief 设置帧的设备时间戳
+     *
+     * @param frame 设置的帧对象
+     * @param deviceTimestampUs 设置的设备时间戳（Us）
+     */
+    static void setFrameDeviceTimestampUs(std::shared_ptr<Frame> frame, uint64_t deviceTimestampUs);
 };
 
 template <typename T> bool Frame::is() {

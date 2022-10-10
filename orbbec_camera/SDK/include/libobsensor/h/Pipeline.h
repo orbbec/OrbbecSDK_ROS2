@@ -1,9 +1,9 @@
 /**
  * \if English
  * @file Pipeline.h
- * @brief The SDK's advanced API can quickly implement functions such as switching streaming, frame synchronization, software filtering, etc., suitable for applications, and the algorithm focuses on rgbd data stream scenarios.
- * If you are on real-time or need to handle synchronization separately, align the scene. Please use the interface of Device's Lower API.
- * \else
+ * @brief The SDK's advanced API can quickly implement functions such as switching streaming, frame synchronization, software filtering, etc., suitable for
+ * applications, and the algorithm focuses on rgbd data stream scenarios. If you are on real-time or need to handle synchronization separately, align the scene.
+ * Please use the interface of Device's Lower API. \else
  * @file Pipeline.h
  * @brief SDK的高级API，可以快速实现开关流，帧同步，软件滤波等功能，适用于应用，算法重点关于rgbd数据流场景。如果对实时性或需要单独
  * 处理的同步，对齐的场景。请使用Device的Lower API的接口。
@@ -168,13 +168,13 @@ ob_config *ob_pipeline_get_config(ob_pipeline *pipeline, ob_error **error);
 
 /**
  * \if English
- * @brief Waiting for the return of a set of frames in the form of synchronous blocking 
+ * @brief Waiting for the return of a set of frames in the form of synchronous blocking
  *
  * @param[in] pipeline pipeline object
  * @param[in] timeout_ms Waiting timeout (ms)
  * @param[out] error Log error messages
- * @return ob_frame*  returns the waiting frameset, frameset is a special frame, you can use the frameset related interface to obtain the independent frame in the set
- * \else
+ * @return ob_frame*  returns the waiting frameset, frameset is a special frame, you can use the frameset related interface to obtain the independent frame in
+ * the set \else
  * @brief 以同步阻塞的形式等待返回一组帧集合
  *
  * @param[in] pipeline pipeline对象
@@ -204,7 +204,7 @@ ob_device *ob_pipeline_get_device(ob_pipeline *pipeline, ob_error **error);
 
 /**
  * \if English
-  * @brief Get playback object from pipeline
+ * @brief Get playback object from pipeline
  *
  * @param[in] pipeline pipeline objet
  * @param[out] error Log error messages
@@ -221,7 +221,7 @@ ob_playback *ob_pipeline_get_playback(ob_pipeline *pipeline, ob_error **error);
 
 /**
  * \if English
-  * @brief Get stream profile from the pipeline
+ * @brief Get stream profile from the pipeline
  *
  * @param[in] pipeline pipeline object
  * @param[in] sensor_type sensor type, the sensor_type type supported by the camera can be obtained through the ob_device_get_sensor_list() interface
@@ -308,7 +308,7 @@ ob_camera_param ob_pipeline_get_camera_param(ob_pipeline *pipeline, ob_error **e
 
 /**
  * \if English
-  * @brief Returns a list of D2C-enabled depth sensor resolutions corresponding to the input color sensor resolution
+ * @brief Returns a list of D2C-enabled depth sensor resolutions corresponding to the input color sensor resolution
  *
  * @param[in] pipeline pipeline object
  * @param[in] color_profile Input resolution of Color Sensor
@@ -325,18 +325,18 @@ ob_camera_param ob_pipeline_get_camera_param(ob_pipeline *pipeline, ob_error **e
  * @return ob_stream_profile_list*
  * \endif
  */
-ob_stream_profile_list *ob_get_d2c_depth_profile_list(ob_pipeline *pipeline, ob_stream_profile *color_profile,ob_align_mode align_mode, ob_error **error);
+ob_stream_profile_list *ob_get_d2c_depth_profile_list(ob_pipeline *pipeline, ob_stream_profile *color_profile, ob_align_mode align_mode, ob_error **error);
 
 /**
  * \if English
- * @brief Get valid area after D2C
+ * @brief Get valid area after D2C (DEPRECATED)
  *
  * @param[in] pipeline pipeline object
  * @param[in] distance working distance
  * @param[out] error Log error messages
  * @return ob_rect returns the area information valid after D2C at working distance
  * \else
- * @brief 获取D2C后有效的区域
+ * @brief 获取D2C后有效的区域 (废弃接口)
  *
  * @param[in] pipeline pipeline对象
  * @param[in] distance 工作距离
@@ -345,6 +345,28 @@ ob_stream_profile_list *ob_get_d2c_depth_profile_list(ob_pipeline *pipeline, ob_
  * \endif
  */
 ob_rect ob_get_d2c_valid_area(ob_pipeline *pipeline, uint32_t distance, ob_error **error);
+
+/**
+ * \if English
+ * @brief Get valid area between minimum distance and maximum distance after D2C
+ *
+ * @param[in] pipeline pipeline object
+ * @param[in] minimum_distance minimum working distance
+ * @param[in] maximum_distance maximum working distance
+ * @param[out] error Log error messages
+ * @return ob_rect returns the area information valid after D2C at working distance
+ * \else
+ * @brief 获取D2C后有效的区域。
+ * 如果需要获取指定距离D2C后的ROI区域，将minimum_distance与maximum_distance设置成一样或者将maximum_distance设置成0
+ *
+ * @param[in] pipeline pipeline对象
+ * @param[in] minimum_distance 最小工作距离
+ * @param[in] maximum_distance 最大工作距离
+ * @param[out] error 记录错误信息
+ * @return ob_rect 返回在工作距离下D2C后有效的区域信息
+ * \endif
+ */
+ob_rect ob_get_d2c_range_valid_area(ob_pipeline *pipeline, uint32_t minimum_distance,uint32_t maximum_distance, ob_error **error);
 
 /**
  * \if English
@@ -442,7 +464,7 @@ void ob_config_enable_all_stream(ob_config *config, ob_error **error);
 
 /**
  * \if English
- * @brief Configure the stream to be disabled 
+ * @brief Configure the stream to be disabled
  *
  * @param[in] config Configuration of pipeline
  * @param[in] profile  The configuration of the stream to be closed
@@ -459,7 +481,7 @@ void ob_config_disable_stream(ob_config *config, ob_stream_type type, ob_error *
 
 /**
  * \if English
- * @brief Configure all streams to be disabled 
+ * @brief Configure all streams to be disabled
  *
  * @param[in] config Configuration of pipeline
  * @param[out] error Log error messages
@@ -488,6 +510,44 @@ void ob_config_disable_all_stream(ob_config *config, ob_error **error);
  * \endif
  */
 void ob_config_set_align_mode(ob_config *config, ob_align_mode mode, ob_error **error);
+
+
+/**
+ * \if English
+ * @brief Whether scale depth frame after D2C
+ *
+ * @param[in] config config object
+ * @param[in] enable Scale or not
+ * @param[out] error Log error messages
+ * \else
+ * @brief 设置D2C后是否需要缩放深度
+ *
+ * @param[in] config config对象
+ * @param[in] enable 是否需要缩放
+ * @param[out] error 记录错误信息
+ * \endif
+ */
+void ob_config_set_depth_scale_require(ob_config *config,bool enable,ob_error **error);
+
+/**
+ * \if English
+ * @brief 
+ *
+ * @param[in] config config object
+ * @param[in] d2c_target_width D2C target width
+ * @param[in] d2c_target_height D2C target height
+ * @param[out] error Log error messages
+ * \else
+ * @brief 设置D2C目标分辨率，适用于未使用OrbbecSDK开启Color流，且需要对深度进行D2C的情况
+ * 注意:当使用OrbbecSDK开启Color流时，同时使用了此接口设置了D2C目标分辨率时。优先使用开启的Color流的配置进行D2C。
+ *
+ * @param[in] config config对象
+ * @param[in] d2c_target_width D2C目标分辨率宽
+ * @param[in] d2c_target_height D2C目标分辨率高
+ * @param[out] error 记录错误信息
+ * \endif
+ */
+void ob_config_set_d2c_target_resolution(ob_config *config,uint32_t d2c_target_width,uint32_t d2c_target_height,ob_error **error);
 
 #ifdef __cplusplus
 }

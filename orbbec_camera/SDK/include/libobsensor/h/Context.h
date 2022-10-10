@@ -2,8 +2,8 @@
  * \if English
  * @file Context.h
  * @brief Context is a management class that describes the runtime of the SDK and is responsible for resource application and release of the SDK.
- * Context has the ability to manage multiple devices. It is responsible for enumerating devices, monitoring device callbacks, and enabling multi device synchronization.
- * \else
+ * Context has the ability to manage multiple devices. It is responsible for enumerating devices, monitoring device callbacks, and enabling multi device
+ * synchronization. \else
  * @file Context.h
  * @brief context是描述SDK的runtime一个管理类，负责SDK的资源申请与释放
  * context具备多设备的管理能力，负责枚举设备，监听设备回调，启用多设备同步等功能
@@ -82,6 +82,17 @@ void ob_delete_context(ob_context *context, ob_error **error);
 ob_device_list *ob_query_device_list(ob_context *context, ob_error **error);
 
 /**
+ * @brief 创建网络设备
+ *
+ * @param[in] context 上下文环境
+ * @param[in] address 设备ip地址
+ * @param[in] port 设备端口
+ * @param[out] error 记录错误信息
+ * @return[out] ob_device* 返回设备对象
+ */
+ob_device *ob_create_net_device(ob_context *context, const char *address, uint16_t port, ob_error **error);
+
+/**
  * \if English
  * @brief Set device plug-in callback function
  * @attention The added and removed device list returned through the callback interface need to be released manually
@@ -107,7 +118,8 @@ void ob_set_device_changed_callback(ob_context *context, ob_device_changed_callb
  * @brief Activate the multi-device synchronization function to synchronize the clock of the created device(the device needs to support this function)
  *
  * @param[in]  context Context
- * @param[in]  repeatInterval synchronization time interval (unit: ms; if repeatInterval=0, itmeans that it will only be synchronized once and will not be executedregularly)
+ * @param[in]  repeatInterval synchronization time interval (unit: ms; if repeatInterval=0, itmeans that it will only be synchronized once and will not be
+ * executedregularly)
  * @param[out] error Log error messages
  * \else
  * @brief 启动多设备同步功能，同步已创建设备的时钟(需要使用的设备支持该功能)
@@ -139,7 +151,8 @@ void ob_set_logger_severity(ob_log_severity severity, ob_error **error);
  * @brief Set output log to file
  *
  * @param[in] severity log level output to file
- * @param[in] directory The log file output path. If the path is empty, the existing settings will continue to be used (if the existing configuration is also empty, the log will not be output to the file)
+ * @param[in] directory The log file output path. If the path is empty, the existing settings will continue to be used (if the existing configuration is also
+ * empty, the log will not be output to the file)
  * @param[out] error Log error messages
  * \else
  * @brief 设置输出日志到文件

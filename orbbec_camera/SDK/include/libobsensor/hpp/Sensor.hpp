@@ -95,15 +95,15 @@ public:
     void stop();
 
     /**
-	 * \if English
-	 * @brief Dynamically switch resolutions
+     * \if English
+     * @brief Dynamically switch resolutions
      *
      * @param streamProfile Resolution to switch
-	 * \else
+     * \else
      * @brief 动态切换分辨率
      *
      * @param streamProfile 需要切换的分辨率
-	 * \endif
+     * \endif
      */
     void switchProfile(std::shared_ptr<StreamProfile> streamProfile);
 };

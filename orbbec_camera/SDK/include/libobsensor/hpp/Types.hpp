@@ -1,4 +1,4 @@
-/**   
+/**
  * \if English
  * \file Types.hpp
  *    \brief  Provide SDK structure and enumeration constant definition (depending on libobsensor/h/ObTypes.h)

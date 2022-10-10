@@ -258,15 +258,16 @@ public:
     const std::shared_ptr<StreamProfile> getProfile(uint32_t index);
 
     /**
-	 * \if English
-	 * @brief Match the corresponding streamprofile through the passed in parameters. If there are multiple matches, the first one in the list will be returned by default.
+     * \if English
+     * @brief Match the corresponding streamprofile through the passed in parameters. If there are multiple matches, the first one in the list will be returned
+     * by default.
      *
      * @param width Width. If no matching condition is required, it can be passed to 0
      * @param height Height. If no matching condition is required, it can be passed to 0
      * @param format Type. If no matching condition is required, it can be passed to OB_FORMAT_UNKNOWN
      * @param fps Frame rate. If no matching condition is required, it can be passed to 0
      * @return std::shared_ptr<StreamProfile> Returns the matching resolution
-	 * \else
+     * \else
      * @brief 通过传入的参数进行匹配对应的StreamProfile，若有多个匹配项默认返回列表中的第一个
      *
      * @param width 宽度，如不要求加入匹配条件，可传0
@@ -274,7 +275,7 @@ public:
      * @param format 类型，如不要求加入匹配条件，可传OB_FORMAT_UNKNOWN
      * @param fps 帧率，如不要求加入匹配条件，可传0
      * @return std::shared_ptr<StreamProfile> 返回匹配的分辨率
-	 * \endif
+     * \endif
      */
     const std::shared_ptr<VideoStreamProfile> getVideoStreamProfile(int width = 0, int height = 0, OBFormat format = OB_FORMAT_UNKNOWN, int fps = 0);
 };

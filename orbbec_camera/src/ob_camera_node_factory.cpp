@@ -32,8 +32,11 @@ OBCameraNodeFactory::~OBCameraNodeFactory() {
     query_thread_.join();
   }
 }
+
 void OBCameraNodeFactory::init() {
-  ctx_->setLoggerSeverity(OB_LOG_SEVERITY_NONE);
+  ob_log_level_str_ = declare_parameter<std::string>("ob_log_level", "info");
+  auto ob_log_level = obLogSeverityFromString(ob_log_level_str_);
+  ctx_->setLoggerSeverity(ob_log_level);
   is_alive_.store(true);
   parameters_ = std::make_shared<Parameters>(this);
   serial_number_ = declare_parameter<std::string>("serial_number", "");
@@ -123,6 +126,21 @@ void OBCameraNodeFactory::printDeviceInfo(const std::shared_ptr<ob::DeviceInfo> 
   RCLCPP_INFO_STREAM(logger_, "hardware version " << device_info->hardwareVersion());
 }
 
+OBLogSeverity OBCameraNodeFactory::obLogSeverityFromString(const std::string &log_level) {
+  if (log_level == "debug") {
+    return OBLogSeverity::OB_LOG_SEVERITY_DEBUG;
+  } else if (log_level == "info") {
+    return OBLogSeverity::OB_LOG_SEVERITY_INFO;
+  } else if (log_level == "warn") {
+    return OBLogSeverity::OB_LOG_SEVERITY_WARN;
+  } else if (log_level == "error") {
+    return OBLogSeverity::OB_LOG_SEVERITY_ERROR;
+  } else if (log_level == "fatal") {
+    return OBLogSeverity::OB_LOG_SEVERITY_FATAL;
+  } else {
+    return OBLogSeverity::OB_LOG_SEVERITY_INFO;
+  }
+}
 void OBCameraNodeFactory::getDevice(const std::shared_ptr<ob::DeviceList> &list) {
   if (device_) {
     return;

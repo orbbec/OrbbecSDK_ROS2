@@ -43,7 +43,7 @@ class OBCameraNodeFactory : public rclcpp::Node {
 
   void printDeviceInfo(const std::shared_ptr<ob::DeviceInfo>& device_info);
 
-  OBLogSeverity obLogSeverityFromString(const std::string& log_level);
+  static OBLogSeverity obLogSeverityFromString(const std::string& log_level);
 
  private:
   std::unique_ptr<ob::Context> ctx_;
@@ -58,7 +58,7 @@ class OBCameraNodeFactory : public rclcpp::Node {
   double reconnect_timeout_ = 0.0;
   double wait_for_device_timeout_ = 0.0;
   std::shared_ptr<Parameters> parameters_;
-  std::string ob_log_level_;
+  std::string ob_log_level_str_;
 };
 }  // namespace orbbec_camera
 

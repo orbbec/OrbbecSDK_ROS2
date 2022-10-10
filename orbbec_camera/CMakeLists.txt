@@ -19,7 +19,6 @@ find_package(ament_index_cpp REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(cv_bridge REQUIRED)
-find_package(glog REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(image_publisher REQUIRED)
 find_package(magic_enum REQUIRED)
@@ -36,6 +35,12 @@ find_package(tf2_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_sensor_msgs REQUIRED)
 find_package(Threads REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_search_module(GLOG REQUIRED libglog)
+
+if (NOT GLOG_FOUND)
+  message(FATAL_ERROR "glog is not found")
+endif()
 
 set(ORBBEC_LIBS ${CMAKE_CURRENT_SOURCE_DIR}/SDK/lib)
 set(ORBBEC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/SDK/include/)
@@ -81,6 +86,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   $<INSTALL_INTERFACE:include>
   ${ORBBEC_INCLUDE_DIR}
   ${OpenCV_INCLUDED_DIRS}
+  ${GLOG_INCLUDED_DIRS}
   )
 
 
@@ -88,7 +94,7 @@ target_link_libraries(${PROJECT_NAME}
   ${ORBBEC_SDK_LIBRARIES}
   ${OpenCV_LIBS}
   Eigen3::Eigen
-  glog::glog
+  ${GLOG_LIBRARIES}
   magic_enum::magic_enum
   -lOrbbecSDK
   -L${ORBBEC_LIBS}
@@ -125,12 +131,11 @@ install(DIRECTORY
   DESTINATION include
   )
 
-install(FILES
-  ${ORBBEC_LIBS}/libOrbbecSDK.so
-  ${ORBBEC_LIBS}/libOrbbecSDK.so.1.3
-  ${ORBBEC_LIBS}/libOrbbecSDK.so.1.3.1
-  ${ORBBEC_LIBS}/libpostfilter.so
-  DESTINATION lib
+install(DIRECTORY
+  ${ORBBEC_LIBS}/
+  DESTINATION lib/
+  FILES_MATCHING PATTERN "*.so"
+  PATTERN "*.so.*"
   )
 
 if (BUILD_TESTING)

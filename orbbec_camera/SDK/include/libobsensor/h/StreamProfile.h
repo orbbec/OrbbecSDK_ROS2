@@ -171,8 +171,8 @@ ob_gyro_sample_rate ob_gyro_stream_profile_sample_rate(ob_stream_profile *profil
 
 /**
  * \if English
- * @brief Match the corresponding ob_stream_profile through the passed parameters. If there are multiple matches, the first one in the list will be returned by
- * default.
+ * @brief Match the corresponding ob_stream_profile through the passed parameters. If there are multiple matches,
+ * the first one in the list will be returned by default. If no matched profile found, will return error!
  *
  * @param profile_list Resolution list
  * @param width Width, if you don't need to add matching conditions, you can pass 0
@@ -182,7 +182,7 @@ ob_gyro_sample_rate ob_gyro_stream_profile_sample_rate(ob_stream_profile *profil
  * @param[out] error Log error messages
  * @return ob_stream_profile* returns the matching profile
  * \else
- * @brief 通过传入的参数进行匹配对应的ob_stream_profile，若有多个匹配项默认返回列表中的第一个
+ * @brief 通过传入的参数进行匹配对应的ob_stream_profile。若有多个匹配项默认返回列表中的第一个, 若未找打匹配的项，则返回错误。
  *
  * @param profile_list 分辨率列表
  * @param width 宽度, 如不要求加入匹配条件，可传0

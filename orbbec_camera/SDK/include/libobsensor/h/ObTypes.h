@@ -465,15 +465,22 @@ typedef enum {
     FORMAT_I420_TO_RGB888,     /**< \if English I420 to RGB888 \else I420转换为RGB888 \endif */
     FORMAT_NV21_TO_RGB888,     /**< \if English NV21 to RGB888 \else NV21转换为RGB888 \endif */
     FORMAT_NV12_TO_RGB888,     /**< \if English NV12 to RGB888 \else NV12转换为RGB888 \endif */
-    FORMAT_MJPEG_TO_I420,      /**< \if English MJPG to I420 \else MJPG转换为I420\endif */
+    FORMAT_MJPG_TO_I420,      /**< \if English MJPG to I420 \else MJPG转换为I420\endif */
     FORMAT_RGB888_TO_BGR,      /**< \if English RGB888 to BGR \else RGB888转换为BGR \endif */
-    FORMAT_MJPEG_TO_NV21,      /**< \if English MJPG to NV21 \else MJPG转换为NV21 \endif */
-    FORMAT_MJPEG_TO_RGB888,    /**< \if English MJPG to RGB888 \else MJPG转换为RGB888 \endif */
-    FORMAT_MJPEG_TO_BGR888,    /**< \if English MJPG to BGR888 \else MJPG转换为BGR888 \endif */
-    FORMAT_MJPEG_TO_BGRA,      /**< \if English MJPG to BGRA \else MJPG转换为BGRA \endif */
+    FORMAT_MJPG_TO_NV21,      /**< \if English MJPG to NV21 \else MJPG转换为NV21 \endif */
+    FORMAT_MJPG_TO_RGB888,    /**< \if English MJPG to RGB888 \else MJPG转换为RGB888 \endif */
+    FORMAT_MJPG_TO_BGR888,    /**< \if English MJPG to BGR888 \else MJPG转换为BGR888 \endif */
+    FORMAT_MJPG_TO_BGRA,      /**< \if English MJPG to BGRA \else MJPG转换为BGRA \endif */
     FORMAT_UYVY_TO_RGB888,     /**< \if English UYVY to RGB888 \else MJPG转换为RGB888 \endif */
 } OBConvertFormat,
     ob_convert_format;
+
+// DEPRECATED: 仅用于旧版本程序兼容，会在后续迭代版本彻底删除
+#define FORMAT_MJPEG_TO_I420 FORMAT_MJPG_TO_I420
+#define FORMAT_MJPEG_TO_NV21 FORMAT_MJPG_TO_NV21
+#define FORMAT_MJPEG_TO_RGB888 FORMAT_MJPG_TO_RGB888
+#define FORMAT_MJPEG_TO_BGR888 FORMAT_MJPG_TO_BGR888
+#define FORMAT_MJPEG_TO_BGRA FORMAT_MJPG_TO_BGRA
 
 /**
  * \if English

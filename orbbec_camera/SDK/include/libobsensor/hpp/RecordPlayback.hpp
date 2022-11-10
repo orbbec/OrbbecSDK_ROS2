@@ -20,7 +20,7 @@ class Device;
 class Frame;
 class DeviceInfo;
 
-using PlaybackCallback   = std::function<void(std::shared_ptr<Frame> frame, void *pCookies)>;
+using PlaybackCallback = std::function<void(std::shared_ptr<Frame> frame)>;
 using MediaStateCallback = std::function<void(OBMediaState state)>;
 
 class OB_EXTENSION_API Recorder {

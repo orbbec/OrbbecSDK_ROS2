@@ -259,8 +259,8 @@ public:
 
     /**
      * \if English
-     * @brief Match the corresponding streamprofile through the passed in parameters. If there are multiple matches, the first one in the list will be returned
-     * by default.
+     * @brief Match the corresponding stream profile through the passed in parameters. If there are multiple matches,
+     * the first one in the list will be returned by default. If no matched profile found, will throw exception!
      *
      * @param width Width. If no matching condition is required, it can be passed to 0
      * @param height Height. If no matching condition is required, it can be passed to 0
@@ -268,7 +268,7 @@ public:
      * @param fps Frame rate. If no matching condition is required, it can be passed to 0
      * @return std::shared_ptr<StreamProfile> Returns the matching resolution
      * \else
-     * @brief 通过传入的参数进行匹配对应的StreamProfile，若有多个匹配项默认返回列表中的第一个
+     * @brief 通过传入的参数进行匹配对应的StreamProfile。若有多个匹配项默认返回列表中的第一个, 若没有找到匹配的项，则抛异常
      *
      * @param width 宽度，如不要求加入匹配条件，可传0
      * @param height 高度，如不要求加入匹配条件，可传0

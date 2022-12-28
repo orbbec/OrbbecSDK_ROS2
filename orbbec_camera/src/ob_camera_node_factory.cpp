@@ -52,6 +52,8 @@ void OBCameraNodeFactory::init() {
     deviceDisconnectCallback(removed_list);
     deviceConnectCallback(added_list);
   });
+  check_connect_timer_ =
+      this->create_wall_timer(std::chrono::milliseconds(1000), [this]() { checkConnectTimer(); });
   query_thread_ = std::make_shared<std::thread>([this]() { queryDevice(); });
 }
 
@@ -105,10 +107,16 @@ OBLogSeverity OBCameraNodeFactory::obLogSeverityFromString(const std::string &lo
   } else if (log_level == "fatal") {
     return OBLogSeverity::OB_LOG_SEVERITY_FATAL;
   } else {
-    return OBLogSeverity::OB_LOG_SEVERITY_INFO;
+    return OBLogSeverity::OB_LOG_SEVERITY_NONE;
   }
 }
 
+void OBCameraNodeFactory::checkConnectTimer() {
+  if (!device_connected_) {
+    RCLCPP_ERROR_STREAM(logger_, "checkConnectTimer: device not connected");
+    return;
+  }
+}
 void OBCameraNodeFactory::queryDevice() {
   while (is_alive_ && rclcpp::ok()) {
     std::lock_guard<decltype(device_lock_)> lock(device_lock_);

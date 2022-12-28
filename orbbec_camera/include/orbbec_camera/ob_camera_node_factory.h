@@ -39,6 +39,8 @@ class OBCameraNodeFactory : public rclcpp::Node {
 
   static OBLogSeverity obLogSeverityFromString(const std::string& log_level);
 
+  void checkConnectTimer();
+
   void queryDevice();
 
  private:
@@ -55,6 +57,7 @@ class OBCameraNodeFactory : public rclcpp::Node {
   std::shared_ptr<std::thread> query_thread_ = nullptr;
   std::recursive_mutex device_lock_;
   size_t device_num_ = 1;
+  rclcpp::TimerBase::SharedPtr check_connect_timer_ = nullptr;
 };
 }  // namespace orbbec_camera
 

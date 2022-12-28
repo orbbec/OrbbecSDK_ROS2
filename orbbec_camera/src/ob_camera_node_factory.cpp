@@ -35,6 +35,11 @@ OBCameraNodeFactory::OBCameraNodeFactory(const std::string &node_name, const std
 
 OBCameraNodeFactory::~OBCameraNodeFactory() {
   is_alive_.store(false);
+  sem_unlink(DEFAULT_SEM_NAME.c_str());
+  int shm_id = shmget(DEFAULT_SEM_KEY, 1, 0666 | IPC_CREAT);
+  if (shm_id != -1) {
+    shmctl(shm_id, IPC_RMID, nullptr);
+  }
   if (query_thread_ && query_thread_->joinable()) {
     query_thread_->join();
   }

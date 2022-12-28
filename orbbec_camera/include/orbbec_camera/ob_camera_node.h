@@ -140,17 +140,6 @@ class OBCameraNode {
 
   std::optional<OBCameraParam> findDefaultCameraParam();
 
-  std::optional<OBCameraParam> findStreamDefaultCameraParam(const stream_index_pair& stream);
-
-  std::optional<OBCameraParam> findStreamCameraParam(const stream_index_pair& stream,
-                                                     uint32_t width, uint32_t height);
-
-  std::optional<OBCameraParam> findCameraParam(uint32_t color_width, uint32_t color_height,
-                                               uint32_t depth_width, uint32_t depth_height);
-  std::optional<OBCameraParam> findDepthCameraParam(uint32_t width, uint32_t height);
-
-  std::optional<OBCameraParam> findColorCameraParam(uint32_t width, uint32_t height);
-
   void getExposureCallback(const std::shared_ptr<GetInt32::Request>& request,
                            std::shared_ptr<GetInt32::Response>& response,
                            const stream_index_pair& stream_index);
@@ -275,15 +264,21 @@ class OBCameraNode {
   std::map<stream_index_pair, rclcpp::Service<GetInt32>::SharedPtr> get_gain_srv_;
   std::map<stream_index_pair, rclcpp::Service<SetInt32>::SharedPtr> set_gain_srv_;
   std::map<stream_index_pair, rclcpp::Service<SetBool>::SharedPtr> toggle_sensor_srv_;
-  rclcpp::Service<GetInt32>::SharedPtr get_white_balance_srv_;  // only rgb
+  rclcpp::Service<GetInt32>::SharedPtr get_white_balance_srv_;
   rclcpp::Service<SetInt32>::SharedPtr set_white_balance_srv_;
-  rclcpp::Service<GetInt32>::SharedPtr get_auto_white_balance_srv_;  // only rgb
+  rclcpp::Service<GetInt32>::SharedPtr get_auto_white_balance_srv_;
   rclcpp::Service<SetBool>::SharedPtr set_auto_white_balance_srv_;
   rclcpp::Service<GetString>::SharedPtr get_sdk_version_srv_;
   std::map<stream_index_pair, rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr>
-      set_auto_exposure_srv_;  // only rgb color
+      set_auto_exposure_srv_;
+  rclcpp::Service<GetDeviceInfo>::SharedPtr get_device_srv_;
+  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_laser_enable_srv_;
+  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_ldp_enable_srv_;
+  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_floor_enable_srv_;
+  rclcpp::Service<SetInt32>::SharedPtr set_fan_mode_srv_;
+  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr toggle_sensors_srv_;
 
-  bool publish_tf_;
+  bool publish_tf_ = false;
   std::shared_ptr<tf2_ros::StaticTransformBroadcaster> static_tf_broadcaster_;
   std::shared_ptr<tf2_ros::TransformBroadcaster> dynamic_tf_broadcaster_;
   std::vector<geometry_msgs::msg::TransformStamped> tf_msgs;
@@ -294,15 +289,10 @@ class OBCameraNode {
   sensor_msgs::msg::PointCloud2 point_cloud_msg_;
 
   rclcpp::Publisher<Extrinsics>::SharedPtr extrinsics_publisher_;
-  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr toggle_sensors_srv_;
   orbbec_camera_msgs::msg::DeviceInfo device_info_;
-  rclcpp::Service<GetDeviceInfo>::SharedPtr get_device_srv_;
-  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_laser_enable_srv_;
-  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_ldp_enable_srv_;
-  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_floor_enable_srv_;
-  rclcpp::Service<SetInt32>::SharedPtr set_fan_mode_srv_;
+
   std::vector<geometry_msgs::msg::TransformStamped> static_tf_msgs_;
-  std::shared_ptr<std::thread> tf_thread_;
+  std::shared_ptr<std::thread> tf_thread_ = nullptr;
   std::condition_variable tf_cv_;
   double tf_publish_rate_ = 10.0;
 };

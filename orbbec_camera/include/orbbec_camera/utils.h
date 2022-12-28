@@ -44,4 +44,6 @@ std::string getObSDKVersion();
 
 OBFormat OBFormatFromString(const std::string& format);
 
+std::string ObDeviceTypeToString(const OBDeviceType& type);
+
 }  // namespace orbbec_camera

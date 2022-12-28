@@ -31,34 +31,30 @@ class OBCameraNodeFactory : public rclcpp::Node {
  private:
   void init();
 
-  void startDevice();
-
-  void getDevice(const std::shared_ptr<ob::DeviceList>& list);
-
-  void updateDeviceInfo();
+  void startDevice(const std::shared_ptr<ob::DeviceList>& list);
 
   void deviceConnectCallback(const std::shared_ptr<ob::DeviceList>& device_list);
 
   void deviceDisconnectCallback(const std::shared_ptr<ob::DeviceList>& device_list);
 
-  void printDeviceInfo(const std::shared_ptr<ob::DeviceInfo>& device_info);
-
   static OBLogSeverity obLogSeverityFromString(const std::string& log_level);
 
+  void queryDevice();
+
  private:
-  std::unique_ptr<ob::Context> ctx_;
+  std::unique_ptr<ob::Context> ctx_ = nullptr;
   rclcpp::Logger logger_;
-  std::unique_ptr<OBCameraNode> ob_camera_node_;
-  std::shared_ptr<ob::Device> device_;
-  std::shared_ptr<ob::DeviceInfo> device_info_;
+  std::unique_ptr<OBCameraNode> ob_camera_node_ = nullptr;
+  std::shared_ptr<ob::Device> device_ = nullptr;
+  std::shared_ptr<ob::DeviceInfo> device_info_ = nullptr;
   std::atomic_bool is_alive_{false};
-  std::thread query_thread_;
+  std::atomic_bool device_connected_{false};
+  std::string log_level_;
   std::string serial_number_;
-  std::string usb_port_id_;
-  double reconnect_timeout_ = 0.0;
-  double wait_for_device_timeout_ = 0.0;
   std::shared_ptr<Parameters> parameters_;
-  std::string ob_log_level_str_;
+  std::shared_ptr<std::thread> query_thread_ = nullptr;
+  std::recursive_mutex device_lock_;
+  size_t device_num_ = 1;
 };
 }  // namespace orbbec_camera
 

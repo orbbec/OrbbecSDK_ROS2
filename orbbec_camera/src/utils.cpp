@@ -205,4 +205,15 @@ OBFormat OBFormatFromString(const std::string &format) {
   }
 }
 
+std::string ObDeviceTypeToString(const OBDeviceType &type) {
+  switch (type) {
+    case OBDeviceType::OB_STRUCTURED_LIGHT_BINOCULAR_CAMERA:
+      return "structured light binocular camera";
+    case OBDeviceType::OB_STRUCTURED_LIGHT_MONOCULAR_CAMERA:
+      return "structured light monocular camera";
+    case OBDeviceType::OB_TOF_CAMERA:
+      return "tof camera";
+  }
+  return "unknown technology camera";
+}
 }  // namespace orbbec_camera

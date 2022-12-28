@@ -101,5 +101,7 @@ const int32_t FEMTO_LIVE_PID = 0x0668;
 const int32_t FEMTO_PID = 0x0635;
 const int32_t ASTRA_PLUS_PID = 0x0636;
 const int32_t ASTRA_PLUS_S_PID = 0x0637;
+const std::string DEFAULT_SEM_NAME = "orbbec_device_sem";
+const key_t DEFAULT_SEM_KEY = 0x0401;
 
 }  // namespace orbbec_camera

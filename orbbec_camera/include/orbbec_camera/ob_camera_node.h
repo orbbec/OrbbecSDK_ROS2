@@ -125,10 +125,6 @@ class OBCameraNode {
 
   void setupPublishers();
 
-  void setupDefaultStreamCalibData();
-
-  void updateStreamCalibData(const OBCameraParam& param);
-
   void publishStaticTF(const rclcpp::Time& t, const std::vector<float>& trans,
                        const tf2::Quaternion& q, const std::string& from, const std::string& to);
 
@@ -205,20 +201,16 @@ class OBCameraNode {
 
   void publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_set);
 
-  void frameSetCallback(std::shared_ptr<ob::FrameSet> frame_set);
+  void onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set);
 
-  void publishColorFrame(std::shared_ptr<ob::ColorFrame> frame);
+  void onNewFrameCallback(std::shared_ptr<ob::Frame> frame, const stream_index_pair& stream_index);
 
-  bool rbgFormatConvertRGB888(std::shared_ptr<ob::ColorFrame> frame);
-
-  void publishDepthFrame(std::shared_ptr<ob::DepthFrame> frame);
-
-  void publishIRFrame(std::shared_ptr<ob::IRFrame> frame);
+  bool setupFormatConvertType(OBFormat format);
 
  private:
-  rclcpp::Node* node_;
-  std::shared_ptr<ob::Device> device_;
-  std::shared_ptr<Parameters> parameters_;
+  rclcpp::Node* node_ = nullptr;
+  std::shared_ptr<ob::Device> device_ = nullptr;
+  std::shared_ptr<Parameters> parameters_ = nullptr;
   rclcpp::Logger logger_;
   std::atomic_bool is_running_{false};
   std::unique_ptr<ob::Pipeline> pipeline_ = nullptr;
@@ -234,7 +226,7 @@ class OBCameraNode {
   std::map<stream_index_pair, std::string> optical_frame_id_;
   std::map<stream_index_pair, std::string> depth_aligned_frame_id_;
   std::string camera_link_frame_id_;
-  bool align_depth_ = false;
+  bool depth_align_ = false;
   bool publish_rgb_point_cloud_;
   std::string d2c_mode_;  // sw, hw, none
   std::map<stream_index_pair, std::string> qos_;

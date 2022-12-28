@@ -123,13 +123,13 @@ void OBCameraNode::setupProfiles() {
   config_ = std::make_shared<ob::Config>();
   if (d2c_mode_ == "sw") {
     config_->setAlignMode(ALIGN_D2C_SW_MODE);
-    align_depth_ = true;
+    depth_align_ = true;
   } else if (d2c_mode_ == "hw") {
     config_->setAlignMode(ALIGN_D2C_HW_MODE);
-    align_depth_ = true;
+    depth_align_ = true;
   } else {
     config_->setAlignMode(ALIGN_DISABLE);
-    align_depth_ = false;
+    depth_align_ = false;
   }
   for (const auto& elem : IMAGE_STREAMS) {
     if (enable_[elem]) {
@@ -186,7 +186,7 @@ void OBCameraNode::startPipeline() {
   }
   pipeline_ = std::make_unique<ob::Pipeline>(device_);
   pipeline_->start(config_, [this](std::shared_ptr<ob::FrameSet> frame_set) {
-    frameSetCallback(std::move(frame_set));
+    onNewFrameSetCallback(std::move(frame_set));
   });
 }
 
@@ -223,7 +223,6 @@ void OBCameraNode::setupTopics() {
   getParameters();
   setupDevices();
   setupProfiles();
-  setupDefaultStreamCalibData();
   setupCameraCtrlServices();
   setupPublishers();
   publishStaticTransforms();
@@ -251,7 +250,7 @@ void OBCameraNode::setupPublishers() {
 
 void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
   try {
-    if (align_depth_ && (format_[COLOR] == OB_FORMAT_YUYV || format_[COLOR] == OB_FORMAT_I420)) {
+    if (depth_align_ && (format_[COLOR] == OB_FORMAT_YUYV || format_[COLOR] == OB_FORMAT_I420)) {
       if (frame_set->depthFrame() != nullptr && frame_set->colorFrame() != nullptr) {
         publishColorPointCloud(frame_set);
       }
@@ -374,20 +373,82 @@ void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   point_cloud_publisher_->publish(point_cloud_msg_);
 }
 
-void OBCameraNode::frameSetCallback(std::shared_ptr<ob::FrameSet> frame_set) {
-  auto color_frame = frame_set->colorFrame();
-  auto depth_frame = frame_set->depthFrame();
-  auto ir_frame = frame_set->irFrame();
-  if (color_frame && enable_[COLOR]) {
-    publishColorFrame(color_frame);
+void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set) {
+  if (frame_set == nullptr) {
+    return;
   }
-  if (depth_frame && enable_[DEPTH]) {
-    publishDepthFrame(depth_frame);
+  try {
+    auto color_frame = std::dynamic_pointer_cast<ob::Frame>(frame_set->colorFrame());
+    auto depth_frame = std::dynamic_pointer_cast<ob::Frame>(frame_set->depthFrame());
+    auto ir_frame = std::dynamic_pointer_cast<ob::Frame>(frame_set->irFrame());
+    onNewFrameCallback(color_frame, COLOR);
+    onNewFrameCallback(depth_frame, DEPTH);
+    onNewFrameCallback(ir_frame, INFRA0);
+    publishPointCloud(frame_set);
+  } catch (const ob::Error& e) {
+    RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: " << e.getMessage());
+  } catch (const std::exception& e) {
+    RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: " << e.what());
+  } catch (...) {
+    RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: unknown error");
   }
-  if (ir_frame && enable_[INFRA0]) {
-    publishIRFrame(ir_frame);
+}
+
+void OBCameraNode::onNewFrameCallback(std::shared_ptr<ob::Frame> frame,
+                                      const stream_index_pair& stream_index) {
+  if (frame == nullptr) {
+    return;
   }
-  publishPointCloud(frame_set);
+  std::shared_ptr<ob::VideoFrame> video_frame = nullptr;
+  if (frame->type() == OB_FRAME_COLOR && frame->format() != OB_FORMAT_RGB888) {
+    if (!setupFormatConvertType(frame->format())) {
+      RCLCPP_ERROR(logger_, "Unsupported color format: %d", frame->format());
+      return;
+    }
+    auto color_frame = format_convert_filter_.process(frame);
+    if (color_frame == nullptr) {
+      RCLCPP_ERROR(logger_, "Failed to convert color frame");
+      return;
+    }
+    video_frame = color_frame->as<ob::ColorFrame>();
+  } else if (frame->type() == OB_FRAME_COLOR) {
+    video_frame = frame->as<ob::ColorFrame>();
+  } else if (frame->type() == OB_FRAME_DEPTH) {
+    video_frame = frame->as<ob::DepthFrame>();
+  } else if (frame->type() == OB_FRAME_IR) {
+    video_frame = frame->as<ob::IRFrame>();
+  } else {
+    RCLCPP_ERROR(logger_, "Unsupported frame type: %d", frame->type());
+    return;
+  }
+  if (!video_frame) {
+    RCLCPP_ERROR(logger_, "Failed to convert frame to video frame");
+    return;
+  }
+  int width = static_cast<int>(video_frame->width());
+  int height = static_cast<int>(video_frame->height());
+  auto& image = images_[stream_index];
+  if (image.empty() || image.cols != width || image.rows != height) {
+    image.create(height, width, image_format_[stream_index.first]);
+  }
+  image.data = (uchar*)video_frame->data();
+  auto timestamp = frameTimeStampToROSTime(video_frame->systemTimeStamp());
+  auto camera_param = pipeline_->getCameraParam();
+  auto& intrinsic = stream_index == COLOR ? camera_param.rgbIntrinsic : camera_param.depthIntrinsic;
+  auto& distortion =
+      stream_index == COLOR ? camera_param.rgbDistortion : camera_param.depthDistortion;
+  auto camera_info = convertToCameraInfo(intrinsic, distortion, width);
+  CHECK(camera_info_publishers_.count(stream_index) > 0);
+  camera_info_publishers_[stream_index]->publish(camera_info);
+  auto image_msg =
+      cv_bridge::CvImage(std_msgs::msg::Header(), encoding_[stream_index], image).toImageMsg();
+  image_msg->header.stamp = timestamp;
+  image_msg->is_bigendian = false;
+  image_msg->step = width * unit_step_size_[stream_index];
+  image_msg->header.frame_id =
+      depth_align_ ? depth_aligned_frame_id_[stream_index] : optical_frame_id_[stream_index];
+  CHECK(image_publishers_.count(stream_index) > 0);
+  image_publishers_[stream_index].publish(image_msg);
 }
 
 std::optional<OBCameraParam> OBCameraNode::findDefaultCameraParam() {
@@ -404,23 +465,6 @@ std::optional<OBCameraParam> OBCameraNode::findDefaultCameraParam() {
     }
   }
   return {};
-}
-
-void OBCameraNode::setupDefaultStreamCalibData() {
-  auto param = findDefaultCameraParam();
-  if (!param.has_value()) {
-    RCLCPP_WARN_STREAM(logger_, "Not Found default camera parameter");
-    align_depth_ = false;
-    return;
-  } else {
-    updateStreamCalibData(*param);
-  }
-}
-
-void OBCameraNode::updateStreamCalibData(const OBCameraParam& param) {
-  camera_infos_[DEPTH] = convertToCameraInfo(param.depthIntrinsic, param.depthDistortion);
-  camera_infos_[COLOR] = convertToCameraInfo(param.rgbIntrinsic, param.rgbDistortion);
-  camera_infos_[INFRA0] = camera_infos_[DEPTH];
 }
 
 void OBCameraNode::publishStaticTF(const rclcpp::Time& t, const std::vector<float>& trans,
@@ -493,8 +537,8 @@ void OBCameraNode::publishDynamicTransforms() {
   }
 }
 
-bool OBCameraNode::rbgFormatConvertRGB888(std::shared_ptr<ob::ColorFrame> frame) {
-  switch (frame->format()) {
+bool OBCameraNode::setupFormatConvertType(OBFormat format) {
+  switch (format) {
     case OB_FORMAT_RGB888:
       return true;
     case OB_FORMAT_I420:
@@ -516,125 +560,6 @@ bool OBCameraNode::rbgFormatConvertRGB888(std::shared_ptr<ob::ColorFrame> frame)
       return false;
   }
   return true;
-}
-
-void OBCameraNode::publishColorFrame(std::shared_ptr<ob::ColorFrame> frame) {
-  if (!rbgFormatConvertRGB888(frame)) {
-    RCLCPP_ERROR_STREAM(
-        logger_, "can not convert " << magic_enum::enum_name(frame->format()) << " to RGB888");
-    return;
-  }
-  frame = format_convert_filter_.process(frame)->as<ob::ColorFrame>();
-  format_convert_filter_.setFormatConvertType(FORMAT_RGB888_TO_BGR);
-  frame = format_convert_filter_.process(frame)->as<ob::ColorFrame>();
-  auto width = frame->width();
-  auto height = frame->height();
-  auto stream = COLOR;
-  auto& image = images_[stream];
-  if (image.size() != cv::Size(width, height)) {
-    image.create(height, width, image.type());
-  }
-  image.data = (uint8_t*)frame->data();
-  auto timestamp = frameTimeStampToROSTime(frame->systemTimeStamp());
-  if (camera_infos_.count(stream)) {
-    auto& cam_info = camera_infos_.at(stream);
-    if (cam_info.width != width || cam_info.height != height) {
-      updateStreamCalibData(pipeline_->getCameraParam());
-      cam_info.height = height;
-      cam_info.width = width;
-    }
-    cam_info.header.stamp = timestamp;
-    auto& camera_info_publisher = camera_info_publishers_.at(stream);
-    camera_info_publisher->publish(cam_info);
-  }
-  sensor_msgs::msg::Image::SharedPtr img;
-  img = cv_bridge::CvImage(std_msgs::msg::Header(), encoding_.at(stream), image).toImageMsg();
-
-  img->width = width;
-  img->height = height;
-  img->is_bigendian = false;
-  img->step = width * unit_step_size_[stream];
-  img->header.frame_id = optical_frame_id_[COLOR];
-  img->header.stamp = timestamp;
-  auto& image_publisher = image_publishers_.at(stream);
-  image_publisher.publish(img);
-}
-
-void OBCameraNode::publishDepthFrame(std::shared_ptr<ob::DepthFrame> frame) {
-  auto width = frame->width();
-  auto height = frame->height();
-  auto stream = DEPTH;
-  auto& image = images_[stream];
-  if (image.size() != cv::Size(width, height)) {
-    image.create(height, width, image.type());
-  }
-  image.data = (uint8_t*)frame->data();
-  auto timestamp = frameTimeStampToROSTime(frame->systemTimeStamp());
-  if (camera_infos_.count(stream)) {
-    auto& cam_info = camera_infos_.at(stream);
-    if (cam_info.width != width || cam_info.height != height) {
-      updateStreamCalibData(pipeline_->getCameraParam());
-      cam_info.height = height;
-      cam_info.width = width;
-    }
-    cam_info.header.stamp = timestamp;
-    auto& camera_info_publisher = camera_info_publishers_.at(stream);
-    camera_info_publisher->publish(cam_info);
-  }
-  sensor_msgs::msg::Image::SharedPtr img;
-  img = cv_bridge::CvImage(std_msgs::msg::Header(), encoding_.at(stream), image).toImageMsg();
-
-  img->width = width;
-  img->height = height;
-  img->is_bigendian = false;
-  img->step = width * unit_step_size_[stream];
-  if (align_depth_) {
-    img->header.frame_id = depth_aligned_frame_id_[DEPTH];
-  } else {
-    img->header.frame_id = optical_frame_id_[DEPTH];
-  }
-  img->header.stamp = timestamp;
-  auto& image_publisher = image_publishers_.at(stream);
-  image_publisher.publish(img);
-}
-
-void OBCameraNode::publishIRFrame(std::shared_ptr<ob::IRFrame> frame) {
-  auto width = frame->width();
-  auto height = frame->height();
-  auto stream = INFRA0;
-  auto& image = images_[stream];
-  if (image.size() != cv::Size(width, height)) {
-    image.create(height, width, image.type());
-  }
-  image.data = (uint8_t*)frame->data();
-  auto timestamp = frameTimeStampToROSTime(frame->systemTimeStamp());
-  auto& image_publisher = image_publishers_.at(stream);
-  if (camera_infos_.count(stream)) {
-    auto& cam_info = camera_infos_.at(stream);
-    auto& camera_info_publisher = camera_info_publishers_.at(stream);
-
-    if (cam_info.width != width || cam_info.height != height) {
-      updateStreamCalibData(pipeline_->getCameraParam());
-      cam_info.height = height;
-      cam_info.width = width;
-    }
-    cam_info.header.stamp = timestamp;
-    camera_info_publisher->publish(cam_info);
-  }
-  sensor_msgs::msg::Image::SharedPtr img;
-  img = cv_bridge::CvImage(std_msgs::msg::Header(), encoding_.at(stream), image).toImageMsg();
-
-  img->width = width;
-  img->height = height;
-  img->is_bigendian = false;
-  img->step = width * unit_step_size_[stream];
-  if (align_depth_) {
-    img->header.frame_id = depth_aligned_frame_id_[DEPTH];
-  } else {
-    img->header.frame_id = optical_frame_id_[DEPTH];
-  }
-  img->header.stamp = timestamp;
-  image_publisher.publish(img);
 }
 
 }  // namespace orbbec_camera

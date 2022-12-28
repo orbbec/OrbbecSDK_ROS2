@@ -25,7 +25,7 @@
 
 namespace orbbec_camera {
 sensor_msgs::msg::CameraInfo convertToCameraInfo(OBCameraIntrinsic intrinsic,
-                                                 OBCameraDistortion distortion);
+                                                 OBCameraDistortion distortion, int width);
 
 void saveRGBPointsToPly(std::shared_ptr<ob::Frame> frame, std::string fileName);
 

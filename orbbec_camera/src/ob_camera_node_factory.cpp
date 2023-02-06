@@ -63,11 +63,11 @@ void OBCameraNodeFactory::init() {
 }
 
 void OBCameraNodeFactory::onDeviceConnected(const std::shared_ptr<ob::DeviceList> &device_list) {
+  CHECK_NOTNULL(device_list);
   if (device_list->deviceCount() == 0) {
     return;
   }
   RCLCPP_INFO_STREAM(logger_, "onDeviceConnected");
-  CHECK_NOTNULL(device_list);
   if (!device_) {
     try {
       startDevice(device_list);
@@ -80,11 +80,11 @@ void OBCameraNodeFactory::onDeviceConnected(const std::shared_ptr<ob::DeviceList
 }
 
 void OBCameraNodeFactory::onDeviceDisconnected(const std::shared_ptr<ob::DeviceList> &device_list) {
+  CHECK_NOTNULL(device_list);
   if (device_list->deviceCount() == 0) {
     return;
   }
   RCLCPP_INFO_STREAM(logger_, "onDeviceDisconnected");
-  CHECK_NOTNULL(device_list);
   for (size_t i = 0; i < device_list->deviceCount(); i++) {
     std::string serial_number = device_list->serialNumber(i);
     std::scoped_lock<decltype(device_lock_)> lock(device_lock_);

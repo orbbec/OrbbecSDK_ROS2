@@ -14,7 +14,6 @@
 
 #include <glog/logging.h>
 #include <nlohmann/json.hpp>
-#include <magic_enum.hpp>
 
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -32,6 +31,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <std_srvs/srv/set_bool.hpp>
 #include <sensor_msgs/msg/camera_info.hpp>
+#include <camera_info_manager/camera_info_manager.hpp>
 
 #include <image_publisher/image_publisher.hpp>
 #include <image_transport/publisher.hpp>
@@ -47,6 +47,7 @@
 
 #include "orbbec_camera/constants.h"
 #include "orbbec_camera/dynamic_params.h"
+#include "magic_enum/magic_enum.hpp"
 
 #define STREAM_NAME(sip)                                                                       \
   (static_cast<std::ostringstream&&>(std::ostringstream()                                      \
@@ -123,6 +124,8 @@ class OBCameraNode {
 
   void startPipeline();
 
+  void setupDefaultImageFormat();
+
   void setupPublishers();
 
   void publishStaticTF(const rclcpp::Time& t, const std::vector<float>& trans,
@@ -195,15 +198,16 @@ class OBCameraNode {
 
   bool toggleSensor(const stream_index_pair& stream_index, bool enabled, std::string& msg);
 
-  void publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set);
+  void publishPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set);
 
-  void publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_set);
+  void publishDepthPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set);
 
-  void publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_set);
+  void publishColoredPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set);
 
-  void onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set);
+  void onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet>& frame_set);
 
-  void onNewFrameCallback(std::shared_ptr<ob::Frame> frame, const stream_index_pair& stream_index);
+  void onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
+                          const stream_index_pair& stream_index);
 
   bool setupFormatConvertType(OBFormat format);
 
@@ -221,19 +225,17 @@ class OBCameraNode {
   std::map<stream_index_pair, OBCameraParam> ob_camera_param_;
   std::map<stream_index_pair, int> width_;
   std::map<stream_index_pair, int> height_;
-  std::map<stream_index_pair, double> fps_;
+  std::map<stream_index_pair, int> fps_;
   std::map<stream_index_pair, std::string> frame_id_;
   std::map<stream_index_pair, std::string> optical_frame_id_;
   std::map<stream_index_pair, std::string> depth_aligned_frame_id_;
   std::string camera_link_frame_id_;
-  bool depth_align_ = false;
-  bool publish_rgb_point_cloud_;
-  std::string d2c_mode_;  // sw, hw, none
-  std::map<stream_index_pair, std::string> qos_;
-  std::map<stream_index_pair, std::string> info_qos_;
+  bool depth_registration_ = false;
+  std::map<stream_index_pair, std::string> image_qos_;
+  std::map<stream_index_pair, std::string> camera_info_qos_;
   std::map<stream_index_pair, ob_format> format_;
   std::map<stream_index_pair, std::string> format_str_;
-  std::map<ob_stream_type, int> image_format_;
+  std::map<stream_index_pair, int> image_format_;
   std::map<stream_index_pair, std::vector<std::shared_ptr<ob::VideoStreamProfile>>>
       enabled_profiles_;
   std::map<stream_index_pair, uint32_t> seq_;
@@ -243,10 +245,8 @@ class OBCameraNode {
   std::vector<int> compression_params_;
   ob::FormatConvertFilter format_convert_filter_;
 
-  std::map<ob_frame_type, bool> is_first_frame_;
-
-  std::map<stream_index_pair, bool> enable_;
-  std::map<ob_stream_type, std::string> stream_name_;
+  std::map<stream_index_pair, bool> enable_stream_;
+  std::map<stream_index_pair, std::string> stream_name_;
   std::map<stream_index_pair, image_transport::Publisher> image_publishers_;
   std::map<stream_index_pair, rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr>
       camera_info_publishers_;
@@ -271,21 +271,28 @@ class OBCameraNode {
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr toggle_sensors_srv_;
 
   bool publish_tf_ = false;
-  std::shared_ptr<tf2_ros::StaticTransformBroadcaster> static_tf_broadcaster_;
-  std::shared_ptr<tf2_ros::TransformBroadcaster> dynamic_tf_broadcaster_;
+  std::shared_ptr<tf2_ros::StaticTransformBroadcaster> static_tf_broadcaster_ = nullptr;
+  std::shared_ptr<tf2_ros::TransformBroadcaster> dynamic_tf_broadcaster_ = nullptr;
   std::vector<geometry_msgs::msg::TransformStamped> tf_msgs;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr colored_point_cloud_publisher_;
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr point_cloud_publisher_;
-  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr depth_point_cloud_publisher_;
-
+  bool enable_point_cloud_ = true;
+  bool enable_colored_point_cloud_ = false;
   ob::PointCloudFilter point_cloud_filter_;
   sensor_msgs::msg::PointCloud2 point_cloud_msg_;
 
   rclcpp::Publisher<Extrinsics>::SharedPtr extrinsics_publisher_;
+  bool enable_publish_extrinsic_ = false;
   orbbec_camera_msgs::msg::DeviceInfo device_info_;
-
+  std::string point_cloud_qos_;
   std::vector<geometry_msgs::msg::TransformStamped> static_tf_msgs_;
   std::shared_ptr<std::thread> tf_thread_ = nullptr;
   std::condition_variable tf_cv_;
   double tf_publish_rate_ = 10.0;
+  std::unique_ptr<camera_info_manager::CameraInfoManager> ir_info_manager_ = nullptr;
+  std::unique_ptr<camera_info_manager::CameraInfoManager> color_info_manager_ = nullptr;
+  std::string color_info_url_;
+  std::string ir_info_url_;
+  std::optional<OBCameraParam> camera_param_;
 };
 }  // namespace orbbec_camera

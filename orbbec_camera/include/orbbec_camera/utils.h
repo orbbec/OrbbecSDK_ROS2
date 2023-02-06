@@ -13,7 +13,6 @@
 #pragma once
 #include <ostream>
 #include <glog/logging.h>
-#include <magic_enum.hpp>
 #include <Eigen/Dense>
 #include <tf2/LinearMath/Quaternion.h>
 #include <rclcpp/rclcpp.hpp>
@@ -22,6 +21,7 @@
 #include "sensor_msgs/distortion_models.hpp"
 #include "sensor_msgs/msg/camera_info.hpp"
 #include "orbbec_camera_msgs/msg/extrinsics.hpp"
+#include "magic_enum/magic_enum.hpp"
 
 namespace orbbec_camera {
 sensor_msgs::msg::CameraInfo convertToCameraInfo(OBCameraIntrinsic intrinsic,
@@ -45,5 +45,7 @@ std::string getObSDKVersion();
 OBFormat OBFormatFromString(const std::string& format);
 
 std::string ObDeviceTypeToString(const OBDeviceType& type);
+
+rmw_qos_profile_t getRMWQosProfileFromString(const std::string& str_qos);
 
 }  // namespace orbbec_camera

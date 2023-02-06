@@ -19,9 +19,9 @@ find_package(ament_index_cpp REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(cv_bridge REQUIRED)
+find_package(camera_info_manager REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(image_publisher REQUIRED)
-find_package(magic_enum REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(orbbec_camera_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -40,7 +40,7 @@ pkg_search_module(GLOG REQUIRED libglog)
 
 if (NOT GLOG_FOUND)
   message(FATAL_ERROR "glog is not found")
-endif()
+endif ()
 execute_process(COMMAND uname -m OUTPUT_VARIABLE MACHINES)
 execute_process(COMMAND getconf LONG_BIT OUTPUT_VARIABLE MACHINES_BIT)
 message(STATUS "ORRBEC Machine : ${MACHINES}")
@@ -71,6 +71,7 @@ set(dependencies
   ament_index_cpp
   builtin_interfaces
   cv_bridge
+  camera_info_manager
   Eigen3
   image_transport
   image_publisher
@@ -89,10 +90,7 @@ set(dependencies
 ament_target_dependencies(${PROJECT_NAME}
   ${dependencies}
   )
-rclcpp_components_register_node(${PROJECT_NAME}
-  PLUGIN "orbbec_camera::OBCameraNodeFactory"
-  EXECUTABLE orbbec_camera_node
-  )
+
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -108,9 +106,91 @@ target_link_libraries(${PROJECT_NAME}
   ${OpenCV_LIBS}
   Eigen3::Eigen
   ${GLOG_LIBRARIES}
-  magic_enum::magic_enum
   -lOrbbecSDK
   -L${ORBBEC_LIBS}
+  )
+
+add_executable(${PROJECT_NAME}_node
+  src/main.cpp
+  )
+
+target_include_directories(${PROJECT_NAME}_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+  ${ORBBEC_INCLUDE_DIR}
+  ${OpenCV_INCLUDED_DIRS}
+  ${GLOG_INCLUDED_DIRS}
+  )
+
+
+target_link_libraries(${PROJECT_NAME}_node
+  ${ORBBEC_SDK_LIBRARIES}
+  ${OpenCV_LIBS}
+  Eigen3::Eigen
+  ${GLOG_LIBRARIES}
+  -lOrbbecSDK
+  -L${ORBBEC_LIBS}
+  ${PROJECT_NAME}
+  )
+
+ament_target_dependencies(${PROJECT_NAME}_node
+  ${dependencies}
+  )
+add_executable(list_devices_node
+  src/list_devices_node.cpp
+  )
+
+target_include_directories(list_devices_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+  ${ORBBEC_INCLUDE_DIR}
+  ${OpenCV_INCLUDED_DIRS}
+  ${GLOG_INCLUDED_DIRS}
+  )
+
+
+target_link_libraries(list_devices_node
+  ${ORBBEC_SDK_LIBRARIES}
+  ${OpenCV_LIBS}
+  Eigen3::Eigen
+  ${GLOG_LIBRARIES}
+  -lOrbbecSDK
+  -L${ORBBEC_LIBS}
+  ${PROJECT_NAME}
+  )
+
+ament_target_dependencies(list_devices_node
+  ${dependencies}
+  )
+
+add_executable(ob_cleanup_shm_node
+  src/ob_cleanup_shm.cpp
+  )
+
+target_include_directories(ob_cleanup_shm_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+  ${ORBBEC_INCLUDE_DIR}
+  ${OpenCV_INCLUDED_DIRS}
+  ${GLOG_INCLUDED_DIRS}
+  )
+
+
+target_link_libraries(ob_cleanup_shm_node
+  ${ORBBEC_SDK_LIBRARIES}
+  ${OpenCV_LIBS}
+  Eigen3::Eigen
+  ${GLOG_LIBRARIES}
+  -lOrbbecSDK
+  -L${ORBBEC_LIBS}
+  ${PROJECT_NAME}
+  )
+
+ament_target_dependencies(ob_cleanup_shm_node
+  ${dependencies}
   )
 
 install(TARGETS ${PROJECT_NAME}
@@ -134,11 +214,6 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME}/
   )
 
-
-install(DIRECTORY
-  params
-  DESTINATION share/${PROJECT_NAME}/
-  )
 install(DIRECTORY
   ${ORBBEC_INCLUDE_DIR}
   DESTINATION include
@@ -151,6 +226,12 @@ install(DIRECTORY
   PATTERN "*.so.*"
   )
 
+
+install(TARGETS list_devices_node
+  ob_cleanup_shm_node
+  ${PROJECT_NAME}_node
+  DESTINATION lib/${PROJECT_NAME}/
+  )
 if (BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()

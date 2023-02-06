@@ -241,26 +241,52 @@ uint32_t ob_video_frame_metadata_size(ob_frame *frame, ob_error **error);
  */
 uint8_t ob_video_frame_pixel_available_bit_size(ob_frame *frame, ob_error **error);
 
+/* @brief 查询IR frame的最原始数据来源（即使回放视频，其原始的数据源也是sensor）
+ * @param[in] frame 视频帧对象
+ * @param[out] error 记录错误信息
+ * @return uint8_t 返回
+ * \endif
+ */
+ob_sensor_type ob_ir_frame_get_source_sensor_type(ob_frame *frame, ob_error **ob_error);
+
 /**
  * \if English
- * @brief Get the value scale of the depth frame, the unit is mm/step,
- *      such as valueScale=0.1, and a certain coordinate pixel value is pixelValue=10000,
- *      then the depth value = pixelValue*valueScale = 10000*0.1=1000mm。
+ * @brief Get the value scale of the depth frame. The pixel value of depth frame is multiplied by the scale to give a depth value in millimeter.
+ *      such as valueScale=0.1, and a certain coordinate pixel value is pixelValue=10000, then the depth value = pixelValue*valueScale = 10000*0.1=1000mm。
  *
  * @param[in] frame Frame object
  * @param[out] error Log error messages
  * @return float value scale
  * \else
- * @brief 获取深度帧的值刻度，单位为 mm/step，
- *      如valueScale=0.1, 某坐标像素值为pixelValue=10000，
+ * @brief 获取深度帧的值缩放系数，深度像素值乘以缩放系数后，可以得到单位为毫米的深度值； 如valueScale=0.1, 某坐标像素值为pixelValue=10000，
  *     则表示深度值value = pixelValue*valueScale = 10000*0.1=1000mm。
  *
  * @param[in] frame 帧对象
  * @param[out] error 记录错误信息
- * @return float 值刻度
+ * @return float 缩放系数
  * \endif
  */
 float ob_depth_frame_get_value_scale(ob_frame *frame, ob_error **error);
+
+/**
+ * \if English
+ * @brief Get the point position value scale of the points frame. the point position value of points frame is multiplied by the scale to give a position value
+ * in millimeter. such as scale=0.1, The x-coordinate value of a point is x = 10000, which means that the actual x-coordinate value = x*scale = 10000*0.1 =
+ * 1000mm.
+ *
+ * @param[in] frame Frame object
+ * @param[out] error Log error messages
+ * @return float position value scale
+ * \else
+ * @brief 获取点云帧的点坐标值缩放系数，点坐标值乘以缩放系数后，可以得到单位为毫米的坐标值； 如scale=0.1, 某个点的x坐标值为x=10000，
+ *     则表示实际x坐标value = x*scale = 10000*0.1=1000mm。
+ *
+ * @param[in] frame 点云帧对象
+ * @param[out] error 记录错误信息
+ * @return float 缩放系数
+ * \endif
+ */
+float ob_points_frame_get_position_value_scale(ob_frame *frame, ob_error **error);
 
 /**
  * \if English
@@ -361,6 +387,11 @@ ob_frame *ob_frameset_ir_frame(ob_frame *frameset, ob_error **error);
  * \endif
  */
 ob_frame *ob_frameset_points_frame(ob_frame *frameset, ob_error **error);
+
+/**
+ * 获取指定类型的frame
+ */
+ob_frame *ob_frameset_get_frame(ob_frame *frameset, ob_frame_type frame_type, ob_error **error);
 
 /**
  * \if English

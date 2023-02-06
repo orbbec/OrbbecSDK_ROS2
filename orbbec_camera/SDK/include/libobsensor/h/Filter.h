@@ -84,12 +84,18 @@ void ob_pointcloud_filter_set_frame_align_state(ob_filter *filter, bool state, o
 
 /**
  * \if English
- * @brief  Set point cloud position data scale ratio
- * @param[in] filter pointcloud_filter object
- * @param[in] scale scale ratio
+ * @brief  Set the point cloud data scaling factor
+ * @attention Calling this function to set the scale will change the point coordinate scaling factor of the output point cloud frame: posScale = posScale /
+ * scale.The point coordinate scaling factor for the output point cloud frame can be obtained via @ref ob_points_frame_get_position_value_scale function
+ * @param[in] filter object
+ * @param[in] scale Set the point cloud coordinate data zoom factor
  * @param[out] error Log error messages
  * \else
  * @brief  设置点云数据缩放比例
+ *
+ * @attention 调用该函数设置缩放比例会改变输出点云帧的点坐标缩放系数：posScale = posScale / scale;
+ *  输出点云帧的点坐标缩放系数可通过 @ref ob_points_frame_get_position_value_scale 函数获取
+ *
  * @param[in] filter pointcloud_filter对象
  * @param[in] scale 设置点云坐标数据缩放比例
  * @param[out] error 记录错误信息
@@ -100,8 +106,8 @@ void ob_pointcloud_filter_set_position_data_scale(ob_filter *filter, float scale
 /**
  * \if English
  * @brief  Set point cloud color data normalization
- * @param[in] filter pointcloud_filter object
- * @param[in] state Whether to normalize
+ * @param[in] filter object
+ * @param[in] state Sets whether the point cloud color data is normalized
  * @param[out] error Log error messages
  * \else
  * @brief  设置点云颜色数据归一化
@@ -145,6 +151,60 @@ ob_filter *ob_create_format_convert_filter(ob_error **error);
  * \endif
  */
 void ob_format_convert_filter_set_format(ob_filter *filter, ob_convert_format type, ob_error **error);
+
+/**
+ * \if English
+ * @brief Create compression Filter
+ *
+ * @param[out] error Log error messages
+ *
+ * @return filter depth_filter object
+ * \else
+ * @brief 创建compression Filter
+ *
+ * @param[out] error 记录错误信息
+ *
+ * @return filter depth_filter 对象
+ * \endif
+ */
+ob_filter *ob_create_compression_filter(ob_error **error);
+
+/**
+ * \if English
+ * @brief Set compression parameters
+ *
+ * @param[in] filter compression_filter object
+ * @param[in] mode Compression mode OB_COMPRESSION_LOSSLESS or OB_COMPRESSION_LOSSY
+ * @param[in] params Compression params, struct ob_compression_params, when mode is OB_COMPRESSION_LOSSLESS, params is NULL
+ * @param[out] error Log error messages
+ * \else
+ * @brief 设置压缩类型
+ *
+ * @param[in] filter compression_filter对象
+ * @param[in] mode 压缩模式 OB_COMPRESSION_LOSSLESS or OB_COMPRESSION_LOSSY
+ * @param[in] params 压缩参数，结构体 ob_compression_params，当mode为OB_COMPRESSION_LOSSLESS时，params为NULL
+ * @param[out] error 记录错误信息
+ * \endif
+ */
+void ob_compression_filter_set_compression_params(ob_filter *filter, ob_compression_mode mode, void *params, ob_error **error);
+
+/**
+ * \if English
+ * @brief Create decompression Filter
+ *
+ * @param[out] error Log error messages
+ *
+ * @return filter decompression Filter object
+ * \else
+ * @brief 创建decompressionr Filter
+ *
+ * @param[out] error 记录错误信息
+ *
+ * @return filter decompression Filter 对象
+ * \endif
+ */
+
+ob_filter *ob_create_decompression_filter(ob_error **error);
 
 /**
  * \if English

@@ -446,6 +446,49 @@ void ob_device_get_structured_data(ob_device *device, ob_property_id property_id
 
 /**
  * \if English
+ * @brief Set property struct data.
+ *
+ * @param[in] device Device object
+ * @param[in] property_id Id of the property
+ * @param[in] data_bundle Target data to set
+ * @param[in] Set data callback
+ * @param[in] user_data User-defined data will be returned in the callback
+ * @param[out] error Log error messages
+ * \else
+ * @brief 设置结构体类型的设备属性
+
+ * @param[in] device 设备对象
+ * @param[in] property_id 要设置的属性id
+ * @param[in] data_bundle
+ 要设置的数据内容，注意data_bundle指针为OrbbecSDK外部构建，所以自行释放指针资源，禁止调用ob_delete_data_bundle释放资源，会造成不可预知的错误；
+ * @param[in] cb 设置进度回调
+ * @param[in] user_data 用户自定义数据，会在回调中返回
+ * @param[out] error 记录错误信息
+ * @return void 无返回值
+ * \endif
+ */
+void ob_device_set_structured_data_ext(ob_device *device, ob_property_id property_id, ob_data_bundle *data_bundle, ob_set_data_callback cb, void *user_data,
+                                       ob_error **error);
+
+/**
+ * \if English
+ * @brief Get property struct data.
+ * @param[in] device Device object
+ * @param[in] property_id Id of the property
+ * @param[out] error Log error messages
+ * @return ob_data_dundle, NOTE: ob_data_dundle must free by ob_delete_data_bundle() because it come from OrbbecSDK's API
+ * \else
+ * @brief 获取结构体类型的设备属性
+ * @param[in] device 设备对象
+ * @param[in] property_id 要获取的属性id
+ * @param[out] error 记录错误信息
+ * @return 返回ob_data_dundle 结构体对象指针，返回的必须调用ob_delete_data_bundle()函数释放资源，否则会造成内存泄漏
+ * \endif
+ */
+ob_data_bundle *ob_device_get_structured_data_ext(ob_device *device, ob_property_id property_id, ob_error **error);
+
+/**
+ * \if English
  * @brief Set raw data type of device property
  *
  * @param[in] device Device object
@@ -494,6 +537,44 @@ void ob_device_set_raw_data(ob_device *device, ob_property_id property_id, void 
  * \endif
  */
 void ob_device_get_raw_data(ob_device *device, ob_property_id property_id, ob_get_data_callback cb, bool async, void *user_data, ob_error **error);
+
+/**
+ * \if English
+ * @brief Get the property protocol version
+ * 
+ * @param[in] device Device object
+ * @param[out] error Log error messages
+ * @return ob_protocol_version
+ * 
+ * \else
+ * 
+ * @brief 获取设备的控制命令协议版本
+ * 
+ * @param[in] device 设备对象
+ * @param[out] error 记录错误信息
+ * @return ob_protocol_version
+ * \endif
+ */
+ob_protocol_version ob_device_get_protocol_version(ob_device *device, ob_error **error);
+
+/**
+ * \if English
+ * @brief Get cmdVersion of property
+ *
+ * @param[in] device Device object
+ * @param[in] propertyId Property id
+ * @param[out] error Log error messages
+ * @return ob_cmd_version 
+ * \else
+ * @brief 获取控制命令的版本号
+ *
+ * @param[in] device 设备对象
+ * @param[in] propertyId 属性id
+ * @param[out] error 记录错误信息
+ * @return ob_cmd_version 
+ * \endif
+ */
+ob_cmd_version ob_device_get_cmd_version(ob_device *device, ob_property_id property_id, ob_error **error);
 
 /**
  * \if English
@@ -905,6 +986,72 @@ ob_camera_param_list *ob_device_get_calibration_camera_param_list(ob_device *dev
 
 /**
  * \if English
+ * @brief Get current depth work mode
+ * @param[in] device Device object
+ * @param[out] error Log error messages
+ * @return ob_depth_work_mode Current depth work mode
+ * \else
+ * @brief 查询当前相机深度模式
+ * @param[in] device 设备对象
+ * @param[out] error 记录错误信息
+ * @return ob_depth_work_mode 当前深度工作模式
+ * \endif
+ */
+ob_depth_work_mode ob_device_get_current_depth_work_mode(ob_device *device, ob_error **error);
+
+/**
+ * \if English
+ * @brief Switch depth work mode by ob_depth_work_mode. Prefer invoke ob_device_switch_depth_work_mode_by_name to switch depth mode
+ *        when known the complete name of depth work mode.
+ * @param[in] device Device object
+ * @param[in] work_mode Depth work mode come from ob_depth_work_mode_list which return by ob_device_get_depth_work_mode_list
+ * @param[out] error Log error messages
+ * @return Return switch result. OB_STATUS_OK: success, other failed.
+ * \else
+ * @brief 切换相机深度模式（根据深度工作模式对象），如果知道设备支持的深度工作模式名称，那么推荐用ob_device_switch_depth_work_mode_by_name
+ * @param[in] device 设备对象
+ * @param[in] work_mode 深度工作模式，从深度工作模式列表ob_depth_work_mode_list获取的模式对象(ob_device_get_depth_work_mode_list返回的对象)
+ * @param[out] error 记录错误信息
+ * @return ob_status 设置设置结果，OB_STATUS_OK成功，其他：设置失败
+ * \endif
+ */
+ob_status ob_device_switch_depth_work_mode(ob_device *device, const ob_depth_work_mode *work_mode, ob_error **error);
+
+/**
+ * \if English
+ * @brief Switch depth work mode by work mode name.
+ * @param[in] device Device object
+ * @param[in] mode name Depth work mode name which equals to ob_depth_work_mode.name
+ * @param[out] error Log error messages
+ * 
+ * @return Return switch result. OB_STATUS_OK: success, other failed.
+ * \else
+ * @brief 切换相机深度模式（根据深度工作模式名称）
+ * @param[in] device 设备对象
+ * @param[in] mode_name 深度工作模式名称，模式名称必须与ob_depth_work_mode.name一致
+ * @param[out] error 记录错误信息
+ * @return ob_status 设置设置结果，OB_STATUS_OK成功，其他：设置失败
+ * \endif
+ */
+ob_status ob_device_switch_depth_work_mode_by_name(ob_device *device, const char *mode_name, ob_error **error);
+
+/**
+ * \if English
+ * @brief Request support depth work mode list
+ * @param[in] device Device object
+ * @param[out] error Log error messages
+ * @return ob_depth_work_mode_list list of ob_depth_work_mode
+ * \else
+ * @brief 查询当前相机深度模式的列表
+ * @param[in] device 设备对象
+ * @param[out] error 记录错误信息
+ * @return ob_depth_work_mode_list 深度模式列表。注意：返回对象要用ob_delete_depth_work_mode_list()释放资源，否者会内存泄漏
+ * \endif
+ */
+ob_depth_work_mode_list *ob_device_get_depth_work_mode_list(ob_device *device, ob_error **error);
+
+/**
+ * \if English
  * @brief Device reboot
  * @attention The device will be disconnected and reconnected. After the device is disconnected, the interface access to the device handle may be abnormal.
  * Please use the ob_delete_device interface to delete the handle directly. After the device is reconnected, it can be obtained again.
@@ -921,6 +1068,28 @@ ob_camera_param_list *ob_device_get_calibration_camera_param_list(ob_device *dev
  * \endif
  */
 void ob_device_reboot(ob_device *device, ob_error **error);
+
+/**
+ * @brief 获取当前设备同步配置
+ * @brief 设备同步：包括单机内的不同 Sensor 的曝光同步功能 和 多机同步功能
+ *
+ * @param[in] device 设备对象
+ * @param[out] error 记录错误信息
+ * @return ob_device_sync_config 返回设备同步配置
+ */
+ob_device_sync_config ob_device_get_sync_config(ob_device *device, ob_error **error);
+
+/**
+ * @brief 设置设备同步配置
+ * @brief 用于配置 单机内的不同 Sensor 的曝光同步功能 和 多机同步功能
+ *
+ * @attention 调用本函数会直接将配置写入设备Flash，设备重启后依然会生效。为了避免影响Flash寿命，不要频繁更新配置。
+ *
+ * @param[in] device 设备对象
+ * @param[out] device_sync_config 设备同步配置
+ * @param[out] error 记录错误信息
+ */
+void ob_device_set_sync_config(ob_device *device, ob_device_sync_config device_sync_config, ob_error **error);
 
 /**
  * \if English
@@ -1170,6 +1339,68 @@ ob_camera_param ob_camera_param_list_get_param(ob_camera_param_list *param_list,
  * \endif
  */
 void ob_delete_camera_param_list(ob_camera_param_list *param_list, ob_error **error);
+
+/**
+ * \if English
+ * @brief Get the depth work mode count that ob_depth_work_mode_list hold
+ * @param[in] work_mode_list data struct contain list of ob_depth_work_mode
+ * @param[out] error Log error messages
+ * @return The total number contain in ob_depth_work_mode_list
+ * \else
+ * @brief 获取深度工作模式列表的元素数量
+ * @param[in] work_mode_list 工作模式列表对象
+ * @param[in] index 下标，从0开始
+ * @return work_mode_list包含的深度模式总数
+ * \endif
+ *
+ */
+uint32_t ob_depth_work_mode_list_count(ob_depth_work_mode_list *work_mode_list, ob_error **error);
+
+/**
+ * \if English
+ * @brief Get the index target of ob_depth_work_mode from work_mode_list
+ * @param[in] work_mode_list data struct contain list of ob_depth_work_mode
+ * @param[in] index index of target ob_depth_work_mode
+ * @param[out] error Log error messages
+ * @return ob_depth_work_mode
+ * \else
+ * @brief 从深度工作模式列表获取第N个对象
+ * @param[in] work_mode_list 工作模式列表对象
+ * @param[in] index 下标，从0开始
+ * @param[out] error 记录错误信息
+ * @return 深度工作模式对象
+ * \endif
+ *
+ */
+ob_depth_work_mode ob_depth_work_mode_list_get_item(ob_depth_work_mode_list *work_mode_list, uint32_t index, ob_error **error);
+
+/**
+ * \if English
+ * @brief Free resource of ob_depth_work_mode_list
+ * @param[in] work_mode_list data struct contain list of ob_depth_work_mode
+ * @param[out] error Log error messages
+ * \else
+ * @brief 删除深度工作模式列表对象，释放资源
+ * @param[in] work_mode_list 工作模式列表对象
+ * @param[out] error 记录错误信息
+ * \endif
+ *
+ */
+void ob_delete_depth_work_mode_list(ob_depth_work_mode_list *work_mode_list, ob_error **error);
+
+/**
+ * \if English
+ * @brief Free resource of data_bundle which come from OrbbecSDK's API
+ * @param data_bundle Data bundle
+ * @param[out] error Log error messages
+ * \else
+ * @brief 删除ob_data_bundle对象，释放资源；
+ * 注意：只能释放OrbbecSDK库返回的ob_data_bundle对象，非OrbbecSDK构建的对象不能调用该接口，否则会造成意想不到的错误
+ * @param[in] data_bundle 数据集
+ * @param[out] error 记录错误信息
+ * \endif
+ */
+void ob_delete_data_bundle(ob_data_bundle *data_bundle, ob_error **error);
 
 #ifdef __cplusplus
 }

@@ -13,6 +13,7 @@
 #include "Types.hpp"
 
 #include <memory>
+#include <iostream>
 #include <typeinfo>
 
 /**
@@ -26,7 +27,10 @@
  *       +--+------+---------+
  *      |          |         |
  *  ColorFrame DepthFrame IRFrame
- *
+ *                           |
+ *                     +-----+-----+
+ *                     |           |
+ *                IRLeftFrame IRRightFrame
  */
 
 struct FrameImpl;
@@ -280,17 +284,15 @@ public:
 
     /**
      * \if English
-     * @brief Get the value scale of the depth frame, the unit is mm/step,
-     *        such as valueScale=0.1, and a certain coordinate pixel value is pixelValue=10000,
-     *        then the depth value value = pixelValue*valueScale = 10000*0.1=1000mm.
+     * @brief Get the value scale of the depth frame. The pixel value of depth frame is multiplied by the scale to give a depth value in millimeter.
+     *      such as valueScale=0.1, and a certain coordinate pixel value is pixelValue=10000, then the depth value = pixelValue*valueScale = 10000*0.1=1000mm。
      *
-     * @return float
+     * @return float scale
      * \else
-     * @brief 获取深度帧的值刻度，单位为 mm/step，
-     *      如valueScale=0.1, 某坐标像素值为pixelValue=10000，
+     * @brief 获取深度帧的值缩放系数，深度像素值乘以缩放系数后，可以得到单位为毫米的深度值； 如valueScale=0.1, 某坐标像素值为pixelValue=10000，
      *     则表示深度值value = pixelValue*valueScale = 10000*0.1=1000mm。
      *
-     * @return float
+     * @return float 缩放系数
      * \endif
      */
     float getValueScale();
@@ -300,12 +302,33 @@ class OB_EXTENSION_API IRFrame : public VideoFrame {
 public:
     IRFrame(Frame &frame);
     virtual ~IRFrame() noexcept {};
+
+public:
+    OBSensorType getDataSource();
 };
 
 class OB_EXTENSION_API PointsFrame : public Frame {
 public:
     PointsFrame(Frame &frame);
     ~PointsFrame() noexcept {};
+
+    /**
+     * \if English
+     * @brief Get the point position value scale of the points frame. the point position value of points frame is multiplied by the scale to give a position
+     * value in millimeter. such as scale=0.1, The x-coordinate value of a point is x = 10000, which means that the actual x-coordinate value = x*scale =
+     * 10000*0.1 = 1000mm.
+     *
+     * @param[in] frame Frame object
+     * @param[out] error Log error messages
+     * @return float position value scale
+     * \else
+     * @brief 获取点云帧的点坐标值缩放系数，点坐标值乘以缩放系数后，可以得到单位为毫米的坐标值； 如scale=0.1, 某个点的x坐标值为x=10000，
+     *     则表示实际x坐标value = x*scale = 10000*0.1=1000mm。
+     *
+     * @return float 缩放系数
+     * \endif
+     */
+    float getPositionValueScale();
 };
 
 class OB_EXTENSION_API FrameSet : public Frame {
@@ -393,7 +416,7 @@ public:
      * @return std::shared_ptr<Frame> 返回相应类型的帧
      * \endif
      */
-    std::shared_ptr<Frame> getFrame(OBSensorType sensorType);
+    std::shared_ptr<Frame> getFrame(OBFrameType frameType);
 
     friend class Pipeline;
     friend class Filter;
@@ -523,6 +546,8 @@ public:
 
 template <typename T> bool Frame::is() {
     switch(this->type()) {
+    case OB_FRAME_IR_LEFT:   // follow
+    case OB_FRAME_IR_RIGHT:  // follow
     case OB_FRAME_IR:
         return (typeid(T) == typeid(IRFrame) || typeid(T) == typeid(VideoFrame));
     case OB_FRAME_DEPTH:
@@ -538,6 +563,7 @@ template <typename T> bool Frame::is() {
     case OB_FRAME_POINTS:
         return (typeid(T) == typeid(PointsFrame));
     default:
+        std::cout << "ob::Frame::is() not catch frame type: " << (int)this->type() << std::endl;
         break;
     }
     return false;

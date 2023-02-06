@@ -18,7 +18,7 @@
 #define THREAD_NUM 4
 
 #define OB_ROS_MAJOR_VERSION 1
-#define OB_ROS_MINOR_VERSION 0
+#define OB_ROS_MINOR_VERSION 1
 #define OB_ROS_PATCH_VERSION 4
 
 #ifndef STRINGIFY
@@ -48,7 +48,7 @@ const double DIAGNOSTICS_PERIOD = 0;  // Static transform
 
 const int IMAGE_WIDTH = 640;
 const int IMAGE_HEIGHT = 480;
-const double IMAGE_FPS = 30.0;
+const int IMAGE_FPS = 30;
 
 const std::string IMAGE_QOS = "SYSTEM_DEFAULT";
 const std::string DEFAULT_QOS = "DEFAULT";

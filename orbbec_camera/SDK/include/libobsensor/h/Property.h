@@ -11,6 +11,9 @@
  * \endif
  */
 
+#ifdef OB_SENSOR_SDK_DEVELOPER
+#include "libobsensor/internal/InternalProperty.h"
+#else  // not define OB_SENSOR_SDK_DEVELOPER
 #ifndef _OB_PROPERTY_H_
 #define _OB_PROPERTY_H_
 
@@ -78,9 +81,26 @@ typedef enum {
         91, /**< \if English D2C preprocessing switch (such as RGB cropping), 0: off, 1: on \else  D2C前处理开关（如RGB裁剪），0:关闭，1:打开 \endif */
     OB_PROP_RGB_CUSTOM_CROP_BOOL = 94, /**< \if English Custom RGB cropping switch, 0 is off, 1 is on custom cropping, and the ROI cropping area is issued \else
                                           自定义RGB裁剪开关，0为关闭，1为开启自定义裁剪，下发ROI裁剪区域\endif */
-    OB_PROP_DEVICE_WORK_MODE_INT          = 95, /**< \if English Device operating mode (power consumption) \else  设备工作模式（功耗） \endif */
-    OB_PROP_DEVICE_COMMUNICATION_TYPE_INT = 97, /**< 设备通信方式 0: USB; 1: Ethernet(RTSP)*/
-    OB_PROP_SWITCH_IR_MODE_INT            = 98, /**< 切换IR模式，0为主动IR模式,1为被动IR模式*/
+
+    OB_PROP_DEVICE_WORK_MODE_INT                = 95, /**< \if English Device operating mode (power consumption) \else  设备工作模式（功耗） \endif */
+    OB_PROP_DEVICE_COMMUNICATION_TYPE_INT       = 97, /**< 设备通信方式 0: USB; 1: Ethernet(RTSP)*/
+    OB_PROP_SWITCH_IR_MODE_INT                  = 98, /**< 切换IR模式，0为主动IR模式,1为被动IR模式*/
+    OB_PROP_LASER_ENERGY_LEVEL_INT              = 99, /**< 激光能量层级 */
+    OB_PROP_TIMER_RESET_SIGNAL_BOOL             = 104, /**< 触发设备时间归零 */
+    OB_PROP_TIMER_RESET_TRIGGLE_OUT_ENABLE_BOOL = 105, /**< 向外发送时间归零信号开关, true:打开, false: 关闭; 默认为true */
+    OB_PROP_TIMER_RESET_DELAY_US_INT            = 106, /**< 设置硬件时间归零延迟时间, 单位: 微妙 */
+    OB_PROP_CAPTURE_IMAGE_SIGNAL_BOOL           = 107, /**< 软触发信号, 触发抓拍图片 */
+    OB_PROP_IR_RIGHT_MIRROR_BOOL                = 112, /**< 右IR的镜像 */
+    OB_PROP_CAPTURE_IMAGE_FRAME_NUMBER_INT      = 113, /**  单次软触发抓拍的帧数, 范围：[1, 255] */
+    OB_PROP_IR_RIGHT_FLIP_BOOL                  = 114, /**< 右IR的翻转, true：翻转,false：不翻转；默认为false */
+    OB_PROP_COLOR_ROTATE_INT                    = 115, /**< 彩色旋转, 翻转角度范围{0, 90, 180, 270}, 默认为0 */
+    OB_PROP_IR_ROTATE_INT                       = 116, /**< IR旋转, 翻转角度范围{0, 90, 180, 270}, 默认为0 */
+    OB_PROP_IR_RIGHT_ROTATE_INT                 = 117, /**< 右IR旋转, 翻转角度范围{0, 90, 180, 270}, 默认为0 */
+    OB_PROP_DEPTH_ROTATE_INT                    = 118, /**< 深度旋转, 翻转角度范围{0, 90, 180, 270}, 默认为0 */
+    OB_PROP_LASER_HW_ENERGY_LEVEL_INT =
+        119, /**< 查询激光硬件的实际能量层级, OB_PROP_LASER_ENERGY_LEVEL_INT（99）指令用于设置能级,该指令用于查询设置后硬件实际能级 */
+    OB_PROP_USB_POWER_STATE_INT = 121, /**< USB供电状态，状态值枚举: OBUSBPowerState */
+    OB_PROP_DC_POWER_STATE_INT  = 122, /**< DC供电状态,状态值枚举: OBDCPowerState */
 
     OB_STRUCT_BASELINE_CALIBRATION_PARAM     = 1002, /**< \if English Baseline calibration parameters \else  基线标定参数 \endif */
     OB_STRUCT_DEVICE_TEMPERATURE             = 1003, /**< \if English Device temperature information \else  设备温度信息 \endif */
@@ -89,8 +109,10 @@ typedef enum {
     OB_STRUCT_DEVICE_TIME                    = 1037, /**< \if English get/set device time \else 获取/设置设备时间 \endif */
     OB_STRUCT_MULTI_DEVICE_SYNC_CONFIG =
         1038, /**< \if English Multi-device synchronization mode and parameter configuration \else  多设备同步模式和参数配置 \endif */
-    OB_STRUCT_RGB_CROP_ROI          = 1040, /**< \if English RGB cropping ROI \else  RGB裁剪ROI \endif */
-    OB_STRUCT_DEVICE_IP_ADDR_CONFIG = 1041, /**< 设备ip地址配置 */
+    OB_STRUCT_RGB_CROP_ROI                 = 1040, /**< \if English RGB cropping ROI \else  RGB裁剪ROI \endif */
+    OB_STRUCT_DEVICE_IP_ADDR_CONFIG        = 1041, /**< 设备ip地址配置 */
+    OB_STRUCT_CURRENT_DEPTH_ALG_MODE       = 1043, /**< 当前的相机深度模式 */
+    OB_STRUCT_DEPTH_PRECISION_SUPPORT_LIST = 1045, /**< 深度精度等级列表，返回uin16_t数组，对应精度等级的枚举定义 */
 
     OB_PROP_COLOR_AUTO_EXPOSURE_BOOL         = 2000, /**< \if English Color camera auto exposure \else  彩色相机自动曝光 \endif */
     OB_PROP_COLOR_EXPOSURE_INT               = 2001, /**< \if English Color camera exposure adjustment \else  彩色相机曝光调节 \endif */
@@ -119,17 +141,21 @@ typedef enum {
                                        红外相机曝光调节（某些型号设备下会同步设置深度相机） \endif */
     OB_PROP_IR_GAIN_INT = 2027, /**< \if English Infrared camera gain adjustment (the depth camera will be set synchronously under some models of devices) \else
                                    红外相机增益调节（某些型号设备下会同步设置深度相机） \endif */
-    OB_PROP_IR_SWITCH_INT = 2028,
-    /**< 双目红外相机左右IR切换 */  // todo: id有冲突@千手修罗
+    OB_PROP_IR_CHANNEL_DATA_SOURCE_INT = 2028, /**< \if English Select Infrared camera data source channel. If not support throw exception. 0 : IR stream from IR Left sensor; 1 : IR stream from IR Left sensor; \else 读写IR通道的输出目标sensor,不支持时返回错误。0: 左侧IR  sensor,1: 右侧IR sensor; \endif */
+    OB_PROP_DEPTH_RM_FILTER_BOOL = 2029, /**< 深度效果去畸变, true：打开，false：关闭, 与D2C功能互斥。软硬件D2C开启时，不能使用mask功能 */
 
     OB_PROP_SDK_DISPARITY_TO_DEPTH_BOOL = 3004, /**< 视差转深度 */
-    OB_PROP_SDK_DEPTH_FRAME_UNPACK_BOOL = 3007, /**< Depth数据解包功能开关(每次开流都会默认打开，支持RLE/Y10/Y11/Y12/Y14格式) */
-    OB_PROP_SDK_IR_FRAME_UNPACK_BOOL    = 3008, /**< Ir数据解包功能开关(每次开流都会默认打开，支持RLE/Y10/Y11/Y12/Y14格式) */
-
-    OB_RAW_DATA_CAMERA_CALIB_JSON_FILE   = 4029, /**< 从设备端读取的标定Json文件(Femto Mega, read only)*/
-    OB_RAW_DATA_D2C_ROT_LUT_FILE         = 4030, /**< D2C初始化表文件(Femto Mega)*/
-    OB_STRUCT_DEBUG_SENSOR_EXPOSURE_TIME = 5504, /**< \if English LDP status \else  曝光时间读写 \endif */
-
+    OB_PROP_SDK_DEPTH_FRAME_UNPACK_BOOL =
+        3007, /**< \if English Depth data unpacking function switch (each open stream will be turned on by default, support RLE/Y10/Y11/Y12/Y14 format) \else
+                 Depth数据解包功能开关(每次开流都会默认打开，支持RLE/Y10/Y11/Y12/Y14格式) \endif */
+    OB_PROP_SDK_IR_FRAME_UNPACK_BOOL =
+        3008, /**< \if English IR data unpacking function switch (each current will be turned on by default, support RLE/Y10/Y11/Y12/Y14 format) \else
+                 Ir数据解包功能开关(每次开流都会默认打开，支持RLE/Y10/Y11/Y12/Y14格式) \endif */
+    OB_PROP_SDK_ACCEL_FRAME_TRANSFORMED_BOOL = 3009, /**< Accel数据转换功能开关(默认打开) */
+    OB_PROP_SDK_GYRO_FRAME_TRANSFORMED_BOOL  = 3010, /**< Gyro数据转换功能开关(默认打开) */
+    OB_PROP_SDK_IR_LEFT_FRAME_UNPACK_BOOL    = 3011, /**< [左]Ir数据解包功能开关(每次开流都会默认打开，支持RLE/Y10/Y11/Y12/Y14格式) */
+    OB_PROP_SDK_IR_RIGHT_FRAME_UNPACK_BOOL   = 3012, /**< [右]Ir数据解包功能开关(每次开流都会默认打开，支持RLE/Y10/Y11/Y12/Y14格式) */
+    OB_RAW_DATA_CAMERA_CALIB_JSON_FILE              = 4029, /**< 从设备端读取的标定Json文件(Femto Mega, read only)*/
 } OBPropertyID,
     ob_property_id;
 
@@ -167,3 +193,4 @@ typedef struct OBPropertyItem {
 #endif
 
 #endif  // _OB_PROPERTY_H_
+#endif  // OB_SENSOR_SDK_DEVELOPER

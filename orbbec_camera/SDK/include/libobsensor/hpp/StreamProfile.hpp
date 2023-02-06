@@ -11,6 +11,7 @@
 
 #include "Types.hpp"
 
+#include <iostream>
 #include <memory>
 
 struct StreamProfileImpl;
@@ -43,7 +44,7 @@ public:
      * @return OBFormat 返回流的格式
      * \endif
      */
-    OBFormat format();
+    OBFormat format() const;
     /**
      * \if English
      * @brief Get the type of stream
@@ -55,7 +56,7 @@ public:
      * @return OBStreamType 返回流的类型
      * \endif
      */
-    OBStreamType type();
+    OBStreamType type() const;
 
     /**
      * \if English
@@ -113,7 +114,7 @@ public:
      * @return uint32_t 返回流的帧率
      * \endif
      */
-    uint32_t fps();
+    uint32_t fps() const;
     /**
      * \if English
      * @brief Get stream width
@@ -125,7 +126,7 @@ public:
      * @return uint32_t 返回流的宽
      * \endif
      */
-    uint32_t width();
+    uint32_t width() const;
     /**
      * \if English
      * @brief Get stream height
@@ -137,7 +138,7 @@ public:
      * @return uint32_t 返回流的高
      * \endif
      */
-    uint32_t height();
+    uint32_t height() const;
 };
 
 class OB_EXTENSION_API AccelStreamProfile : public StreamProfile {
@@ -156,7 +157,7 @@ public:
      * @return OBAccelFullScaleRange  返回量程范围值
      * \endif
      */
-    OBAccelFullScaleRange fullScaleRange();
+    OBAccelFullScaleRange fullScaleRange() const;
 
     /**
      * \if English
@@ -169,7 +170,7 @@ public:
      * @return OBAccelFullScaleRange  返回采样频率
      * \endif
      */
-    OBAccelSampleRate sampleRate();
+    OBAccelSampleRate sampleRate() const;
 };
 
 class OB_EXTENSION_API GyroStreamProfile : public StreamProfile {
@@ -188,7 +189,7 @@ public:
      * @return OBAccelFullScaleRange  返回量程范围值
      * \endif
      */
-    OBGyroFullScaleRange fullScaleRange();
+    OBGyroFullScaleRange fullScaleRange() const;
 
     /**
      * \if English
@@ -201,13 +202,15 @@ public:
      * @return OBAccelFullScaleRange  返回采样频率
      * \endif
      */
-    OBGyroSampleRate sampleRate();
+    OBGyroSampleRate sampleRate() const;
 };
 
 template <typename T> bool StreamProfile::is() {
     switch(this->type()) {
     case OB_STREAM_VIDEO:
     case OB_STREAM_IR:
+    case OB_STREAM_IR_LEFT:
+    case OB_STREAM_IR_RIGHT:
     case OB_STREAM_COLOR:
     case OB_STREAM_DEPTH:
         return typeid(T) == typeid(VideoStreamProfile);
@@ -240,7 +243,7 @@ public:
      * @return uint32_t 返回StreamProfile的数量
      * \endif
      */
-    uint32_t count();
+    uint32_t count() const;
 
     /**
      * \if English

@@ -33,13 +33,13 @@ class OBCameraNodeFactory : public rclcpp::Node {
 
   void startDevice(const std::shared_ptr<ob::DeviceList>& list);
 
-  void deviceConnectCallback(const std::shared_ptr<ob::DeviceList>& device_list);
+  void onDeviceConnected(const std::shared_ptr<ob::DeviceList>& device_list);
 
-  void deviceDisconnectCallback(const std::shared_ptr<ob::DeviceList>& device_list);
+  void onDeviceDisconnected(const std::shared_ptr<ob::DeviceList>& device_list);
 
-  static OBLogSeverity obLogSeverityFromString(const std::string& log_level);
+  static OBLogSeverity obLogSeverityFromString(const std::string_view& log_level);
 
-  void checkConnectTimer();
+  void checkConnectTimer() const;
 
   void queryDevice();
 
@@ -51,16 +51,11 @@ class OBCameraNodeFactory : public rclcpp::Node {
   std::shared_ptr<ob::DeviceInfo> device_info_ = nullptr;
   std::atomic_bool is_alive_{false};
   std::atomic_bool device_connected_{false};
-  std::string log_level_;
   std::string serial_number_;
-  std::shared_ptr<Parameters> parameters_;
+  std::shared_ptr<Parameters> parameters_ = nullptr;
   std::shared_ptr<std::thread> query_thread_ = nullptr;
   std::recursive_mutex device_lock_;
   size_t device_num_ = 1;
   rclcpp::TimerBase::SharedPtr check_connect_timer_ = nullptr;
 };
 }  // namespace orbbec_camera
-
-#include <rclcpp_components/register_node_macro.hpp>
-
-RCLCPP_COMPONENTS_REGISTER_NODE(orbbec_camera::OBCameraNodeFactory)

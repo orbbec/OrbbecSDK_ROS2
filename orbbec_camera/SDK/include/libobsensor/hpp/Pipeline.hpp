@@ -230,13 +230,13 @@ public:
     std::shared_ptr<StreamProfileList> getD2CDepthProfileList(std::shared_ptr<StreamProfile> colorProfile, OBAlignMode alignMode);
 
     /**
-	 * \if English
-	 * @brief Get valid area between minimum distance and maximum distance after D2C
+     * \if English
+     * @brief Get valid area between minimum distance and maximum distance after D2C
      *
      * @param minimumDistance minimum working distance
      * @param maximumDistance maximum working distance
      * @return OBRect returns the area information valid after D2C at the working distance
-	 * \else
+     * \else
      * @brief 获取D2C后给定工作范围的有效区域
      * 如果需要获取指定距离D2C后的ROI区域，将minimum_distance与maximum_distance设置成一样或者将maximum_distance设置成0
      *
@@ -245,7 +245,7 @@ public:
      * @return OBRect 返回在工作距离下D2C后有效的区域信息
      * \endif
      */
-    OBRect getD2CValidArea(uint32_t minimumDistance,uint32_t maximumDistance = 0);
+    OBRect getD2CValidArea(uint32_t minimumDistance, uint32_t maximumDistance = 0);
 
     /**
      * \if English
@@ -346,33 +346,34 @@ public:
     void setAlignMode(OBAlignMode mode);
 
     /**
-	 * \if English
-	 * @brief Whether scale depth frame after D2C
+     * \if English
+     * @brief Whether the depth needs to be scaled after setting D2C
      *
-     * @param enable Scale or not
-	 * \else
+     * @param enable Whether scaling is required
+     * \else
      * @brief 设置D2C后是否需要缩放深度
      *
      * @param enable 是否需要缩放
-	 * \endif
+     * \endif
      */
     void setDepthScaleRequire(bool enable);
 
     /**
-	 * \if English
-	 * @brief
-     *
-     * @param d2cTargetWidth  D2C target width
-     * @param d2cTargetHeight D2C target height
-	 * \else
+     * \if English
+     * @brief Set the D2C target resolution, which is applicable to cases where the Color stream is not enabled using the OrbbecSDK and the depth needs to be
+     * D2C Note: When you use OrbbecSDK to enable the Color stream, you also use this interface to set the D2C target resolution. The configuration of the
+     * enabled Color stream is preferred for D2C.
+     * @param d2cTargetWidth  The D2C target has a wide resolution
+     * @param d2cTargetHeight The D2C target has a high resolutio
+     * \else
      * @brief 设置D2C目标分辨率，适用于未使用OrbbecSDK开启Color流，且需要对深度进行D2C的情况
      * 注意:当使用OrbbecSDK开启Color流时，同时使用了此接口设置了D2C目标分辨率时。优先使用开启的Color流的配置进行D2C。
      *
      * @param d2cTargetWidth  D2C目标分辨率宽
      * @param d2cTargetHeight D2C目标分辨率高
-	 * \endif
+     * \endif
      */
-    void setD2CTargetResolution(uint32_t d2cTargetWidth,uint32_t d2cTargetHeight);
+    void setD2CTargetResolution(uint32_t d2cTargetWidth, uint32_t d2cTargetHeight);
 
     friend class Pipeline;
 };

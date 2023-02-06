@@ -21,7 +21,7 @@ namespace orbbec_camera {
 void OBCameraNode::setupCameraCtrlServices() {
   using std_srvs::srv::SetBool;
   for (auto stream_index : IMAGE_STREAMS) {
-    auto stream_name = stream_name_[stream_index.first];
+    auto stream_name = stream_name_[stream_index];
     std::string service_name = "get_" + stream_name + "_exposure";
     get_exposure_srv_[stream_index] = node_->create_service<GetInt32>(
         service_name,
@@ -497,16 +497,16 @@ void OBCameraNode::toggleSensorCallback(const std::shared_ptr<SetBool::Request>&
                                         const stream_index_pair& stream_index) {
   std::string msg;
   if (request->data) {
-    if (enable_[stream_index]) {
-      msg = stream_name_[stream_index.first] + " Already ON";
+    if (enable_stream_[stream_index]) {
+      msg = stream_name_[stream_index] + " Already ON";
     }
-    RCLCPP_INFO_STREAM(logger_, "toggling sensor " << stream_name_[stream_index.first] << " ON");
+    RCLCPP_INFO_STREAM(logger_, "toggling sensor " << stream_name_[stream_index] << " ON");
 
   } else {
-    if (!enable_[stream_index]) {
-      msg = stream_name_[stream_index.first] + " Already OFF";
+    if (!enable_stream_[stream_index]) {
+      msg = stream_name_[stream_index] + " Already OFF";
     }
-    RCLCPP_INFO_STREAM(logger_, "toggling sensor " << stream_name_[stream_index.first] << " OFF");
+    RCLCPP_INFO_STREAM(logger_, "toggling sensor " << stream_name_[stream_index] << " OFF");
   }
   if (!msg.empty()) {
     RCLCPP_ERROR_STREAM(logger_, msg);
@@ -521,7 +521,7 @@ bool OBCameraNode::toggleSensor(const stream_index_pair& stream_index, bool enab
                                 std::string& msg) {
   try {
     pipeline_->stop();
-    enable_[stream_index] = enabled;
+    enable_stream_[stream_index] = enabled;
     setupProfiles();
     startPipeline();
     return true;

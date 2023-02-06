@@ -202,7 +202,7 @@ OBFormat OBFormatFromString(const std::string &format) {
     return OB_FORMAT_RGB_POINT;
   } else if (fixed_format == "REL") {
     return OB_FORMAT_RLE;
-  } else if (fixed_format == "RGB888") {
+  } else if (fixed_format == "RGB888" || fixed_format == "RGB") {
     return OB_FORMAT_RGB888;
   } else if (fixed_format == "BGR") {
     return OB_FORMAT_BGR;
@@ -224,4 +224,27 @@ std::string ObDeviceTypeToString(const OBDeviceType &type) {
   }
   return "unknown technology camera";
 }
+
+rmw_qos_profile_t getRMWQosProfileFromString(const std::string& str_qos) {
+  std::string upper_str_qos = str_qos;
+  std::transform(upper_str_qos.begin(), upper_str_qos.end(), upper_str_qos.begin(), ::toupper);
+  if (upper_str_qos == "SYSTEM_DEFAULT") {
+    return rmw_qos_profile_system_default;
+  } else if (upper_str_qos == "DEFAULT") {
+    return rmw_qos_profile_default;
+  } else if (upper_str_qos == "PARAMETER_EVENTS") {
+    return rmw_qos_profile_parameter_events;
+  } else if (upper_str_qos == "SERVICES_DEFAULT") {
+    return rmw_qos_profile_services_default;
+  } else if (upper_str_qos == "PARAMETERS") {
+    return rmw_qos_profile_parameters;
+  } else if (upper_str_qos == "SENSOR_DATA") {
+    return rmw_qos_profile_sensor_data;
+  } else {
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("astra_camera"),
+                        "Invalid QoS profile: " << upper_str_qos << ". Using default QoS profile.");
+    return rmw_qos_profile_default;
+  }
+}
+
 }  // namespace orbbec_camera

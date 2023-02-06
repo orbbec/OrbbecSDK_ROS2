@@ -15,6 +15,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 struct DeviceImpl;
 struct DeviceInfoImpl;
@@ -27,6 +28,7 @@ class Context;
 class DeviceInfo;
 class Sensor;
 class CameraParamList;
+class OBDepthWorkModeList;
 
 class OB_EXTENSION_API Device {
 private:
@@ -409,6 +411,66 @@ public:
 
     /**
      * \if English
+     * @brief Get structured data type of device property
+     *
+     * @param propertyId Property id
+     * @param dataBundle Target data
+     * @param callback Callback of setting
+     * \else
+     * @brief Set the Structured Data Ext object
+     *
+     * @param propertyId 属性id
+     * @param dataBundle 设置的目标数据
+     * @param callback 设置数据回调
+     * \endif
+     */
+    void setStructuredDataExt(OBPropertyID propertyId, std::shared_ptr<OBDataBundle> dataBundle, SetDataCallback callback);
+
+    /**
+     * \if English
+     * @brief Get structured data type of device property
+     *
+     * @param propertyId Property id
+     * @return Data bundle
+     * \else
+     * @brief 获取structured data类型的数据
+     *
+     * @param propertyId 属性id
+     * @return std::shared_ptr<OBDataBundle> 数据集
+     * \endif
+     */
+    std::shared_ptr<OBDataBundle> getStructuredDataExt(OBPropertyID propertyId);
+
+    /**
+     * \if English
+     * @brief Get the property protocol version
+     * 
+     * @return OBProtocolVersion
+     * \else
+     * @brief 获取设备的控制命令协议版本
+     *
+     * @return OBProtocolVersion
+     * \endif
+     */
+    OBProtocolVersion getProtocolVersion();
+
+    /**
+     * \if English
+     * @brief Get cmdVersion of property
+     *
+     * @param propertyId Property id
+     * @return OBCmdVersion
+     * \else
+     * @brief 获取控制命令的版本号
+     *
+     * @param propertyId 属性id
+     * @return OBCmdVersion
+     * \endif
+     */
+    OBCmdVersion getCmdVersion(OBPropertyID propertyId);
+
+    /**
+     * \if English
      * @brief Get number of devices supported property
      *
      * @return uint32_t returns the number of supported attributes
@@ -565,6 +627,61 @@ public:
 
     /**
      * \if English
+     * @brief Get current depth work mode
+     * 
+     * @return ob_depth_work_mode Current depth work mode
+     * \else
+     * @brief 查询当前的相机深度模式
+     *
+     * @return 返回当前的相机深度模式
+     * \endif
+     */
+    OBDepthWorkMode getCurrentDepthWorkMode();
+
+    /**
+     * \if English
+     * @brief Switch depth work mode by OBDepthWorkMode. Prefer invoke switchDepthWorkMode(const char *modeName) to switch depth mode
+     *        when known the complete name of depth work mode.
+     * @param[in] workMode Depth work mode come from ob_depth_work_mode_list which return by ob_device_get_depth_work_mode_list
+     * \else
+     * @brief 切换相机深度模式（根据深度工作模式对象），如果知道设备支持的深度工作模式名称，那么推荐用switchDepthWorkMode(const char *modeName)
+     *
+     * @param workMode 要切换的相机深度模式
+     *
+     * @return 返回指令是否切换成功
+     * \endif
+     */
+    OBStatus switchDepthWorkMode(const OBDepthWorkMode &workMode);
+
+    /**
+     * \if English
+     * @brief Switch depth work mode by work mode name.
+     * 
+     * @param[in] mode name Depth work mode name which equals to ob_depth_work_mode.name
+     * \else
+     * @brief 切换相机深度模式（根据深度工作模式名称）
+     *
+     * @param workMode 
+     *
+     * @return ob_status 设置设置结果，OB_STATUS_OK成功，其他：设置失败
+     * \endif
+     */
+    OBStatus switchDepthWorkMode(const char *modeName);
+
+    /**
+     * \if English
+     * @brief Request support depth work mode list
+     * @return OBDepthWorkModeList list of ob_depth_work_mode
+     * \else
+     * @brief 查询相机深度模式列表
+     *
+     * @return 相机深度模式列表
+     * \endif
+     */
+    std::shared_ptr<OBDepthWorkModeList> getDepthWorkModeList();
+
+    /**
+     * \if English
      * @brief Device restart
      * @attention The device will be disconnected and reconnected. After the device is disconnected, the access to the Device object interface may be abnormal.
      *   Please delete the object directly and obtain it again after the device is reconnected.
@@ -575,6 +692,24 @@ public:
      * \endif
      */
     void reboot();
+
+    /**
+     * @brief 获取当前设备同步配置
+     * @brief 设备同步：包括单机内的不同 Sensor 的曝光同步功能 和 多机同步功能
+     *
+     * @return OBDeviceSyncConfig 返回设备同步配置
+     */
+    OBDeviceSyncConfig getSyncConfig();
+
+    /**
+     * @brief 设置设备同步配置
+     * @brief 用于配置 单机内的不同 Sensor 的曝光同步功能 和 多机同步功能
+     *
+     * @attention 调用本函数会直接将配置写入设备Flash，设备重启后依然会生效。为了避免影响Flash寿命，不要频繁更新配置。
+     *
+     * @param[out] deviceSyncConfig 设备同步配置
+     */
+    void setSyncConfig(const OBDeviceSyncConfig &deviceSyncConfig);
 
     friend class Pipeline;
     friend class Recorder;
@@ -932,6 +1067,81 @@ public:
      * \endif
      */
     OBCameraParam getCameraParam(uint32_t index);
+};
+
+/**
+ * \if English
+ * @brief Type contain list of OBDepthWorkMode
+ * \else
+ * @brief 相机深度模式列表
+ * \endif
+ *
+ */
+class OB_EXTENSION_API OBDepthWorkModeList {
+private:
+    std::unique_ptr<OBDepthWorkModeListImpl> impl_;
+
+public:
+    OBDepthWorkModeList(std::unique_ptr<OBDepthWorkModeListImpl> impl_);
+    ~OBDepthWorkModeList();
+    /**
+     * \if English
+     * @brief Get the count of OBDepthWorkMode
+     * 
+     * @return Count of OBDepthWorkMode
+     * \else
+     * @brief 获取相机深度模式的数量
+     *
+     * @return 列表中的相机深度模式数量
+     * \endif
+     */
+    uint32_t count();
+
+    /**
+     * \if English
+     * @brief Get OBDepthWorkMode at index in OBDepthWorkModeList
+     * 
+     * @param[in] index Target OBDepthWorkMode's index
+     * 
+     * @return OBDepthWorkMode at index
+     * \else
+     * @brief 根据下标获取相机深度模式
+     *
+     * @param index 对应模式列表的下标
+     * @return 相机深度模式
+     * \endif
+     */
+    OBDepthWorkMode getOBDepthWorkMode(uint32_t index);
+
+    /**
+     * \if English
+     * @brief Get depth work mode name at index
+     * 
+     * @return Depth work mode name 
+     * \else
+     * @brief 模式名称
+     *
+     * @param index 对应模式列表的下标
+     * @return 模式名称
+     * \endif
+     */
+    std::string getName(uint32_t index);
+
+    /**
+     * \if English
+     * @brief Get OBDepthWorkMode at index in OBDepthWorkModeList
+     * 
+     * @param[in] index Target OBDepthWorkMode's index
+     * 
+     * @return OBDepthWorkMode at index
+     * \else
+     * @brief 运算符重载，根据下标获取相机深度模式
+     *
+     * @param index 对应模式列表的下标
+     * @return 相机深度模式
+     * \endif
+     */
+    OBDepthWorkMode operator[](uint32_t index);
 };
 
 }  // namespace ob

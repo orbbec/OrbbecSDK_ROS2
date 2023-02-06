@@ -21,44 +21,20 @@ using namespace std::chrono_literals;
 
 OBCameraNode::OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> device,
                            std::shared_ptr<Parameters> parameters)
-    : node_(node), device_(device), parameters_(parameters), logger_(node->get_logger()) {
-  static_tf_broadcaster_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(node);
-  dynamic_tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(node);
-  // FIXME:
+    : node_(node),
+      device_(std::move(device)),
+      parameters_(std::move(parameters)),
+      logger_(node->get_logger()) {
   is_running_.store(true);
-  format_[DEPTH] = OB_FORMAT_Y16;
-  format_str_[DEPTH] = "Y16";
-  image_format_[OB_STREAM_DEPTH] = CV_16UC1;
-  encoding_[DEPTH] = sensor_msgs::image_encodings::TYPE_16UC1;
-  stream_name_[OB_STREAM_DEPTH] = "depth";
-  unit_step_size_[DEPTH] = sizeof(uint16_t);
-  format_[INFRA0] = OB_FORMAT_Y16;
-  format_str_[INFRA0] = "Y16";
-  image_format_[OB_STREAM_IR] = CV_16UC1;
-  encoding_[INFRA0] = sensor_msgs::image_encodings::MONO16;
-  stream_name_[OB_STREAM_IR] = "ir";
-  unit_step_size_[INFRA0] = sizeof(uint8_t);
-  const auto device_pid = device_->getDeviceInfo()->pid();
-  if (device_pid == FEMTO_PID || device_pid == FEMTO_LIVE_PID || device_pid == FEMTO_OW_PID) {
-    format_[COLOR] = OB_FORMAT_I420;
-    format_str_[COLOR] = "I420";
-  } else if (device_pid == ASTRA_PLUS_PID || device_pid == ASTRA_PLUS_S_PID) {
-    format_[COLOR] = OB_FORMAT_YUYV;
-    format_str_[COLOR] = "YUYV";
-  } else {
-    // default RGB888
-    format_[COLOR] = OB_FORMAT_RGB888;
-    format_str_[COLOR] = "RGB888";
-  }
-  image_format_[OB_STREAM_COLOR] = CV_8UC3;
-  encoding_[COLOR] = sensor_msgs::image_encodings::BGR8;
-  stream_name_[OB_STREAM_COLOR] = "color";
-  unit_step_size_[COLOR] = 3;
+  stream_name_[COLOR] = "color";
+  stream_name_[DEPTH] = "depth";
+  stream_name_[INFRA0] = "ir";
 
   compression_params_.push_back(cv::IMWRITE_PNG_COMPRESSION);
   compression_params_.push_back(0);
   compression_params_.push_back(cv::IMWRITE_PNG_STRATEGY);
   compression_params_.push_back(cv::IMWRITE_PNG_STRATEGY_DEFAULT);
+  setupDefaultImageFormat();
   setupTopics();
   startPipeline();
 }
@@ -106,12 +82,12 @@ void OBCameraNode::setupDevices() {
     }
   }
 
-  for (const auto& [stream_index, enable] : enable_) {
+  for (const auto& [stream_index, enable] : enable_stream_) {
     if (enable && sensors_.find(stream_index) == sensors_.end()) {
       RCLCPP_INFO_STREAM(logger_,
                          magic_enum::enum_name(stream_index.first)
                              << "sensor isn't supported by current device! -- Skipping...");
-      enable_[stream_index] = false;
+      enable_stream_[stream_index] = false;
     }
   }
 }
@@ -121,18 +97,13 @@ void OBCameraNode::setupProfiles() {
     config_.reset();
   }
   config_ = std::make_shared<ob::Config>();
-  if (d2c_mode_ == "sw") {
-    config_->setAlignMode(ALIGN_D2C_SW_MODE);
-    depth_align_ = true;
-  } else if (d2c_mode_ == "hw") {
+  if (depth_registration_) {
     config_->setAlignMode(ALIGN_D2C_HW_MODE);
-    depth_align_ = true;
   } else {
     config_->setAlignMode(ALIGN_DISABLE);
-    depth_align_ = false;
   }
   for (const auto& elem : IMAGE_STREAMS) {
-    if (enable_[elem]) {
+    if (enable_stream_[elem]) {
       const auto& sensor = sensors_[elem];
       auto profiles = sensor->getStreamProfileList();
       for (size_t i = 0; i < profiles->count(); i++) {
@@ -164,16 +135,16 @@ void OBCameraNode::setupProfiles() {
           RCLCPP_ERROR_STREAM(
               logger_, " NO default_profile found , Stream: " << magic_enum::enum_name(elem.first)
                                                               << " will be disable");
-          enable_[elem] = false;
+          enable_stream_[elem] = false;
           continue;
         }
       }
       CHECK_NOTNULL(selected_profile);
       config_->enableStream(selected_profile);
       images_[elem] =
-          cv::Mat(height_[elem], width_[elem], image_format_[elem.first], cv::Scalar(0, 0, 0));
+          cv::Mat(height_[elem], width_[elem], image_format_[elem], cv::Scalar(0, 0, 0));
       RCLCPP_INFO_STREAM(
-          logger_, " stream " << stream_name_[elem.first] << " is enabled - width: " << width_[elem]
+          logger_, " stream " << stream_name_[elem] << " is enabled - width: " << width_[elem]
                               << ", height: " << height_[elem] << ", fps: " << fps_[elem] << ", "
                               << "Format: " << magic_enum::enum_name(selected_profile->format()));
     }
@@ -186,37 +157,75 @@ void OBCameraNode::startPipeline() {
   }
   pipeline_ = std::make_unique<ob::Pipeline>(device_);
   pipeline_->start(config_, [this](std::shared_ptr<ob::FrameSet> frame_set) {
-    onNewFrameSetCallback(std::move(frame_set));
+    onNewFrameSetCallback(frame_set);
   });
+}
+
+void OBCameraNode::setupDefaultImageFormat() {
+  format_[DEPTH] = OB_FORMAT_Y16;
+  format_str_[DEPTH] = "Y16";
+  image_format_[DEPTH] = CV_16UC1;
+  encoding_[DEPTH] = sensor_msgs::image_encodings::TYPE_16UC1;
+  unit_step_size_[DEPTH] = sizeof(uint16_t);
+  format_[INFRA0] = OB_FORMAT_Y16;
+  format_str_[INFRA0] = "Y16";
+  image_format_[INFRA0] = CV_16UC1;
+  encoding_[INFRA0] = sensor_msgs::image_encodings::MONO16;
+  unit_step_size_[INFRA0] = sizeof(uint8_t);
+
+  image_format_[COLOR] = CV_8UC3;
+  encoding_[COLOR] = sensor_msgs::image_encodings::RGB8;
+  unit_step_size_[COLOR] = 3 * sizeof(uint8_t);
 }
 
 void OBCameraNode::getParameters() {
   for (auto stream_index : IMAGE_STREAMS) {
-    std::string param_name = stream_name_[stream_index.first] + "_width";
+    std::string param_name = stream_name_[stream_index] + "_width";
     setAndGetNodeParameter(width_[stream_index], param_name, IMAGE_WIDTH);
-    param_name = stream_name_[stream_index.first] + "_height";
+    param_name = stream_name_[stream_index] + "_height";
     setAndGetNodeParameter(height_[stream_index], param_name, IMAGE_HEIGHT);
-    param_name = stream_name_[stream_index.first] + "_fps";
+    param_name = stream_name_[stream_index] + "_fps";
     setAndGetNodeParameter(fps_[stream_index], param_name, IMAGE_FPS);
-    param_name = "enable_" + stream_name_[stream_index.first];
-    setAndGetNodeParameter(enable_[stream_index], param_name, true);
-    param_name = stream_name_[stream_index.first] + "_frame_id";
-    std::string default_frame_id = "camera_" + stream_name_[stream_index.first] + "_frame";
+    param_name = "enable_" + stream_name_[stream_index];
+    setAndGetNodeParameter(enable_stream_[stream_index], param_name, true);
+    param_name = stream_name_[stream_index] + "_frame_id";
+    std::string default_frame_id = "camera_" + stream_name_[stream_index] + "_frame";
     setAndGetNodeParameter(frame_id_[stream_index], param_name, default_frame_id);
     std::string default_optical_frame_id =
-        "camera_" + stream_name_[stream_index.first] + "_optical_frame";
-    param_name = stream_name_[stream_index.first] + "_optical_frame_id";
+        "camera_" + stream_name_[stream_index] + "_optical_frame";
+    param_name = stream_name_[stream_index] + "_optical_frame_id";
     setAndGetNodeParameter(optical_frame_id_[stream_index], param_name, default_optical_frame_id);
-    depth_aligned_frame_id_[stream_index] = stream_name_[OB_STREAM_COLOR] + "_optical_frame";
-    param_name = stream_name_[stream_index.first] + "_format";
+    depth_aligned_frame_id_[stream_index] = stream_name_[COLOR] + "_optical_frame";
+    param_name = stream_name_[stream_index] + "_format";
     setAndGetNodeParameter(format_str_[stream_index], param_name, format_str_[stream_index]);
     format_[stream_index] = OBFormatFromString(format_str_[stream_index]);
+    if (format_[stream_index] == OB_FORMAT_Y8) {
+      CHECK(stream_index.first != OB_STREAM_COLOR);
+      image_format_[stream_index] = CV_8UC1;
+      encoding_[stream_index] = stream_index.first == OB_STREAM_DEPTH
+                                    ? sensor_msgs::image_encodings::TYPE_8UC1
+                                    : sensor_msgs::image_encodings::MONO8;
+      unit_step_size_[stream_index] = sizeof(uint8_t);
+    }
+    param_name = stream_name_[stream_index] + "_qos";
+    setAndGetNodeParameter<std::string>(image_qos_[stream_index], param_name, "default");
+    param_name = stream_name_[stream_index] + "_camera_info_qos";
+    setAndGetNodeParameter<std::string>(camera_info_qos_[stream_index], param_name, "default");
   }
   setAndGetNodeParameter(publish_tf_, "publish_tf", true);
   setAndGetNodeParameter(tf_publish_rate_, "tf_publish_rate", 10.0);
-  setAndGetNodeParameter(publish_rgb_point_cloud_, "publish_rgb_point_cloud", false);
-  setAndGetNodeParameter(d2c_mode_, "d2c_mode", DEFAULT_D2C_MODE);
+  setAndGetNodeParameter(depth_registration_, "depth_registration", false);
+  setAndGetNodeParameter(enable_point_cloud_, "enable_point_cloud", true);
+  setAndGetNodeParameter<std::string>(ir_info_url_, "ir_info_url", "");
+  setAndGetNodeParameter<std::string>(color_info_url_, "color_info_url", "");
+  setAndGetNodeParameter(enable_colored_point_cloud_, "enable_colored_point_cloud", false);
   setAndGetNodeParameter(camera_link_frame_id_, "camera_link_frame_id", DEFAULT_BASE_FRAME_ID);
+  setAndGetNodeParameter(enable_point_cloud_, "enable_point_cloud", true);
+  setAndGetNodeParameter<std::string>(point_cloud_qos_, "point_cloud_qos", "default");
+  setAndGetNodeParameter(enable_publish_extrinsic_, "enable_publish_extrinsic", false);
+  if (enable_colored_point_cloud_) {
+    depth_registration_ = true;
+  }
 }
 
 void OBCameraNode::setupTopics() {
@@ -232,30 +241,46 @@ void OBCameraNode::setupPublishers() {
   static_tf_broadcaster_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(node_);
   using PointCloud2 = sensor_msgs::msg::PointCloud2;
   using CameraInfo = sensor_msgs::msg::CameraInfo;
-  point_cloud_publisher_ = node_->create_publisher<PointCloud2>(
-      "depth/color/points", rclcpp::QoS{1}.best_effort().keep_last(1));
-  depth_point_cloud_publisher_ = node_->create_publisher<PointCloud2>(
-      "depth/points", rclcpp::QoS{1}.best_effort().keep_last(1));
-  for (const auto& stream_index : IMAGE_STREAMS) {
-    std::string name = stream_name_[stream_index.first];
-    std::string topic = name + "/image_raw";
-    image_publishers_[stream_index] = image_transport::create_publisher(node_, topic);
-    topic = name + "/camera_info";
-    camera_info_publishers_[stream_index] =
-        node_->create_publisher<CameraInfo>(topic, rclcpp::QoS{1}.best_effort());
+  auto point_cloud_qos_profile = getRMWQosProfileFromString(point_cloud_qos_);
+  if (enable_colored_point_cloud_) {
+    colored_point_cloud_publisher_ = node_->create_publisher<PointCloud2>(
+        "depth/color/points",
+        rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(point_cloud_qos_profile),
+                    point_cloud_qos_profile));
   }
-  extrinsics_publisher_ = node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
-      "extrinsic/depth_to_color", rclcpp::QoS{1}.transient_local());
+  if (enable_point_cloud_) {
+    point_cloud_publisher_ = node_->create_publisher<PointCloud2>(
+        "depth/points", rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(point_cloud_qos_profile),
+                                    point_cloud_qos_profile));
+  }
+  for (const auto& stream_index : IMAGE_STREAMS) {
+    std::string name = stream_name_[stream_index];
+    std::string topic = name + "/image_raw";
+    auto image_qos = image_qos_[stream_index];
+    auto image_qos_profile = getRMWQosProfileFromString(image_qos);
+    image_publishers_[stream_index] =
+        image_transport::create_publisher(node_, topic, image_qos_profile);
+    topic = name + "/camera_info";
+    auto camera_info_qos = camera_info_qos_[stream_index];
+    auto camera_info_qos_profile = getRMWQosProfileFromString(camera_info_qos);
+    camera_info_publishers_[stream_index] = node_->create_publisher<CameraInfo>(
+        topic, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(camera_info_qos_profile),
+                           camera_info_qos_profile));
+  }
+  if (enable_publish_extrinsic_) {
+    extrinsics_publisher_ = node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
+        "extrinsic/depth_to_color", rclcpp::QoS{1}.transient_local());
+  }
 }
 
-void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
+void OBCameraNode::publishPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set) {
   try {
-    if (depth_align_ && (format_[COLOR] == OB_FORMAT_YUYV || format_[COLOR] == OB_FORMAT_I420)) {
+    if (depth_registration_ || enable_colored_point_cloud_) {
       if (frame_set->depthFrame() != nullptr && frame_set->colorFrame() != nullptr) {
-        publishColorPointCloud(frame_set);
+        publishColoredPointCloud(frame_set);
       }
     }
-    if (frame_set->depthFrame() != nullptr) {
+    if (enable_point_cloud_ && frame_set->depthFrame() != nullptr) {
       publishDepthPointCloud(frame_set);
     }
   } catch (const ob::Error& e) {
@@ -267,12 +292,15 @@ void OBCameraNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
   }
 }
 
-void OBCameraNode::publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
-  if (depth_point_cloud_publisher_->get_subscription_count() == 0) {
+void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set) {
+  if (!enable_point_cloud_ || !point_cloud_publisher_ ||
+      point_cloud_publisher_->get_subscription_count() == 0) {
     return;
   }
-  auto camera_param = pipeline_->getCameraParam();
-  point_cloud_filter_.setCameraParam(camera_param);
+  if (!camera_param_) {
+    camera_param_ = pipeline_->getCameraParam();
+  }
+  point_cloud_filter_.setCameraParam(*camera_param_);
   point_cloud_filter_.setCreatePointFormat(OB_FORMAT_POINT);
   auto depth_frame = frame_set->depthFrame();
   auto frame = point_cloud_filter_.process(frame_set);
@@ -309,17 +337,21 @@ void OBCameraNode::publishDepthPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   point_cloud_msg_.width = valid_count;
   point_cloud_msg_.height = 1;
   modifier.resize(valid_count);
-  depth_point_cloud_publisher_->publish(point_cloud_msg_);
+  point_cloud_publisher_->publish(point_cloud_msg_);
 }
 
-void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
-  if (point_cloud_publisher_->get_subscription_count() == 0) {
+void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set) {
+  if (!enable_colored_point_cloud_ || !colored_point_cloud_publisher_ ||
+      colored_point_cloud_publisher_->get_subscription_count() == 0) {
     return;
   }
   auto depth_frame = frame_set->depthFrame();
   auto color_frame = frame_set->colorFrame();
-  auto camera_param = pipeline_->getCameraParam();
-  point_cloud_filter_.setCameraParam(camera_param);
+  if (!camera_param_) {
+    camera_param_ = pipeline_->getCameraParam();
+  }
+  point_cloud_filter_.setCameraParam(*camera_param_);
+  point_cloud_filter_.setCreatePointFormat(OB_FORMAT_POINT);
   point_cloud_filter_.setCreatePointFormat(OB_FORMAT_RGB_POINT);
   auto frame = point_cloud_filter_.process(frame_set);
   size_t point_size = frame->dataSize() / sizeof(OBColorPoint);
@@ -332,7 +364,7 @@ void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   point_cloud_msg_.height = color_frame->height();
   std::string format_str = "rgb";
   point_cloud_msg_.point_step =
-      addPointField(point_cloud_msg_, format_str.c_str(), 1, sensor_msgs::msg::PointField::FLOAT32,
+      addPointField(point_cloud_msg_, format_str, 1, sensor_msgs::msg::PointField::FLOAT32,
                     point_cloud_msg_.point_step);
   point_cloud_msg_.row_step = point_cloud_msg_.width * point_cloud_msg_.point_step;
   point_cloud_msg_.data.resize(point_cloud_msg_.height * point_cloud_msg_.row_step);
@@ -370,10 +402,10 @@ void OBCameraNode::publishColorPointCloud(std::shared_ptr<ob::FrameSet> frame_se
   point_cloud_msg_.width = valid_count;
   point_cloud_msg_.height = 1;
   modifier.resize(valid_count);
-  point_cloud_publisher_->publish(point_cloud_msg_);
+  colored_point_cloud_publisher_->publish(point_cloud_msg_);
 }
 
-void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set) {
+void OBCameraNode::onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet>& frame_set) {
   if (frame_set == nullptr) {
     return;
   }
@@ -394,12 +426,12 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
   }
 }
 
-void OBCameraNode::onNewFrameCallback(std::shared_ptr<ob::Frame> frame,
+void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
                                       const stream_index_pair& stream_index) {
   if (frame == nullptr) {
     return;
   }
-  std::shared_ptr<ob::VideoFrame> video_frame = nullptr;
+  std::shared_ptr<ob::VideoFrame> video_frame;
   if (frame->type() == OB_FRAME_COLOR && frame->format() != OB_FORMAT_RGB888) {
     if (!setupFormatConvertType(frame->format())) {
       RCLCPP_ERROR(logger_, "Unsupported color format: %d", frame->format());
@@ -429,14 +461,17 @@ void OBCameraNode::onNewFrameCallback(std::shared_ptr<ob::Frame> frame,
   int height = static_cast<int>(video_frame->height());
   auto& image = images_[stream_index];
   if (image.empty() || image.cols != width || image.rows != height) {
-    image.create(height, width, image_format_[stream_index.first]);
+    image.create(height, width, image_format_[stream_index]);
   }
   image.data = (uchar*)video_frame->data();
   auto timestamp = frameTimeStampToROSTime(video_frame->systemTimeStamp());
-  auto camera_param = pipeline_->getCameraParam();
-  auto& intrinsic = stream_index == COLOR ? camera_param.rgbIntrinsic : camera_param.depthIntrinsic;
+  if (!camera_param_) {
+    camera_param_ = pipeline_->getCameraParam();
+  }
+  auto& intrinsic =
+      stream_index == COLOR ? camera_param_->rgbIntrinsic : camera_param_->depthIntrinsic;
   auto& distortion =
-      stream_index == COLOR ? camera_param.rgbDistortion : camera_param.depthDistortion;
+      stream_index == COLOR ? camera_param_->rgbDistortion : camera_param_->depthDistortion;
   auto camera_info = convertToCameraInfo(intrinsic, distortion, width);
   CHECK(camera_info_publishers_.count(stream_index) > 0);
   camera_info_publishers_[stream_index]->publish(camera_info);
@@ -446,7 +481,7 @@ void OBCameraNode::onNewFrameCallback(std::shared_ptr<ob::Frame> frame,
   image_msg->is_bigendian = false;
   image_msg->step = width * unit_step_size_[stream_index];
   image_msg->header.frame_id =
-      depth_align_ ? depth_aligned_frame_id_[stream_index] : optical_frame_id_[stream_index];
+      depth_registration_ ? depth_aligned_frame_id_[stream_index] : optical_frame_id_[stream_index];
   CHECK(image_publishers_.count(stream_index) > 0);
   image_publishers_[stream_index].publish(image_msg);
 }
@@ -492,7 +527,7 @@ void OBCameraNode::calcAndPublishStaticTransform() {
   quaternion_optical.setRPY(-M_PI / 2, 0.0, -M_PI / 2);
   std::vector<float> zero_trans = {0, 0, 0};
   auto camera_param = findDefaultCameraParam();
-  if (camera_param.has_value()) {
+  if (enable_publish_extrinsic_ && extrinsics_publisher_ && camera_param.has_value()) {
     auto ex = camera_param->transform;
     Q = rotationMatrixToQuaternion(ex.rot);
     Q = quaternion_optical * Q * quaternion_optical.inverse();
@@ -512,6 +547,11 @@ void OBCameraNode::calcAndPublishStaticTransform() {
 }
 
 void OBCameraNode::publishStaticTransforms() {
+  if (!publish_tf_) {
+    return;
+  }
+  static_tf_broadcaster_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(node_);
+  dynamic_tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(node_);
   calcAndPublishStaticTransform();
   if (tf_publish_rate_ > 0) {
     tf_thread_ = std::make_shared<std::thread>([this]() { publishDynamicTransforms(); });

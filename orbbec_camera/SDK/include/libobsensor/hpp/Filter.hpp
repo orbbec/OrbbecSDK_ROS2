@@ -123,28 +123,34 @@ public:
     void setFrameAlignState(bool state);
 
     /**
-	 * \if English
-	 * @brief  Set point cloud position data scale ratio
+     * \if English
+     * @brief  Set the point cloud coordinate data zoom factor
      *
-     * @param scale scale ratio
-	 * \else
+     * @attention Calling this function to set the scale will change the point coordinate scaling factor of the output point cloud frame: posScale = posScale /
+     * scale.The point coordinate scaling factor for the output point cloud frame can be obtained via @ref PointsFrame::getPositionValueScale function
+     *
+     * @param scale Zoom factor
+     * \else
      * @brief  设置点云坐标数据缩放比例
      *
+     * @attention 调用该函数设置缩放比例会改变输出点云帧的点坐标缩放系数：posScale = posScale / scale;
+     *  输出点云帧的点坐标缩放系数可通过 @ref PointsFrame::getPositionValueScale 函数获取
+     *
      * @param scale 缩放比例
-	 * \endif
+     * \endif
      */
     void setPositionDataScaled(float scale);
 
     /**
-	 * \if English
-	 * @brief  Set point cloud color data normalization
+     * \if English
+     * @brief  Set point cloud color data normalization
      *
-     * @param state Whether to normalize
-	 * \else
+     * @param state Whether normalization is required
+     * \else
      * @brief  设置点云颜色数据归一化
      *
      * @param state 是否需要归一化
-	 * \endif
+     * \endif
      */
     void setColorDataNormalization(bool state);
 };
@@ -165,4 +171,29 @@ public:
      */
     void setFormatConvertType(OBConvertFormat type);
 };
+
+class OB_EXTENSION_API CompressionFilter : public Filter {
+public:
+    CompressionFilter();
+    /**
+     * \if English
+     * @brief Set compression params
+     *
+     * @param mode Compression mode OB_COMPRESSION_LOSSLESS or OB_COMPRESSION_LOSSY
+     * @param params Compression params, when mode is OB_COMPRESSION_LOSSLESS, params is NULL
+     * \else
+     * @brief 设置压缩参数
+     *
+     * @param mode 压缩模式 OB_COMPRESSION_LOSSLESS or OB_COMPRESSION_LOSSY
+     * @param params 压缩参数, 当mode为OB_COMPRESSION_LOSSLESS时，params为NULL
+     * \endif
+     */
+    void setCompressionParams(OBCompressionMode mode, void *params);
+};
+
+class OB_EXTENSION_API DecompressionFilter : public Filter {
+public:
+    DecompressionFilter();
+};
+
 }  // namespace ob

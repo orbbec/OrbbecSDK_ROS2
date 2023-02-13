@@ -53,8 +53,8 @@ void OBCameraNodeFactory::init() {
   device_num_ = declare_parameter<int>("device_num", 1);
   ctx_->setDeviceChangedCallback([this](std::shared_ptr<ob::DeviceList> removed_list,
                                         std::shared_ptr<ob::DeviceList> added_list) {
+    (void)added_list;
     onDeviceDisconnected(removed_list);
-    onDeviceConnected(added_list);
   });
   check_connect_timer_ =
       this->create_wall_timer(std::chrono::milliseconds(1000), [this]() { checkConnectTimer(); });
@@ -67,10 +67,12 @@ void OBCameraNodeFactory::onDeviceConnected(const std::shared_ptr<ob::DeviceList
   if (device_list->deviceCount() == 0) {
     return;
   }
-  RCLCPP_INFO_STREAM(logger_, "onDeviceConnected");
+  RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 1000, "onDeviceConnected");
   if (!device_) {
     try {
       startDevice(device_list);
+    } catch (ob::Error &e) {
+      RCLCPP_ERROR_STREAM(logger_, "startDevice failed: " << e.getMessage());
     } catch (const std::exception &e) {
       RCLCPP_ERROR_STREAM(logger_, "startDevice failed: " << e.what());
     } catch (...) {
@@ -123,7 +125,7 @@ void OBCameraNodeFactory::checkConnectTimer() const {
 
 void OBCameraNodeFactory::queryDevice() {
   while (is_alive_ && rclcpp::ok()) {
-    if (!device_connected_) {
+    if (!device_connected_.load()) {
       RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 1000, "Waiting for device connection...");
       auto device_list = ctx_->queryDeviceList();
       if (device_list->deviceCount() == 0) {

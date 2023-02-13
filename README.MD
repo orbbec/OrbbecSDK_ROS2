@@ -149,7 +149,7 @@ ros2 service call  /camera/toggle_ir std_srvs/srv/SetBool "{data : true}"
 ros2 run orbbec_camera list_devices_node
 ```
 
-* Set the device_num parameter to the number of cameras you have.
+* Set the `device_num` parameter to the number of cameras you have.
 * Go to the `OrbbecSDK_ROS2/launch/multi_xxx.launch` file and change the serial number. Currently,
   different cameras can only be differentiated by their serial number.
 
@@ -204,7 +204,7 @@ ros2 launch orbbec_camera multi_camera.launch.xml
 
 The following are the launch parameters available:
 
-- `connection_delay`: The delay time in seconds for reopening the device.
+- `connection_delay`: The delay time in milliseconds for reopening the device.
   Some devices, such as Astra mini, require a longer time to initialize and
   reopening the device immediately can cause
   firmware crashes when hot plugging.

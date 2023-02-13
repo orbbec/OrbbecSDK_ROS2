@@ -59,15 +59,16 @@ Launch camera node
 
 ```bash 
 . ./install/setup.bash 
-ros2 launch orbbec_camera ob_camera.launch.py
+ros2 launch orbbec_camera astra.launch.xml
 ```
 
 * On terminal 2
 
 ```bash
 . ./install/setup.bash 
-rviz2 -d src/orbbec_camera/rviz/pointcloud.rviz
+rviz2
 ```
+Select the topic you want to display
 
 * List topics / services/ parameters ( on terminal 3)
 
@@ -150,7 +151,7 @@ ros2 run orbbec_camera list_devices_node
 ```
 
 * Set the `device_num` parameter to the number of cameras you have.
-* Go to the `OrbbecSDK_ROS2/launch/multi_xxx.launch` file and change the serial number. Currently,
+* Go to the `OrbbecSDK_ROS2/launch/multi_xxx.launch.xml` file and change the serial number. Currently,
   different cameras can only be differentiated by their serial number.
 
 ```xml

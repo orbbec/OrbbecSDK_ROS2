@@ -1,7 +1,7 @@
 # orbbec_camera
 
 ---
-ORBBEC_SDK ROS2 wrapper for orbbec 3d camera
+OrbbecSDK ROS2 is a wrapper for the Orbbec 3D camera, providing seamless integration with the ROS2 environment.
 
 ## Installation Instructions
 
@@ -9,8 +9,8 @@ ORBBEC_SDK ROS2 wrapper for orbbec 3d camera
   official [ROS 2 installation guide](https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html)
   guidance
 
-> > If your ROS2 command does not auto-complete, put the following two lines into your `.bashrc`
-> > or `.zshrc`
+> If your ROS2 command does not auto-complete, put the following two lines into your `.bashrc`
+> or `.zshrc`
 
 ```bash
 eval "$(register-python-argcomplete3 ros2)"
@@ -24,11 +24,10 @@ mkdir -p ~/ros2_ws/src
 cd ~/ros2_ws/src
 ```
 
-Clone source code
-
-```bash
-git clone gitlab@code.orbbec.com.cn:OrbbecSDK/orbbecros2sdk.git
-```
+Get source code
+> Please visit
+> [Orbbec developerwebsite](https://developer.orbbec.com.cn/download.html?id=75&menushow=1) to find
+> the latest version code
 
 Install deb dependencies
 
@@ -308,13 +307,19 @@ net.core.rmem_default=2147483647
 
 ## Frequently Asked Questions
 
-● No Picture from Multiple Cameras
+No Picture from Multiple Cameras
 
-* t's possible that the power supply is insufficient.
+- it's possible that the power supply is insufficient.
   To avoid this, do not connect all cameras to the same hub and use a powered hub instead.
 
-* It's also possible that the resolution is too high.
+- It's also possible that the resolution is too high.
   To resolve this, try lowering the resolution.
+
+Why are there so many launch files here
+
+- The reason for the presence of multiple launch
+  files is due to the fact that the default resolutions and image formats of different cameras vary.
+  To make it easier to use, the launch files have been separated for each camera.
 
 ## License
 

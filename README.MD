@@ -33,36 +33,19 @@ Get source code
 Install deb dependencies
 
 ```bash
-sudo apt install libgflags-dev nlohmann-json3-dev \
+sudo apt install libgflags-dev nlohmann-json3-dev libgoogle-glog-dev \
 ros-galactic-image-transport ros-galactic-image-publisher
 ```
 
-Install glog
+Install udev rules.
 
-```bash
-cd orbbec_camera/dependencies
-tar -xzvf glog-0.6.0.tar.gz
-cd glog-0.6.0
-mkdir build && cd build
-cmake .. && make -j4
-sudo make install
-sudo ldconfig
-```
-
-```
-
-Install `99-obsensor-libusb.rules`
 ```bash 
-cd orbbec_camera/scripts
+cd `~/ros2_ws/src/OrbbecSDK_ROS2/orbbec_camera/scripts`
 sudo bash install.sh
 sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
 
----
-
 ## Getting start
-
----
 
 ```bash
 cd ~/ros2_ws/

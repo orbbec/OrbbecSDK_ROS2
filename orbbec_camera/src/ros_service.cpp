@@ -523,7 +523,7 @@ bool OBCameraNode::toggleSensor(const stream_index_pair& stream_index, bool enab
     pipeline_->stop();
     enable_stream_[stream_index] = enabled;
     setupProfiles();
-    startPipeline();
+    startStreams();
     return true;
   } catch (const ob::Error& e) {
     msg = e.getMessage();

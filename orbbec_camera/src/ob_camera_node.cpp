@@ -36,7 +36,7 @@ OBCameraNode::OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> devic
   compression_params_.push_back(cv::IMWRITE_PNG_STRATEGY_DEFAULT);
   setupDefaultImageFormat();
   setupTopics();
-  startPipeline();
+  startStreams();
 }
 
 template <class T>
@@ -62,8 +62,8 @@ void OBCameraNode::clean() {
   if (tf_thread_->joinable()) {
     tf_thread_->join();
   }
-  RCLCPP_WARN_STREAM(logger_, "stop pipeline");
-  pipeline_->stop();
+  RCLCPP_WARN_STREAM(logger_, "stop streams");
+  stopStreams();
   RCLCPP_WARN_STREAM(logger_, "Destroy ~OBCameraNode DONE");
 }
 
@@ -93,15 +93,6 @@ void OBCameraNode::setupDevices() {
 }
 
 void OBCameraNode::setupProfiles() {
-  if (config_ != nullptr) {
-    config_.reset();
-  }
-  config_ = std::make_shared<ob::Config>();
-  if (depth_registration_) {
-    config_->setAlignMode(ALIGN_D2C_HW_MODE);
-  } else {
-    config_->setAlignMode(ALIGN_DISABLE);
-  }
   for (const auto& elem : IMAGE_STREAMS) {
     if (enable_stream_[elem]) {
       const auto& sensor = sensors_[elem];
@@ -113,7 +104,7 @@ void OBCameraNode::setupProfiles() {
                          << "stream_type: " << magic_enum::enum_name(profile->type())
                          << "Format: " << profile->format() << ", Width: " << profile->width()
                          << ", Height: " << profile->height() << ", FPS: " << profile->fps());
-        enabled_profiles_[elem].emplace_back(profile);
+        soupported_profiles_[elem].emplace_back(profile);
       }
 
       auto selected_profile =
@@ -140,7 +131,7 @@ void OBCameraNode::setupProfiles() {
         }
       }
       CHECK_NOTNULL(selected_profile);
-      config_->enableStream(selected_profile);
+      stream_profile_[elem] = selected_profile;
       images_[elem] =
           cv::Mat(height_[elem], width_[elem], image_format_[elem], cv::Scalar(0, 0, 0));
       RCLCPP_INFO_STREAM(
@@ -151,14 +142,37 @@ void OBCameraNode::setupProfiles() {
   }
 }
 
-void OBCameraNode::startPipeline() {
+void OBCameraNode::startStreams() {
   if (pipeline_ != nullptr) {
     pipeline_.reset();
   }
   pipeline_ = std::make_unique<ob::Pipeline>(device_);
-  pipeline_->start(config_, [this](std::shared_ptr<ob::FrameSet> frame_set) {
-    onNewFrameSetCallback(frame_set);
-  });
+  try {
+    setupPipelineConfig();
+    pipeline_->start(pipeline_config_, [this](std::shared_ptr<ob::FrameSet> frame_set) {
+      onNewFrameSetCallback(frame_set);
+    });
+  } catch (const ob::Error& e) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to start pipeline: " << e.getMessage());
+    RCLCPP_INFO_STREAM(logger_, "try to disable ir stream and try again");
+    enable_stream_[INFRA0] = false;
+    setupPipelineConfig();
+    pipeline_->start(pipeline_config_, [this](std::shared_ptr<ob::FrameSet> frame_set) {
+      onNewFrameSetCallback(frame_set);
+    });
+  }
+  pipeline_started_.store(true);
+}
+
+void OBCameraNode::stopStreams() {
+  if (!pipeline_started_ || !pipeline_) {
+    return;
+  }
+  try {
+    pipeline_->stop();
+  } catch (const ob::Error& e) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to stop pipeline: " << e.getMessage());
+  }
 }
 
 void OBCameraNode::setupDefaultImageFormat() {
@@ -235,6 +249,21 @@ void OBCameraNode::setupTopics() {
   setupCameraCtrlServices();
   setupPublishers();
   publishStaticTransforms();
+}
+
+void OBCameraNode::setupPipelineConfig() {
+  if (pipeline_config_) {
+    pipeline_config_.reset();
+  }
+  pipeline_config_ = std::make_shared<ob::Config>();
+  if (depth_registration_ && enable_stream_[COLOR] && enable_stream_[DEPTH]) {
+    pipeline_config_->setAlignMode(ALIGN_D2C_HW_MODE);
+  }
+  for (const auto& stream_index : IMAGE_STREAMS) {
+    if (enable_stream_[stream_index]) {
+      pipeline_config_->enableStream(stream_profile_[stream_index]);
+    }
+  }
 }
 
 void OBCameraNode::setupPublishers() {

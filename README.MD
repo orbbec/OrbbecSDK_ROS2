@@ -68,6 +68,7 @@ ros2 launch orbbec_camera astra.launch.xml
 . ./install/setup.bash 
 rviz2
 ```
+
 Select the topic you want to display
 
 * List topics / services/ parameters ( on terminal 3)
@@ -226,7 +227,8 @@ The following are the launch parameters available:
 - `enable_color`: Enables the RGB camera.
 - `enable_depth`: Enables the depth camera.
 - `enable_ir`: Enables the IR camera.
-- `depth_registration`: Enables hardware alignment of depth and color. This requires the RGB point cloud to be open.
+- `depth_registration`: Enables hardware alignment the depth frame to color frame.
+  This field is required when the `enable_colored_point_cloud` is set to `true`.
 - `enable_publish_extrinsic`: Enables the publishing of camera extrinsic information.
 
 ## DDS Tuning

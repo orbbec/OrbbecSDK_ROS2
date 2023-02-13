@@ -120,9 +120,13 @@ class OBCameraNode {
 
   void setupTopics();
 
+  void setupPipelineConfig();
+
   void setupCameraCtrlServices();
 
-  void startPipeline();
+  void startStreams();
+
+  void stopStreams();
 
   void setupDefaultImageFormat();
 
@@ -218,7 +222,8 @@ class OBCameraNode {
   rclcpp::Logger logger_;
   std::atomic_bool is_running_{false};
   std::unique_ptr<ob::Pipeline> pipeline_ = nullptr;
-  std::shared_ptr<ob::Config> config_ = nullptr;
+  std::atomic_bool pipeline_started_{false};
+  std::shared_ptr<ob::Config> pipeline_config_ = nullptr;
   std::map<stream_index_pair, std::shared_ptr<ob::Sensor>> sensors_;
   std::map<stream_index_pair, ob_camera_intrinsic> stream_intrinsics_;
   std::map<stream_index_pair, sensor_msgs::msg::CameraInfo> camera_infos_;
@@ -237,7 +242,8 @@ class OBCameraNode {
   std::map<stream_index_pair, std::string> format_str_;
   std::map<stream_index_pair, int> image_format_;
   std::map<stream_index_pair, std::vector<std::shared_ptr<ob::VideoStreamProfile>>>
-      enabled_profiles_;
+      soupported_profiles_;
+  std::map<stream_index_pair, std::shared_ptr<ob::StreamProfile>> stream_profile_;
   std::map<stream_index_pair, uint32_t> seq_;
   std::map<stream_index_pair, cv::Mat> images_;
   std::map<stream_index_pair, std::string> encoding_;

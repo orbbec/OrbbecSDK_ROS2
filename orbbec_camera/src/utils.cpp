@@ -225,7 +225,7 @@ std::string ObDeviceTypeToString(const OBDeviceType &type) {
   return "unknown technology camera";
 }
 
-rmw_qos_profile_t getRMWQosProfileFromString(const std::string& str_qos) {
+rmw_qos_profile_t getRMWQosProfileFromString(const std::string &str_qos) {
   std::string upper_str_qos = str_qos;
   std::transform(upper_str_qos.begin(), upper_str_qos.end(), upper_str_qos.begin(), ::toupper);
   if (upper_str_qos == "SYSTEM_DEFAULT") {

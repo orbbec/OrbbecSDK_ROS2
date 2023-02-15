@@ -326,8 +326,10 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet>& f
       point_cloud_publisher_->get_subscription_count() == 0) {
     return;
   }
-  if (!camera_param_) {
+  if (!camera_param_ && depth_registration_) {
     camera_param_ = pipeline_->getCameraParam();
+  } else if (!camera_param_) {
+    camera_param_ = getDepthCameraParam();
   }
   point_cloud_filter_.setCameraParam(*camera_param_);
   point_cloud_filter_.setCreatePointFormat(OB_FORMAT_POINT);
@@ -494,8 +496,12 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
   }
   image.data = (uchar*)video_frame->data();
   auto timestamp = frameTimeStampToROSTime(video_frame->systemTimeStamp());
-  if (!camera_param_) {
+  if (!camera_param_ && depth_registration_) {
     camera_param_ = pipeline_->getCameraParam();
+  } else if (!camera_param_ && stream_index == COLOR) {
+    camera_param_ = getColorCameraParam();
+  } else if (!camera_param_) {
+    camera_param_ = getDepthCameraParam();
   }
   auto& intrinsic =
       stream_index == COLOR ? camera_param_->rgbIntrinsic : camera_param_->depthIntrinsic;
@@ -525,6 +531,32 @@ std::optional<OBCameraParam> OBCameraNode::findDefaultCameraParam() {
     int color_h = param.rgbIntrinsic.height;
     if ((depth_w * height_[DEPTH] == depth_h * width_[DEPTH]) &&
         (color_w * height_[COLOR] == color_h * width_[COLOR])) {
+      return param;
+    }
+  }
+  return {};
+}
+
+std::optional<OBCameraParam> OBCameraNode::getDepthCameraParam() {
+  auto camera_params = device_->getCalibrationCameraParamList();
+  for (size_t i = 0; i < camera_params->count(); i++) {
+    auto param = camera_params->getCameraParam(i);
+    int depth_w = param.depthIntrinsic.width;
+    int depth_h = param.depthIntrinsic.height;
+    if (depth_w * height_[DEPTH] == depth_h * width_[DEPTH]) {
+      return param;
+    }
+  }
+  return {};
+}
+
+std::optional<OBCameraParam> OBCameraNode::getColorCameraParam() {
+  auto camera_params = device_->getCalibrationCameraParamList();
+  for (size_t i = 0; i < camera_params->count(); i++) {
+    auto param = camera_params->getCameraParam(i);
+    int color_w = param.rgbIntrinsic.width;
+    int color_h = param.rgbIntrinsic.height;
+    if (color_w * height_[COLOR] == color_h * width_[COLOR]) {
       return param;
     }
   }

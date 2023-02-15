@@ -143,6 +143,10 @@ class OBCameraNode {
 
   std::optional<OBCameraParam> findDefaultCameraParam();
 
+  std::optional<OBCameraParam> getDepthCameraParam();
+
+  std::optional<OBCameraParam> getColorCameraParam();
+
   void getExposureCallback(const std::shared_ptr<GetInt32::Request>& request,
                            std::shared_ptr<GetInt32::Response>& response,
                            const stream_index_pair& stream_index);

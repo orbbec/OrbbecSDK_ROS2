@@ -88,13 +88,14 @@ void OBCameraNodeFactory::onDeviceDisconnected(const std::shared_ptr<ob::DeviceL
   }
   RCLCPP_INFO_STREAM(logger_, "onDeviceDisconnected");
   for (size_t i = 0; i < device_list->deviceCount(); i++) {
-    std::string serial_number = device_list->serialNumber(i);
+    std::string uid = device_list->uid(i);
     std::scoped_lock<decltype(device_lock_)> lock(device_lock_);
-    RCLCPP_INFO_STREAM(logger_, "onDeviceDisconnected: " << serial_number);
-    if (device_info_ && device_info_->serialNumber() == serial_number) {
+    RCLCPP_INFO_STREAM(logger_, "device with" << uid << "disconnected");
+    if (uid == device_unique_id_) {
       ob_camera_node_.reset();
       device_.reset();
       device_connected_ = false;
+      device_unique_id_.clear();
       break;
     }
   }
@@ -214,7 +215,7 @@ void OBCameraNodeFactory::startDevice(const std::shared_ptr<ob::DeviceList> &lis
     }
 
     if (device_ == nullptr) {
-     // RCLCPP_WARN(logger_, "Device with serial number %s not found", serial_number_.c_str());
+      // RCLCPP_WARN(logger_, "Device with serial number %s not found", serial_number_.c_str());
       device_connected_ = false;
       return;
     } else {
@@ -251,6 +252,7 @@ void OBCameraNodeFactory::startDevice(const std::shared_ptr<ob::DeviceList> &lis
   device_connected_ = true;
   device_info_ = device_->getDeviceInfo();
   CHECK_NOTNULL(device_info_.get());
+  device_unique_id_ = device_info_->uid();
   RCLCPP_INFO_STREAM(logger_, "Device " << device_info_->name() << " connected");
   RCLCPP_INFO_STREAM(logger_, "Serial number: " << device_info_->serialNumber());
   RCLCPP_INFO_STREAM(logger_, "Firmware version: " << device_info_->firmwareVersion());

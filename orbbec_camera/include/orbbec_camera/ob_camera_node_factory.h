@@ -52,6 +52,7 @@ class OBCameraNodeFactory : public rclcpp::Node {
   std::atomic_bool is_alive_{false};
   std::atomic_bool device_connected_{false};
   std::string serial_number_;
+  std::string device_unique_id_;
   std::shared_ptr<Parameters> parameters_ = nullptr;
   std::shared_ptr<std::thread> query_thread_ = nullptr;
   std::recursive_mutex device_lock_;

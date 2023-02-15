@@ -191,6 +191,19 @@ void OBCameraNodeFactory::startDevice(const std::shared_ptr<ob::DeviceList> &lis
     }
     try {
       auto device = list->getDeviceBySN(serial_number_.c_str());
+      if (device == nullptr) {
+        for (size_t i = 0; i < list->deviceCount(); i++) {
+          auto dev = list->getDevice(i);
+          if (dev != nullptr) {
+            std::string sn = dev->getDeviceInfo()->serialNumber();
+            RCLCPP_INFO_STREAM(logger_, "Device serial number: " << sn);
+            if (sn == serial_number_ || lower_sn == sn) {
+              device = dev;
+              break;
+            }
+          }
+        }
+      }
       device_ = device;
     } catch (ob::Error &e) {
       RCLCPP_INFO_STREAM(logger_, "Failed to get device info " << e.getMessage());
@@ -201,7 +214,7 @@ void OBCameraNodeFactory::startDevice(const std::shared_ptr<ob::DeviceList> &lis
     }
 
     if (device_ == nullptr) {
-      RCLCPP_WARN(logger_, "Device with serial number %s not found", serial_number_.c_str());
+     // RCLCPP_WARN(logger_, "Device with serial number %s not found", serial_number_.c_str());
       device_connected_ = false;
       return;
     } else {

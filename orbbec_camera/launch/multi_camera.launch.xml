@@ -2,12 +2,12 @@
     <!-- unique camera name-->
     <arg name="camera_name" default="camera"/>
     <!-- Hardware depth registration -->
-    <arg name="3d_sensor" default="astra"/>
+    <arg name="3d_sensor" default="astra_mini"/>
     <!-- stereo_s_u3, astrapro, astra -->
     <arg name="camera1_prefix" default="01"/>
     <arg name="camera2_prefix" default="02"/>
-    <arg name="camera1_serila_number" default="ADAX91301LB"/>
-    <arg name="camera2_serila_number" default="'18011820122'"/>
+    <arg name="camera1_serila_number" default="'ADAX9130012'"/>
+    <arg name="camera2_serila_number" default="'ADAX91301LB'"/>
     <arg name="device_num" default="2"/>
     <node name="camera" pkg="orbbec_camera" exec="ob_cleanup_shm_node" output="screen"/>
     <include file="$(find-pkg-share orbbec_camera)/launch/$(var 3d_sensor).launch.xml">

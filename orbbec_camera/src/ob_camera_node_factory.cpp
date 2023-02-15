@@ -90,7 +90,7 @@ void OBCameraNodeFactory::onDeviceDisconnected(const std::shared_ptr<ob::DeviceL
   for (size_t i = 0; i < device_list->deviceCount(); i++) {
     std::string uid = device_list->uid(i);
     std::scoped_lock<decltype(device_lock_)> lock(device_lock_);
-    RCLCPP_INFO_STREAM(logger_, "device with" << uid << "disconnected");
+    RCLCPP_INFO_STREAM(logger_, "device with " << uid << " disconnected");
     if (uid == device_unique_id_) {
       ob_camera_node_.reset();
       device_.reset();
@@ -119,7 +119,8 @@ OBLogSeverity OBCameraNodeFactory::obLogSeverityFromString(const std::string_vie
 
 void OBCameraNodeFactory::checkConnectTimer() const {
   if (!device_connected_.load()) {
-    RCLCPP_ERROR_STREAM(logger_, "checkConnectTimer: device not connected");
+    RCLCPP_ERROR_STREAM(logger_,
+                        "checkConnectTimer: device " << serial_number_ << " not connected");
     return;
   }
 }
@@ -135,6 +136,7 @@ void OBCameraNodeFactory::queryDevice() {
       }
       onDeviceConnected(device_list);
     } else {
+      RCLCPP_INFO_STREAM(logger_, "Device connected");
       std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
   }
@@ -182,7 +184,6 @@ void OBCameraNodeFactory::startDevice(const std::shared_ptr<ob::DeviceList> &lis
       RCLCPP_INFO_STREAM(logger_, "Failed to open semaphore");
       return;
     }
-    RCLCPP_INFO_STREAM(logger_, "Connecting to device with serial number: " << serial_number_);
     int sem_value = 0;
     sem_getvalue(device_sem, &sem_value);
     RCLCPP_INFO_STREAM(logger_, "semaphore value: " << sem_value);
@@ -199,6 +200,7 @@ void OBCameraNodeFactory::startDevice(const std::shared_ptr<ob::DeviceList> &lis
             std::string sn = dev->getDeviceInfo()->serialNumber();
             RCLCPP_INFO_STREAM(logger_, "Device serial number: " << sn);
             if (sn == serial_number_ || lower_sn == sn) {
+              RCLCPP_INFO_STREAM(logger_, "Device serial number matched: " << sn);
               device = dev;
               break;
             }
@@ -215,7 +217,7 @@ void OBCameraNodeFactory::startDevice(const std::shared_ptr<ob::DeviceList> &lis
     }
 
     if (device_ == nullptr) {
-      // RCLCPP_WARN(logger_, "Device with serial number %s not found", serial_number_.c_str());
+      RCLCPP_WARN(logger_, "Device with serial number %s not found", serial_number_.c_str());
       device_connected_ = false;
       return;
     } else {
@@ -258,5 +260,6 @@ void OBCameraNodeFactory::startDevice(const std::shared_ptr<ob::DeviceList> &lis
   RCLCPP_INFO_STREAM(logger_, "Firmware version: " << device_info_->firmwareVersion());
   RCLCPP_INFO_STREAM(logger_, "Hardware version: " << device_info_->hardwareVersion());
   RCLCPP_INFO_STREAM(logger_, "device type: " << ObDeviceTypeToString(device_info_->deviceType()));
+  RCLCPP_INFO_STREAM(logger_, "device unique id: " << device_unique_id_);
 }
 }  // namespace orbbec_camera

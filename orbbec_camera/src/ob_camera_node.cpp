@@ -349,12 +349,13 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet>& f
   sensor_msgs::PointCloud2Iterator<float> iter_y(point_cloud_msg_, "y");
   sensor_msgs::PointCloud2Iterator<float> iter_z(point_cloud_msg_, "z");
   size_t valid_count = 0;
+  auto scale = depth_frame->getValueScale();
   for (size_t point_idx = 0; point_idx < point_size; point_idx++, points++) {
     bool valid_pixel(points->z > 0);
     if (valid_pixel) {
-      *iter_x = static_cast<float>(points->x / 1000.0);
-      *iter_y = -static_cast<float>(points->y / 1000.0);
-      *iter_z = static_cast<float>(points->z / 1000.0);
+      *iter_x = static_cast<float>((points->x * scale) / 1000.0);
+      *iter_y = -static_cast<float>((points->y * scale) / 1000.0);
+      *iter_z = static_cast<float>((points->z * scale) / 1000.0);
       ++iter_x;
       ++iter_y;
       ++iter_z;
@@ -406,13 +407,13 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet>&
   sensor_msgs::PointCloud2Iterator<uint8_t> iter_g(point_cloud_msg_, "g");
   sensor_msgs::PointCloud2Iterator<uint8_t> iter_b(point_cloud_msg_, "b");
   size_t valid_count = 0;
-
+  auto scale = depth_frame->getValueScale();
   for (size_t point_idx = 0; point_idx < point_size; point_idx += 1) {
     bool valid_pixel((points + point_idx)->z > 0);
     if (valid_pixel) {
-      *iter_x = static_cast<float>((points + point_idx)->x / 1000.0);
-      *iter_y = -static_cast<float>((points + point_idx)->y / 1000.0);
-      *iter_z = static_cast<float>((points + point_idx)->z / 1000.0);
+      *iter_x = static_cast<float>(((points + point_idx)->x * scale) / 1000.0);
+      *iter_y = -static_cast<float>(((points + point_idx)->y * scale) / 1000.0);
+      *iter_z = static_cast<float>(((points + point_idx)->z * scale) / 1000.0);
       *iter_r = static_cast<uint8_t>((points + point_idx)->r);
       *iter_g = static_cast<uint8_t>((points + point_idx)->g);
       *iter_b = static_cast<uint8_t>((points + point_idx)->b);

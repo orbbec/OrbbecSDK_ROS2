@@ -42,7 +42,6 @@
     <arg name="log_level" default="none"/>
     <arg name="enable_publish_extrinsic" default="false"/>
     <group>
-        <push-ros-namespace namespace="$(var camera_name)"/>
         <node name="camera" pkg="orbbec_camera" exec="orbbec_camera_node" output="screen">
             <param name="camera_name" value="$(var camera_name)"/>
             <param name="depth_registration" value="$(var depth_registration)"/>

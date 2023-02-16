@@ -136,7 +136,6 @@ void OBCameraNodeFactory::queryDevice() {
       }
       onDeviceConnected(device_list);
     } else {
-      RCLCPP_INFO_STREAM(logger_, "Device connected");
       std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
   }
@@ -191,29 +190,39 @@ void OBCameraNodeFactory::startDevice(const std::shared_ptr<ob::DeviceList> &lis
       RCLCPP_INFO_STREAM(logger_, "Failed to wait semaphore " << strerror(errno));
       return;
     }
-    try {
-      auto device = list->getDeviceBySN(serial_number_.c_str());
-      if (device == nullptr) {
-        for (size_t i = 0; i < list->deviceCount(); i++) {
+
+    for (size_t i = 0; i < list->deviceCount(); i++) {
+      try {
+        auto pid = list->pid(i);
+        if ((pid >= OPENNI_START_PID && pid <= OPENNI_END_PID) || pid == ASTRA_MINI_PID ||
+            pid == ASTRA_MINI_S_PID) {
+          // openNI device
           auto dev = list->getDevice(i);
-          if (dev != nullptr) {
-            std::string sn = dev->getDeviceInfo()->serialNumber();
-            RCLCPP_INFO_STREAM(logger_, "Device serial number: " << sn);
-            if (sn == serial_number_ || lower_sn == sn) {
-              RCLCPP_INFO_STREAM(logger_, "Device serial number matched: " << sn);
-              device = dev;
-              break;
-            }
+          auto device_info = dev->getDeviceInfo();
+          if (device_info->serialNumber() == serial_number_) {
+            RCLCPP_INFO_STREAM(
+                logger_, "Device serial number " << device_info->serialNumber() << " matched");
+            device_ = dev;
+            break;
+          }
+        } else {
+          std::string sn = list->serialNumber(i);
+          RCLCPP_INFO_STREAM(logger_, "Device serial number: " << sn);
+          if (sn == serial_number_) {
+            RCLCPP_INFO_STREAM(logger_, "Device serial number <<" << sn << " matched");
+            auto dev = list->getDevice(i);
+            device_ = dev;
+            break;
           }
         }
+      } catch (ob::Error &e) {
+        RCLCPP_INFO_STREAM(logger_, "Failed to get device info " << e.getMessage());
+      } catch (std::exception &e) {
+        RCLCPP_INFO_STREAM(logger_, "Failed to get device info " << e.what());
+      } catch (...) {
+        RCLCPP_INFO_STREAM(logger_, "Failed to get device info");
       }
-      device_ = device;
-    } catch (ob::Error &e) {
-      RCLCPP_INFO_STREAM(logger_, "Failed to get device info " << e.getMessage());
-    } catch (std::exception &e) {
-      RCLCPP_INFO_STREAM(logger_, "Failed to get device info " << e.what());
-    } catch (...) {
-      RCLCPP_INFO_STREAM(logger_, "Failed to get device info");
+
     }
 
     if (device_ == nullptr) {

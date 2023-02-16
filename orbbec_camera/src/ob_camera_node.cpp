@@ -96,7 +96,10 @@ void OBCameraNode::setupProfiles() {
   for (const auto& elem : IMAGE_STREAMS) {
     if (enable_stream_[elem]) {
       const auto& sensor = sensors_[elem];
+      CHECK_NOTNULL(sensor.get());
       auto profiles = sensor->getStreamProfileList();
+      CHECK_NOTNULL(profiles.get());
+      CHECK(profiles->count() > 0);
       for (size_t i = 0; i < profiles->count(); i++) {
         auto profile = profiles->getProfile(i)->as<ob::VideoStreamProfile>();
         RCLCPP_DEBUG_STREAM(
@@ -106,11 +109,23 @@ void OBCameraNode::setupProfiles() {
                          << ", Height: " << profile->height() << ", FPS: " << profile->fps());
         soupported_profiles_[elem].emplace_back(profile);
       }
+      std::shared_ptr<ob::VideoStreamProfile> selected_profile;
+      std::shared_ptr<ob::VideoStreamProfile> default_profile;
+      try {
+        selected_profile =
+            profiles->getVideoStreamProfile(width_[elem], height_[elem], format_[elem], fps_[elem]);
+        default_profile =
+            profiles->getVideoStreamProfile(width_[elem], height_[elem], format_[elem]);
+      } catch (const ob::Error& ex) {
+        RCLCPP_ERROR_STREAM(logger_, "Failed to get profile: " << ex.getMessage());
+        RCLCPP_ERROR_STREAM(
+            logger_, "Stream: " << magic_enum::enum_name(elem.first)
+                                << ", Stream Index: " << elem.second << ", Width: " << width_[elem]
+                                << ", Height: " << height_[elem] << ", FPS: " << fps_[elem]
+                                << ", Format: " << magic_enum::enum_name(format_[elem]));
+        throw;
+      }
 
-      auto selected_profile =
-          profiles->getVideoStreamProfile(width_[elem], height_[elem], format_[elem], fps_[elem]);
-      auto default_profile =
-          profiles->getVideoStreamProfile(width_[elem], height_[elem], format_[elem]);
       if (!selected_profile) {
         RCLCPP_WARN_STREAM(logger_, "Given stream configuration is not supported by the device! "
                                         << " Stream: " << magic_enum::enum_name(elem.first)
@@ -261,6 +276,11 @@ void OBCameraNode::setupPipelineConfig() {
   }
   for (const auto& stream_index : IMAGE_STREAMS) {
     if (enable_stream_[stream_index]) {
+      RCLCPP_INFO_STREAM(logger_, "Enable " << stream_name_[stream_index] << " stream");
+      RCLCPP_INFO_STREAM(
+          logger_, "Stream " << stream_name_[stream_index] << " width: " << width_[stream_index]
+                             << " height: " << height_[stream_index] << " fps: "
+                             << fps_[stream_index] << " format: " << format_str_[stream_index]);
       pipeline_config_->enableStream(stream_profile_[stream_index]);
     }
   }

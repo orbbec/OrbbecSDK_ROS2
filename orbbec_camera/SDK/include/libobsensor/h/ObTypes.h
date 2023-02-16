@@ -1355,15 +1355,26 @@ typedef void (*ob_frameset_callback)(ob_frame *frameset, void *user_data);
  */
 typedef void(ob_frame_destroy_callback)(void *buffer, void *context);
 
-/*
- * 由于 Gemini2 产品有左右 IR，特地提供函数判断是否为 IR 相关的 Type
+/**
+ * @brief 判断是否为 IR Sensor
+ *
  */
-OB_EXTENSION_API bool is_ir_frame(const ob_frame_type type);
-#define isIRFrame is_ir_frame
-OB_EXTENSION_API bool is_ir_sensor(const ob_sensor_type type);
+#define is_ir_sensor(sensor_type) (sensor_type == OB_SENSOR_IR || sensor_type == OB_SENSOR_IR_LEFT || sensor_type == OB_SENSOR_IR_RIGHT)
 #define isIRSensor is_ir_sensor
-OB_EXTENSION_API bool is_ir_stream(const ob_stream_type type);
+
+/**
+ * @brief 判断是否为 IR 数据流
+ *
+ */
+#define is_ir_stream(stream_type) (stream_type == OB_STREAM_IR || stream_type == OB_STREAM_IR_LEFT || stream_type == OB_STREAM_IR_RIGHT)
 #define isIRStream is_ir_stream
+
+/**
+ * @brief 判断是否为 IR 数据帧
+ *
+ */
+#define is_ir_frame(frame_type) (frame_type == OB_FRAME_IR || frame_type == OB_FRAME_IR_LEFT || frame_type == OB_FRAME_IR_RIGHT)
+#define isIRFrame is_ir_frame
 
 #ifdef __cplusplus
 }

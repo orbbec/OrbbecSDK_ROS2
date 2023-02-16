@@ -31,7 +31,6 @@
     <arg name="ir_info_url" default=""/>
     <arg name="log_level" default="none"/>
     <group>
-        <push-ros-namespace namespace="$(var camera_name)"/>
         <node name="camera" pkg="orbbec_camera" exec="orbbec_camera_node" output="screen">
             <param name="camera_name" value="$(var camera_name)"/>
             <param name="serial_number" value="$(var serial_number)"/>

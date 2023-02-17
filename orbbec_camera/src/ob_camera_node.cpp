@@ -287,7 +287,6 @@ void OBCameraNode::setupPipelineConfig() {
 }
 
 void OBCameraNode::setupPublishers() {
-  static_tf_broadcaster_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(node_);
   using PointCloud2 = sensor_msgs::msg::PointCloud2;
   using CameraInfo = sensor_msgs::msg::CameraInfo;
   auto point_cloud_qos_profile = getRMWQosProfileFromString(point_cloud_qos_);

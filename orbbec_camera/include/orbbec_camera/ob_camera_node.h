@@ -44,6 +44,7 @@
 #include "orbbec_camera_msgs/srv/get_int32.hpp"
 #include "orbbec_camera_msgs/srv/get_string.hpp"
 #include "orbbec_camera_msgs/srv/set_int32.hpp"
+#include "orbbec_camera_msgs/srv/get_bool.hpp"
 
 #include "orbbec_camera/constants.h"
 #include "orbbec_camera/dynamic_params.h"
@@ -80,6 +81,7 @@ using SetInt32 = orbbec_camera_msgs::srv::SetInt32;
 using GetInt32 = orbbec_camera_msgs::srv::GetInt32;
 using GetString = orbbec_camera_msgs::srv::GetString;
 using SetBool = std_srvs::srv::SetBool;
+using GetBool = orbbec_camera_msgs::srv::GetBool;
 
 typedef std::pair<ob_stream_type, int> stream_index_pair;
 
@@ -191,8 +193,8 @@ class OBCameraNode {
                             const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
                             std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
 
-  void setFanModeCallback(const std::shared_ptr<SetInt32::Request>& request,
-                          std::shared_ptr<SetInt32::Response>& response);
+  void setFanWorkModeCallback(const std::shared_ptr<SetInt32::Request>& request,
+                              std::shared_ptr<SetInt32::Response>& response);
 
   void getDeviceInfoCallback(const std::shared_ptr<GetDeviceInfo::Request>& request,
                              std::shared_ptr<GetDeviceInfo::Response>& response);
@@ -203,6 +205,13 @@ class OBCameraNode {
   void toggleSensorCallback(const std::shared_ptr<SetBool::Request>& request,
                             std::shared_ptr<SetBool::Response>& response,
                             const stream_index_pair& stream_index);
+
+  void setMirrorCallback(const std::shared_ptr<SetBool::Request>& request,
+                         std::shared_ptr<SetBool::Response>& response,
+                         const stream_index_pair& stream_index);
+
+  void getLdpStatusCallback(const std::shared_ptr<GetBool::Request>& request,
+                            std::shared_ptr<GetBool::Response>& response);
 
   bool toggleSensor(const stream_index_pair& stream_index, bool enabled, std::string& msg);
 
@@ -266,6 +275,7 @@ class OBCameraNode {
   std::map<stream_index_pair, rclcpp::Service<GetInt32>::SharedPtr> get_gain_srv_;
   std::map<stream_index_pair, rclcpp::Service<SetInt32>::SharedPtr> set_gain_srv_;
   std::map<stream_index_pair, rclcpp::Service<SetBool>::SharedPtr> toggle_sensor_srv_;
+  std::map<stream_index_pair, rclcpp::Service<SetBool>::SharedPtr> set_mirror_srv_;
   rclcpp::Service<GetInt32>::SharedPtr get_white_balance_srv_;
   rclcpp::Service<SetInt32>::SharedPtr set_white_balance_srv_;
   rclcpp::Service<GetInt32>::SharedPtr get_auto_white_balance_srv_;
@@ -276,8 +286,9 @@ class OBCameraNode {
   rclcpp::Service<GetDeviceInfo>::SharedPtr get_device_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_laser_enable_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_ldp_enable_srv_;
+  rclcpp::Service<orbbec_camera_msgs::srv::GetBool>::SharedPtr get_ldp_status_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_floor_enable_srv_;
-  rclcpp::Service<SetInt32>::SharedPtr set_fan_mode_srv_;
+  rclcpp::Service<SetInt32>::SharedPtr set_fan_work_mode_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr toggle_sensors_srv_;
 
   bool publish_tf_ = false;

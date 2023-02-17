@@ -71,11 +71,18 @@ void OBCameraNode::setupCameraCtrlServices() {
                                             std::shared_ptr<SetBool::Response> response) {
           toggleSensorCallback(request, response, stream_index);
         });
+    service_name = "set_" + stream_name + "_mirror";
+    set_mirror_srv_[stream_index] = node_->create_service<SetBool>(
+        service_name,
+        [this, stream_index = stream_index](const std::shared_ptr<SetBool::Request> request,
+                                            std::shared_ptr<SetBool::Response> response) {
+          setMirrorCallback(request, response, stream_index);
+        });
   }
-  set_fan_mode_srv_ = node_->create_service<SetInt32>(
+  set_fan_work_mode_srv_ = node_->create_service<SetInt32>(
       "set_fan_work_mode", [this](const std::shared_ptr<SetInt32::Request> request,
-                             std::shared_ptr<SetInt32::Response> response) {
-        setFanModeCallback(request, response);
+                                  std::shared_ptr<SetInt32::Response> response) {
+        setFanWorkModeCallback(request, response);
       });
   set_floor_enable_srv_ = node_->create_service<SetBool>(
       "set_floor_enable", [this](const std::shared_ptr<rmw_request_id_t> request_header,
@@ -94,6 +101,13 @@ void OBCameraNode::setupCameraCtrlServices() {
                                const std::shared_ptr<SetBool::Request> request,
                                std::shared_ptr<SetBool::Response> response) {
         setLdpEnableCallback(request_header, request, response);
+      });
+  get_ldp_status_srv_ = node_->create_service<GetBool>(
+      "get_ldp_status", [this](const std::shared_ptr<rmw_request_id_t> request_header,
+                               const std::shared_ptr<GetBool::Request> request,
+                               std::shared_ptr<GetBool::Response> response) {
+        (void)request_header;
+        getLdpStatusCallback(request, response);
       });
 
   get_white_balance_srv_ = node_->create_service<GetInt32>(
@@ -329,8 +343,8 @@ void OBCameraNode::setAutoExposureCallback(
   }
 }
 
-void OBCameraNode::setFanModeCallback(const std::shared_ptr<SetInt32::Request>& request,
-                                      std::shared_ptr<SetInt32::Response>& response) {
+void OBCameraNode::setFanWorkModeCallback(const std::shared_ptr<SetInt32::Request>& request,
+                                          std::shared_ptr<SetInt32::Response>& response) {
   (void)response;
   bool fan_mode = request->data;
   try {
@@ -492,6 +506,57 @@ void OBCameraNode::getSDKVersion(const std::shared_ptr<GetString::Request>& requ
   } catch (...) {
     response->success = false;
     response->message = "unknown error";
+  }
+}
+
+void OBCameraNode::setMirrorCallback(const std::shared_ptr<SetBool::Request>& request,
+                                     std::shared_ptr<SetBool::Response>& response,
+                                     const stream_index_pair& stream_index) {
+  (void)request;
+  auto stream = stream_index.first;
+  try {
+    switch (stream) {
+      case OB_STREAM_IR:
+        device_->setBoolProperty(OB_PROP_IR_MIRROR_BOOL, request->data);
+        break;
+      case OB_STREAM_DEPTH:
+        device_->setBoolProperty(OB_PROP_DEPTH_MIRROR_BOOL, request->data);
+        break;
+      case OB_STREAM_COLOR:
+        device_->setBoolProperty(OB_PROP_COLOR_MIRROR_BOOL, request->data);
+        break;
+      default:
+        RCLCPP_ERROR(logger_, " %s NOT a video stream", __FUNCTION__);
+        break;
+    }
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->message = e.getMessage();
+    response->success = false;
+  } catch (const std::exception& e) {
+    response->message = e.what();
+    response->success = false;
+  } catch (...) {
+    response->message = "unknown error";
+    response->success = false;
+  }
+}
+
+void OBCameraNode::getLdpStatusCallback(const std::shared_ptr<GetBool::Request>& request,
+                                        std::shared_ptr<GetBool::Response>& response) {
+  (void)request;
+  try {
+    response->data = device_->getBoolProperty(OB_PROP_LDP_STATUS_BOOL);
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->message = e.getMessage();
+    response->success = false;
+  } catch (const std::exception& e) {
+    response->message = e.what();
+    response->success = false;
+  } catch (...) {
+    response->message = "unknown error";
+    response->success = false;
   }
 }
 

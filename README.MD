@@ -159,6 +159,7 @@ to `true` in the stream that corresponds to the argument of the launch file.
 - `/camera/get_device_info`
 - `/camera/get_ir_exposure`
 - `/camera/get_ir_gain`
+- `/camera/get_ldp_status`
 - `/camera/get_sdk_version`
 - `/camera/get_white_balance`
 - `/camera/set_auto_white_balance`

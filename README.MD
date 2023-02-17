@@ -168,7 +168,7 @@ to `true` in the stream that corresponds to the argument of the launch file.
 - `/camera/set_depth_auto_exposure`
 - `/camera/set_depth_exposure`
 - `/camera/set_depth_gain`
-- `/camera/set_fan_mode`
+- `/camera/set_fan_work_mode`
 - `/camera/set_floor_enable`
 - `/camera/set_ir_auto_exposure`
 - `/camera/set_ir_exposure`

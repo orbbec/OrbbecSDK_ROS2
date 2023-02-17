@@ -73,7 +73,7 @@ void OBCameraNode::setupCameraCtrlServices() {
         });
   }
   set_fan_mode_srv_ = node_->create_service<SetInt32>(
-      "set_fan_mode", [this](const std::shared_ptr<SetInt32::Request> request,
+      "set_fan_work_mode", [this](const std::shared_ptr<SetInt32::Request> request,
                              std::shared_ptr<SetInt32::Response> response) {
         setFanModeCallback(request, response);
       });

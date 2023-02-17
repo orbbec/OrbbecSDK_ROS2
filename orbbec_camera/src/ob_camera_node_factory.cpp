@@ -141,119 +141,119 @@ void OBCameraNodeFactory::queryDevice() {
   }
 }
 
-void OBCameraNodeFactory::startDevice(const std::shared_ptr<ob::DeviceList> &list) {
-  std::scoped_lock<decltype(device_lock_)> lock(device_lock_);
-  if (device_connected_) {
-    return;
+void OBCameraNodeFactory::releaseDeviceSemaphore(sem_t *device_sem, size_t &num_devices_connected) {
+  RCLCPP_INFO(logger_, "Release device semaphore");
+  sem_post(device_sem);
+  int sem_value = 0;
+  sem_getvalue(device_sem, &sem_value);
+  RCLCPP_INFO_STREAM(logger_, "semaphore value: " << sem_value);
+  RCLCPP_INFO_STREAM(logger_, "Release device semaphore done");
+  if (num_devices_connected >= device_num_) {
+    RCLCPP_INFO_STREAM(logger_, "All devices connected,  sem_unlink");
+    sem_destroy(device_sem);
+    sem_unlink(DEFAULT_SEM_NAME.c_str());
+    RCLCPP_INFO_STREAM(logger_, "All devices connected,  sem_unlink done..");
   }
-  if (list->deviceCount() == 0) {
-    RCLCPP_WARN(logger_, "No device found");
-    return;
-  }
-  if (device_) {
-    device_.reset();
-  }
-  size_t connected_device_num = 0;
-  sem_t *device_sem = nullptr;
-  std::shared_ptr<int> sem_guard(nullptr, [&](int const *) {
-    if (device_num_ > 1 && device_sem) {
-      RCLCPP_INFO(logger_, "Release device semaphore");
-      sem_post(device_sem);
-      int sem_value = 0;
-      sem_getvalue(device_sem, &sem_value);
-      RCLCPP_INFO_STREAM(logger_, "semaphore value: " << sem_value);
-      RCLCPP_INFO_STREAM(logger_, "Release device semaphore done");
-      if (connected_device_num >= device_num_) {
-        RCLCPP_INFO_STREAM(logger_, "All devices connected,  sem_unlink");
-        sem_destroy(device_sem);
-        sem_unlink(DEFAULT_SEM_NAME.c_str());
-        RCLCPP_INFO_STREAM(logger_, "All devices connected,  sem_unlink done..");
+}
+
+void OBCameraNodeFactory::updateConnectedDeviceCount(size_t &num_devices_connected) {
+  // write connected device count to file
+  int shm_id = shmget(DEFAULT_SEM_KEY, 1, 0666 | IPC_CREAT);
+  if (shm_id == -1) {
+    RCLCPP_INFO_STREAM(logger_, "Failed to create shared memory " << strerror(errno));
+  } else {
+    RCLCPP_INFO_STREAM(logger_, "Created shared memory");
+    auto shm_ptr = (int *)shmat(shm_id, nullptr, 0);
+    if (shm_ptr == (void *)-1) {
+      RCLCPP_INFO_STREAM(logger_, "Failed to attach shared memory " << strerror(errno));
+    } else {
+      RCLCPP_INFO_STREAM(logger_, "Attached shared memory");
+      num_devices_connected = *shm_ptr + 1;
+      RCLCPP_INFO_STREAM(logger_, "Current connected device " << num_devices_connected);
+      *shm_ptr = static_cast<int>(num_devices_connected);
+      RCLCPP_INFO_STREAM(logger_, "Wrote to shared memory");
+      shmdt(shm_ptr);
+      if (num_devices_connected >= device_num_) {
+        RCLCPP_INFO_STREAM(logger_, "All devices connected, removing shared memory");
+        shmctl(shm_id, IPC_RMID, nullptr);
       }
     }
-  });
+  }
+}
+
+std::shared_ptr<ob::Device> OBCameraNodeFactory::selectDevice(
+    const std::shared_ptr<ob::DeviceList> &list) {
   if (device_num_ == 1) {
     RCLCPP_INFO_STREAM(logger_, "Connecting to the default device");
-    device_ = list->getDevice(0);
-  } else {
-    std::string lower_sn;
-    std::transform(serial_number_.begin(), serial_number_.end(), std::back_inserter(lower_sn),
-                   [](auto ch) { return isalpha(ch) ? tolower(ch) : static_cast<int>(ch); });
-    device_sem = sem_open(DEFAULT_SEM_NAME.c_str(), O_CREAT, 0644, 1);
-    if (device_sem == SEM_FAILED) {
-      RCLCPP_INFO_STREAM(logger_, "Failed to open semaphore");
-      return;
-    }
-    int sem_value = 0;
-    sem_getvalue(device_sem, &sem_value);
-    RCLCPP_INFO_STREAM(logger_, "semaphore value: " << sem_value);
-    if (int ret = sem_wait(device_sem); ret != 0) {
-      RCLCPP_INFO_STREAM(logger_, "Failed to wait semaphore " << strerror(errno));
-      return;
-    }
+    return list->getDevice(0);
+  }
+  sem_t *device_sem = sem_open(DEFAULT_SEM_NAME.c_str(), O_CREAT, 0644, 1);
+  if (device_sem == SEM_FAILED) {
+    RCLCPP_INFO_STREAM(logger_, "Failed to open semaphore");
+    return nullptr;
+  }
+  size_t num_devices_connected = 0;
+  std::shared_ptr<int> sem_guard(nullptr, [&](int const *) {
+    releaseDeviceSemaphore(device_sem, num_devices_connected);
+    updateConnectedDeviceCount(num_devices_connected);
+  });
+  RCLCPP_INFO_STREAM(logger_, "Connecting to device with serial number: " << serial_number_);
+  int sem_value = 0;
+  sem_getvalue(device_sem, &sem_value);
+  RCLCPP_INFO_STREAM(logger_, "semaphore value: " << sem_value);
+  int ret = sem_wait(device_sem);
+  if (ret != 0) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to wait semaphore " << strerror(errno));
+    return nullptr;
+  }
+  auto device = selectDeviceBySerialNumber(list, serial_number_);
+  if (device == nullptr) {
+    RCLCPP_WARN(logger_, "Device with serial number %s not found", serial_number_.c_str());
+    device_connected_ = false;
+    return nullptr;
+  }
+  return device;
+}
 
-    for (size_t i = 0; i < list->deviceCount(); i++) {
-      try {
-        auto pid = list->pid(i);
-        if ((pid >= OPENNI_START_PID && pid <= OPENNI_END_PID) || pid == ASTRA_MINI_PID ||
-            pid == ASTRA_MINI_S_PID) {
-          // openNI device
-          auto dev = list->getDevice(i);
-          auto device_info = dev->getDeviceInfo();
-          if (device_info->serialNumber() == serial_number_) {
-            RCLCPP_INFO_STREAM(
-                logger_, "Device serial number " << device_info->serialNumber() << " matched");
-            device_ = dev;
-            break;
-          }
-        } else {
-          std::string sn = list->serialNumber(i);
-          RCLCPP_INFO_STREAM(logger_, "Device serial number: " << sn);
-          if (sn == serial_number_) {
-            RCLCPP_INFO_STREAM(logger_, "Device serial number <<" << sn << " matched");
-            auto dev = list->getDevice(i);
-            device_ = dev;
-            break;
-          }
+std::shared_ptr<ob::Device> OBCameraNodeFactory::selectDeviceBySerialNumber(
+    const std::shared_ptr<ob::DeviceList> &list, const std::string &serial_number) {
+  std::string lower_sn;
+  std::transform(serial_number.begin(), serial_number.end(), std::back_inserter(lower_sn),
+                 [](auto ch) { return isalpha(ch) ? tolower(ch) : static_cast<int>(ch); });
+  for (size_t i = 0; i < list->deviceCount(); i++) {
+    try {
+      auto pid = list->pid(i);
+      if ((pid >= OPENNI_START_PID && pid <= OPENNI_END_PID) || pid == ASTRA_MINI_PID ||
+          pid == ASTRA_MINI_S_PID) {
+        // openNI device
+        auto device = list->getDevice(i);
+        auto device_info = device->getDeviceInfo();
+        if (device_info->serialNumber() == serial_number) {
+          RCLCPP_INFO_STREAM(logger_,
+                             "Device serial number " << device_info->serialNumber() << " matched");
+          return device;
         }
-      } catch (ob::Error &e) {
-        RCLCPP_INFO_STREAM(logger_, "Failed to get device info " << e.getMessage());
-      } catch (std::exception &e) {
-        RCLCPP_INFO_STREAM(logger_, "Failed to get device info " << e.what());
-      } catch (...) {
-        RCLCPP_INFO_STREAM(logger_, "Failed to get device info");
-      }
-
-    }
-
-    if (device_ == nullptr) {
-      RCLCPP_WARN(logger_, "Device with serial number %s not found", serial_number_.c_str());
-      device_connected_ = false;
-      return;
-    } else {
-      // write connected device info to file
-      int shm_id = shmget(DEFAULT_SEM_KEY, 1, 0666 | IPC_CREAT);
-      if (shm_id == -1) {
-        RCLCPP_INFO_STREAM(logger_, "Failed to create shared memory " << strerror(errno));
       } else {
-        RCLCPP_INFO_STREAM(logger_, "Created shared memory");
-        auto shm_ptr = (int *)shmat(shm_id, nullptr, 0);
-        if (shm_ptr == (void *)-1) {
-          RCLCPP_INFO_STREAM(logger_, "Failed to attach shared memory " << strerror(errno));
-        } else {
-          RCLCPP_INFO_STREAM(logger_, "Attached shared memory");
-          connected_device_num = *shm_ptr + 1;
-          RCLCPP_INFO_STREAM(logger_, "Current connected device " << connected_device_num);
-          *shm_ptr = static_cast<int>(connected_device_num);
-          RCLCPP_INFO_STREAM(logger_, "Wrote to shared memory");
-          shmdt(shm_ptr);
-          if (connected_device_num >= device_num_) {
-            RCLCPP_INFO_STREAM(logger_, "All devices connected, removing shared memory");
-            shmctl(shm_id, IPC_RMID, nullptr);
-          }
+        std::string sn = list->serialNumber(i);
+        RCLCPP_INFO_STREAM(logger_, "Device serial number: " << sn);
+        if (sn == serial_number) {
+          RCLCPP_INFO_STREAM(logger_, "Device serial number <<" << sn << " matched");
+          return list->getDevice(i);
         }
       }
+    } catch (ob::Error &e) {
+      RCLCPP_INFO_STREAM(logger_, "Failed to get device info " << e.getMessage());
+    } catch (std::exception &e) {
+      RCLCPP_INFO_STREAM(logger_, "Failed to get device info " << e.what());
+    } catch (...) {
+      RCLCPP_INFO_STREAM(logger_, "Failed to get device info");
     }
   }
+  return nullptr;
+}
+
+void OBCameraNodeFactory::initializeDevice(const std::shared_ptr<ob::Device> &device) {
+  device_ = device;
   CHECK_NOTNULL(device_);
   CHECK_NOTNULL(device_.get());
   if (ob_camera_node_) {
@@ -270,5 +270,26 @@ void OBCameraNodeFactory::startDevice(const std::shared_ptr<ob::DeviceList> &lis
   RCLCPP_INFO_STREAM(logger_, "Hardware version: " << device_info_->hardwareVersion());
   RCLCPP_INFO_STREAM(logger_, "device type: " << ObDeviceTypeToString(device_info_->deviceType()));
   RCLCPP_INFO_STREAM(logger_, "device unique id: " << device_unique_id_);
+}
+
+void OBCameraNodeFactory::startDevice(const std::shared_ptr<ob::DeviceList> &list) {
+  std::scoped_lock<decltype(device_lock_)> lock(device_lock_);
+  if (device_connected_) {
+    return;
+  }
+  if (list->deviceCount() == 0) {
+    RCLCPP_WARN(logger_, "No device found");
+    return;
+  }
+  if (device_) {
+    device_.reset();
+  }
+  auto device = selectDevice(list);
+  if (device == nullptr) {
+    RCLCPP_WARN(logger_, "Device with serial number %s not found", serial_number_.c_str());
+    device_connected_ = false;
+    return;
+  }
+  initializeDevice(device);
 }
 }  // namespace orbbec_camera

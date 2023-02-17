@@ -14,6 +14,7 @@
 #include <thread>
 
 #include <rclcpp/rclcpp.hpp>
+#include <semaphore.h>
 #include "ob_camera_node.h"
 #include "utils.h"
 #include "dynamic_params.h"
@@ -30,6 +31,17 @@ class OBCameraNodeFactory : public rclcpp::Node {
 
  private:
   void init();
+
+  void releaseDeviceSemaphore(sem_t* device_sem, size_t& num_devices_connected);
+
+  void updateConnectedDeviceCount(size_t& num_devices_connected);
+
+  std::shared_ptr<ob::Device> selectDevice(const std::shared_ptr<ob::DeviceList>& list);
+
+  std::shared_ptr<ob::Device> selectDeviceBySerialNumber(
+      const std::shared_ptr<ob::DeviceList>& list, const std::string& serial_number);
+
+  void initializeDevice(const std::shared_ptr<ob::Device>& device);
 
   void startDevice(const std::shared_ptr<ob::DeviceList>& list);
 

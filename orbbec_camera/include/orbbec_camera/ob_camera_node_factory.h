@@ -22,6 +22,15 @@
 #include "libobsensor/ObSensor.hpp"
 
 namespace orbbec_camera {
+
+enum DeviceConnectionEvent {
+  kDeviceConnected = 0,
+  kDeviceDisconnected,
+  kOtherDeviceConnected,
+  kOtherDeviceDisconnected,
+  kOtherDeviceCountUpdate,
+};
+
 class OBCameraNodeFactory : public rclcpp::Node {
  public:
   explicit OBCameraNodeFactory(const rclcpp::NodeOptions& node_options = rclcpp::NodeOptions());
@@ -32,9 +41,10 @@ class OBCameraNodeFactory : public rclcpp::Node {
  private:
   void init();
 
-  void releaseDeviceSemaphore(sem_t* device_sem, size_t& num_devices_connected);
+  void releaseDeviceSemaphore(sem_t* device_sem, int& num_devices_connected);
 
-  void updateConnectedDeviceCount(size_t& num_devices_connected);
+  void updateConnectedDeviceCount(int& num_devices_connected,
+                                  DeviceConnectionEvent connection_event);
 
   std::shared_ptr<ob::Device> selectDevice(const std::shared_ptr<ob::DeviceList>& list);
 
@@ -55,6 +65,9 @@ class OBCameraNodeFactory : public rclcpp::Node {
 
   void queryDevice();
 
+  void getConnectedDeviceCountCallback(const std::shared_ptr<GetInt32::Request> request,
+                                       std::shared_ptr<GetInt32::Response> response);
+
  private:
   std::unique_ptr<ob::Context> ctx_ = nullptr;
   rclcpp::Logger logger_;
@@ -68,7 +81,9 @@ class OBCameraNodeFactory : public rclcpp::Node {
   std::shared_ptr<Parameters> parameters_ = nullptr;
   std::shared_ptr<std::thread> query_thread_ = nullptr;
   std::recursive_mutex device_lock_;
-  size_t device_num_ = 1;
+  int device_num_ = 1;
+  int num_devices_connected_ = 0;
   rclcpp::TimerBase::SharedPtr check_connect_timer_ = nullptr;
+  rclcpp::Service<GetInt32>::SharedPtr get_connected_device_count_srv_ = nullptr;
 };
 }  // namespace orbbec_camera

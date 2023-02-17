@@ -203,34 +203,40 @@ ros2 run orbbec_camera list_devices_node
 - Set the `device_num` parameter to the number of cameras you have.
 - Go to the `OrbbecSDK_ROS2/launch/multi_xxx.launch.xml` file and change the serial number. Currently,
   different cameras can only be differentiated by their serial number.
+- Don't forget to put the `include` tag inside the `group` tag. 
+Otherwise, the parameter values of different cameras may become contaminated.
+
 
 ```xml
 
 <launch>
-    <!-- Unique camera name -->
-    <arg name="camera_name" default="camera"/>
-    <!-- Hardware depth registration -->
-    <arg name="3d_sensor" default="astra"/>
-    <!-- Stereo_s_u3, astrapro, astra -->
-    <arg name="camera1_prefix" default="01"/>
-    <arg name="camera2_prefix" default="02"/>
-    <arg name="camera1_serial_number" default="ADA611300CE"/>
-    <arg name="camera2_serial_number" default="sn123456789"/>
-    <arg name="device_num" default="2"/>
-    <node name="camera" pkg="orbbec_camera" type="ob_cleanup_shm_node" output="screen"/>
-    <include file="$(find-pkg-share orbbec_camera)/launch/$(arg 3d_sensor).launch.xml">
-        <arg name="camera_name" value="$(var camera_name)_$(var camera1_prefix)"/>
-        <arg name="serial_number" value="$(var camera1_serial_number)"/>
-        <arg name="device_num" value="$(var device_num)"/>
+  <!-- unique camera name-->
+  <arg name="camera_name" default="camera"/>
+  <!-- Hardware depth registration -->
+  <arg name="3d_sensor" default="astra_mini"/>
+  <!-- stereo_s_u3, astrapro, astra -->
+  <arg name="camera1_prefix" default="01"/>
+  <arg name="camera2_prefix" default="02"/>
+  <arg name="camera1_serila_number" default="AY3JB20003C"/>
+  <arg name="camera2_serila_number" default="CH26420001B"/>
+  <arg name="device_num" default="2"/>
+  <node name="camera" pkg="orbbec_camera" exec="ob_cleanup_shm_node" output="screen"/>
+  <group>
+    <include file="$(find-pkg-share orbbec_camera)/launch/gemini2.launch.xml">
+      <arg name="camera_name" value="camera_$(var camera1_prefix)"/>
+      <arg name="serial_number" value="$(var camera1_serila_number)"/>
+      <arg name="device_num" value="$(var device_num)"/>
     </include>
-
-    <include file="$(find-pkg-share orbbec_camera)/launch/$(var 3d_sensor).launch.xml">
-        <arg name="camera_name" value="$(var camera_name)_$(var camera2_prefix)"/>
-        <arg name="serial_number" value="$(var camera2_serial_number)"/>
-        <arg name="device_num" value="$(var device_num)"/>
+  </group>
+  <group>
+    <include file="$(find-pkg-share orbbec_camera)/launch/dabai_dcw.launch.xml">
+      <arg name="camera_name" value="camera_$(var camera2_prefix)"/>
+      <arg name="serial_number" value="$(var camera2_serila_number)"/>
+      <arg name="device_num" value="$(var device_num)"/>
     </include>
-    <node pkg="tf2_ros" exec="static_transform_publisher" name="camera_tf"
-          args="0 0 0 0 0 0 camera01_link camera02_link"/>
+  </group>
+  <node pkg="tf2_ros" exec="static_transform_publisher" name="camera_tf"
+        args="0 0 0 0 0 0 camera01_link camera02_link"/>
 </launch>
 
 ```

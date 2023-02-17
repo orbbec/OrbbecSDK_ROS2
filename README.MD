@@ -39,7 +39,7 @@ ros-galactic-image-transport ros-galactic-image-publisher
 
 Install udev rules.
 
-```bash 
+```bash
 cd `~/ros2_ws/src/OrbbecSDK_ROS2/orbbec_camera/scripts`
 sudo bash install.sh
 sudo udevadm control --reload-rules && sudo udevadm trigger
@@ -55,14 +55,14 @@ colcon build --event-handlers  console_direct+  --cmake-args  -DCMAKE_BUILD_TYPE
 
 Launch camera node
 
-* On terminal 1
+- On terminal 1
 
-```bash 
+```bash
 . ./install/setup.bash 
 ros2 launch orbbec_camera astra.launch.xml
 ```
 
-* On terminal 2
+- On terminal 2
 
 ```bash
 . ./install/setup.bash 
@@ -71,7 +71,7 @@ rviz2
 
 Select the topic you want to display
 
-* List topics / services/ parameters ( on terminal 3)
+- List topics / services/ parameters ( on terminal 3)
 
 ```bash
 ros2 topic list
@@ -79,80 +79,128 @@ ros2 service list
 ros2 param list
 ```
 
-* Show depth to color extrinsic
+- Show depth to color extrinsic
 
 ```bash
 ros2 topic echo --qos-durability=transient_local /camera/extrinsic/depth_to_color  --qos-profile=services_default
 ```
 
-* Get device info
+- Get device info
 
-```bash 
+```bash
 ros2 service call /camera/get_device_info orbbec_camera_msgs/srv/GetDeviceInfo '{}'
 ```
 
-* Get SDK version
+- Get SDK version
 
 ```bash
 ros2 service call /camera/get_sdk_version orbbec_camera_msgs/srv/GetString '{}'
 
 ```
 
-* Get exposure
+- Get exposure
 
 ```bash
 ros2 service call /camera/get_color_exposure orbbec_camera_msgs/srv/GetInt32 '{}'
 ```
 
-> If your check `ir` or `depth`, please change ` /camera/get_color_exposure`
+> If your check `ir` or `depth`, please change `/camera/get_color_exposure`
 > to  `/camera/get_ir_exposure` or `/camera/get_depth_exposure`, Same below.
 
-* Get gain
+- Get gain
 
 ```bash
 ros2 service call /camera/get_color_gain orbbec_camera_msgs/srv/GetInt32 '{}'
 ```
 
-* Get white balance
+- Get white balance
 
 ```bash
 ros2 service call /camera/get_white_balance orbbec_camera_msgs/srv/GetInt32 '{}'
 ```
 
-* Set auto exposure
+- Set auto exposure
 
 ```bash
 ros2 service call /camera/set_color_auto_exposure std_srvs/srv/SetBool '{data: false}'
 ```
 
-* Set white balance
+- Set white balance
 
 ```bash
 ros2 service call /camera/set_white_balance orbbec_camera_msgs/srv/SetInt32 '{data: 4600}'
 ```
 
-* Set laser enable
+- Set laser enable
 
 ```bash
 ros2 service call  /camera/set_laser_enable std_srvs/srv/SetBool "{data: true}" 
-* ```
+```
 
-* toggle sensor
+- toggle sensor
 
 ```bash
-ros2 service call  /camera/toggle_ir std_srvs/srv/SetBool "{data : true}"
-* ```
+ros2 service call /camera/toggle_ir std_srvs/srv/SetBool "{data : true}"
+
+```
+
+### All available service for camera control
+
+The name of the following service already expresses its function.
+However, it should be noted that the corresponding `set_[ir|depth|color]*`
+and `get[ir|depth|color]*` **services are only available if you set** `enable[ir|depth|color]`
+to `true` in the stream that corresponds to the argument of the launch file.
+
+- `/camera/get_auto_white_balance`
+- `/camera/get_color_exposure`
+- `/camera/get_color_gain`
+- `/camera/get_depth_exposure`
+- `/camera/get_depth_gain`
+- `/camera/get_device_info`
+- `/camera/get_ir_exposure`
+- `/camera/get_ir_gain`
+- `/camera/get_sdk_version`
+- `/camera/get_white_balance`
+- `/camera/set_auto_white_balance`
+- `/camera/set_color_auto_exposure`
+- `/camera/set_color_exposure`
+- `/camera/set_color_gain`
+- `/camera/set_depth_auto_exposure`
+- `/camera/set_depth_exposure`
+- `/camera/set_depth_gain`
+- `/camera/set_fan_mode`
+- `/camera/set_floor_enable`
+- `/camera/set_ir_auto_exposure`
+- `/camera/set_ir_exposure`
+- `/camera/set_ir_gain`
+- `/camera/set_laser_enable`
+- `/camera/set_ldp_enable`
+- `/camera/set_white_balance`
+- `/camera/toggle_color`
+- `/camera/toggle_depth`
+- `/camera/toggle_ir`
+
+### All available topics
+
+- `/camera/color/camera_info` : The color camera info.
+- `/camera/color/image_raw`: The color stream image.
+- `/camera/depth/camera_info`: The depth stream image.
+- `/camera/depth/image_raw`: The depth stream image
+- `/camera/depth/points` : The point cloud,  only available when  `enable_point_cloud` is `true`.
+- `/camera/depth_registered/points`: The colored point cloud,  only available when  `enable_colored_point_cloud` is `true`.
+- `/camera/ir/camera_info`:  The IR camera info.
+- `/camera/ir/image_raw`: The IR stream image
 
 ### Multi-Camera
 
-* To get the serial number of the camera, plug in the camera and run the following command in the terminal:
+- To get the serial number of the camera, plug in the camera and run the following command in the terminal:
 
 ```bash
 ros2 run orbbec_camera list_devices_node
 ```
 
-* Set the `device_num` parameter to the number of cameras you have.
-* Go to the `OrbbecSDK_ROS2/launch/multi_xxx.launch.xml` file and change the serial number. Currently,
+- Set the `device_num` parameter to the number of cameras you have.
+- Go to the `OrbbecSDK_ROS2/launch/multi_xxx.launch.xml` file and change the serial number. Currently,
   different cameras can only be differentiated by their serial number.
 
 ```xml
@@ -186,7 +234,7 @@ ros2 run orbbec_camera list_devices_node
 
 ```
 
-* Note that the astra camera uses semaphores for process synchronization.
+- Note that the astra camera uses semaphores for process synchronization.
   If the camera start fails, the semaphore file may be left in `/dev/shm`,
   causing the next start to become stuck. To avoid this, run the following command before launching:
 
@@ -196,7 +244,7 @@ ros2 run orbbec_camera ob_cleanup_shm_node
 
 This will clean up `/dev/shm/`.
 
-* To launch the cameras, run the following command:
+- To launch the cameras, run the following command:
 
 ```bash
 ros2 launch orbbec_camera multi_camera.launch.xml

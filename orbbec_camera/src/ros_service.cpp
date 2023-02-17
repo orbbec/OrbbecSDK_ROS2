@@ -21,6 +21,9 @@ namespace orbbec_camera {
 void OBCameraNode::setupCameraCtrlServices() {
   using std_srvs::srv::SetBool;
   for (auto stream_index : IMAGE_STREAMS) {
+    if (!enable_stream_[stream_index]) {
+      continue;
+    }
     auto stream_name = stream_name_[stream_index];
     std::string service_name = "get_" + stream_name + "_exposure";
     get_exposure_srv_[stream_index] = node_->create_service<GetInt32>(

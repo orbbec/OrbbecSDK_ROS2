@@ -216,7 +216,7 @@ void OBCameraNode::getParameters() {
     param_name = stream_name_[stream_index] + "_fps";
     setAndGetNodeParameter(fps_[stream_index], param_name, IMAGE_FPS);
     param_name = "enable_" + stream_name_[stream_index];
-    setAndGetNodeParameter(enable_stream_[stream_index], param_name, true);
+    setAndGetNodeParameter(enable_stream_[stream_index], param_name, false);
     param_name = stream_name_[stream_index] + "_frame_id";
     std::string default_frame_id = "camera_" + stream_name_[stream_index] + "_frame";
     setAndGetNodeParameter(frame_id_[stream_index], param_name, default_frame_id);
@@ -303,6 +303,9 @@ void OBCameraNode::setupPublishers() {
                                     point_cloud_qos_profile));
   }
   for (const auto& stream_index : IMAGE_STREAMS) {
+    if (!enable_stream_[stream_index]) {
+      continue;
+    }
     std::string name = stream_name_[stream_index];
     std::string topic = name + "/image_raw";
     auto image_qos = image_qos_[stream_index];

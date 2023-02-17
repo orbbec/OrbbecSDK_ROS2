@@ -11,7 +11,6 @@
     <arg name="device_num" default="2"/>
     <node name="camera" pkg="orbbec_camera" exec="ob_cleanup_shm_node" output="screen"/>
     <group>
-        <push-ros-namespace namespace="camera_$(var camera1_prefix)"/>
         <include file="$(find-pkg-share orbbec_camera)/launch/gemini2.launch.xml">
             <arg name="camera_name" value="camera_$(var camera1_prefix)"/>
             <arg name="serial_number" value="$(var camera1_serila_number)"/>
@@ -19,14 +18,12 @@
         </include>
     </group>
     <group>
-        <push-ros-namespace namespace="camera_$(var camera2_prefix)"/>
         <include file="$(find-pkg-share orbbec_camera)/launch/dabai_dcw.launch.xml">
             <arg name="camera_name" value="camera_$(var camera2_prefix)"/>
             <arg name="serial_number" value="$(var camera2_serila_number)"/>
             <arg name="device_num" value="$(var device_num)"/>
         </include>
     </group>
-
     <node pkg="tf2_ros" exec="static_transform_publisher" name="camera_tf"
           args="0 0 0 0 0 0 camera01_link camera02_link"/>
 </launch>

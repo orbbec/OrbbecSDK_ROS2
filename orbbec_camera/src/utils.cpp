@@ -55,9 +55,13 @@ sensor_msgs::msg::CameraInfo convertToCameraInfo(OBCameraIntrinsic intrinsic,
   return info;
 }
 
-void saveRGBPointsToPly(std::shared_ptr<ob::Frame> frame, std::string fileName) {
+void saveRGBPointsToPly(const std::shared_ptr<ob::Frame> &frame, const std::string &fileName) {
   size_t point_size = frame->dataSize() / sizeof(OBColorPoint);
   FILE *fp = fopen(fileName.c_str(), "wb+");
+  std::shared_ptr<int> fp_guard(nullptr, [&fp](int *) {
+    fflush(fp);
+    fclose(fp);
+  });
   fprintf(fp, "ply\n");
   fprintf(fp, "format ascii 1.0\n");
   fprintf(fp, "element vertex %zu\n", point_size);
@@ -69,20 +73,21 @@ void saveRGBPointsToPly(std::shared_ptr<ob::Frame> frame, std::string fileName) 
   fprintf(fp, "property uchar blue\n");
   fprintf(fp, "end_header\n");
 
-  auto *point = (OBColorPoint *)frame->data();
+  const auto *points = (OBColorPoint *)frame->data();
+  CHECK_NOTNULL(points);
   for (size_t i = 0; i < point_size; i++) {
-    fprintf(fp, "%.3f %.3f %.3f %d %d %d\n", point->x, point->y, point->z, (int)point->r,
-            (int)point->g, (int)point->b);
-    point++;
+    fprintf(fp, "%.3f %.3f %.3f %d %d %d\n", points[i].x, points[i].y, points[i].z,
+            (int)points[i].r, (int)points[i].g, (int)points[i].b);
   }
-
-  fflush(fp);
-  fclose(fp);
 }
 
-void savePointsToPly(std::shared_ptr<ob::Frame> frame, std::string fileName) {
+void savePointsToPly(const std::shared_ptr<ob::Frame> &frame, const std::string &fileName) {
   size_t point_size = frame->dataSize() / sizeof(OBPoint);
   FILE *fp = fopen(fileName.c_str(), "wb+");
+  std::shared_ptr<int> fp_guard(nullptr, [&fp](int *) {
+    fflush(fp);
+    fclose(fp);
+  });
   fprintf(fp, "ply\n");
   fprintf(fp, "format ascii 1.0\n");
   fprintf(fp, "element vertex %zu\n", point_size);
@@ -91,14 +96,11 @@ void savePointsToPly(std::shared_ptr<ob::Frame> frame, std::string fileName) {
   fprintf(fp, "property float z\n");
   fprintf(fp, "end_header\n");
 
-  auto *points = (OBPoint *)frame->data();
+  const auto *points = (OBPoint *)frame->data();
+  CHECK_NOTNULL(points);
   for (size_t i = 0; i < point_size; i++) {
-    fprintf(fp, "%.3f %.3f %.3f\n", points->x, points->y, points->z);
-    points++;
+    fprintf(fp, "%.3f %.3f %.3f\n", points[i].x, points[i].y, points[i].z);
   }
-
-  fflush(fp);
-  fclose(fp);
 }
 
 tf2::Quaternion rotationMatrixToQuaternion(const float rotation[9]) {

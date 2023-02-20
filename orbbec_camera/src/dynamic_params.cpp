@@ -41,6 +41,8 @@ Parameters::~Parameters() noexcept {
     try {
       node_->undeclare_parameter(param.first);
     } catch (const rclcpp::exceptions::InvalidParameterTypeException &e) {
+      // ignore
+    } catch (const std::exception &e) {
       RCLCPP_ERROR_STREAM(logger_, e.what());
     }
   }

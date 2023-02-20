@@ -27,9 +27,9 @@ namespace orbbec_camera {
 sensor_msgs::msg::CameraInfo convertToCameraInfo(OBCameraIntrinsic intrinsic,
                                                  OBCameraDistortion distortion, int width);
 
-void saveRGBPointsToPly(std::shared_ptr<ob::Frame> frame, std::string fileName);
+void saveRGBPointsToPly(const std::shared_ptr<ob::Frame>& frame, const std::string& fileName);
 
-void savePointsToPly(std::shared_ptr<ob::Frame> frame, std::string fileName);
+void savePointsToPly(const std::shared_ptr<ob::Frame>& frame, const std::string& fileName);
 
 tf2::Quaternion rotationMatrixToQuaternion(const float rotation[9]);
 

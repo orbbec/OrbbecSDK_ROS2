@@ -59,6 +59,7 @@ set(ORBBEC_LIBS ${CMAKE_CURRENT_SOURCE_DIR}/SDK/lib/${HOST_PLATFORM})
 set(ORBBEC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/SDK/include/)
 
 add_library(${PROJECT_NAME} SHARED
+  src/d2c_viewer.cpp
   src/dynamic_params.cpp
   src/ob_camera_node_driver.cpp
   src/ob_camera_node.cpp

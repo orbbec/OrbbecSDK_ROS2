@@ -37,6 +37,11 @@ OBCameraNode::OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> devic
   setupDefaultImageFormat();
   setupTopics();
   startStreams();
+  if (enable_d2c_viewer_) {
+    auto rgb_qos = getRMWQosProfileFromString(image_qos_[COLOR]);
+    auto depth_qos = getRMWQosProfileFromString(image_qos_[DEPTH]);
+    d2c_viewer_ = std::make_unique<D2CViewer>(node_, rgb_qos, depth_qos);
+  }
 }
 
 template <class T>
@@ -252,6 +257,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter(enable_point_cloud_, "enable_point_cloud", true);
   setAndGetNodeParameter<std::string>(point_cloud_qos_, "point_cloud_qos", "default");
   setAndGetNodeParameter(enable_publish_extrinsic_, "enable_publish_extrinsic", false);
+  setAndGetNodeParameter(enable_d2c_viewer_, "enable_d2c_viewer", false);
   if (enable_colored_point_cloud_) {
     depth_registration_ = true;
   }

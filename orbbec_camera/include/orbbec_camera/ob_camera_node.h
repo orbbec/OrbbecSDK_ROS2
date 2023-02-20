@@ -48,6 +48,7 @@
 
 #include "orbbec_camera/constants.h"
 #include "orbbec_camera/dynamic_params.h"
+#include "orbbec_camera/d2c_viewer.h"
 #include "magic_enum/magic_enum.hpp"
 
 #define STREAM_NAME(sip)                                                                       \
@@ -315,5 +316,7 @@ class OBCameraNode {
   std::string color_info_url_;
   std::string ir_info_url_;
   std::optional<OBCameraParam> camera_param_;
+  bool enable_d2c_viewer_ = false;
+  std::unique_ptr<D2CViewer> d2c_viewer_ = nullptr;
 };
 }  // namespace orbbec_camera

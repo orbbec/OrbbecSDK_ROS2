@@ -222,6 +222,7 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDevice(
   int ret = sem_wait(device_sem);
   if (ret != 0) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to wait semaphore " << strerror(errno));
+    releaseDeviceSemaphore(device_sem, num_devices_connected_);
     return nullptr;
   }
   auto device = selectDeviceBySerialNumber(list, serial_number_);

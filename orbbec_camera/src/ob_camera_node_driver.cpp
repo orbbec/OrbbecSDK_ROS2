@@ -10,40 +10,43 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include "orbbec_camera/ob_camera_node_factory.h"
+#include "orbbec_camera/ob_camera_node_driver.h"
 #include <fcntl.h>
 #include <unistd.h>
 #include <semaphore.h>
 #include <sys/shm.h>
 
 namespace orbbec_camera {
-OBCameraNodeFactory::OBCameraNodeFactory(const rclcpp::NodeOptions &node_options)
+OBCameraNodeDriver::OBCameraNodeDriver(const rclcpp::NodeOptions &node_options)
     : Node("orbbec_camera_node", "/", node_options),
       ctx_(std::make_unique<ob::Context>()),
       logger_(this->get_logger()) {
   init();
 }
 
-OBCameraNodeFactory::OBCameraNodeFactory(const std::string &node_name, const std::string &ns,
-                                         const rclcpp::NodeOptions &node_options)
+OBCameraNodeDriver::OBCameraNodeDriver(const std::string &node_name, const std::string &ns,
+                                       const rclcpp::NodeOptions &node_options)
     : Node(node_name, ns, node_options),
       ctx_(std::make_unique<ob::Context>()),
       logger_(this->get_logger()) {
   init();
 }
 
-OBCameraNodeFactory::~OBCameraNodeFactory() {
+OBCameraNodeDriver::~OBCameraNodeDriver() {
   is_alive_.store(false);
   sem_unlink(DEFAULT_SEM_NAME.c_str());
   if (int shm_id = shmget(DEFAULT_SEM_KEY, 1, 0666 | IPC_CREAT); shm_id != -1) {
     shmctl(shm_id, IPC_RMID, nullptr);
+  }
+  if (device_count_update_thread_ && device_count_update_thread_->joinable()) {
+    device_count_update_thread_->join();
   }
   if (query_thread_ && query_thread_->joinable()) {
     query_thread_->join();
   }
 }
 
-void OBCameraNodeFactory::init() {
+void OBCameraNodeDriver::init() {
   auto log_level_str = declare_parameter<std::string>("log_level", "none");
   auto log_level = obLogSeverityFromString(log_level_str);
   ob::Context::setLoggerSeverity(log_level);
@@ -59,18 +62,12 @@ void OBCameraNodeFactory::init() {
   check_connect_timer_ =
       this->create_wall_timer(std::chrono::milliseconds(1000), [this]() { checkConnectTimer(); });
   CHECK_NOTNULL(check_connect_timer_);
-  get_connected_device_count_srv_ = this->create_service<GetInt32>(
-      "get_connected_device_count", [this](const std::shared_ptr<rmw_request_id_t> request_header,
-                                           const std::shared_ptr<GetInt32::Request> request,
-                                           const std::shared_ptr<GetInt32::Response> response) {
-        (void)request_header;
-        (void)request;
-        response->data = num_devices_connected_;
-      });
   query_thread_ = std::make_shared<std::thread>([this]() { queryDevice(); });
+  device_count_update_thread_ = std::make_shared<std::thread>([this]() { deviceCountUpdate(); });
+  CHECK_NOTNULL(device_count_update_thread_);
 }
 
-void OBCameraNodeFactory::onDeviceConnected(const std::shared_ptr<ob::DeviceList> &device_list) {
+void OBCameraNodeDriver::onDeviceConnected(const std::shared_ptr<ob::DeviceList> &device_list) {
   CHECK_NOTNULL(device_list);
   if (device_list->deviceCount() == 0) {
     return;
@@ -89,7 +86,7 @@ void OBCameraNodeFactory::onDeviceConnected(const std::shared_ptr<ob::DeviceList
   }
 }
 
-void OBCameraNodeFactory::onDeviceDisconnected(const std::shared_ptr<ob::DeviceList> &device_list) {
+void OBCameraNodeDriver::onDeviceDisconnected(const std::shared_ptr<ob::DeviceList> &device_list) {
   CHECK_NOTNULL(device_list);
   if (device_list->deviceCount() == 0) {
     return;
@@ -115,7 +112,7 @@ void OBCameraNodeFactory::onDeviceDisconnected(const std::shared_ptr<ob::DeviceL
   updateConnectedDeviceCount(num_devices_connected_, connect_event);
 }
 
-OBLogSeverity OBCameraNodeFactory::obLogSeverityFromString(const std::string_view &log_level) {
+OBLogSeverity OBCameraNodeDriver::obLogSeverityFromString(const std::string_view &log_level) {
   if (log_level == "debug") {
     return OBLogSeverity::OB_LOG_SEVERITY_DEBUG;
   } else if (log_level == "info") {
@@ -131,7 +128,7 @@ OBLogSeverity OBCameraNodeFactory::obLogSeverityFromString(const std::string_vie
   }
 }
 
-void OBCameraNodeFactory::checkConnectTimer() const {
+void OBCameraNodeDriver::checkConnectTimer() const {
   if (!device_connected_.load()) {
     RCLCPP_ERROR_STREAM(logger_,
                         "checkConnectTimer: device " << serial_number_ << " not connected");
@@ -139,7 +136,7 @@ void OBCameraNodeFactory::checkConnectTimer() const {
   }
 }
 
-void OBCameraNodeFactory::queryDevice() {
+void OBCameraNodeDriver::queryDevice() {
   while (is_alive_ && rclcpp::ok()) {
     if (!device_connected_.load()) {
       RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 1000, "Waiting for device connection...");
@@ -150,14 +147,19 @@ void OBCameraNodeFactory::queryDevice() {
       }
       onDeviceConnected(device_list);
     } else {
-      updateConnectedDeviceCount(num_devices_connected_,
-                                 DeviceConnectionEvent::kOtherDeviceCountUpdate);
       std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
   }
 }
 
-void OBCameraNodeFactory::releaseDeviceSemaphore(sem_t *device_sem, int &num_devices_connected) {
+void OBCameraNodeDriver::deviceCountUpdate() {
+  while (is_alive_ && rclcpp::ok()) {
+    updateConnectedDeviceCount(num_devices_connected_, DeviceConnectionEvent::kDeviceCountUpdate);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  }
+}
+
+void OBCameraNodeDriver::releaseDeviceSemaphore(sem_t *device_sem, int &num_devices_connected) {
   RCLCPP_INFO_THROTTLE(logger_, *get_clock(), 1000, "Release device semaphore");
   sem_post(device_sem);
   int sem_value = 0;
@@ -170,8 +172,8 @@ void OBCameraNodeFactory::releaseDeviceSemaphore(sem_t *device_sem, int &num_dev
   }
 }
 
-void OBCameraNodeFactory::updateConnectedDeviceCount(int &num_devices_connected,
-                                                     DeviceConnectionEvent connection_event) {
+void OBCameraNodeDriver::updateConnectedDeviceCount(int &num_devices_connected,
+                                                    DeviceConnectionEvent connection_event) {
   // write connected device count to file
   int shm_id = shmget(DEFAULT_SEM_KEY, 1, 0666 | IPC_CREAT);
   if (shm_id == -1) {
@@ -191,7 +193,7 @@ void OBCameraNodeFactory::updateConnectedDeviceCount(int &num_devices_connected,
     num_devices_connected = *shm_ptr;
   }
   RCLCPP_DEBUG_STREAM_THROTTLE(logger_, *get_clock(), 5000,
-                              "Current connected device " << num_devices_connected);
+                               "Current connected device " << num_devices_connected);
   *shm_ptr = static_cast<int>(num_devices_connected);
   shmdt(shm_ptr);
   if (connection_event == DeviceConnectionEvent::kDeviceDisconnected &&
@@ -201,7 +203,7 @@ void OBCameraNodeFactory::updateConnectedDeviceCount(int &num_devices_connected,
   }
 }
 
-std::shared_ptr<ob::Device> OBCameraNodeFactory::selectDevice(
+std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDevice(
     const std::shared_ptr<ob::DeviceList> &list) {
   if (device_num_ == 1) {
     RCLCPP_INFO_STREAM(logger_, "Connecting to the default device");
@@ -239,7 +241,7 @@ std::shared_ptr<ob::Device> OBCameraNodeFactory::selectDevice(
   return device;
 }
 
-std::shared_ptr<ob::Device> OBCameraNodeFactory::selectDeviceBySerialNumber(
+std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceBySerialNumber(
     const std::shared_ptr<ob::DeviceList> &list, const std::string &serial_number) {
   std::string lower_sn;
   std::transform(serial_number.begin(), serial_number.end(), std::back_inserter(lower_sn),
@@ -277,7 +279,7 @@ std::shared_ptr<ob::Device> OBCameraNodeFactory::selectDeviceBySerialNumber(
   return nullptr;
 }
 
-void OBCameraNodeFactory::initializeDevice(const std::shared_ptr<ob::Device> &device) {
+void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &device) {
   device_ = device;
   CHECK_NOTNULL(device_);
   CHECK_NOTNULL(device_.get());
@@ -297,7 +299,7 @@ void OBCameraNodeFactory::initializeDevice(const std::shared_ptr<ob::Device> &de
   RCLCPP_INFO_STREAM(logger_, "device unique id: " << device_unique_id_);
 }
 
-void OBCameraNodeFactory::startDevice(const std::shared_ptr<ob::DeviceList> &list) {
+void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list) {
   std::scoped_lock<decltype(device_lock_)> lock(device_lock_);
   if (device_connected_) {
     return;

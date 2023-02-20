@@ -1,6 +1,6 @@
 #include <rclcpp/rclcpp.hpp>
 
-#include <orbbec_camera/ob_camera_node_factory.h>
+#include <orbbec_camera/ob_camera_node_driver.h>
 
 int main() {
   auto context = std::make_unique<ob::Context>();

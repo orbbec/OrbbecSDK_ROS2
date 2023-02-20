@@ -28,15 +28,15 @@ enum DeviceConnectionEvent {
   kDeviceDisconnected,
   kOtherDeviceConnected,
   kOtherDeviceDisconnected,
-  kOtherDeviceCountUpdate,
+  kDeviceCountUpdate,
 };
 
-class OBCameraNodeFactory : public rclcpp::Node {
+class OBCameraNodeDriver : public rclcpp::Node {
  public:
-  explicit OBCameraNodeFactory(const rclcpp::NodeOptions& node_options = rclcpp::NodeOptions());
-  OBCameraNodeFactory(const std::string& node_name, const std::string& ns,
-                      const rclcpp::NodeOptions& node_options = rclcpp::NodeOptions());
-  ~OBCameraNodeFactory() override;
+  explicit OBCameraNodeDriver(const rclcpp::NodeOptions& node_options = rclcpp::NodeOptions());
+  OBCameraNodeDriver(const std::string& node_name, const std::string& ns,
+                     const rclcpp::NodeOptions& node_options = rclcpp::NodeOptions());
+  ~OBCameraNodeDriver() override;
 
  private:
   void init();
@@ -65,8 +65,7 @@ class OBCameraNodeFactory : public rclcpp::Node {
 
   void queryDevice();
 
-  void getConnectedDeviceCountCallback(const std::shared_ptr<GetInt32::Request> request,
-                                       std::shared_ptr<GetInt32::Response> response);
+  void deviceCountUpdate();
 
  private:
   std::unique_ptr<ob::Context> ctx_ = nullptr;
@@ -80,10 +79,10 @@ class OBCameraNodeFactory : public rclcpp::Node {
   std::string device_unique_id_;
   std::shared_ptr<Parameters> parameters_ = nullptr;
   std::shared_ptr<std::thread> query_thread_ = nullptr;
+  std::shared_ptr<std::thread> device_count_update_thread_ = nullptr;
   std::recursive_mutex device_lock_;
   int device_num_ = 1;
   int num_devices_connected_ = 0;
   rclcpp::TimerBase::SharedPtr check_connect_timer_ = nullptr;
-  rclcpp::Service<GetInt32>::SharedPtr get_connected_device_count_srv_ = nullptr;
 };
 }  // namespace orbbec_camera

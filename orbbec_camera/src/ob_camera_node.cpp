@@ -112,7 +112,7 @@ void OBCameraNode::setupProfiles() {
                          << "stream_type: " << magic_enum::enum_name(profile->type())
                          << "Format: " << profile->format() << ", Width: " << profile->width()
                          << ", Height: " << profile->height() << ", FPS: " << profile->fps());
-        soupported_profiles_[elem].emplace_back(profile);
+        supported_profiles_[elem].emplace_back(profile);
       }
       std::shared_ptr<ob::VideoStreamProfile> selected_profile;
       std::shared_ptr<ob::VideoStreamProfile> default_profile;

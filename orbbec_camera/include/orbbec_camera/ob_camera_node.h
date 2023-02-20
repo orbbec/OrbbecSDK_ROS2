@@ -256,7 +256,7 @@ class OBCameraNode {
   std::map<stream_index_pair, std::string> format_str_;
   std::map<stream_index_pair, int> image_format_;
   std::map<stream_index_pair, std::vector<std::shared_ptr<ob::VideoStreamProfile>>>
-      soupported_profiles_;
+      supported_profiles_;
   std::map<stream_index_pair, std::shared_ptr<ob::StreamProfile>> stream_profile_;
   std::map<stream_index_pair, uint32_t> seq_;
   std::map<stream_index_pair, cv::Mat> images_;

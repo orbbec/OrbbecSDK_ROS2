@@ -140,6 +140,16 @@ void OBCameraNode::setupCameraCtrlServices() {
       "get_sdk_version",
       [this](const std::shared_ptr<GetString::Request> request,
              std::shared_ptr<GetString::Response> response) { getSDKVersion(request, response); });
+  save_images_srv_ = node_->create_service<std_srvs::srv::Empty>(
+      "save_images", [this](const std::shared_ptr<std_srvs::srv::Empty::Request> request,
+                            std::shared_ptr<std_srvs::srv::Empty::Response> response) {
+        saveImageCallback(request, response);
+      });
+  save_point_cloud_srv_ = node_->create_service<std_srvs::srv::Empty>(
+      "save_point_cloud", [this](const std::shared_ptr<std_srvs::srv::Empty::Request> request,
+                                 std::shared_ptr<std_srvs::srv::Empty::Response> response) {
+        savePointCloudCallback(request, response);
+      });
 }
 
 void OBCameraNode::setExposureCallback(const std::shared_ptr<SetInt32::Request>& request,
@@ -604,4 +614,29 @@ bool OBCameraNode::toggleSensor(const stream_index_pair& stream_index, bool enab
     return false;
   }
 }
+
+void OBCameraNode::saveImageCallback(const std::shared_ptr<std_srvs::srv::Empty::Request>& request,
+                                     std::shared_ptr<std_srvs::srv::Empty::Response>& response) {
+  (void)request;
+  (void)response;
+  for (const auto& stream_index : IMAGE_STREAMS) {
+    if (enable_stream_[stream_index]) {
+      save_images_[stream_index] = true;
+    }
+  }
+}
+
+void OBCameraNode::savePointCloudCallback(
+    const std::shared_ptr<std_srvs::srv::Empty::Request>& request,
+    std::shared_ptr<std_srvs::srv::Empty::Response>& response) {
+  (void)request;
+  (void)response;
+  if (enable_point_cloud_) {
+    save_point_cloud_ = true;
+  }
+  if (enable_colored_point_cloud_) {
+    save_colored_point_cloud_ = true;
+  }
+}
+
 }  // namespace orbbec_camera

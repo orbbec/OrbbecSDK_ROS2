@@ -30,6 +30,8 @@
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <std_srvs/srv/set_bool.hpp>
+#include <std_srvs/srv/empty.hpp>
+
 #include <sensor_msgs/msg/camera_info.hpp>
 #include <camera_info_manager/camera_info_manager.hpp>
 
@@ -216,6 +218,12 @@ class OBCameraNode {
 
   bool toggleSensor(const stream_index_pair& stream_index, bool enabled, std::string& msg);
 
+  void saveImageCallback(const std::shared_ptr<std_srvs::srv::Empty::Request>& request,
+                         std::shared_ptr<std_srvs::srv::Empty::Response>& response);
+
+  void savePointCloudCallback(const std::shared_ptr<std_srvs::srv::Empty::Request>& request,
+                              std::shared_ptr<std_srvs::srv::Empty::Response>& response);
+
   void publishPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set);
 
   void publishDepthPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set);
@@ -226,6 +234,9 @@ class OBCameraNode {
 
   void onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
                           const stream_index_pair& stream_index);
+
+  void saveImageToFile(const stream_index_pair& stream_index, const cv::Mat& image,
+                       const sensor_msgs::msg::Image::SharedPtr& image_msg);
 
   bool setupFormatConvertType(OBFormat format);
 
@@ -318,5 +329,10 @@ class OBCameraNode {
   std::optional<OBCameraParam> camera_param_;
   bool enable_d2c_viewer_ = false;
   std::unique_ptr<D2CViewer> d2c_viewer_ = nullptr;
+  std::map<stream_index_pair, std::atomic_bool> save_images_;
+  std::atomic_bool save_point_cloud_{false};
+  std::atomic_bool save_colored_point_cloud_{false};
+  rclcpp::Service<std_srvs::srv::Empty>::SharedPtr save_images_srv_;
+  rclcpp::Service<std_srvs::srv::Empty>::SharedPtr save_point_cloud_srv_;
 };
 }  // namespace orbbec_camera

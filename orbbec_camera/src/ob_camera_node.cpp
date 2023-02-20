@@ -16,6 +16,7 @@
 #include <geometry_msgs/msg/transform_stamped.hpp>
 
 #include "orbbec_camera/utils.h"
+#include <filesystem>
 namespace orbbec_camera {
 using namespace std::chrono_literals;
 
@@ -398,6 +399,20 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet>& f
   point_cloud_msg_.height = 1;
   modifier.resize(valid_count);
   point_cloud_publisher_->publish(point_cloud_msg_);
+
+  if (save_point_cloud_) {
+    save_point_cloud_ = false;
+    auto now = std::time(nullptr);
+    std::stringstream ss;
+    ss << std::put_time(std::localtime(&now), "%Y%m%d_%H%M%S");
+    auto current_path = std::filesystem::current_path().string();
+    std::string filename = current_path + "/point_cloud/points_" + ss.str() + ".ply";
+    if (!std::filesystem::exists(current_path + "/point_cloud")) {
+      std::filesystem::create_directory(current_path + "/point_cloud");
+    }
+    RCLCPP_INFO_STREAM(logger_, "Saving point cloud to " << filename);
+    savePointsToPly(frame, filename);
+  }
 }
 
 void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set) {
@@ -463,6 +478,19 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet>&
   point_cloud_msg_.height = 1;
   modifier.resize(valid_count);
   colored_point_cloud_publisher_->publish(point_cloud_msg_);
+  if (save_colored_point_cloud_) {
+    save_colored_point_cloud_ = false;
+    auto now = std::time(nullptr);
+    std::stringstream ss;
+    ss << std::put_time(std::localtime(&now), "%Y%m%d_%H%M%S");
+    auto current_path = std::filesystem::current_path().string();
+    std::string filename = current_path + "/point_cloud/colored_points_" + ss.str() + ".ply";
+    if (!std::filesystem::exists(current_path + "/point_cloud")) {
+      std::filesystem::create_directory(current_path + "/point_cloud");
+    }
+    RCLCPP_INFO_STREAM(logger_, "Saving point cloud to " << filename);
+    saveRGBPointsToPly(frame, filename);
+  }
 }
 
 void OBCameraNode::onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet>& frame_set) {
@@ -548,6 +576,39 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
       depth_registration_ ? depth_aligned_frame_id_[stream_index] : optical_frame_id_[stream_index];
   CHECK(image_publishers_.count(stream_index) > 0);
   image_publishers_[stream_index].publish(image_msg);
+  saveImageToFile(stream_index, image, image_msg);
+}
+
+void OBCameraNode::saveImageToFile(const stream_index_pair& stream_index, const cv::Mat& image,
+                                   const sensor_msgs::msg::Image::SharedPtr& image_msg) {
+  if (save_images_[stream_index]) {
+    auto now = time(nullptr);
+    std::stringstream ss;
+    ss << std::put_time(localtime(&now), "%Y%m%d_%H%M%S");
+    auto current_path = std::filesystem::current_path().string();
+    auto fps = fps_[stream_index];
+    std::string filename = current_path + "/image/" + stream_name_[stream_index] + "_" +
+                           std::to_string(image_msg->width) + "x" +
+                           std::to_string(image_msg->height) + "_" + std::to_string(fps) + "hz_" +
+                           ss.str() + ".png";
+    if (!std::filesystem::exists(current_path + "/image")) {
+      std::filesystem::create_directory(current_path + "/image");
+    }
+    RCLCPP_INFO_STREAM(logger_, "Saving image to " << filename);
+    if (stream_index.first == OB_STREAM_DEPTH) {
+      auto image_to_save = cv_bridge::toCvCopy(image_msg, encoding_[stream_index])->image;
+      cv::imwrite(filename, image_to_save);
+    } else if (stream_index.first == OB_STREAM_COLOR) {
+      auto image_to_save =
+          cv_bridge::toCvCopy(image_msg, sensor_msgs::image_encodings::BGR8)->image;
+      cv::imwrite(filename, image_to_save);
+    } else if (stream_index.first == OB_STREAM_IR) {
+      cv::imwrite(filename, image);
+    } else {
+      RCLCPP_ERROR_STREAM(logger_, "Unsupported stream type: " << stream_index.first);
+    }
+    save_images_[stream_index] = false;
+  }
 }
 
 std::optional<OBCameraParam> OBCameraNode::findDefaultCameraParam() {

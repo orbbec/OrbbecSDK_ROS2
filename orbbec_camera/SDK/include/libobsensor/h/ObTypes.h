@@ -16,11 +16,14 @@
 #if(defined(WIN32) || defined(_WIN32) || defined(WINCE))
 #ifdef OB_EXPORTS
 #define OB_EXTENSION_API __declspec(dllexport)
+#define OB_EXTENSION_INTERNAL_API __declspec(dllexport)
 #else
 #define OB_EXTENSION_API __declspec(dllimport)
+#define OB_EXTENSION_INTERNAL_API
 #endif
 #else
 #define OB_EXTENSION_API __attribute__((visibility("default")))
+#define OB_EXTENSION_INTERNAL_API
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)
@@ -245,13 +248,13 @@ typedef enum {
     OB_FORMAT_Y14 = 24,          /**< \if English Y14 format, single channel 14bit depth (SDK will unpack into Y16 by default) \else
                                     Y14 格式，单通道 14bit 深度 (SDK 默认会解包成 Y16) \endif */
     OB_FORMAT_BGRA       = 25,   /**< BGRA */
-    OB_FORMAT_COMPRESSED = 26,   /**< 压缩格式 */
+    OB_FORMAT_COMPRESSED = 26,   /**< \if English compressed format \else 压缩格式 \endif */
     OB_FORMAT_UNKNOWN    = 0xff, /**< \if English unknown format \else 未知格式 \endif */
 } OBFormat,
     ob_format;
 
-#define OB_FORMAT_RGB888 OB_FORMAT_RGB  // 别名，用于兼容旧版本命名
-#define OB_FORMAT_MJPEG OB_FORMAT_MJPG  // 别名，用于兼容旧版本命名
+#define OB_FORMAT_RGB888 OB_FORMAT_RGB  // \if English Alias of OB_FORMAT_RGB for compatible \else 别名，用于兼容旧版本命名 \endif
+#define OB_FORMAT_MJPEG OB_FORMAT_MJPG  // \if English Alias of OB_FORMAT_MJPG for compatible \else 别名，用于兼容旧版本命名 \endif
 
 /**
  * \if English
@@ -805,7 +808,7 @@ typedef struct {
 typedef enum {
     /**
      * \if English
-     * @brief Close Synchronize mode
+     * @brief Close synchronize mode
      * @brief Single device, neither process input trigger signal nor output trigger signal
      * @brief Each Sensor in a single device automatically triggers
      * \else
@@ -819,7 +822,7 @@ typedef enum {
 
     /**
      * \if English
-     * @brief Standalone sychronize mode
+     * @brief Standalone synchronize mode
      * @brief Single device, neither process input trigger signal nor output trigger signal
      * @brief Inside single device, RGB as Major sensor: RGB -> IR/Depth/TOF
      * \else
@@ -968,11 +971,11 @@ typedef struct {
      * @brief IR Trigger signal input delay: Used to configure the delay between the IR/Depth/TOF Sensor receiving the trigger signal and starting exposure,
      * Unit: microsecond
      *
-     * @attention This parameter is invalid when the synchronization MODE is set to @ref OB SYNC MODE HOST IR TRIGGER
+     * @attention This parameter is invalid when the synchronization MODE is set to @ref OB_SYNC_MODE_PRIMARY_IR_TRIGGER
      * \else
      * @brief IR 触发信号输入延时，用于 IR/Depth/TOF Sensor 接收到触发信号后到开始曝光的延时配置，单位为微秒
      *
-     * @attention 同步模式配置为  @ref OB_SYNC_MODE_HOST_IR_TRIGGER 时无效
+     * @attention 同步模式配置为  @ref OB_SYNC_MODE_PRIMARY_IR_TRIGGER 时无效
      * \endif
      */
     uint16_t irTriggerSignalInDelay;
@@ -982,11 +985,11 @@ typedef struct {
      * @brief RGB trigger signal input delay is used to configure the delay from the time when an RGB Sensor receives the trigger signal to the time when the
      * exposure starts. Unit: microsecond
      *
-     * @attention This parameter is invalid when the synchronization MODE is set to @ref OB SYNC MODE HOST
+     * @attention This parameter is invalid when the synchronization MODE is set to @ref OB_SYNC_MODE_PRIMARY
      * \else
      * @brief RGB 触发信号输入延时，用于 RGB Sensor 接收到触发信号后到开始曝光的延时配置，单位为微秒
      *
-     * @attention 同步模式配置为  @ref OB_SYNC_MODE_HOST 时无效
+     * @attention 同步模式配置为  @ref OB_SYNC_MODE_PRIMARY 时无效
      * \endif
      */
     uint16_t rgbTriggerSignalInDelay;
@@ -996,27 +999,26 @@ typedef struct {
      * @brief Device trigger signal output delay, used to control the delay configuration of the host device to output trigger signals or the slave device to
      * output trigger signals. Unit: microsecond
      *
-     * @attention This parameter is invalid when the synchronization MODE is set to @ref OB SYNC MODE CLOSE or @ref OB SYNC Mode SINGLE
+     * @attention This parameter is invalid when the synchronization MODE is set to @ref OB_SYNC_MODE_CLOSE or @ref OB_SYNC_MODE_STANDALONE
      * \else
      * @brief 设备触发信号输出延时，用于控制主机设备向外输 或 从机设备向外中继输出 触发信号的延时配置，单位：微秒
      *
-     * @attention 同步模式配置为 @ref OB_SYNC_MODE_CLOSE 和  @ref OB_SYNC_MODE_SINGLE 时无效
+     * @attention 同步模式配置为 @ref OB_SYNC_MODE_CLOSE 和  @ref OB_SYNC_MODE_STANDALONE 时无效
      * \endif
      */
     uint16_t deviceTriggerSignalOutDelay;
 
     /**
      * \if English
-     * @brief The device trigger signal output polarity is used to control the polarity configuration of the trigger signal output from the host device or the
-     * trigger signal output from the slave device
+     * @brief The device trigger signal output polarity
      * @brief 0: forward pulse; 1: negative pulse
      *
-     * @attention This parameter is invalid when the synchronization MODE is set to @ref OB SYNC MODE CLOSE or @ref OB SYNC Mode SINGLE
+     * @attention This parameter is invalid when the synchronization MODE is set to @ref OB_SYNC_MODE_CLOSE or @ref OB_SYNC_MODE_STANDALONE
      * \else
-     * @brief 设备触发信号输出极性，用于控制主机设备向外输 或 从机设备向外中继输出 触发信号的极性配置
+     * @brief 设备触发信号输出极性
      * @brief 0: 正向脉冲；1: 负向脉冲
      *
-     * @attention 同步模式配置为 @ref OB_SYNC_MODE_CLOSE 和  @ref OB_SYNC_MODE_SINGLE 时无效
+     * @attention 同步模式配置为 @ref OB_SYNC_MODE_CLOSE 和  @ref OB_SYNC_MODE_STANDALONE 时无效
      * \endif
      */
     uint16_t deviceTriggerSignalOutPolarity;
@@ -1026,12 +1028,12 @@ typedef struct {
      * @brief MCU trigger frequency, used to configure the output frequency of MCU trigger signal in MCU master mode, unit: Hz
      * @brief This configuration will directly affect the image output frame rate of the Sensor. Unit: FPS （frame pre second）
      *
-     * @attention This parameter is invalid only when the synchronization MODE is set to @ref OB SYNC MODE HOST MCU TRIGGER
+     * @attention This parameter is invalid only when the synchronization MODE is set to @ref OB_SYNC_MODE_PRIMARY_MCU_TRIGGER
      * \else
      * @brief MCU 触发频率，用于 MCU 主模式下，MCU触发信号输出频率配置，单位：Hz
      * @brief 该配置会直接影响 Sensor 的图像输出帧率，即也可以认为单位为：FPS （frame pre second）
      *
-     * @attention 仅当同步模式配置为 @ref OB_SYNC_MODE_HOST_MCU_TRIGGER 时无效
+     * @attention 仅当同步模式配置为 @ref OB_SYNC_MODE_PRIMARY_MCU_TRIGGER 时无效
      * \endif
      */
     uint16_t mcuTriggerFrequency;
@@ -1071,13 +1073,17 @@ typedef struct {
 } OBDepthWorkMode, ob_depth_work_mode;
 
 /**
+ * \if English
+ * @brief Command version of device property
+ * \else
  * @brief 控制命令协议版本号
+ * \endif
  *
  */
 typedef struct {
-    uint8_t major;  ///< 主版本号
-    uint8_t minor;  ///< 次版本号
-    uint8_t patch;  ///< 补丁版本
+    uint8_t major;  ///< \if English Major version number \else 主版本号 \endif
+    uint8_t minor;  ///< \if English Minor version number \else 次版本号 \endif
+    uint8_t patch;  ///< \if English Patch version number \else 补丁版本 \endif
 } OBProtocolVersion, ob_protocol_version;
 
 /**
@@ -1102,8 +1108,21 @@ typedef enum {
 /**
  * \if English
  * Internal api, publish future.
+ * Description: Data type match OBCmdVersion of one propertyId
+ * 1. propertyId has multiple OBCmdVersion; different OBCmdVersion of this propertyId has different data type;
+ *    propertyId && OBCmdVersion match only one data type.
+ * 2. itemCount is the number of data type contain in data bytes.
+ * 3. C language and C++ is difference.
+ * 
+ * C language:
+ * data's type is an uint8_t pointer, user parse data to destionation type. 
+ * itemTypeSize == 1，dataSize == itemCount；
+ * 
+ * C++:
+ * data's type is the propertyId && OBCmdVersion's data type.
+ * itemTypeSize = sizeof(T)，itemCount = dataSize / itemTypeSize;
  * \else
- * @brief OrbbecSDK私有接口
+ * @brief OrbbecSDK私有接口, 未来对外开放
  * 功能：保存多版本数据结构的数据内容；
  * 1. 通过propertyId和cmdVersion可以决定具体的数据类型；
  * 2. 通过itemCount可以决定data内容映射的对象数量；
@@ -1118,13 +1137,13 @@ typedef enum {
  * \endif
  */
 typedef struct OBDataBundle {
-    OBCmdVersion cmdVersion;  ///< 与控制命令关联的数据结构的版本号
+    OBCmdVersion cmdVersion;  ///< \if English propertyId's OBCmdVersion \else 与控制命令关联的数据结构的版本号 \endif
 
-    void *   data;  ///< 数据内容，是一个数组，长度为 itemCount; void *data = new T[itemCount]; 数组元素类型为 T，类型 T 由 propertyId 和 cmdVersion 决定
-    uint32_t dataSize;  ///< data 的大小，单位：byte，dataSize == itemTypeSize * itemCount
+    void *   data;  ///< \if English Data contain which contain itemCount of element. void *data = new T[itemCount];\else 数据内容，是一个数组，长度为 itemCount; void *data = new T[itemCount]; 数组元素类型为 T，类型 T 由 propertyId 和 cmdVersion 决定 \endif
+    uint32_t dataSize;  ///< \if English Data size. unit: byte. dataSize == itemTypeSize * itemCount \else data 的大小，单位：byte，dataSize == itemTypeSize * itemCount \endif
 
-    uint32_t itemTypeSize;  ///< data 内容映射的目标对象的数据类型大小，C 语言：1，C++：sizeof(T)
-    uint32_t itemCount;     ///< data 内容映射的目标对象数量，满足条件：itemCount = dataSize / itemTypeSize; 0 == dataSize % itemTypeSize;
+    uint32_t itemTypeSize;  ///< \if English Size of data item. C language, itemTypeSize = 1, C++: itemTypeSize = sizeof(T) \else data 内容映射的目标对象的数据类型大小，C 语言：1，C++：sizeof(T) \endif
+    uint32_t itemCount;     ///< \if English Count of data item. itemCount = dataSize / itemTypeSize; 0 == dataSize % itemTypeSize; \else data 内容映射的目标对象数量，满足条件：itemCount = dataSize / itemTypeSize; 0 == dataSize % itemTypeSize; \endif
 } OBDataBundle, ob_data_bundle;
 
 /**
@@ -1356,21 +1375,33 @@ typedef void (*ob_frameset_callback)(ob_frame *frameset, void *user_data);
 typedef void(ob_frame_destroy_callback)(void *buffer, void *context);
 
 /**
+ * \if English
+ * @brief Check sensor_type is IR sensor, true: IR sensor, false: no IR sensor
+ * \else 
  * @brief 判断是否为 IR Sensor
+ * \endif
  *
  */
 #define is_ir_sensor(sensor_type) (sensor_type == OB_SENSOR_IR || sensor_type == OB_SENSOR_IR_LEFT || sensor_type == OB_SENSOR_IR_RIGHT)
 #define isIRSensor is_ir_sensor
 
 /**
+ * \if English
+ * @brief Check stream_type is IR stream, true: IR stream, false: no IR stream
+ * \else 
  * @brief 判断是否为 IR 数据流
+ * \endif
  *
  */
 #define is_ir_stream(stream_type) (stream_type == OB_STREAM_IR || stream_type == OB_STREAM_IR_LEFT || stream_type == OB_STREAM_IR_RIGHT)
 #define isIRStream is_ir_stream
 
 /**
+ * \if English
+ * @brief Check frame_type is IR frame, true: IR frame, false: no IR frame
+ * \else 
  * @brief 判断是否为 IR 数据帧
+ * \endif
  *
  */
 #define is_ir_frame(frame_type) (frame_type == OB_FRAME_IR || frame_type == OB_FRAME_IR_LEFT || frame_type == OB_FRAME_IR_RIGHT)

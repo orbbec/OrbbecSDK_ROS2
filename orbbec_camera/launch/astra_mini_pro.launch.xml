@@ -14,7 +14,7 @@
     <arg name="color_width" default="640"/>
     <arg name="color_height" default="480"/>
     <arg name="color_fps" default="30"/>
-    <arg name="color_format" default="MJPG"/>
+    <arg name="color_format" default="RGB888"/>
     <arg name="enable_color" default="true"/>
     <arg name="flip_color" default="false"/>
     <arg name="color_qos" default="default"/>

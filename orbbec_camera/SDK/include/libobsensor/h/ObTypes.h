@@ -1113,11 +1113,11 @@ typedef enum {
  *    propertyId && OBCmdVersion match only one data type.
  * 2. itemCount is the number of data type contain in data bytes.
  * 3. C language and C++ is difference.
- * 
+ *
  * C language:
- * data's type is an uint8_t pointer, user parse data to destionation type. 
+ * data's type is an uint8_t pointer, user parse data to destionation type.
  * itemTypeSize == 1，dataSize == itemCount；
- * 
+ *
  * C++:
  * data's type is the propertyId && OBCmdVersion's data type.
  * itemTypeSize = sizeof(T)，itemCount = dataSize / itemTypeSize;
@@ -1139,11 +1139,15 @@ typedef enum {
 typedef struct OBDataBundle {
     OBCmdVersion cmdVersion;  ///< \if English propertyId's OBCmdVersion \else 与控制命令关联的数据结构的版本号 \endif
 
-    void *   data;  ///< \if English Data contain which contain itemCount of element. void *data = new T[itemCount];\else 数据内容，是一个数组，长度为 itemCount; void *data = new T[itemCount]; 数组元素类型为 T，类型 T 由 propertyId 和 cmdVersion 决定 \endif
-    uint32_t dataSize;  ///< \if English Data size. unit: byte. dataSize == itemTypeSize * itemCount \else data 的大小，单位：byte，dataSize == itemTypeSize * itemCount \endif
+    void *data;  ///< \if English Data contain which contain itemCount of element. void *data = new T[itemCount];\else 数据内容，是一个数组，长度为 itemCount;
+                 ///< void *data = new T[itemCount]; 数组元素类型为 T，类型 T 由 propertyId 和 cmdVersion 决定 \endif
+    uint32_t dataSize;  ///< \if English Data size. unit: byte. dataSize == itemTypeSize * itemCount \else data 的大小，单位：byte，dataSize == itemTypeSize *
+                        ///< itemCount \endif
 
-    uint32_t itemTypeSize;  ///< \if English Size of data item. C language, itemTypeSize = 1, C++: itemTypeSize = sizeof(T) \else data 内容映射的目标对象的数据类型大小，C 语言：1，C++：sizeof(T) \endif
-    uint32_t itemCount;     ///< \if English Count of data item. itemCount = dataSize / itemTypeSize; 0 == dataSize % itemTypeSize; \else data 内容映射的目标对象数量，满足条件：itemCount = dataSize / itemTypeSize; 0 == dataSize % itemTypeSize; \endif
+    uint32_t itemTypeSize;  ///< \if English Size of data item. C language, itemTypeSize = 1, C++: itemTypeSize = sizeof(T) \else data
+                            ///< 内容映射的目标对象的数据类型大小，C 语言：1，C++：sizeof(T) \endif
+    uint32_t itemCount;     ///< \if English Count of data item. itemCount = dataSize / itemTypeSize; 0 == dataSize % itemTypeSize; \else data
+                            ///< 内容映射的目标对象数量，满足条件：itemCount = dataSize / itemTypeSize; 0 == dataSize % itemTypeSize; \endif
 } OBDataBundle, ob_data_bundle;
 
 /**
@@ -1226,6 +1230,61 @@ typedef enum {
     OB_POWER_LINE_FREQ_MODE_60HZ  = 2,  ///< \if English 60Hz \else 60Hz \endif
 } ob_power_line_freq_mode,
     OBPowerLineFreqMode;
+
+/**
+ * \if English
+ * @brief Frame aggregate output mode
+ * \else
+ * @brief 帧汇聚输出模式
+ * \endif
+ */
+typedef enum {
+    /**
+     * \if English
+     * @brief Only FrameSet that contains all types of data frames will be output
+     * \else
+     * @brief 只有包含所有类型数据帧的FrameSet才会被输出
+     * \endif
+     */
+    OB_FRAME_AGGREGATE_OUTPUT_FULL_FRAME_REQUIRE = 0,
+
+    /**
+     * \if English
+     *
+     * @brief Frame aggregate output mode
+     * @brief Suitable for Color using H264, H265 and other inter-frame encoding format open stream
+     *
+     * @attention In this mode, the user may return null when getting a non-Color type data frame from the acquired FrameSet
+     *
+     * \else
+     *
+     * @brief 必须包含Color类似数据帧的FrameSet才会被输出
+     * @brief 适用于Color使用H264、H265等帧间编码格式开流的情况
+     *
+     * @attention 该模式下，用户从获取到的FrameSet上获取非Color类型数据帧可能会返回空
+     *
+     * \endif
+     */
+    OB_FRAME_AGGREGATE_OUTPUT_COLOR_FRAME_REQUIRE,
+
+    /**
+     * \if English
+     *
+     * @brief FrameSet for any case will be output
+     *
+     * @attention In this mode, the user may return null when getting the specified type of data frame from the acquired FrameSet
+     *
+     * \else
+     *
+     * @brief 任何情况的FrameSet都会被输出
+     *
+     * @attention 该模式下，用户从获取到的FrameSet上获取指定类型数据帧可能会返回空
+     *
+     * \endif
+     */
+    OB_FRAME_AGGREGATE_OUTPUT_ANY_SITUATION,
+} OB_FRAME_AGGREGATE_OUTPUT_MODE,
+    OBFrameAggregateOutputMode, ob_frame_aggregate_output_mode;
 
 /**
  * \if English
@@ -1377,7 +1436,7 @@ typedef void(ob_frame_destroy_callback)(void *buffer, void *context);
 /**
  * \if English
  * @brief Check sensor_type is IR sensor, true: IR sensor, false: no IR sensor
- * \else 
+ * \else
  * @brief 判断是否为 IR Sensor
  * \endif
  *
@@ -1388,7 +1447,7 @@ typedef void(ob_frame_destroy_callback)(void *buffer, void *context);
 /**
  * \if English
  * @brief Check stream_type is IR stream, true: IR stream, false: no IR stream
- * \else 
+ * \else
  * @brief 判断是否为 IR 数据流
  * \endif
  *
@@ -1399,7 +1458,7 @@ typedef void(ob_frame_destroy_callback)(void *buffer, void *context);
 /**
  * \if English
  * @brief Check frame_type is IR frame, true: IR frame, false: no IR frame
- * \else 
+ * \else
  * @brief 判断是否为 IR 数据帧
  * \endif
  *

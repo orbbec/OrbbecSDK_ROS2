@@ -47,7 +47,7 @@
 #include "orbbec_camera_msgs/srv/get_string.hpp"
 #include "orbbec_camera_msgs/srv/set_int32.hpp"
 #include "orbbec_camera_msgs/srv/get_bool.hpp"
-
+#include "orbbec_camera_msgs/srv/set_string.hpp"
 #include "orbbec_camera/constants.h"
 #include "orbbec_camera/dynamic_params.h"
 #include "orbbec_camera/d2c_viewer.h"
@@ -83,6 +83,7 @@ using Extrinsics = orbbec_camera_msgs::msg::Extrinsics;
 using SetInt32 = orbbec_camera_msgs::srv::SetInt32;
 using GetInt32 = orbbec_camera_msgs::srv::GetInt32;
 using GetString = orbbec_camera_msgs::srv::GetString;
+using SetString = orbbec_camera_msgs::srv::SetString;
 using SetBool = std_srvs::srv::SetBool;
 using GetBool = orbbec_camera_msgs::srv::GetBool;
 
@@ -224,6 +225,9 @@ class OBCameraNode {
   void savePointCloudCallback(const std::shared_ptr<std_srvs::srv::Empty::Request>& request,
                               std::shared_ptr<std_srvs::srv::Empty::Response>& response);
 
+  void switchIRCameraCallback(const std::shared_ptr<SetString::Request>& request,
+                              std::shared_ptr<SetString::Response>& response);
+
   void publishPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set);
 
   void publishDepthPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set);
@@ -293,6 +297,7 @@ class OBCameraNode {
   rclcpp::Service<GetInt32>::SharedPtr get_auto_white_balance_srv_;
   rclcpp::Service<SetBool>::SharedPtr set_auto_white_balance_srv_;
   rclcpp::Service<GetString>::SharedPtr get_sdk_version_srv_;
+  rclcpp::Service<SetString>::SharedPtr switch_ir_camera_srv_;
   std::map<stream_index_pair, rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr>
       set_auto_exposure_srv_;
   rclcpp::Service<GetDeviceInfo>::SharedPtr get_device_srv_;

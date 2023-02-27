@@ -150,6 +150,11 @@ void OBCameraNode::setupCameraCtrlServices() {
                                  std::shared_ptr<std_srvs::srv::Empty::Response> response) {
         savePointCloudCallback(request, response);
       });
+  switch_ir_camera_srv_ = node_->create_service<SetString>(
+      "switch_ir", [this](const std::shared_ptr<SetString::Request> request,
+                                 std::shared_ptr<SetString::Response> response) {
+        switchIRCameraCallback(request, response);
+      });
 }
 
 void OBCameraNode::setExposureCallback(const std::shared_ptr<SetInt32::Request>& request,
@@ -639,4 +644,27 @@ void OBCameraNode::savePointCloudCallback(
   }
 }
 
+void OBCameraNode::switchIRCameraCallback(const std::shared_ptr<SetString::Request>& request,
+                                          std::shared_ptr<SetString::Response>& response) {
+  if (request->data != "left" && request->data != "right") {
+    response->success = false;
+    response->message = "invalid ir camera name";
+    return;
+  }
+  try {
+    int data = request->data == "left" ? 0 : 1;
+    device_->setIntProperty(OB_PROP_IR_CHANNEL_DATA_SOURCE_INT, data);
+    response->success = true;
+    return;
+  } catch (const ob::Error& e) {
+    response->message = e.getMessage();
+    response->success = false;
+  } catch (const std::exception& e) {
+    response->message = e.what();
+    response->success = false;
+  } catch (...) {
+    response->message = "unknown error";
+    response->success = false;
+  }
+}
 }  // namespace orbbec_camera

@@ -24,6 +24,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/GetInt32.srv"
   "srv/GetString.srv"
   "srv/SetInt32.srv"
+  "srv/SetString.srv"
   DEPENDENCIES
   sensor_msgs
   std_msgs)

@@ -96,6 +96,10 @@ void OBCameraNode::setupDevices() {
       enable_stream_[stream_index] = false;
     }
   }
+  auto info = device_->getDeviceInfo();
+  if(enable_hardware_d2d_ && info->pid() == GEMINI2_PID){
+    device_->setBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL, true);
+  }
 }
 
 void OBCameraNode::setupProfiles() {
@@ -259,6 +263,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<std::string>(point_cloud_qos_, "point_cloud_qos", "default");
   setAndGetNodeParameter(enable_publish_extrinsic_, "enable_publish_extrinsic", false);
   setAndGetNodeParameter(enable_d2c_viewer_, "enable_d2c_viewer", false);
+  setAndGetNodeParameter(enable_hardware_d2d_, "enable_hardware_d2d", true);
   if (enable_colored_point_cloud_) {
     depth_registration_ = true;
   }

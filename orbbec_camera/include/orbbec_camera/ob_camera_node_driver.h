@@ -61,7 +61,7 @@ class OBCameraNodeDriver : public rclcpp::Node {
 
   static OBLogSeverity obLogSeverityFromString(const std::string_view& log_level);
 
-  void checkConnectTimer() const;
+  void checkConnectTimer();
 
   void queryDevice();
 

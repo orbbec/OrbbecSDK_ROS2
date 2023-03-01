@@ -339,5 +339,6 @@ class OBCameraNode {
   std::atomic_bool save_colored_point_cloud_{false};
   rclcpp::Service<std_srvs::srv::Empty>::SharedPtr save_images_srv_;
   rclcpp::Service<std_srvs::srv::Empty>::SharedPtr save_point_cloud_srv_;
+  bool enable_hardware_d2d_ = true;
 };
 }  // namespace orbbec_camera

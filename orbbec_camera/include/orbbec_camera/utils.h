@@ -48,4 +48,6 @@ std::string ObDeviceTypeToString(const OBDeviceType& type);
 
 rmw_qos_profile_t getRMWQosProfileFromString(const std::string& str_qos);
 
+bool isOpenNIDevice(int pid);
+
 }  // namespace orbbec_camera

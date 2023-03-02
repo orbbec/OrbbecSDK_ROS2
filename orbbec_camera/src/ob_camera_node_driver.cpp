@@ -252,8 +252,7 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceBySerialNumber(
   for (size_t i = 0; i < list->deviceCount(); i++) {
     try {
       auto pid = list->pid(i);
-      if ((pid >= OPENNI_START_PID && pid <= OPENNI_END_PID) || pid == ASTRA_MINI_PID ||
-          pid == ASTRA_MINI_S_PID) {
+      if (isOpenNIDevice(pid)) {
         // openNI device
         auto device = list->getDevice(i);
         auto device_info = device->getDeviceInfo();
@@ -266,7 +265,7 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceBySerialNumber(
         std::string sn = list->serialNumber(i);
         RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 1000, "Device serial number: " << sn);
         if (sn == serial_number) {
-          RCLCPP_INFO_STREAM(logger_, "Device serial number <<" << sn << " matched");
+          RCLCPP_INFO_STREAM(logger_, "Device serial number " << sn << " matched");
           return list->getDevice(i);
         }
       }

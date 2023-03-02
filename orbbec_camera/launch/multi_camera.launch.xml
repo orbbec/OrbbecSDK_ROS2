@@ -2,23 +2,23 @@
     <!-- unique camera name-->
     <arg name="camera_name" default="camera"/>
     <!-- Hardware depth registration -->
-    <arg name="3d_sensor" default="astra_mini"/>
+    <arg name="3d_sensor" default="gemini2"/>
     <!-- stereo_s_u3, astrapro, astra -->
     <arg name="camera1_prefix" default="01"/>
     <arg name="camera2_prefix" default="02"/>
     <arg name="camera1_serila_number" default="AY3JB20003C"/>
-    <arg name="camera2_serila_number" default="CH26420001B"/>
+    <arg name="camera2_serila_number" default="AY3JB20001L"/>
     <arg name="device_num" default="2"/>
     <node name="camera" pkg="orbbec_camera" exec="ob_cleanup_shm_node" output="screen"/>
     <group>
-        <include file="$(find-pkg-share orbbec_camera)/launch/gemini2.launch.xml">
+        <include file="$(find-pkg-share orbbec_camera)/launch/$(var 3d_sensor).launch.xml">
             <arg name="camera_name" value="camera_$(var camera1_prefix)"/>
             <arg name="serial_number" value="$(var camera1_serila_number)"/>
             <arg name="device_num" value="$(var device_num)"/>
         </include>
     </group>
     <group>
-        <include file="$(find-pkg-share orbbec_camera)/launch/dabai_dcw.launch.xml">
+        <include file="$(find-pkg-share orbbec_camera)/launch/$(var 3d_sensor).launch.xml">
             <arg name="camera_name" value="camera_$(var camera2_prefix)"/>
             <arg name="serial_number" value="$(var camera2_serila_number)"/>
             <arg name="device_num" value="$(var device_num)"/>

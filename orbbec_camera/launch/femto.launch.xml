@@ -41,6 +41,8 @@
     <arg name="color_info_url" default=""/>
     <arg name="log_level" default="none"/>
     <arg name="enable_publish_extrinsic" default="false"/>
+    <arg name="enable_d2c_viewer" default="false"/>
+
     <group>
         <push-ros-namespace namespace="$(var camera_name)"/>
         <node name="camera" pkg="orbbec_camera" exec="orbbec_camera_node" output="screen">
@@ -84,6 +86,7 @@
             <param name="color_info_url" value="$(var color_info_url)"/>
             <param name="log_level" value="$(var log_level)"/>
             <param name="enable_publish_extrinsic" value="$(var enable_publish_extrinsic)"/>
+            <param name="enable_d2c_viewer" value="$(var enable_d2c_viewer)"/>
             <remap from="/$(var camera_name)/depth/color/points" to="/$(var camera_name)/depth_registered/points"/>
         </node>
     </group>

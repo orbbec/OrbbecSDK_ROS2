@@ -264,4 +264,42 @@ bool isOpenNIDevice(int pid) {
   return false;
 }
 
+OB_DEPTH_PRECISION_LEVEL depthPrecisionLevelFromString(
+    const std::string &depth_precision_level_str) {
+  if (depth_precision_level_str == "1mm") {
+    return OB_PRECISION_1MM;
+  } else if (depth_precision_level_str == "0.8mm") {
+    return OB_PRECISION_0MM8;
+  } else if (depth_precision_level_str == "0.4mm") {
+    return OB_PRECISION_0MM4;
+  } else if (depth_precision_level_str == "0.2mm") {
+    return OB_PRECISION_0MM2;
+  } else if (depth_precision_level_str == "0.1mm") {
+    return OB_PRECISION_0MM1;
+  } else {
+    return OB_PRECISION_0MM8;
+  }
+}
+
+OBSyncMode OBSyncModeFromString(const std::string &mode) {
+  if (mode == "CLOSE") {
+    return OBSyncMode::OB_SYNC_MODE_CLOSE;
+  } else if (mode == "STANDALONE") {
+    return OBSyncMode::OB_SYNC_MODE_STANDALONE;
+  } else if (mode == "SECONDARY") {
+    return OBSyncMode::OB_SYNC_MODE_SECONDARY;
+  } else if (mode == "PRIMARY_MCU_TRIGGER") {
+    return OBSyncMode::OB_SYNC_MODE_PRIMARY_MCU_TRIGGER;
+  } else if (mode == "PRIMARY_IR_TRIGGER") {
+    return OBSyncMode::OB_SYNC_MODE_PRIMARY_IR_TRIGGER;
+  } else if (mode == "PRIMARY_SOFT_TRIGGER") {
+    return OBSyncMode::OB_SYNC_MODE_PRIMARY_SOFT_TRIGGER;
+  } else if (mode == "SECONDARY_SOFT_TRIGGER") {
+    return OBSyncMode::OB_SYNC_MODE_SECONDARY_SOFT_TRIGGER;
+  } else {
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("utils"), "Unknown OBSyncMode: " << mode);
+    return OBSyncMode::OB_SYNC_MODE_CLOSE;
+  }
+}
+
 }  // namespace orbbec_camera

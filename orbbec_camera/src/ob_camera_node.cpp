@@ -97,8 +97,35 @@ void OBCameraNode::setupDevices() {
     }
   }
   auto info = device_->getDeviceInfo();
-  if(enable_hardware_d2d_ && info->pid() == GEMINI2_PID){
+  if (enable_hardware_d2d_ && info->pid() == GEMINI2_PID) {
     device_->setBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL, true);
+  }
+  try {
+    if (!depth_work_mode_.empty()) {
+      device_->switchDepthWorkMode(depth_work_mode_.c_str());
+    }
+    if (sync_mode_ != OB_SYNC_MODE_CLOSE) {
+      OBDeviceSyncConfig sync_config;
+      sync_config.syncMode = sync_mode_;
+      sync_config.irTriggerSignalInDelay = ir_trigger_signal_in_delay_;
+      sync_config.rgbTriggerSignalInDelay = rgb_trigger_signal_in_delay_;
+      sync_config.deviceTriggerSignalOutDelay = device_trigger_signal_out_delay_;
+      device_->setSyncConfig(sync_config);
+    }
+    if (info->pid() == GEMINI2_PID) {
+      auto default_precision_level = device_->getIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT);
+      if (default_precision_level != depth_precision_) {
+        device_->setIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT, depth_precision_);
+      }
+    }
+
+    device_->setBoolProperty(OB_PROP_DEPTH_SOFT_FILTER_BOOL, enable_soft_filter_);
+    device_->setBoolProperty(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, enable_color_auto_exposure_);
+    device_->setBoolProperty(OB_PROP_IR_AUTO_EXPOSURE_BOOL, enable_ir_auto_exposure_);
+  } catch (const ob::Error& e) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to setup devices: " << e.getMessage());
+  } catch (const std::exception& e) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to setup devices: " << e.what());
   }
 }
 
@@ -264,6 +291,18 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter(enable_publish_extrinsic_, "enable_publish_extrinsic", false);
   setAndGetNodeParameter(enable_d2c_viewer_, "enable_d2c_viewer", false);
   setAndGetNodeParameter(enable_hardware_d2d_, "enable_hardware_d2d", true);
+  setAndGetNodeParameter(enable_soft_filter_, "enable_soft_filter", true);
+  setAndGetNodeParameter(enable_color_auto_exposure_, "enable_color_auto_exposure", true);
+  setAndGetNodeParameter(enable_ir_auto_exposure_, "enable_ir_auto_exposure", true);
+  setAndGetNodeParameter<std::string>(depth_work_mode_, "depth_work_mode", "");
+  setAndGetNodeParameter<std::string>(sync_mode_str_, "sync_mode", "close");
+  setAndGetNodeParameter(ir_trigger_signal_in_delay_, "ir_trigger_signal_in_delay", 0);
+  setAndGetNodeParameter(rgb_trigger_signal_in_delay_, "rgb_trigger_signal_in_delay", 0);
+  setAndGetNodeParameter(device_trigger_signal_out_delay_, "device_trigger_signal_out_delay", 0);
+  setAndGetNodeParameter<std::string>(depth_precision_str_, "depth_precision", "0.8mm");
+  std::transform(sync_mode_str_.begin(), sync_mode_str_.end(), sync_mode_str_.begin(), ::toupper);
+  sync_mode_ = OBSyncModeFromString(sync_mode_str_);
+  depth_precision_ = depthPrecisionLevelFromString(depth_precision_str_);
   if (enable_colored_point_cloud_) {
     depth_registration_ = true;
   }

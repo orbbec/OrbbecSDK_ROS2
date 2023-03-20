@@ -339,6 +339,18 @@ class OBCameraNode {
   std::atomic_bool save_colored_point_cloud_{false};
   rclcpp::Service<std_srvs::srv::Empty>::SharedPtr save_images_srv_;
   rclcpp::Service<std_srvs::srv::Empty>::SharedPtr save_point_cloud_srv_;
+  bool enable_soft_filter_ = true;
+  bool enable_color_auto_exposure_ = true;
+  bool enable_ir_auto_exposure_ = true;
+  // Only for Gemini2 device
   bool enable_hardware_d2d_ = true;
+  std::string depth_work_mode_;
+  OBSyncMode sync_mode_ = OBSyncMode::OB_SYNC_MODE_CLOSE;
+  std::string sync_mode_str_;
+  int ir_trigger_signal_in_delay_ = 0;
+  int rgb_trigger_signal_in_delay_ = 0;
+  int device_trigger_signal_out_delay_ = 0;
+  std::string depth_precision_str_;
+  OB_DEPTH_PRECISION_LEVEL depth_precision_ = OB_PRECISION_0MM8;
 };
 }  // namespace orbbec_camera

@@ -19,6 +19,7 @@
     <arg name="flip_color" default="false"/>
     <arg name="color_qos" default="default"/>
     <arg name="color_camera_info_qos" default="default"/>
+    <arg name="enable_color_auto_exposure" default="true"/>
     <arg name="depth_width" default="640"/>
     <arg name="depth_height" default="480"/>
     <arg name="depth_fps" default="30"/>
@@ -35,6 +36,7 @@
     <arg name="flip_ir" default="false"/>
     <arg name="ir_qos" default="default"/>
     <arg name="ir_camera_info_qos" default="default"/>
+    <arg name="enable_ir_auto_exposure" default="true"/>
     <arg name="publish_tf" default="true"/>
     <arg name="tf_publish_rate" default="10.0"/>
     <arg name="ir_info_url" default=""/>
@@ -42,6 +44,7 @@
     <arg name="log_level" default="none"/>
     <arg name="enable_publish_extrinsic" default="false"/>
     <arg name="enable_d2c_viewer" default="false"/>
+    <arg name="enable_soft_filter" default="true"/>
     <group>
         <push-ros-namespace namespace="$(var camera_name)"/>
         <node name="camera" pkg="orbbec_camera" exec="orbbec_camera_node" output="screen">
@@ -63,6 +66,7 @@
             <param name="flip_color" value="$(var flip_color)"/>
             <param name="color_qos" value="$(var color_qos)"/>
             <param name="color_camera_info_qos" value="$(var color_camera_info_qos)"/>
+            <param name="enable_color_auto_exposure" value="$(var enable_color_auto_exposure)"/>
             <param name="depth_width" value="$(var depth_width)"/>
             <param name="depth_height" value="$(var depth_height)"/>
             <param name="depth_fps" value="$(var depth_fps)"/>
@@ -79,6 +83,7 @@
             <param name="flip_ir" value="$(var flip_ir)"/>
             <param name="ir_qos" value="$(var ir_qos)"/>
             <param name="ir_camera_info_qos" value="$(var ir_camera_info_qos)"/>
+            <param name="enable_ir_auto_exposure" value="$(var enable_ir_auto_exposure)"/>
             <param name="publish_tf" value="$(var publish_tf)"/>
             <param name="tf_publish_rate" value="$(var tf_publish_rate)"/>
             <param name="ir_info_url" value="$(var ir_info_url)"/>
@@ -86,6 +91,7 @@
             <param name="log_level" value="$(var log_level)"/>
             <param name="enable_publish_extrinsic" value="$(var enable_publish_extrinsic)"/>
             <param name="enable_d2c_viewer" value="$(var enable_d2c_viewer)"/>
+            <param name="enable_soft_filter" value="$(var enable_soft_filter)"/>
             <remap from="/$(var camera_name)/depth/color/points" to="/$(var camera_name)/depth_registered/points"/>
         </node>
     </group>

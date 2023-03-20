@@ -194,6 +194,33 @@ ament_target_dependencies(ob_cleanup_shm_node
   ${dependencies}
   )
 
+add_executable(list_depth_work_mode_node
+  src/list_depth_work_mode.cpp
+  )
+
+target_include_directories(list_depth_work_mode_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+  ${ORBBEC_INCLUDE_DIR}
+  ${OpenCV_INCLUDED_DIRS}
+  ${GLOG_INCLUDED_DIRS}
+  )
+
+target_link_libraries(list_depth_work_mode_node
+  ${ORBBEC_SDK_LIBRARIES}
+  ${OpenCV_LIBS}
+  Eigen3::Eigen
+  ${GLOG_LIBRARIES}
+  -lOrbbecSDK
+  -L${ORBBEC_LIBS}
+  ${PROJECT_NAME}
+  )
+
+ament_target_dependencies(list_depth_work_mode_node
+  ${dependencies}
+  )
+
 install(TARGETS ${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
@@ -230,6 +257,7 @@ install(DIRECTORY
 
 install(TARGETS list_devices_node
   ob_cleanup_shm_node
+  list_depth_work_mode_node
   ${PROJECT_NAME}_node
   DESTINATION lib/${PROJECT_NAME}/
   )

@@ -33,8 +33,9 @@ cd ~/ros2_ws/src
 安装deb依赖
 
 ```bash
+# assume you have sourced ROS environment, same blow
 sudo apt install libgflags-dev nlohmann-json3-dev libgoogle-glog-dev \
-ros-galactic-image-transport ros-galactic-image-publisher
+ros-$ROS_DISTRO-image-transport ros-$ROS_DISTRO-image-publisher ros-$ROS_DISTRO-camera-info-manager
 ```
 
 安装 udev rules.

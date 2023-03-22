@@ -596,6 +596,11 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
     image.create(height, width, image_format_[stream_index]);
   }
   image.data = (uchar*)video_frame->data();
+  if (stream_index == DEPTH) {
+    auto depth_scale = video_frame->as<ob::DepthFrame>()->getValueScale();
+    image = image * depth_scale;
+  }
+
   auto timestamp = frameTimeStampToROSTime(video_frame->systemTimeStamp());
   if (!camera_param_ && depth_registration_) {
     camera_param_ = pipeline_->getCameraParam();

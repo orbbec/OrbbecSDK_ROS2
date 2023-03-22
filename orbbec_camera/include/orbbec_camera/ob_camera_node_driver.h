@@ -68,6 +68,7 @@ class OBCameraNodeDriver : public rclcpp::Node {
   void deviceCountUpdate();
 
  private:
+  std::string config_path_;
   std::unique_ptr<ob::Context> ctx_ = nullptr;
   rclcpp::Logger logger_;
   std::unique_ptr<OBCameraNode> ob_camera_node_ = nullptr;

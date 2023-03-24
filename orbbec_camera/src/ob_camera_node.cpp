@@ -542,13 +542,13 @@ void OBCameraNode::onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet>& fr
     return;
   }
   try {
+    publishPointCloud(frame_set);
     auto color_frame = std::dynamic_pointer_cast<ob::Frame>(frame_set->colorFrame());
     auto depth_frame = std::dynamic_pointer_cast<ob::Frame>(frame_set->depthFrame());
     auto ir_frame = std::dynamic_pointer_cast<ob::Frame>(frame_set->irFrame());
     onNewFrameCallback(color_frame, COLOR);
     onNewFrameCallback(depth_frame, DEPTH);
     onNewFrameCallback(ir_frame, INFRA0);
-    publishPointCloud(frame_set);
   } catch (const ob::Error& e) {
     RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: " << e.getMessage());
   } catch (const std::exception& e) {

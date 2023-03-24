@@ -342,6 +342,9 @@ class OBCameraNode {
   bool enable_soft_filter_ = true;
   bool enable_color_auto_exposure_ = true;
   bool enable_ir_auto_exposure_ = true;
+  bool enable_ldp_ = true;
+  int soft_filter_max_diff_ = -1;
+  int soft_filter_speckle_size_ = -1;
   // Only for Gemini2 device
   bool enable_hardware_d2d_ = true;
   std::string depth_work_mode_;

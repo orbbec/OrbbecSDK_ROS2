@@ -11,10 +11,12 @@ int main() {
     std::cout << "Current device not support depth work mode!" << std::endl;
     return -1;
   }
-  auto depthModeList = device->getDepthWorkModeList();
+  auto current_depth_mode = device->getCurrentDepthWorkMode();
+  std::cout << "current depth mode: " << current_depth_mode.name << std::endl;
+  auto depth_mode_list = device->getDepthWorkModeList();
   std::cout << "depth mode list: " << std::endl;
-  for (uint32_t i = 0; i < depthModeList->count(); i++) {
-    std::cout << "depthModeList[" << i << "]: " << (*depthModeList)[i].name;
+  for (uint32_t i = 0; i < depth_mode_list->count(); i++) {
+    std::cout << "depth_mode_list[" << i << "]: " << (*depth_mode_list)[i].name;
 
     std::cout << std::endl;
   }

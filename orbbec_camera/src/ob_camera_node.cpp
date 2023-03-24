@@ -420,9 +420,20 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet>& f
   point_cloud_filter_.setCameraParam(*camera_param_);
   point_cloud_filter_.setCreatePointFormat(OB_FORMAT_POINT);
   auto depth_frame = frame_set->depthFrame();
+  if (!depth_frame) {
+    return;
+  }
   auto frame = point_cloud_filter_.process(frame_set);
+  if (!frame) {
+    RCLCPP_ERROR_STREAM(logger_, "point cloud filter process failed");
+    return;
+  }
   size_t point_size = frame->dataSize() / sizeof(OBPoint);
   auto* points = (OBPoint*)frame->data();
+  if (!points) {
+    RCLCPP_ERROR_STREAM(logger_, "point cloud data is null");
+    return;
+  }
   CHECK_NOTNULL(points);
   sensor_msgs::PointCloud2Modifier modifier(point_cloud_msg_);
   modifier.setPointCloud2FieldsByString(1, "xyz");
@@ -479,6 +490,9 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet>&
   }
   auto depth_frame = frame_set->depthFrame();
   auto color_frame = frame_set->colorFrame();
+  if (!depth_frame || !color_frame) {
+    return;
+  }
   if (!camera_param_) {
     camera_param_ = pipeline_->getCameraParam();
   }
@@ -486,8 +500,16 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet>&
   point_cloud_filter_.setCreatePointFormat(OB_FORMAT_POINT);
   point_cloud_filter_.setCreatePointFormat(OB_FORMAT_RGB_POINT);
   auto frame = point_cloud_filter_.process(frame_set);
+  if (!frame) {
+    RCLCPP_ERROR_STREAM(logger_, "point cloud filter process failed");
+    return;
+  }
   size_t point_size = frame->dataSize() / sizeof(OBColorPoint);
   auto* points = (OBColorPoint*)frame->data();
+  if (!points) {
+    RCLCPP_ERROR_STREAM(logger_, "point cloud data is null");
+    return;
+  }
   CHECK_NOTNULL(points);
   sensor_msgs::PointCloud2Modifier modifier(point_cloud_msg_);
   modifier.setPointCloud2FieldsByString(1, "xyz");

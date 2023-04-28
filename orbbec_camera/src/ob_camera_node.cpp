@@ -30,6 +30,9 @@ OBCameraNode::OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> devic
   stream_name_[COLOR] = "color";
   stream_name_[DEPTH] = "depth";
   stream_name_[INFRA0] = "ir";
+  stream_name_[INFRA1] = "ir2";
+  stream_name_[ACCEL] = "accel";
+  stream_name_[GYRO] = "gyro";
 
   compression_params_.push_back(cv::IMWRITE_PNG_COMPRESSION);
   compression_params_.push_back(0);
@@ -224,6 +227,55 @@ void OBCameraNode::startStreams() {
     });
   }
   pipeline_started_.store(true);
+  startIMU();
+}
+
+void OBCameraNode::startIMU() {
+  for (const auto& stream_index : HID_STREAMS) {
+    if (enable_stream_[stream_index]) {
+      CHECK(sensors_.count(stream_index));
+      auto profile_list = sensors_[stream_index]->getStreamProfileList();
+      for (size_t i = 0; i < profile_list->count(); i++) {
+        auto item = profile_list->getProfile(i);
+        if (stream_index == ACCEL) {
+          auto profile = item->as<ob::AccelStreamProfile>();
+          auto accel_rate = sampleRateFromString(imu_rate_[stream_index]);
+          auto accel_range = fullAccelScaleRangeFromString(imu_range_[stream_index]);
+          if (profile->fullScaleRange() == accel_range && profile->sampleRate() == accel_rate) {
+            sensors_[stream_index]->start(profile,
+                                          [this, stream_index](std::shared_ptr<ob::Frame> frame) {
+                                            onNewIMUFrameCallback(frame, stream_index);
+                                          });
+            imu_started_[stream_index] = true;
+            RCLCPP_INFO_STREAM(logger_, "start accel stream with "
+                                            << magic_enum::enum_name(accel_range) << " range and "
+                                            << magic_enum::enum_name(accel_rate) << " rate");
+          }
+        } else if (stream_index == GYRO) {
+          auto profile = item->as<ob::GyroStreamProfile>();
+          auto gyro_rate = sampleRateFromString(imu_rate_[stream_index]);
+          auto gyro_range = fullGyroScaleRangeFromString(imu_range_[stream_index]);
+          if (profile->fullScaleRange() == gyro_range && profile->sampleRate() == gyro_rate) {
+            sensors_[stream_index]->start(profile,
+                                          [this, stream_index](std::shared_ptr<ob::Frame> frame) {
+                                            onNewIMUFrameCallback(frame, stream_index);
+                                          });
+            RCLCPP_INFO_STREAM(logger_, "start gyro stream with "
+                                            << magic_enum::enum_name(gyro_range) << " range and "
+                                            << magic_enum::enum_name(gyro_rate) << " rate");
+            imu_started_[stream_index] = true;
+          }
+        }
+      }
+    }
+  }
+  for (const auto& stream_index : HID_STREAMS) {
+    if (enable_stream_[stream_index] && !imu_started_[stream_index]) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to start IMU stream: "
+                                       << magic_enum::enum_name(stream_index.first)
+                                       << ", please check the imu_rate and imu_range parameters");
+    }
+  }
 }
 
 void OBCameraNode::stopStreams() {
@@ -232,8 +284,19 @@ void OBCameraNode::stopStreams() {
   }
   try {
     pipeline_->stop();
+    stopIMU();
   } catch (const ob::Error& e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to stop pipeline: " << e.getMessage());
+  }
+}
+
+void OBCameraNode::stopIMU() {
+  for (const auto& stream_index : HID_STREAMS) {
+    if (imu_started_[stream_index]) {
+      CHECK(sensors_.count(stream_index));
+      sensors_[stream_index]->stop();
+      imu_started_[stream_index] = false;
+    }
   }
 }
 
@@ -255,6 +318,7 @@ void OBCameraNode::setupDefaultImageFormat() {
 }
 
 void OBCameraNode::getParameters() {
+  setAndGetNodeParameter<std::string>(camera_name_, "camera_name", "camera");
   for (auto stream_index : IMAGE_STREAMS) {
     std::string param_name = stream_name_[stream_index] + "_width";
     setAndGetNodeParameter(width_[stream_index], param_name, IMAGE_WIDTH);
@@ -264,11 +328,11 @@ void OBCameraNode::getParameters() {
     setAndGetNodeParameter(fps_[stream_index], param_name, IMAGE_FPS);
     param_name = "enable_" + stream_name_[stream_index];
     setAndGetNodeParameter(enable_stream_[stream_index], param_name, false);
-    param_name = stream_name_[stream_index] + "_frame_id";
-    std::string default_frame_id = "camera_" + stream_name_[stream_index] + "_frame";
+    param_name = camera_name_ + "_" + stream_name_[stream_index] + "_frame_id";
+    std::string default_frame_id = camera_name_ + "_" + stream_name_[stream_index] + "_frame";
     setAndGetNodeParameter(frame_id_[stream_index], param_name, default_frame_id);
     std::string default_optical_frame_id =
-        "camera_" + stream_name_[stream_index] + "_optical_frame";
+        camera_name_ + "_" + stream_name_[stream_index] + "_optical_frame";
     param_name = stream_name_[stream_index] + "_optical_frame_id";
     setAndGetNodeParameter(optical_frame_id_[stream_index], param_name, default_optical_frame_id);
     depth_aligned_frame_id_[stream_index] = stream_name_[COLOR] + "_optical_frame";
@@ -288,6 +352,26 @@ void OBCameraNode::getParameters() {
     param_name = stream_name_[stream_index] + "_camera_info_qos";
     setAndGetNodeParameter<std::string>(camera_info_qos_[stream_index], param_name, "default");
   }
+
+  for (const auto& stream_index : HID_STREAMS) {
+    std::string param_name = stream_name_[stream_index] + "_qos";
+    setAndGetNodeParameter<std::string>(imu_qos_[stream_index], param_name, "default");
+    param_name = "enable_" + stream_name_[stream_index];
+    setAndGetNodeParameter(enable_stream_[stream_index], param_name, false);
+    param_name = stream_name_[stream_index] + "_rate";
+    setAndGetNodeParameter<std::string>(imu_rate_[stream_index], param_name, "");
+    param_name = stream_name_[stream_index] + "_range";
+    setAndGetNodeParameter<std::string>(imu_range_[stream_index], param_name, "");
+    param_name = camera_name_ + "_" + stream_name_[stream_index] + "_frame_id";
+    std::string default_frame_id = camera_name_ + "_" + stream_name_[stream_index] + "_frame";
+    setAndGetNodeParameter(frame_id_[stream_index], param_name, default_frame_id);
+    std::string default_optical_frame_id =
+        camera_name_ + "_" + stream_name_[stream_index] + "_optical_frame";
+    param_name = stream_name_[stream_index] + "_optical_frame_id";
+    setAndGetNodeParameter(optical_frame_id_[stream_index], param_name, default_optical_frame_id);
+    depth_aligned_frame_id_[stream_index] = stream_name_[COLOR] + "_optical_frame";
+  }
+
   setAndGetNodeParameter(publish_tf_, "publish_tf", true);
   setAndGetNodeParameter(tf_publish_rate_, "tf_publish_rate", 10.0);
   setAndGetNodeParameter(depth_registration_, "depth_registration", false);
@@ -319,6 +403,8 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<bool>(enable_ldp_, "enable_ldp", true);
   setAndGetNodeParameter<int>(soft_filter_max_diff_, "soft_filter_max_diff", -1);
   setAndGetNodeParameter<int>(soft_filter_speckle_size_, "soft_filter_speckle_size", -1);
+  setAndGetNodeParameter<double>(liner_accel_cov_, "linear_accel_cov", 0.0003);
+  setAndGetNodeParameter<double>(angular_vel_cov_, "angular_vel_cov", 0.02);
 }
 
 void OBCameraNode::setupTopics() {
@@ -355,13 +441,13 @@ void OBCameraNode::setupPublishers() {
   using CameraInfo = sensor_msgs::msg::CameraInfo;
   auto point_cloud_qos_profile = getRMWQosProfileFromString(point_cloud_qos_);
   if (enable_colored_point_cloud_) {
-    colored_point_cloud_publisher_ = node_->create_publisher<PointCloud2>(
+    depth_registration_cloud_pub_ = node_->create_publisher<PointCloud2>(
         "depth/color/points",
         rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(point_cloud_qos_profile),
                     point_cloud_qos_profile));
   }
   if (enable_point_cloud_) {
-    point_cloud_publisher_ = node_->create_publisher<PointCloud2>(
+    depth_cloud_pub_ = node_->create_publisher<PointCloud2>(
         "depth/points", rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(point_cloud_qos_profile),
                                     point_cloud_qos_profile));
   }
@@ -381,6 +467,15 @@ void OBCameraNode::setupPublishers() {
     camera_info_publishers_[stream_index] = node_->create_publisher<CameraInfo>(
         topic, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(camera_info_qos_profile),
                            camera_info_qos_profile));
+  }
+  for (const auto& stream_index : HID_STREAMS) {
+    if (!enable_stream_[stream_index]) {
+      continue;
+    }
+    std::string data_topic_name = stream_name_[stream_index] + "/sample";
+    auto data_qos = getRMWQosProfileFromString(imu_qos_[stream_index]);
+    imu_publishers_[stream_index] = node_->create_publisher<sensor_msgs::msg::Imu>(
+        data_topic_name, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(data_qos), data_qos));
   }
   if (enable_publish_extrinsic_) {
     extrinsics_publisher_ = node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
@@ -408,8 +503,8 @@ void OBCameraNode::publishPointCloud(const std::shared_ptr<ob::FrameSet>& frame_
 }
 
 void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set) {
-  if (!enable_point_cloud_ || !point_cloud_publisher_ ||
-      point_cloud_publisher_->get_subscription_count() == 0) {
+  if (!enable_point_cloud_ || !depth_cloud_pub_ ||
+      depth_cloud_pub_->get_subscription_count() == 0) {
     return;
   }
   if (!camera_param_ && depth_registration_) {
@@ -466,7 +561,7 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet>& f
   point_cloud_msg_.width = valid_count;
   point_cloud_msg_.height = 1;
   modifier.resize(valid_count);
-  point_cloud_publisher_->publish(point_cloud_msg_);
+  depth_cloud_pub_->publish(point_cloud_msg_);
 
   if (save_point_cloud_) {
     save_point_cloud_ = false;
@@ -484,8 +579,8 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet>& f
 }
 
 void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set) {
-  if (!enable_colored_point_cloud_ || !colored_point_cloud_publisher_ ||
-      colored_point_cloud_publisher_->get_subscription_count() == 0) {
+  if (!enable_colored_point_cloud_ || !depth_registration_cloud_pub_ ||
+      depth_registration_cloud_pub_->get_subscription_count() == 0) {
     return;
   }
   auto depth_frame = frame_set->depthFrame();
@@ -556,7 +651,7 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet>&
   point_cloud_msg_.width = valid_count;
   point_cloud_msg_.height = 1;
   modifier.resize(valid_count);
-  colored_point_cloud_publisher_->publish(point_cloud_msg_);
+  depth_registration_cloud_pub_->publish(point_cloud_msg_);
   if (save_colored_point_cloud_) {
     save_colored_point_cloud_ = false;
     auto now = std::time(nullptr);
@@ -695,6 +790,70 @@ void OBCameraNode::saveImageToFile(const stream_index_pair& stream_index, const 
   }
 }
 
+void OBCameraNode::onNewIMUFrameCallback(const std::shared_ptr<ob::Frame>& frame,
+                                         const stream_index_pair& stream_index) {
+  if (!imu_publishers_.count(stream_index)) {
+    RCLCPP_ERROR_STREAM(logger_,
+                        "stream " << stream_name_[stream_index] << " publisher not initialized");
+    return;
+  }
+  auto subscriber_count = imu_publishers_[stream_index]->get_subscription_count();
+  if (subscriber_count == 0) {
+    return;
+  }
+  auto imu_msg = sensor_msgs::msg::Imu();
+  setDefaultIMUMessage(imu_msg);
+  imu_msg.header.frame_id = optical_frame_id_[stream_index];
+  auto timestamp = frameTimeStampToROSTime(frame->systemTimeStamp());
+  imu_msg.header.stamp = timestamp;
+  if (frame->type() == OB_FRAME_GYRO) {
+    auto gyro_frame = frame->as<ob::GyroFrame>();
+    auto data = gyro_frame->value();
+    imu_msg.angular_velocity.x = data.x;
+    imu_msg.angular_velocity.y = data.y;
+    imu_msg.angular_velocity.z = data.z;
+  } else if (frame->type() == OB_FRAME_ACCEL) {
+    auto accel_frame = frame->as<ob::AccelFrame>();
+    auto data = accel_frame->value();
+    imu_msg.linear_acceleration.x = data.x;
+    imu_msg.linear_acceleration.y = data.y;
+    imu_msg.linear_acceleration.z = data.z;
+  } else {
+    RCLCPP_ERROR(logger_, "Unsupported IMU frame type");
+    return;
+  }
+  imu_publishers_[stream_index]->publish(imu_msg);
+}
+
+void OBCameraNode::setDefaultIMUMessage(sensor_msgs::msg::Imu& imu_msg) {
+  imu_msg.header.frame_id = "imu_link";
+  imu_msg.orientation.x = 0.0;
+  imu_msg.orientation.y = 0.0;
+  imu_msg.orientation.z = 0.0;
+  imu_msg.orientation.w = 0.0;
+
+  imu_msg.orientation_covariance = {-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  imu_msg.linear_acceleration_covariance = {
+      liner_accel_cov_, 0.0, 0.0, 0.0, liner_accel_cov_, 0.0, 0.0, 0.0, liner_accel_cov_};
+  imu_msg.angular_velocity_covariance = {
+      angular_vel_cov_, 0.0, 0.0, 0.0, angular_vel_cov_, 0.0, 0.0, 0.0, angular_vel_cov_};
+}
+
+sensor_msgs::msg::Imu OBCameraNode::createUnitIMUMessage(const IMUData& accel_data,
+                                                         const IMUData& gyro_data) {
+  sensor_msgs::msg::Imu imu_msg;
+  rclcpp::Time timestamp(gyro_data.timestamp_);
+  imu_msg.header.stamp = timestamp;
+  imu_msg.angular_velocity.x = gyro_data.data_.x();
+  imu_msg.angular_velocity.y = gyro_data.data_.y();
+  imu_msg.angular_velocity.z = gyro_data.data_.z();
+
+  imu_msg.linear_acceleration.x = accel_data.data_.x();
+  imu_msg.linear_acceleration.y = accel_data.data_.y();
+  imu_msg.linear_acceleration.z = accel_data.data_.z();
+  return imu_msg;
+}
+
 std::optional<OBCameraParam> OBCameraNode::findDefaultCameraParam() {
   auto camera_params = device_->getCalibrationCameraParamList();
   for (size_t i = 0; i < camera_params->count(); i++) {
@@ -779,6 +938,8 @@ void OBCameraNode::calcAndPublishStaticTransform() {
   publishStaticTF(tf_timestamp, zero_trans, quaternion_optical, frame_id_[DEPTH],
                   optical_frame_id_[DEPTH]);
   publishStaticTF(tf_timestamp, zero_trans, zero_rot, camera_link_frame_id_, frame_id_[DEPTH]);
+  publishStaticTF(tf_timestamp, zero_trans, zero_rot, camera_link_frame_id_, frame_id_[ACCEL]);
+  publishStaticTF(tf_timestamp, zero_trans, zero_rot, camera_link_frame_id_, frame_id_[GYRO]);
 }
 
 void OBCameraNode::publishStaticTransforms() {
@@ -810,6 +971,56 @@ void OBCameraNode::publishDynamicTransforms() {
       dynamic_tf_broadcaster_->sendTransform(static_tf_msgs_);
     }
   }
+}
+
+template <typename T>
+T lerp(const T& a, const T& b, const double t) {
+  return a * (1.0 - t) + b * t;
+}
+
+void OBCameraNode::FillImuDataLinearInterpolation(const IMUData& imu_data,
+                                                  std::deque<sensor_msgs::msg::Imu>& imu_msgs) {
+  imu_history_.push_back(imu_data);
+  stream_index_pair steam_index(imu_data.stream_);
+  imu_msgs.clear();
+  std::deque<IMUData> gyros_data;
+  IMUData accel0, accel1, current_imu;
+  while (!imu_history_.empty()) {
+    current_imu = imu_history_.front();
+    imu_history_.pop_front();
+    if (accel0.isSet() && current_imu.stream_ == ACCEL) {
+      accel0 = current_imu;
+    } else if (accel0.isSet() && current_imu.stream_ == ACCEL) {
+      accel1 = current_imu;
+      const double dt = accel1.timestamp_ - accel0.timestamp_;
+      while (!gyros_data.empty()) {
+        auto current_gyro = gyros_data.front();
+        gyros_data.pop_front();
+        const double alpha = (current_gyro.timestamp_ - accel0.timestamp_) / dt;
+        IMUData current_accel(ACCEL, lerp(accel0.data_, accel1.data_, alpha),
+                              current_gyro.timestamp_);
+        imu_msgs.push_back((createUnitIMUMessage(current_accel, current_gyro)));
+      }
+      accel0 = accel1;
+    } else if (accel0.isSet() && current_imu.timestamp_ >= accel0.timestamp_ &&
+               current_imu.stream_ == GYRO) {
+      gyros_data.push_back(current_imu);
+    }
+  }
+  imu_history_.push_back(current_imu);
+}
+
+void OBCameraNode::FillImuDataCopy(const IMUData& imu_data,
+                                   std::deque<sensor_msgs::msg::Imu>& imu_msgs) {
+  stream_index_pair steam_index(imu_data.stream_);
+  if (steam_index == ACCEL) {
+    accel_data_ = imu_data;
+    return;
+  }
+  if (accel_data_.isSet()) {
+    return;
+  }
+  imu_msgs.push_back(createUnitIMUMessage(accel_data_, imu_data));
 }
 
 bool OBCameraNode::setupFormatConvertType(OBFormat format) {

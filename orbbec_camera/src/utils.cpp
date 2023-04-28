@@ -256,12 +256,8 @@ bool isOpenNIDevice(int pid) {
       0x063a, 0x0650, 0x0651, 0x0654, 0x0655, 0x0656, 0x0657, 0x0658, 0x0659, 0x065a,
       0x065b, 0x065c, 0x065d, 0x0698, 0x0699, 0x069a};
 
-  for (const auto &pid_openni : OPENNI_DEVICE_PIDS) {
-    if (pid == pid_openni) {
-      return true;
-    }
-  }
-  return false;
+  return std::any_of(OPENNI_DEVICE_PIDS.begin(), OPENNI_DEVICE_PIDS.end(),
+                     [pid](int pid_openni) { return pid == pid_openni; });
 }
 
 OB_DEPTH_PRECISION_LEVEL depthPrecisionLevelFromString(
@@ -302,4 +298,86 @@ OBSyncMode OBSyncModeFromString(const std::string &mode) {
   }
 }
 
+OB_SAMPLE_RATE sampleRateFromString(std::string &sample_rate) {
+  // covert to lower case
+  std::transform(sample_rate.begin(), sample_rate.end(), sample_rate.begin(), ::tolower);
+  if (sample_rate == "1.5625hz") {
+    return OB_SAMPLE_RATE_1_5625_HZ;
+  } else if (sample_rate == "3.125hz") {
+    return OB_SAMPLE_RATE_3_125_HZ;
+  } else if (sample_rate == "6.25hz") {
+    return OB_SAMPLE_RATE_6_25_HZ;
+  } else if (sample_rate == "12.5hz") {
+    return OB_SAMPLE_RATE_12_5_HZ;
+  } else if (sample_rate == "25hz") {
+    return OB_SAMPLE_RATE_25_HZ;
+  } else if (sample_rate == "50hz") {
+    return OB_SAMPLE_RATE_50_HZ;
+  } else if (sample_rate == "100hz") {
+    return OB_SAMPLE_RATE_100_HZ;
+  } else if (sample_rate == "200hz") {
+    return OB_SAMPLE_RATE_200_HZ;
+  } else if (sample_rate == "500hz") {
+    return OB_SAMPLE_RATE_500_HZ;
+  } else if (sample_rate == "1khz") {
+    return OB_SAMPLE_RATE_1_KHZ;
+  } else if (sample_rate == "2khz") {
+    return OB_SAMPLE_RATE_2_KHZ;
+  } else if (sample_rate == "4khz") {
+    return OB_SAMPLE_RATE_4_KHZ;
+  } else if (sample_rate == "8khz") {
+    return OB_SAMPLE_RATE_8_KHZ;
+  } else if (sample_rate == "16khz") {
+    return OB_SAMPLE_RATE_16_KHZ;
+  } else if (sample_rate == "32khz") {
+    return OB_SAMPLE_RATE_32_KHZ;
+  } else {
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("utils"), "Unknown OB_SAMPLE_RATE: " << sample_rate);
+    return OB_SAMPLE_RATE_100_HZ;
+  }
+}
+
+OB_GYRO_FULL_SCALE_RANGE fullGyroScaleRangeFromString(std::string &full_scale_range) {
+  std::transform(full_scale_range.begin(), full_scale_range.end(), full_scale_range.begin(),
+                 ::tolower);
+  if (full_scale_range == "16dps") {
+    return OB_GYRO_FS_16dps;
+  } else if (full_scale_range == "31dps") {
+    return OB_GYRO_FS_31dps;
+  } else if (full_scale_range == "62dps") {
+    return OB_GYRO_FS_62dps;
+  } else if (full_scale_range == "125dps") {
+    return OB_GYRO_FS_125dps;
+  } else if (full_scale_range == "250dps") {
+    return OB_GYRO_FS_250dps;
+  } else if (full_scale_range == "500dps") {
+    return OB_GYRO_FS_500dps;
+  } else if (full_scale_range == "1000dps") {
+    return OB_GYRO_FS_1000dps;
+  } else if (full_scale_range == "2000dps") {
+    return OB_GYRO_FS_2000dps;
+  } else {
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("utils"),
+                        "Unknown OB_GYRO_FULL_SCALE_RANGE: " << full_scale_range);
+    return OB_GYRO_FS_2000dps;
+  }
+}
+
+OBAccelFullScaleRange fullAccelScaleRangeFromString(std::string &full_scale_range) {
+  std::transform(full_scale_range.begin(), full_scale_range.end(), full_scale_range.begin(),
+                 ::tolower);
+  if (full_scale_range == "2g") {
+    return OB_ACCEL_FS_2g;
+  } else if (full_scale_range == "4g") {
+    return OB_ACCEL_FS_4g;
+  } else if (full_scale_range == "8g") {
+    return OB_ACCEL_FS_8g;
+  } else if (full_scale_range == "16g") {
+    return OB_ACCEL_FS_16g;
+  } else {
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("utils"),
+                        "Unknown OB_ACCEL_FULL_SCALE_RANGE: " << full_scale_range);
+    return OB_ACCEL_FS_16g;
+  }
+}
 }  // namespace orbbec_camera

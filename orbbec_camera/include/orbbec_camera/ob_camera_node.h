@@ -20,6 +20,7 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 #include <atomic>
 #include <opencv2/opencv.hpp>
@@ -37,6 +38,7 @@
 
 #include <image_publisher/image_publisher.hpp>
 #include <image_transport/publisher.hpp>
+#include <sensor_msgs/msg/imu.hpp>
 #include "libobsensor/ObSensor.hpp"
 
 #include "orbbec_camera_msgs/msg/device_info.hpp"
@@ -118,6 +120,16 @@ class OBCameraNode {
   void clean();
 
  private:
+  struct IMUData {
+    IMUData() = default;
+    IMUData(stream_index_pair stream, Eigen::Vector3d data, double timestamp)
+        : stream_(std::move(stream)), data_(std::move(data)), timestamp_(timestamp) {}
+    bool isSet() const { return timestamp_ >= 0; }
+    stream_index_pair stream_{};
+    Eigen::Vector3d data_{};
+    double timestamp_ = -1;  // in nanoseconds
+  };
+
   void setupDevices();
 
   void setupProfiles();
@@ -132,7 +144,11 @@ class OBCameraNode {
 
   void startStreams();
 
+  void startIMU();
+
   void stopStreams();
+
+  void stopIMU();
 
   void setupDefaultImageFormat();
 
@@ -242,6 +258,18 @@ class OBCameraNode {
   void saveImageToFile(const stream_index_pair& stream_index, const cv::Mat& image,
                        const sensor_msgs::msg::Image::SharedPtr& image_msg);
 
+  void onNewIMUFrameCallback(const std::shared_ptr<ob::Frame>& frame,
+                             const stream_index_pair& stream_index);
+
+  void setDefaultIMUMessage(sensor_msgs::msg::Imu& imu_msg);
+
+  sensor_msgs::msg::Imu createUnitIMUMessage(const IMUData& accel_data, const IMUData& gyro_data);
+
+  void FillImuDataLinearInterpolation(const IMUData& imu_data,
+                                      std::deque<sensor_msgs::msg::Imu>& imu_msgs);
+
+  void FillImuDataCopy(const IMUData& imu_data, std::deque<sensor_msgs::msg::Imu>& imu_msgs);
+
   bool setupFormatConvertType(OBFormat format);
 
  private:
@@ -252,6 +280,7 @@ class OBCameraNode {
   std::atomic_bool is_running_{false};
   std::unique_ptr<ob::Pipeline> pipeline_ = nullptr;
   std::atomic_bool pipeline_started_{false};
+  std::string camera_name_ = "camera";
   std::shared_ptr<ob::Config> pipeline_config_ = nullptr;
   std::map<stream_index_pair, std::shared_ptr<ob::Sensor>> sensors_;
   std::map<stream_index_pair, ob_camera_intrinsic> stream_intrinsics_;
@@ -312,8 +341,8 @@ class OBCameraNode {
   std::shared_ptr<tf2_ros::StaticTransformBroadcaster> static_tf_broadcaster_ = nullptr;
   std::shared_ptr<tf2_ros::TransformBroadcaster> dynamic_tf_broadcaster_ = nullptr;
   std::vector<geometry_msgs::msg::TransformStamped> tf_msgs;
-  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr colored_point_cloud_publisher_;
-  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr point_cloud_publisher_;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr depth_registration_cloud_pub_;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr depth_cloud_pub_;
   bool enable_point_cloud_ = true;
   bool enable_colored_point_cloud_ = false;
   ob::PointCloudFilter point_cloud_filter_;
@@ -355,5 +384,15 @@ class OBCameraNode {
   int device_trigger_signal_out_delay_ = 0;
   std::string depth_precision_str_;
   OB_DEPTH_PRECISION_LEVEL depth_precision_ = OB_PRECISION_0MM8;
+  // IMU
+  std::map<stream_index_pair, rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr> imu_publishers_;
+  std::map<stream_index_pair, std::string> imu_rate_;
+  std::map<stream_index_pair, std::string> imu_range_;
+  std::map<stream_index_pair, std::string> imu_qos_;
+  std::map<stream_index_pair, bool> imu_started_;
+  double liner_accel_cov_ = 0.0001;
+  double angular_vel_cov_ = 0.0001;
+  std::deque<IMUData> imu_history_;
+  IMUData accel_data_{ACCEL, {0, 0, 0}, -1.0};
 };
 }  // namespace orbbec_camera

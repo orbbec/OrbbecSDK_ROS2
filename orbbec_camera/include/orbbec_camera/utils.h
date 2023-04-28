@@ -55,4 +55,10 @@ OB_DEPTH_PRECISION_LEVEL depthPrecisionLevelFromString(
 
 OBSyncMode OBSyncModeFromString(const std::string& mode);
 
+OB_SAMPLE_RATE sampleRateFromString(std::string& sample_rate);
+
+OB_GYRO_FULL_SCALE_RANGE fullGyroScaleRangeFromString(std::string& full_scale_range);
+
+OBAccelFullScaleRange fullAccelScaleRangeFromString(std::string& full_scale_range);
+
 }  // namespace orbbec_camera

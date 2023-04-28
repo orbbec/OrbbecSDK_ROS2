@@ -61,6 +61,7 @@
     <arg name="ir_trigger_signal_in_delay" default="0"/>
     <arg name="rgb_trigger_signal_in_delay" default="0"/>
     <arg name="device_trigger_signal_out_delay" default="0"/>
+    <arg name="sync_signal_trigger_out" default="false"/>
     <group>
         <push-ros-namespace namespace="$(var camera_name)"/>
         <node name="camera" pkg="orbbec_camera" exec="orbbec_camera_node" output="screen">
@@ -124,6 +125,7 @@
             <param name="ir_trigger_signal_in_delay" value="$(var ir_trigger_signal_in_delay)"/>
             <param name="rgb_trigger_signal_in_delay" value="$(var rgb_trigger_signal_in_delay)"/>
             <param name="device_trigger_signal_out_delay" value="$(var device_trigger_signal_out_delay)"/>
+            <param name="sync_signal_trigger_out" value="$(var sync_signal_trigger_out)"/>
             <remap from="/$(var camera_name)/depth/color/points" to="/$(var camera_name)/depth_registered/points"/>
         </node>
     </group>

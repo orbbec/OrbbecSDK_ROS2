@@ -114,6 +114,7 @@ void OBCameraNode::setupDevices() {
       sync_config.rgbTriggerSignalInDelay = rgb_trigger_signal_in_delay_;
       sync_config.deviceTriggerSignalOutDelay = device_trigger_signal_out_delay_;
       device_->setSyncConfig(sync_config);
+      // TODO: add set signal trigger out mode
     }
     if (info->pid() == GEMINI2_PID) {
       auto default_precision_level = device_->getIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT);
@@ -393,6 +394,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter(ir_trigger_signal_in_delay_, "ir_trigger_signal_in_delay", 0);
   setAndGetNodeParameter(rgb_trigger_signal_in_delay_, "rgb_trigger_signal_in_delay", 0);
   setAndGetNodeParameter(device_trigger_signal_out_delay_, "device_trigger_signal_out_delay", 0);
+  setAndGetNodeParameter(sync_signal_trigger_out_, "sync_signal_trigger_out", false);
   setAndGetNodeParameter<std::string>(depth_precision_str_, "depth_precision", "0.8mm");
   std::transform(sync_mode_str_.begin(), sync_mode_str_.end(), sync_mode_str_.begin(), ::toupper);
   sync_mode_ = OBSyncModeFromString(sync_mode_str_);

@@ -8,7 +8,7 @@
     <arg name="vendor_id" default="0x2bc5"/>
     <arg name="product_id" default=""/>
     <arg name="enable_point_cloud" default="true"/>
-    <arg name="enable_colored_point_cloud" default="true"/>
+    <arg name="enable_colored_point_cloud" default="false"/>
     <arg name="point_cloud_qos" default="default"/>
     <arg name="connection_delay" default="100"/>
     <arg name="color_width" default="640"/>

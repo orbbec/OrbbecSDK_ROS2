@@ -12,7 +12,7 @@
     <arg name="point_cloud_qos" default="default"/>
     <arg name="connection_delay" default="100"/>
     <arg name="color_width" default="640"/>
-    <arg name="color_height" default="480"/>
+    <arg name="color_height" default="360"/>
     <arg name="color_fps" default="30"/>
     <arg name="color_format" default="MJPG"/>
     <arg name="enable_color" default="true"/>
@@ -21,7 +21,7 @@
     <arg name="color_camera_info_qos" default="default"/>
     <arg name="enable_color_auto_exposure" default="true"/>
     <arg name="depth_width" default="640"/>
-    <arg name="depth_height" default="480"/>
+    <arg name="depth_height" default="360"/>
     <arg name="depth_fps" default="30"/>
     <arg name="depth_format" default="Y11"/>
     <arg name="enable_depth" default="true"/>

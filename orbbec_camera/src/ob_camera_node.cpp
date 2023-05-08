@@ -703,7 +703,8 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
     }
     auto color_frame = format_convert_filter_.process(frame);
     if (color_frame == nullptr) {
-      RCLCPP_ERROR(logger_, "Failed to convert color frame");
+      RCLCPP_ERROR_SKIPFIRST_THROTTLE(logger_, *(node_->get_clock()), 1000,
+                                      "Failed to convert frame to RGB format");
       return;
     }
     video_frame = color_frame->as<ob::ColorFrame>();

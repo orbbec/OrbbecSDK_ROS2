@@ -164,7 +164,11 @@ OBFormat OBFormatFromString(const std::string &format) {
   std::string fixed_format;
   std::transform(format.begin(), format.end(), std::back_inserter(fixed_format),
                  [](const auto ch) { return std::isalpha(ch) ? toupper(ch) : ch; });
-  if (fixed_format == "YUYV") {
+  if (fixed_format == "MJPG") {
+    return OB_FORMAT_MJPG;
+  } else if (fixed_format == "MJPEG") {
+    return OB_FORMAT_MJPEG;
+  } else if (fixed_format == "YUYV") {
     return OB_FORMAT_YUYV;
   } else if (fixed_format == "YUYV2") {
     return OB_FORMAT_YUY2;

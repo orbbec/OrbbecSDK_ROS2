@@ -1,8 +1,7 @@
 # orbbec_camera
 
 ---
-OrbbecSDK ROS2 is a OrbbecSDK wrapper for the Orbbec 3D camera, providing seamless integration with the ROS2
-environment.
+OrbbecSDK ROS2 is a wrapper for the Orbbec 3D camera that provides seamless integration with the ROS2 environment. It supports ROS2 Foxy, Galactic, and Humble distributions.
 
 ## Installation Instructions
 

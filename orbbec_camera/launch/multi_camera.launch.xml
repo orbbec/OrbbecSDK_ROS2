@@ -6,8 +6,8 @@
     <!-- stereo_s_u3, astrapro, astra -->
     <arg name="camera1_prefix" default="01"/>
     <arg name="camera2_prefix" default="02"/>
-    <arg name="camera1_serila_number" default="AY3JB20003C"/>
-    <arg name="camera2_serila_number" default="AY3JB20001L"/>
+    <arg name="camera1_serila_number" default="AY3A131007R"/>
+    <arg name="camera2_serila_number" default="AY3JB20003L"/>
     <arg name="device_num" default="2"/>
     <node name="camera" pkg="orbbec_camera" exec="ob_cleanup_shm_node" output="screen"/>
     <group>

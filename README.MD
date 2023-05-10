@@ -81,12 +81,6 @@ ros2 service list
 ros2 param list
 ```
 
-- Show depth to color extrinsic
-
-```bash
-ros2 topic echo --qos-durability=transient_local /camera/extrinsic/depth_to_color  --qos-profile=services_default
-```
-
 - Get device info
 
 ```bash
@@ -205,9 +199,8 @@ ros2 run orbbec_camera list_devices_node
 - Set the `device_num` parameter to the number of cameras you have.
 - Go to the `OrbbecSDK_ROS2/launch/multi_xxx.launch.xml` file and change the serial number. Currently,
   different cameras can only be differentiated by their serial number.
-- Don't forget to put the `include` tag inside the `group` tag. 
+- Don't forget to put the `include` tag inside the `group` tag.
 Otherwise, the parameter values of different cameras may become contaminated.
-
 
 ```xml
 

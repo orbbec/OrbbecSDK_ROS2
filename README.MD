@@ -23,13 +23,14 @@ Create `colcon` workspace
 
 ```bash
 mkdir -p ~/ros2_ws/src
-cd ~/ros2_ws/src
 ```
 
 Get source code
-> Please visit
-> [Orbbec developer website](https://developer.orbbec.com.cn/download.html?id=75&menushow=1) to find
-> the latest version code
+
+```bash
+cd ~/ros2_ws/src
+git clone https://github.com/OrbbecDeveloper/OrbbecSDK_ROS2.git
+```
 
 Install deb dependencies
 

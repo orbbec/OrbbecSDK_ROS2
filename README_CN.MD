@@ -24,9 +24,11 @@ cd ~/ros2_ws/src
 ```
 
 获取源代码
-> 请访问
-> [Orbbec 开发者社区](https://developer.orbbec.com.cn/download.html?id=75&menushow=1)
-> 获取最新版本的代码
+
+```bash
+cd ~/ros2_ws/src
+git clone https://github.com/OrbbecDeveloper/OrbbecSDK_ROS2.git
+```
 
 安装deb依赖
 

@@ -1,2 +1,0 @@
-*.so.* filter=lfs diff=lfs merge=lfs -text
-SDK/* filter=lfs diff=lfs merge=lfs -text

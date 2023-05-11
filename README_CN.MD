@@ -6,7 +6,7 @@ OrbbecSDK ROS2是用于Orbbec 3D相机的ROS2 wrapper ，可与ROS2环境无缝�
 安装 ROS2
 
 - 请参考官方
-  [ROS2 安装指南](https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html)
+  [ROS2 安装指南](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)
 
 > 如果你的ROS2 命令不能自动补全，把下面两行代码放在你的 `.bashrc`
 > 或者 `.zshrc`
@@ -270,7 +270,7 @@ ros2 launch orbbec_camera multi_camera.launch.xml
 
 ## DDS Tuning
 
-默认的DDS设置（Galactic）可能不适用于数据传输。不同的DDS设置可能具有不同的性能。在此示例中，我们使用CycloneDDS。有关更详细的信息，请参考[ROS DDS Tuning](https://docs.ros.org/en/humble/How-To-Guides/DDS-tuning.html)。
+默认的DDS设置（humble）可能不适用于数据传输。不同的DDS设置可能具有不同的性能。在此示例中，我们使用CycloneDDS。有关更详细的信息，请参考[ROS DDS Tuning](https://docs.ros.org/en/humble/How-To-Guides/DDS-tuning.html)。
 
 ● 编辑CycloneDDS配置文件.
 

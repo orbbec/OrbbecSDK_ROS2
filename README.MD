@@ -8,7 +8,7 @@ OrbbecSDK ROS2 is a wrapper for the Orbbec 3D camera that provides seamless inte
 Install ROS2
 
 - Please refer to the
-  official [ROS 2 installation guide](https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html)
+  official [ROS 2 installation guide](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)
   guidance
 
 > If your ROS2 command does not auto-complete, put the following two lines into your `.bashrc`

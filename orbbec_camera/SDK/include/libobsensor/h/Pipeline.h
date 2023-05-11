@@ -297,7 +297,7 @@ void ob_pipeline_switch_config(ob_pipeline *pipeline, ob_config *config, ob_erro
  * @return ob_camera_param returns camera internal parameters
  * \else
  * @brief 获取当前相机参数
- * @attention 如果开启了D2C将返回D2C后的相机参数，如果没有将返回默认参数
+ * @attention 如果开启了D2C将返回D2C后的相机参数
  *
  * @param[in] pipeline pipeline对象
  * @param[out] error 记录错误信息

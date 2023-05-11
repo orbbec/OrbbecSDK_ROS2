@@ -205,7 +205,7 @@ public:
      * @return  OBCameraParam returns camera parameters
      * \else
      * @brief 获取相机参数
-     * @attention 如果开启了D2C将返回D2C后的相机参数，如果没有将返回默认参数
+     * @attention 如果开启了D2C将返回D2C后的相机参数
      *
      * @return  OBCameraParam返回相机参数
      * \endif

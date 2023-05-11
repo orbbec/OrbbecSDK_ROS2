@@ -136,6 +136,10 @@ typedef enum {
                                                 devices) \else  深度相机曝光调节（某些型号设备下会同步设置红外相机） \endif */
     OB_PROP_DEPTH_GAIN_INT = 2018, /**< \if English Depth camera gain adjustment (infrared cameras will be set synchronously under some models of devices) \else
                                       深度相机增益调节（某些型号设备下会同步设置红外相机） \endif */
+    OB_PROP_GYRO_ODR_INT                     = 2021, /**< \if English get/set current gyro sample rate \else get/set当前陀螺仪的采样率 \endif */
+    OB_PROP_ACCEL_ODR_INT                    = 2022, /**< \if English get/set current accel sample rate \else get/set当前加速度计的采样率 \endif */
+    OB_PROP_GYRO_FULL_SCALE_INT              = 2023, /**< \if English get/set current gyro full scale range \else get/set当前陀螺仪的量程 \endif */
+    OB_PROP_ACCEL_FULL_SCALE_INT             = 2024, /**< \if English get/set current accel full scale range \else get/set当前加速度计的量程 \endif */
     OB_PROP_IR_AUTO_EXPOSURE_BOOL = 2025, /**< \if English Infrared camera auto exposure (depth camera will be set synchronously under some models of devices)
                                              \else  红外相机自动曝光（某些型号设备下会同步设置深度相机） \endif */
     OB_PROP_IR_EXPOSURE_INT = 2026, /**< \if English Infrared camera exposure adjustment (some models of devices will set the depth camera synchronously) \else

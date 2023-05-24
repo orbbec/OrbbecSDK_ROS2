@@ -311,7 +311,7 @@ void OBCameraNode::setupDefaultImageFormat() {
   format_str_[INFRA0] = "Y16";
   image_format_[INFRA0] = CV_16UC1;
   encoding_[INFRA0] = sensor_msgs::image_encodings::MONO16;
-  unit_step_size_[INFRA0] = sizeof(uint8_t);
+  unit_step_size_[INFRA0] = sizeof(uint16_t);
 
   image_format_[COLOR] = CV_8UC3;
   encoding_[COLOR] = sensor_msgs::image_encodings::RGB8;

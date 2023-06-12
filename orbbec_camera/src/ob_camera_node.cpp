@@ -865,8 +865,6 @@ std::optional<OBCameraParam> OBCameraNode::findDefaultCameraParam() {
     int depth_h = param.depthIntrinsic.height;
     int color_w = param.rgbIntrinsic.width;
     int color_h = param.rgbIntrinsic.height;
-    RCLCPP_INFO_STREAM(logger_, "depth_w: " << depth_w << " depth_h: " << depth_h
-                                            << " color_w: " << color_w << " color_h: " << color_h);
     if ((depth_w * height_[DEPTH] == depth_h * width_[DEPTH]) &&
         (color_w * height_[COLOR] == color_h * width_[COLOR])) {
       return param;

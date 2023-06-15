@@ -1060,6 +1060,9 @@ bool OBCameraNode::setupFormatConvertType(OBFormat format) {
     case OB_FORMAT_NV12:
       format_convert_filter_.setFormatConvertType(FORMAT_NV12_TO_RGB888);
       break;
+    case OB_FORMAT_UYVY:
+      format_convert_filter_.setFormatConvertType(FORMAT_UYVY_TO_RGB888);
+      break;
     default:
       return false;
   }

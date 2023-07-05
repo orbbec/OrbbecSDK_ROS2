@@ -1,7 +1,8 @@
 # orbbec_camera
 
 ---
-OrbbecSDK ROS2 is a wrapper for the Orbbec 3D camera that provides seamless integration with the ROS2 environment. It supports ROS2 Foxy, Galactic, and Humble distributions.
+OrbbecSDK ROS2 is a wrapper for the Orbbec 3D camera that provides seamless integration with the ROS2 environment. It
+supports ROS2 Foxy, Galactic, and Humble distributions.
 
 ## Installation Instructions
 
@@ -43,8 +44,8 @@ ros-$ROS_DISTRO-image-transport ros-$ROS_DISTRO-image-publisher ros-$ROS_DISTRO-
 Install udev rules.
 
 ```bash
-cd `~/ros2_ws/src/OrbbecSDK_ROS2/orbbec_camera/scripts`
-sudo bash install.sh
+cd  ~/ros2_ws/src/OrbbecSDK_ROS2/orbbec_camera/scripts
+sudo bash install_udev_rules.sh
 sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
 
@@ -184,8 +185,9 @@ to `true` in the stream that corresponds to the argument of the launch file.
 - `/camera/color/image_raw`: The color stream image.
 - `/camera/depth/camera_info`: The depth stream image.
 - `/camera/depth/image_raw`: The depth stream image
-- `/camera/depth/points` : The point cloud,  only available when  `enable_point_cloud` is `true`.
-- `/camera/depth_registered/points`: The colored point cloud,  only available when  `enable_colored_point_cloud` is `true`.
+- `/camera/depth/points` : The point cloud, only available when  `enable_point_cloud` is `true`.
+- `/camera/depth_registered/points`: The colored point cloud, only available when  `enable_colored_point_cloud`
+  is `true`.
 - `/camera/ir/camera_info`:  The IR camera info.
 - `/camera/ir/image_raw`: The IR stream image
 
@@ -201,38 +203,38 @@ ros2 run orbbec_camera list_devices_node
 - Go to the `OrbbecSDK_ROS2/launch/multi_xxx.launch.xml` file and change the serial number. Currently,
   different cameras can only be differentiated by their serial number.
 - Don't forget to put the `include` tag inside the `group` tag.
-Otherwise, the parameter values of different cameras may become contaminated.
+  Otherwise, the parameter values of different cameras may become contaminated.
 
 ```xml
 
 <launch>
-  <!-- unique camera name-->
-  <arg name="camera_name" default="camera"/>
-  <!-- Hardware depth registration -->
-  <arg name="3d_sensor" default="astra_mini"/>
-  <!-- stereo_s_u3, astrapro, astra -->
-  <arg name="camera1_prefix" default="01"/>
-  <arg name="camera2_prefix" default="02"/>
-  <arg name="camera1_serila_number" default="AY3JB20003C"/>
-  <arg name="camera2_serila_number" default="CH26420001B"/>
-  <arg name="device_num" default="2"/>
-  <node name="camera" pkg="orbbec_camera" exec="ob_cleanup_shm_node" output="screen"/>
-  <group>
-    <include file="$(find-pkg-share orbbec_camera)/launch/gemini2.launch.xml">
-      <arg name="camera_name" value="camera_$(var camera1_prefix)"/>
-      <arg name="serial_number" value="$(var camera1_serila_number)"/>
-      <arg name="device_num" value="$(var device_num)"/>
-    </include>
-  </group>
-  <group>
-    <include file="$(find-pkg-share orbbec_camera)/launch/dabai_dcw.launch.xml">
-      <arg name="camera_name" value="camera_$(var camera2_prefix)"/>
-      <arg name="serial_number" value="$(var camera2_serila_number)"/>
-      <arg name="device_num" value="$(var device_num)"/>
-    </include>
-  </group>
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="camera_tf"
-        args="0 0 0 0 0 0 camera01_link camera02_link"/>
+    <!-- unique camera name-->
+    <arg name="camera_name" default="camera"/>
+    <!-- Hardware depth registration -->
+    <arg name="3d_sensor" default="astra_mini"/>
+    <!-- stereo_s_u3, astrapro, astra -->
+    <arg name="camera1_prefix" default="01"/>
+    <arg name="camera2_prefix" default="02"/>
+    <arg name="camera1_serila_number" default="AY3JB20003C"/>
+    <arg name="camera2_serila_number" default="CH26420001B"/>
+    <arg name="device_num" default="2"/>
+    <node name="camera" pkg="orbbec_camera" exec="ob_cleanup_shm_node" output="screen"/>
+    <group>
+        <include file="$(find-pkg-share orbbec_camera)/launch/gemini2.launch.xml">
+            <arg name="camera_name" value="camera_$(var camera1_prefix)"/>
+            <arg name="serial_number" value="$(var camera1_serila_number)"/>
+            <arg name="device_num" value="$(var device_num)"/>
+        </include>
+    </group>
+    <group>
+        <include file="$(find-pkg-share orbbec_camera)/launch/dabai_dcw.launch.xml">
+            <arg name="camera_name" value="camera_$(var camera2_prefix)"/>
+            <arg name="serial_number" value="$(var camera2_serila_number)"/>
+            <arg name="device_num" value="$(var device_num)"/>
+        </include>
+    </group>
+    <node pkg="tf2_ros" exec="static_transform_publisher" name="camera_tf"
+          args="0 0 0 0 0 0 camera01_link camera02_link"/>
 </launch>
 
 ```
@@ -281,6 +283,32 @@ The following are the launch parameters available:
 - `depth_registration`: Enables hardware alignment the depth frame to color frame.
   This field is required when the `enable_colored_point_cloud` is set to `true`.
 - `enable_publish_extrinsic`: Enables the publishing of camera extrinsic information.
+
+## Launch files
+
+| product serials     | launch file               |
+|---------------------|---------------------------|
+| asta+               | astra_adv.launch.xml      |
+| astra mini          | astra_mini.launch.xml     |
+| astra mini pro      | astra_mini_pro.launch.xml |
+| astra pro           | astra_pro.launch.xml      |
+| astra stereo s      | stereo_s_u3.launch.xml    |
+| dabai               | dabai.launch.xml          |
+| dabai d1            | dabai_d1.launch.xml       |
+| dabai dcw           | dabai_dcw.launch.xml      |
+| dabai dw            | dabai_dw.launch.xml       |
+| dabai pro           | dabai_pro.launch.xml      |
+| deeya               | deeya.launch.xml          |
+| femto               | femto.launch.xml          |
+| femto mega          | femto_mega.launch.xml     |
+| femto w             | femto_w.launch.xml        |
+| gemini              | gemini.launch.xml         |
+| gemini              | gemini.launch.xml         |
+| gemini2 / dabai DCL | gemini2.launch.xml        |
+| gemini e            | gemini_e.launch.xml       |
+| gemini e lite       | gemini_e_lite.launch.xml  |
+
+Actually, All launch files all most the same, the only difference is the default value of the parameters.
 
 ## DDS Tuning
 

@@ -1,11 +1,6 @@
 /**
- * \if English
  * @file StreamProfile.hpp
- * @brief The stream configuration related type is used to get information such as the width, height, frame rate, and format of the stream.
- * \else
- * @file StreamProfile.hpp
- * @brief 流配置相关类型，用于获取流的宽、高、帧率及格式等信息
- * \endif
+ * @brief The stream profile related type is used to get information such as the width, height, frame rate, and format of the stream.
  */
 #pragma once
 
@@ -31,64 +26,40 @@ protected:
 public:
     StreamProfile(std::unique_ptr<StreamProfileImpl> impl);
     StreamProfile(StreamProfile &streamProfile);
-    ~StreamProfile() noexcept;
+    virtual ~StreamProfile() noexcept;
 
     /**
-     * \if English
      * @brief Get the format of the stream
      *
-     * @return OBFormat returns the format of the stream
-     * \else
-     * @brief 获取流的格式
-     *
-     * @return OBFormat 返回流的格式
-     * \endif
+     * @return OBFormat return the format of the stream
      */
     OBFormat format() const;
+
     /**
-     * \if English
      * @brief Get the type of stream
      *
-     * @return OBStreamType returns the type of the stream
-     * \else
-     * @brief 获取流的类型
-     *
-     * @return OBStreamType 返回流的类型
-     * \endif
+     * @return OBStreamType return the type of the stream
      */
     OBStreamType type() const;
 
     /**
-     * \if English
      * @brief Check if frame object is compatible with the given type
      *
      * @tparam T  Given type
      * @return bool return result
-     * \else
-     * @brief 检查帧对象的运行时类型是否与给定类型兼容
-     *
-     * @tparam T 给定的类型
-     * @return bool 返回结果
-     * \endif
      */
     template <typename T> bool is();
 
     /**
-     * \if English
-     * @brief Object type conversion
+     * @brief Converts object type to target type
      *
-     * @tparam T  Target type
-     * @return std::shared_ptr<T>  returns the result, if it cannot be converted, an exception will be thrown
-     * \else
-     * @brief 对象类型转换
-     *
-     * @tparam T 目标类型
-     * @return std::shared_ptr<T> 返回结果, 如果不能够转换，将抛异常
-     * \endif
+     * @tparam T Target type
+     * @return std::shared_ptr<T> Return the result. Throws an exception if conversion is not possible.
      */
     template <typename T> std::shared_ptr<T> as() {
-        if(!is<T>())
-            throw "unsupported operation, object's type is not require type";
+        if(!is<T>()) {
+            throw std::runtime_error("Unsupported operation. Object's type is not the required type.");
+        }
 
         return std::static_pointer_cast<T>(std::const_pointer_cast<StreamProfile>(shared_from_this()));
     }
@@ -98,109 +69,86 @@ public:
     friend class Pipeline;
 };
 
+/**
+ * @brief Class representing a video stream profile.
+ */
 class OB_EXTENSION_API VideoStreamProfile : public StreamProfile {
 public:
-    VideoStreamProfile(StreamProfile &profile);
-    ~VideoStreamProfile() noexcept;
+    explicit VideoStreamProfile(StreamProfile &profile);
+
+    explicit VideoStreamProfile(std::unique_ptr<StreamProfileImpl> impl);
+
+    ~VideoStreamProfile() noexcept override;
 
     /**
-     * \if English
-     * @brief Get stream frame rate
+     * @brief Return the frame rate of the stream.
      *
-     * @return uint32_t returns the frame rate of the stream
-     * \else
-     * @brief 获取流的帧率
-     *
-     * @return uint32_t 返回流的帧率
-     * \endif
+     * @return uint32_t Return the frame rate of the stream.
      */
     uint32_t fps() const;
+
     /**
-     * \if English
-     * @brief Get stream width
+     * @brief Return the width of the stream.
      *
-     * @return uint32_t returns the width of the stream
-     * \else
-     * @brief 获取流的宽
-     *
-     * @return uint32_t 返回流的宽
-     * \endif
+     * @return uint32_t Return the width of the stream.
      */
     uint32_t width() const;
+
     /**
-     * \if English
-     * @brief Get stream height
+     * @brief Return the height of the stream.
      *
-     * @return uint32_t returns the high of the stream
-     * \else
-     * @brief 获取流的高
-     *
-     * @return uint32_t 返回流的高
-     * \endif
+     * @return uint32_t Return the height of the stream.
      */
     uint32_t height() const;
 };
 
+/**
+ * @brief Class representing an accelerometer stream profile.
+ */
 class OB_EXTENSION_API AccelStreamProfile : public StreamProfile {
 public:
-    AccelStreamProfile(StreamProfile &profile);
-    ~AccelStreamProfile() noexcept;
+    explicit AccelStreamProfile(StreamProfile &profile);
+
+    explicit AccelStreamProfile(std::unique_ptr<StreamProfileImpl> impl);
+
+    ~AccelStreamProfile() noexcept override;
 
     /**
-     * \if English
-     * @brief Get full scale range
+     * @brief Return the full scale range.
      *
-     * @return OBAccelFullScaleRange  returns the scale range value
-     * \else
-     * @brief 获取满量程范围
-     *
-     * @return OBAccelFullScaleRange  返回量程范围值
-     * \endif
+     * @return OBAccelFullScaleRange Return the scale range value.
      */
     OBAccelFullScaleRange fullScaleRange() const;
 
     /**
-     * \if English
-     * @brief Get sampling frequency
+     * @brief Return the sampling frequency.
      *
-     * @return OBAccelFullScaleRange  returns the sampling frequency
-     * \else
-     * @brief 获取采样频率
-     *
-     * @return OBAccelFullScaleRange  返回采样频率
-     * \endif
+     * @return OBAccelFullScaleRange Return the sampling frequency.
      */
     OBAccelSampleRate sampleRate() const;
 };
 
+/**
+ * @brief Class representing a gyroscope stream profile.
+ */
 class OB_EXTENSION_API GyroStreamProfile : public StreamProfile {
 public:
-    GyroStreamProfile(StreamProfile &profile);
-    ~GyroStreamProfile() noexcept;
+    explicit GyroStreamProfile(StreamProfile &profile);
+
+    explicit GyroStreamProfile(std::unique_ptr<StreamProfileImpl> impl);
+    ~GyroStreamProfile() noexcept override;
 
     /**
-     * \if English
-     * @brief Get full scale range
+     * @brief Return the full scale range.
      *
-     * @return OBAccelFullScaleRange  returns the scale range value
-     * \else
-     * @brief 获取满量程范围
-     *
-     * @return OBAccelFullScaleRange  返回量程范围值
-     * \endif
+     * @return OBAccelFullScaleRange Return the scale range value.
      */
     OBGyroFullScaleRange fullScaleRange() const;
 
     /**
-     * \if English
-     * @brief Get sampling frequency
+     * @brief Return the sampling frequency.
      *
-     * @return OBAccelFullScaleRange  returns the sampling frequency
-     * \else
-     * @brief 获取采样频率
-     *
-     * @return OBAccelFullScaleRange  返回采样频率
-     * \endif
+     * @return OBAccelFullScaleRange Return the sampling frequency.
      */
     OBGyroSampleRate sampleRate() const;
 };
@@ -229,58 +177,53 @@ protected:
     std::unique_ptr<StreamProfileListImpl> impl_;
 
 public:
-    StreamProfileList(std::unique_ptr<StreamProfileListImpl> impl);
+    explicit StreamProfileList(std::unique_ptr<StreamProfileListImpl> impl);
     ~StreamProfileList() noexcept;
 
     /**
-     * \if English
-     * @brief Get stream profile count
+     * @brief Return the number of StreamProfile objects.
      *
-     * @return uint32_t returns the number of StreamProfile
-     * \else
-     * @brief 获取StreamProfile数量
-     *
-     * @return uint32_t 返回StreamProfile的数量
-     * \endif
+     * @return uint32_t Return the number of StreamProfile objects.
      */
     uint32_t count() const;
 
     /**
-     * \if English
-     * @brief Get StreamProfile by index number
+     * @brief Return the StreamProfile object at the specified index.
      *
-     * @param index Device index to be created，the range is [0, count-1],if the index exceeds the range, an exception will be thrown
-     * @return std::shared_ptr<StreamProfile> returns StreamProfile object
-     * \else
-     * @brief 通过索引号获取StreamProfile
-     *
-     * @param index 要创建设备的索，范围 [0, count-1]，如果index超出范围将抛异常
-     * @return std::shared_ptr<StreamProfile> 返回StreamProfile对象
-     * \endif
+     * @param index The index of the StreamProfile object to be retrieved. Must be in the range [0, count-1]. Throws an exception if the index is out of range.
+     * @return std::shared_ptr<StreamProfile> Return the StreamProfile object.
      */
     const std::shared_ptr<StreamProfile> getProfile(uint32_t index);
 
     /**
-     * \if English
-     * @brief Match the corresponding stream profile through the passed in parameters. If there are multiple matches,
-     * the first one in the list will be returned by default. If no matched profile found, will throw exception!
+     * @brief Match the corresponding video stream profile based on the passed-in parameters. If multiple Match are found, the first one in the list is
+     * returned by default. Throws an exception if no matching profile is found.
      *
-     * @param width Width. If no matching condition is required, it can be passed to 0
-     * @param height Height. If no matching condition is required, it can be passed to 0
-     * @param format Type. If no matching condition is required, it can be passed to OB_FORMAT_UNKNOWN
-     * @param fps Frame rate. If no matching condition is required, it can be passed to 0
-     * @return std::shared_ptr<StreamProfile> Returns the matching resolution
-     * \else
-     * @brief 通过传入的参数进行匹配对应的StreamProfile。若有多个匹配项默认返回列表中的第一个, 若没有找到匹配的项，则抛异常
-     *
-     * @param width 宽度，如不要求加入匹配条件，可传0
-     * @param height 高度，如不要求加入匹配条件，可传0
-     * @param format 类型，如不要求加入匹配条件，可传OB_FORMAT_UNKNOWN
-     * @param fps 帧率，如不要求加入匹配条件，可传0
-     * @return std::shared_ptr<StreamProfile> 返回匹配的分辨率
-     * \endif
+     * @param width The width of the stream. Pass 0 if no matching condition is required.
+     * @param height The height of the stream. Pass 0 if no matching condition is required.
+     * @param format The type of the stream. Pass OB_FORMAT_UNKNOWN if no matching condition is required.
+     * @param fps The frame rate of the stream. Pass 0 if no matching condition is required.
+     * @return std::shared_ptr<VideoStreamProfile> Return the matching resolution.
      */
     const std::shared_ptr<VideoStreamProfile> getVideoStreamProfile(int width = 0, int height = 0, OBFormat format = OB_FORMAT_UNKNOWN, int fps = 0);
+
+    /**
+     * @brief Match the corresponding accelerometer stream profile based on the passed-in parameters. If multiple Match are found, the first one in the list
+     * is returned by default. Throws an exception if no matching profile is found.
+     *
+     * @param fullScaleRange The full scale range. Pass 0 if no matching condition is required.
+     * @param sampleRate The sampling frequency. Pass 0 if no matching condition is required.
+     */
+    const std::shared_ptr<AccelStreamProfile> getAccelStreamProfile(OBAccelFullScaleRange fullScaleRange, OBAccelSampleRate sampleRate);
+
+    /**
+     * @brief Match the corresponding gyroscope stream profile based on the passed-in parameters. If multiple Match are found, the first one in the list is
+     * returned by default. Throws an exception if no matching profile is found.
+     *
+     * @param fullScaleRange The full scale range. Pass 0 if no matching condition is required.
+     * @param sampleRate The sampling frequency. Pass 0 if no matching condition is required.
+     */
+    const std::shared_ptr<GyroStreamProfile> getGyroStreamProfile(OBGyroFullScaleRange fullScaleRange, OBGyroSampleRate sampleRate);
 };
 
 }  // namespace ob

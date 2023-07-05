@@ -1,11 +1,7 @@
 /**
- * \if English
  * @file Context.hpp
- * @brief The SDK context class, the entry to the underlying SDK, is used to query device lists，handle device callbacks，set the level of the log
- * \else
- * @file Context.hpp
- * @brief SDK上下文环境类，底层SDK的入口，用于获取设备列表，处理设备的回调，日志等级的设置操作
- * \endif
+ * @brief The SDK context class, which serves as the entry point to the underlying SDK. It is used to query device lists, handle device callbacks, and set the
+ * log level.
  *
  */
 #pragma once
@@ -28,106 +24,113 @@ private:
 
 public:
     /**
-     * \if English
-     * @brief Context is a management class that describes the runtime of the SDK. It is responsible for the applying and releasing of resources for the SDK.
-     * The context has the ability to manage multiple devices, is responsible for enumerating devices, monitoring device callbacks, and enabling functions such
-     * as multi-device synchronization. \else
-     * @brief context是描述SDK的runtime一个管理类，负责SDK的资源申请与释放
-     * context具备多设备的管理能力，负责枚举设备，监听设备回调，启用多设备同步等功能
-     * \endif
-     *
+     * @brief The Context class is a management class that describes the runtime of the SDK. It is responsible for applying and releasing resources for the SDK.
+     * The context has the ability to manage multiple devices, enumerate devices, monitor device callbacks, and enable functions such as multi-device
+     * synchronization.
      */
     Context(const char *configPath = "");
     virtual ~Context() noexcept;
 
     /**
-     *\if English
-     * @brief Query enumerated device list
+     * @brief Queries the enumerated device list.
      *
-     * @return std::shared_ptr<DeviceList> returns a pointer to the device list class
-     * \else
-     * @brief 获取枚举到设备列表
-     *
-     * @return std::shared_ptr<DeviceList>返回设备列表类的指针
-     * \endif
+     * @return std::shared_ptr<DeviceList> A pointer to the device list class.
      */
     std::shared_ptr<DeviceList> queryDeviceList();
 
     /**
-     * @brief 创建网络设备对象
+     * @brief Creates a network device object.
      *
-     * @param address  ip 地址
-     * @param port 端口号
-     * @return std::shared_ptr<Device> 返回创建好的设备对象
+     * @param address The IP address.
+     * @param port The port.
+     * @return std::shared_ptr<Device> The created device object.
      */
     std::shared_ptr<Device> createNetDevice(const char *address, uint16_t port);
 
-    using DeviceChangedCallback = std::function<void(std::shared_ptr<DeviceList> removedList, std::shared_ptr<DeviceList> addedList)>;
     /**
-     * \if English
-     * @brief Set device plug-in callback function
+     * @brief Changes the IP configuration of a network device.
      *
-     * @param callback function triggered when the device is plugged and unplugged
-     * \else
-     * @brief 设置设备插拔回调函数
+     * @param deviceUid The device unique ID, which is the network device MAC address. It can be obtained through the @ref DeviceList::uid() function.
+     * @param config The new IP configuration.
+     */
+    void changeNetDeviceIpConfig(const char *deviceUid, const OBNetIpConfig &config);
+
+    using DeviceChangedCallback = std::function<void(std::shared_ptr<DeviceList> removedList, std::shared_ptr<DeviceList> addedList)>;
+
+    /**
+     * @brief Set the device plug-in callback function.
      *
-     * @param callback 设备插拔时触发的回调函数
-     * \endif
+     * @param callback The function triggered when the device is plugged and unplugged.
      */
     void setDeviceChangedCallback(DeviceChangedCallback callback);
 
     /**
-     * \if English
-     * @brief Activate the multi-device synchronization function to synchronize the clock of the created device(the device needs support this function)
+     * @brief Activates the multi-device synchronization function to synchronize the clock of the created device (the device needs to support this function).
      *
-     * @param repeatInterval  synchronization time interval (unit: ms; if repeatInterval=0, it means that it will only be synchronized once and will not be
-     * executed regularly) \else
-     * @brief 启动多设备同步功能，同步已创建设备的时钟(需要使用的设备支持该功能)
-     *
-     * @param repeatInterval 定时同步时间间隔（单位ms；如果repeatInterval=0，表示只同步一次，不再定时执行）
-     * \endif
+     * @param repeatInterval The synchronization time interval (unit: ms; if repeatInterval=0, it means that it will only be synchronized once and will not be
+     * executed regularly).
      */
     void enableMultiDeviceSync(uint64_t repeatInterval);
 
     /**
-     * \if English
-     * @brief Set the level of the global log will affect both the log level output to the terminal and output to the file
+     * @brief Frees idle memory from the internal frame memory pool.
+     */
+    void freeIdleMemory();
+
+    /**
+     * @brief Set the level of the global log, which affects both the log level output to the terminal and output to the file.
      *
-     * @param severity log output level
-     * \else
-     * @brief 设置全局日志的等级，会同时作用于输出到终端和输出到文件的日志等级
-     *
-     * @param severity 日志输出等级
-     * \endif
+     * @param severity The log output level.
      */
     static void setLoggerSeverity(OBLogSeverity severity);
 
     /**
-     * \if English
-     * @brief Set log output to file
+     * @brief Set log output to a file.
      *
-     * @param severity log level output to file
+     * @param severity The log level output to the file.
      * @param directory The log file output path. If the path is empty, the existing settings will continue to be used (if the existing configuration is also
-     * empty, the log will not be output to the file) \else
-     * @brief 设置日志输出到文件
-     *
-     * @param severity 输出到文件的日志等级
-     * @param directory 日志文件输出路径，如果路径为空，则继续使用已有设置(已有配置也为空则不输出日志到文件)
-     * \endif
+     * empty, the log will not be output to the file).
      */
     static void setLoggerToFile(OBLogSeverity severity, const char *directory);
 
     /**
-     * \if English
-     * @brief Set log output to terminal
+     * @brief Set log output to the terminal.
      *
-     * @param severity 	log level output to the terminal
-     * \else
-     * @brief 设置日志输出到终端
-     *
-     * @param severity 输出到终端的日志等级
-     * \endif
+     * @param severity The log level output to the terminal.
      */
     static void setLoggerToConsole(OBLogSeverity severity);
+
+    /**
+     * @brief Log output callback function.
+     *
+     * @param severity The current callback log level.
+     * @param logMsg The log message.
+     */
+    using LogCallback = std::function<void(OBLogSeverity severity, const char *logMsg)>;
+
+    /**
+     * @brief Set the logger to callback.
+     *
+     * @param severity The callback log level.
+     * @param callback The callback function.
+     */
+    static void setLoggerToCallback(OBLogSeverity severity, LogCallback callback);
+
+    /**
+     * @brief Loads a license file.
+     *
+     * @param filePath The license file path.
+     * @param key The decryption key.
+     */
+    static void loadLicense(const char *filePath, const char *key = OB_DEFAULT_DECRYPT_KEY);
+
+    /**
+     * @brief Loads a license from data.
+     *
+     * @param data The license data.
+     * @param dataLen The license data length.
+     * @param key The decryption key.
+     */
+    static void loadLicenseFromData(const char *data, uint32_t dataLen, const char *key = OB_DEFAULT_DECRYPT_KEY);
 };
 }  // namespace ob

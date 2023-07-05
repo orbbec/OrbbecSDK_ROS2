@@ -1,11 +1,6 @@
 /**
- * \if English
  * @file Version.h
- * @brief Get the SDK version number information function
- * \else
- * @file Version.h
- * @brief 获取SDK版本号相关信息函数
- * \endif
+ * @brief Functions for retrieving the SDK version number information.
  *
  */
 #pragma once
@@ -15,55 +10,40 @@ extern "C" {
 #endif
 
 /**
- * \if English
- * @brief Get the SDK version
+ * @brief Get the SDK version number.
  *
- * @return int  returns the SDK version
- * \else
- * @brief 获取SDK版本号
- *
- * @return int 返回SDK版本号
- * \endif
+ * @return int The SDK version number.
  */
 int ob_get_version();
 
 /**
- * \if English
- * @brief Get the SDK major version
+ * @brief Get the SDK major version number.
  *
- * @return int returns the SDK major version
- * \else
- * @brief 获取SDK主版本号
- *
- * @return int 返回SDK主版本号
- * \endif
+ * @return int The SDK major version number.
  */
 int ob_get_major_version();
+
 /**
- * \if English
- * @brief Get the SDK minor version
+ * @brief Get the SDK minor version number.
  *
- * @return int returns the SDK minor version
- * \else
- * @brief 获取SDK副版本号
- *
- * @return int 返回SDK副版本号
- * \endif
+ * @return int The SDK minor version number.
  */
 int ob_get_minor_version();
 
 /**
- * \if English
- * @brief Get the SDK patch version
+ * @brief Get the SDK patch version number.
  *
- * @return int returns the SDK patch version
- * \else
- * @brief 获取SDK修订版本号
- *
- * @return int 返回SDK修订版本号
- * \endif
+ * @return int The SDK patch version number.
  */
 int ob_get_patch_version();
+
+/**
+ * @brief Get the SDK stage version.
+ * @attention The returned char* does not need to be freed.
+ *
+ * @return const char* The SDK stage version.
+ */
+const char *ob_get_stage_version();
 
 #ifdef __cplusplus
 }

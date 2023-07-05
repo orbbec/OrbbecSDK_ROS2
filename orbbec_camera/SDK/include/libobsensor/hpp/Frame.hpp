@@ -1,11 +1,6 @@
 /**
- * \if English
  * @file Frame.hpp
  * @brief Frame related type, which is mainly used to obtain frame data and frame information.
- * \else
- * @file Frame.hpp
- * @brief 帧相关类型，主要用于获取帧数据及帧的信息
- * \endif
  *
  */
 #pragma once
@@ -17,12 +12,12 @@
 #include <typeinfo>
 
 /**
- *    Frame类继承关系：
+ *    Frame class：
  *                 Frame
  *                   |
  *            +------+----------+----------+-----------+
  *            |      |          |         |            |
- *      VideoFrame PointFrame AccelFrame GyroFrame FrameSet
+ *      VideoFrame PointsFrame AccelFrame GyroFrame FrameSet
  *          |
  *       +--+------+---------+
  *      |          |         |
@@ -47,149 +42,92 @@ protected:
     std::unique_ptr<FrameImpl> impl_;
 
 public:
-    Frame(std::unique_ptr<FrameImpl> impl);
+    explicit Frame(std::unique_ptr<FrameImpl> impl);
     Frame(Frame &frame);
 
     virtual ~Frame() noexcept;
+
     /**
-     * \if English
-     * @brief Get the type of frame
+     * @brief Get the type of frame.
      *
-     * @return OBFrameType returns the type of frame
-     * \else
-     * @brief 获取帧的类型
-     *
-     * @return OBFrameType 返回帧的类型
-     * \endif
+     * @return OBFrameType The type of frame.
      */
     virtual OBFrameType type();
 
     /**
-     * \if English
-     * @brief Get the format of the frame
+     * @brief Get the format of the frame.
      *
-     * @return OBFormat returns the format of the frame
-     * \else
-     * @brief 获取帧的格式
-     *
-     * @return OBFormat 返回帧的格式
-     * \endif
+     * @return OBFormat The format of the frame.
      */
     virtual OBFormat format();
 
     /**
-     * \if English
-     * @brief Get the sequence number of the frame
+     * @brief Get the sequence number of the frame.
      *
-     * @return uint64_t returns the sequence number of the frame
-     * \else
-     * @brief 获取帧的序号
-     *
-     * @return uint64_t 返回帧的序号
-     * \endif
+     * @return uint64_t The sequence number of the frame.
      */
     virtual uint64_t index();
 
     /**
-     * \if English
-     * @brief Get frame data
+     * @brief Get the frame data.
      *
-     * @return void* returns frame data
-     * \else
-     * @brief 获取帧数据
-     *
-     * @return void* 返回帧数据
-     * \endif
+     * @return void* The frame data.
      */
     virtual void *data();
 
     /**
-     * \if English
-     * @brief Get the frame data size
+     * @brief Get the size of the frame data.
      *
-     * @return uint32_t returns the frame data size
-     * If it is point cloud data, it returns the number of bytes occupied by all point sets. If you need to find the number of points, you need to divide the
-     * dataSize by the structure size of the corresponding point type. \else
-     * @brief 获取帧数据大小
-     *
-     * @return uint32_t 返回帧数据的大小
-     * 如果是点云数据返回的是所有点集合占的字节数，若需要求出点的个数需要将dataSize除以对应的点类型的结构体大小
-     * \endif
+     * @return uint32_t The size of the frame data.
+     * For point cloud data, this returns the number of bytes occupied by all point sets. To find the number of points, divide the dataSize by the structure
+     * size of the corresponding point type.
      */
     virtual uint32_t dataSize();
 
     /**
-     * \if English
-     * @brief Get the hardware timestamp of the frame
+     * @brief Get the hardware timestamp of the frame in milliseconds.
+     * @brief The hardware timestamp is the time point when the frame was captured by the device, on device clock domain.
      *
-     * @return uint64_t returns the time stamp of the frame hardware
-     * \else
-     * @brief 获取帧的硬件时间戳
-     *
-     * @return uint64_t 返回帧硬件的时间戳
-     * \endif
+     * @return uint64_t The hardware timestamp of the frame in milliseconds.
      */
     uint64_t timeStamp();
 
     /**
-     * \if English
-     * @brief Get the hardware timestamp of the frame us
+     * @brief Get the hardware timestamp of the frame in microseconds.
+     * @brief The hardware timestamp is the time point when the frame was captured by the device, on device clock domain.
      *
-     * @return uint64_t returns the time stamp of the frame hardware, unit us
-     * \else
-     * @brief 获取帧的硬件时间戳
-     *
-     * @return uint64_t 返回帧硬件的时间戳
-     * \endif
+     * @return uint64_t The hardware timestamp of the frame in microseconds.
      */
     uint64_t timeStampUs();
 
     /**
-     * \if English
-     * @brief Get frame system timestamp
+     * @brief Get the system timestamp of the frame in milliseconds.
+     * @brief The system timestamp is the time point when the frame was received by the host, on host clock domain.
      *
-     * @return uint64_t returns the time stamp of the frame hardware
-     * \else
-     * @brief 获取帧的系统时间戳
-     *
-     * @return uint64_t 返回帧的系统时间戳
-     * \endif
+     * @return uint64_t The system timestamp of the frame in milliseconds.
      */
     uint64_t systemTimeStamp();
 
     /**
-     * \if English
-     * @brief Check if the runtime type of the frame object is compatible with a given type
+     * @brief Check if the runtime type of the frame object is compatible with a given type.
      *
-     * @tparam T Given type
-     * @return bool returns result
-     * \else
-     * @brief 检查帧对象的运行时类型是否与给定类型兼容
-     *
-     * @tparam T 给定的类型
-     * @return bool 返回结果
-     * \endif
+     * @tparam T The given type.
+     * @return bool The result.
      */
     template <typename T> bool is();
 
     /**
-     * \if English
-     * @brief Frame object type conversion
+     * @brief Convert the frame object to a target type.
      *
-     * @tparam T Target type
-     * @return std::shared_ptr<T> returns the result, if it cannot be converted, an exception will be thrown
-     * \else
-     * @brief 帧对象类型转换
-     *
-     * @tparam T 目标类型
-     * @return std::shared_ptr<T> 返回结果, 如果不能够转换，将抛异常
-     * \endif
+     * @tparam T The target type.
+     * @return std::shared_ptr<T> The result. If it cannot be converted, an exception will be thrown.
      */
     template <typename T> std::shared_ptr<T> as() {
-        if(!is<T>())
-            throw "unsupported operation, object's type is not require type";
+        if(!is<T>()) {
+            throw std::runtime_error("unsupported operation, object's type is not require type");
+        }
 
-        return std::static_pointer_cast<T>(std::const_pointer_cast<Frame>(shared_from_this()));
+        return std::dynamic_pointer_cast<T>(shared_from_this());
     }
 
 private:
@@ -200,108 +138,83 @@ private:
 
 class OB_EXTENSION_API VideoFrame : public Frame {
 public:
-    VideoFrame(Frame &frame);
-    virtual ~VideoFrame() noexcept {};
+    explicit VideoFrame(Frame &frame);
+
+    explicit VideoFrame(std::unique_ptr<FrameImpl> impl);
+
+    ~VideoFrame() noexcept override = default;
 
     /**
-     * \if English
-     * @brief Get frame width
+     * @brief Get the width of the frame.
      *
-     * @return uint32_t returns the width of the frame
-     * \else
-     * @brief 获取帧的宽
-     *
-     * @return uint32_t 返回帧的宽
-     * \endif
+     * @return uint32_t The width of the frame.
      */
     uint32_t width();
 
     /**
-     * \if English
-     * @brief Get frame height
+     * @brief Get the height of the frame.
      *
-     * @return uint32_t returns the height of the frame
-     * \else
-     * @brief 获取帧的高
-     *
-     * @return uint32_t 返回帧的高
-     * \endif
+     * @return uint32_t The height of the frame.
      */
     uint32_t height();
 
     /**
-     * \if English
-     * @brief Get the metadata of the frame
+     * @brief Get the metadata of the frame.
      *
-     * @return void* returns the metadata of the frame
-     * \else
-     * @brief 获取帧的元数据
-     *
-     * @return void* 返回帧的元数据
-     * \endif
+     * @return void* The metadata of the frame.
      */
     void *metadata();
 
     /**
-     * \if English
-     * @brief Get the metadata size of the frame
+     * @brief Get the size of the metadata of the frame.
      *
-     * @return uint32_t returns the metadata size of the frame
-     * \else
-     * @brief 获取帧的元数据大小
-     *
-     * @return uint32_t 返回帧的元数据大小
-     * \endif
+     * @return uint32_t The size of the metadata of the frame.
      */
     uint32_t metadataSize();
 
     /**
-     * \if English
-     * @brief Get the effective number of pixels (such as Y16 format frame, but only the lower 10 bits are valid bits, and the upper 6 bits are filled with 0)
-     * @attention Only valid for Y8/Y10/Y11/Y12/Y14/Y16 format
+     * @brief Get the effective number of pixels in the frame.
+     * @attention Only valid for Y8/Y10/Y11/Y12/Y14/Y16 format.
      *
-     * @return uint8_t returns the effective number of pixels in the pixel, or 0 if it is an unsupported format
-     * \else
-     * @brief 获取像素有效位数（如Y16格式帧，每个像素占16bit，但实际只有低10位是有效位，高6位填充0）
-     * @attention 仅对Y8/Y10/Y11/Y12/Y14/Y16格式有效
-     *
-     * @return uint8_t 返回像素有效位数，如果是不支持的格式，返回0
-     * \endif
+     * @return uint8_t The effective number of pixels in the frame, or 0 if it is an unsupported format.
      */
     uint8_t pixelAvailableBitSize();
 };
 
 class OB_EXTENSION_API ColorFrame : public VideoFrame {
 public:
-    ColorFrame(Frame &frame);
-    ~ColorFrame() noexcept {};
+    explicit ColorFrame(Frame &frame);
+
+    explicit ColorFrame(std::unique_ptr<FrameImpl> impl);
+
+    ~ColorFrame() noexcept override = default;
 };
 
 class OB_EXTENSION_API DepthFrame : public VideoFrame {
 public:
-    DepthFrame(Frame &frame);
-    ~DepthFrame() noexcept {};
+    explicit DepthFrame(Frame &frame);
+
+    explicit DepthFrame(std::unique_ptr<FrameImpl> impl);
+
+    ~DepthFrame() noexcept override = default;
 
     /**
-     * \if English
-     * @brief Get the value scale of the depth frame. The pixel value of depth frame is multiplied by the scale to give a depth value in millimeter.
-     *      such as valueScale=0.1, and a certain coordinate pixel value is pixelValue=10000, then the depth value = pixelValue*valueScale = 10000*0.1=1000mm。
+     * @brief Get the value scale of the depth frame. The pixel value of depth frame is multiplied by the scale to give a depth value in millimeters.
+     *      For example, if valueScale=0.1 and a certain coordinate pixel value is pixelValue=10000, then the depth value = pixelValue*valueScale =
+     *      10000*0.1=1000mm.
      *
-     * @return float scale
-     * \else
-     * @brief 获取深度帧的值缩放系数，深度像素值乘以缩放系数后，可以得到单位为毫米的深度值； 如valueScale=0.1, 某坐标像素值为pixelValue=10000，
-     *     则表示深度值value = pixelValue*valueScale = 10000*0.1=1000mm。
-     *
-     * @return float 缩放系数
-     * \endif
+     * @return float The scale.
      */
     float getValueScale();
 };
 
 class OB_EXTENSION_API IRFrame : public VideoFrame {
 public:
-    IRFrame(Frame &frame);
-    virtual ~IRFrame() noexcept {};
+    explicit IRFrame(Frame &frame);
+
+    explicit IRFrame(std::unique_ptr<FrameImpl> impl);
+
+    ~IRFrame() noexcept override = default;
 
 public:
     OBSensorType getDataSource();
@@ -309,245 +222,225 @@ public:
 
 class OB_EXTENSION_API PointsFrame : public Frame {
 public:
-    PointsFrame(Frame &frame);
-    ~PointsFrame() noexcept {};
+    explicit PointsFrame(Frame &frame);
+
+    explicit PointsFrame(std::unique_ptr<FrameImpl> impl);
+
+    ~PointsFrame() noexcept override = default;
 
     /**
-     * \if English
-     * @brief Get the point position value scale of the points frame. the point position value of points frame is multiplied by the scale to give a position
-     * value in millimeter. such as scale=0.1, The x-coordinate value of a point is x = 10000, which means that the actual x-coordinate value = x*scale =
-     * 10000*0.1 = 1000mm.
+     * @brief Get the point position value scale of the points frame. The point position value of the points frame is multiplied by the scale to give a position
+     * value in millimeters. For example, if scale=0.1, the x-coordinate value of a point is x = 10000, which means that the actual x-coordinate value = x*scale
+     * = 10000*0.1 = 1000mm.
      *
-     * @param[in] frame Frame object
-     * @param[out] error Log error messages
-     * @return float position value scale
-     * \else
-     * @brief 获取点云帧的点坐标值缩放系数，点坐标值乘以缩放系数后，可以得到单位为毫米的坐标值； 如scale=0.1, 某个点的x坐标值为x=10000，
-     *     则表示实际x坐标value = x*scale = 10000*0.1=1000mm。
-     *
-     * @return float 缩放系数
-     * \endif
+     * @return float The position value scale.
      */
     float getPositionValueScale();
 };
 
+/**
+ * @brief Define the FrameSet class, which inherits from the Frame class
+ *
+ */
 class OB_EXTENSION_API FrameSet : public Frame {
 
 public:
-    // FrameSet();
-    FrameSet(Frame &frame);
-    ~FrameSet() noexcept;
+    explicit FrameSet(std::unique_ptr<FrameImpl> impl);
+
+    explicit FrameSet(Frame &frame);
+
+    ~FrameSet() noexcept override;
 
     /**
-     * \if English
-     * @brief Get frame count
+     * @brief Get the number of frames in the FrameSet
      *
-     * @return uint32_t returns the number of frames
-     * \else
-     * @brief 帧集合中包含的帧数量
-     *
-     * @return uint32_t 返回帧的数量
-     * \endif
+     * @return uint32_t The number of frames
      */
     uint32_t frameCount();
 
     /**
-     * \if English
-     * @brief Get depth frame
+     * @brief Get the depth frame in the FrameSet
      *
-     * @return std::shared_ptr<DepthFrame> returns the depth frame
-     * \else
-     * @brief 获取深度帧
-     *
-     * @return std::shared_ptr<DepthFrame> 返回深度帧
-     * \endif
+     * @return std::shared_ptr<DepthFrame> The depth frame
      */
     std::shared_ptr<DepthFrame> depthFrame();
 
     /**
-     * \if English
-     * @brief Get color frame
+     * @brief Get the color frame in the FrameSet
      *
-     * @return std::shared_ptr<ColorFrame> returns the color frame
-     * \else
-     * @brief 获取彩色帧
-     *
-     * @return std::shared_ptr<ColorFrame> 返回彩色帧
-     * \endif
+     * @return std::shared_ptr<ColorFrame> The color frame
      */
     std::shared_ptr<ColorFrame> colorFrame();
 
     /**
-     * \if English
-     * @brief Get infrared frame
+     * @brief Get the infrared frame in the FrameSet
      *
-     * @return std::shared_ptr<IRFrame> returns infrared frame
-     * \else
-     * @brief 获取红外帧
-     *
-     * @return std::shared_ptr<IRFrame> 返回红外帧
-     * \endif
+     * @return std::shared_ptr<IRFrame> The infrared frame
      */
     std::shared_ptr<IRFrame> irFrame();
 
     /**
-     * \if English
-     * @brief Get point cloud frame
+     * @brief Get the point cloud frame in the FrameSet
      *
-     * @return  std::shared_ptr<PointsFrame> returns the point cloud data frame
-     * \else
-     * @brief 获取点云帧
-     *
-     * @return  std::shared_ptr<PointsFrame> 返回点云帧
-     * \endif
+     * @return  std::shared_ptr<PointsFrame> The point cloud data frame
      */
     std::shared_ptr<PointsFrame> pointsFrame();
 
     /**
-     * \if English
-     * @brief Get frame by sensor type
+     * @brief Get a frame of a specific type from the FrameSet
      *
-     * @param frameType  Type of sensor
-     * @return std::shared_ptr<Frame> returns the corresponding type of frame
-     * \else
-     * @brief 通过传感器类型获取帧
-     *
-     * @param frameType 传感器的类型
-     * @return std::shared_ptr<Frame> 返回相应类型的帧
-     * \endif
+     * @param frameType The type of sensor
+     * @return std::shared_ptr<Frame> The corresponding type of frame
      */
     std::shared_ptr<Frame> getFrame(OBFrameType frameType);
 
+    /**
+     * @brief Get a frame at a specific index from the FrameSet
+     *
+     * @param index The index of the frame
+     * @return std::shared_ptr<Frame> The frame at the specified index
+     */
+    std::shared_ptr<Frame> getFrame(int index);
+
+    // Declare Pipeline and Filter classes as friends
     friend class Pipeline;
     friend class Filter;
 };
 
+/**
+ * @brief Define the AccelFrame class, which inherits from the Frame class
+ *
+ */
 class OB_EXTENSION_API AccelFrame : public Frame {
 public:
-    AccelFrame(Frame &frame);
-    ~AccelFrame() noexcept = default;
+    explicit AccelFrame(Frame &frame);
+
+    explicit AccelFrame(std::unique_ptr<FrameImpl> impl);
+
+    ~AccelFrame() noexcept override = default;
 
     /**
-     * \if English
-     * @brief Accelerometer frame data
+     * @brief Get the accelerometer frame data
      *
-     * @return OBAccelValue
-     * \else
-     * @brief 获取加速度帧X数据
-     *
-     * @return OBAccelValue
-     * \endif
+     * @return OBAccelValue The accelerometer frame data
      */
     OBAccelValue value();
 
     /**
-     * \if English
-     * @brief Get the temperature when the frame is sampled
+     * @brief Get the temperature when the frame was sampled
      *
-     * @return float temperature value
-     * \else
-     * @brief 获取帧采样时的温度
-     *
-     * @return float 温度值
-     * \endif
+     * @return float The temperature value
      */
     float temperature();
 };
 
+/**
+ * @brief Define the GyroFrame class, which inherits from the Frame class
+ */
 class OB_EXTENSION_API GyroFrame : public Frame {
 public:
-    GyroFrame(Frame &frame);
-    ~GyroFrame() noexcept = default;
+    explicit GyroFrame(Frame &frame);
+
+    explicit GyroFrame(std::unique_ptr<FrameImpl> impl);
+
+    ~GyroFrame() noexcept override = default;
 
     /**
-     * \if English
-     * @brief Get gyro frame data
+     * @brief Get the gyro frame data
      *
-     * @return OBAccelValue
-     * \else
-     * @brief 获取陀螺仪帧数据
-     *
-     * @return OBAccelValue
-     * \endif
+     * @return OBAccelValue The gyro frame data
      */
     OBGyroValue value();
 
     /**
-     * \if English
-     * @brief Get temperature when the frame is sampled.
+     * @brief Get the temperature when the frame was sampled
      *
-     * @return float temperature value
-     * \else
-     * @brief 获取帧采样时的温度
-     *
-     * @return float 温度值
-     * \endif
+     * @return float The temperature value
      */
     float temperature();
 };
 
+/**
+ * @brief Define the FrameHelper class
+ */
 class OB_EXTENSION_API FrameHelper {
 public:
-    FrameHelper();
-    ~FrameHelper();
     /**
-     * @brief 根据外部创建的Buffer创建帧对象
+     * @brief Create a Frame object.
      *
-     * @param format 帧对象格式
-     * @param frameWidth 帧对象宽
-     * @param frameHeight 帧对象高
-     * @param buffer 帧对象数据
-     * @param bufferSize 帧对象数据大小
-     * @return std::shared_ptr<Frame> 返回帧对象
+     * @param[in] type The type of frame. See @ref OBFrameType.
+     * @param[in] format The format of the frame. See @ref OBFormat.
+     * @param[in] width The width of the frame.
+     * @param[in] height The height of the frame.
+     * @param[in] strideBytes The stride of the frame in bytes. If strideBytes > 0, the frame data size = height * strideBytes. If strideBytes = 0, the frame
+     * datasize = height * width * pixelSize (pixelSize according to the format).
+     *
+     * @return std::shared_ptr<Frame> The created frame object.
      */
-    static std::shared_ptr<Frame> createFrameFromBuffer(OBFormat format, uint32_t frameWidth, uint32_t frameHeight, uint8_t *buffer, uint32_t bufferSize,
+    static std::shared_ptr<Frame> createFrame(OBFrameType type, OBFormat format, uint32_t width, uint32_t height, uint32_t strideBytes);
+
+    /**
+     * @brief Create a frame object based on an externally created buffer
+     *
+     * @param[in] format The format of the frame. See @ref OBFormat.
+     * @param[in] width The width of the frame.
+     * @param[in] height The height of the frame.
+     * @param[in] buffer The frame object buffer
+     * @param[in] bufferSize The frame object buffer size
+     * @param[in] destroyCallback The frame object buffer destroy callback
+     * @param[in] destroyCallbackContext The frame object buffer destroy callback context
+     *
+     * @return std::shared_ptr<Frame> The created frame object
+     */
+    static std::shared_ptr<Frame> createFrameFromBuffer(OBFormat format, uint32_t width, uint32_t height, uint8_t *buffer, uint32_t bufferSize,
                                                         BufferDestroyCallback destroyCallback, void *destroyCallbackContext);
 
     /**
-     * @brief 创建空的帧集合对象
+     * @brief Create an empty FrameSet object
      *
-     * @return std::shared_ptr<Frame> 返回帧集合对象
+     * @return std::shared_ptr<Frame> The FrameSet object
      */
-    static std::shared_ptr<Frame> createFrameSet();
+    static std::shared_ptr<FrameSet> createFrameSet();
 
     /**
-     * @brief 往帧集合中填入对应类型的帧
+     * @brief Add a frame of a specific type to the FrameSet
      *
-     * @param frameSet 帧集合对象
-     * @param frameType 填入帧的类型
-     * @param frame 填入帧的对象
+     * @param frameSet The FrameSet object
+     * @param frameType The type of frame to add
+     * @param frame The frame object to add
      */
     static void pushFrame(std::shared_ptr<Frame> frameSet, OBFrameType frameType, std::shared_ptr<Frame> frame);
 
     /**
-     * @brief 设置帧的系统时间戳
+     * @brief Set the system timestamp of the frame.
      *
-     * @param frame 设置的帧对象
-     * @param systemTimestamp 设置的系统时间戳
+     * @param frame The frame object.
+     * @param systemTimestamp The system timestamp to set in milliseconds.
      */
     static void setFrameSystemTimestamp(std::shared_ptr<Frame> frame, uint64_t systemTimestamp);
 
     /**
-     * @brief 设置帧的设备时间戳
+     * @brief Set the device timestamp of the frame.
      *
-     * @param frame 设置的帧对象
-     * @param deviceTimestamp 设置的设备时间戳
+     * @param frame The frame object.
+     * @param deviceTimestamp The device timestamp to set in milliseconds.
      */
     static void setFrameDeviceTimestamp(std::shared_ptr<Frame> frame, uint64_t deviceTimestamp);
 
     /**
-     * @brief 设置帧的设备时间戳
+     * @brief Set the device timestamp of the frame.
      *
-     * @param frame 设置的帧对象
-     * @param deviceTimestampUs 设置的设备时间戳（Us）
+     * @param frame The frame object.
+     * @param deviceTimestampUs The device timestamp to set in microseconds.
      */
     static void setFrameDeviceTimestampUs(std::shared_ptr<Frame> frame, uint64_t deviceTimestampUs);
 };
 
+// Define the is() template function for the Frame class
 template <typename T> bool Frame::is() {
     switch(this->type()) {
-    case OB_FRAME_IR_LEFT:   // follow
-    case OB_FRAME_IR_RIGHT:  // follow
+    case OB_FRAME_IR_LEFT:   // Follow
+    case OB_FRAME_IR_RIGHT:  // Follow
     case OB_FRAME_IR:
         return (typeid(T) == typeid(IRFrame) || typeid(T) == typeid(VideoFrame));
     case OB_FRAME_DEPTH:
@@ -563,7 +456,7 @@ template <typename T> bool Frame::is() {
     case OB_FRAME_POINTS:
         return (typeid(T) == typeid(PointsFrame));
     default:
-        std::cout << "ob::Frame::is() not catch frame type: " << (int)this->type() << std::endl;
+        std::cout << "ob::Frame::is() did not catch frame type: " << (int)this->type() << std::endl;
         break;
     }
     return false;

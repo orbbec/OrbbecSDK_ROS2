@@ -1,17 +1,13 @@
 /* License: Apache 2.0. See LICENSE file in root directory.
-   Copyright(c) 2020  Orbbec Corporation. All Rights Reserved. */
+    Copyright(c) 2020  Orbbec Corporation. All Rights Reserved. */
 
 /**
- * \if English
  * \file ObSensor.h
- * \brief libobsensor C entrance
- * \else
- * \file ObSensor.h
- * \brief  libobsensor的C的入口
- * \endif
- *
+ * \brief This file serves as the C entrance for the OrbbecSDK library.
+ *        It includes all necessary header files for OrbbecSDK usage.
  */
 #pragma once
+
 #include <libobsensor/h/Context.h>
 #include <libobsensor/h/Device.h>
 #include <libobsensor/h/Error.h>

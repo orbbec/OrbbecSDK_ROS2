@@ -114,7 +114,10 @@ void OBCameraNode::setupDevices() {
       sync_config.rgbTriggerSignalInDelay = rgb_trigger_signal_in_delay_;
       sync_config.deviceTriggerSignalOutDelay = device_trigger_signal_out_delay_;
       device_->setSyncConfig(sync_config);
-      // TODO: add set signal trigger out mode
+      if (device_->isPropertySupported(OB_PROP_SYNC_SIGNAL_TRIGGER_OUT_BOOL,
+                                       OB_PERMISSION_READ_WRITE)) {
+        device_->setBoolProperty(OB_PROP_SYNC_SIGNAL_TRIGGER_OUT_BOOL, sync_signal_trigger_out_);
+      }
     }
     if (info->pid() == GEMINI2_PID) {
       auto default_precision_level = device_->getIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT);
@@ -243,10 +246,10 @@ void OBCameraNode::startIMU() {
           auto accel_rate = sampleRateFromString(imu_rate_[stream_index]);
           auto accel_range = fullAccelScaleRangeFromString(imu_range_[stream_index]);
           if (profile->fullScaleRange() == accel_range && profile->sampleRate() == accel_rate) {
-            sensors_[stream_index]->start(profile,
-                                          [this, stream_index](const std::shared_ptr<ob::Frame>& frame) {
-                                            onNewIMUFrameCallback(frame, stream_index);
-                                          });
+            sensors_[stream_index]->start(
+                profile, [this, stream_index](const std::shared_ptr<ob::Frame>& frame) {
+                  onNewIMUFrameCallback(frame, stream_index);
+                });
             imu_started_[stream_index] = true;
             RCLCPP_INFO_STREAM(logger_, "start accel stream with "
                                             << magic_enum::enum_name(accel_range) << " range and "
@@ -257,10 +260,10 @@ void OBCameraNode::startIMU() {
           auto gyro_rate = sampleRateFromString(imu_rate_[stream_index]);
           auto gyro_range = fullGyroScaleRangeFromString(imu_range_[stream_index]);
           if (profile->fullScaleRange() == gyro_range && profile->sampleRate() == gyro_rate) {
-            sensors_[stream_index]->start(profile,
-                                          [this, stream_index](const std::shared_ptr<ob::Frame>& frame) {
-                                            onNewIMUFrameCallback(frame, stream_index);
-                                          });
+            sensors_[stream_index]->start(
+                profile, [this, stream_index](const std::shared_ptr<ob::Frame>& frame) {
+                  onNewIMUFrameCallback(frame, stream_index);
+                });
             RCLCPP_INFO_STREAM(logger_, "start gyro stream with "
                                             << magic_enum::enum_name(gyro_range) << " range and "
                                             << magic_enum::enum_name(gyro_rate) << " rate");

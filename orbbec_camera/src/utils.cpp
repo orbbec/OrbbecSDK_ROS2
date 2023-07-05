@@ -10,6 +10,7 @@
 /*                                                                        */
 /**************************************************************************/
 
+#include <regex>
 #include "orbbec_camera/utils.h"
 namespace orbbec_camera {
 sensor_msgs::msg::CameraInfo convertToCameraInfo(OBCameraIntrinsic intrinsic,
@@ -383,5 +384,25 @@ OBAccelFullScaleRange fullAccelScaleRangeFromString(std::string &full_scale_rang
                         "Unknown OB_ACCEL_FULL_SCALE_RANGE: " << full_scale_range);
     return OB_ACCEL_FS_16g;
   }
+}
+
+std::string parseUsbPort(const std::string &line) {
+  std::string port_id;
+  std::regex self_regex("(?:[^ ]+/usb[0-9]+[0-9./-]*/){0,1}([0-9.-]+)(:){0,1}[^ ]*",
+                        std::regex_constants::ECMAScript);
+  std::smatch base_match;
+  bool found = std::regex_match(line, base_match, self_regex);
+  if (found) {
+    port_id = base_match[1].str();
+    if (base_match[2].str().empty())  // This is libuvc string. Remove counter is exists.
+    {
+      std::regex end_regex = std::regex(".+(-[0-9]+$)", std::regex_constants::ECMAScript);
+      bool found_end = std::regex_match(port_id, base_match, end_regex);
+      if (found_end) {
+        port_id = port_id.substr(0, port_id.size() - base_match[1].str().size());
+      }
+    }
+  }
+  return port_id;
 }
 }  // namespace orbbec_camera

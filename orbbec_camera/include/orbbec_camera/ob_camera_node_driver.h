@@ -51,6 +51,9 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::shared_ptr<ob::Device> selectDeviceBySerialNumber(
       const std::shared_ptr<ob::DeviceList>& list, const std::string& serial_number);
 
+  std::shared_ptr<ob::Device> selectDeviceByUSBPort(const std::shared_ptr<ob::DeviceList>& list,
+                                                    const std::string& usb_port);
+
   void initializeDevice(const std::shared_ptr<ob::Device>& device);
 
   void startDevice(const std::shared_ptr<ob::DeviceList>& list);
@@ -67,6 +70,8 @@ class OBCameraNodeDriver : public rclcpp::Node {
 
   void deviceCountUpdate();
 
+  void syncTime();
+
  private:
   std::string config_path_;
   std::unique_ptr<ob::Context> ctx_ = nullptr;
@@ -78,6 +83,7 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::atomic_bool device_connected_{false};
   std::string serial_number_;
   std::string device_unique_id_;
+  std::string usb_port_;
   std::shared_ptr<Parameters> parameters_ = nullptr;
   std::shared_ptr<std::thread> query_thread_ = nullptr;
   std::shared_ptr<std::thread> device_count_update_thread_ = nullptr;
@@ -85,5 +91,6 @@ class OBCameraNodeDriver : public rclcpp::Node {
   int device_num_ = 1;
   int num_devices_connected_ = 0;
   rclcpp::TimerBase::SharedPtr check_connect_timer_ = nullptr;
+  std::shared_ptr<std::thread> sync_time_thread_ = nullptr;
 };
 }  // namespace orbbec_camera

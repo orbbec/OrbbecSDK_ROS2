@@ -11,6 +11,8 @@ SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0660", MODE:="066
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="060f", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="AstraPlus"
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="050f", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="AstraPlus_rgb"
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0670", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Orbbec Gemini 2"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0673", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Orbbec Gemini 2 L "
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0701", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Dabai DCL"
 
 # OpenNI Modules
 SUBSYSTEM=="usb", ATTR{idProduct}=="0401", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="astra"
@@ -77,4 +79,4 @@ SUBSYSTEM=="usb", ATTR{idProduct}=="065c", ATTR{idVendor}=="2bc5", MODE:="0666",
 SUBSYSTEM=="usb", ATTR{idProduct}=="055c", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="gemini_e_rgb"
 SUBSYSTEM=="usb", ATTR{idProduct}=="065d", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="gemini_e_lite"
 SUBSYSTEM=="usb", ATTR{idProduct}=="0698", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="j1"
-
+SUBSYSTEM=="usb", ATTR{idProduct}=="069c", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="TB2201"

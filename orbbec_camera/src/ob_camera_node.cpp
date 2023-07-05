@@ -215,7 +215,7 @@ void OBCameraNode::startStreams() {
   pipeline_ = std::make_unique<ob::Pipeline>(device_);
   try {
     setupPipelineConfig();
-    pipeline_->start(pipeline_config_, [this](std::shared_ptr<ob::FrameSet> frame_set) {
+    pipeline_->start(pipeline_config_, [this](const std::shared_ptr<ob::FrameSet>& frame_set) {
       onNewFrameSetCallback(frame_set);
     });
   } catch (const ob::Error& e) {
@@ -223,7 +223,7 @@ void OBCameraNode::startStreams() {
     RCLCPP_INFO_STREAM(logger_, "try to disable ir stream and try again");
     enable_stream_[INFRA0] = false;
     setupPipelineConfig();
-    pipeline_->start(pipeline_config_, [this](std::shared_ptr<ob::FrameSet> frame_set) {
+    pipeline_->start(pipeline_config_, [this](const std::shared_ptr<ob::FrameSet>& frame_set) {
       onNewFrameSetCallback(frame_set);
     });
   }
@@ -244,7 +244,7 @@ void OBCameraNode::startIMU() {
           auto accel_range = fullAccelScaleRangeFromString(imu_range_[stream_index]);
           if (profile->fullScaleRange() == accel_range && profile->sampleRate() == accel_rate) {
             sensors_[stream_index]->start(profile,
-                                          [this, stream_index](std::shared_ptr<ob::Frame> frame) {
+                                          [this, stream_index](const std::shared_ptr<ob::Frame>& frame) {
                                             onNewIMUFrameCallback(frame, stream_index);
                                           });
             imu_started_[stream_index] = true;
@@ -258,7 +258,7 @@ void OBCameraNode::startIMU() {
           auto gyro_range = fullGyroScaleRangeFromString(imu_range_[stream_index]);
           if (profile->fullScaleRange() == gyro_range && profile->sampleRate() == gyro_rate) {
             sensors_[stream_index]->start(profile,
-                                          [this, stream_index](std::shared_ptr<ob::Frame> frame) {
+                                          [this, stream_index](const std::shared_ptr<ob::Frame>& frame) {
                                             onNewIMUFrameCallback(frame, stream_index);
                                           });
             RCLCPP_INFO_STREAM(logger_, "start gyro stream with "

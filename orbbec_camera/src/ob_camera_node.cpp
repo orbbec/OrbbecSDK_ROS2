@@ -231,7 +231,7 @@ void OBCameraNode::startStreams() {
     });
   }
   pipeline_started_.store(true);
-  // startIMU();
+  startIMU();
 }
 
 void OBCameraNode::startIMU() {
@@ -288,7 +288,7 @@ void OBCameraNode::stopStreams() {
   }
   try {
     pipeline_->stop();
-    // stopIMU();
+    stopIMU();
   } catch (const ob::Error& e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to stop pipeline: " << e.getMessage());
   }
@@ -398,7 +398,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter(rgb_trigger_signal_in_delay_, "rgb_trigger_signal_in_delay", 0);
   setAndGetNodeParameter(device_trigger_signal_out_delay_, "device_trigger_signal_out_delay", 0);
   setAndGetNodeParameter(sync_signal_trigger_out_, "sync_signal_trigger_out", false);
-  setAndGetNodeParameter<std::string>(depth_precision_str_, "depth_precision", "0.8mm");
+  setAndGetNodeParameter<std::string>(depth_precision_str_, "depth_precision", "1mm");
   std::transform(sync_mode_str_.begin(), sync_mode_str_.end(), sync_mode_str_.begin(), ::toupper);
   sync_mode_ = OBSyncModeFromString(sync_mode_str_);
   depth_precision_ = depthPrecisionLevelFromString(depth_precision_str_);

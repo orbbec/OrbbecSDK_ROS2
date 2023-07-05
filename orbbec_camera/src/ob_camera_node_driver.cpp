@@ -59,6 +59,7 @@ void OBCameraNodeDriver::init() {
   parameters_ = std::make_shared<Parameters>(this);
   serial_number_ = declare_parameter<std::string>("serial_number", "");
   device_num_ = static_cast<int>(declare_parameter<int>("device_num", 1));
+  usb_port_ = declare_parameter<std::string>("usb_port", "");
   ctx_->setDeviceChangedCallback([this](const std::shared_ptr<ob::DeviceList> &removed_list,
                                         const std::shared_ptr<ob::DeviceList> &added_list) {
     (void)added_list;

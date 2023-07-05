@@ -4,6 +4,7 @@
     <!-- Hardware depth registration -->
     <arg name="depth_registration" default="false"/>
     <arg name="serial_number" default=""/>
+    <arg name="usb_port" default=""/>
     <arg name="device_num" default="1"/>
     <arg name="vendor_id" default="0x2bc5"/>
     <arg name="product_id" default=""/>
@@ -68,6 +69,7 @@
             <param name="camera_name" value="$(var camera_name)"/>
             <param name="depth_registration" value="$(var depth_registration)"/>
             <param name="serial_number" value="$(var serial_number)"/>
+            <param name="usb_port" value="$(var usb_port)"/>
             <param name="device_num" value="$(var device_num)"/>
             <param name="vendor_id" value="$(var vendor_id)"/>
             <param name="product_id" value="$(var product_id)"/>
@@ -126,6 +128,7 @@
             <param name="rgb_trigger_signal_in_delay" value="$(var rgb_trigger_signal_in_delay)"/>
             <param name="device_trigger_signal_out_delay" value="$(var device_trigger_signal_out_delay)"/>
             <param name="sync_signal_trigger_out" value="$(var sync_signal_trigger_out)"/>
+            <param name="enable_ldp" value="$(var enable_ldp)"/>
             <remap from="/$(var camera_name)/depth/color/points" to="/$(var camera_name)/depth_registered/points"/>
         </node>
     </group>

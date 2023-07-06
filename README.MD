@@ -305,6 +305,7 @@ The following are the launch parameters available:
 | gemini              | gemini.launch.xml         |
 | gemini              | gemini.launch.xml         |
 | gemini2 / dabai DCL | gemini2.launch.xml        |
+| gemini2L            | gemini2L.launch.xml       |
 | gemini e            | gemini_e.launch.xml       |
 | gemini e lite       | gemini_e_lite.launch.xml  |
 

@@ -270,6 +270,32 @@ ros2 launch orbbec_camera multi_camera.launch.xml
 - `depth_registration`: 是否启用将深度帧硬件对齐到彩色帧。当`enable_colored_point_cloud`设置为`true`时，此字段也要设置为`true`。
 - `enable_publish_extrinsic`: 是否启用发布外参.
 
+## 启动文件
+
+| product serials     | launch file               |
+|---------------------|---------------------------|
+| asta+               | astra_adv.launch.xml      |
+| astra mini          | astra_mini.launch.xml     |
+| astra mini pro      | astra_mini_pro.launch.xml |
+| astra pro           | astra_pro.launch.xml      |
+| astra stereo s      | stereo_s_u3.launch.xml    |
+| dabai               | dabai.launch.xml          |
+| dabai d1            | dabai_d1.launch.xml       |
+| dabai dcw           | dabai_dcw.launch.xml      |
+| dabai dw            | dabai_dw.launch.xml       |
+| dabai pro           | dabai_pro.launch.xml      |
+| deeya               | deeya.launch.xml          |
+| femto               | femto.launch.xml          |
+| femto mega          | femto_mega.launch.xml     |
+| femto w             | femto_w.launch.xml        |
+| gemini              | gemini.launch.xml         |
+| gemini              | gemini.launch.xml         |
+| gemini2 / dabai DCL | gemini2.launch.xml        |
+| gemini2L            | gemini2L.launch.xml       |
+| gemini e            | gemini_e.launch.xml       |
+| gemini e lite       | gemini_e_lite.launch.xml  |
+
+
 ## DDS Tuning
 
 默认的DDS设置（humble）可能不适用于数据传输。不同的DDS设置可能具有不同的性能。在此示例中，我们使用CycloneDDS。有关更详细的信息，请参考[ROS DDS Tuning](https://docs.ros.org/en/humble/How-To-Guides/DDS-tuning.html)。

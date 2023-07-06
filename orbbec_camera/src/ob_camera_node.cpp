@@ -298,6 +298,7 @@ void OBCameraNode::stopIMU() {
   for (const auto& stream_index : HID_STREAMS) {
     if (imu_started_[stream_index]) {
       CHECK(sensors_.count(stream_index));
+      RCLCPP_INFO_STREAM(logger_, "stop " << stream_name_[stream_index] << " stream");
       sensors_[stream_index]->stop();
       imu_started_[stream_index] = false;
     }
@@ -473,15 +474,15 @@ void OBCameraNode::setupPublishers() {
         topic, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(camera_info_qos_profile),
                            camera_info_qos_profile));
   }
-  //  for (const auto& stream_index : HID_STREAMS) {
-  //    if (!enable_stream_[stream_index]) {
-  //      continue;
-  //    }
-  //    std::string data_topic_name = stream_name_[stream_index] + "/sample";
-  //    auto data_qos = getRMWQosProfileFromString(imu_qos_[stream_index]);
-  //    imu_publishers_[stream_index] = node_->create_publisher<sensor_msgs::msg::Imu>(
-  //        data_topic_name, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(data_qos), data_qos));
-  //  }
+  for (const auto& stream_index : HID_STREAMS) {
+    if (!enable_stream_[stream_index]) {
+      continue;
+    }
+    std::string data_topic_name = stream_name_[stream_index] + "/sample";
+    auto data_qos = getRMWQosProfileFromString(imu_qos_[stream_index]);
+    imu_publishers_[stream_index] = node_->create_publisher<sensor_msgs::msg::Imu>(
+        data_topic_name, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(data_qos), data_qos));
+  }
   if (enable_publish_extrinsic_) {
     extrinsics_publisher_ = node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
         "extrinsic/depth_to_color", rclcpp::QoS{1}.transient_local());

@@ -334,7 +334,7 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByUSBPort(
         std::string uid = device_info->uid();
         auto port_id = parseUsbPort(uid);
         if (port_id == usb_port) {
-          RCLCPP_ERROR_STREAM_THROTTLE(logger_, *get_clock(), 1000,
+          RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 1000,
                                        "Device port id " << port_id << " matched");
           return dev;
         }
@@ -343,7 +343,7 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByUSBPort(
         auto port_id = parseUsbPort(uid);
         RCLCPP_ERROR_STREAM_THROTTLE(logger_, *get_clock(), 1000, "Device usb port: " << uid);
         if (port_id == usb_port) {
-          RCLCPP_ERROR_STREAM_THROTTLE(logger_, *get_clock(), 1000,
+          RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 1000,
                                        "Device usb port " << uid << " matched");
           return list->getDevice(i);
         }

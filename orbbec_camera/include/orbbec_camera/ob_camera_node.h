@@ -338,6 +338,7 @@ class OBCameraNode {
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr toggle_sensors_srv_;
 
   bool publish_tf_ = false;
+  bool tf_published_ = false;
   std::shared_ptr<tf2_ros::StaticTransformBroadcaster> static_tf_broadcaster_ = nullptr;
   std::shared_ptr<tf2_ros::TransformBroadcaster> dynamic_tf_broadcaster_ = nullptr;
   std::vector<geometry_msgs::msg::TransformStamped> tf_msgs;

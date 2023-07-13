@@ -419,7 +419,6 @@ void OBCameraNode::setupTopics() {
   setupProfiles();
   setupCameraCtrlServices();
   setupPublishers();
-  publishStaticTransforms();
 }
 
 void OBCameraNode::setupPipelineConfig() {
@@ -678,6 +677,10 @@ void OBCameraNode::onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet>& fr
     return;
   }
   try {
+    if (!tf_published_) {
+      publishStaticTransforms();
+      tf_published_ = true;
+    }
     publishPointCloud(frame_set);
     auto color_frame = std::dynamic_pointer_cast<ob::Frame>(frame_set->colorFrame());
     auto depth_frame = std::dynamic_pointer_cast<ob::Frame>(frame_set->depthFrame());
@@ -927,23 +930,18 @@ void OBCameraNode::calcAndPublishStaticTransform() {
   zero_rot.setRPY(0.0, 0.0, 0.0);
   quaternion_optical.setRPY(-M_PI / 2, 0.0, -M_PI / 2);
   std::vector<float> zero_trans = {0, 0, 0};
-  auto camera_param = findDefaultCameraParam();
-  if (camera_param.has_value()) {
-    auto ex = camera_param->transform;
-    RCLCPP_INFO_STREAM(logger_,
-                       "transform x " << ex.trans[0] << " y " << ex.trans[1] << " z " << trans[2]);
-    Q = rotationMatrixToQuaternion(ex.rot);
-    Q = quaternion_optical * Q * quaternion_optical.inverse();
-    trans[0] = ex.trans[0];
-    trans[1] = ex.trans[1];
-    trans[2] = ex.trans[2];
-  } else {
-    Q.setRPY(0, 0, 0);
-  }
-  if (enable_publish_extrinsic_ && extrinsics_publisher_ && camera_param.has_value()) {
-    auto ex = camera_param->transform;
-    extrinsics_publisher_->publish(obExtrinsicsToMsg(ex, "depth_to_color_extrinsics"));
-  }
+  auto camera_param = pipeline_->getCameraParam();
+  auto ex = camera_param.transform;
+  RCLCPP_INFO_STREAM(logger_,
+                     "transform x " << ex.trans[0] << " y " << ex.trans[1] << " z " << trans[2]);
+  Q = rotationMatrixToQuaternion(ex.rot);
+  Q = quaternion_optical * Q * quaternion_optical.inverse();
+  Q.normalize();
+  Q = Q.inverse();
+  trans[0] = -ex.trans[0];
+  trans[1] = -ex.trans[1];
+  trans[2] = -ex.trans[2];
+
   rclcpp::Time tf_timestamp = node_->now();
 
   publishStaticTF(tf_timestamp, trans, Q, frame_id_[DEPTH], frame_id_[COLOR]);

@@ -906,17 +906,16 @@ std::optional<OBCameraParam> OBCameraNode::getColorCameraParam() {
   return {};
 }
 
-void OBCameraNode::publishStaticTF(const rclcpp::Time& t, const std::vector<float>& trans,
+void OBCameraNode::publishStaticTF(const rclcpp::Time& t, const tf2::Vector3& trans,
                                    const tf2::Quaternion& q, const std::string& from,
                                    const std::string& to) {
-  CHECK_EQ(trans.size(), 3u);
   geometry_msgs::msg::TransformStamped msg;
   msg.header.stamp = t;
   msg.header.frame_id = from;
   msg.child_frame_id = to;
-  msg.transform.translation.x = trans.at(2) / 1000.0;
-  msg.transform.translation.y = -trans.at(0) / 1000.0;
-  msg.transform.translation.z = -trans.at(1) / 1000.0;
+  msg.transform.translation.x = trans[2] / 1000.0;
+  msg.transform.translation.y = -trans[0] / 1000.0;
+  msg.transform.translation.z = -trans[1] / 1000.0;
   msg.transform.rotation.x = q.getX();
   msg.transform.rotation.y = q.getY();
   msg.transform.rotation.z = q.getZ();
@@ -926,22 +925,23 @@ void OBCameraNode::publishStaticTF(const rclcpp::Time& t, const std::vector<floa
 
 void OBCameraNode::calcAndPublishStaticTransform() {
   tf2::Quaternion quaternion_optical, zero_rot, Q;
-  std::vector<float> trans(3, 0);
   zero_rot.setRPY(0.0, 0.0, 0.0);
   quaternion_optical.setRPY(-M_PI / 2, 0.0, -M_PI / 2);
-  std::vector<float> zero_trans = {0, 0, 0};
+  tf2::Vector3 zero_trans(0, 0, 0);
+  tf2::Vector3 trans(0, 0, 0);
   auto camera_param = pipeline_->getCameraParam();
   auto ex = camera_param.transform;
   RCLCPP_INFO_STREAM(logger_,
                      "transform x " << ex.trans[0] << " y " << ex.trans[1] << " z " << trans[2]);
   Q = rotationMatrixToQuaternion(ex.rot);
   Q = quaternion_optical * Q * quaternion_optical.inverse();
-  Q.normalize();
-  Q = Q.inverse();
-  trans[0] = -ex.trans[0];
-  trans[1] = -ex.trans[1];
-  trans[2] = -ex.trans[2];
-
+  trans[0] = ex.trans[0];
+  trans[1] = ex.trans[1];
+  trans[2] = ex.trans[2];
+  tf2::Transform transform(Q, trans);
+  transform = transform.inverse();
+  Q = transform.getRotation();
+  trans = transform.getOrigin();
   rclcpp::Time tf_timestamp = node_->now();
 
   publishStaticTF(tf_timestamp, trans, Q, frame_id_[DEPTH], frame_id_[COLOR]);

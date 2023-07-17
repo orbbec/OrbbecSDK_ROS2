@@ -95,7 +95,10 @@ ob_device *ob_device_list_get_device(ob_device_list *list, uint32_t index, ob_er
 ob_device *ob_device_list_get_device_by_serial_number(ob_device_list *list, const char *serial_number, ob_error **error);
 
 /**
- * @brief Create a device.
+ * @brief Create device by uid
+ * @brief On Linux platform, the uid of the device is composed of bus-port-dev, for example 1-1.2-1. But the SDK will remove the dev number and only keep the
+ * bus-port as the uid to create the device, for example 1-1.2, so that we can create a device connected to the specified USB port. Similarly, users can also
+ * directly pass in bus-port as uid to create device.
  *
  * @attention If the device has already been acquired and created elsewhere, repeated acquisitions will return an error.
  *
@@ -604,18 +607,6 @@ ob_depth_work_mode_list *ob_device_get_depth_work_mode_list(ob_device *device, o
  * @param[out] error Log error messages
  */
 void ob_device_reboot(ob_device *device, ob_error **error);
-
-/**
- * @brief Device reboot delay mode
- * @attention The device will be disconnected and reconnected. After the device is disconnected, the interface access to the device handle may be abnormal.
- * Please use the ob_delete_device interface to delete the handle directly. After the device is reconnected, it can be obtained again.
- * Support devices: Gemini2 L
- *
- * @param[in] device Device object
- * @param[in] delay_ms Time unit：ms。delay_ms == 0：No delay；delay_ms > 0, Delay millisecond connect to host device after reboot
- * @param[out] error Log error messages
- */
-void ob_device_reboot_delay_mode(ob_device *device, uint32_t delay_ms, ob_error **error);
 
 /**
  * @brief Get the current device synchronization configuration

@@ -360,6 +360,11 @@ typedef enum {
     OB_PROP_CAPTURE_IMAGE_NUMBER_INTERVAL_INT = 136,
 
     /**
+     * @brief Reboot device delay mode. Delay time unit: ms, range: [0, 8000).
+     */
+    OB_PROP_DEVICE_REBOOT_DELAY_INT = 142,
+
+    /**
      * @brief Baseline calibration parameters
      */
     OB_STRUCT_BASELINE_CALIBRATION_PARAM = 1002,

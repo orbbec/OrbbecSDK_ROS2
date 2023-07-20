@@ -173,7 +173,9 @@ void OBCameraNodeDriver::deviceCountUpdate() {
 
 void OBCameraNodeDriver::syncTime() {
   while (is_alive_ && rclcpp::ok()) {
-    ctx_->enableMultiDeviceSync(0);
+    if (device_ && device_info_ && !isOpenNIDevice(device_info_->pid())) {
+      ctx_->enableMultiDeviceSync(0);
+    }
     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
   }
 }
@@ -188,6 +190,7 @@ void OBCameraNodeDriver::resetDevice() {
     }
     ob_camera_node_.reset();
     device_.reset();
+    device_info_.reset();
     device_connected_ = false;
     device_unique_id_.clear();
     reset_device_flag_ = false;
@@ -335,7 +338,7 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByUSBPort(
         auto port_id = parseUsbPort(uid);
         if (port_id == usb_port) {
           RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 1000,
-                                       "Device port id " << port_id << " matched");
+                                      "Device port id " << port_id << " matched");
           return dev;
         }
       } else {
@@ -344,7 +347,7 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByUSBPort(
         RCLCPP_ERROR_STREAM_THROTTLE(logger_, *get_clock(), 1000, "Device usb port: " << uid);
         if (port_id == usb_port) {
           RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 1000,
-                                       "Device usb port " << uid << " matched");
+                                      "Device usb port " << uid << " matched");
           return list->getDevice(i);
         }
       }
@@ -371,7 +374,9 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   device_info_ = device_->getDeviceInfo();
   CHECK_NOTNULL(device_info_.get());
   device_unique_id_ = device_info_->uid();
-  ctx_->enableMultiDeviceSync(0);  // sync time stamp
+  if (!isOpenNIDevice(device_info_->pid())) {
+    ctx_->enableMultiDeviceSync(0);  // sync time stamp
+  }
   RCLCPP_INFO_STREAM(logger_, "Device " << device_info_->name() << " connected");
   RCLCPP_INFO_STREAM(logger_, "Serial number: " << device_info_->serialNumber());
   RCLCPP_INFO_STREAM(logger_, "Firmware version: " << device_info_->firmwareVersion());

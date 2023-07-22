@@ -193,15 +193,14 @@ to `true` in the stream that corresponds to the argument of the launch file.
 
 ### Multi-Camera
 
-- To get the serial number of the camera, plug in the camera and run the following command in the terminal:
+- To get the `usb_port` of the camera, plug in the camera and run the following command in the terminal:
 
 ```bash
 ros2 run orbbec_camera list_devices_node
 ```
 
 - Set the `device_num` parameter to the number of cameras you have.
-- Go to the `OrbbecSDK_ROS2/launch/multi_xxx.launch.xml` file and change the serial number. Currently,
-  different cameras can only be differentiated by their serial number.
+- Go to the `OrbbecSDK_ROS2/launch/multi_xxx.launch.xml` file and change the `usb_port`.
 - Don't forget to put the `include` tag inside the `group` tag.
   Otherwise, the parameter values of different cameras may become contaminated.
 
@@ -215,21 +214,22 @@ ros2 run orbbec_camera list_devices_node
     <!-- stereo_s_u3, astrapro, astra -->
     <arg name="camera1_prefix" default="01"/>
     <arg name="camera2_prefix" default="02"/>
-    <arg name="camera1_serila_number" default="AY3JB20003C"/>
-    <arg name="camera2_serila_number" default="CH26420001B"/>
+    <!-- TODO: change to your usb port -->
+    <arg name="camera1_usb_port" default="1-4.2.1"/>
+    <arg name="camera2_usb_port" default="1-4.2.1"/>
     <arg name="device_num" default="2"/>
     <node name="camera" pkg="orbbec_camera" exec="ob_cleanup_shm_node" output="screen"/>
     <group>
         <include file="$(find-pkg-share orbbec_camera)/launch/gemini2.launch.xml">
             <arg name="camera_name" value="camera_$(var camera1_prefix)"/>
-            <arg name="serial_number" value="$(var camera1_serila_number)"/>
+            <arg name="usb_port" value="$(var camera1_usb_port)"/>
             <arg name="device_num" value="$(var device_num)"/>
         </include>
     </group>
     <group>
         <include file="$(find-pkg-share orbbec_camera)/launch/dabai_dcw.launch.xml">
             <arg name="camera_name" value="camera_$(var camera2_prefix)"/>
-            <arg name="serial_number" value="$(var camera2_serila_number)"/>
+            <arg name="usb_port" value="$(var camera2_usb_port)"/>
             <arg name="device_num" value="$(var device_num)"/>
         </include>
     </group>
@@ -282,7 +282,7 @@ The following are the launch parameters available:
 - `enable_ir`: Enables the IR camera.
 - `depth_registration`: Enables hardware alignment the depth frame to color frame.
   This field is required when the `enable_colored_point_cloud` is set to `true`.
-- `enable_publish_extrinsic`: Enables the publishing of camera extrinsic information.
+- `usb_port`: The USB port of the camera. This is required when multiple cameras are used.
 
 ## Launch files
 

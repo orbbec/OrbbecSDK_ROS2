@@ -193,46 +193,47 @@ ros2 service call /camera/toggle_ir std_srvs/srv/SetBool "{data : true}"
 
 ### 多相机
 
-- 首先需要获取所有相机的序列号, 插入所有的相机在终端执行以下命令:
+- 首先需要获取所有相机的USB Port, 插入所有的相机在终端执行以下命令:
 
 ```bash
 ros2 run orbbec_camera list_devices_node
 ```
 
 - 把参数 `device_num` 设置成为你的相机数量。
-- 编辑 `OrbbecSDK_ROS2/launch/multi_xxx.launch.xml` 修改相机的序列号，当前只能通过序列号来区分相机。
+- 编辑 `OrbbecSDK_ROS2/launch/multi_xxx.launch.xml` 修改相机的`usb_port`。
 - 注意不要忘记在`include` 加上 `group` 标签，不然前面的相机的参数会污染后面的相机的参数。
 
 ```xml
 
 <launch>
-    <!-- unique camera name-->
-    <arg name="camera_name" default="camera"/>
-    <!-- Hardware depth registration -->
-    <arg name="3d_sensor" default="astra_mini"/>
-    <!-- stereo_s_u3, astrapro, astra -->
-    <arg name="camera1_prefix" default="01"/>
-    <arg name="camera2_prefix" default="02"/>
-    <arg name="camera1_serila_number" default="AY3JB20003C"/>
-    <arg name="camera2_serila_number" default="CH26420001B"/>
-    <arg name="device_num" default="2"/>
-    <node name="camera" pkg="orbbec_camera" exec="ob_cleanup_shm_node" output="screen"/>
-    <group>
-        <include file="$(find-pkg-share orbbec_camera)/launch/gemini2.launch.xml">
-            <arg name="camera_name" value="camera_$(var camera1_prefix)"/>
-            <arg name="serial_number" value="$(var camera1_serila_number)"/>
-            <arg name="device_num" value="$(var device_num)"/>
-        </include>
-    </group>
-    <group>
-        <include file="$(find-pkg-share orbbec_camera)/launch/dabai_dcw.launch.xml">
-            <arg name="camera_name" value="camera_$(var camera2_prefix)"/>
-            <arg name="serial_number" value="$(var camera2_serila_number)"/>
-            <arg name="device_num" value="$(var device_num)"/>
-        </include>
-    </group>
-    <node pkg="tf2_ros" exec="static_transform_publisher" name="camera_tf"
-          args="0 0 0 0 0 0 camera01_link camera02_link"/>
+  <!-- unique camera name-->
+  <arg name="camera_name" default="camera"/>
+  <!-- Hardware depth registration -->
+  <arg name="3d_sensor" default="astra_mini"/>
+  <!-- stereo_s_u3, astrapro, astra -->
+  <arg name="camera1_prefix" default="01"/>
+  <arg name="camera2_prefix" default="02"/>
+  <!-- TODO: change to your usb port -->
+  <arg name="camera1_usb_port" default="1-4.2.1"/>
+  <arg name="camera2_usb_port" default="1-4.2.1"/>
+  <arg name="device_num" default="2"/>
+  <node name="camera" pkg="orbbec_camera" exec="ob_cleanup_shm_node" output="screen"/>
+  <group>
+    <include file="$(find-pkg-share orbbec_camera)/launch/gemini2.launch.xml">
+      <arg name="camera_name" value="camera_$(var camera1_prefix)"/>
+      <arg name="usb_port" value="$(var camera1_usb_port)"/>
+      <arg name="device_num" value="$(var device_num)"/>
+    </include>
+  </group>
+  <group>
+    <include file="$(find-pkg-share orbbec_camera)/launch/dabai_dcw.launch.xml">
+      <arg name="camera_name" value="camera_$(var camera2_prefix)"/>
+      <arg name="usb_port" value="$(var camera2_usb_port)"/>
+      <arg name="device_num" value="$(var device_num)"/>
+    </include>
+  </group>
+  <node pkg="tf2_ros" exec="static_transform_publisher" name="camera_tf"
+        args="0 0 0 0 0 0 camera01_link camera02_link"/>
 </launch>
 
 ```
@@ -272,7 +273,7 @@ ros2 launch orbbec_camera multi_camera.launch.xml
 - `enable_ir`: 是否开启IR相机。
 - `depth_registration`: 是否启用将深度帧硬件对齐到彩色帧。当`enable_colored_point_cloud`设置为`true`
   时，此字段也要设置为`true`。
-- `enable_publish_extrinsic`: 是否启用发布外参.
+- `usb_port` : USB端口号，当使用多个相机时，这是必需的。
 
 ## 启动文件
 

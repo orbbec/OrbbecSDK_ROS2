@@ -288,7 +288,9 @@ The following are the launch parameters available:
 
 | product serials     | launch file               |
 |---------------------|---------------------------|
-| asta+               | astra_adv.launch.xml      |
+| astra+              | astra_adv.launch.xml      |
+| astra               | astra.launch.xml          |
+| astra2              | astra2.launch.xml         |
 | astra mini          | astra_mini.launch.xml     |
 | astra mini pro      | astra_mini_pro.launch.xml |
 | astra pro           | astra_pro.launch.xml      |

@@ -24,7 +24,7 @@
     <arg name="depth_width" default="640"/>
     <arg name="depth_height" default="400"/>
     <arg name="depth_fps" default="30"/>
-    <arg name="depth_format" default="Y16"/>
+    <arg name="depth_format" default="Y11"/>
     <arg name="enable_depth" default="true"/>
     <arg name="flip_depth" default="false"/>
     <arg name="depth_qos" default="default"/>
@@ -32,7 +32,7 @@
     <arg name="ir_width" default="640"/>
     <arg name="ir_height" default="400"/>
     <arg name="ir_fps" default="30"/>
-    <arg name="ir_format" default="Y16"/>
+    <arg name="ir_format" default="Y10"/>
     <arg name="enable_ir" default="true"/>
     <arg name="flip_ir" default="false"/>
     <arg name="ir_qos" default="default"/>

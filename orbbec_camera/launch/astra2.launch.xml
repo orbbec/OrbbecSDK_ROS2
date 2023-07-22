@@ -31,8 +31,8 @@
     <arg name="depth_camera_info_qos" default="default"/>
     <arg name="ir_width" default="800"/>
     <arg name="ir_height" default="600"/>
-    <arg name="ir_fps" default="Y8"/>
-    <arg name="ir_format" default="Y10"/>
+    <arg name="ir_fps" default="30"/>
+    <arg name="ir_format" default="Y8"/>
     <arg name="enable_ir" default="true"/>
     <arg name="flip_ir" default="false"/>
     <arg name="ir_qos" default="default"/>

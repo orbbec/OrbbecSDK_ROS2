@@ -187,7 +187,7 @@ ros2 service call /camera/toggle_ir std_srvs/srv/SetBool "{data : true}"
 - `/camera/depth/image_raw`: 深度相机数据流图像。
 - `/camera/depth/points` : 点云，只有  `enable_point_cloud` 设置为 `true`才可用。
 - `/camera/depth_registered/points`: 彩色点云  `enable_colored_point_cloud` 还有 `depth_registration`
-都设置为 `true`才可用。
+  都设置为 `true`才可用。
 - `/camera/ir/camera_info`:  IR相机信息。
 - `/camera/ir/image_raw`: 红外数据流图像。
 
@@ -206,38 +206,39 @@ ros2 run orbbec_camera list_devices_node
 ```xml
 
 <launch>
-  <!-- unique camera name-->
-  <arg name="camera_name" default="camera"/>
-  <!-- Hardware depth registration -->
-  <arg name="3d_sensor" default="astra_mini"/>
-  <!-- stereo_s_u3, astrapro, astra -->
-  <arg name="camera1_prefix" default="01"/>
-  <arg name="camera2_prefix" default="02"/>
-  <arg name="camera1_serila_number" default="AY3JB20003C"/>
-  <arg name="camera2_serila_number" default="CH26420001B"/>
-  <arg name="device_num" default="2"/>
-  <node name="camera" pkg="orbbec_camera" exec="ob_cleanup_shm_node" output="screen"/>
-  <group>
-    <include file="$(find-pkg-share orbbec_camera)/launch/gemini2.launch.xml">
-      <arg name="camera_name" value="camera_$(var camera1_prefix)"/>
-      <arg name="serial_number" value="$(var camera1_serila_number)"/>
-      <arg name="device_num" value="$(var device_num)"/>
-    </include>
-  </group>
-  <group>
-    <include file="$(find-pkg-share orbbec_camera)/launch/dabai_dcw.launch.xml">
-      <arg name="camera_name" value="camera_$(var camera2_prefix)"/>
-      <arg name="serial_number" value="$(var camera2_serila_number)"/>
-      <arg name="device_num" value="$(var device_num)"/>
-    </include>
-  </group>
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="camera_tf"
-        args="0 0 0 0 0 0 camera01_link camera02_link"/>
+    <!-- unique camera name-->
+    <arg name="camera_name" default="camera"/>
+    <!-- Hardware depth registration -->
+    <arg name="3d_sensor" default="astra_mini"/>
+    <!-- stereo_s_u3, astrapro, astra -->
+    <arg name="camera1_prefix" default="01"/>
+    <arg name="camera2_prefix" default="02"/>
+    <arg name="camera1_serila_number" default="AY3JB20003C"/>
+    <arg name="camera2_serila_number" default="CH26420001B"/>
+    <arg name="device_num" default="2"/>
+    <node name="camera" pkg="orbbec_camera" exec="ob_cleanup_shm_node" output="screen"/>
+    <group>
+        <include file="$(find-pkg-share orbbec_camera)/launch/gemini2.launch.xml">
+            <arg name="camera_name" value="camera_$(var camera1_prefix)"/>
+            <arg name="serial_number" value="$(var camera1_serila_number)"/>
+            <arg name="device_num" value="$(var device_num)"/>
+        </include>
+    </group>
+    <group>
+        <include file="$(find-pkg-share orbbec_camera)/launch/dabai_dcw.launch.xml">
+            <arg name="camera_name" value="camera_$(var camera2_prefix)"/>
+            <arg name="serial_number" value="$(var camera2_serila_number)"/>
+            <arg name="device_num" value="$(var device_num)"/>
+        </include>
+    </group>
+    <node pkg="tf2_ros" exec="static_transform_publisher" name="camera_tf"
+          args="0 0 0 0 0 0 camera01_link camera02_link"/>
 </launch>
 
 ```
 
-- 请注意，Astra相机使用信号量进行进程同步。如果相机启动失败，信号量文件可能会留在`/dev/shm`目录下，导致下一次启动卡住。为了避免这种情况，请在启动前运行以下命令：
+- 请注意，Astra相机使用信号量进行进程同步。如果相机启动失败，信号量文件可能会留在`/dev/shm`
+  目录下，导致下一次启动卡住。为了避免这种情况，请在启动前运行以下命令：
 
 ```bash
 ros2 run orbbec_camera ob_cleanup_shm_node
@@ -258,7 +259,9 @@ ros2 launch orbbec_camera multi_camera.launch.xml
 - `connection_delay`: 重新打开设备的延迟时间（以毫秒为单位）。某些设备，例如Astra mini，需要更长的时间来初始化，立即重新打开设备可能会在热插拔时导致固件崩溃。
 - `enable_point_cloud`: 是否开启点云。
 - `enable_colored_point_cloud`: 是否开启彩色点云。
-- `point_cloud_qos`, `[color|depth|ir]_qos,``[color|depth|ir]_camera_info_qos`: ROS2消息质量服务（QoS）设置。可能的值是`SYSTEM_DEFAULT`，`DEFAULT`，`PARAMETER_EVENTS`，`SERVICES_DEFAULT`，`PARAMETERS`，`SENSOR_DATA`，并且不区分大小写。这些对应于`rmw_qos_profile_system_default`，`rmw_qos_profile_default`，`rmw_qos_profile_parameter_events`，`rmw_qos_profile_services_default`，`rmw_qos_profile_parameters`。
+- `point_cloud_qos`, `[color|depth|ir]_qos,``[color|depth|ir]_camera_info_qos`:
+  ROS2消息质量服务（QoS）设置。可能的值是`SYSTEM_DEFAULT`，`DEFAULT`，`PARAMETER_EVENTS`，`SERVICES_DEFAULT`，`PARAMETERS`，`SENSOR_DATA`
+  ，并且不区分大小写。这些对应于`rmw_qos_profile_system_default`，`rmw_qos_profile_default`，`rmw_qos_profile_parameter_events`，`rmw_qos_profile_services_default`，`rmw_qos_profile_parameters`。
 - `enable_d2c_viewer`: 发布D2C叠加图像（仅用于测试）。
 - `device_num`: 设备数量。如果需要多个相机，则必须填写此项。
 - `color_width`, `color_height`, `color_fps`: 彩色流的分辨率和帧率。
@@ -267,7 +270,8 @@ ros2 launch orbbec_camera multi_camera.launch.xml
 - `enable_color`: 是否启用RGB相机。
 - `enable_depth`: 启用深度相机。
 - `enable_ir`: 是否开启IR相机。
-- `depth_registration`: 是否启用将深度帧硬件对齐到彩色帧。当`enable_colored_point_cloud`设置为`true`时，此字段也要设置为`true`。
+- `depth_registration`: 是否启用将深度帧硬件对齐到彩色帧。当`enable_colored_point_cloud`设置为`true`
+  时，此字段也要设置为`true`。
 - `enable_publish_extrinsic`: 是否启用发布外参.
 
 ## 启动文件
@@ -295,6 +299,56 @@ ros2 launch orbbec_camera multi_camera.launch.xml
 | gemini e            | gemini_e.launch.xml       |
 | gemini e lite       | gemini_e_lite.launch.xml  |
 
+## 已经支持的硬件产品列表
+
+| **SDK version** | **products list** | **firmware version**        |
+|-----------------|-------------------|-----------------------------|
+| v1.6.2          | Astra2            | 2.8.20                      |
+|                 | Gemini2 L         | 1.4.32                      |
+|                 | Gemini2           | 1.4.60                      |
+|                 | FemtoMega         | 1.1.7                       |
+|                 | Astra+            | 1.0.22/1.0.21/1.0.20/1.0.19 |
+|                 | Femto             | 1.6.7                       |
+|                 | Femto W           | 1.1.8                       |
+|                 | Dabai             | 2436                        |
+|                 | Dabai DCW         | 2460                        |
+|                 | Dabai DW          | 2606                        |
+|                 | Astra Mini Pro    | 1007                        |
+|                 | Astra Pro Plus    | 2513                        |
+|                 | A1 Pro            | 3057                        |
+|                 | Gemini E          | 3460                        |
+|                 | Gemini E Lite     | 3606                        |
+|                 | Gemini            | 3.0.18                      |
+| v1.5.7          | Gemini2           | 1.4.60                      |
+|                 | FemtoMega         | 1.1.5                       |
+|                 | Astra+            | 1.0.22/1.0.21/1.0.20/1.0.19 |
+|                 | Femto             | 1.6.7                       |
+|                 | Femto W           | 1.1.8                       |
+|                 | Dabai             | 2436                        |
+|                 | Dabai DCW         | 2460                        |
+|                 | Dabai DW          | 2606                        |
+|                 | Astra Mini Pro    | 1007                        |
+|                 | Astra Pro Plus    | 2513                        |
+|                 | A1 Pro            | 3057                        |
+|                 | Gemini E          | 3460                        |
+|                 | Gemini E Lite     | 3606                        |
+|                 | Gemini            | 3.0.18                      |
+| v1.4.3          | Astra+            | 1.0.22/1.0.21/1.0.20/1.0.19 |
+|                 | Femto             | 1.6.7                       |
+|                 | *Femto W          | 1.1.3                       |
+|                 | Dabai             | 2436                        |
+|                 | Dabai DCW         | 2460                        |
+|                 | Dabai DW          | 2606                        |
+|                 | Astra Mini Pro    | 1007                        |
+|                 | Astra Pro Plus    | 2513                        |
+|                 | Gemini            | 3.0.18                      |
+| v1.3.1          | Astra+            | 1.0.21/1.0.20/1.0.19        |
+|                 | Femto             | 1.6.7                       |
+| v1.2.8          | Astra+            | 1.0.20                      |
+|                 | Femto             | 1.6.7                       |
+| v1.1.6          | Astra+            | 1.0.20/1.0.19               |
+|                 | *Femto            | 1.5.1                       |
+| v1.0.2          | Astra+            | 1.0.19                      |
 
 ## DDS Tuning
 
@@ -339,7 +393,8 @@ export ROS_LOCALHOST_ONLY=1
 export CYCLONEDDS_URI=file:///etc/cyclonedds/config.xml
 ```
 
-提示：要了解为什么最大的ROS_DOMAIN_ID是232 请参考[The ROS DOMAIN ID](https://docs.ros.org/en/humble/Concepts/About-Domain-ID.html)
+提示：要了解为什么最大的ROS_DOMAIN_ID是232
+请参考[The ROS DOMAIN ID](https://docs.ros.org/en/humble/Concepts/About-Domain-ID.html)
 ● 增加UDP接收缓冲区大小。编辑
 
 ```bash

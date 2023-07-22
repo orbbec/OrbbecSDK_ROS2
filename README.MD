@@ -311,6 +311,57 @@ The following are the launch parameters available:
 
 Actually, All launch files all most the same, the only difference is the default value of the parameters.
 
+## Supported hardware products
+
+| **SDK version** | **products list** | **firmware version**        |
+|-----------------|-------------------|-----------------------------|
+| v1.6.2          | Astra2            | 2.8.20                      |
+|                 | Gemini2 L         | 1.4.32                      |
+|                 | Gemini2           | 1.4.60                      |
+|                 | FemtoMega         | 1.1.7                       |
+|                 | Astra+            | 1.0.22/1.0.21/1.0.20/1.0.19 |
+|                 | Femto             | 1.6.7                       |
+|                 | Femto W           | 1.1.8                       |
+|                 | Dabai             | 2436                        |
+|                 | Dabai DCW         | 2460                        |
+|                 | Dabai DW          | 2606                        |
+|                 | Astra Mini Pro    | 1007                        |
+|                 | Astra Pro Plus    | 2513                        |
+|                 | A1 Pro            | 3057                        |
+|                 | Gemini E          | 3460                        |
+|                 | Gemini E Lite     | 3606                        |
+|                 | Gemini            | 3.0.18                      |
+| v1.5.7          | Gemini2           | 1.4.60                      |
+|                 | FemtoMega         | 1.1.5                       |
+|                 | Astra+            | 1.0.22/1.0.21/1.0.20/1.0.19 |
+|                 | Femto             | 1.6.7                       |
+|                 | Femto W           | 1.1.8                       |
+|                 | Dabai             | 2436                        |
+|                 | Dabai DCW         | 2460                        |
+|                 | Dabai DW          | 2606                        |
+|                 | Astra Mini Pro    | 1007                        |
+|                 | Astra Pro Plus    | 2513                        |
+|                 | A1 Pro            | 3057                        |
+|                 | Gemini E          | 3460                        |
+|                 | Gemini E Lite     | 3606                        |
+|                 | Gemini            | 3.0.18                      |
+| v1.4.3          | Astra+            | 1.0.22/1.0.21/1.0.20/1.0.19 |
+|                 | Femto             | 1.6.7                       |
+|                 | *Femto W          | 1.1.3                       |
+|                 | Dabai             | 2436                        |
+|                 | Dabai DCW         | 2460                        |
+|                 | Dabai DW          | 2606                        |
+|                 | Astra Mini Pro    | 1007                        |
+|                 | Astra Pro Plus    | 2513                        |
+|                 | Gemini            | 3.0.18                      |
+| v1.3.1          | Astra+            | 1.0.21/1.0.20/1.0.19        |
+|                 | Femto             | 1.6.7                       |
+| v1.2.8          | Astra+            | 1.0.20                      |
+|                 | Femto             | 1.6.7                       |
+| v1.1.6          | Astra+            | 1.0.20/1.0.19               |
+|                 | *Femto            | 1.5.1                       |
+| v1.0.2          | Astra+            | 1.0.19                      |
+
 ## DDS Tuning
 
 The default DDS settings (Galactic) may not be optimal for data transmission. Different DDS settings can have varying

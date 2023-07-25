@@ -1,6 +1,6 @@
 /**
  * @file Pipeline.hpp
- * @brief The SDK's advanced API type can quickly implement switching streaming, frame synchronization, software filtering, and generating point cloud
+ * @brief The SDK's advanced API type can quickly implement switching streaming and frame synchronization
  * operations.
  */
 #pragma once

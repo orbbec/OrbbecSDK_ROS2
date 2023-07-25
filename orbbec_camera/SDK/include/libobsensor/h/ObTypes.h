@@ -121,7 +121,7 @@ typedef enum {
     ob_exception_type;
 
 /**
- * @brief The error class exposed by the SDK, users can get detailed error information according to the erro
+ * @brief The error class exposed by the SDK, users can get detailed error information according to the error
  */
 typedef struct ob_error {
     ob_status         status;          ///< Describe the status code of the error, as compatible with previous customer status code requirements
@@ -205,8 +205,8 @@ typedef enum {
     OB_FORMAT_POINT      = 19,   /**< XYZ 3D coordinate point format */
     OB_FORMAT_RGB_POINT  = 20,   /**< XYZ 3D coordinate point format with RGB information */
     OB_FORMAT_RLE        = 21,   /**< RLE pressure test format (SDK will be unpacked into Y16 by default) */
-    OB_FORMAT_RGB        = 22,   /**< RGB format (actual BRG888)  */
-    OB_FORMAT_BGR        = 23,   /**< BGR format (actual BRG888) */
+    OB_FORMAT_RGB        = 22,   /**< RGB format (actual RGB888)  */
+    OB_FORMAT_BGR        = 23,   /**< BGR format (actual BGR888) */
     OB_FORMAT_Y14        = 24,   /**< Y14 format, single channel 14-bit depth (SDK will unpack into Y16 by default) */
     OB_FORMAT_BGRA       = 25,   /**< BGRA format */
     OB_FORMAT_COMPRESSED = 26,   /**< Compression format */
@@ -1072,7 +1072,7 @@ typedef void (*ob_get_data_callback)(ob_data_tran_state state, ob_data_chunk *da
 typedef void (*ob_media_state_callback)(ob_media_state state, void *user_data);
 
 /**
- * @brief Callback for device change (up and down)
+ * @brief Callback for device change
  *
  * @param removed List of deleted (dropped) devices
  * @param added List of added (online) devices

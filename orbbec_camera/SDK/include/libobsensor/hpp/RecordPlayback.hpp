@@ -101,7 +101,7 @@ public:
     /**
      * @brief Get the intrinsic and extrinsic parameter in the recording file.
      *
-     * @return OBCameraParam The internal and external parameter.
+     * @return OBCameraParam Camera intrinsic and extrinsic parameter
      */
     OBCameraParam getCameraParam();
 };

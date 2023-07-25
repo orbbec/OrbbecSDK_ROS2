@@ -123,7 +123,7 @@ ob_device_info *ob_playback_get_device_info(ob_playback *playback, ob_error **er
  *
  * @param[in] playback Pointer to the playback object.
  * @param[out] error Pointer to log error messages.
- * @return The internal and external parameter information.
+ * @return  Camera intrinsic and extrinsic parameter.
  */
 ob_camera_param ob_playback_get_camera_param(ob_playback *playback, ob_error **error);
 

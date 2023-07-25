@@ -317,27 +317,27 @@ ob_frame *ob_create_frameset(ob_error **error);
 void ob_frameset_push_frame(ob_frame *frameset, ob_frame_type type, ob_frame *frame, ob_error **error);
 
 /**
- * @brief Set the system timestamp of a frameset object.
+ * @brief Set the system timestamp of a frame object.
  *
- * @param[in] frame Frameset object to set the system timestamp for.
+ * @param[in] frame Frame object to set the system timestamp for.
  * @param[in] system_timestamp System timestamp to set in milliseconds.
  * @param[out] error Log error messages.
  */
 void ob_frame_set_system_time_stamp(ob_frame *frame, uint64_t system_timestamp, ob_error **error);
 
 /**
- * @brief Set the device timestamp of a frameset object.
+ * @brief Set the device timestamp of a frame object.
  *
- * @param[in] frame Frameset object to set the device timestamp.
+ * @param[in] frame Frame object to set the device timestamp.
  * @param[in] device_timestamp Device timestamp to set in milliseconds.
  * @param[out] error Log error messages.
  */
 void ob_frame_set_device_time_stamp(ob_frame *frame, uint64_t device_timestamp, ob_error **error);
 
 /**
- * @brief Set the device timestamp of a frameset object.
+ * @brief Set the device timestamp of a frame object.
  *
- * @param[in] frame Frameset object to set the device timestamp for.
+ * @param[in] frame Frame object to set the device timestamp for.
  * @param[in] device_timestamp_us Device timestamp to set in microseconds.
  * @param[out] error Log error messages.
  */

@@ -586,7 +586,6 @@ typedef enum {
 } OBPropertyID,
     ob_property_id;
 
-// typo fixed
 #define OB_PROP_TIMER_RESET_TRIGGLE_OUT_ENABLE_BOOL OB_PROP_TIMER_RESET_TRIGGER_OUT_ENABLE_BOOL
 
 /**

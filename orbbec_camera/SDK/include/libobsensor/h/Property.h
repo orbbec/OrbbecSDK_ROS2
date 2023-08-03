@@ -360,9 +360,24 @@ typedef enum {
     OB_PROP_CAPTURE_IMAGE_NUMBER_INTERVAL_INT = 136,
 
     /**
+     * @brief Enable switch for USB3.0 repeated recognition on the device.
+     */
+    OB_PROP_DEVICE_USB3_REPEAT_IDENTIFY_BOOL = 141,
+
+    /**
      * @brief Reboot device delay mode. Delay time unit: ms, range: [0, 8000).
      */
     OB_PROP_DEVICE_REBOOT_DELAY_INT = 142,
+
+    /**
+     * @brief Query the status of laser overcurrent protection (read-only)
+     */
+    OB_PROP_LASER_OVERCURRENT_PROTECTION_STATUS_BOOL = 148,
+
+    /**
+     * @brief Query the status of laser pulse width protection (read-only)
+     */
+    OB_PROP_LASER_PULSE_WIDTH_PROTECTION_STATUS_BOOL = 149,
 
     /**
      * @brief Baseline calibration parameters
@@ -543,6 +558,11 @@ typedef enum {
      * @brief Color camera shutter gain
      */
     OB_PROP_COLOR_MAXIMAL_SHUTTER_INT = 2031,
+
+    /**
+     * @brief The enable/disable switch for IR short exposure function, supported only by a few devices.
+     */
+    OB_PROP_IR_SHORT_EXPOSURE_BOOL = 2032,
 
     /**
      * @brief Software disparity to depth

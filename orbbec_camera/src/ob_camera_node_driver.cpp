@@ -381,7 +381,6 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   RCLCPP_INFO_STREAM(logger_, "Serial number: " << device_info_->serialNumber());
   RCLCPP_INFO_STREAM(logger_, "Firmware version: " << device_info_->firmwareVersion());
   RCLCPP_INFO_STREAM(logger_, "Hardware version: " << device_info_->hardwareVersion());
-  RCLCPP_INFO_STREAM(logger_, "device type: " << ObDeviceTypeToString(device_info_->deviceType()));
   RCLCPP_INFO_STREAM(logger_, "device unique id: " << device_unique_id_);
 }
 

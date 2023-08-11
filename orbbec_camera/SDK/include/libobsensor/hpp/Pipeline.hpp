@@ -1,11 +1,7 @@
 /**
- * \if English
  * @file Pipeline.hpp
- * @brief The SDK's advanced API type can quickly implement switching streaming, frame synchronization, software filtering, and generating point cloud
- * operations. \else
- * @file Pipeline.hpp
- * @brief SDK的高级API类型，可以快速实现开关流，帧同步，软件滤波，生成点云等操作
- * \endif
+ * @brief The SDK's advanced API type can quickly implement switching streaming and frame synchronization
+ * operations.
  */
 #pragma once
 
@@ -35,343 +31,212 @@ private:
 
 public:
     /**
-     * \if English
      * @brief Pipeline is a high-level interface for applications, algorithms related RGBD data streams. Pipeline can provide alignment inside and synchronized
      * FrameSet. Pipeline() no parameter version, which opens the first device in the list of devices connected to the OS by default. If the application has
-     * obtained the device through the DeviceList, opening the Pipeline() at this time will throw an exception that the device has been created. \else
-     * @brief Pipeline 是SDK的高级接口，适用于应用，算法等重点关注RGBD数据流常见，Pipeline在SDK内部可以提供对齐，同步后的FrameSet桢集合
-     * 直接方便客户使用。
-     * Pipeline()无参数版本，默认打开连接到OS的设备列表中的第一个设备。若应用已经通过DeviceList获取设备，此时打开Pipeline()会抛出设备已经创建异常。
-     * 需要开发者捕获异常处理。
-     * \endif
+     * obtained the device through the DeviceList, opening the Pipeline() at this time will throw an exception that the device has been created.
      */
     Pipeline();
+
     /**
-     * \if English
      * @brief
      * Pipeline(std::shared_ptr< Device > device ) Function for multi-device operations. Multiple devices need to be obtained through DeviceList, and the device
-     * and pipeline are bound through this interface. \else
-     * @brief
-     * Pipeline(std::shared_ptr< Device > device )函数，适用于多设备操作常见，此时需要通过DeviceList获取多个设备，通过该接口实现device和pipeline绑定。
-     * \endif
+     * and pipeline are bound through this interface.
      */
     Pipeline(std::shared_ptr<Device> device);
 
     /**
-     * \if English
-     * @brief Create a pipeline for playback of recorded stream files
+     * @brief Construct a pipeline for playback of recorded stream files
      *
-     * @param filename Playback file path
-     * \else
-     * @brief 创建pipeline用于回放录制好的流文件
-     *
-     * @param filename 回放文件路径
-     * \endif
+     * @param filename The file path of the recorded stream file to be played back
      */
     Pipeline(const char *filename);
+
+    /**
+     * @brief Destroy the pipeline object
+     */
     ~Pipeline() noexcept;
 
     /**
-     * \if English
      * @brief Start the pipeline with configuration parameters
      *
-     * @param config Parameter configuration of pipeline
-     * \else
-     * @brief 启动pipeline并配置参数
-     *
-     * @param config pipeline的参数配置
-     * \endif
+     * @param config The parameter configuration of the pipeline
      */
     void start(std::shared_ptr<Config> config);
 
     /**
-     * \if English
      * @brief Start the pipeline and set the frameset data callback
      *
-     * @param config parameter configuration of pipeline
-     * @param callback  Set the callback to be triggered when all frame data in the frame set arrives
-     * \else
-     * @brief 启动pipeline并设置帧集合数据回调
-     *
-     * @param config pipeline的参数配置
-     * @param callback 设置帧集合中的所有帧数据都到达时触发回调
-     * \endif
+     * @param config The parameter configuration of the pipeline
+     * @param callback The callback to be triggered when all frame data in the frameset arrives
      */
     void start(std::shared_ptr<Config> config, FrameSetCallback callback);
 
     /**
-     * \if English
-     * @brief Stop pipeline
-     * \else
-     * @brief 停止pipeline
-     * \endif
+     * @brief Stop the pipeline
      */
     void stop();
 
     /**
-     * \if English
-     * @brief Get pipeline configuration parameters
+     * @brief Get the pipeline configuration parameters
      *
-     * @return std::shared_ptr<Config> returns the configured parameters
-     * \else
-     * @brief 获取pipeline的配置参数
-     *
-     * @return std::shared_ptr<Config> 返回配置的参数
-     * \endif
+     * @return std::shared_ptr<Config> The configured parameters
      */
     std::shared_ptr<Config> getConfig();
 
     /**
-     * \if English
-     * @brief Waiting for frame set data
+     * @brief Wait for frameset data
      *
-     * @param timeout_ms  Waiting timeout (ms)
-     * @return std::shared_ptr<FrameSet> returns the waiting frame set data
-     * \else
-     * @brief 等待帧集合数据
-     *
-     * @param timeout_ms 等待超时时间(毫秒)
-     * @return std::shared_ptr<FrameSet> 返回等待的帧集合数据
-     * \endif
+     * @param timeout_ms The waiting timeout in milliseconds
+     * @return std::shared_ptr<FrameSet> The waiting frameset data
      */
     std::shared_ptr<FrameSet> waitForFrames(uint32_t timeout_ms);
 
     /**
-     * \if English
-     * @brief Get device object
+     * @brief Get the device object
      *
-     * @return std::shared_ptr<Device> returns the device object
-     * \else
-     * @brief 获取设备对象
-     *
-     * @return std::shared_ptr<Device> 返回设备对象
-     * \endif
+     * @return std::shared_ptr<Device> The device object
      */
     std::shared_ptr<Device> getDevice();
 
     /**
-     * \if English
-     * @brief Get playback object
+     * @brief Get the playback object
      *
-     * @return std::shared_ptr<Playback> returns the playback object
-     * \else
-     * @brief 获取回放对象
-     *
-     * @return std::shared_ptr<Playback> 返回回放对象
-     * \endif
+     * @return std::shared_ptr<Playback> The playback object
      */
     std::shared_ptr<Playback> getPlayback();
 
     /**
-     * \if English
-     * @brief Get the stream profile of specified sensor
+     * @brief Get the stream profile of the specified sensor
      *
-     * @param sensorType Type of sensor
-
-     * @return std::shared_ptr<StreamProfileList> returns the stream configuration list
-     * \else
-     * @brief 获取指定传感器的流配置
-     *
-     * @param sensorType 传感器的类型
-     * @return std::shared_ptr<StreamProfileList> 返回流配置列表
-     * \endif
+     * @param sensorType The type of sensor
+     * @return std::shared_ptr<StreamProfileList> The stream profile list
      */
     std::shared_ptr<StreamProfileList> getStreamProfileList(OBSensorType sensorType);
 
     /**
-     * \if English
      * @brief Turn on frame synchronization
-     * \else
-     * @brief 打开帧同步功能
-     * \endif
-     *
      */
     void enableFrameSync();
 
     /**
-     * \if English
      * @brief Turn off frame synchronization
-     * \else
-     * @brief 关闭帧同步功能
-     * \endif
      */
     void disableFrameSync();
 
     /**
-     * \if English
-     * @brief Get camera parameters
-     * @attention If D2C is enabled, it will return the camera parameters after D2C, if not, it will return to the default parameters
+     * @brief Get the camera parameters
      *
-     * @return  OBCameraParam returns camera parameters
-     * \else
-     * @brief 获取相机参数
-     * @attention 如果开启了D2C将返回D2C后的相机参数
+     * @note If D2C is enabled, it will return the camera parameters after D2C. If not, it will return the default parameters.
      *
-     * @return  OBCameraParam返回相机参数
-     * \endif
+     * @return OBCameraParam The camera parameters
      */
     OBCameraParam getCameraParam();
 
     /**
-     * \if English
      * @brief Return a list of D2C-enabled depth sensor resolutions corresponding to the input color sensor resolution
-     * @param colorProfile Input color sensor resolution
-     * @param alignMode Input align mode
      *
-     * @return std::shared_ptr<StreamProfileList> returns a list of depth sensor resolutions
-     * \else
-     * @brief 返回与输入的彩色传感器分辨率对应的支持D2C的深度传感器分辨率列表
-     * @param colorProfile 输入的彩色传感器分辨率
-     * @param alignMode 输入的对齐模式
-     *
-     * @return std::shared_ptr<StreamProfileList> 返回深度传感器分辨率列表
-     * \endif
+     * @param colorProfile The input color sensor resolution
+     * @param alignMode The input align mode
+     * @return std::shared_ptr<StreamProfileList> A list of depth sensor resolutions
      */
     std::shared_ptr<StreamProfileList> getD2CDepthProfileList(std::shared_ptr<StreamProfile> colorProfile, OBAlignMode alignMode);
 
     /**
-     * \if English
-     * @brief Get valid area between minimum distance and maximum distance after D2C
+     * @brief Get the valid area between the minimum distance and maximum distance after D2C
      *
-     * @param minimumDistance minimum working distance
-     * @param maximumDistance maximum working distance
-     * @return OBRect returns the area information valid after D2C at the working distance
-     * \else
-     * @brief 获取D2C后给定工作范围的有效区域
-     * 如果需要获取指定距离D2C后的ROI区域，将minimum_distance与maximum_distance设置成一样或者将maximum_distance设置成0
-     *
-     * @param minimumDistance 最小工作距离
-     * @param maximumDistance 最大工作距离
-     * @return OBRect 返回在工作距离下D2C后有效的区域信息
-     * \endif
+     * @param minimumDistance The minimum working distance
+     * @param maximumDistance The maximum working distance (optional)
+     * @return OBRect The area information valid after D2C at the working distance
      */
     OBRect getD2CValidArea(uint32_t minimumDistance, uint32_t maximumDistance = 0);
 
     /**
-     * \if English
      * @brief Dynamically switch the corresponding config configuration
      *
-     * @param config Updated config configuration
-     * \else
-     * @brief 动态切换对应的config配置
-     *
-     * @param config 更新后的config配置
-     * \endif
+     * @param config The updated config configuration
      */
     void switchConfig(std::shared_ptr<Config> config);
 
     /**
-     * \if English
-     * @brief start recording
+     * @brief Start recording
      *
-     * @param filename Record file name
-     * \else
-     * @brief 开始录制
-     *
-     * @param filename 录制文件名
-     * \endif
+     * @param filename The name of the record file
      */
     void startRecord(const char *filename);
 
     /**
-     * \if English
      * @brief Stop recording
-     * \else
-     * @brief 停止录制
-     * \endif
      */
     void stopRecord();
 };
 
+/**
+ * @brief Config class for configuring pipeline parameters
+ *
+ * The Config class provides an interface for configuring pipeline parameters.
+ */
 class OB_EXTENSION_API Config {
 private:
     std::unique_ptr<ConfigImpl> impl_;
 
 public:
+    /**
+     * @brief Construct a new Config object
+     */
     Config();
+
+    /**
+     * @brief Destroy the Config object
+     */
     ~Config() noexcept;
 
     /**
-     * \if English
-     * @brief Configure the stream to be enabled
+     * @brief Enable a stream to be used in the pipeline
      *
-     * @param streamProfile Stream  configuration
-     * \else
-     * @brief 设置要打开的流配置
-     *
-     * @param streamProfile 流的配置
-     * \endif
+     * @param streamProfile The stream configuration to be enabled
      */
     void enableStream(std::shared_ptr<StreamProfile> streamProfile);
+
     /**
-     * \if English
-     * @brief Configure all streams to be enabled
-     * \else
-     * @brief 设置打开所有的流
-     * \endif
+     * @brief Enable all streams to be used in the pipeline
      */
     void enableAllStream();
+
     /**
-     * \if English
-     * @brief Configure the stream to be disabled
+     * @brief Disable a stream to be used in the pipeline
      *
-     * @param streamType Stream configuration
-     * \else
-     * @brief 设置要关闭的流配置
-     *
-     * @param streamType 流的配置
-     * \endif
+     * @param streamType The stream configuration to be disabled
      */
     void disableStream(OBStreamType streamType);
+
     /**
-     * \if English
-     * @brief Configure all streams to be disabled
-     * \else
-     * @brief 设置关闭所有的流
-     * \endif
+     * @brief Disable all streams to be used in the pipeline
      */
     void disableAllStream();
 
     /**
-     * \if English
      * @brief Set the alignment mode
      *
-     * @param mode Align State Mode
-     * \else
-     * @brief 设置对齐模式
-     *
-     * @param mode 对齐状态模式
-     * \endif
+     * @param mode The alignment mode
      */
     void setAlignMode(OBAlignMode mode);
 
     /**
-     * \if English
-     * @brief Whether the depth needs to be scaled after setting D2C
+     * @brief Set whether the depth needs to be scaled after setting D2C
      *
      * @param enable Whether scaling is required
-     * \else
-     * @brief 设置D2C后是否需要缩放深度
-     *
-     * @param enable 是否需要缩放
-     * \endif
      */
     void setDepthScaleRequire(bool enable);
 
     /**
-     * \if English
-     * @brief Set the D2C target resolution, which is applicable to cases where the Color stream is not enabled using the OrbbecSDK and the depth needs to be
-     * D2C Note: When you use OrbbecSDK to enable the Color stream, you also use this interface to set the D2C target resolution. The configuration of the
-     * enabled Color stream is preferred for D2C.
-     * @param d2cTargetWidth  The D2C target has a wide resolution
-     * @param d2cTargetHeight The D2C target has a high resolutio
-     * \else
-     * @brief 设置D2C目标分辨率，适用于未使用OrbbecSDK开启Color流，且需要对深度进行D2C的情况
-     * 注意:当使用OrbbecSDK开启Color流时，同时使用了此接口设置了D2C目标分辨率时。优先使用开启的Color流的配置进行D2C。
+     * @brief Set the D2C target resolution
+     * @brief The D2C target resolution is applicable to cases where the color stream is not enabled using the OrbbecSDK and the depth needs to be D2C.
      *
-     * @param d2cTargetWidth  D2C目标分辨率宽
-     * @param d2cTargetHeight D2C目标分辨率高
-     * \endif
+     * @note When you use OrbbecSDK to enable the color stream, you also use this interface to set the D2C target resolution. The configuration of the
+     * enabled Color stream is preferred for D2C.
+     *
+     * @param d2cTargetWidth The D2C target width resolution
+     * @param d2cTargetHeight The D2C target height resolution
      */
     void setD2CTargetResolution(uint32_t d2cTargetWidth, uint32_t d2cTargetHeight);
 

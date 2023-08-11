@@ -4,6 +4,7 @@
     <!-- Hardware depth registration -->
     <arg name="depth_registration" default="false"/>
     <arg name="serial_number" default=""/>
+    <arg name="usb_port" default=""/>
     <arg name="device_num" default="1"/>
     <arg name="vendor_id" default="0x2bc5"/>
     <arg name="product_id" default=""/>
@@ -32,12 +33,14 @@
     <arg name="ir_info_url" default=""/>
     <arg name="log_level" default="none"/>
     <arg name="enable_soft_filter" default="true"/>
+    <arg name="enable_ldp" default="true"/>
     <group>
         <push-ros-namespace namespace="$(var camera_name)"/>
         <node name="camera" pkg="orbbec_camera" exec="orbbec_camera_node" output="screen">
             <param name="camera_name" value="$(var camera_name)"/>
             <param name="depth_registration" value="$(var depth_registration)"/>
             <param name="serial_number" value="$(var serial_number)"/>
+            <param name="usb_port" value="$(var usb_port)"/>
             <param name="device_num" value="$(var device_num)"/>
             <param name="vendor_id" value="$(var vendor_id)"/>
             <param name="product_id" value="$(var product_id)"/>
@@ -66,6 +69,7 @@
             <param name="ir_info_url" value="$(var ir_info_url)"/>
             <param name="log_level" value="$(var log_level)"/>
             <param name="enable_soft_filter" value="$(var enable_soft_filter)"/>
+            <param name="enable_ldp" value="$(var enable_ldp)"/>
         </node>
     </group>
 </launch>

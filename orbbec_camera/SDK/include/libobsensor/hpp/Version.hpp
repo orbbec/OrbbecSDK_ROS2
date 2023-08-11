@@ -1,11 +1,6 @@
 /**
- * \if English
  * @file Version.hpp
- * @brief Get the SDK version information
- * \else
- * @file Version.hpp
- * @brief 获取SDK版本号相关信息的类
- * \endif
+ * @brief Provides functions to retrieve version information of the SDK.
  */
 #pragma once
 
@@ -13,53 +8,38 @@ namespace ob {
 class OB_EXTENSION_API Version {
 public:
     /**
-     * \if English
-     * @brief Get the SDK major version number
+     * @brief Get the major version number of the SDK.
      *
-     * @return int returns the SDK major version number
-     * \else
-     * @brief 获取SDK主版本号
-     *
-     * @return int 返回SDK主版本号
-     * \endif
+     * @return int The major version number of the SDK.
      */
     static int getMajor();
+
     /**
-     * \if English
-     * @brief Get the SDK minor version number
+     * @brief Get the minor version number of the SDK.
      *
-     * @return int returns the SDK minor version number
-     * \else
-     * @brief 获取SDK副版本号
-     *
-     * @return int 返回SDK副版本号
-     * \endif
+     * @return int The minor version number of the SDK.
      */
     static int getMinor();
+
     /**
-     * \if English
-     * @brief Get the SDK revision number
+     * @brief Get the patch version number of the SDK.
      *
-     * @return int returns the SDK revision number
-     * \else
-     * @brief 获取SDK修订版本号
-     *
-     * @return int 返回SDK修订版本号
-     * \endif
+     * @return int The patch version number of the SDK.
      */
     static int getPatch();
 
     /**
-     * \if English
-     * @brief Get the SDK version number
+     * @brief Get the full version number of the SDK.
      *
-     * @return int returns the SDK version number
-     * \else
-     * @brief 获取SDK版本号
-     *
-     * @return int 返回SDK版本号
-     * \endif
+     * @return int The full version number of the SDK.
      */
     static int getVersion();
+
+    /**
+     * @brief Get the stage version of the SDK.
+     *
+     * @return char* The stage version string of the SDK.
+     */
+    static char *getStageVersion();
 };
 }  // namespace ob

@@ -1,0 +1,132 @@
+<launch>
+    <!-- unique camera name-->
+    <arg name="camera_name" default="camera"/>
+    <!-- Hardware depth registration -->
+    <arg name="depth_registration" default="false"/>
+    <arg name="serial_number" default=""/>
+    <arg name="device_num" default="1"/>
+    <arg name="vendor_id" default="0x2bc5"/>
+    <arg name="product_id" default=""/>
+    <arg name="enable_point_cloud" default="true"/>
+    <arg name="enable_colored_point_cloud" default="false"/>
+    <arg name="point_cloud_qos" default="default"/>
+    <arg name="connection_delay" default="100"/>
+    <arg name="color_width" default="1280"/>
+    <arg name="color_height" default="720"/>
+    <arg name="color_fps" default="30"/>
+    <arg name="color_format" default="MJPG"/>
+    <arg name="enable_color" default="true"/>
+    <arg name="flip_color" default="false"/>
+    <arg name="color_qos" default="default"/>
+    <arg name="color_camera_info_qos" default="default"/>
+    <arg name="enable_color_auto_exposure" default="true"/>
+    <arg name="depth_width" default="1280"/>
+    <arg name="depth_height" default="800"/>
+    <arg name="depth_fps" default="30"/>
+    <arg name="depth_format" default="Y14"/>
+    <arg name="enable_depth" default="true"/>
+    <arg name="flip_depth" default="false"/>
+    <arg name="depth_qos" default="default"/>
+    <arg name="depth_camera_info_qos" default="default"/>
+    <arg name="ir_width" default="1280"/>
+    <arg name="ir_height" default="800"/>
+    <arg name="ir_fps" default="30"/>
+    <arg name="ir_format" default="Y8"/>
+    <arg name="enable_ir" default="true"/>
+    <arg name="flip_ir" default="false"/>
+    <arg name="ir_qos" default="default"/>
+    <arg name="ir_camera_info_qos" default="default"/>
+    <arg name="enable_ir_auto_exposure" default="true"/>
+    <arg name="enable_accel" default="false"/>
+    <arg name="accel_rate" default="100hz"/>
+    <arg name="accel_range" default="4g"/>
+    <arg name="enable_gyro" default="false"/>
+    <arg name="gyro_rate" default="100hz"/>
+    <arg name="gyro_range" default="1000dps"/>
+    <arg name="liner_accel_cov" default="0.01"/>
+    <arg name="angular_vel_cov" default="0.01"/>
+    <arg name="publish_tf" default="true"/>
+    <arg name="tf_publish_rate" default="10.0"/>
+    <arg name="ir_info_url" default=""/>
+    <arg name="color_info_url" default=""/>
+    <arg name="log_level" default="none"/>
+    <arg name="enable_publish_extrinsic" default="false"/>
+    <arg name="enable_hardware_d2d" default="true"/>
+    <arg name="enable_d2c_viewer" default="false"/>
+    <arg name="enable_ldp" default="true"/>
+    <arg name="enable_soft_filter" default="true"/>
+    <arg name="soft_filter_max_diff" default="-1"/>
+    <arg name="soft_filter_speckle_size" default="-1"/>
+    <arg name="sync_mode" default="close"/>
+    <arg name="ir_trigger_signal_in_delay" default="0"/>
+    <arg name="rgb_trigger_signal_in_delay" default="0"/>
+    <arg name="device_trigger_signal_out_delay" default="0"/>
+    <arg name="sync_signal_trigger_out" default="false"/>
+    <group>
+        <push-ros-namespace namespace="$(var camera_name)"/>
+        <node name="camera" pkg="orbbec_camera" exec="orbbec_camera_node" output="screen">
+            <param name="camera_name" value="$(var camera_name)"/>
+            <param name="depth_registration" value="$(var depth_registration)"/>
+            <param name="serial_number" value="$(var serial_number)"/>
+            <param name="device_num" value="$(var device_num)"/>
+            <param name="vendor_id" value="$(var vendor_id)"/>
+            <param name="product_id" value="$(var product_id)"/>
+            <param name="enable_point_cloud" value="$(var enable_point_cloud)"/>
+            <param name="enable_colored_point_cloud" value="$(var enable_colored_point_cloud)"/>
+            <param name="point_cloud_qos" value="$(var point_cloud_qos)"/>
+            <param name="connection_delay" value="$(var connection_delay)"/>
+            <param name="color_width" value="$(var color_width)"/>
+            <param name="color_height" value="$(var color_height)"/>
+            <param name="color_fps" value="$(var color_fps)"/>
+            <param name="color_format" value="$(var color_format)"/>
+            <param name="enable_color" value="$(var enable_color)"/>
+            <param name="flip_color" value="$(var flip_color)"/>
+            <param name="color_qos" value="$(var color_qos)"/>
+            <param name="color_camera_info_qos" value="$(var color_camera_info_qos)"/>
+            <param name="enable_color_auto_exposure" value="$(var enable_color_auto_exposure)"/>
+            <param name="depth_width" value="$(var depth_width)"/>
+            <param name="depth_height" value="$(var depth_height)"/>
+            <param name="depth_fps" value="$(var depth_fps)"/>
+            <param name="depth_format" value="$(var depth_format)"/>
+            <param name="flip_depth" value="$(var flip_depth)"/>
+            <param name="enable_depth" value="$(var enable_depth)"/>
+            <param name="depth_qos" value="$(var depth_qos)"/>
+            <param name="depth_camera_info_qos" value="$(var depth_camera_info_qos)"/>
+            <param name="ir_width" value="$(var ir_width)"/>
+            <param name="ir_height" value="$(var ir_height)"/>
+            <param name="ir_fps" value="$(var ir_fps)"/>
+            <param name="ir_format" value="$(var ir_format)"/>
+            <param name="enable_ir" value="$(var enable_ir)"/>
+            <param name="flip_ir" value="$(var flip_ir)"/>
+            <param name="ir_qos" value="$(var ir_qos)"/>
+            <param name="ir_camera_info_qos" value="$(var ir_camera_info_qos)"/>
+            <param name="enable_ir_auto_exposure" value="$(var enable_ir_auto_exposure)"/>
+            <param name="enable_accel" value="$(var enable_accel)"/>
+            <param name="accel_rate" value="$(var accel_rate)"/>
+            <param name="accel_range" value="$(var accel_range)"/>
+            <param name="enable_gyro" value="$(var enable_gyro)"/>
+            <param name="gyro_rate" value="$(var gyro_rate)"/>
+            <param name="gyro_range" value="$(var gyro_range)"/>
+            <param name="liner_accel_cov" value="$(var liner_accel_cov)"/>
+            <param name="angular_vel_cov" value="$(var angular_vel_cov)"/>
+            <param name="publish_tf" value="$(var publish_tf)"/>
+            <param name="tf_publish_rate" value="$(var tf_publish_rate)"/>
+            <param name="ir_info_url" value="$(var ir_info_url)"/>
+            <param name="color_info_url" value="$(var color_info_url)"/>
+            <param name="log_level" value="$(var log_level)"/>
+            <param name="enable_publish_extrinsic" value="$(var enable_publish_extrinsic)"/>
+            <param name="enable_hardware_d2d" value="$(var enable_hardware_d2d)"/>
+            <param name="enable_d2c_viewer" value="$(var enable_d2c_viewer)"/>
+            <param name="enable_ldp" value="$(var enable_ldp)"/>
+            <param name="enable_soft_filter" value="$(var enable_soft_filter)"/>
+            <param name="soft_filter_max_diff" value="$(var soft_filter_max_diff)"/>
+            <param name="soft_filter_speckle_size" value="$(var soft_filter_speckle_size)"/>
+            <param name="sync_mode" value="$(var sync_mode)"/>
+            <param name="ir_trigger_signal_in_delay" value="$(var ir_trigger_signal_in_delay)"/>
+            <param name="rgb_trigger_signal_in_delay" value="$(var rgb_trigger_signal_in_delay)"/>
+            <param name="device_trigger_signal_out_delay" value="$(var device_trigger_signal_out_delay)"/>
+            <param name="sync_signal_trigger_out" value="$(var sync_signal_trigger_out)"/>
+            <remap from="/$(var camera_name)/depth/color/points" to="/$(var camera_name)/depth_registered/points"/>
+        </node>
+    </group>
+</launch>

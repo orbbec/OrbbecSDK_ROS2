@@ -61,4 +61,6 @@ OB_GYRO_FULL_SCALE_RANGE fullGyroScaleRangeFromString(std::string& full_scale_ra
 
 OBAccelFullScaleRange fullAccelScaleRangeFromString(std::string& full_scale_range);
 
+std::string parseUsbPort(const std::string& line);
+
 }  // namespace orbbec_camera

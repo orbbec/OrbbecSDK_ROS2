@@ -30,6 +30,8 @@
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2/LinearMath/Quaternion.h>
+#include <tf2/LinearMath/Vector3.h>
+#include <tf2/LinearMath/Transform.h>
 #include <std_srvs/srv/set_bool.hpp>
 #include <std_srvs/srv/empty.hpp>
 
@@ -154,7 +156,7 @@ class OBCameraNode {
 
   void setupPublishers();
 
-  void publishStaticTF(const rclcpp::Time& t, const std::vector<float>& trans,
+  void publishStaticTF(const rclcpp::Time& t, const tf2::Vector3& trans,
                        const tf2::Quaternion& q, const std::string& from, const std::string& to);
 
   void calcAndPublishStaticTransform();
@@ -338,6 +340,7 @@ class OBCameraNode {
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr toggle_sensors_srv_;
 
   bool publish_tf_ = false;
+  bool tf_published_ = false;
   std::shared_ptr<tf2_ros::StaticTransformBroadcaster> static_tf_broadcaster_ = nullptr;
   std::shared_ptr<tf2_ros::TransformBroadcaster> dynamic_tf_broadcaster_ = nullptr;
   std::vector<geometry_msgs::msg::TransformStamped> tf_msgs;

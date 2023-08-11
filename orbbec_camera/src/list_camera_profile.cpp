@@ -3,6 +3,7 @@
 #include <orbbec_camera/ob_camera_node_driver.h>
 #include <memory>
 #include <magic_enum/magic_enum.hpp>
+
 int main() {
   auto context = std::make_unique<ob::Context>();
   context->setLoggerSeverity(OBLogSeverity::OB_LOG_SEVERITY_NONE);

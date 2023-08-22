@@ -67,13 +67,14 @@ add_library(${PROJECT_NAME} SHARED
   src/ros_service.cpp
   src/synced_imu_publisher.cpp
   src/utils.cpp
-  )
+)
 
 set(dependencies
   ament_index_cpp
   builtin_interfaces
   cv_bridge
   camera_info_manager
+  rclcpp_components
   Eigen3
   image_transport
   image_publisher
@@ -87,11 +88,11 @@ set(dependencies
   tf2_msgs
   tf2_ros
   tf2_sensor_msgs
-  )
+)
 
 ament_target_dependencies(${PROJECT_NAME}
   ${dependencies}
-  )
+)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
@@ -100,7 +101,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   ${ORBBEC_INCLUDE_DIR}
   ${OpenCV_INCLUDED_DIRS}
   ${GLOG_INCLUDED_DIRS}
-  )
+)
 
 
 target_link_libraries(${PROJECT_NAME}
@@ -110,38 +111,16 @@ target_link_libraries(${PROJECT_NAME}
   ${GLOG_LIBRARIES}
   -lOrbbecSDK
   -L${ORBBEC_LIBS}
-  )
+)
 
-add_executable(${PROJECT_NAME}_node
-  src/main.cpp
-  )
+rclcpp_components_register_node(${PROJECT_NAME}
+  PLUGIN "orbbec_camera::OBCameraNodeDriver"
+  EXECUTABLE orbbec_camera_node
+)
 
-target_include_directories(${PROJECT_NAME}_node PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-  ${ORBBEC_INCLUDE_DIR}
-  ${OpenCV_INCLUDED_DIRS}
-  ${GLOG_INCLUDED_DIRS}
-  )
-
-
-target_link_libraries(${PROJECT_NAME}_node
-  ${ORBBEC_SDK_LIBRARIES}
-  ${OpenCV_LIBS}
-  Eigen3::Eigen
-  ${GLOG_LIBRARIES}
-  -lOrbbecSDK
-  -L${ORBBEC_LIBS}
-  ${PROJECT_NAME}
-  )
-
-ament_target_dependencies(${PROJECT_NAME}_node
-  ${dependencies}
-  )
 add_executable(list_devices_node
   src/list_devices_node.cpp
-  )
+)
 
 target_include_directories(list_devices_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
@@ -150,7 +129,7 @@ target_include_directories(list_devices_node PUBLIC
   ${ORBBEC_INCLUDE_DIR}
   ${OpenCV_INCLUDED_DIRS}
   ${GLOG_INCLUDED_DIRS}
-  )
+)
 
 
 target_link_libraries(list_devices_node
@@ -161,15 +140,15 @@ target_link_libraries(list_devices_node
   -lOrbbecSDK
   -L${ORBBEC_LIBS}
   ${PROJECT_NAME}
-  )
+)
 
 ament_target_dependencies(list_devices_node
   ${dependencies}
-  )
+)
 
 add_executable(ob_cleanup_shm_node
   src/ob_cleanup_shm.cpp
-  )
+)
 
 target_include_directories(ob_cleanup_shm_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
@@ -178,7 +157,7 @@ target_include_directories(ob_cleanup_shm_node PUBLIC
   ${ORBBEC_INCLUDE_DIR}
   ${OpenCV_INCLUDED_DIRS}
   ${GLOG_INCLUDED_DIRS}
-  )
+)
 
 
 target_link_libraries(ob_cleanup_shm_node
@@ -189,15 +168,15 @@ target_link_libraries(ob_cleanup_shm_node
   -lOrbbecSDK
   -L${ORBBEC_LIBS}
   ${PROJECT_NAME}
-  )
+)
 
 ament_target_dependencies(ob_cleanup_shm_node
   ${dependencies}
-  )
+)
 
 add_executable(list_depth_work_mode_node
   src/list_depth_work_mode.cpp
-  )
+)
 
 target_include_directories(list_depth_work_mode_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
@@ -206,7 +185,7 @@ target_include_directories(list_depth_work_mode_node PUBLIC
   ${ORBBEC_INCLUDE_DIR}
   ${OpenCV_INCLUDED_DIRS}
   ${GLOG_INCLUDED_DIRS}
-  )
+)
 
 target_link_libraries(list_depth_work_mode_node
   ${ORBBEC_SDK_LIBRARIES}
@@ -216,15 +195,15 @@ target_link_libraries(list_depth_work_mode_node
   -lOrbbecSDK
   -L${ORBBEC_LIBS}
   ${PROJECT_NAME}
-  )
+)
 
 ament_target_dependencies(list_depth_work_mode_node
   ${dependencies}
-  )
+)
 
 add_executable(list_camera_profile_mode_node
   src/list_camera_profile.cpp
-  )
+)
 
 target_include_directories(list_camera_profile_mode_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
@@ -233,7 +212,7 @@ target_include_directories(list_camera_profile_mode_node PUBLIC
   ${ORBBEC_INCLUDE_DIR}
   ${OpenCV_INCLUDED_DIRS}
   ${GLOG_INCLUDED_DIRS}
-  )
+)
 
 target_link_libraries(list_camera_profile_mode_node
   ${ORBBEC_SDK_LIBRARIES}
@@ -243,16 +222,16 @@ target_link_libraries(list_camera_profile_mode_node
   -lOrbbecSDK
   -L${ORBBEC_LIBS}
   ${PROJECT_NAME}
-  )
+)
 
 ament_target_dependencies(list_depth_work_mode_node
   ${dependencies}
-  )
+)
 install(TARGETS ${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
-  )
+)
 
 install(
   DIRECTORY include/
@@ -262,33 +241,31 @@ install(
 install(DIRECTORY
   launch
   DESTINATION share/${PROJECT_NAME}/
-  )
+)
 
 install(DIRECTORY
   config
   DESTINATION share/${PROJECT_NAME}/
-  )
+)
 
 install(DIRECTORY
   ${ORBBEC_INCLUDE_DIR}
   DESTINATION include
-  )
+)
 
 install(DIRECTORY
   ${ORBBEC_LIBS}/
   DESTINATION lib/
   FILES_MATCHING PATTERN "*.so"
   PATTERN "*.so.*"
-  )
-
+)
 
 install(TARGETS list_devices_node
   ob_cleanup_shm_node
   list_depth_work_mode_node
   list_camera_profile_mode_node
-  ${PROJECT_NAME}_node
   DESTINATION lib/${PROJECT_NAME}/
-  )
+)
 if (BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()

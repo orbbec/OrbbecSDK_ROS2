@@ -15,6 +15,7 @@
 #include <semaphore.h>
 #include <sys/shm.h>
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include <rclcpp_components/register_node_macro.hpp>
 
 namespace orbbec_camera {
 OBCameraNodeDriver::OBCameraNodeDriver(const rclcpp::NodeOptions &node_options)
@@ -406,3 +407,5 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
   initializeDevice(device);
 }
 }  // namespace orbbec_camera
+
+RCLCPP_COMPONENTS_REGISTER_NODE(orbbec_camera::OBCameraNodeDriver)

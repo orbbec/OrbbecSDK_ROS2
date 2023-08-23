@@ -312,6 +312,7 @@ The following are the launch parameters available:
 | gemini e lite       | gemini_e_lite.launch.xml  |
 
 Actually, All launch files all most the same, the only difference is the default value of the parameters.
+If you need to use python launch file, please refer to `gemini2.launch.py`.
 
 ## Supported hardware products
 

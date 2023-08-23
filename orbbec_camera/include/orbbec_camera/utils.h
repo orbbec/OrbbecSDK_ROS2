@@ -57,9 +57,15 @@ OBSyncMode OBSyncModeFromString(const std::string& mode);
 
 OB_SAMPLE_RATE sampleRateFromString(std::string& sample_rate);
 
+std::string sampleRateToString(const OB_SAMPLE_RATE &sample_rate);
+
 OB_GYRO_FULL_SCALE_RANGE fullGyroScaleRangeFromString(std::string& full_scale_range);
 
+std::string fullGyroScaleRangeToString(const OB_GYRO_FULL_SCALE_RANGE &full_scale_range);
+
 OBAccelFullScaleRange fullAccelScaleRangeFromString(std::string& full_scale_range);
+
+std::string fullAccelScaleRangeToString(const OBAccelFullScaleRange &full_scale_range);
 
 std::string parseUsbPort(const std::string& line);
 

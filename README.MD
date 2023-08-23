@@ -283,6 +283,20 @@ The following are the launch parameters available:
 - `depth_registration`: Enables hardware alignment the depth frame to color frame.
   This field is required when the `enable_colored_point_cloud` is set to `true`.
 - `usb_port`: The USB port of the camera. This is required when multiple cameras are used.
+- `enable_accel` : Enables the accelerometer.
+- `accel_rate`: The frequency of the accelerometer, the optional values are `1.5625hz`,`3.125hz`,`6.25hz`,`12.5hz`,`25hz`,`50hz`,
+`100hz`,`200hz`,`500hz`,`1khz`,`2khz`,`4khz`,`8khz`,`16khz`,`32khz`. The specific value depends on the current camera.
+- `accel_range` : The range of the accelerometer, the optional values are `2g`,`4g`,`8g`,`16g`. The specific value depends on the current camera.
+- `enable_gyro`: Whether to enable the gyroscope.
+- `gyro_rate` : The frequency of the gyroscope, the optional values are `1.5625hz`,`3.125hz`,`6.25hz`,`12.5hz`,`25hz`,`50hz`,
+`100hz`,`200hz`,`500hz`,`1khz`,`2khz`,`4khz`,`8khz`,`16khz`,`32khz`. The specific value depends on the current camera.
+- `gyro_range` : The range of the gyroscope, the optional values are `16dps`,`31dps`,`62dps`,`125dps`,`250dps`,`500dps`,`1000dps`,`2000dps`. The specific value depends on the current camera.
+
+## Check which profiles the camera supports
+  
+  ```bash
+  ros2 run orbbec_camera list_camera_profile_mode_node
+  ```
 
 ## Launch files
 

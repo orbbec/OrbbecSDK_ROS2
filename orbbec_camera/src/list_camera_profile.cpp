@@ -3,8 +3,9 @@
 #include <orbbec_camera/ob_camera_node_driver.h>
 #include <memory>
 #include <magic_enum/magic_enum.hpp>
-
+#include <orbbec_camera/utils.h>
 int main() {
+  using namespace orbbec_camera;
   auto context = std::make_unique<ob::Context>();
   context->setLoggerSeverity(OBLogSeverity::OB_LOG_SEVERITY_NONE);
   auto device_list = context->queryDeviceList();
@@ -37,16 +38,14 @@ int main() {
         auto profile = origin_profile->as<ob::AccelStreamProfile>();
         RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"),
                            "accel profile: sampleRate "
-                               << magic_enum::enum_name(profile->sampleRate())
-                               << "  full scale_range "
-                               << magic_enum::enum_name(profile->fullScaleRange()));
+                               << sampleRateToString(profile->sampleRate()) << "  full scale_range "
+                               << fullAccelScaleRangeToString(profile->fullScaleRange()));
       } else if (sensor->type() == OB_SENSOR_GYRO) {
         auto profile = origin_profile->as<ob::GyroStreamProfile>();
         RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"),
                            "gyro profile: sampleRate "
-                               << magic_enum::enum_name(profile->sampleRate())
-                               << "  full scale_range "
-                               << magic_enum::enum_name(profile->fullScaleRange()));
+                               << sampleRateToString(profile->sampleRate()) << "  full scale_range "
+                               << fullGyroScaleRangeToString(profile->fullScaleRange()));
       } else {
         RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"),
                            "unknown profile: " << magic_enum::enum_name(sensor->type()));

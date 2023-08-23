@@ -274,7 +274,21 @@ ros2 launch orbbec_camera multi_camera.launch.xml
 - `depth_registration`: 是否启用将深度帧硬件对齐到彩色帧。当`enable_colored_point_cloud`设置为`true`
   时，此字段也要设置为`true`。
 - `usb_port` : USB端口号，当使用多个相机时，这是必需的。
+- `enable_accel`: 是否启用加速度计。
+- `accel_rate` : 加速度计的频率， 可选值为`1.5625hz`,`3.125hz`,`6.25hz`,`12.5hz`,`25hz`,`50hz`,
+`100hz`,`200hz`,`500hz`,`1khz`,`2khz`,`4khz`,`8khz`,`16khz`,`32khz`。具体的值取决于当前的相机型号。
+- `accel_range` : 加速度计的量程, 可选值为`2g`,`4g`,`8g`,`16g`。具体的值取决于当前的相机型号。
+- `enable_gyro` : 是否启用陀螺仪。
+- `gyro_rate` : 陀螺仪的频率, 可选值为`1.5625hz`,`3.125hz`,`6.25hz`,`12.5hz`,`25hz`,`50hz`,
+`100hz`,`200hz`,`500hz`,`1khz`,`2khz`,`4khz`,`8khz`,`16khz`,`32khz`。具体的值取决于当前的相机型号。
+- `gyro_range` : 陀螺仪的量程, 可选值为`16dps`,`31dps`,`62dps`,`125dps`,`250dps`,`500dps`,`1000dps`,`2000dps`。具体的值取决于当前的相机型号。
 
+
+## 查看相机支持那些Profile
+  
+  ```bash
+  ros2 run orbbec_camera list_camera_profile_mode_node
+  ```
 ## 启动文件
 
 | product serials     | launch file               |

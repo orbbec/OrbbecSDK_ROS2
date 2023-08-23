@@ -301,6 +301,8 @@ ros2 launch orbbec_camera multi_camera.launch.xml
 | gemini2L            | gemini2L.launch.xml       |
 | gemini e            | gemini_e.launch.xml       |
 | gemini e lite       | gemini_e_lite.launch.xml  |
+实际上所有的launch文件都是差不多的内容，只是相机的分辨率和图像格式不同。
+如果你需要使用python launch文件请参考`gemini2.launch.py`。
 
 ## 已经支持的硬件产品列表
 

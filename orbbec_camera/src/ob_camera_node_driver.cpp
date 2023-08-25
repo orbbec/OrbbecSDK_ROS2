@@ -16,6 +16,7 @@
 #include <sys/shm.h>
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
+#include <signal.h>
 
 namespace orbbec_camera {
 OBCameraNodeDriver::OBCameraNodeDriver(const rclcpp::NodeOptions &node_options)
@@ -77,6 +78,15 @@ void OBCameraNodeDriver::init() {
   device_count_update_thread_ = std::make_shared<std::thread>([this]() { deviceCountUpdate(); });
   sync_time_thread_ = std::make_shared<std::thread>([this]() { syncTime(); });
   reset_device_thread_ = std::make_shared<std::thread>([this]() { resetDevice(); });
+  signal(SIGINT, [](int) {
+    RCLCPP_INFO_STREAM(rclcpp::get_logger("orbbec_camera_node_driver"), "SIGINT received");
+    exit(0);
+  });
+  signal(SIGTERM, [](int) {
+    RCLCPP_INFO_STREAM(rclcpp::get_logger("orbbec_camera_node_driver"), "SIGTERM received");
+    exit(0);
+  });
+
 }
 
 void OBCameraNodeDriver::onDeviceConnected(const std::shared_ptr<ob::DeviceList> &device_list) {

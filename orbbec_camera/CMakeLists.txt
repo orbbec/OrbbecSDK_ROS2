@@ -8,9 +8,10 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -fPIC -g")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O3")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fPIC -g")
 set(CMAKE_BUILD_TYPE "Release")
+option(USE_RK_HW_DECODER "Use Rockchip hardware decoder" OFF)
 
 if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+  add_compile_options(-Wall -Wextra -Werror)
 endif ()
 
 # find dependencies
@@ -49,6 +50,14 @@ if (NOT GLOG_FOUND)
   message(FATAL_ERROR "glog is not found")
 endif ()
 
+if (USE_RK_HW_DECODER)
+  pkg_search_module(RK_MPP REQUIRED rockchip_mpp)
+  if (NOT RK_MPP_FOUND)
+    message(FATAL_ERROR "rockchip_mpp is not found")
+  endif ()
+  pkg_search_module(RGA REQUIRED librga)
+endif ()
+
 execute_process(COMMAND uname -m OUTPUT_VARIABLE MACHINES)
 execute_process(COMMAND getconf LONG_BIT OUTPUT_VARIABLE MACHINES_BIT)
 message(STATUS "ORRBEC Machine : ${MACHINES}")
@@ -72,6 +81,8 @@ set(common_include_dirs
   ${ORBBEC_INCLUDE_DIR}
   ${OpenCV_INCLUDED_DIRS}
   ${GLOG_INCLUDED_DIRS}
+  ${RK_MPP_INCLUDE_DIRS}
+  ${RGA_INCLUDE_DIRS}
 )
 
 set(common_libraries
@@ -81,17 +92,10 @@ set(common_libraries
   ${GLOG_LIBRARIES}
   -lOrbbecSDK
   -L${ORBBEC_LIBS}
+  ${RK_MPP_LIBRARIES}
 )
 
-macro(add_orbbec_executable target source)
-  add_executable(${target} ${source})
-  target_include_directories(${target} PUBLIC ${common_include_dirs})
-  target_link_libraries(${target} ${common_libraries} ${PROJECT_NAME})
-  ament_target_dependencies(${target} ${dependencies})
-endmacro()
-
-# Define library and nodes
-add_library(${PROJECT_NAME} SHARED
+set(source_files
   src/d2c_viewer.cpp
   src/dynamic_params.cpp
   src/ob_camera_node_driver.cpp
@@ -100,17 +104,44 @@ add_library(${PROJECT_NAME} SHARED
   src/ros_service.cpp
   src/synced_imu_publisher.cpp
   src/utils.cpp
+  src/mjpeg_decoder.cpp
+)
+
+if (USE_RK_HW_DECODER)
+  add_definitions(-DUSE_RK_HW_DECODER)
+  list(APPEND source_files src/rk_mpp_decoder.cpp)
+endif ()
+
+macro(add_orbbec_executable target source)
+  add_executable(${target} ${source})
+  target_include_directories(${target} PUBLIC ${common_include_dirs})
+  target_link_libraries(${target} ${common_libraries} ${PROJECT_NAME})
+  ament_target_dependencies(${target} ${dependencies})
+  if (USE_RK_HW_DECODER)
+    target_link_libraries(${target}
+      ${RGA_LIBRARIES}
+    )
+  endif ()
+endmacro()
+
+# Define library and nodes
+add_library(${PROJECT_NAME} SHARED
+  ${source_files}
 )
 
 ament_target_dependencies(${PROJECT_NAME} ${dependencies})
 target_include_directories(${PROJECT_NAME} PUBLIC ${common_include_dirs})
 target_link_libraries(${PROJECT_NAME} ${common_libraries})
+if (USE_RK_HW_DECODER)
+  target_link_libraries(${PROJECT_NAME}
+    ${RGA_LIBRARIES}
+  )
+endif ()
 
 rclcpp_components_register_node(${PROJECT_NAME}
   PLUGIN "orbbec_camera::OBCameraNodeDriver"
   EXECUTABLE orbbec_camera_node
 )
-
 # Add nodes using the macro
 add_orbbec_executable(list_devices_node src/list_devices_node.cpp)
 add_orbbec_executable(ob_cleanup_shm_node src/ob_cleanup_shm.cpp)

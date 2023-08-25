@@ -17,6 +17,11 @@
 
 #include "orbbec_camera/utils.h"
 #include <filesystem>
+
+#if defined(USE_RK_HW_DECODER)
+#include "orbbec_camera/rk_mpp_decoder.h"
+#endif
+
 namespace orbbec_camera {
 using namespace std::chrono_literals;
 
@@ -46,6 +51,10 @@ OBCameraNode::OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> devic
     auto depth_qos = getRMWQosProfileFromString(image_qos_[DEPTH]);
     d2c_viewer_ = std::make_unique<D2CViewer>(node_, rgb_qos, depth_qos);
   }
+
+#if defined(USE_RK_HW_DECODER)
+  mjpeg_decoder_ = std::make_unique<RKMjpegDecoder>(width_[COLOR], height_[COLOR]);
+#endif
 }
 
 template <class T>
@@ -697,24 +706,58 @@ void OBCameraNode::onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet>& fr
   }
 }
 
+std::shared_ptr<ob::Frame> OBCameraNode::softwareDecodeColorFrame(
+    const std::shared_ptr<ob::Frame>& frame) {
+  if (frame == nullptr) {
+    return nullptr;
+  }
+  if (frame->format() == OB_FORMAT_RGB888) {
+    return frame;
+  }
+  if (!setupFormatConvertType(frame->format())) {
+    RCLCPP_ERROR(logger_, "Unsupported color format: %d", frame->format());
+    return nullptr;
+  }
+  auto color_frame = format_convert_filter_.process(frame);
+  if (color_frame == nullptr) {
+    RCLCPP_ERROR_SKIPFIRST_THROTTLE(logger_, *(node_->get_clock()), 1000,
+                                    "Failed to convert frame to RGB format");
+    return nullptr;
+  }
+  return color_frame;
+}
+
 void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
                                       const stream_index_pair& stream_index) {
   if (frame == nullptr) {
     return;
   }
   std::shared_ptr<ob::VideoFrame> video_frame;
-  if (frame->type() == OB_FRAME_COLOR && frame->format() != OB_FORMAT_RGB888) {
-    if (!setupFormatConvertType(frame->format())) {
-      RCLCPP_ERROR(logger_, "Unsupported color format: %d", frame->format());
-      return;
+  bool hw_decode = false;
+  auto frame_format = frame->format();
+  if (frame->type() == OB_FRAME_COLOR && frame_format != OB_FORMAT_RGB888) {
+    if (frame_format == OB_FORMAT_MJPG || frame_format == OB_FORMAT_MJPEG) {
+#if defined(USE_RK_HW_DECODER)
+      CHECK_NOTNULL(mjpeg_decoder_.get());
+      video_frame = frame->as<ob::ColorFrame>();
+      const auto& color_frame = frame->as<ob::ColorFrame>();
+      if (rgb_buffer_ == nullptr) {
+        rgb_buffer_ = new uint8_t[video_frame->width() * video_frame->height() * 3];
+      }
+      bool ret = mjpeg_decoder_->decode(color_frame, rgb_buffer_);
+      if (!ret) {
+        RCLCPP_ERROR(logger_,"Decode frame failed");
+        return;
+      }
+      hw_decode = true;
+#else
+      auto covert_frame = softwareDecodeColorFrame(frame);
+      video_frame = covert_frame->as<ob::ColorFrame>();
+#endif
+    } else {
+      auto covert_frame = softwareDecodeColorFrame(frame);
+      video_frame = covert_frame->as<ob::ColorFrame>();
     }
-    auto color_frame = format_convert_filter_.process(frame);
-    if (color_frame == nullptr) {
-      RCLCPP_ERROR_SKIPFIRST_THROTTLE(logger_, *(node_->get_clock()), 1000,
-                                      "Failed to convert frame to RGB format");
-      return;
-    }
-    video_frame = color_frame->as<ob::ColorFrame>();
   } else if (frame->type() == OB_FRAME_COLOR) {
     video_frame = frame->as<ob::ColorFrame>();
   } else if (frame->type() == OB_FRAME_DEPTH) {
@@ -735,7 +778,11 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
   if (image.empty() || image.cols != width || image.rows != height) {
     image.create(height, width, image_format_[stream_index]);
   }
-  image.data = (uchar*)video_frame->data();
+  if (hw_decode) {
+    memcpy(image.data, rgb_buffer_, video_frame->width() * video_frame->height() * 3);
+  } else {
+    memcpy(image.data, video_frame->data(), video_frame->dataSize());
+  }
   if (stream_index == DEPTH) {
     auto depth_scale = video_frame->as<ob::DepthFrame>()->getValueScale();
     image = image * depth_scale;

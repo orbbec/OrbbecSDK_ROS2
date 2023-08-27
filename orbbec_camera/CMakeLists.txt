@@ -9,6 +9,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O3")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fPIC -g")
 set(CMAKE_BUILD_TYPE "Release")
 option(USE_RK_HW_DECODER "Use Rockchip hardware decoder" OFF)
+option(USE_GST_HW_DECODER "Use Gstreamer hardware decoder" ON)
 
 if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Werror)
@@ -58,6 +59,14 @@ if (USE_RK_HW_DECODER)
   pkg_search_module(RGA REQUIRED librga)
 endif ()
 
+if (USE_GST_HW_DECODER)
+  find_package(PkgConfig REQUIRED)
+  pkg_search_module(GST REQUIRED gstreamer-1.0)
+  if (NOT GST_FOUND)
+    message(FATAL_ERROR "gstreamer-1.0 is not found")
+  endif ()
+  pkg_search_module(GST_APP REQUIRED gstreamer-app-1.0)
+endif ()
 execute_process(COMMAND uname -m OUTPUT_VARIABLE MACHINES)
 execute_process(COMMAND getconf LONG_BIT OUTPUT_VARIABLE MACHINES_BIT)
 message(STATUS "ORRBEC Machine : ${MACHINES}")
@@ -83,6 +92,8 @@ set(common_include_dirs
   ${GLOG_INCLUDED_DIRS}
   ${RK_MPP_INCLUDE_DIRS}
   ${RGA_INCLUDE_DIRS}
+  ${GST_INCLUDE_DIRS}
+  ${GST_APP_INCLUDE_DIRS}
 )
 
 set(common_libraries
@@ -112,6 +123,11 @@ if (USE_RK_HW_DECODER)
   list(APPEND source_files src/rk_mpp_decoder.cpp)
 endif ()
 
+if (USE_GST_HW_DECODER)
+  add_definitions(-DUSE_GST_HW_DECODER)
+  list(APPEND source_files src/gst_decoder.cpp)
+endif ()
+
 macro(add_orbbec_executable target source)
   add_executable(${target} ${source})
   target_include_directories(${target} PUBLIC ${common_include_dirs})
@@ -120,6 +136,11 @@ macro(add_orbbec_executable target source)
   if (USE_RK_HW_DECODER)
     target_link_libraries(${target}
       ${RGA_LIBRARIES}
+    )
+  elseif (USE_GST_HW_DECODER)
+    target_link_libraries(${target}
+      ${GST_LIBRARIES}
+      ${GST_APP_LIBRARIES}
     )
   endif ()
 endmacro()
@@ -135,6 +156,11 @@ target_link_libraries(${PROJECT_NAME} ${common_libraries})
 if (USE_RK_HW_DECODER)
   target_link_libraries(${PROJECT_NAME}
     ${RGA_LIBRARIES}
+  )
+elseif (USE_GST_HW_DECODER)
+  target_link_libraries(${PROJECT_NAME}
+    ${GST_LIBRARIES}
+    ${GST_APP_LIBRARIES}
   )
 endif ()
 

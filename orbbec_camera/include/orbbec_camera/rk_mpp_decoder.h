@@ -36,6 +36,7 @@ class RKMjpegDecoder : public MjpegDecoder {
   MppBufferGroup mpp_packet_group_ = nullptr;
   MppTask mpp_task_ = nullptr;
   uint32_t need_split_ = 0;
+  uint8_t * rgb_buffer_ = nullptr;
 };
 
 }  // namespace orbbec_camera

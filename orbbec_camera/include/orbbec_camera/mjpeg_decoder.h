@@ -18,7 +18,6 @@ class MjpegDecoder {
  protected:
   int width_ = 0;
   int height_ = 0;
-  uint8_t *rgb_buffer_ = nullptr;
   std::string error_msg_;
 };
 }  // namespace orbbec_camera

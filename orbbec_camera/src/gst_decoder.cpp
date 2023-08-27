@@ -38,8 +38,8 @@ GstreamerMjpegDecoder::GstreamerMjpegDecoder(int width, int height, HWDecoder hw
                         "gst buffer pool set active error");
     throw std::runtime_error("gst buffer pool set active error");
   }
-  std::string pipeline_str = "appsrc name=src is-live=true do-timestamp=true ! " + hw_decoder_ +
-                             " ! videoconvert ! video/x-raw,format=RGB ! appsink name=sink";
+  std::string pipeline_str = "appsrc name=appsrc0 is-live=true do-timestamp=true ! " + hw_decoder_ +
+                             " ! videoconvert ! video/x-raw,format=RGB ! appsink name=appsink0";
   pipeline_ = gst_parse_launch(pipeline_str.c_str(), NULL);
   if (!pipeline_) {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger("gstreamer_mjpeg_decoder"), "gst parse launch error");

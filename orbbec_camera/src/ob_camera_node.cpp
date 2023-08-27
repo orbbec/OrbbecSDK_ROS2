@@ -25,7 +25,7 @@
 namespace orbbec_camera {
 using namespace std::chrono_literals;
 
-OBCameraNode::OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> device,
+OBCameraNode::OBCameraNode(rclcpp::Node *node, std::shared_ptr<ob::Device> device,
                            std::shared_ptr<Parameters> parameters)
     : node_(node),
       device_(std::move(device)),
@@ -59,14 +59,14 @@ OBCameraNode::OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> devic
 
 template <class T>
 void OBCameraNode::setAndGetNodeParameter(
-    T& param, const std::string& param_name, const T& default_value,
-    const rcl_interfaces::msg::ParameterDescriptor& parameter_descriptor) {
+    T &param, const std::string &param_name, const T &default_value,
+    const rcl_interfaces::msg::ParameterDescriptor &parameter_descriptor) {
   try {
     param = parameters_
                 ->setParam(param_name, rclcpp::ParameterValue(default_value),
-                           std::function<void(const rclcpp::Parameter&)>(), parameter_descriptor)
+                           std::function<void(const rclcpp::Parameter &)>(), parameter_descriptor)
                 .get<T>();
-  } catch (const rclcpp::ParameterTypeException& ex) {
+  } catch (const rclcpp::ParameterTypeException &ex) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to set parameter: " << param_name << ". " << ex.what());
     throw;
   }
@@ -83,6 +83,10 @@ void OBCameraNode::clean() {
   RCLCPP_WARN_STREAM(logger_, "stop streams");
   stopStreams();
   RCLCPP_WARN_STREAM(logger_, "Destroy ~OBCameraNode DONE");
+  if (rgb_buffer_) {
+    delete[] rgb_buffer_;
+    rgb_buffer_ = nullptr;
+  }
 }
 
 void OBCameraNode::setupDevices() {
@@ -100,7 +104,7 @@ void OBCameraNode::setupDevices() {
     }
   }
 
-  for (const auto& [stream_index, enable] : enable_stream_) {
+  for (const auto &[stream_index, enable] : enable_stream_) {
     if (enable && sensors_.find(stream_index) == sensors_.end()) {
       RCLCPP_INFO_STREAM(logger_,
                          magic_enum::enum_name(stream_index.first)
@@ -148,17 +152,17 @@ void OBCameraNode::setupDevices() {
         default_soft_filter_speckle_size != soft_filter_speckle_size_) {
       device_->setIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT, soft_filter_speckle_size_);
     }
-  } catch (const ob::Error& e) {
+  } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to setup devices: " << e.getMessage());
-  } catch (const std::exception& e) {
+  } catch (const std::exception &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to setup devices: " << e.what());
   }
 }
 
 void OBCameraNode::setupProfiles() {
-  for (const auto& elem : IMAGE_STREAMS) {
+  for (const auto &elem : IMAGE_STREAMS) {
     if (enable_stream_[elem]) {
-      const auto& sensor = sensors_[elem];
+      const auto &sensor = sensors_[elem];
       CHECK_NOTNULL(sensor.get());
       auto profiles = sensor->getStreamProfileList();
       CHECK_NOTNULL(profiles.get());
@@ -179,7 +183,7 @@ void OBCameraNode::setupProfiles() {
             profiles->getVideoStreamProfile(width_[elem], height_[elem], format_[elem], fps_[elem]);
         default_profile =
             profiles->getVideoStreamProfile(width_[elem], height_[elem], format_[elem]);
-      } catch (const ob::Error& ex) {
+      } catch (const ob::Error &ex) {
         RCLCPP_ERROR_STREAM(logger_, "Failed to get profile: " << ex.getMessage());
         RCLCPP_ERROR_STREAM(
             logger_, "Stream: " << magic_enum::enum_name(elem.first)
@@ -227,15 +231,15 @@ void OBCameraNode::startStreams() {
   pipeline_ = std::make_unique<ob::Pipeline>(device_);
   try {
     setupPipelineConfig();
-    pipeline_->start(pipeline_config_, [this](const std::shared_ptr<ob::FrameSet>& frame_set) {
+    pipeline_->start(pipeline_config_, [this](const std::shared_ptr<ob::FrameSet> &frame_set) {
       onNewFrameSetCallback(frame_set);
     });
-  } catch (const ob::Error& e) {
+  } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to start pipeline: " << e.getMessage());
     RCLCPP_INFO_STREAM(logger_, "try to disable ir stream and try again");
     enable_stream_[INFRA0] = false;
     setupPipelineConfig();
-    pipeline_->start(pipeline_config_, [this](const std::shared_ptr<ob::FrameSet>& frame_set) {
+    pipeline_->start(pipeline_config_, [this](const std::shared_ptr<ob::FrameSet> &frame_set) {
       onNewFrameSetCallback(frame_set);
     });
   }
@@ -244,7 +248,7 @@ void OBCameraNode::startStreams() {
 }
 
 void OBCameraNode::startIMU() {
-  for (const auto& stream_index : HID_STREAMS) {
+  for (const auto &stream_index : HID_STREAMS) {
     if (enable_stream_[stream_index]) {
       CHECK(sensors_.count(stream_index));
       auto profile_list = sensors_[stream_index]->getStreamProfileList();
@@ -256,7 +260,7 @@ void OBCameraNode::startIMU() {
           auto accel_range = fullAccelScaleRangeFromString(imu_range_[stream_index]);
           if (profile->fullScaleRange() == accel_range && profile->sampleRate() == accel_rate) {
             sensors_[stream_index]->start(
-                profile, [this, stream_index](const std::shared_ptr<ob::Frame>& frame) {
+                profile, [this, stream_index](const std::shared_ptr<ob::Frame> &frame) {
                   onNewIMUFrameCallback(frame, stream_index);
                 });
             imu_started_[stream_index] = true;
@@ -270,7 +274,7 @@ void OBCameraNode::startIMU() {
           auto gyro_range = fullGyroScaleRangeFromString(imu_range_[stream_index]);
           if (profile->fullScaleRange() == gyro_range && profile->sampleRate() == gyro_rate) {
             sensors_[stream_index]->start(
-                profile, [this, stream_index](const std::shared_ptr<ob::Frame>& frame) {
+                profile, [this, stream_index](const std::shared_ptr<ob::Frame> &frame) {
                   onNewIMUFrameCallback(frame, stream_index);
                 });
             RCLCPP_INFO_STREAM(logger_, "start gyro stream with "
@@ -282,7 +286,7 @@ void OBCameraNode::startIMU() {
       }
     }
   }
-  for (const auto& stream_index : HID_STREAMS) {
+  for (const auto &stream_index : HID_STREAMS) {
     if (enable_stream_[stream_index] && !imu_started_[stream_index]) {
       RCLCPP_ERROR_STREAM(logger_, "Failed to start IMU stream: "
                                        << magic_enum::enum_name(stream_index.first)
@@ -298,13 +302,13 @@ void OBCameraNode::stopStreams() {
   try {
     pipeline_->stop();
     stopIMU();
-  } catch (const ob::Error& e) {
+  } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to stop pipeline: " << e.getMessage());
   }
 }
 
 void OBCameraNode::stopIMU() {
-  for (const auto& stream_index : HID_STREAMS) {
+  for (const auto &stream_index : HID_STREAMS) {
     if (imu_started_[stream_index]) {
       CHECK(sensors_.count(stream_index));
       RCLCPP_INFO_STREAM(logger_, "stop " << stream_name_[stream_index] << " stream");
@@ -368,7 +372,7 @@ void OBCameraNode::getParameters() {
     setAndGetNodeParameter<std::string>(camera_info_qos_[stream_index], param_name, "default");
   }
 
-  for (const auto& stream_index : HID_STREAMS) {
+  for (const auto &stream_index : HID_STREAMS) {
     std::string param_name = stream_name_[stream_index] + "_qos";
     setAndGetNodeParameter<std::string>(imu_qos_[stream_index], param_name, "default");
     param_name = "enable_" + stream_name_[stream_index];
@@ -438,7 +442,7 @@ void OBCameraNode::setupPipelineConfig() {
   if (depth_registration_ && enable_stream_[COLOR] && enable_stream_[DEPTH]) {
     pipeline_config_->setAlignMode(ALIGN_D2C_HW_MODE);
   }
-  for (const auto& stream_index : IMAGE_STREAMS) {
+  for (const auto &stream_index : IMAGE_STREAMS) {
     if (enable_stream_[stream_index]) {
       RCLCPP_INFO_STREAM(logger_, "Enable " << stream_name_[stream_index] << " stream");
       RCLCPP_INFO_STREAM(
@@ -465,7 +469,7 @@ void OBCameraNode::setupPublishers() {
         "depth/points", rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(point_cloud_qos_profile),
                                     point_cloud_qos_profile));
   }
-  for (const auto& stream_index : IMAGE_STREAMS) {
+  for (const auto &stream_index : IMAGE_STREAMS) {
     if (!enable_stream_[stream_index]) {
       continue;
     }
@@ -482,7 +486,7 @@ void OBCameraNode::setupPublishers() {
         topic, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(camera_info_qos_profile),
                            camera_info_qos_profile));
   }
-  for (const auto& stream_index : HID_STREAMS) {
+  for (const auto &stream_index : HID_STREAMS) {
     if (!enable_stream_[stream_index]) {
       continue;
     }
@@ -497,7 +501,7 @@ void OBCameraNode::setupPublishers() {
   }
 }
 
-void OBCameraNode::publishPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set) {
+void OBCameraNode::publishPointCloud(const std::shared_ptr<ob::FrameSet> &frame_set) {
   try {
     if (depth_registration_ || enable_colored_point_cloud_) {
       if (frame_set->depthFrame() != nullptr && frame_set->colorFrame() != nullptr) {
@@ -507,16 +511,16 @@ void OBCameraNode::publishPointCloud(const std::shared_ptr<ob::FrameSet>& frame_
     if (enable_point_cloud_ && frame_set->depthFrame() != nullptr) {
       publishDepthPointCloud(frame_set);
     }
-  } catch (const ob::Error& e) {
+  } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, e.getMessage());
-  } catch (const std::exception& e) {
+  } catch (const std::exception &e) {
     RCLCPP_ERROR_STREAM(logger_, e.what());
   } catch (...) {
     RCLCPP_ERROR_STREAM(logger_, "publishPointCloud with unknown error");
   }
 }
 
-void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set) {
+void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &frame_set) {
   if (!enable_point_cloud_ || !depth_cloud_pub_ ||
       depth_cloud_pub_->get_subscription_count() == 0) {
     return;
@@ -538,7 +542,7 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet>& f
     return;
   }
   size_t point_size = frame->dataSize() / sizeof(OBPoint);
-  auto* points = (OBPoint*)frame->data();
+  auto *points = (OBPoint *)frame->data();
   if (!points) {
     RCLCPP_ERROR_STREAM(logger_, "point cloud data is null");
     return;
@@ -592,7 +596,7 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet>& f
   }
 }
 
-void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set) {
+void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> &frame_set) {
   if (!enable_colored_point_cloud_ || !depth_registration_cloud_pub_ ||
       depth_registration_cloud_pub_->get_subscription_count() == 0) {
     return;
@@ -614,7 +618,7 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet>&
     return;
   }
   size_t point_size = frame->dataSize() / sizeof(OBColorPoint);
-  auto* points = (OBColorPoint*)frame->data();
+  auto *points = (OBColorPoint *)frame->data();
   if (!points) {
     RCLCPP_ERROR_STREAM(logger_, "point cloud data is null");
     return;
@@ -681,7 +685,7 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet>&
   }
 }
 
-void OBCameraNode::onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet>& frame_set) {
+void OBCameraNode::onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet> &frame_set) {
   if (frame_set == nullptr) {
     return;
   }
@@ -697,9 +701,9 @@ void OBCameraNode::onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet>& fr
     onNewFrameCallback(color_frame, COLOR);
     onNewFrameCallback(depth_frame, DEPTH);
     onNewFrameCallback(ir_frame, INFRA0);
-  } catch (const ob::Error& e) {
+  } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: " << e.getMessage());
-  } catch (const std::exception& e) {
+  } catch (const std::exception &e) {
     RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: " << e.what());
   } catch (...) {
     RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: unknown error");
@@ -707,7 +711,7 @@ void OBCameraNode::onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet>& fr
 }
 
 std::shared_ptr<ob::Frame> OBCameraNode::softwareDecodeColorFrame(
-    const std::shared_ptr<ob::Frame>& frame) {
+    const std::shared_ptr<ob::Frame> &frame) {
   if (frame == nullptr) {
     return nullptr;
   }
@@ -727,8 +731,8 @@ std::shared_ptr<ob::Frame> OBCameraNode::softwareDecodeColorFrame(
   return color_frame;
 }
 
-void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
-                                      const stream_index_pair& stream_index) {
+void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
+                                      const stream_index_pair &stream_index) {
   if (frame == nullptr) {
     return;
   }
@@ -740,13 +744,13 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
 #if defined(USE_RK_HW_DECODER)
       CHECK_NOTNULL(mjpeg_decoder_.get());
       video_frame = frame->as<ob::ColorFrame>();
-      const auto& color_frame = frame->as<ob::ColorFrame>();
+      const auto &color_frame = frame->as<ob::ColorFrame>();
       if (rgb_buffer_ == nullptr) {
         rgb_buffer_ = new uint8_t[video_frame->width() * video_frame->height() * 3];
       }
       bool ret = mjpeg_decoder_->decode(color_frame, rgb_buffer_);
       if (!ret) {
-        RCLCPP_ERROR(logger_,"Decode frame failed");
+        RCLCPP_ERROR(logger_, "Decode frame failed");
         return;
       }
       hw_decode = true;
@@ -774,7 +778,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
   }
   int width = static_cast<int>(video_frame->width());
   int height = static_cast<int>(video_frame->height());
-  auto& image = images_[stream_index];
+  auto &image = images_[stream_index];
   if (image.empty() || image.cols != width || image.rows != height) {
     image.create(height, width, image_format_[stream_index]);
   }
@@ -796,9 +800,9 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
   } else if (!camera_param_ && (stream_index == DEPTH || stream_index == INFRA0)) {
     camera_param_ = getDepthCameraParam();
   }
-  auto& intrinsic =
+  auto &intrinsic =
       stream_index == COLOR ? camera_param_->rgbIntrinsic : camera_param_->depthIntrinsic;
-  auto& distortion =
+  auto &distortion =
       stream_index == COLOR ? camera_param_->rgbDistortion : camera_param_->depthDistortion;
   auto camera_info = convertToCameraInfo(intrinsic, distortion, width);
   CHECK(camera_info_publishers_.count(stream_index) > 0);
@@ -815,8 +819,8 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
   saveImageToFile(stream_index, image, image_msg);
 }
 
-void OBCameraNode::saveImageToFile(const stream_index_pair& stream_index, const cv::Mat& image,
-                                   const sensor_msgs::msg::Image::SharedPtr& image_msg) {
+void OBCameraNode::saveImageToFile(const stream_index_pair &stream_index, const cv::Mat &image,
+                                   const sensor_msgs::msg::Image::SharedPtr &image_msg) {
   if (save_images_[stream_index]) {
     auto now = time(nullptr);
     std::stringstream ss;
@@ -847,8 +851,8 @@ void OBCameraNode::saveImageToFile(const stream_index_pair& stream_index, const 
   }
 }
 
-void OBCameraNode::onNewIMUFrameCallback(const std::shared_ptr<ob::Frame>& frame,
-                                         const stream_index_pair& stream_index) {
+void OBCameraNode::onNewIMUFrameCallback(const std::shared_ptr<ob::Frame> &frame,
+                                         const stream_index_pair &stream_index) {
   if (!imu_publishers_.count(stream_index)) {
     RCLCPP_ERROR_STREAM(logger_,
                         "stream " << stream_name_[stream_index] << " publisher not initialized");
@@ -882,7 +886,7 @@ void OBCameraNode::onNewIMUFrameCallback(const std::shared_ptr<ob::Frame>& frame
   imu_publishers_[stream_index]->publish(imu_msg);
 }
 
-void OBCameraNode::setDefaultIMUMessage(sensor_msgs::msg::Imu& imu_msg) {
+void OBCameraNode::setDefaultIMUMessage(sensor_msgs::msg::Imu &imu_msg) {
   imu_msg.header.frame_id = "imu_link";
   imu_msg.orientation.x = 0.0;
   imu_msg.orientation.y = 0.0;
@@ -896,8 +900,8 @@ void OBCameraNode::setDefaultIMUMessage(sensor_msgs::msg::Imu& imu_msg) {
       angular_vel_cov_, 0.0, 0.0, 0.0, angular_vel_cov_, 0.0, 0.0, 0.0, angular_vel_cov_};
 }
 
-sensor_msgs::msg::Imu OBCameraNode::createUnitIMUMessage(const IMUData& accel_data,
-                                                         const IMUData& gyro_data) {
+sensor_msgs::msg::Imu OBCameraNode::createUnitIMUMessage(const IMUData &accel_data,
+                                                         const IMUData &gyro_data) {
   sensor_msgs::msg::Imu imu_msg;
   rclcpp::Time timestamp(gyro_data.timestamp_);
   imu_msg.header.stamp = timestamp;
@@ -953,9 +957,9 @@ std::optional<OBCameraParam> OBCameraNode::getColorCameraParam() {
   return {};
 }
 
-void OBCameraNode::publishStaticTF(const rclcpp::Time& t, const tf2::Vector3& trans,
-                                   const tf2::Quaternion& q, const std::string& from,
-                                   const std::string& to) {
+void OBCameraNode::publishStaticTF(const rclcpp::Time &t, const tf2::Vector3 &trans,
+                                   const tf2::Quaternion &q, const std::string &from,
+                                   const std::string &to) {
   geometry_msgs::msg::TransformStamped msg;
   msg.header.stamp = t;
   msg.header.frame_id = from;
@@ -1032,7 +1036,7 @@ void OBCameraNode::publishDynamicTransforms() {
                     [this] { return (!(is_running_)); });
     {
       rclcpp::Time t = node_->now();
-      for (auto& msg : static_tf_msgs_) {
+      for (auto &msg : static_tf_msgs_) {
         msg.header.stamp = t;
       }
       dynamic_tf_broadcaster_->sendTransform(static_tf_msgs_);
@@ -1041,12 +1045,12 @@ void OBCameraNode::publishDynamicTransforms() {
 }
 
 template <typename T>
-T lerp(const T& a, const T& b, const double t) {
+T lerp(const T &a, const T &b, const double t) {
   return a * (1.0 - t) + b * t;
 }
 
-void OBCameraNode::FillImuDataLinearInterpolation(const IMUData& imu_data,
-                                                  std::deque<sensor_msgs::msg::Imu>& imu_msgs) {
+void OBCameraNode::FillImuDataLinearInterpolation(const IMUData &imu_data,
+                                                  std::deque<sensor_msgs::msg::Imu> &imu_msgs) {
   imu_history_.push_back(imu_data);
   stream_index_pair steam_index(imu_data.stream_);
   imu_msgs.clear();
@@ -1077,8 +1081,8 @@ void OBCameraNode::FillImuDataLinearInterpolation(const IMUData& imu_data,
   imu_history_.push_back(current_imu);
 }
 
-void OBCameraNode::FillImuDataCopy(const IMUData& imu_data,
-                                   std::deque<sensor_msgs::msg::Imu>& imu_msgs) {
+void OBCameraNode::FillImuDataCopy(const IMUData &imu_data,
+                                   std::deque<sensor_msgs::msg::Imu> &imu_msgs) {
   stream_index_pair steam_index(imu_data.stream_);
   if (steam_index == ACCEL) {
     accel_data_ = imu_data;

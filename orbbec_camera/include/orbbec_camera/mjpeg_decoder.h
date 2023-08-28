@@ -5,6 +5,13 @@
 #include "libobsensor/ObSensor.hpp"
 
 namespace orbbec_camera {
+enum HWDecoder {
+  ROCKCHIP_MPP = 0,
+  NV_JPEG_DEC = 1,
+  AMLOGIC_CODEC = 2,
+  AV_CODEC = 3,
+};
+
 class MjpegDecoder {
  public:
   MjpegDecoder(int width, int height);

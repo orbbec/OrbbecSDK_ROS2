@@ -1,13 +1,7 @@
 #pragma once
 #include "mjpeg_decoder.h"
 #include <gst/gst.h>
-
 namespace orbbec_camera {
-enum class HWDecoder : int {
-  ROCKCHIP_MPP = 0,
-  NV_JPEG_DEC = 1,
-  AMLOGIC_CODEC = 2,
-};
 
 std::string hwDecoderToString(HWDecoder hw_decoder);
 
@@ -24,6 +18,9 @@ class GstreamerMjpegDecoder : public MjpegDecoder {
   GstBufferPool* buffer_pool_ = nullptr;
   GstElement* pipeline_ = nullptr;
   GstElement* appsrc_ = nullptr;
+  GstElement* jpegparse_ = nullptr;
+  GstElement* jpegdec_ = nullptr;
+  GstElement* videoconvert_ = nullptr;
   GstElement* appsink_ = nullptr;
 };
 

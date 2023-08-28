@@ -57,6 +57,11 @@
 #include "orbbec_camera/d2c_viewer.h"
 #include "magic_enum/magic_enum.hpp"
 #include "mjpeg_decoder.h"
+#if defined(USE_RK_HW_DECODER)
+#include "orbbec_camera/rk_mpp_decoder.h"
+#elif defined(USE_GST_HW_DECODER)
+#include "orbbec_camera/gst_decoder.h"
+#endif
 
 #define STREAM_NAME(sip)                                                                       \
   (static_cast<std::ostringstream&&>(std::ostringstream()                                      \
@@ -404,5 +409,6 @@ class OBCameraNode {
   // mjpeg decoder
   std::shared_ptr<MjpegDecoder> mjpeg_decoder_ = nullptr;
   uint8_t* rgb_buffer_ = nullptr;
+  HWDecoder hw_decoder_ = HWDecoder::AV_CODEC;
 };
 }  // namespace orbbec_camera

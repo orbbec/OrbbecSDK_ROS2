@@ -20,6 +20,8 @@
 
 #if defined(USE_RK_HW_DECODER)
 #include "orbbec_camera/rk_mpp_decoder.h"
+#elif defined(USE_GST_HW_DECODER)
+#include "orbbec_camera/gst_decoder.h"
 #endif
 
 namespace orbbec_camera {
@@ -45,16 +47,18 @@ OBCameraNode::OBCameraNode(rclcpp::Node *node, std::shared_ptr<ob::Device> devic
   compression_params_.push_back(cv::IMWRITE_PNG_STRATEGY_DEFAULT);
   setupDefaultImageFormat();
   setupTopics();
+#if defined(USE_RK_HW_DECODER)
+  mjpeg_decoder_ = std::make_unique<RKMjpegDecoder>(width_[COLOR], height_[COLOR]);
+#elif defined(USE_GST_HW_DECODER)
+  mjpeg_decoder_ =
+      std::make_unique<GstreamerMjpegDecoder>(width_[COLOR], height_[COLOR], hw_decoder_);
+#endif
   startStreams();
   if (enable_d2c_viewer_) {
     auto rgb_qos = getRMWQosProfileFromString(image_qos_[COLOR]);
     auto depth_qos = getRMWQosProfileFromString(image_qos_[DEPTH]);
     d2c_viewer_ = std::make_unique<D2CViewer>(node_, rgb_qos, depth_qos);
   }
-
-#if defined(USE_RK_HW_DECODER)
-  mjpeg_decoder_ = std::make_unique<RKMjpegDecoder>(width_[COLOR], height_[COLOR]);
-#endif
 }
 
 template <class T>
@@ -424,6 +428,9 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(soft_filter_speckle_size_, "soft_filter_speckle_size", -1);
   setAndGetNodeParameter<double>(liner_accel_cov_, "linear_accel_cov", 0.0003);
   setAndGetNodeParameter<double>(angular_vel_cov_, "angular_vel_cov", 0.02);
+  int hw_decoder = 0;
+  setAndGetNodeParameter<int>(hw_decoder, "hw_decoder", 3);
+  hw_decoder_ = static_cast<HWDecoder>(hw_decoder);
 }
 
 void OBCameraNode::setupTopics() {
@@ -741,7 +748,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   auto frame_format = frame->format();
   if (frame->type() == OB_FRAME_COLOR && frame_format != OB_FORMAT_RGB888) {
     if (frame_format == OB_FORMAT_MJPG || frame_format == OB_FORMAT_MJPEG) {
-#if defined(USE_RK_HW_DECODER)
+#if defined(USE_RK_HW_DECODER) || defined(USE_GST_HW_DECODER)
       CHECK_NOTNULL(mjpeg_decoder_.get());
       video_frame = frame->as<ob::ColorFrame>();
       const auto &color_frame = frame->as<ob::ColorFrame>();

@@ -291,37 +291,32 @@ ros2 launch orbbec_camera multi_camera.launch.xml
   ```
 ## 启动文件
 
-| product serials     | launch file               |
-|---------------------|---------------------------|
-| astra+              | astra_adv.launch.xml      |
-| astra               | astra.launch.xml          |
-| astra2              | astra2.launch.xml         |
-| astra mini          | astra_mini.launch.xml     |
-| astra mini pro      | astra_mini_pro.launch.xml |
-| astra pro           | astra_pro.launch.xml      |
-| astra stereo s      | stereo_s_u3.launch.xml    |
-| dabai               | dabai.launch.xml          |
-| dabai d1            | dabai_d1.launch.xml       |
-| dabai dcw           | dabai_dcw.launch.xml      |
-| dabai dw            | dabai_dw.launch.xml       |
-| dabai pro           | dabai_pro.launch.xml      |
-| deeya               | deeya.launch.xml          |
-| femto               | femto.launch.xml          |
-| femto mega          | femto_mega.launch.xml     |
-| femto w             | femto_w.launch.xml        |
-| gemini              | gemini.launch.xml         |
-| gemini              | gemini.launch.xml         |
-| gemini2 / dabai DCL | gemini2.launch.xml        |
-| gemini2L            | gemini2L.launch.xml       |
-| gemini e            | gemini_e.launch.xml       |
-| gemini e lite       | gemini_e_lite.launch.xml  |
+| product serials                              | launch file             |
+| -------------------------------------------- | ----------------------- |
+| astra+                                       | astra_adv.launch.py     |
+| astra /astra mini /astra mini pro /astra pro | astra.launch.py         |
+| astra2                                       | astra2.launch.py        |
+| astra stereo s                               | stereo_s_u3.launch.py   |
+| dabai                                        | dabai.launch.py         |
+| dabai d1                                     | dabai_d1.launch.py      |
+| dabai dcw                                    | dabai_dcw.launch.py     |
+| dabai dw                                     | dabai_dw.launch.py      |
+| dabai pro                                    | dabai_pro.launch.py     |
+| deeya                                        | deeya.launch.py         |
+| femto  /femto w                              | femto.launch.py         |
+| femto mega                                   | femto_mega.launch.py    |
+| gemini                                       | gemini.launch.py        |
+| gemini                                       | gemini.launch.py        |
+| gemini2 / dabai DCL                          | gemini2.launch.py       |
+| gemini2L                                     | gemini2L.launch.py      |
+| gemini e                                     | gemini_e.launch.py      |
+| gemini e lite                                | gemini_e_lite.launch.py |
 实际上所有的launch文件都是差不多的内容，只是相机的分辨率和图像格式不同。
-如果你需要使用python launch文件请参考`gemini2.launch.py`。
-
+XML launch 文件将会在后续的版本中删除。
 ## 已经支持的硬件产品列表
 
 | **SDK version** | **products list** | **firmware version**        |
-|-----------------|-------------------|-----------------------------|
+| --------------- | ----------------- | --------------------------- |
 | v1.6.2          | Astra2            | 2.8.20                      |
 |                 | Gemini2 L         | 1.4.32                      |
 |                 | Gemini2           | 1.4.60                      |

@@ -50,8 +50,8 @@ OBCameraNode::OBCameraNode(rclcpp::Node *node, std::shared_ptr<ob::Device> devic
 #if defined(USE_RK_HW_DECODER)
   mjpeg_decoder_ = std::make_unique<RKMjpegDecoder>(width_[COLOR], height_[COLOR]);
 #elif defined(USE_GST_HW_DECODER)
-  mjpeg_decoder_ =
-      std::make_unique<GstreamerMjpegDecoder>(width_[COLOR], height_[COLOR], hw_decoder_);
+  mjpeg_decoder_ = std::make_unique<GstreamerMjpegDecoder>(
+      width_[COLOR], height_[COLOR], jpeg_decoder_, video_convert_, jpeg_parse_);
 #endif
   startStreams();
   if (enable_d2c_viewer_) {
@@ -428,9 +428,9 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(soft_filter_speckle_size_, "soft_filter_speckle_size", -1);
   setAndGetNodeParameter<double>(liner_accel_cov_, "linear_accel_cov", 0.0003);
   setAndGetNodeParameter<double>(angular_vel_cov_, "angular_vel_cov", 0.02);
-  int hw_decoder = 0;
-  setAndGetNodeParameter<int>(hw_decoder, "hw_decoder", 3);
-  hw_decoder_ = static_cast<HWDecoder>(hw_decoder);
+  setAndGetNodeParameter<std::string>(jpeg_decoder_, "jpeg_decoder", "avdec_mjpeg");
+  setAndGetNodeParameter<std::string>(video_convert_, "video_convert", "videoconvert");
+  setAndGetNodeParameter<std::string>(jpeg_parse_, "jpeg_parse", "jpegparse");
 }
 
 void OBCameraNode::setupTopics() {

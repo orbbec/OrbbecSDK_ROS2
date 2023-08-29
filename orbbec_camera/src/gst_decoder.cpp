@@ -1,5 +1,6 @@
 #include "orbbec_camera/gst_decoder.h"
 #include <rclcpp/rclcpp.hpp>
+#include <utility>
 #include <gst/app/gstappsrc.h>
 #include <gst/app/gstappsink.h>
 #include <glog/logging.h>
@@ -20,9 +21,12 @@ std::string hwDecoderToString(HWDecoder hw_decoder) {
   }
 }
 
-GstreamerMjpegDecoder::GstreamerMjpegDecoder(int width, int height, HWDecoder hw_decoder)
+GstreamerMjpegDecoder::GstreamerMjpegDecoder(int width, int height, std::string jpeg_decoder,
+                                             std::string video_convert, std::string jpeg_parse)
     : MjpegDecoder(width, height),
-      hw_decoder_(hwDecoderToString(hw_decoder)),
+      jpeg_decoder_(std::move(jpeg_decoder)),
+      video_convert_(std::move(video_convert)),
+      jpeg_parse_(std::move(jpeg_parse)),
       buffer_size_(width * height * 3) {
   gst_init(NULL, NULL);
   buffer_pool_ = gst_buffer_pool_new();
@@ -30,7 +34,7 @@ GstreamerMjpegDecoder::GstreamerMjpegDecoder(int width, int height, HWDecoder hw
   GstStructure* config = gst_buffer_pool_get_config(buffer_pool_);
   CHECK_NOTNULL(config);
   gst_buffer_pool_config_set_params(config, NULL, buffer_size_, 0, 0);
-  if (hw_decoder_ == "unknown") {
+  if (jpeg_decoder_ == "unknown") {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger("gstreamer_mjpeg_decoder"), "hw decoder is unknown");
     throw std::runtime_error("hw decoder is unknown");
   }
@@ -45,10 +49,13 @@ GstreamerMjpegDecoder::GstreamerMjpegDecoder(int width, int height, HWDecoder hw
     throw std::runtime_error("gst buffer pool set active error");
   }
   // Create GStreamer elements
+  RCLCPP_INFO_STREAM(rclcpp::get_logger("gstreamer_mjpeg_decoder"),
+                     "hw decoder: " << jpeg_decoder_ << ", video convert: " << video_convert_
+                                    << ", jpeg parse: " << jpeg_parse_);
   appsrc_ = gst_element_factory_make("appsrc", "appsrc");
-  jpegparse_ = gst_element_factory_make("jpegparse", "jpegparse");
-  jpegdec_ = gst_element_factory_make(hw_decoder_.c_str(), hw_decoder_.c_str());
-  videoconvert_ = gst_element_factory_make("videoconvert", "videoconvert");
+  jpegparse_ = gst_element_factory_make(jpeg_parse_.c_str(), jpeg_parse_.c_str());
+  jpegdec_ = gst_element_factory_make(jpeg_decoder_.c_str(), jpeg_decoder_.c_str());
+  videoconvert_ = gst_element_factory_make(video_convert_.c_str(), video_convert_.c_str());
   appsink_ = gst_element_factory_make("appsink", "appsink");
 
   // Check for null pointers

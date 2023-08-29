@@ -6,20 +6,6 @@
 #include <glog/logging.h>
 
 namespace orbbec_camera {
-std::string hwDecoderToString(HWDecoder hw_decoder) {
-  switch (hw_decoder) {
-    case HWDecoder::ROCKCHIP_MPP:
-      return "mppjpegdec";
-    case HWDecoder::NV_JPEG_DEC:
-      return "nvjpegdec";
-    case HWDecoder::AMLOGIC_CODEC:
-      return "amlvenc";
-    case HWDecoder::AV_CODEC:
-      return "avdec_mjpeg";
-    default:
-      return "unknown";
-  }
-}
 
 GstreamerMjpegDecoder::GstreamerMjpegDecoder(int width, int height, std::string jpeg_decoder,
                                              std::string video_convert, std::string jpeg_parse)

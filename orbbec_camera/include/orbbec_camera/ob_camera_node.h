@@ -409,6 +409,8 @@ class OBCameraNode {
   // mjpeg decoder
   std::shared_ptr<MjpegDecoder> mjpeg_decoder_ = nullptr;
   uint8_t* rgb_buffer_ = nullptr;
-  HWDecoder hw_decoder_ = HWDecoder::AV_CODEC;
+  std::string jpeg_decoder_ = "avdec_mjpeg";  // avdec_mjpeg, mppjpegdec, nvjpegdec, jpegdec
+  std::string jpeg_parse_ = "jpegparse";
+  std::string video_convert_ = "videoconvert";  // videoconvert, nvvidconv
 };
 }  // namespace orbbec_camera

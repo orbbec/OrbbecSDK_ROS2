@@ -3,17 +3,18 @@
 #include <gst/gst.h>
 namespace orbbec_camera {
 
-std::string hwDecoderToString(HWDecoder hw_decoder);
-
 class GstreamerMjpegDecoder : public MjpegDecoder {
  public:
-  GstreamerMjpegDecoder(int width, int height, HWDecoder hw_decoder);
+  GstreamerMjpegDecoder(int width, int height, std::string jpeg_decoder, std::string video_convert,
+                        std::string jpeg_parse);
   ~GstreamerMjpegDecoder() override;
 
   bool decode(const std::shared_ptr<ob::ColorFrame>& frame, uint8_t* dest) override;
 
  private:
-  std::string hw_decoder_;
+  std::string jpeg_decoder_;
+  std::string video_convert_;
+  std::string jpeg_parse_;
   guint buffer_size_ = 0;
   GstBufferPool* buffer_pool_ = nullptr;
   GstElement* pipeline_ = nullptr;

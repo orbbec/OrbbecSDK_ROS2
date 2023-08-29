@@ -5,6 +5,7 @@
 namespace orbbec_camera {
 
 RKMjpegDecoder::RKMjpegDecoder(int width, int height) : MjpegDecoder(width, height) {
+  rgb_buffer_ = new uint8_t[width_ * height_ * 3];
   MPP_RET ret = mpp_create(&mpp_ctx_, &mpp_api_);
   if (ret != MPP_OK) {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger("rk_mpp_decoder"), "mpp_create failed, ret = " << ret);
@@ -99,6 +100,9 @@ RKMjpegDecoder::~RKMjpegDecoder() {
   if (mpp_ctx_) {
     mpp_destroy(mpp_ctx_);
     mpp_ctx_ = nullptr;
+  }
+  if(rgb_buffer_){
+    delete[] rgb_buffer_;
   }
 }
 

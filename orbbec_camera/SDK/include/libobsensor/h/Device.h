@@ -809,15 +809,6 @@ ob_camera_param ob_camera_param_list_get_param(ob_camera_param_list *param_list,
 void ob_delete_camera_param_list(ob_camera_param_list *param_list, ob_error **error);
 
 /**
- * @brief Get Imu data.
- *
- * @param[in] device Device object
- * @param[in] cb data callback
- * @param[out] error Log error messages
- */
-void ob_device_get_imu_data_ext(ob_device *device, ob_get_imu_data_callback cb, ob_error **error);
-
-/**
  * \if English
  * @brief Get the depth work mode count that ob_depth_work_mode_list hold
  * @param[in] work_mode_list data struct contain list of ob_depth_work_mode

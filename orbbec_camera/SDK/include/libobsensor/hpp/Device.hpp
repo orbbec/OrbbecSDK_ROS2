@@ -626,9 +626,9 @@ public:
     const char *supportedMinSdkVersion();
 
     /**
-     * @brief Get the minimum version number of the SDK supported by the device
+     * @brief Get information about extensions obtained from SDK supported by the device
      *
-     * @return const char* returns the minimum SDK version number supported by the device
+     * @return const char* Returns extended information about the device
      */
     const char *extensionInfo();
 

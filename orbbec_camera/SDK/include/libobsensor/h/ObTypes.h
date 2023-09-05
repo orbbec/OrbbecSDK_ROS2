@@ -1103,7 +1103,6 @@ typedef enum {
 typedef struct {
     /**
      * @brief The sync mode of the device.
-     *
      */
     ob_multi_device_sync_mode syncMode;
 
@@ -1112,8 +1111,8 @@ typedef struct {
      *
      * @attention This parameter is only valid for some models， please refer to the product manual for details.
      */
-
     int depthDelayUs;
+
     /**
      * @brief The delay time of the color image capture after receiving the capture command or trigger signal in microseconds.
      *
@@ -1125,6 +1124,7 @@ typedef struct {
      * @brief The delay time of the image capture after receiving the capture command or trigger signal in microseconds.
      * @brief The depth and color images are captured synchronously as the product design and can not change the delay between the depth and color images.
      *
+     * @attention For Orbbec Astra 2 device, this parameter is valid only when the @ref triggerSignalOutputDelayUs is set to 0.
      * @attention This parameter is only valid for some models to replace @ref depthDelayUs and @ref colorDelayUs, please refer to the product manual for
      * details.
      */
@@ -1144,6 +1144,8 @@ typedef struct {
     /**
      * @brief The delay time of the trigger signal output after receiving the capture command or trigger signal in microseconds.
      *
+     * @attention For Orbbec Astra 2 device, only supported -1 and 0. -1 means the trigger signal output delay is automatically adjusted by the device, 0 means
+     * the trigger signal output is disabled.
      */
     int triggerSignalOutputDelayUs;
 

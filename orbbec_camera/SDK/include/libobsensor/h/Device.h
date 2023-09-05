@@ -10,6 +10,7 @@ extern "C" {
 
 #include "ObTypes.h"
 #include "Property.h"
+#include "MultipleDevices.h"
 
 /**
  * @brief Get the number of devices
@@ -71,6 +72,29 @@ const char *ob_device_list_get_device_uid(ob_device_list *list, uint32_t index, 
 const char *ob_device_list_get_device_serial_number(ob_device_list *list, uint32_t index, ob_error **error);
 
 /**
+ * @brief Get device connection type
+ *
+ * @param[in] list Device list object
+ * @param[in] index Device index
+ * @param[out] error Log error messages
+ * @return const char* returns the device connection type，currently supports："USB", "USB1.0", "USB1.1", "USB2.0", "USB2.1", "USB3.0", "USB3.1", "USB3.2",
+ * "Ethernet"
+ */
+const char *ob_device_list_get_device_connection_type(ob_device_list *list, uint32_t index, ob_error **error);
+
+/**
+ * @brief Get device ip address
+ *
+ * @attention Only valid for network devices, otherwise it will return "0.0.0.0".
+ *
+ * @param list Device list object
+ * @param index Device index
+ * @param error Log error messages
+ * @return const char* returns the device ip address，such as "192.168.1.10"
+ */
+const char *ob_device_list_get_device_ip_address(ob_device_list *list, uint32_t index, ob_error **error);
+
+/**
  * @brief Create a device.
  *
  * @attention If the device has already been acquired and created elsewhere, repeated acquisitions will return an error.
@@ -79,6 +103,7 @@ const char *ob_device_list_get_device_serial_number(ob_device_list *list, uint32
  * @param[in] index The index of the device to create.
  * @param[out] error Log error messages.
  * @return ob_device* The created device.
+ *
  */
 ob_device *ob_device_list_get_device(ob_device_list *list, uint32_t index, ob_error **error);
 
@@ -467,16 +492,6 @@ void ob_device_write_customer_data(ob_device *device, const void *data, uint32_t
 void ob_device_read_customer_data(ob_device *device, void *data, uint32_t *data_size, ob_error **error);
 
 /**
- * @brief Synchronize the device time (sets the device time to the local system time).
- *
- * @param[in] device The device object.
- * @param[out] error Log error messages.
- *
- * @return uint64_t The command round trip time (rtt).
- */
-uint64_t ob_device_sync_device_time(ob_device *device, ob_error **error);
-
-/**
  * @brief Upgrade the device firmware.
  *
  * @param[in] device The device object.
@@ -487,6 +502,20 @@ uint64_t ob_device_sync_device_time(ob_device *device, ob_error **error);
  * @param[out] error Log error messages.
  */
 void ob_device_upgrade(ob_device *device, const char *path, ob_device_upgrade_callback callback, bool async, void *user_data, ob_error **error);
+
+/**
+ * @brief Upgrade the device firmware.
+ *
+ * @param[in] device The device object.
+ * @param[in] file_data The firmware file data.
+ * @param[in] file_size The firmware file size.
+ * @param[in] callback The firmware upgrade progress callback.
+ * @param[in] async Whether to execute asynchronously.
+ * @param[in] user_data User-defined data that will be returned in the callback.
+ * @param[out] error Log error messages.
+ */
+void ob_device_upgrade_from_data(ob_device *device, const char *file_data, uint32_t file_size, ob_device_upgrade_callback callback, bool async, void *user_data,
+                                 ob_error **error);
 
 /**
  * @brief Get the current device status.
@@ -544,9 +573,10 @@ void ob_device_write_authorization_code(ob_device *device, const char *auth_code
 
 /**
  * @brief Get the original parameter list of camera calibration saved on the device.
- *        The parameters in the list do not correspond to the current open-stream configuration.
- *        You need to select the parameters according to the actual situation, and may need to do scaling, mirroring and other processing.
- *        Non-professional users are recommended to use the ob_pipeline_get_camera_param() interface.
+ *
+ * @attention The parameters in the list do not correspond to the current open-stream configuration.You need to select the parameters according to the actual
+ * situation, and may need to do scaling, mirroring and other processing. Non-professional users are recommended to use the ob_pipeline_get_camera_param()
+ * interface.
  *
  * @param[in] device The device object.
  * @param[out] error Log error messages.
@@ -700,9 +730,20 @@ const char *ob_device_info_usb_type(ob_device_info *info, ob_error **error);
  *
  * @param[in] info Device Information
  * @param[out] error Log error messages
- * @return const char* The connection type
+ * @return const char* The connection type，currently supports："USB", "USB1.0", "USB1.1", "USB2.0", "USB2.1", "USB3.0", "USB3.1", "USB3.2", "Ethernet"
  */
 const char *ob_device_info_connection_type(ob_device_info *info, ob_error **error);
+
+/**
+ * @brief Get the device IP address
+ *
+ * @attention Only valid for network devices, otherwise it will return "0.0.0.0"
+ *
+ * @param info Device Information
+ * @param error Log error messages
+ * @return const char* The IP address，such as "192.168.1.10"
+ */
+const char *ob_device_info_ip_address(ob_device_info *info, ob_error **error);
 
 /**
  * @brief Get the hardware version number
@@ -768,9 +809,18 @@ ob_camera_param ob_camera_param_list_get_param(ob_camera_param_list *param_list,
 void ob_delete_camera_param_list(ob_camera_param_list *param_list, ob_error **error);
 
 /**
- * @brief Get the number of depth work modes that ob_depth_work_mode_list holds
+ * @brief Get Imu data.
  *
- * @param[in] work_mode_list Data structure containing a list of ob_depth_work_mode
+ * @param[in] device Device object
+ * @param[in] cb data callback
+ * @param[out] error Log error messages
+ */
+void ob_device_get_imu_data_ext(ob_device *device, ob_get_imu_data_callback cb, ob_error **error);
+
+/**
+ * \if English
+ * @brief Get the depth work mode count that ob_depth_work_mode_list hold
+ * @param[in] work_mode_list data struct contain list of ob_depth_work_mode
  * @param[out] error Log error messages
  * @return The total number contained in ob_depth_work_mode_list
  *

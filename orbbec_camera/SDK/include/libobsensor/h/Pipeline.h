@@ -157,9 +157,23 @@ void ob_pipeline_switch_config(ob_pipeline *pipeline, ob_config *config, ob_erro
 /**
  * @brief Get the current camera parameters
  *
- * @attention If D2C is enabled, it will return the camera parameters after D2C. Otherwise, it will return the default parameters.
+ * @param[in] pipeline pipeline object
+ * @param[in] colorWidth color width
+ * @param[in] colorHeight color height
+ * @param[in] depthWidth depth width
+ * @param[in] depthHeight depth height
+ * @param[out] error Log error messages
+ * @return ob_camera_param returns camera internal parameters
+ */
+ob_camera_param ob_pipeline_get_camera_param_with_profile(ob_pipeline *pipeline, uint32_t colorWidth, uint32_t colorHeight, uint32_t depthWidth,
+                                                          uint32_t depthHeight, ob_error **error);
+
+/**
+ * \if English
+ * @brief Get current camera parameters
+ * @attention If D2C is enabled, it will return the camera parameters after D2C, if not, it will return to the default parameters
  *
- * @param[in] pipeline The pipeline object
+ * @param[in] pipeline pipeline object
  * @param[out] error Log error messages
  * @return ob_camera_param The camera internal parameters
  */

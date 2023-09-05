@@ -39,6 +39,17 @@ public:
     std::shared_ptr<DeviceList> queryDeviceList();
 
     /**
+     * @brief enable or disable net device enumeration.
+     * @brief after enable, the net device will be discovered automatically and can be retrieved by @ref queryDeviceList. The default state can be set in the
+     * configuration file.
+     *
+     * @attention Net device enumeration by gvcp protocol, if the device is not in the same subnet as the host, it will be discovered but cannot be connected.
+     *
+     * @param[out] enable true to enable, false to disable
+     */
+    void enableNetDeviceEnumeration(bool enable);
+
+    /**
      * @brief Creates a network device object.
      *
      * @param address The IP address.
@@ -65,12 +76,12 @@ public:
     void setDeviceChangedCallback(DeviceChangedCallback callback);
 
     /**
-     * @brief Activates the multi-device synchronization function to synchronize the clock of the created device (the device needs to support this function).
+     * @brief Activates device clock synchronization to synchronize the clock of the host and all created devices (if supported).
      *
-     * @param repeatInterval The synchronization time interval (unit: ms; if repeatInterval=0, it means that it will only be synchronized once and will not be
-     * executed regularly).
+     * @param repeatInterval The interval for auto-repeated synchronization, in milliseconds. If the value is 0, synchronization is performed only once.
      */
-    void enableMultiDeviceSync(uint64_t repeatInterval);
+    void enableDeviceClockSync(uint64_t repeatInterval);
+#define enableMultiDeviceSync enableDeviceClockSync
 
     /**
      * @brief Frees idle memory from the internal frame memory pool.

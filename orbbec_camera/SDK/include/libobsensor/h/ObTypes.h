@@ -69,6 +69,17 @@ typedef struct PlaybackImpl            ob_playback;
 typedef struct OBDepthWorkModeListImpl ob_depth_work_mode_list;
 
 /**
+ * @brief senddata or recdata return status type
+ */
+typedef enum {
+    HP_STATUS_OK                      = 0,      /**< success*/
+    HP_STATUS_NO_DEVICE_FOUND         = 1,      /**< No device found*/
+    HP_STATUS_CONTROL_TRANSFER_FAILED = 2,      /**< Transfer failed*/
+    HP_STATUS_UNKNOWN_ERROR           = 0xffff, /**< Unknown error*/
+} OBHPStatusCode,
+    ob_hp_status_code;
+
+/**
  * @brief the permission type of api or property
  */
 typedef enum {
@@ -210,7 +221,8 @@ typedef enum {
     OB_FORMAT_Y14        = 24,   /**< Y14 format, single channel 14-bit depth (SDK will unpack into Y16 by default) */
     OB_FORMAT_BGRA       = 25,   /**< BGRA format */
     OB_FORMAT_COMPRESSED = 26,   /**< Compression format */
-    OB_FORMAT_UNKNOWN    = 0xff, /**< Unknown format */
+    OB_FORMAT_RVL        = 27,   /**< RVL pressure test format (SDK will be unpacked into Y16 by default) */
+    OB_FORMAT_UNKNOWN    = 0xff, /**< unknown format */
 } OBFormat,
     ob_format;
 
@@ -639,6 +651,7 @@ typedef struct {
 
 /**
  * @brief Sync mode
+ * @deprecated This define is deprecated, please use @ref ob_multi_device_sync_mode instead
  */
 typedef enum {
     /**
@@ -711,16 +724,9 @@ typedef enum {
 } OBSyncMode,
     ob_sync_mode, OB_SYNC_MODE;
 
-// DEPRECATED: for compatibility, will be removed in the future
-#define OB_SYNC_STOP OB_SYNC_MODE_CLOSE
-#define OB_SYNC_SINGLE_MODE OB_SYNC_MODE_STANDALONE
-#define OB_SYNC_ONLINE_HOST_MODE OB_SYNC_MODE_PRIMARY
-#define OB_SYNC_ONLINE_SLAVE_MODE OB_SYNC_MODE_SECONDARY
-#define OB_SYNC_ONLY_MCU_MODE OB_SYNC_MODE_PRIMARY_MCU_TRIGGER
-#define OB_SYNC_ONLY_IR_MODE OB_SYNC_MODE_PRIMARY_IR_TRIGGER
-
 /**
  * @brief Device synchronization configuration
+ * @deprecated This structure is deprecated, please use @ref ob_multi_device_sync_config instead
  */
 typedef struct {
     /**
@@ -773,19 +779,8 @@ typedef struct {
      * @brief Device number. Users can mark the device with this number
      */
     uint16_t deviceId;
+
 } OBDeviceSyncConfig, ob_device_sync_config, OB_DEVICE_SYNC_CONFIG;
-
-// DEPRECATED: for compatibility， will be removed in the future
-#define OBMultiDeviceSyncConfig OBDeviceSyncConfig
-#define ob_multi_device_sync_config ob_device_sync_config
-#define OB_MULTI_DEVICE_SYNC_CONFIG OB_DEVICE_SYNC_CONFIG
-// #define tofPhaseDelay irTriggerSignalInDelay
-// #define rgbPhaseDelay rgbTriggerSignalInDelay
-// #define outPhaseDelay deviceTriggerSignalOutDelay
-// #define outOCPolarity deviceTriggerSignalOutPolarity
-// #define mcuHostFps mcuTriggerFrequency
-// #define curDevId deviceId
-
 /**
  * @brief Depth work mode
  */
@@ -1017,6 +1012,181 @@ typedef enum {
     OBDeviceDevelopmentMode, ob_device_development_mode;
 
 /**
+ * @brief The synchronization mode of the device.
+ */
+typedef enum {
+
+    /**
+     * @brief free run mode
+     * @brief The device does not synchronize with other devices,
+     * @brief The Color and Depth can be set to different frame rates.
+     */
+    OB_MULTI_DEVICE_SYNC_MODE_FREE_RUN = 1 << 0,
+
+    /**
+     * @brief standalone mode
+     * @brief The device does not synchronize with other devices.
+     * @brief The Color and Depth should be set to same frame rates, the Color and Depth will be synchronized.
+     */
+    OB_MULTI_DEVICE_SYNC_MODE_STANDALONE = 1 << 1,
+
+    /**
+     * @brief primary mode
+     * @brief The device is the primary device in the multi-device system, it will output the trigger signal via VSYNC_OUT pin on synchronization port by
+     * default.
+     * @brief The Color and Depth should be set to same frame rates, the Color and Depth will be synchronized and can be adjusted by @ref colorDelayUs, @ref
+     * depthDelayUs or @ref trigger2ImageDelayUs.
+     */
+    OB_MULTI_DEVICE_SYNC_MODE_PRIMARY = 1 << 2,
+
+    /**
+     * @brief secondary mode
+     * @brief The device is the secondary device in the multi-device system, it will receive the trigger signal via VSYNC_IN pin on synchronization port. It
+     * will out the trigger signal via VSYNC_OUT pin on synchronization port by default.
+     * @brief The Color and Depth should be set to same frame rates, the Color and Depth will be synchronized and can be adjusted by @ref colorDelayUs, @ref
+     * depthDelayUs or @ref trigger2ImageDelayUs.
+     * @brief After starting the stream, the device will wait for the trigger signal to start capturing images, and will stop capturing images when the trigger
+     * signal is stopped.
+     *
+     * @attention The frequency of the trigger signal should be same as the frame rate of the stream profile which is set when starting the stream.
+     */
+    OB_MULTI_DEVICE_SYNC_MODE_SECONDARY = 1 << 3,
+
+    /**
+     * @brief secondary synced mode
+     * @brief The device is the secondary device in the multi-device system, it will receive the trigger signal via VSYNC_IN pin on synchronization port. It
+     * will out the trigger signal via VSYNC_OUT pin on synchronization port by default.
+     * @brief The Color and Depth should be set to same frame rates, the Color and Depth will be synchronized and can be adjusted by @ref colorDelayUs, @ref
+     * depthDelayUs or @ref trigger2ImageDelayUs.
+     * @brief After starting the stream, the device will be immediately start capturing images, and will adjust the capture time when the trigger signal is
+     * received to synchronize with the primary device. If the trigger signal is stopped, the device will still capture images.
+     *
+     * @attention The frequency of the trigger signal should be same as the frame rate of the stream profile which is set when starting the stream.
+     */
+    OB_MULTI_DEVICE_SYNC_MODE_SECONDARY_SYNCED = 1 << 4,
+
+    /**
+     * @brief software triggering mode
+     * @brief The device will start one time image capture after receiving the capture command and will output the trigger signal via VSYNC_OUT pin by default.
+     * The capture command can be sent form host by call @ref ob_device_trigger_capture. The number of images captured each time can be set by @ref
+     * framesPerTriggerForTriggeringMode.
+     * @brief The Color and Depth should be set to same frame rates, the Color and Depth will be synchronized and can be adjusted by @ref colorDelayUs, @ref
+     * depthDelayUs or @ref trigger2ImageDelayUs.
+     *
+     * @brief The frequency of the user call @ref ob_device_trigger_capture to send the capture command multiplied by the number of frames per trigger should be
+     * less than the frame rate of the stream profile which is set when starting the stream.
+     */
+    OB_MULTI_DEVICE_SYNC_MODE_SOFTWARE_TRIGGERING = 1 << 5,
+
+    /**
+     * @brief hardware triggering mode
+     * @brief The device will start one time image capture after receiving the trigger signal via VSYNC_IN pin on synchronization port and will output the
+     * trigger signal via VSYNC_OUT pin by default. The number of images captured each time can be set by @ref framesPerTriggerForTriggeringMode.
+     * @brief The Color and Depth should be set to same frame rates, the Color and Depth will be synchronized and can be adjusted by @ref colorDelayUs, @ref
+     * depthDelayUs or @ref trigger2ImageDelayUs.
+     *
+     * @attention The frequency of the trigger signal multiplied by the number of frames per trigger should be less than the frame rate of the stream profile
+     * which is set when starting the stream.
+     * @attention The trigger signal input via VSYNC_IN pin on synchronization port should be ouput by other device via VSYNC_OUT pin in hardware triggering
+     * mode or software triggering mode.
+     * @attention Due to different models may have different signal input requirements, please do not use different models to output trigger
+     * signal as input-trigger signal.
+     */
+    OB_MULTI_DEVICE_SYNC_MODE_HARDWARE_TRIGGERING = 1 << 6,
+
+} ob_multi_device_sync_mode,
+    OBMultiDeviceSyncMode;
+
+/**
+ * @brief The synchronization configuration of the device.
+ */
+typedef struct {
+    /**
+     * @brief The sync mode of the device.
+     *
+     */
+    ob_multi_device_sync_mode syncMode;
+
+    /**
+     * @brief The delay time of the depth image capture after receiving the capture command or trigger signal in microseconds.
+     *
+     * @attention This parameter is only valid for some models， please refer to the product manual for details.
+     */
+
+    int depthDelayUs;
+    /**
+     * @brief The delay time of the color image capture after receiving the capture command or trigger signal in microseconds.
+     *
+     * @attention This parameter is only valid for some models， please refer to the product manual for details.
+     */
+    int colorDelayUs;
+
+    /**
+     * @brief The delay time of the image capture after receiving the capture command or trigger signal in microseconds.
+     * @brief The depth and color images are captured synchronously as the product design and can not change the delay between the depth and color images.
+     *
+     * @attention This parameter is only valid for some models to replace @ref depthDelayUs and @ref colorDelayUs, please refer to the product manual for
+     * details.
+     */
+    int trigger2ImageDelayUs;
+
+    /**
+     * @brief Trigger signal output enable flag.
+     * @brief After the trigger signal output is enabled, the trigger signal will be output when the capture command or trigger signal is received. User can
+     * adjust the delay time of the trigger signal output by @ref triggerSignalOutputDelayUs.
+     *
+     * @attention For some models, the trigger signal output is always enabled and cannot be disabled in some modes.
+     * @attention If device is in the @ref OB_MULTI_DEVICE_SYNC_MODE_FREE_RUN or @ref OB_MULTI_DEVICE_SYNC_MODE_STANDALONE mode, the trigger signal output is
+     * always disabled. Set this parameter to true will not take effect.
+     */
+    bool triggerSignalOutputEnable;
+
+    /**
+     * @brief The delay time of the trigger signal output after receiving the capture command or trigger signal in microseconds.
+     *
+     */
+    int triggerSignalOutputDelayUs;
+
+    /**
+     * @brief The number of frames per trigger in the triggering mode.
+     *
+     * @attention This parameter is only valid when the triggering mode is set to @ref OB_MULTI_DEVICE_SYNC_MODE_HARDWARE_TRIGGERING or @ref
+     * OB_MULTI_DEVICE_SYNC_MODE_SOFTWARE_TRIGGERING.
+     * @attention The trigger frequency multiplied by the number of frames per trigger cannot exceed the maximum frame rate of the stream profile which is set
+     * when starting the stream.
+     */
+    int framesPerTriggerForTriggeringMode;
+} ob_multi_device_sync_config, OBMultiDeviceSyncConfig;
+
+/**
+ * @brief The timestamp reset configuration of the device.
+ *
+ */
+typedef struct {
+    /**
+     * @brief Whether to enable the timestamp reset function.
+     * @brief If the timestamp reset function is enabled, the timer for calculating the timestamp for output frames will be reset to 0 when the timestamp reset
+     * command or timestamp reset signal is received, and one timestamp reset signal will be output via TIMER_SYNC_OUT pin on synchronization port by default.
+     * The timestamp reset signal is input via TIMER_SYNC_IN pin on the synchronization port.
+     *
+     * @attention For some models, the timestamp reset function is always enabled and cannot be disabled.
+     */
+    bool enable;
+
+    /**
+     * @brief The delay time of executing the timestamp reset function after receiving the command or signal in microseconds.
+     */
+    int timestamp_reset_delay_us;
+
+    /**
+     * @brief the timestamp reset signal output enable flag.
+     *
+     * @attention For some models, the timestamp reset signal output is always enabled and cannot be disabled.
+     */
+    bool timestamp_reset_signal_output_enable;
+} ob_device_timestamp_reset_config, OBDeviceTimestampResetConfig;
+
+/**
  * @brief Callback for file transfer
  *
  * @param state Transmission status
@@ -1117,6 +1287,8 @@ typedef void(ob_frame_destroy_callback)(void *buffer, void *user_data);
  * @param user_data User-defined data
  */
 typedef void(ob_log_callback)(ob_log_severity severity, const char *message, void *user_data);
+
+typedef void(ob_get_imu_data_callback)(const uint8_t *data, uint32_t dataLen);
 
 /**
  * @brief Check if sensor_type is an IR sensor

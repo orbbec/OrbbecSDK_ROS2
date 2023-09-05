@@ -47,6 +47,20 @@ void ob_delete_context(ob_context *context, ob_error **error);
 ob_device_list *ob_query_device_list(ob_context *context, ob_error **error);
 
 /**
+ * @brief Enable or disable network device enumeration
+ * @brief After enabling, the network device will be automatically discovered and can be retrieved through @ref ob_query_device_list. The default state can be
+ * set in the configuration file.
+ *
+ * @attention Network device enumeration is performed through the GVCP protocol. If the device is not in the same subnet as the host, it will be discovered but
+ * cannot be connected.
+ *
+ * @param[in] context Pointer to the context object
+ * @param[in] enable true to enable, false to disable
+ * @param[out] error Pointer to an error object that will be populated if an error occurs.
+ */
+void ob_enable_net_device_enumeration(ob_context *context, bool enable, ob_error **error);
+
+/**
  * @brief Create a network device object
  *
  * @param[in] context Pointer to the context object
@@ -69,14 +83,14 @@ ob_device *ob_create_net_device(ob_context *context, const char *address, uint16
 void ob_set_device_changed_callback(ob_context *context, ob_device_changed_callback callback, void *user_data, ob_error **error);
 
 /**
- * @brief Activate the multi-device synchronization function to synchronize the clock of the created device (the device needs to support this function)
+ * @brief Activates device clock synchronization to synchronize the clock of the host and all created devices (if supported).
  *
  * @param[in] context Pointer to the context object
- * @param[in] repeatInterval Synchronization time interval in milliseconds. If repeatInterval=0, synchronization will only occur once and will not be
- * executed regularly.
- * @param[out] error Pointer to an error object that will be populated if an error occurs during multi-device synchronization activation
+ * @param[in] repeatInterval The interval for auto-repeated synchronization, in milliseconds. If the value is 0, synchronization is performed only once.
+ * @param[out] error Pointer to an error object that will be populated if an error occurs during execution
  */
-void ob_enable_multi_device_sync(ob_context *context, uint64_t repeatInterval, ob_error **error);
+void ob_enable_device_clock_sync(ob_context *context, uint64_t repeatInterval, ob_error **error);
+#define ob_enable_multi_device_sync ob_enable_device_clock_sync
 
 /**
  * @brief Free idle memory from the internal frame memory pool

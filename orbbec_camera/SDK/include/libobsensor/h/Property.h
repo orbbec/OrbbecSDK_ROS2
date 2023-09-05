@@ -359,6 +359,11 @@ typedef enum {
      */
     OB_PROP_CAPTURE_IMAGE_NUMBER_INTERVAL_INT = 136,
 
+    /*
+     * @brief Timer reset function enable
+     */
+    OB_PROP_TIMER_RESET_ENABLE_BOOL = 140,
+
     /**
      * @brief Enable switch for USB3.0 repeated recognition on the device.
      */
@@ -428,6 +433,14 @@ typedef enum {
      * @brief A list of depth accuracy levels, returning an array of uin16_t, corresponding to the enumeration
      */
     OB_STRUCT_DEPTH_PRECISION_SUPPORT_LIST = 1045,
+
+    /**
+     * @brief Device network static ip config record
+     * @brief Using for get last static ip config，witch is record in device flash when user set static ip config
+     *
+     * @attention read only
+     */
+    OB_STRUCT_DEVICE_STATIC_IP_CONFIG_RECORD = 1053,
 
     /**
      * @brief Color camera auto exposure
@@ -540,7 +553,7 @@ typedef enum {
     OB_PROP_IR_GAIN_INT = 2027,
 
     /**
-     * @brief Select Infrared camera data source channel. If not support throw exception. 0 : IR stream from IR Left sensor; 1 : IR stream from IR Left sensor;
+     * @brief Select Infrared camera data source channel. If not support throw exception. 0 : IR stream from IR Left sensor; 1 : IR stream from IR Right sensor;
      */
     OB_PROP_IR_CHANNEL_DATA_SOURCE_INT = 2028,
 

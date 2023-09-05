@@ -300,13 +300,6 @@ public:
     bool isPropertySupported(OBPropertyID propertyId, OBPermissionType permission);
 
     /**
-     * @brief Synchronize the device time (synchronize local system time to device)
-     *
-     * @return The command (round trip time, rtt)
-     */
-    uint64_t syncDeviceTime();
-
-    /**
      * @brief Upgrade the device firmware
      *
      * @param filePath Firmware path
@@ -314,6 +307,17 @@ public:
      * @param async    Whether to execute asynchronously
      */
     void deviceUpgrade(const char *filePath, DeviceUpgradeCallback callback, bool async = true);
+
+    /**
+     * \if English
+     * @brief Upgrade the device firmware
+     *
+     * @param fileData Firmware file data
+     * @param fileSize Firmware file size
+     * @param callback  Firmware upgrade progress and status callback
+     * @param async    Whether to execute asynchronously
+     */
+    void deviceUpgradeFromData(const char *fileData, uint32_t fileSize, DeviceUpgradeCallback callback, bool async = true);
 
     /**
      * @brief Send files to the specified path on the device side [Asynchronouscallback]
@@ -354,9 +358,11 @@ public:
     void writeAuthorizationCode(const char *authCodeStr);
 
     /**
-     * @brief Get the original parameter list of camera calibration saved in the device. The parameters in the list do not correspond to the current
-     * open-current configuration. You need to select the parameters according to the actual situation, and may need to do scaling, mirroring and other
-     * processing. Non-professional users are recommended to use the Pipeline::getCameraParam() interface.
+     * @brief Get the original parameter list of camera calibration saved in the device.
+     *
+     * @attention The parameters in the list do not correspond to the current open-current configuration. You need to select the parameters according to the
+     * actual situation, and may need to do scaling, mirroring and other processing. Non-professional users are recommended to use the
+     * Pipeline::getCameraParam() interface.
      *
      * @return std::shared_ptr<CameraParamList> camera parameter list
      */
@@ -407,24 +413,122 @@ public:
     void reboot(uint32_t delayMs);
 
     /**
+     * @brief Synchronize the device time (synchronize local system time to device)
+     * @deprecated This interface is deprecated, please use @ref timerSyncWithHost instead.
+     * @return The command (round trip time, rtt)
+     */
+    DEPRECATED uint64_t syncDeviceTime();
+
+    /**
      * @brief get the current device synchronization configuration
      * @brief Device synchronization: including exposure synchronization function and multi-camera synchronization function of different sensors within a single
      * machine
      *
+     * @deprecated This interface is deprecated, please use @ref getMultiDeviceSyncConfig instead.
+     *
      * @return OBDeviceSyncConfig return the device synchronization configuration
      */
-    OBDeviceSyncConfig getSyncConfig();
+    DEPRECATED OBDeviceSyncConfig getSyncConfig();
 
     /**
      * @brief Set the device synchronization configuration
      * @brief Used to configure the exposure synchronization function and multi-camera synchronization function of different sensors in a single machine
+     *
+     * @deprecated This interface is deprecated, please use @ref setMultiDeviceSyncConfig instead.
      *
      * @attention Calling this function will directly write the configuration to the device Flash, and it will still take effect after the device restarts. To
      * avoid affecting the Flash lifespan, do not update the configuration frequently.
      *
      * @param deviceSyncConfig Device synchronization configuration
      */
-    void setSyncConfig(const OBDeviceSyncConfig &deviceSyncConfig);
+    DEPRECATED void setSyncConfig(const OBDeviceSyncConfig &deviceSyncConfig);
+
+    /**
+     * @brief Get the supported multi device sync mode bitmap of the device.
+     * @brief For example, if the return value is 0b00001100, it means the device supports @ref OB_MULTI_DEVICE_SYNC_MODE_PRIMARY and @ref
+     * OB_MULTI_DEVICE_SYNC_MODE_SECONDARY. User can check the supported mode by the code:
+     * ```c
+     *   if(supported_mode_bitmap & OB_MULTI_DEVICE_SYNC_MODE_FREE_RUN){
+     *      //support OB_MULTI_DEVICE_SYNC_MODE_FREE_RUN
+     *   }
+     *   if(supported_mode_bitmap & OB_MULTI_DEVICE_SYNC_MODE_STANDALONE){
+     *     //support OB_MULTI_DEVICE_SYNC_MODE_STANDALONE
+     *   }
+     *   // and so on
+     * ```
+     * @return uint16_t return the supported multi device sync mode bitmap of the device.
+     */
+    uint16_t getSupportedMultiDeviceSyncModeBitmap();
+
+    /**
+     * @brief set the multi device sync configuration of the device.
+     *
+     * @param[in] config The multi device sync configuration.
+     */
+    void setMultiDeviceSyncConfig(const OBMultiDeviceSyncConfig &config);
+
+    /**
+     * @brief get the multi device sync configuration of the device.
+     *
+     * @return OBMultiDeviceSyncConfig return the multi device sync configuration of the device.
+     */
+    OBMultiDeviceSyncConfig getMultiDeviceSyncConfig();
+
+    /**
+     * @brief send the capture command to the device.
+     * @brief The device will start one time image capture after receiving the capture command when it is in the @ref
+     * OB_MULTI_DEVICE_SYNC_MODE_SOFTWARE_TRIGGERING
+     *
+     * @attention The frequency of the user call this function multiplied by the number of frames per trigger should be less than the frame rate of the stream.
+     * The number of frames per trigger can be set by @ref framesPerTriggerForTriggeringMode.
+     * @attention For some models，receive and execute the capture command will have a certain delay and performance consumption, so the frequency of calling
+     * this function should not be too high, please refer to the product manual for the specific supported frequency.
+     * @attention If the device is not in the @ref OB_MULTI_DEVICE_SYNC_MODE_HARDWARE_TRIGGERING mode, device will ignore the capture command.
+     */
+    void triggerCapture();
+
+    /**
+     * @brief set the timestamp reset configuration of the device.
+     */
+    void setTimestampResetConfig(const OBDeviceTimestampResetConfig &config);
+
+    /**
+     * @brief get the timestamp reset configuration of the device.
+     *
+     * @return OBDeviceTimestampResetConfig return the timestamp reset configuration of the device.
+     */
+    OBDeviceTimestampResetConfig getTimestampResetConfig();
+
+    /**
+     * @brief send the timestamp reset command to the device.
+     * @brief The device will reset the timer for calculating the timestamp for output frames to 0 after receiving the timestamp reset command when the
+     * timestamp reset function is enabled. The timestamp reset function can be enabled by call @ref ob_device_set_timestamp_reset_config.
+     * @brief Before calling this function, user should call @ref ob_device_set_timestamp_reset_config to disable the timestamp reset function (It is not
+     * required for some models, but it is still recommended to do so for code compatibility).
+     *
+     * @attention If the stream of the device is started, the timestamp of the continuous frames output by the stream will jump once after the timestamp reset.
+     * @attention Due to the timer of device is not high-accuracy, the timestamp of the continuous frames output by the stream will drift after a long time.
+     * User can call this function periodically to reset the timer to avoid the timestamp drift, the recommended interval time is 60 minutes.
+     */
+    void timestampReset();
+
+    /**
+     *  @brief Alias for @ref timestampReset since it is more accurate.
+     */
+#define timerReset timestampReset
+
+    /**
+     * @brief synchronize the timer of the device with the host.
+     * @brief After calling this function, the timer of the device will be synchronized with the host. User can call this function to multiple devices to
+     * synchronize all timers of the devices.
+     *
+     * @attention If the stream of the device is started, the timestamp of the continuous frames output by the stream will may jump once after the timer
+     * sync.
+     * @attention Due to the timer of device is not high-accuracy, the timestamp of the continuous frames output by the stream will drift after a long time.
+     * User can call this function periodically to synchronize the timer to avoid the timestamp drift, the recommended interval time is 60 minutes.
+     *
+     */
+    void timerSyncWithHost();
 
     friend class Pipeline;
     friend class Recorder;
@@ -493,9 +597,19 @@ public:
     /**
      * @brief Get the connection type of the device
      *
-     * @return const char* the connection type of the device
+     * @return const char* the connection type of the device，currently supports："USB", "USB1.0", "USB1.1", "USB2.0", "USB2.1", "USB3.0", "USB3.1", "USB3.2",
+     * "Ethernet"
      */
     const char *connectionType();
+
+    /**
+     * @brief Get the IP address of the device
+     *
+     * @attention Only valid for network devices, otherwise it will return "0.0.0.0".
+     *
+     * @return const char* the IP address of the device, such as "192.168.1.10"
+     */
+    const char *ipAddress();
 
     /**
      * @brief Get the version number of the hardware
@@ -512,7 +626,14 @@ public:
     const char *supportedMinSdkVersion();
 
     /**
-     * @brief Get the chip type name
+     * @brief Get the minimum version number of the SDK supported by the device
+     *
+     * @return const char* returns the minimum SDK version number supported by the device
+     */
+    const char *extensionInfo();
+
+    /**
+     * @brief Get chip type name
      *
      * @return const char* the chip type name
      */
@@ -587,6 +708,24 @@ public:
      * @return const char* the serial number of the device
      */
     const char *serialNumber(uint32_t index);
+
+    /**
+     * @brief Get device connection type
+     *
+     * @param index device index
+     * @return const char* returns connection type，currently supports："USB", "USB1.0", "USB1.1", "USB2.0", "USB2.1", "USB3.0", "USB3.1", "USB3.2", "Ethernet"
+     */
+    const char *connectionType(uint32_t index);
+
+    /**
+     * @brief get the ip address of the device at the specified index
+     *
+     * @attention Only valid for network devices, otherwise it will return "0.0.0.0".
+     *
+     * @param index the index of the device
+     * @return const char* the ip address of the device
+     */
+    const char *ipAddress(uint32_t index);
 
     /**
      * @brief Get the device object at the specified index
@@ -679,9 +818,9 @@ public:
      * @brief Get the name of the depth work mode at the specified index
      *
      * @param index the index of the depth work mode
-     * @return std::string the name of the depth work mode
+     * @return const char* the name of the depth work mode
      */
-    std::string getName(uint32_t index);
+    const char *getName(uint32_t index);
 
     /**
      * @brief Get the OBDepthWorkMode object at the specified index

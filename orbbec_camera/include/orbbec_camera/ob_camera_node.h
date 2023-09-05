@@ -57,11 +57,6 @@
 #include "orbbec_camera/d2c_viewer.h"
 #include "magic_enum/magic_enum.hpp"
 #include "mjpeg_decoder.h"
-#if defined(USE_RK_HW_DECODER)
-#include "orbbec_camera/rk_mpp_decoder.h"
-#elif defined(USE_GST_HW_DECODER)
-#include "orbbec_camera/gst_decoder.h"
-#endif
 
 #define STREAM_NAME(sip)                                                                       \
   (static_cast<std::ostringstream&&>(std::ostringstream()                                      \
@@ -102,15 +97,25 @@ typedef std::pair<ob_stream_type, int> stream_index_pair;
 const stream_index_pair COLOR{OB_STREAM_COLOR, 0};
 const stream_index_pair DEPTH{OB_STREAM_DEPTH, 0};
 const stream_index_pair INFRA0{OB_STREAM_IR, 0};
-const stream_index_pair INFRA1{OB_STREAM_IR, 1};
-const stream_index_pair INFRA2{OB_STREAM_IR, 2};
+const stream_index_pair INFRA1{OB_STREAM_IR_LEFT, 0};
+const stream_index_pair INFRA2{OB_STREAM_IR_RIGHT, 0};
 
 const stream_index_pair GYRO{OB_STREAM_GYRO, 0};
 const stream_index_pair ACCEL{OB_STREAM_ACCEL, 0};
 
-const std::vector<stream_index_pair> IMAGE_STREAMS = {DEPTH, INFRA0, COLOR};
+const std::vector<stream_index_pair> IMAGE_STREAMS = {DEPTH, INFRA0, COLOR, INFRA1, INFRA2};
 
 const std::vector<stream_index_pair> HID_STREAMS = {GYRO, ACCEL};
+
+const std::map<OBStreamType, OBFrameType> STREAM_TYPE_TO_FRAME_TYPE = {
+    {OB_STREAM_COLOR, OB_FRAME_COLOR},
+    {OB_STREAM_DEPTH, OB_FRAME_DEPTH},
+    {OB_STREAM_IR, OB_FRAME_IR},
+    {OB_STREAM_IR_LEFT, OB_FRAME_IR_LEFT},
+    {OB_STREAM_IR_RIGHT, OB_FRAME_IR_RIGHT},
+    {OB_STREAM_GYRO, OB_FRAME_GYRO},
+    {OB_STREAM_ACCEL, OB_FRAME_ACCEL},
+};
 
 class OBCameraNode {
  public:
@@ -359,8 +364,6 @@ class OBCameraNode {
   ob::PointCloudFilter point_cloud_filter_;
   sensor_msgs::msg::PointCloud2 point_cloud_msg_;
 
-  rclcpp::Publisher<Extrinsics>::SharedPtr extrinsics_publisher_;
-  bool enable_publish_extrinsic_ = false;
   orbbec_camera_msgs::msg::DeviceInfo device_info_;
   std::string point_cloud_qos_;
   std::vector<geometry_msgs::msg::TransformStamped> static_tf_msgs_;
@@ -388,12 +391,13 @@ class OBCameraNode {
   // Only for Gemini2 device
   bool enable_hardware_d2d_ = true;
   std::string depth_work_mode_;
-  OBSyncMode sync_mode_ = OBSyncMode::OB_SYNC_MODE_CLOSE;
+  OBMultiDeviceSyncMode sync_mode_ = OBMultiDeviceSyncMode::OB_MULTI_DEVICE_SYNC_MODE_FREE_RUN;
   std::string sync_mode_str_;
-  int ir_trigger_signal_in_delay_ = 0;
-  int rgb_trigger_signal_in_delay_ = 0;
-  int device_trigger_signal_out_delay_ = 0;
-  bool sync_signal_trigger_out_ = false;
+  int depth_delay_us_ = 0;
+  int color_delay_us_ = 0;
+  int trigger2image_delay_us_ = 0;
+  int trigger_signal_output_delay_us_ = 0;
+  bool trigger_signal_output_enabled_ = false;
   std::string depth_precision_str_;
   OB_DEPTH_PRECISION_LEVEL depth_precision_ = OB_PRECISION_0MM8;
   // IMU
@@ -409,8 +413,5 @@ class OBCameraNode {
   // mjpeg decoder
   std::shared_ptr<MjpegDecoder> mjpeg_decoder_ = nullptr;
   uint8_t* rgb_buffer_ = nullptr;
-  std::string jpeg_decoder_ = "avdec_mjpeg";  // avdec_mjpeg, mppjpegdec, nvjpegdec, jpegdec
-  std::string jpeg_parse_ = "jpegparse";
-  std::string video_convert_ = "videoconvert";  // videoconvert, nvvidconv
 };
 }  // namespace orbbec_camera

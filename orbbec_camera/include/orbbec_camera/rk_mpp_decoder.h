@@ -1,7 +1,6 @@
 #pragma once
 
 #include "mjpeg_decoder.h"
-#include <rga/RgaApi.h>
 #include <rockchip/mpp_buffer.h>
 #include <rockchip/mpp_err.h>
 #include <rockchip/mpp_frame.h>
@@ -10,6 +9,11 @@
 #include <rockchip/mpp_rc_defs.h>
 #include <rockchip/mpp_task.h>
 #include <rockchip/rk_mpi.h>
+#if defined(USE_LIBYUV)
+#include <libyuv.h>
+#else
+#include <rga/RgaApi.h>
+#endif
 #define MPP_ALIGN(x, a) (((x) + (a)-1) & ~((a)-1))
 
 namespace orbbec_camera {
@@ -36,7 +40,7 @@ class RKMjpegDecoder : public MjpegDecoder {
   MppBufferGroup mpp_packet_group_ = nullptr;
   MppTask mpp_task_ = nullptr;
   uint32_t need_split_ = 0;
-  uint8_t * rgb_buffer_ = nullptr;
+  uint8_t* rgb_buffer_ = nullptr;
 };
 
 }  // namespace orbbec_camera

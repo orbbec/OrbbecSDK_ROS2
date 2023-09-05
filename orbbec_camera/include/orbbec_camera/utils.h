@@ -53,7 +53,7 @@ bool isOpenNIDevice(int pid);
 OB_DEPTH_PRECISION_LEVEL depthPrecisionLevelFromString(
     const std::string& depth_precision_level_str);
 
-OBSyncMode OBSyncModeFromString(const std::string& mode);
+OBMultiDeviceSyncMode OBSyncModeFromString(const std::string& mode);
 
 OB_SAMPLE_RATE sampleRateFromString(std::string& sample_rate);
 

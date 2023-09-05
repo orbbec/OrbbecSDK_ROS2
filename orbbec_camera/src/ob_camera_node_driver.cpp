@@ -16,7 +16,7 @@
 #include <sys/shm.h>
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
-#include <signal.h>
+#include <csignal>
 
 namespace orbbec_camera {
 OBCameraNodeDriver::OBCameraNodeDriver(const rclcpp::NodeOptions &node_options)
@@ -86,7 +86,6 @@ void OBCameraNodeDriver::init() {
     RCLCPP_INFO_STREAM(rclcpp::get_logger("orbbec_camera_node_driver"), "SIGTERM received");
     exit(0);
   });
-
 }
 
 void OBCameraNodeDriver::onDeviceConnected(const std::shared_ptr<ob::DeviceList> &device_list) {
@@ -185,7 +184,7 @@ void OBCameraNodeDriver::deviceCountUpdate() {
 void OBCameraNodeDriver::syncTime() {
   while (is_alive_ && rclcpp::ok()) {
     if (device_ && device_info_ && !isOpenNIDevice(device_info_->pid())) {
-      ctx_->enableMultiDeviceSync(0);
+      ctx_->enableDeviceClockSync(0);
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
   }
@@ -386,7 +385,7 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   CHECK_NOTNULL(device_info_.get());
   device_unique_id_ = device_info_->uid();
   if (!isOpenNIDevice(device_info_->pid())) {
-    ctx_->enableMultiDeviceSync(0);  // sync time stamp
+    ctx_->enableDeviceClockSync(0);  // sync time stamp
   }
   RCLCPP_INFO_STREAM(logger_, "Device " << device_info_->name() << " connected");
   RCLCPP_INFO_STREAM(logger_, "Serial number: " << device_info_->serialNumber());

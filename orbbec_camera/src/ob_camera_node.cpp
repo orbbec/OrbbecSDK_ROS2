@@ -20,8 +20,6 @@
 
 #if defined(USE_RK_HW_DECODER)
 #include "orbbec_camera/rk_mpp_decoder.h"
-#elif defined(USE_GST_HW_DECODER)
-#include "orbbec_camera/gst_decoder.h"
 #endif
 
 namespace orbbec_camera {
@@ -37,7 +35,8 @@ OBCameraNode::OBCameraNode(rclcpp::Node *node, std::shared_ptr<ob::Device> devic
   stream_name_[COLOR] = "color";
   stream_name_[DEPTH] = "depth";
   stream_name_[INFRA0] = "ir";
-  stream_name_[INFRA1] = "ir2";
+  stream_name_[INFRA1] = "left_ir";
+  stream_name_[INFRA2] = "right_ir";
   stream_name_[ACCEL] = "accel";
   stream_name_[GYRO] = "gyro";
 
@@ -49,9 +48,6 @@ OBCameraNode::OBCameraNode(rclcpp::Node *node, std::shared_ptr<ob::Device> devic
   setupTopics();
 #if defined(USE_RK_HW_DECODER)
   mjpeg_decoder_ = std::make_unique<RKMjpegDecoder>(width_[COLOR], height_[COLOR]);
-#elif defined(USE_GST_HW_DECODER)
-  mjpeg_decoder_ = std::make_unique<GstreamerMjpegDecoder>(
-      width_[COLOR], height_[COLOR], jpeg_decoder_, video_convert_, jpeg_parse_);
 #endif
   startStreams();
   if (enable_d2c_viewer_) {
@@ -124,17 +120,15 @@ void OBCameraNode::setupDevices() {
     if (!depth_work_mode_.empty()) {
       device_->switchDepthWorkMode(depth_work_mode_.c_str());
     }
-    if (sync_mode_ != OB_SYNC_MODE_CLOSE) {
-      OBDeviceSyncConfig sync_config;
+    if (sync_mode_ != OB_MULTI_DEVICE_SYNC_MODE_FREE_RUN) {
+      auto sync_config = device_->getMultiDeviceSyncConfig();
       sync_config.syncMode = sync_mode_;
-      sync_config.irTriggerSignalInDelay = ir_trigger_signal_in_delay_;
-      sync_config.rgbTriggerSignalInDelay = rgb_trigger_signal_in_delay_;
-      sync_config.deviceTriggerSignalOutDelay = device_trigger_signal_out_delay_;
-      device_->setSyncConfig(sync_config);
-      if (device_->isPropertySupported(OB_PROP_SYNC_SIGNAL_TRIGGER_OUT_BOOL,
-                                       OB_PERMISSION_READ_WRITE)) {
-        device_->setBoolProperty(OB_PROP_SYNC_SIGNAL_TRIGGER_OUT_BOOL, sync_signal_trigger_out_);
-      }
+      sync_config.depthDelayUs = depth_delay_us_;
+      sync_config.colorDelayUs = color_delay_us_;
+      sync_config.trigger2ImageDelayUs = trigger2image_delay_us_;
+      sync_config.triggerSignalOutputDelayUs = trigger_signal_output_delay_us_;
+      sync_config.triggerSignalOutputEnable = trigger_signal_output_enabled_;
+      device_->setMultiDeviceSyncConfig(sync_config);
     }
     if (info->pid() == GEMINI2_PID) {
       auto default_precision_level = device_->getIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT);
@@ -194,7 +188,7 @@ void OBCameraNode::setupProfiles() {
                                 << ", Stream Index: " << elem.second << ", Width: " << width_[elem]
                                 << ", Height: " << height_[elem] << ", FPS: " << fps_[elem]
                                 << ", Format: " << magic_enum::enum_name(format_[elem]));
-        throw;
+        exit(-1);
       }
 
       if (!selected_profile) {
@@ -334,6 +328,18 @@ void OBCameraNode::setupDefaultImageFormat() {
   encoding_[INFRA0] = sensor_msgs::image_encodings::MONO16;
   unit_step_size_[INFRA0] = sizeof(uint16_t);
 
+  format_[INFRA1] = OB_FORMAT_Y16;
+  format_str_[INFRA1] = "Y16";
+  image_format_[INFRA1] = CV_16UC1;
+  encoding_[INFRA1] = sensor_msgs::image_encodings::MONO16;
+  unit_step_size_[INFRA1] = sizeof(uint16_t);
+
+  format_[INFRA2] = OB_FORMAT_Y16;
+  format_str_[INFRA2] = "Y16";
+  image_format_[INFRA2] = CV_16UC1;
+  encoding_[INFRA2] = sensor_msgs::image_encodings::MONO16;
+  unit_step_size_[INFRA2] = sizeof(uint16_t);
+
   image_format_[COLOR] = CV_8UC3;
   encoding_[COLOR] = sensor_msgs::image_encodings::RGB8;
   unit_step_size_[COLOR] = 3 * sizeof(uint8_t);
@@ -404,7 +410,6 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter(enable_colored_point_cloud_, "enable_colored_point_cloud", false);
   setAndGetNodeParameter(enable_point_cloud_, "enable_point_cloud", true);
   setAndGetNodeParameter<std::string>(point_cloud_qos_, "point_cloud_qos", "default");
-  setAndGetNodeParameter(enable_publish_extrinsic_, "enable_publish_extrinsic", false);
   setAndGetNodeParameter(enable_d2c_viewer_, "enable_d2c_viewer", false);
   setAndGetNodeParameter(enable_hardware_d2d_, "enable_hardware_d2d", true);
   setAndGetNodeParameter(enable_soft_filter_, "enable_soft_filter", true);
@@ -412,10 +417,11 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter(enable_ir_auto_exposure_, "enable_ir_auto_exposure", true);
   setAndGetNodeParameter<std::string>(depth_work_mode_, "depth_work_mode", "");
   setAndGetNodeParameter<std::string>(sync_mode_str_, "sync_mode", "close");
-  setAndGetNodeParameter(ir_trigger_signal_in_delay_, "ir_trigger_signal_in_delay", 0);
-  setAndGetNodeParameter(rgb_trigger_signal_in_delay_, "rgb_trigger_signal_in_delay", 0);
-  setAndGetNodeParameter(device_trigger_signal_out_delay_, "device_trigger_signal_out_delay", 0);
-  setAndGetNodeParameter(sync_signal_trigger_out_, "sync_signal_trigger_out", false);
+  setAndGetNodeParameter(depth_delay_us_, "depth_delay_us", 0);
+  setAndGetNodeParameter(color_delay_us_, "color_delay_us", 0);
+  setAndGetNodeParameter(trigger2image_delay_us_, "trigger2image_delay_us", 0);
+  setAndGetNodeParameter(trigger_signal_output_delay_us_, "trigger_signal_output_delay_us", 0);
+  setAndGetNodeParameter(trigger_signal_output_enabled_, "trigger_signal_output_enabled", false);
   setAndGetNodeParameter<std::string>(depth_precision_str_, "depth_precision", "1mm");
   std::transform(sync_mode_str_.begin(), sync_mode_str_.end(), sync_mode_str_.begin(), ::toupper);
   sync_mode_ = OBSyncModeFromString(sync_mode_str_);
@@ -428,9 +434,6 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(soft_filter_speckle_size_, "soft_filter_speckle_size", -1);
   setAndGetNodeParameter<double>(liner_accel_cov_, "linear_accel_cov", 0.0003);
   setAndGetNodeParameter<double>(angular_vel_cov_, "angular_vel_cov", 0.02);
-  setAndGetNodeParameter<std::string>(jpeg_decoder_, "jpeg_decoder", "avdec_mjpeg");
-  setAndGetNodeParameter<std::string>(video_convert_, "video_convert", "videoconvert");
-  setAndGetNodeParameter<std::string>(jpeg_parse_, "jpeg_parse", "jpegparse");
 }
 
 void OBCameraNode::setupTopics() {
@@ -501,10 +504,6 @@ void OBCameraNode::setupPublishers() {
     auto data_qos = getRMWQosProfileFromString(imu_qos_[stream_index]);
     imu_publishers_[stream_index] = node_->create_publisher<sensor_msgs::msg::Imu>(
         data_topic_name, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(data_qos), data_qos));
-  }
-  if (enable_publish_extrinsic_) {
-    extrinsics_publisher_ = node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
-        "extrinsic/depth_to_color", rclcpp::QoS{1}.transient_local());
   }
 }
 
@@ -702,12 +701,16 @@ void OBCameraNode::onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet> &fr
       tf_published_ = true;
     }
     publishPointCloud(frame_set);
-    auto color_frame = std::dynamic_pointer_cast<ob::Frame>(frame_set->colorFrame());
-    auto depth_frame = std::dynamic_pointer_cast<ob::Frame>(frame_set->depthFrame());
-    auto ir_frame = std::dynamic_pointer_cast<ob::Frame>(frame_set->irFrame());
-    onNewFrameCallback(color_frame, COLOR);
-    onNewFrameCallback(depth_frame, DEPTH);
-    onNewFrameCallback(ir_frame, INFRA0);
+    for (const auto &stream_index : IMAGE_STREAMS) {
+      if (enable_stream_[stream_index]) {
+        auto frame_type = STREAM_TYPE_TO_FRAME_TYPE.at(stream_index.first);
+        auto frame = frame_set->getFrame(frame_type);
+        if (frame == nullptr) {
+          continue;
+        }
+        onNewFrameCallback(frame, stream_index);
+      }
+    }
   } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: " << e.getMessage());
   } catch (const std::exception &e) {
@@ -748,7 +751,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   auto frame_format = frame->format();
   if (frame->type() == OB_FRAME_COLOR && frame_format != OB_FORMAT_RGB888) {
     if (frame_format == OB_FORMAT_MJPG || frame_format == OB_FORMAT_MJPEG) {
-#if defined(USE_RK_HW_DECODER) || defined(USE_GST_HW_DECODER)
+#if defined(USE_RK_HW_DECODER)
       CHECK_NOTNULL(mjpeg_decoder_.get());
       video_frame = frame->as<ob::ColorFrame>();
       const auto &color_frame = frame->as<ob::ColorFrame>();
@@ -773,7 +776,8 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
     video_frame = frame->as<ob::ColorFrame>();
   } else if (frame->type() == OB_FRAME_DEPTH) {
     video_frame = frame->as<ob::DepthFrame>();
-  } else if (frame->type() == OB_FRAME_IR) {
+  } else if (frame->type() == OB_FRAME_IR || frame->type() == OB_FRAME_IR_LEFT ||
+             frame->type() == OB_FRAME_IR_RIGHT) {
     video_frame = frame->as<ob::IRFrame>();
   } else {
     RCLCPP_ERROR(logger_, "Unsupported frame type: %d", frame->type());

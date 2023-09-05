@@ -101,17 +101,12 @@ RKMjpegDecoder::~RKMjpegDecoder() {
     mpp_destroy(mpp_ctx_);
     mpp_ctx_ = nullptr;
   }
-  if(rgb_buffer_){
+  if (rgb_buffer_) {
     delete[] rgb_buffer_;
   }
 }
 
 bool RKMjpegDecoder::mppFrame2RGB(const MppFrame frame, uint8_t *data) {
-  rga_info_t src_info;
-  rga_info_t dst_info;
-  // NOTE: memset to zero is MUST
-  memset(&src_info, 0, sizeof(rga_info_t));
-  memset(&dst_info, 0, sizeof(rga_info_t));
   int width = mpp_frame_get_width(frame);
   int height = mpp_frame_get_height(frame);
   MppBuffer buffer = mpp_frame_get_buffer(frame);
@@ -122,6 +117,19 @@ bool RKMjpegDecoder::mppFrame2RGB(const MppFrame frame, uint8_t *data) {
   CHECK_EQ(height, height_);
   memset(data, 0, width * height * 3);
   auto buffer_ptr = mpp_buffer_get_ptr(buffer);
+#if defined(USE_LIBYUV)
+  // use libyuv to convert yuv420sp to rgb888
+  libyuv::I420ToRGB24((const uint8_t *)buffer_ptr, width,
+                      (const uint8_t *)buffer_ptr + width * height, width / 2,
+                      (const uint8_t *)buffer_ptr + width * height * 5 / 4, width / 2, data,
+                      width * 3, width, height);
+  return true;
+#else
+  rga_info_t src_info;
+  rga_info_t dst_info;
+  // NOTE: memset to zero is MUST
+  memset(&src_info, 0, sizeof(rga_info_t));
+  memset(&dst_info, 0, sizeof(rga_info_t));
   src_info.fd = -1;
   src_info.mmuFlag = 1;
   src_info.virAddr = buffer_ptr;
@@ -139,6 +147,7 @@ bool RKMjpegDecoder::mppFrame2RGB(const MppFrame frame, uint8_t *data) {
     return false;
   }
   return true;
+#endif
 }
 
 bool RKMjpegDecoder::decode(const std::shared_ptr<ob::ColorFrame> &frame, uint8_t *dest) {

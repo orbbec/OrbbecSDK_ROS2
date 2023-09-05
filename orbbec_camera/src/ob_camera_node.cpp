@@ -570,7 +570,7 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
     bool valid_pixel(points->z > 0);
     if (valid_pixel) {
       *iter_x = static_cast<float>((points->x * scale) / 1000.0);
-      *iter_y = -static_cast<float>((points->y * scale) / 1000.0);
+      *iter_y = static_cast<float>((points->y * scale) / 1000.0);
       *iter_z = static_cast<float>((points->z * scale) / 1000.0);
       ++iter_x;
       ++iter_y;
@@ -653,7 +653,7 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
     bool valid_pixel((points + point_idx)->z > 0);
     if (valid_pixel) {
       *iter_x = static_cast<float>(((points + point_idx)->x * scale) / 1000.0);
-      *iter_y = -static_cast<float>(((points + point_idx)->y * scale) / 1000.0);
+      *iter_y = static_cast<float>(((points + point_idx)->y * scale) / 1000.0);
       *iter_z = static_cast<float>(((points + point_idx)->z * scale) / 1000.0);
       *iter_r = static_cast<uint8_t>((points + point_idx)->r);
       *iter_g = static_cast<uint8_t>((points + point_idx)->g);

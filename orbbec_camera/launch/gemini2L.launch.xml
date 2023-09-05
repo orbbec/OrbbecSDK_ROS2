@@ -57,11 +57,12 @@
     <arg name="enable_soft_filter" default="true"/>
     <arg name="soft_filter_max_diff" default="-1"/>
     <arg name="soft_filter_speckle_size" default="-1"/>
-    <arg name="sync_mode" default="close"/>
-    <arg name="ir_trigger_signal_in_delay" default="0"/>
-    <arg name="rgb_trigger_signal_in_delay" default="0"/>
-    <arg name="device_trigger_signal_out_delay" default="0"/>
-    <arg name="sync_signal_trigger_out" default="false"/>
+    <arg name="sync_mode" default="free_run"/>
+    <arg name="depth_delay_us" default="0"/>
+    <arg name="color_delay_us" default="0"/>
+    <arg name="trigger2image_delay_us" default="0"/>
+    <arg name="trigger_signal_output_delay_us" default="0"/>
+    <arg name="trigger_signal_output_enabled" default="false"/>
     <group>
         <push-ros-namespace namespace="$(var camera_name)"/>
         <node name="camera" pkg="orbbec_camera" exec="orbbec_camera_node" output="screen">
@@ -121,11 +122,12 @@
             <param name="enable_soft_filter" value="$(var enable_soft_filter)"/>
             <param name="soft_filter_max_diff" value="$(var soft_filter_max_diff)"/>
             <param name="soft_filter_speckle_size" value="$(var soft_filter_speckle_size)"/>
-            <param name="sync_mode" value="$(var sync_mode)"/>
-            <param name="ir_trigger_signal_in_delay" value="$(var ir_trigger_signal_in_delay)"/>
-            <param name="rgb_trigger_signal_in_delay" value="$(var rgb_trigger_signal_in_delay)"/>
-            <param name="device_trigger_signal_out_delay" value="$(var device_trigger_signal_out_delay)"/>
-            <param name="sync_signal_trigger_out" value="$(var sync_signal_trigger_out)"/>
+            <param name="sync_mode" value="$(arg sync_mode)"/>
+            <param name="depth_delay_us" value="$(arg depth_delay_us)"/>
+            <param name="color_delay_us" value="$(arg color_delay_us)"/>
+            <param name="trigger2image_delay_us" value="$(arg trigger2image_delay_us)"/>
+            <param name="trigger_signal_output_delay_us" value="$(arg trigger_signal_output_delay_us)"/>
+            <param name="trigger_signal_output_enabled" value="$(arg trigger_signal_output_enabled)"/>
             <remap from="/$(var camera_name)/depth/color/points" to="/$(var camera_name)/depth_registered/points"/>
         </node>
     </group>

@@ -206,38 +206,57 @@ ros2 run orbbec_camera list_devices_node
 - Don't forget to put the `include` tag inside the `group` tag.
   Otherwise, the parameter values of different cameras may become contaminated.
 
-```xml
+```python
+from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, GroupAction, ExecuteProcess
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch_ros.actions import Node
+from ament_index_python.packages import get_package_share_directory
+import os
+def generate_launch_description():
+    # Node configuration
+    cleanup_node = Node(
+        package='orbbec_camera',
+        executable='ob_cleanup_shm_node',
+        name='camera',
+        output='screen'
+    )
 
-<launch>
-    <!-- unique camera name-->
-    <arg name="camera_name" default="camera"/>
-    <!-- Hardware depth registration -->
-    <arg name="3d_sensor" default="astra_mini"/>
-    <!-- stereo_s_u3, astrapro, astra -->
-    <arg name="camera1_prefix" default="01"/>
-    <arg name="camera2_prefix" default="02"/>
-    <!-- TODO: change to your usb port -->
-    <arg name="camera1_usb_port" default="1-4.2.1"/>
-    <arg name="camera2_usb_port" default="1-4.2.1"/>
-    <arg name="device_num" default="2"/>
-    <node name="camera" pkg="orbbec_camera" exec="ob_cleanup_shm_node" output="screen"/>
-    <group>
-        <include file="$(find-pkg-share orbbec_camera)/launch/gemini2.launch.xml">
-            <arg name="camera_name" value="camera_$(var camera1_prefix)"/>
-            <arg name="usb_port" value="$(var camera1_usb_port)"/>
-            <arg name="device_num" value="$(var device_num)"/>
-        </include>
-    </group>
-    <group>
-        <include file="$(find-pkg-share orbbec_camera)/launch/dabai_dcw.launch.xml">
-            <arg name="camera_name" value="camera_$(var camera2_prefix)"/>
-            <arg name="usb_port" value="$(var camera2_usb_port)"/>
-            <arg name="device_num" value="$(var device_num)"/>
-        </include>
-    </group>
-    <node pkg="tf2_ros" exec="static_transform_publisher" name="camera_tf"
-          args="0 0 0 0 0 0 camera01_link camera02_link"/>
-</launch>
+    # Include launch files
+    package_dir = get_package_share_directory('orbbec_camera')
+    launch_file_dir = os.path.join(package_dir, 'launch')
+    launch1_include = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(launch_file_dir, 'gemini2.launch.py')
+        ),
+        launch_arguments={
+            'camera_name': 'camera_01',
+            'usb_port': '6-2.4.4.2', # replace your usb port here 
+            'device_num': '2'
+        }.items()
+    )
+
+    launch2_include = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(launch_file_dir, 'gemini2.launch.py')
+        ),
+        launch_arguments={
+            'camera_name': 'camera_02',
+            'usb_port': '6-2.4.1', # replace your usb port here
+            'device_num': '2'
+        }.items()
+    )
+
+    # If you need more cameras, just add more launch_include here, and change the usb_port and device_num
+
+    # Launch description
+    ld = LaunchDescription([
+        cleanup_node,
+        GroupAction([launch1_include]),
+        GroupAction([launch2_include]),
+    ])
+
+    return ld
 
 ```
 
@@ -286,16 +305,21 @@ The following are the launch parameters available:
   This field is required when the `enable_colored_point_cloud` is set to `true`.
 - `usb_port`: The USB port of the camera. This is required when multiple cameras are used.
 - `enable_accel` : Enables the accelerometer.
-- `accel_rate`: The frequency of the accelerometer, the optional values are `1.5625hz`,`3.125hz`,`6.25hz`,`12.5hz`,`25hz`,`50hz`,
-`100hz`,`200hz`,`500hz`,`1khz`,`2khz`,`4khz`,`8khz`,`16khz`,`32khz`. The specific value depends on the current camera.
-- `accel_range` : The range of the accelerometer, the optional values are `2g`,`4g`,`8g`,`16g`. The specific value depends on the current camera.
+- `accel_rate`: The frequency of the accelerometer, the optional values
+  are `1.5625hz`,`3.125hz`,`6.25hz`,`12.5hz`,`25hz`,`50hz`,
+  `100hz`,`200hz`,`500hz`,`1khz`,`2khz`,`4khz`,`8khz`,`16khz`,`32khz`. The specific value depends on the current camera.
+- `accel_range` : The range of the accelerometer, the optional values are `2g`,`4g`,`8g`,`16g`. The specific value
+  depends on the current camera.
 - `enable_gyro`: Whether to enable the gyroscope.
-- `gyro_rate` : The frequency of the gyroscope, the optional values are `1.5625hz`,`3.125hz`,`6.25hz`,`12.5hz`,`25hz`,`50hz`,
-`100hz`,`200hz`,`500hz`,`1khz`,`2khz`,`4khz`,`8khz`,`16khz`,`32khz`. The specific value depends on the current camera.
-- `gyro_range` : The range of the gyroscope, the optional values are `16dps`,`31dps`,`62dps`,`125dps`,`250dps`,`500dps`,`1000dps`,`2000dps`. The specific value depends on the current camera.
+- `gyro_rate` : The frequency of the gyroscope, the optional values
+  are `1.5625hz`,`3.125hz`,`6.25hz`,`12.5hz`,`25hz`,`50hz`,
+  `100hz`,`200hz`,`500hz`,`1khz`,`2khz`,`4khz`,`8khz`,`16khz`,`32khz`. The specific value depends on the current camera.
+- `gyro_range` : The range of the gyroscope, the optional values
+  are `16dps`,`31dps`,`62dps`,`125dps`,`250dps`,`500dps`,`1000dps`,`2000dps`. The specific value depends on the current
+  camera.
 
 ## Check which profiles the camera supports
-  
+
   ```bash
   ros2 run orbbec_camera list_camera_profile_mode_node
   ```
@@ -303,7 +327,7 @@ The following are the launch parameters available:
 ## Launch files
 
 | product serials                              | launch file             |
-| -------------------------------------------- | ----------------------- |
+|----------------------------------------------|-------------------------|
 | astra+                                       | astra_adv.launch.py     |
 | astra /astra mini /astra mini pro /astra pro | astra.launch.py         |
 | astra2                                       | astra2.launch.py        |
@@ -324,7 +348,6 @@ The following are the launch parameters available:
 | gemini e lite                                | gemini_e_lite.launch.py |
 
 Actually, All launch files all most the same, the only difference is the default value of the parameters.
-XML launch file will be removed in the future version.
 
 ## Supported hardware products
 

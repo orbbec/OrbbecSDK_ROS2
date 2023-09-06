@@ -203,38 +203,57 @@ ros2 run orbbec_camera list_devices_node
 - 编辑 `OrbbecSDK_ROS2/launch/multi_xxx.launch.xml` 修改相机的`usb_port`。
 - 注意不要忘记在`include` 加上 `group` 标签，不然前面的相机的参数会污染后面的相机的参数。
 
-```xml
+```python
+from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, GroupAction, ExecuteProcess
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch_ros.actions import Node
+from ament_index_python.packages import get_package_share_directory
+import os
+def generate_launch_description():
+  # Node configuration
+  cleanup_node = Node(
+    package='orbbec_camera',
+    executable='ob_cleanup_shm_node',
+    name='camera',
+    output='screen'
+  )
 
-<launch>
-  <!-- unique camera name-->
-  <arg name="camera_name" default="camera"/>
-  <!-- Hardware depth registration -->
-  <arg name="3d_sensor" default="astra_mini"/>
-  <!-- stereo_s_u3, astrapro, astra -->
-  <arg name="camera1_prefix" default="01"/>
-  <arg name="camera2_prefix" default="02"/>
-  <!-- TODO: change to your usb port -->
-  <arg name="camera1_usb_port" default="1-4.2.1"/>
-  <arg name="camera2_usb_port" default="1-4.2.1"/>
-  <arg name="device_num" default="2"/>
-  <node name="camera" pkg="orbbec_camera" exec="ob_cleanup_shm_node" output="screen"/>
-  <group>
-    <include file="$(find-pkg-share orbbec_camera)/launch/gemini2.launch.xml">
-      <arg name="camera_name" value="camera_$(var camera1_prefix)"/>
-      <arg name="usb_port" value="$(var camera1_usb_port)"/>
-      <arg name="device_num" value="$(var device_num)"/>
-    </include>
-  </group>
-  <group>
-    <include file="$(find-pkg-share orbbec_camera)/launch/dabai_dcw.launch.xml">
-      <arg name="camera_name" value="camera_$(var camera2_prefix)"/>
-      <arg name="usb_port" value="$(var camera2_usb_port)"/>
-      <arg name="device_num" value="$(var device_num)"/>
-    </include>
-  </group>
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="camera_tf"
-        args="0 0 0 0 0 0 camera01_link camera02_link"/>
-</launch>
+  # Include launch files
+  package_dir = get_package_share_directory('orbbec_camera')
+  launch_file_dir = os.path.join(package_dir, 'launch')
+  launch1_include = IncludeLaunchDescription(
+    PythonLaunchDescriptionSource(
+      os.path.join(launch_file_dir, 'gemini2.launch.py')
+    ),
+    launch_arguments={
+      'camera_name': 'camera_01',
+      'usb_port': '6-2.4.4.2', # replace your usb port here 
+      'device_num': '2'
+    }.items()
+  )
+
+  launch2_include = IncludeLaunchDescription(
+    PythonLaunchDescriptionSource(
+      os.path.join(launch_file_dir, 'gemini2.launch.py')
+    ),
+    launch_arguments={
+      'camera_name': 'camera_02',
+      'usb_port': '6-2.4.1', # replace your usb port here
+      'device_num': '2'
+    }.items()
+  )
+
+  # If you need more cameras, just add more launch_include here, and change the usb_port and device_num
+
+  # Launch description
+  ld = LaunchDescription([
+    cleanup_node,
+    GroupAction([launch1_include]),
+    GroupAction([launch2_include]),
+  ])
+
+  return ld
 
 ```
 

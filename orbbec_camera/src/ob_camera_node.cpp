@@ -766,11 +766,15 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
       hw_decode = true;
 #else
       auto covert_frame = softwareDecodeColorFrame(frame);
-      video_frame = covert_frame->as<ob::ColorFrame>();
+      if(covert_frame) {
+        video_frame = covert_frame->as<ob::ColorFrame>();
+      }
 #endif
     } else {
       auto covert_frame = softwareDecodeColorFrame(frame);
-      video_frame = covert_frame->as<ob::ColorFrame>();
+      if (covert_frame) {
+        video_frame = covert_frame->as<ob::ColorFrame>();
+      }
     }
   } else if (frame->type() == OB_FRAME_COLOR) {
     video_frame = frame->as<ob::ColorFrame>();

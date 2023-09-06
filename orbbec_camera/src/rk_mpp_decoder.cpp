@@ -1,6 +1,7 @@
 #include "orbbec_camera/rk_mpp_decoder.h"
 #include <rclcpp/rclcpp.hpp>
 #include <glog/logging.h>
+#include <magic_enum/magic_enum.hpp>
 
 namespace orbbec_camera {
 
@@ -118,11 +119,13 @@ bool RKMjpegDecoder::mppFrame2RGB(const MppFrame frame, uint8_t *data) {
   memset(data, 0, width * height * 3);
   auto buffer_ptr = mpp_buffer_get_ptr(buffer);
 #if defined(USE_LIBYUV)
-  // use libyuv to convert yuv420sp to rgb888
-  libyuv::I420ToRGB24((const uint8_t *)buffer_ptr, width,
-                      (const uint8_t *)buffer_ptr + width * height, width / 2,
-                      (const uint8_t *)buffer_ptr + width * height * 5 / 4, width / 2, data,
-                      width * 3, width, height);
+  auto *y = (const uint8_t *)buffer_ptr;
+  auto *uv = y + width * height;
+  int ret = libyuv::NV12ToRGB24(y, width, uv, width, data, width * 3, width, height);
+  if (ret) {
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("rk_mpp_decoder"), "libyuv error " << ret);
+    return false;
+  }
   return true;
 #else
   rga_info_t src_info;

@@ -140,9 +140,9 @@ bool RKMjpegDecoder::mppFrame2RGB(const MppFrame frame, uint8_t *data) {
   dst_info.fd = -1;
   dst_info.mmuFlag = 1;
   dst_info.virAddr = data;
-  dst_info.format = RK_FORMAT_RGB_888;
+  dst_info.format = RK_FORMAT_BGR_888;
   rga_set_rect(&src_info.rect, 0, 0, width, height, width, height, RK_FORMAT_YCbCr_420_SP);
-  rga_set_rect(&dst_info.rect, 0, 0, width, height, width, height, RK_FORMAT_RGB_888);
+  rga_set_rect(&dst_info.rect, 0, 0, width, height, width, height, RK_FORMAT_BGR_888);
   int ret = c_RkRgaBlit(&src_info, &dst_info, nullptr);
   if (ret) {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger("rk_mpp_decoder"),

@@ -1013,9 +1013,11 @@ void OBCameraNode::calcAndPublishStaticTransform() {
   Q = transform.getRotation();
   trans = transform.getOrigin();
   rclcpp::Time tf_timestamp = node_->now();
-
-  publishStaticTF(tf_timestamp, trans, Q, frame_id_[DEPTH], frame_id_[COLOR]);
-  publishStaticTF(tf_timestamp, trans, Q, camera_link_frame_id_, frame_id_[COLOR]);
+  if(enable_stream_[COLOR]) {
+    publishStaticTF(tf_timestamp, trans, Q, camera_link_frame_id_, frame_id_[COLOR]);
+    publishStaticTF(tf_timestamp, zero_trans, quaternion_optical, frame_id_[COLOR],
+                    optical_frame_id_[COLOR]);
+  }
   for (const auto &stream_index : IMAGE_STREAMS) {
     if (stream_index == COLOR || !enable_stream_[stream_index]) {
       continue;

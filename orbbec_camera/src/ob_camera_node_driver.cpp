@@ -78,14 +78,6 @@ void OBCameraNodeDriver::init() {
   device_count_update_thread_ = std::make_shared<std::thread>([this]() { deviceCountUpdate(); });
   sync_time_thread_ = std::make_shared<std::thread>([this]() { syncTime(); });
   reset_device_thread_ = std::make_shared<std::thread>([this]() { resetDevice(); });
-  signal(SIGINT, [](int) {
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("orbbec_camera_node_driver"), "SIGINT received");
-    exit(0);
-  });
-  signal(SIGTERM, [](int) {
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("orbbec_camera_node_driver"), "SIGTERM received");
-    exit(0);
-  });
 }
 
 void OBCameraNodeDriver::onDeviceConnected(const std::shared_ptr<ob::DeviceList> &device_list) {

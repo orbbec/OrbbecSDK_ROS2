@@ -60,7 +60,7 @@ colcon build --event-handlers  console_direct+  --cmake-args  -DCMAKE_BUILD_TYPE
 
 ```bash
 . ./install/setup.bash 
-ros2 launch orbbec_camera astra.launch.xml
+ros2 launch orbbec_camera astra.launch.py
 ```
 
 - 在终端 2。
@@ -269,7 +269,7 @@ ros2 run orbbec_camera ob_cleanup_shm_node
 - 执行下面的命令启动多相机:
 
 ```bash
-ros2 launch orbbec_camera multi_camera.launch.xml
+ros2 launch orbbec_camera multi_camera.launch.py
 ```
 
 ## 启动参数

@@ -202,7 +202,7 @@ ros2 run orbbec_camera list_devices_node
 ```
 
 - Set the `device_num` parameter to the number of cameras you have.
-- Go to the `OrbbecSDK_ROS2/launch/multi_xxx.launch.xml` file and change the `usb_port`.
+- Go to the `OrbbecSDK_ROS2/launch/multi_xxx.launch.py` file and change the `usb_port`.
 - Don't forget to put the `include` tag inside the `group` tag.
   Otherwise, the parameter values of different cameras may become contaminated.
 
@@ -273,7 +273,7 @@ This will clean up `/dev/shm/`.
 - To launch the cameras, run the following command:
 
 ```bash
-ros2 launch orbbec_camera multi_camera.launch.xml
+ros2 launch orbbec_camera multi_camera.launch.py
 ```
 
 ## Launch parameters

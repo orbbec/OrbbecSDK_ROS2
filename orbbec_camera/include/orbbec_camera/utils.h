@@ -72,4 +72,6 @@ std::string fullAccelScaleRangeToString(const OBAccelFullScaleRange& full_scale_
 
 std::string parseUsbPort(const std::string& line);
 
+bool isValidJPEG(const std::shared_ptr<ob::ColorFrame>& frame);
+
 }  // namespace orbbec_camera

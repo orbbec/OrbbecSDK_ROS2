@@ -767,7 +767,7 @@ std::shared_ptr<ob::Frame> OBCameraNode::softwareDecodeColorFrame(
   if (frame == nullptr) {
     return nullptr;
   }
-  if (frame->format() == OB_FORMAT_RGB888) {
+  if (frame->format() == OB_FORMAT_RGB || frame->format() == OB_FORMAT_BGR) {
     return frame;
   }
   if (!setupFormatConvertType(frame->format())) {
@@ -799,6 +799,7 @@ bool OBCameraNode::decodeColorFrameToBuffer(const std::shared_ptr<ob::Frame> &fr
   if (!frame) {
     return false;
   }
+
 #if defined(USE_RK_HW_DECODER) || defined(USE_NV_HW_DECODER)
   if (frame && frame->format() != OB_FORMAT_RGB888) {
     if (frame->format() == OB_FORMAT_MJPG && jpeg_decoder_) {

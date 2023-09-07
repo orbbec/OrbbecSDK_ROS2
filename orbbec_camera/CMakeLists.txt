@@ -13,7 +13,7 @@ option(USE_NV_HW_DECODER "Use Nvidia hardware decoder" OFF)
 
 
 if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Werror -Wpedantic)
+  add_compile_options(-Wall -Wextra -Werror -Wno-pedantic)
 endif ()
 
 # find dependencies
@@ -89,6 +89,8 @@ if (USE_NV_HW_DECODER)
   set(JETSON_MULTI_MEDIA_API_INCLUDE_DIR ${JETSON_MULTI_MEDIA_API_DIR}/include/)
   set(LIBJPEG8B_INCLUDE_DIR ${JETSON_MULTI_MEDIA_API_INCLUDE_DIR}/libjpeg-8b)
   set(TEGRA_ARMABI /usr/lib/aarch64-linux-gnu/)
+  add_definitions(-DUSE_NV_HW_DECODER)
+  add_compile_options(-Wno-missing-field-initializers -Wno-unused-parameter)
   set(NV_LIBRARIES
     -lnvjpeg -lnvbufsurface -lnvbufsurftransform -lyuv -lv4l2
   )
@@ -115,15 +117,18 @@ set(COMMON_LIBRARIES
   Threads::Threads
 )
 if (USE_RK_HW_DECODER)
-  list(APPEND COMMON_LINK_LIBRARIES
+  list(APPEND COMMON_LIBRARIES
     ${RK_MPP_LIBRARIES}
     ${RGA_LIBRARIES}
   )
-elseif (USE_NV_HW_DECODER)
-  list(APPEND COMMON_LINK_LIBRARIES
-    ${NV_LIBRARIES}
-  )
+
 endif ()
+
+if (USE_NV_HW_DECODER)
+  list(APPEND COMMON_LIBRARIES
+    ${NV_LIBRARIES})
+endif ()
+
 
 set(SOURCE_FILES
   src/d2c_viewer.cpp
@@ -156,8 +161,9 @@ if (USE_RK_HW_DECODER)
 endif ()
 
 if (USE_NV_HW_DECODER)
-  add_definitions(-DUSE_NV_HW_DECODER)
   list(APPEND SOURCE_FILES src/jetson_nv_decoder.cpp)
+  list(APPEND COMMON_INCLUDE_DIRS ${JETSON_MULTI_MEDIA_API_INCLUDE_DIR}
+    ${LIBJPEG8B_INCLUDE_DIR})
   # append jetson_multimedia_api source files
   list(APPEND SOURCE_FILES
     ${JETSON_MULTI_MEDIA_API_CLASS_DIR}/NvBuffer.cpp

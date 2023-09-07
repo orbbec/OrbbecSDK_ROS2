@@ -161,6 +161,7 @@ tf2::Quaternion rotationMatrixToQuaternion(const float rotation[9]) {
   Eigen::Quaternionf q(m);
   return {q.x(), q.y(), q.z(), q.w()};
 }
+
 std::ostream &operator<<(std::ostream &os, const OBCameraParam &rhs) {
   auto depth_intrinsic = rhs.depthIntrinsic;
   auto rgb_intrinsic = rhs.rgbIntrinsic;
@@ -202,6 +203,7 @@ rclcpp::Time frameTimeStampToROSTime(uint64_t ms) {
   rclcpp::Time stamp(sec, nano_sec);
   return stamp;
 }
+
 std::string getObSDKVersion() {
   std::string major = std::to_string(ob::Version::getMajor());
   std::string minor = std::to_string(ob::Version::getMinor());
@@ -209,6 +211,7 @@ std::string getObSDKVersion() {
   std::string version = major + "." + minor + "." + patch;
   return version;
 }
+
 OBFormat OBFormatFromString(const std::string &format) {
   std::string fixed_format;
   std::transform(format.begin(), format.end(), std::back_inserter(fixed_format),
@@ -301,6 +304,7 @@ rmw_qos_profile_t getRMWQosProfileFromString(const std::string &str_qos) {
     return rmw_qos_profile_default;
   }
 }
+
 bool isOpenNIDevice(int pid) {
   static const std::vector<int> OPENNI_DEVICE_PIDS = {
       0x0300, 0x0301, 0x0400, 0x0401, 0x0402, 0x0403, 0x0404, 0x0407, 0x0601, 0x060b,
@@ -329,6 +333,7 @@ OB_DEPTH_PRECISION_LEVEL depthPrecisionLevelFromString(
     return OB_PRECISION_0MM8;
   }
 }
+
 OBMultiDeviceSyncMode OBSyncModeFromString(const std::string &mode) {
   if (mode == "FREE_RUN") {
     return OBMultiDeviceSyncMode::OB_MULTI_DEVICE_SYNC_MODE_FREE_RUN;
@@ -526,4 +531,19 @@ std::string parseUsbPort(const std::string &line) {
   }
   return port_id;
 }
+
+bool isValidJPEG(const std::shared_ptr<ob::ColorFrame> &frame) {
+  if (frame->dataSize() < 2) {  // Checking both start and end markers, so minimal size is 4
+    return false;
+  }
+
+  const auto *data = static_cast<const uint8_t *>(frame->data());
+
+  // Check for JPEG start marker
+  if (data[0] != 0xFF || data[1] != 0xD8) {
+    return false;
+  }
+  return true;
+}
+
 }  // namespace orbbec_camera

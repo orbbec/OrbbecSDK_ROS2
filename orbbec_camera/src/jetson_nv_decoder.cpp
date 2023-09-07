@@ -8,6 +8,8 @@
 #include <fstream>
 #include <libyuv.h>
 #include <rclcpp/rclcpp.hpp>
+#include "orbbec_camera/utils.h"
+
 namespace orbbec_camera {
 
 JetsonNvJPEGDecoder::JetsonNvJPEGDecoder(int width, int height) : JPEGDecoder(width, height) {}
@@ -24,9 +26,6 @@ bool JetsonNvJPEGDecoder::decode(const std::shared_ptr<ob::ColorFrame> &frame, u
   uint32_t width = 0;
   uint32_t height = 0;
   auto data_size = frame->dataSize();
-  while (data[data_size - 1] == 0) {
-    data_size--;
-  }
   int fd = -1;
   decoder_ = NvJPEGDecoder::createJPEGDecoder("jpegdec");
   std::shared_ptr<int> decoder_deleter(nullptr, [&](int *) { delete decoder_; });
@@ -46,7 +45,8 @@ bool JetsonNvJPEGDecoder::decode(const std::shared_ptr<ob::ColorFrame> &frame, u
     }
     return false;
   }
-  NvBufSurf::NvCommonAllocateParams nvbufParams = {0};
+  NvBufSurf::NvCommonAllocateParams nvbufParams;
+  memset(&nvbufParams, 0, sizeof(nvbufParams));
 
   nvbufParams.memType = NVBUF_MEM_SURFACE_ARRAY;
   nvbufParams.width = width;

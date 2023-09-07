@@ -26,6 +26,9 @@ bool JetsonNvJPEGDecoder::decode(const std::shared_ptr<ob::ColorFrame> &frame, u
   uint32_t width = 0;
   uint32_t height = 0;
   auto data_size = frame->dataSize();
+  while (data_size > 4 && data[data_size - 1] == 0x00) {
+    data_size--;
+  }
   int fd = -1;
   decoder_ = NvJPEGDecoder::createJPEGDecoder("jpegdec");
   std::shared_ptr<int> decoder_deleter(nullptr, [&](int *) { delete decoder_; });

@@ -20,6 +20,8 @@
 
 #if defined(USE_RK_HW_DECODER)
 #include "orbbec_camera/rk_mpp_decoder.h"
+#elif defined(USE_NV_HW_DECODER)
+#include "orbbec_camera/jetson_nv_decoder.h"
 #endif
 
 namespace orbbec_camera {
@@ -47,7 +49,9 @@ OBCameraNode::OBCameraNode(rclcpp::Node *node, std::shared_ptr<ob::Device> devic
   setupDefaultImageFormat();
   setupTopics();
 #if defined(USE_RK_HW_DECODER)
-  mjpeg_decoder_ = std::make_unique<RKMjpegDecoder>(width_[COLOR], height_[COLOR]);
+  jpeg_decoder_ = std::make_unique<RKJPEGDecoder>(width_[COLOR], height_[COLOR]);
+#elif defined(USE_NV_HW_DECODER)
+  jpeg_decoder_ = std::make_unique<JetsonNvJPEGDecoder>(width_[COLOR], height_[COLOR]);
 #endif
   startStreams();
   if (enable_d2c_viewer_) {
@@ -797,11 +801,11 @@ bool OBCameraNode::decodeColorFrameToBuffer(const std::shared_ptr<ob::Frame> &fr
   }
 #if defined(USE_RK_HW_DECODER) || defined(USE_NV_HW_DECODER)
   if (frame && frame->format() != OB_FORMAT_RGB888) {
-    if (frame->format() == OB_FORMAT_MJPG && mjpeg_decoder_) {
-      CHECK_NOTNULL(mjpeg_decoder_.get());
+    if (frame->format() == OB_FORMAT_MJPG && jpeg_decoder_) {
+      CHECK_NOTNULL(jpeg_decoder_.get());
       CHECK_NOTNULL(rgb_buffer_);
       auto video_frame = frame->as<ob::ColorFrame>();
-      bool ret = mjpeg_decoder_->decode(video_frame, rgb_buffer_);
+      bool ret = jpeg_decoder_->decode(video_frame, rgb_buffer_);
       if (!ret) {
         RCLCPP_ERROR_STREAM(logger_, "Decode frame failed");
         is_decoded = false;

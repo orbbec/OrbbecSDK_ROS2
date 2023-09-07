@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mjpeg_decoder.h"
+#include "jpeg_decoder.h"
 #include <rockchip/mpp_buffer.h>
 #include <rockchip/mpp_err.h>
 #include <rockchip/mpp_frame.h>
@@ -17,11 +17,11 @@
 #define MPP_ALIGN(x, a) (((x) + (a)-1) & ~((a)-1))
 
 namespace orbbec_camera {
-class RKMjpegDecoder : public MjpegDecoder {
+class RKJPEGDecoder : public JPEGDecoder {
  public:
-  RKMjpegDecoder(int width, int height);
+  RKJPEGDecoder(int width, int height);
 
-  ~RKMjpegDecoder() override;
+  ~RKJPEGDecoder() override;
 
   bool decode(const std::shared_ptr<ob::ColorFrame>& frame, uint8_t* dest) override;
 

@@ -56,7 +56,7 @@
 #include "orbbec_camera/dynamic_params.h"
 #include "orbbec_camera/d2c_viewer.h"
 #include "magic_enum/magic_enum.hpp"
-#include "mjpeg_decoder.h"
+#include "jpeg_decoder.h"
 
 #define STREAM_NAME(sip)                                                                       \
   (static_cast<std::ostringstream&&>(std::ostringstream()                                      \
@@ -412,7 +412,7 @@ class OBCameraNode {
   std::deque<IMUData> imu_history_;
   IMUData accel_data_{ACCEL, {0, 0, 0}, -1.0};
   // mjpeg decoder
-  std::shared_ptr<MjpegDecoder> mjpeg_decoder_ = nullptr;
+  std::shared_ptr<JPEGDecoder> jpeg_decoder_ = nullptr;
   uint8_t* rgb_buffer_ = nullptr;
   bool is_color_frame_decoded_ = false;
 };

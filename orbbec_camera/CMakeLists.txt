@@ -9,6 +9,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O3")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fPIC -g")
 set(CMAKE_BUILD_TYPE "Release")
 option(USE_RK_HW_DECODER "Use Rockchip hardware decoder" OFF)
+option(USE_NV_HW_DECODER "Use Nvidia hardware decoder" OFF)
+
 
 if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Werror -Wpedantic)
@@ -81,6 +83,18 @@ set(ORBBEC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/SDK/include/)
 
 set(CMAKE_BUILD_RPATH "${CMAKE_BUILD_RPATH}:${ORBBEC_LIBS_DIR}")
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:${ORBBEC_LIBS_DIR}")
+if (USE_NV_HW_DECODER)
+  set(JETSON_MULTI_MEDIA_API_DIR /usr/src/jetson_multimedia_api)
+  set(JETSON_MULTI_MEDIA_API_CLASS_DIR ${JETSON_MULTI_MEDIA_API_DIR}/samples/common/classes)
+  set(JETSON_MULTI_MEDIA_API_INCLUDE_DIR ${JETSON_MULTI_MEDIA_API_DIR}/include/)
+  set(LIBJPEG8B_INCLUDE_DIR ${JETSON_MULTI_MEDIA_API_INCLUDE_DIR}/libjpeg-8b)
+  set(TEGRA_ARMABI /usr/lib/aarch64-linux-gnu/)
+  set(NV_LIBRARIES
+    -lnvjpeg -lnvbufsurface -lnvbufsurftransform -lyuv -lv4l2
+  )
+  list(APPEND NV_LIBRARIES
+    -L${TEGRA_ARMABI} -L${TEGRA_ARMABI}/tegra)
+endif ()
 
 set(COMMON_INCLUDE_DIRS
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
@@ -98,8 +112,18 @@ set(COMMON_LIBRARIES
   ${GLOG_LIBRARIES}
   -lOrbbecSDK
   -L${ORBBEC_LIBS_DIR}
-  ${RK_MPP_LIBRARIES}
+  Threads::Threads
 )
+if (USE_RK_HW_DECODER)
+  list(APPEND COMMON_LINK_LIBRARIES
+    ${RK_MPP_LIBRARIES}
+    ${RGA_LIBRARIES}
+  )
+elseif (USE_NV_HW_DECODER)
+  list(APPEND COMMON_LINK_LIBRARIES
+    ${NV_LIBRARIES}
+  )
+endif ()
 
 set(SOURCE_FILES
   src/d2c_viewer.cpp
@@ -110,7 +134,7 @@ set(SOURCE_FILES
   src/ros_service.cpp
   src/synced_imu_publisher.cpp
   src/utils.cpp
-  src/mjpeg_decoder.cpp
+  src/jpeg_decoder.cpp
 )
 
 if (USE_RK_HW_DECODER)
@@ -129,6 +153,26 @@ if (USE_RK_HW_DECODER)
       -lyuv
     )
   endif ()
+endif ()
+
+if (USE_NV_HW_DECODER)
+  add_definitions(-DUSE_NV_HW_DECODER)
+  list(APPEND SOURCE_FILES src/jetson_nv_decoder.cpp)
+  # append jetson_multimedia_api source files
+  list(APPEND SOURCE_FILES
+    ${JETSON_MULTI_MEDIA_API_CLASS_DIR}/NvBuffer.cpp
+    ${JETSON_MULTI_MEDIA_API_CLASS_DIR}/NvElement.cpp
+    ${JETSON_MULTI_MEDIA_API_CLASS_DIR}/NvElementProfiler.cpp
+    ${JETSON_MULTI_MEDIA_API_CLASS_DIR}/NvJpegDecoder.cpp
+    ${JETSON_MULTI_MEDIA_API_CLASS_DIR}/NvJpegEncoder.cpp
+    ${JETSON_MULTI_MEDIA_API_CLASS_DIR}/NvLogging.cpp
+    ${JETSON_MULTI_MEDIA_API_CLASS_DIR}/NvUtils.cpp
+    ${JETSON_MULTI_MEDIA_API_CLASS_DIR}/NvV4l2Element.cpp
+    ${JETSON_MULTI_MEDIA_API_CLASS_DIR}/NvV4l2ElementPlane.cpp
+    ${JETSON_MULTI_MEDIA_API_CLASS_DIR}/NvVideoDecoder.cpp
+    ${JETSON_MULTI_MEDIA_API_CLASS_DIR}/NvVideoEncoder.cpp
+    ${JETSON_MULTI_MEDIA_API_CLASS_DIR}/NvBufSurface.cpp
+  )
 endif ()
 
 macro(add_orbbec_executable TARGET SOURCE)

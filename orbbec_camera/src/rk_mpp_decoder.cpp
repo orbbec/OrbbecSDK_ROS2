@@ -5,7 +5,7 @@
 
 namespace orbbec_camera {
 
-RKMjpegDecoder::RKMjpegDecoder(int width, int height) : MjpegDecoder(width, height) {
+RKJPEGDecoder::RKJPEGDecoder(int width, int height) : JPEGDecoder(width, height) {
   rgb_buffer_ = new uint8_t[width_ * height_ * 3];
   MPP_RET ret = mpp_create(&mpp_ctx_, &mpp_api_);
   if (ret != MPP_OK) {
@@ -73,7 +73,7 @@ RKMjpegDecoder::RKMjpegDecoder(int width, int height) : MjpegDecoder(width, heig
   data_buffer_ = (uint8_t *)mpp_buffer_get_ptr(mpp_packet_buffer_);
 }
 
-RKMjpegDecoder::~RKMjpegDecoder() {
+RKJPEGDecoder::~RKJPEGDecoder() {
   if (mpp_frame_buffer_) {
     mpp_buffer_put(mpp_frame_buffer_);
     mpp_frame_buffer_ = nullptr;
@@ -107,7 +107,7 @@ RKMjpegDecoder::~RKMjpegDecoder() {
   }
 }
 
-bool RKMjpegDecoder::mppFrame2RGB(const MppFrame frame, uint8_t *data) {
+bool RKJPEGDecoder::mppFrame2RGB(const MppFrame frame, uint8_t *data) {
   int width = mpp_frame_get_width(frame);
   int height = mpp_frame_get_height(frame);
   MppBuffer buffer = mpp_frame_get_buffer(frame);
@@ -153,7 +153,7 @@ bool RKMjpegDecoder::mppFrame2RGB(const MppFrame frame, uint8_t *data) {
 #endif
 }
 
-bool RKMjpegDecoder::decode(const std::shared_ptr<ob::ColorFrame> &frame, uint8_t *dest) {
+bool RKJPEGDecoder::decode(const std::shared_ptr<ob::ColorFrame> &frame, uint8_t *dest) {
   MPP_RET ret = MPP_OK;
   memset(data_buffer_, 0, width_ * height_ * 3);
   memcpy(data_buffer_, frame->data(), frame->dataSize());

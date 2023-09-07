@@ -470,7 +470,7 @@ void OBCameraNode::setupPublishers() {
   auto point_cloud_qos_profile = getRMWQosProfileFromString(point_cloud_qos_);
   if (enable_colored_point_cloud_) {
     depth_registration_cloud_pub_ = node_->create_publisher<PointCloud2>(
-        "depth/color/points",
+        "depth_registered/points",
         rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(point_cloud_qos_profile),
                     point_cloud_qos_profile));
   }

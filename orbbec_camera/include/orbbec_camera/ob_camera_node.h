@@ -267,6 +267,8 @@ class OBCameraNode {
 
   std::shared_ptr<ob::Frame> softwareDecodeColorFrame(const std::shared_ptr<ob::Frame>& frame);
 
+  bool decodeColorFrameToBuffer(const std::shared_ptr<ob::Frame>& frame, uint8_t* buffer);
+
   void onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
                           const stream_index_pair& stream_index);
 
@@ -361,7 +363,6 @@ class OBCameraNode {
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr depth_cloud_pub_;
   bool enable_point_cloud_ = true;
   bool enable_colored_point_cloud_ = false;
-  ob::PointCloudFilter point_cloud_filter_;
   sensor_msgs::msg::PointCloud2 point_cloud_msg_;
 
   orbbec_camera_msgs::msg::DeviceInfo device_info_;
@@ -413,5 +414,6 @@ class OBCameraNode {
   // mjpeg decoder
   std::shared_ptr<MjpegDecoder> mjpeg_decoder_ = nullptr;
   uint8_t* rgb_buffer_ = nullptr;
+  bool is_color_frame_decoded_ = false;
 };
 }  // namespace orbbec_camera

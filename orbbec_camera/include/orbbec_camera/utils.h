@@ -22,12 +22,15 @@
 #include "sensor_msgs/msg/camera_info.hpp"
 #include "orbbec_camera_msgs/msg/extrinsics.hpp"
 #include "magic_enum/magic_enum.hpp"
+#include <sensor_msgs/msg/point_cloud2.hpp>
 
 namespace orbbec_camera {
 sensor_msgs::msg::CameraInfo convertToCameraInfo(OBCameraIntrinsic intrinsic,
                                                  OBCameraDistortion distortion, int width);
 
 void saveRGBPointsToPly(const std::shared_ptr<ob::Frame>& frame, const std::string& fileName);
+
+void soavePointCloudMsgToPly(const sensor_msgs::msg::PointCloud2& msg, const std::string& fileName);
 
 void savePointsToPly(const std::shared_ptr<ob::Frame>& frame, const std::string& fileName);
 
@@ -57,15 +60,15 @@ OBMultiDeviceSyncMode OBSyncModeFromString(const std::string& mode);
 
 OB_SAMPLE_RATE sampleRateFromString(std::string& sample_rate);
 
-std::string sampleRateToString(const OB_SAMPLE_RATE &sample_rate);
+std::string sampleRateToString(const OB_SAMPLE_RATE& sample_rate);
 
 OB_GYRO_FULL_SCALE_RANGE fullGyroScaleRangeFromString(std::string& full_scale_range);
 
-std::string fullGyroScaleRangeToString(const OB_GYRO_FULL_SCALE_RANGE &full_scale_range);
+std::string fullGyroScaleRangeToString(const OB_GYRO_FULL_SCALE_RANGE& full_scale_range);
 
 OBAccelFullScaleRange fullAccelScaleRangeFromString(std::string& full_scale_range);
 
-std::string fullAccelScaleRangeToString(const OBAccelFullScaleRange &full_scale_range);
+std::string fullAccelScaleRangeToString(const OBAccelFullScaleRange& full_scale_range);
 
 std::string parseUsbPort(const std::string& line);
 

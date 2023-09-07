@@ -213,6 +213,8 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 import os
+
+
 def generate_launch_description():
     # Node configuration
     cleanup_node = Node(
@@ -231,7 +233,7 @@ def generate_launch_description():
         ),
         launch_arguments={
             'camera_name': 'camera_01',
-            'usb_port': '6-2.4.4.2', # replace your usb port here 
+            'usb_port': '6-2.4.4.2',  # replace your usb port here 
             'device_num': '2'
         }.items()
     )
@@ -242,7 +244,7 @@ def generate_launch_description():
         ),
         launch_arguments={
             'camera_name': 'camera_02',
-            'usb_port': '6-2.4.1', # replace your usb port here
+            'usb_port': '6-2.4.1',  # replace your usb port here
             'device_num': '2'
         }.items()
     )
@@ -351,54 +353,24 @@ Actually, All launch files all most the same, the only difference is the default
 
 ## Supported hardware products
 
-| **SDK version** | **products list** | **firmware version**        |
-|-----------------|-------------------|-----------------------------|
-| v1.6.2          | Astra2            | 2.8.20                      |
-|                 | Gemini2 L         | 1.4.32                      |
-|                 | Gemini2           | 1.4.60                      |
-|                 | FemtoMega         | 1.1.7                       |
-|                 | Astra+            | 1.0.22/1.0.21/1.0.20/1.0.19 |
-|                 | Femto             | 1.6.7                       |
-|                 | Femto W           | 1.1.8                       |
-|                 | Dabai             | 2436                        |
-|                 | Dabai DCW         | 2460                        |
-|                 | Dabai DW          | 2606                        |
-|                 | Astra Mini Pro    | 1007                        |
-|                 | Astra Pro Plus    | 2513                        |
-|                 | A1 Pro            | 3057                        |
-|                 | Gemini E          | 3460                        |
-|                 | Gemini E Lite     | 3606                        |
-|                 | Gemini            | 3.0.18                      |
-| v1.5.7          | Gemini2           | 1.4.60                      |
-|                 | FemtoMega         | 1.1.5                       |
-|                 | Astra+            | 1.0.22/1.0.21/1.0.20/1.0.19 |
-|                 | Femto             | 1.6.7                       |
-|                 | Femto W           | 1.1.8                       |
-|                 | Dabai             | 2436                        |
-|                 | Dabai DCW         | 2460                        |
-|                 | Dabai DW          | 2606                        |
-|                 | Astra Mini Pro    | 1007                        |
-|                 | Astra Pro Plus    | 2513                        |
-|                 | A1 Pro            | 3057                        |
-|                 | Gemini E          | 3460                        |
-|                 | Gemini E Lite     | 3606                        |
-|                 | Gemini            | 3.0.18                      |
-| v1.4.3          | Astra+            | 1.0.22/1.0.21/1.0.20/1.0.19 |
-|                 | Femto             | 1.6.7                       |
-|                 | *Femto W          | 1.1.3                       |
-|                 | Dabai             | 2436                        |
-|                 | Dabai DCW         | 2460                        |
-|                 | Dabai DW          | 2606                        |
-|                 | Astra Mini Pro    | 1007                        |
-|                 | Astra Pro Plus    | 2513                        |
-|                 | Gemini            | 3.0.18                      |
-| v1.3.1          | Astra+            | 1.0.21/1.0.20/1.0.19        |
-|                 | Femto             | 1.6.7                       |
-| v1.2.8          | Astra+            | 1.0.20                      |
-|                 | Femto             | 1.6.7                       |
-| v1.1.6          | Astra+            | 1.0.20/1.0.19               |
-|                 | *Femto            | 1.5.1                       |
-| v1.0.2          | Astra+            | 1.0.19                      |
+| **SDK version** | **products list** | **firmware version**                      |
+|-----------------|-------------------|-------------------------------------------|
+| v1.7.2          | Gemini 2 XL       | Obox: V1.2.5  VL:1.4.54                   |
+|                 | Astra 2           | 2.8.20                                    |
+|                 | Gemini 2 L        | 1.4.32                                    |
+|                 | Gemini 2          | 1.4.60 /1.4.76                            |
+|                 | Femto Mega        | 1.1.7  (window10、ubuntu20.04、ubuntu22.04) |
+|                 | Astra+            | 1.0.22/1.0.21/1.0.20/1.0.19               |
+|                 | Femto             | 1.6.7                                     |
+|                 | Femto W           | 1.1.8                                     |
+|                 | DaBai             | 2436                                      |
+|                 | DaBai DCW         | 2460                                      |
+|                 | DaBai DW          | 2606                                      |
+|                 | Astra Mini Pro    | 1007                                      |
+|                 | Gemini E          | 3460                                      |
+|                 | Gemini E Lite     | 3606                                      |
+|                 | Gemini            | 3.0.18                                    |
+|                 | Astra Mini S Pro  | 1.0.05                                    |
 
 ## DDS Tuning
 

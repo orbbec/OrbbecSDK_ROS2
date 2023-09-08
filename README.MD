@@ -285,6 +285,7 @@ Open `CMakeLists.txt` and set `USE_RK_HW_DECODER` to `ON`.
 ### Nvidia Jetson
 Depends on: `jetson_multimedia_api`.
 Open `CMakeLists.txt` and set `USE_NV_HW_DECODER` to `ON`.
+
 ## Launch parameters
 
 The following are the launch parameters available:

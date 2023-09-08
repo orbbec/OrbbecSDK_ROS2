@@ -200,7 +200,7 @@ ros2 run orbbec_camera list_devices_node
 ```
 
 - 把参数 `device_num` 设置成为你的相机数量。
-- 编辑 `OrbbecSDK_ROS2/launch/multi_xxx.launch.xml` 修改相机的`usb_port`。
+- 编辑 `OrbbecSDK_ROS2/launch/multi_xxx.launch.py` 修改相机的`usb_port`。
 - 注意不要忘记在`include` 加上 `group` 标签，不然前面的相机的参数会污染后面的相机的参数。
 
 ```python

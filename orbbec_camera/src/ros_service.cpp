@@ -167,6 +167,8 @@ void OBCameraNode::setExposureCallback(const std::shared_ptr<SetInt32::Request>&
   auto stream = stream_index.first;
   try {
     switch (stream) {
+      case OB_STREAM_IR_LEFT:
+      case OB_STREAM_IR_RIGHT:
       case OB_STREAM_IR:
         device_->setIntProperty(OB_PROP_IR_EXPOSURE_INT, request->data);
         break;
@@ -201,6 +203,8 @@ void OBCameraNode::getGainCallback(const std::shared_ptr<GetInt32::Request>& req
   auto stream = stream_index.first;
   try {
     switch (stream) {
+      case OB_STREAM_IR_LEFT:
+      case OB_STREAM_IR_RIGHT:
       case OB_STREAM_IR:
         response->data = device_->getIntProperty(OB_PROP_IR_GAIN_INT);
         break;
@@ -233,6 +237,8 @@ void OBCameraNode::setGainCallback(const std::shared_ptr<SetInt32 ::Request>& re
   auto stream = stream_index.first;
   try {
     switch (stream) {
+      case OB_STREAM_IR_LEFT:
+      case OB_STREAM_IR_RIGHT:
       case OB_STREAM_IR:
         device_->setIntProperty(OB_PROP_IR_GAIN_INT, request->data);
         break;
@@ -333,6 +339,8 @@ void OBCameraNode::setAutoExposureCallback(
   auto stream = stream_index.first;
   try {
     switch (stream) {
+      case OB_STREAM_IR_LEFT:
+      case OB_STREAM_IR_RIGHT:
       case OB_STREAM_IR:
         response->success = true;
         device_->setIntProperty(OB_PROP_IR_AUTO_EXPOSURE_BOOL, request->data);
@@ -454,6 +462,8 @@ void OBCameraNode::getExposureCallback(const std::shared_ptr<GetInt32::Request>&
   auto stream = stream_index.first;
   try {
     switch (stream) {
+      case OB_STREAM_IR_LEFT:
+      case OB_STREAM_IR_RIGHT:
       case OB_STREAM_IR:
         response->data = device_->getIntProperty(OB_PROP_IR_EXPOSURE_INT);
         break;
@@ -535,6 +545,8 @@ void OBCameraNode::setMirrorCallback(const std::shared_ptr<SetBool::Request>& re
   auto stream = stream_index.first;
   try {
     switch (stream) {
+      case OB_STREAM_IR_LEFT:
+      case OB_STREAM_IR_RIGHT:
       case OB_STREAM_IR:
         device_->setBoolProperty(OB_PROP_IR_MIRROR_BOOL, request->data);
         break;

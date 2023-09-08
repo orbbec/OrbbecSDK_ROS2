@@ -277,7 +277,14 @@ This will clean up `/dev/shm/`.
 ```bash
 ros2 launch orbbec_camera multi_camera.launch.py
 ```
+## Use hardware decoder to decode JPEG
+### rockchip and Amlogic
+Depends on `rockchip-mpp-dev` and `rockchip-rga-dev`, not all systems have these two packages, the names may be different, please search by yourself.
+Open `CMakeLists.txt` and set `USE_RK_HW_DECODER` to `ON`.
 
+### Nvidia Jetson
+Depends on: `jetson_multimedia_api`.
+Open `CMakeLists.txt` and set `USE_NV_HW_DECODER` to `ON`.
 ## Launch parameters
 
 The following are the launch parameters available:

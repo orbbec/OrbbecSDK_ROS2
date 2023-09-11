@@ -193,7 +193,8 @@ void OBCameraNode::setupProfiles() {
         default_profile =
             profiles->getVideoStreamProfile(width_[elem], height_[elem], format_[elem]);
       } catch (const ob::Error &ex) {
-        RCLCPP_ERROR_STREAM(logger_, "Failed to get profile: " << ex.getMessage());
+        RCLCPP_ERROR_STREAM(
+            logger_, "Failed to get " << stream_name_[elem] << " << profile: " << ex.getMessage());
         RCLCPP_ERROR_STREAM(
             logger_, "Stream: " << magic_enum::enum_name(elem.first)
                                 << ", Stream Index: " << elem.second << ", Width: " << width_[elem]

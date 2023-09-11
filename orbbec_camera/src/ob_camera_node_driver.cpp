@@ -146,7 +146,7 @@ OBLogSeverity OBCameraNodeDriver::obLogSeverityFromString(const std::string_view
 
 void OBCameraNodeDriver::checkConnectTimer() {
   if (!device_connected_.load()) {
-    RCLCPP_ERROR_STREAM(logger_,
+    RCLCPP_DEBUG_STREAM(logger_,
                         "checkConnectTimer: device " << serial_number_ << " not connected");
     return;
   } else if (!ob_camera_node_) {

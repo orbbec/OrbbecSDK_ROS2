@@ -940,7 +940,8 @@ void OBCameraNode::saveImageToFile(const stream_index_pair &stream_index, const 
       auto image_to_save =
           cv_bridge::toCvCopy(image_msg, sensor_msgs::image_encodings::BGR8)->image;
       cv::imwrite(filename, image_to_save);
-    } else if (stream_index.first == OB_STREAM_IR) {
+    } else if (stream_index.first == OB_STREAM_IR || stream_index.first == OB_STREAM_IR_LEFT ||
+               stream_index.first == OB_STREAM_IR_RIGHT) {
       cv::imwrite(filename, image);
     } else {
       RCLCPP_ERROR_STREAM(logger_, "Unsupported stream type: " << stream_index.first);

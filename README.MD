@@ -283,7 +283,7 @@ Depends on `rockchip-mpp-dev` and `rockchip-rga-dev`, not all systems have these
 Open `CMakeLists.txt` and set `USE_RK_HW_DECODER` to `ON`.
 
 ### Nvidia Jetson
-Depends on: `jetson_multimedia_api`.
+Depends on: `jetson_multimedia_api`,`libyuv`.
 Open `CMakeLists.txt` and set `USE_NV_HW_DECODER` to `ON`.
 
 ## Launch parameters

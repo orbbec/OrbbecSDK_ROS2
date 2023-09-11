@@ -280,7 +280,7 @@ ros2 launch orbbec_camera multi_camera.launch.py
 打开 `CMakeLists.txt` 把 `USE_RK_HW_DECODER` 设置为 `ON`。
 
 ### Nvidia Jetson
-依赖 : `jetson_multimedia_api` 。
+依赖 : `jetson_multimedia_api`,`libyuv` 。
 打开 `CMakeLists.txt` 把 `USE_NV_HW_DECODER` 设置为 `ON`。
 
 

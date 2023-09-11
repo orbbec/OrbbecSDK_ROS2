@@ -1189,6 +1189,20 @@ typedef struct {
 } ob_device_timestamp_reset_config, OBDeviceTimestampResetConfig;
 
 /**
+ * @brief Baseline calibration parameters
+ */
+typedef struct {
+    /**
+     * @brief Baseline length
+     */
+    float baseline;
+    /**
+     * @brief Calibration distance
+     */
+    float zpd;
+} BASELINE_CALIBRATION_PARAM, ob_baseline_calibration_param, OBBaselineCalibrationParam;
+
+/**
  * @brief Callback for file transfer
  *
  * @param state Transmission status

@@ -65,7 +65,7 @@ Launch camera node
 
 ```bash
 . ./install/setup.bash 
-ros2 launch orbbec_camera astra.launch.xml
+ros2 launch orbbec_camera astra.launch.py # or other launch file, see below table
 ```
 
 - On terminal 2
@@ -277,12 +277,17 @@ This will clean up `/dev/shm/`.
 ```bash
 ros2 launch orbbec_camera multi_camera.launch.py
 ```
+
 ## Use hardware decoder to decode JPEG
+
 ### rockchip and Amlogic
-Depends on `rockchip-mpp-dev` and `rockchip-rga-dev`, not all systems have these two packages, the names may be different, please search by yourself.
+
+Depends on `rockchip-mpp-dev` and `rockchip-rga-dev`, not all systems have these two packages, the names may be
+different, please search by yourself.
 Open `CMakeLists.txt` and set `USE_RK_HW_DECODER` to `ON`.
 
 ### Nvidia Jetson
+
 Depends on: `jetson_multimedia_api`,`libyuv`.
 Open `CMakeLists.txt` and set `USE_NV_HW_DECODER` to `ON`.
 
@@ -340,6 +345,7 @@ The following are the launch parameters available:
 |----------------------------------------------|-------------------------|
 | astra+                                       | astra_adv.launch.py     |
 | astra /astra mini /astra mini pro /astra pro | astra.launch.py         |
+| astra mini pro s                             | astra.launch.py         |
 | astra2                                       | astra2.launch.py        |
 | astra stereo s                               | stereo_s_u3.launch.py   |
 | dabai                                        | dabai.launch.py         |

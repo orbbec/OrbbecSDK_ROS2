@@ -546,6 +546,7 @@ void OBCameraNode::setMirrorCallback(const std::shared_ptr<SetBool::Request>& re
     switch (stream) {
       case OB_STREAM_IR_RIGHT:
         device_->setBoolProperty(OB_PROP_IR_RIGHT_MIRROR_BOOL, request->data);
+        break;
       case OB_STREAM_IR_LEFT:
       case OB_STREAM_IR:
         device_->setBoolProperty(OB_PROP_IR_MIRROR_BOOL, request->data);

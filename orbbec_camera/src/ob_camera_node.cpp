@@ -623,7 +623,7 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
       std::filesystem::create_directory(current_path + "/point_cloud");
     }
     RCLCPP_INFO_STREAM(logger_, "Saving point cloud to " << filename);
-    soavePointCloudMsgToPly(point_cloud_msg_, filename);
+    saveDepthPointsToPly(point_cloud_msg_, filename);
   }
 }
 
@@ -733,7 +733,7 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
       std::filesystem::create_directory(current_path + "/point_cloud");
     }
     RCLCPP_INFO_STREAM(logger_, "Saving point cloud to " << filename);
-    soavePointCloudMsgToPly(point_cloud_msg_, filename);
+    saveRGBPointCloudMsgToPly(point_cloud_msg_, filename);
   }
 }
 

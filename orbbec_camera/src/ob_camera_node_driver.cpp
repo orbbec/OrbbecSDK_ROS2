@@ -109,7 +109,8 @@ void OBCameraNodeDriver::onDeviceConnected(const std::shared_ptr<ob::DeviceList>
   pthread_mutex_lock(orb_device_lock_);
   std::shared_ptr<int> lock_holder(nullptr,
                                    [this](int *) { pthread_mutex_unlock(orb_device_lock_); });
- RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 1000, "device list count " << device_list->deviceCount());
+  RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 1000,
+                              "device list count " << device_list->deviceCount());
   if (!device_) {
     try {
       startDevice(device_list);
@@ -275,38 +276,17 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceBySerialNumber(
 
 std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByUSBPort(
     const std::shared_ptr<ob::DeviceList> &list, const std::string &usb_port) {
-  for (size_t i = 0; i < list->deviceCount(); i++) {
-    try {
-      auto pid = list->pid(i);
-      if (isOpenNIDevice(pid)) {
-        // openNI device
-        auto dev = list->getDevice(i);
-        auto device_info = dev->getDeviceInfo();
-        std::string uid = device_info->uid();
-        auto port_id = parseUsbPort(uid);
-        if (port_id == usb_port) {
-          RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 1000,
-                                      "Device port id " << port_id << " matched");
-          return dev;
-        }
-      } else {
-        std::string uid = list->uid(i);
-        auto port_id = parseUsbPort(uid);
-        RCLCPP_ERROR_STREAM_THROTTLE(logger_, *get_clock(), 1000, "Device usb port: " << uid);
-        if (port_id == usb_port) {
-          RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 1000,
-                                      "Device usb port " << uid << " matched");
-          return list->getDevice(i);
-        }
-      }
-    } catch (ob::Error &e) {
-      RCLCPP_ERROR_STREAM(logger_, "Failed to get device info " << e.getMessage());
-    } catch (std::exception &e) {
-      RCLCPP_ERROR_STREAM(logger_, "Failed to get device info " << e.what());
-    } catch (...) {
-      RCLCPP_ERROR_STREAM(logger_, "Failed to get device info");
-    }
+  try {
+    auto device = list->getDeviceByUid(usb_port.c_str());
+    return device;
+  } catch (ob::Error &e) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to get device info " << e.getMessage());
+  } catch (std::exception &e) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to get device info " << e.what());
+  } catch (...) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to get device info");
   }
+
   return nullptr;
 }
 

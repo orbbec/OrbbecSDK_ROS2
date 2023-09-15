@@ -145,6 +145,13 @@ ros2 service call /camera/toggle_ir std_srvs/srv/SetBool "{data : true}"
 
 ```
 
+- 保存点云
+
+```bash
+ros2 service call /camera/save_point_cloud std_srvs/srv/Empty "{}"
+```
+
+
 ### 所有相机控制的service
 
 下面的这些服务的名字已经表明了它的功能，但是要注意的是只有当在launch文件里面把相关数据流打开的时候才能用。

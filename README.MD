@@ -143,6 +143,11 @@ ros2 service call  /camera/set_laser_enable std_srvs/srv/SetBool "{data: true}"
 ros2 service call /camera/toggle_ir std_srvs/srv/SetBool "{data : true}"
 
 ```
+- save point cloud
+
+```bash
+ros2 service call /camera/save_point_cloud std_srvs/srv/Empty "{}"
+```
 
 ### All available service for camera control
 

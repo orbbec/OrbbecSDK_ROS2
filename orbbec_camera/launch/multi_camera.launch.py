@@ -7,35 +7,27 @@ import os
 
 
 def generate_launch_description():
-    # Node configuration
-    cleanup_node = Node(
-        package='orbbec_camera',
-        executable='ob_cleanup_shm_node',
-        name='camera',
-        output='screen'
-    )
-
     # Include launch files
     package_dir = get_package_share_directory('orbbec_camera')
     launch_file_dir = os.path.join(package_dir, 'launch')
     launch1_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, 'dabai_dcw2.launch.py')
+            os.path.join(launch_file_dir, 'dabai_dcw.launch.py')
         ),
         launch_arguments={
             'camera_name': 'camera_01',
-            'usb_port': '5-3.4.4.1.1',
+            'usb_port': '5-3.4.4.3.1',
             'device_num': '2'
         }.items()
     )
 
     launch2_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, 'dabai_dcw2.launch.py')
+            os.path.join(launch_file_dir, 'dabai_dcw.launch.py')
         ),
         launch_arguments={
             'camera_name': 'camera_02',
-            'usb_port': '5-3.4.4.3.1',
+            'usb_port': '5-3.4.4.1.1',
             'device_num': '2'
         }.items()
     )
@@ -44,7 +36,6 @@ def generate_launch_description():
 
     # Launch description
     ld = LaunchDescription([
-        cleanup_node,
         GroupAction([launch1_include]),
         GroupAction([launch2_include]),
     ])

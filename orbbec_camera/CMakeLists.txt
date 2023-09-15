@@ -204,7 +204,6 @@ rclcpp_components_register_node(${PROJECT_NAME}
 )
 # Add nodes using the macro
 add_orbbec_executable(list_devices_node src/list_devices_node.cpp)
-add_orbbec_executable(ob_cleanup_shm_node src/ob_cleanup_shm.cpp)
 add_orbbec_executable(list_depth_work_mode_node src/list_depth_work_mode.cpp)
 add_orbbec_executable(list_camera_profile_mode_node src/list_camera_profile.cpp)
 
@@ -221,7 +220,6 @@ install(DIRECTORY config DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY ${ORBBEC_INCLUDE_DIR} DESTINATION include)
 install(DIRECTORY ${ORBBEC_LIBS_DIR}/ DESTINATION lib/ FILES_MATCHING PATTERN "*.so*")
 install(TARGETS list_devices_node
-  ob_cleanup_shm_node
   list_depth_work_mode_node
   list_camera_profile_mode_node
   DESTINATION lib/${PROJECT_NAME}/)

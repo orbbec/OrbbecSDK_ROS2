@@ -1,18 +1,18 @@
 /*******************************************************************************
-* Copyright (c) 2023 Orbbec 3D Technology, Inc
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*******************************************************************************/
+ * Copyright (c) 2023 Orbbec 3D Technology, Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
 #pragma once
 #include <atomic>
 #include <thread>
@@ -24,16 +24,9 @@
 #include "dynamic_params.h"
 
 #include "libobsensor/ObSensor.hpp"
+#include <pthread.h>
 
 namespace orbbec_camera {
-
-enum DeviceConnectionEvent {
-  kDeviceConnected = 0,
-  kDeviceDisconnected,
-  kOtherDeviceConnected,
-  kOtherDeviceDisconnected,
-  kDeviceCountUpdate,
-};
 
 class OBCameraNodeDriver : public rclcpp::Node {
  public:
@@ -44,11 +37,6 @@ class OBCameraNodeDriver : public rclcpp::Node {
 
  private:
   void init();
-
-  void releaseDeviceSemaphore(sem_t* device_sem, int& num_devices_connected);
-
-  void updateConnectedDeviceCount(int& num_devices_connected,
-                                  DeviceConnectionEvent connection_event);
 
   std::shared_ptr<ob::Device> selectDevice(const std::shared_ptr<ob::DeviceList>& list);
 
@@ -72,8 +60,6 @@ class OBCameraNodeDriver : public rclcpp::Node {
 
   void queryDevice();
 
-  void deviceCountUpdate();
-
   void syncTime();
 
   void resetDevice();
@@ -95,12 +81,16 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::shared_ptr<std::thread> device_count_update_thread_ = nullptr;
   std::recursive_mutex device_lock_;
   int device_num_ = 1;
-  int num_devices_connected_ = 0;
   rclcpp::TimerBase::SharedPtr check_connect_timer_ = nullptr;
   std::shared_ptr<std::thread> sync_time_thread_ = nullptr;
   std::shared_ptr<std::thread> reset_device_thread_ = nullptr;
   std::mutex reset_device_mutex_;
   std::condition_variable reset_device_cond_;
   std::atomic_bool reset_device_flag_{false};
+  pthread_mutex_t* orb_device_lock_ = nullptr;
+  sem_t* orb_device_sem_ = nullptr;
+  pthread_mutexattr_t orb_device_lock_attr_;
+  uint8_t* orb_device_lock_shm_addr_ = nullptr;
+  int orb_device_lock_shm_fd_ = -1;
 };
 }  // namespace orbbec_camera

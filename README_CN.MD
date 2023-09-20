@@ -27,7 +27,7 @@ cd ~/ros2_ws/src
 
 ```bash
 cd ~/ros2_ws/src
-git clone https://github.com/OrbbecDeveloper/OrbbecSDK_ROS2.git
+git clone https://github.com/orbbec/OrbbecSDK_ROS2.git
 ```
 
 安装deb依赖

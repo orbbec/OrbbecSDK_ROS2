@@ -20,6 +20,7 @@
 namespace orbbec_camera {
 sensor_msgs::msg::CameraInfo convertToCameraInfo(OBCameraIntrinsic intrinsic,
                                                  OBCameraDistortion distortion, int width) {
+  (void)width;
   sensor_msgs::msg::CameraInfo info;
   info.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;
   info.width = intrinsic.width;
@@ -49,15 +50,6 @@ sensor_msgs::msg::CameraInfo convertToCameraInfo(OBCameraIntrinsic intrinsic,
   info.p[5] = info.k[4];
   info.p[6] = info.k[5];
   info.p[10] = 1.0;
-  double scaling = static_cast<double>(width) / 640;
-  info.k[0] *= scaling;  // fx
-  info.k[2] *= scaling;  // cx
-  info.k[4] *= scaling;  // fy
-  info.k[5] *= scaling;  // cy
-  info.p[0] *= scaling;  // fx
-  info.p[2] *= scaling;  // cx
-  info.p[5] *= scaling;  // fy
-  info.p[6] *= scaling;  // cy
   return info;
 }
 

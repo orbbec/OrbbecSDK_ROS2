@@ -253,6 +253,9 @@ void OBCameraNode::startStreams() {
       onNewFrameSetCallback(frame_set);
     });
   }
+  if (pipeline_ && (depth_registration_ || enable_colored_point_cloud_)) {
+    pipeline_->enableFrameSync();
+  }
   pipeline_started_.store(true);
   startIMU();
 }

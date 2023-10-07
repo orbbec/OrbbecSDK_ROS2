@@ -81,6 +81,7 @@ def generate_launch_description():
         DeclareLaunchArgument('trigger2image_delay_us', default_value='0'),
         DeclareLaunchArgument('trigger_signal_output_delay_us', default_value='0'),
         DeclareLaunchArgument('trigger_signal_output_enabled', default_value='false'),
+        DeclareLaunchArgument('enable_frame_sync', default_value='true'),
     ]
 
     # Node configuration

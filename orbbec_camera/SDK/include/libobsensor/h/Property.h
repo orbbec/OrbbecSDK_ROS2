@@ -384,6 +384,8 @@ typedef enum {
      */
     OB_PROP_LASER_PULSE_WIDTH_PROTECTION_STATUS_BOOL = 149,
 
+    OB_PROP_UPDATE_BASE_TIME_BOOL = 150,
+
     /**
      * @brief Baseline calibration parameters
      */
@@ -576,6 +578,11 @@ typedef enum {
      * @brief The enable/disable switch for IR short exposure function, supported only by a few devices.
      */
     OB_PROP_IR_SHORT_EXPOSURE_BOOL = 2032,
+
+    /**
+     * @brief Color camera HDR
+     */
+    OB_PROP_COLOR_HDR_BOOL = 2034,
 
     /**
      * @brief Software disparity to depth

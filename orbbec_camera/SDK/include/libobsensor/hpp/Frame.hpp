@@ -361,6 +361,18 @@ public:
 };
 
 /**
+ * @brief Define the RawPhaseFrame class, which inherits from the VideoFrame class
+ */
+class OB_EXTENSION_API RawPhaseFrame : public VideoFrame {
+public:
+    explicit RawPhaseFrame(Frame &frame);
+
+    explicit RawPhaseFrame(std::unique_ptr<FrameImpl> impl);
+
+    ~RawPhaseFrame() noexcept override = default;
+};
+
+/**
  * @brief Define the FrameHelper class
  */
 class OB_EXTENSION_API FrameHelper {
@@ -455,6 +467,8 @@ template <typename T> bool Frame::is() {
         return (typeid(T) == typeid(FrameSet));
     case OB_FRAME_POINTS:
         return (typeid(T) == typeid(PointsFrame));
+    case OB_FRAME_RAW_PHASE:
+        return (typeid(T) == typeid(RawPhaseFrame) || typeid(T) == typeid(VideoFrame));
     default:
         std::cout << "ob::Frame::is() did not catch frame type: " << (int)this->type() << std::endl;
         break;

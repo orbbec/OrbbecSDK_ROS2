@@ -161,6 +161,7 @@ template <typename T> bool StreamProfile::is() {
     case OB_STREAM_IR_RIGHT:
     case OB_STREAM_COLOR:
     case OB_STREAM_DEPTH:
+    case OB_STREAM_RAW_PHASE:
         return typeid(T) == typeid(VideoStreamProfile);
     case OB_STREAM_ACCEL:
         return typeid(T) == typeid(AccelStreamProfile);

@@ -146,14 +146,15 @@ typedef struct ob_error {
  * @brief Enumeration value describing the sensor type
  */
 typedef enum {
-    OB_SENSOR_UNKNOWN  = 0, /**< Unknown type sensor */
-    OB_SENSOR_IR       = 1, /**< IR */
-    OB_SENSOR_COLOR    = 2, /**< Color */
-    OB_SENSOR_DEPTH    = 3, /**< Depth */
-    OB_SENSOR_ACCEL    = 4, /**< Accel */
-    OB_SENSOR_GYRO     = 5, /**< Gyro */
-    OB_SENSOR_IR_LEFT  = 6, /**< left IR */
-    OB_SENSOR_IR_RIGHT = 7, /**< Right IR */
+    OB_SENSOR_UNKNOWN   = 0, /**< Unknown type sensor */
+    OB_SENSOR_IR        = 1, /**< IR */
+    OB_SENSOR_COLOR     = 2, /**< Color */
+    OB_SENSOR_DEPTH     = 3, /**< Depth */
+    OB_SENSOR_ACCEL     = 4, /**< Accel */
+    OB_SENSOR_GYRO      = 5, /**< Gyro */
+    OB_SENSOR_IR_LEFT   = 6, /**< left IR */
+    OB_SENSOR_IR_RIGHT  = 7, /**< Right IR */
+    OB_SENSOR_RAW_PHASE = 8, /**< Raw Phase */
 } OBSensorType,
     ob_sensor_type;
 
@@ -161,15 +162,16 @@ typedef enum {
  * @brief Enumeration value describing the type of data stream
  */
 typedef enum {
-    OB_STREAM_UNKNOWN  = -1, /**< Unknown type stream */
-    OB_STREAM_VIDEO    = 0,  /**< Video stream (infrared, color, depth streams are all video streams) */
-    OB_STREAM_IR       = 1,  /**< IR stream */
-    OB_STREAM_COLOR    = 2,  /**< color stream */
-    OB_STREAM_DEPTH    = 3,  /**< depth stream */
-    OB_STREAM_ACCEL    = 4,  /**< Accelerometer data stream */
-    OB_STREAM_GYRO     = 5,  /**< Gyroscope data stream */
-    OB_STREAM_IR_LEFT  = 6,  /**< Left IR stream */
-    OB_STREAM_IR_RIGHT = 7,  /**< Right IR stream */
+    OB_STREAM_UNKNOWN   = -1, /**< Unknown type stream */
+    OB_STREAM_VIDEO     = 0,  /**< Video stream (infrared, color, depth streams are all video streams) */
+    OB_STREAM_IR        = 1,  /**< IR stream */
+    OB_STREAM_COLOR     = 2,  /**< color stream */
+    OB_STREAM_DEPTH     = 3,  /**< depth stream */
+    OB_STREAM_ACCEL     = 4,  /**< Accelerometer data stream */
+    OB_STREAM_GYRO      = 5,  /**< Gyroscope data stream */
+    OB_STREAM_IR_LEFT   = 6,  /**< Left IR stream */
+    OB_STREAM_IR_RIGHT  = 7,  /**< Right IR stream */
+    OB_STREAM_RAW_PHASE = 8,  /**< RawPhase Stream */
 } OBStreamType,
     ob_stream_type;
 
@@ -177,17 +179,18 @@ typedef enum {
  * @brief Enumeration value describing the type of frame
  */
 typedef enum {
-    OB_FRAME_UNKNOWN  = -1, /**< Unknown frame type */
-    OB_FRAME_VIDEO    = 0,  /**< Video frame */
-    OB_FRAME_IR       = 1,  /**< IR frame */
-    OB_FRAME_COLOR    = 2,  /**< Color frame */
-    OB_FRAME_DEPTH    = 3,  /**< Depth frame */
-    OB_FRAME_ACCEL    = 4,  /**< Accelerometer data frame */
-    OB_FRAME_SET      = 5,  /**< Frame collection (internally contains a variety of data frames) */
-    OB_FRAME_POINTS   = 6,  /**< Point cloud frame */
-    OB_FRAME_GYRO     = 7,  /**< Gyroscope data frame */
-    OB_FRAME_IR_LEFT  = 8,  /**< Left IR frame */
-    OB_FRAME_IR_RIGHT = 9,  /**< Right IR frame */
+    OB_FRAME_UNKNOWN   = -1, /**< Unknown frame type */
+    OB_FRAME_VIDEO     = 0,  /**< Video frame */
+    OB_FRAME_IR        = 1,  /**< IR frame */
+    OB_FRAME_COLOR     = 2,  /**< Color frame */
+    OB_FRAME_DEPTH     = 3,  /**< Depth frame */
+    OB_FRAME_ACCEL     = 4,  /**< Accelerometer data frame */
+    OB_FRAME_SET       = 5,  /**< Frame collection (internally contains a variety of data frames) */
+    OB_FRAME_POINTS    = 6,  /**< Point cloud frame */
+    OB_FRAME_GYRO      = 7,  /**< Gyroscope data frame */
+    OB_FRAME_IR_LEFT   = 8,  /**< Left IR frame */
+    OB_FRAME_IR_RIGHT  = 9,  /**< Right IR frame */
+    OB_FRAME_RAW_PHASE = 10, /**< Rawphase frame*/
 } OBFrameType,
     ob_frame_type;
 
@@ -1069,7 +1072,7 @@ typedef enum {
      * @brief software triggering mode
      * @brief The device will start one time image capture after receiving the capture command and will output the trigger signal via VSYNC_OUT pin by default.
      * The capture command can be sent form host by call @ref ob_device_trigger_capture. The number of images captured each time can be set by @ref
-     * framesPerTriggerForTriggeringMode.
+     * framesPerTrigger.
      * @brief The Color and Depth should be set to same frame rates, the Color and Depth will be synchronized and can be adjusted by @ref colorDelayUs, @ref
      * depthDelayUs or @ref trigger2ImageDelayUs.
      *
@@ -1081,7 +1084,7 @@ typedef enum {
     /**
      * @brief hardware triggering mode
      * @brief The device will start one time image capture after receiving the trigger signal via VSYNC_IN pin on synchronization port and will output the
-     * trigger signal via VSYNC_OUT pin by default. The number of images captured each time can be set by @ref framesPerTriggerForTriggeringMode.
+     * trigger signal via VSYNC_OUT pin by default. The number of images captured each time can be set by @ref framesPerTrigger.
      * @brief The Color and Depth should be set to same frame rates, the Color and Depth will be synchronized and can be adjusted by @ref colorDelayUs, @ref
      * depthDelayUs or @ref trigger2ImageDelayUs.
      *
@@ -1124,7 +1127,7 @@ typedef struct {
      * @brief The delay time of the image capture after receiving the capture command or trigger signal in microseconds.
      * @brief The depth and color images are captured synchronously as the product design and can not change the delay between the depth and color images.
      *
-     * @attention For Orbbec Astra 2 device, this parameter is valid only when the @ref triggerSignalOutputDelayUs is set to 0.
+     * @attention For Orbbec Astra 2 device, this parameter is valid only when the @ref triggerOutDelayUs is set to 0.
      * @attention This parameter is only valid for some models to replace @ref depthDelayUs and @ref colorDelayUs, please refer to the product manual for
      * details.
      */
@@ -1133,13 +1136,13 @@ typedef struct {
     /**
      * @brief Trigger signal output enable flag.
      * @brief After the trigger signal output is enabled, the trigger signal will be output when the capture command or trigger signal is received. User can
-     * adjust the delay time of the trigger signal output by @ref triggerSignalOutputDelayUs.
+     * adjust the delay time of the trigger signal output by @ref triggerOutDelayUs.
      *
-     * @attention For some models, the trigger signal output is always enabled and cannot be disabled in some modes.
+     * @attention For some models, the trigger signal output is always enabled and cannot be disabled.
      * @attention If device is in the @ref OB_MULTI_DEVICE_SYNC_MODE_FREE_RUN or @ref OB_MULTI_DEVICE_SYNC_MODE_STANDALONE mode, the trigger signal output is
      * always disabled. Set this parameter to true will not take effect.
      */
-    bool triggerSignalOutputEnable;
+    bool triggerOutEnable;
 
     /**
      * @brief The delay time of the trigger signal output after receiving the capture command or trigger signal in microseconds.
@@ -1147,17 +1150,17 @@ typedef struct {
      * @attention For Orbbec Astra 2 device, only supported -1 and 0. -1 means the trigger signal output delay is automatically adjusted by the device, 0 means
      * the trigger signal output is disabled.
      */
-    int triggerSignalOutputDelayUs;
+    int triggerOutDelayUs;
 
     /**
-     * @brief The number of frames per trigger in the triggering mode.
+     * @brief The frame number of each stream after each trigger in triggering mode.
      *
      * @attention This parameter is only valid when the triggering mode is set to @ref OB_MULTI_DEVICE_SYNC_MODE_HARDWARE_TRIGGERING or @ref
      * OB_MULTI_DEVICE_SYNC_MODE_SOFTWARE_TRIGGERING.
      * @attention The trigger frequency multiplied by the number of frames per trigger cannot exceed the maximum frame rate of the stream profile which is set
      * when starting the stream.
      */
-    int framesPerTriggerForTriggeringMode;
+    int framesPerTrigger;
 } ob_multi_device_sync_config, OBMultiDeviceSyncConfig;
 
 /**

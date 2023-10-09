@@ -401,8 +401,8 @@ class OBCameraNode {
   int depth_delay_us_ = 0;
   int color_delay_us_ = 0;
   int trigger2image_delay_us_ = 0;
-  int trigger_signal_output_delay_us_ = 0;
-  bool trigger_signal_output_enabled_ = false;
+  int trigger_output_delay_us_ = 0;
+  bool trigger_output_enabled_ = false;
   std::string depth_precision_str_;
   OB_DEPTH_PRECISION_LEVEL depth_precision_ = OB_PRECISION_0MM8;
   // IMU

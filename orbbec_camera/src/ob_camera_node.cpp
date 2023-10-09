@@ -137,8 +137,8 @@ void OBCameraNode::setupDevices() {
       sync_config.depthDelayUs = depth_delay_us_;
       sync_config.colorDelayUs = color_delay_us_;
       sync_config.trigger2ImageDelayUs = trigger2image_delay_us_;
-      sync_config.triggerSignalOutputDelayUs = trigger_signal_output_delay_us_;
-      sync_config.triggerSignalOutputEnable = trigger_signal_output_enabled_;
+      sync_config.triggerOutDelayUs = trigger_output_delay_us_;
+      sync_config.triggerOutEnable = trigger_output_enabled_;
       device_->setMultiDeviceSyncConfig(sync_config);
     }
     if (info->pid() == GEMINI2_PID) {
@@ -435,8 +435,8 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter(depth_delay_us_, "depth_delay_us", 0);
   setAndGetNodeParameter(color_delay_us_, "color_delay_us", 0);
   setAndGetNodeParameter(trigger2image_delay_us_, "trigger2image_delay_us", 0);
-  setAndGetNodeParameter(trigger_signal_output_delay_us_, "trigger_signal_output_delay_us", 0);
-  setAndGetNodeParameter(trigger_signal_output_enabled_, "trigger_signal_output_enabled", false);
+  setAndGetNodeParameter(trigger_output_delay_us_, "trigger_output_delay_us", 0);
+  setAndGetNodeParameter(trigger_output_enabled_, "trigger_output_enabled", false);
   setAndGetNodeParameter<std::string>(depth_precision_str_, "depth_precision", "1mm");
   std::transform(sync_mode_str_.begin(), sync_mode_str_.end(), sync_mode_str_.begin(), ::toupper);
   sync_mode_ = OBSyncModeFromString(sync_mode_str_);

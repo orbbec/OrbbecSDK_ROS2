@@ -79,8 +79,8 @@ def generate_launch_description():
         DeclareLaunchArgument('depth_delay_us', default_value='0'),
         DeclareLaunchArgument('color_delay_us', default_value='0'),
         DeclareLaunchArgument('trigger2image_delay_us', default_value='0'),
-        DeclareLaunchArgument('trigger_output_delay_us', default_value='0'),
-        DeclareLaunchArgument('trigger_output_enabled', default_value='false'),
+        DeclareLaunchArgument('trigger_out_delay_us', default_value='0'),
+        DeclareLaunchArgument('trigger_out_enabled', default_value='false'),
     ]
 
     # Node configuration

@@ -373,6 +373,7 @@ ros2 run orbbec_camera list_depth_work_mode_node
 | deeya                                        | deeya.launch.py         |
 | femto  /femto w                              | femto.launch.py         |
 | femto mega                                   | femto_mega.launch.py    |
+| femto bolt                                   | femto_bolt.launch.py    |
 | gemini                                       | gemini.launch.py        |
 | gemini                                       | gemini.launch.py        |
 | gemini2 / dabai DCL                          | gemini2.launch.py       |

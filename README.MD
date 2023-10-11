@@ -335,6 +335,8 @@ The following are the launch parameters available:
 - `gyro_range` : The range of the gyroscope, the optional values
   are `16dps`,`31dps`,`62dps`,`125dps`,`250dps`,`500dps`,`1000dps`,`2000dps`. The specific value depends on the current
   camera.
+- `enumerate_net_device` : Whether to enable the function of enumerating network devices. True means enabled, false means disabled.
+  This feature is only supported by Femto Mega and Gemini 2 XL devices. When accessing these devices through the network, the IP address of the device needs to be configured in advance. The enable switch needs to be set to true.
 
 ## Depth work mode switch
 - Before starting the camera, depth work mode (depth_work_mode) can be configured for the corresponding xxx.launch.py file's support.

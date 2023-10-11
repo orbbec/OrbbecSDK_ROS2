@@ -59,6 +59,7 @@ def generate_launch_description():
         DeclareLaunchArgument('tf_publish_rate', default_value='10.0'),
         DeclareLaunchArgument('ir_info_url', default_value=''),
         DeclareLaunchArgument('color_info_url', default_value=''),
+        DeclareLaunchArgument('enumerate_net_device', default_value='false'),
         DeclareLaunchArgument('log_level', default_value='none'),
         DeclareLaunchArgument('enable_publish_extrinsic', default_value='false'),
         DeclareLaunchArgument('enable_d2c_viewer', default_value='false'),

@@ -322,6 +322,8 @@ ros2 launch orbbec_camera multi_camera.launch.py
   `100hz`,`200hz`,`500hz`,`1khz`,`2khz`,`4khz`,`8khz`,`16khz`,`32khz`。具体的值取决于当前的相机型号。
 - `gyro_range` : 陀螺仪的量程, 可选值为`16dps`,`31dps`,`62dps`,`125dps`,`250dps`,`500dps`,`1000dps`,`2000dps`
   。具体的值取决于当前的相机型号。
+- `enumerate_net_device` : 是否开启枚举网络设备的功能，true为开启，false为关闭，仅Femto mega和Gemini 2 XL设备支持。
+  当通过网络方式访问以上设备时，需提前配置好设备的IP地址，使能开关需要配置成true。
 
 ## 深度模式切换：
 - 启动相机前,可通过配置对应相继的xxx.launch.py的深度模式(depth_work_mode)支持。

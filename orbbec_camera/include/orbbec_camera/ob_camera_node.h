@@ -393,6 +393,7 @@ class OBCameraNode {
   bool enable_ldp_ = true;
   int soft_filter_max_diff_ = -1;
   int soft_filter_speckle_size_ = -1;
+  bool enable_frame_sync_ = false;
   // Only for Gemini2 device
   bool enable_hardware_d2d_ = true;
   std::string depth_work_mode_;

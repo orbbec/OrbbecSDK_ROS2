@@ -253,7 +253,7 @@ void OBCameraNode::startStreams() {
       onNewFrameSetCallback(frame_set);
     });
   }
-  if (pipeline_ && (depth_registration_ || enable_colored_point_cloud_)) {
+  if (enable_frame_sync_) {
     pipeline_->enableFrameSync();
   }
   pipeline_started_.store(true);
@@ -428,6 +428,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter(enable_d2c_viewer_, "enable_d2c_viewer", false);
   setAndGetNodeParameter(enable_hardware_d2d_, "enable_hardware_d2d", true);
   setAndGetNodeParameter(enable_soft_filter_, "enable_soft_filter", true);
+  setAndGetNodeParameter(enable_frame_sync_, "enable_frame_sync", false);
   setAndGetNodeParameter(enable_color_auto_exposure_, "enable_color_auto_exposure", true);
   setAndGetNodeParameter(enable_ir_auto_exposure_, "enable_ir_auto_exposure", true);
   setAndGetNodeParameter<std::string>(depth_work_mode_, "depth_work_mode", "");

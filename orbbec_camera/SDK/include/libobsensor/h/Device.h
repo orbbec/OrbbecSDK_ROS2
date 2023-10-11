@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file Device.h
  * @brief Device-related functions, including operations such as obtaining and creating a device, setting and obtaining device property, and obtaining sensors
  */

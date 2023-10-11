@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file StreamProfile.h
  * @brief The stream profile related type is used to get information such as the width, height, frame rate, and format of the stream.
  *
@@ -96,10 +96,10 @@ ob_gyro_sample_rate ob_gyro_stream_profile_sample_rate(ob_stream_profile *profil
  * the first one in the list will be returned by default. If no matched profile is found, an error will be returned.
  *
  * @param[in] profile_list Resolution list.
- * @param[in] width Width. If you don't need to add matching conditions, you can pass 0.
- * @param[in] height Height. If you don't need to add matching conditions, you can pass 0.
- * @param[in] format Format. If you don't need to add matching conditions, you can pass OB_FORMAT_UNKNOWN.
- * @param[in] fps Frame rate. If you don't need to add matching conditions, you can pass 0.
+ * @param[in] width Width. If you don't need to add matching conditions, you can pass OB_WIDTH_ANY.
+ * @param[in] height Height. If you don't need to add matching conditions, you can pass OB_HEIGHT_ANY.
+ * @param[in] format Format. If you don't need to add matching conditions, you can pass OB_FORMAT_ANY.
+ * @param[in] fps Frame rate. If you don't need to add matching conditions, you can pass OB_FPS_ANY.
  * @param[out] error Log error messages.
  * @return The matching profile.
  */

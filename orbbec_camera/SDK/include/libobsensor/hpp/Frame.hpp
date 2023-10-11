@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file Frame.hpp
  * @brief Frame related type, which is mainly used to obtain frame data and frame information.
  *

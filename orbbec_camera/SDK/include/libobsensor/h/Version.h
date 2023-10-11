@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file Version.h
  * @brief Functions for retrieving the SDK version number information.
  *

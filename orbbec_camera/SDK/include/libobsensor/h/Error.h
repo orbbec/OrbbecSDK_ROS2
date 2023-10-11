@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file Error.h
  * @brief Functions for handling errors, mainly used for obtaining error messages.
  */

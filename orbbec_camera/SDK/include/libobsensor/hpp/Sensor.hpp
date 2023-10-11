@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file Sensor.hpp
  * @brief Defines types related to sensors, which are used to obtain stream configurations, open and close streams, and set and get sensor properties.
  */

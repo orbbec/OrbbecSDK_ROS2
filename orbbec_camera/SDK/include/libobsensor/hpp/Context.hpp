@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file Context.hpp
  * @brief The SDK context class, which serves as the entry point to the underlying SDK. It is used to query device lists, handle device callbacks, and set the
  * log level.

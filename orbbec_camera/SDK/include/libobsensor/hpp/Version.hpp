@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file Version.hpp
  * @brief Provides functions to retrieve version information of the SDK.
  */

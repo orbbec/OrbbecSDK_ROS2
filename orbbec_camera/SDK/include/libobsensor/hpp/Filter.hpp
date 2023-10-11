@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file  Filter.hpp
  * @brief This file contains the Filter class, which is the processing unit of the SDK that can perform point cloud generation, format conversion, and other
  * functions.

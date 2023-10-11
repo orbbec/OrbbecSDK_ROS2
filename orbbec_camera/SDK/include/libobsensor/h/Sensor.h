@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file Sensor.h
  * @brief Defines types related to sensors, used for obtaining stream configurations, opening and closing streams, and setting and getting sensor properties.
  */

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file MultipleDevices.h
  * @brief This file contains the multiple devices related API witch is used to control the synchronization between multiple devices and the synchronization
  * between different sensor within single device.

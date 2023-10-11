@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file Types.hpp
  * @brief Provides SDK structure and enumeration constant definitions (depending on libobsensor/h/ObTypes.h).
  */

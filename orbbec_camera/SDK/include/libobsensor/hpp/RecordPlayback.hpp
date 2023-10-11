@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file RecordPlayback.hpp
  * @brief Header file for recording and playback functions.
  */

@@ -1,4 +1,4 @@
-/* License: Apache 2.0. See LICENSE file in root directory.
+﻿/* License: Apache 2.0. See LICENSE file in root directory.
     Copyright(c) 2020  Orbbec Corporation. All Rights Reserved. */
 
 /**

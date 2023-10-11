@@ -1,4 +1,4 @@
-// License: Apache 2.0. See LICENSE file in root directory.
+﻿// License: Apache 2.0. See LICENSE file in root directory.
 // Copyright(c) 2020 Orbbec  Corporation. All Rights Reserved.
 
 /**
@@ -68,8 +68,14 @@ typedef struct RecorderImpl            ob_recorder;
 typedef struct PlaybackImpl            ob_playback;
 typedef struct OBDepthWorkModeListImpl ob_depth_work_mode_list;
 
+#define OB_WIDTH_ANY 0
+#define OB_HEIGHT_ANY 0
+#define OB_FPS_ANY 0
+#define OB_FORMAT_ANY OB_FORMAT_UNKNOWN
+#define OB_PROFILE_DEFAULT 0
+
 /**
- * @brief senddata or recdata return status type
+ * @brief send data or receive data return status type
  */
 typedef enum {
     HP_STATUS_OK                      = 0,      /**< success*/

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file RecordPlayback.h
  * @brief Header file for recording and playback functions.
  */

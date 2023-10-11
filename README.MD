@@ -147,6 +147,26 @@ ros2 service call /camera/toggle_ir std_srvs/srv/SetBool "{data : true}"
 ros2 service call /camera/save_point_cloud std_srvs/srv/Empty "{}"
 ```
 
+- Depth work mode switch:
+- Before starting the camera, depth work mode (depth_work_mode) can be configured for the corresponding xxx.launch.py file's support.
+- The depth work mode switch is supported by gemini, gemini2l, gemini2VL, and gemini2XL cameras.
+- The default depth work mode configuration of xxx.launch.py is the camera's default configuration. If you need to modify it, you can switch to the corresponding mode as needed.
+- The specific camera depth work mode support types can be found in the comments of the depth mode.
+
+```python
+    # Depth work mode support is as follows:
+    # Unbinned Dense Default
+    # Unbinned Sparse Default
+    # Binned Sparse Default
+    DeclareLaunchArgument('depth_work_mode', default_value='')
+```
+
+- View depth work modes:
+
+```bash
+ros2 run orbbec_camera list_depth_work_mode_node
+```
+
 ### All available service for camera control
 
 The name of the following service already expresses its function.

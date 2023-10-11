@@ -356,9 +356,8 @@ The following are the launch parameters available:
 ros2 run orbbec_camera list_depth_work_mode_node
 ```
 
-## For Femto Mega and Femto Bolt devices, the depth NFOV and WFOV modes are achieved by configuring different resolutions in the depth startup parameters.
-
-The depth startup parameters depth_width and depth_height specify the resolution of the depth stream. The corresponding resolutions for different modes are as follows:
+## Configuration of depth NFOV and WFOV modes
+For Femto Mega and Femto Bolt devices, the depth NFOV and WFOV modes are achieved by configuring different resolutions in the depth startup parameters.The depth startup parameters depth_width and depth_height specify the resolution of the depth stream. The corresponding resolutions for different modes are as follows:
 - NFOV unbinned: 640 x 576.
 - NFOV binned: 320 x 288.
 - WFOV unbinned: 1024 x 1024.

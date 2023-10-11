@@ -67,6 +67,11 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_soft_filter', default_value='true'),
         DeclareLaunchArgument('soft_filter_max_diff', default_value='-1'),
         DeclareLaunchArgument('soft_filter_speckle_size', default_value='-1'),
+        # Depth work mode support is as follows:
+        # Unbinned Dense Default
+        # Unbinned Sparse Default
+        # Binned Sparse Default
+        DeclareLaunchArgument('depth_work_mode', default_value=''),
         DeclareLaunchArgument('sync_mode', default_value='free_run'),
         DeclareLaunchArgument('depth_delay_us', default_value='0'),
         DeclareLaunchArgument('color_delay_us', default_value='0'),

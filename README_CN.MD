@@ -344,7 +344,7 @@ ros2 run orbbec_camera list_depth_work_mode_node
 ```
 
 ## 深度NFOV和WFOV模式配置
-  对于Femto Mega和Femto Bolt设备，深度NFOV和WFOV模式需要通过配置深度启动参数不同分辨率实现,深度启动参数`depth_width`, `depth_height`为深度流的分辨率，不同模式和分辨率对应关系：
+对于Femto Mega和Femto Bolt设备，深度NFOV和WFOV模式需要通过配置深度启动参数不同分辨率实现,深度启动参数`depth_width`, `depth_height`为深度流的分辨率，IR的分辨率和帧率必须和深度保持一致。不同模式和分辨率对应关系：
 - NFoV unbinned：640 x 576。
 - NFoV binned：320 x 288。
 - WFoV unbinned：1024 x1024。

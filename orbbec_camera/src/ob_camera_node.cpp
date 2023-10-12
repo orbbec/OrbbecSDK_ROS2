@@ -88,7 +88,7 @@ OBCameraNode::~OBCameraNode() { clean(); }
 void OBCameraNode::clean() {
   RCLCPP_WARN_STREAM(logger_, "Do destroy ~OBCameraNode");
   is_running_.store(false);
-  if (tf_thread_->joinable()) {
+  if (tf_thread_ && tf_thread_->joinable()) {
     tf_thread_->join();
   }
   RCLCPP_WARN_STREAM(logger_, "stop streams");

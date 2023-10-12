@@ -117,10 +117,13 @@ void OBCameraNodeDriver::onDeviceConnected(const std::shared_ptr<ob::DeviceList>
     try {
       startDevice(device_list);
     } catch (ob::Error &e) {
+      device_.reset();
       RCLCPP_ERROR_STREAM(logger_, "startDevice failed: " << e.getMessage());
     } catch (const std::exception &e) {
+      device_.reset();
       RCLCPP_ERROR_STREAM(logger_, "startDevice failed: " << e.what());
     } catch (...) {
+      device_.reset();
       RCLCPP_ERROR_STREAM(logger_, "startDevice failed");
     }
   }
@@ -200,7 +203,7 @@ void OBCameraNodeDriver::resetDevice() {
   while (is_alive_ && rclcpp::ok()) {
     std::unique_lock<decltype(reset_device_mutex_)> lock(reset_device_mutex_);
     reset_device_cond_.wait(lock,
-                            [this]() { return !is_alive_ || !rclcpp::ok() || reset_device_flag_; });
+      [this]() { return !is_alive_ || !rclcpp::ok() || reset_device_flag_; });
     if (!is_alive_ || !rclcpp::ok()) {
       break;
     }

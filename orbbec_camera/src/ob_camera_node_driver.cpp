@@ -114,18 +114,7 @@ void OBCameraNodeDriver::onDeviceConnected(const std::shared_ptr<ob::DeviceList>
   RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 1000,
                               "device list count " << device_list->deviceCount());
   if (!device_) {
-    try {
-      startDevice(device_list);
-    } catch (ob::Error &e) {
-      device_.reset();
-      RCLCPP_ERROR_STREAM(logger_, "startDevice failed: " << e.getMessage());
-    } catch (const std::exception &e) {
-      device_.reset();
-      RCLCPP_ERROR_STREAM(logger_, "startDevice failed: " << e.what());
-    } catch (...) {
-      device_.reset();
-      RCLCPP_ERROR_STREAM(logger_, "startDevice failed");
-    }
+    startDevice(device_list);
   }
 }
 
@@ -183,7 +172,24 @@ void OBCameraNodeDriver::queryDevice() {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
         continue;
       }
-      onDeviceConnected(device_list);
+      bool start_device_failed = false;
+      try {
+        onDeviceConnected(device_list);
+      } catch (ob::Error &e) {
+        RCLCPP_ERROR_STREAM(logger_, "Failed to start device " << e.getMessage());
+        start_device_failed = true;
+      } catch (std::exception &e) {
+        RCLCPP_ERROR_STREAM(logger_, "Failed to start device " << e.what());
+        start_device_failed = true;
+      } catch (...) {
+        RCLCPP_ERROR_STREAM(logger_, "Failed to start device");
+        start_device_failed = true;
+      }
+      if (start_device_failed) {
+        std::unique_lock<decltype(reset_device_mutex_)> lock(reset_device_mutex_);
+        reset_device_flag_ = true;
+        reset_device_cond_.notify_all();
+      }
     } else {
       std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
@@ -203,7 +209,7 @@ void OBCameraNodeDriver::resetDevice() {
   while (is_alive_ && rclcpp::ok()) {
     std::unique_lock<decltype(reset_device_mutex_)> lock(reset_device_mutex_);
     reset_device_cond_.wait(lock,
-      [this]() { return !is_alive_ || !rclcpp::ok() || reset_device_flag_; });
+                            [this]() { return !is_alive_ || !rclcpp::ok() || reset_device_flag_; });
     if (!is_alive_ || !rclcpp::ok()) {
       break;
     }
@@ -303,6 +309,7 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
     ob_camera_node_.reset();
   }
   ob_camera_node_ = std::make_unique<OBCameraNode>(this, device_, parameters_);
+  ob_camera_node_->startStreams();
   device_connected_ = true;
   device_info_ = device_->getDeviceInfo();
   CHECK_NOTNULL(device_info_.get());

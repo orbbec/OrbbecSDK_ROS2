@@ -57,7 +57,6 @@ OBCameraNode::OBCameraNode(rclcpp::Node *node, std::shared_ptr<ob::Device> devic
 #elif defined(USE_NV_HW_DECODER)
   jpeg_decoder_ = std::make_unique<JetsonNvJPEGDecoder>(width_[COLOR], height_[COLOR]);
 #endif
-  startStreams();
   if (enable_d2c_viewer_) {
     auto rgb_qos = getRMWQosProfileFromString(image_qos_[COLOR]);
     auto depth_qos = getRMWQosProfileFromString(image_qos_[DEPTH]);
@@ -252,6 +251,9 @@ void OBCameraNode::startStreams() {
     pipeline_->start(pipeline_config_, [this](const std::shared_ptr<ob::FrameSet> &frame_set) {
       onNewFrameSetCallback(frame_set);
     });
+  } catch (...) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to start pipeline");
+    throw std::runtime_error("Failed to start pipeline");
   }
   if (enable_frame_sync_) {
     pipeline_->enableFrameSync();

@@ -466,7 +466,8 @@ void OBCameraNode::setupPipelineConfig() {
   }
   pipeline_config_ = std::make_shared<ob::Config>();
   if (depth_registration_ && enable_stream_[COLOR] && enable_stream_[DEPTH]) {
-    if (device_info_->pid() == FEMTO_BOLT_PID) {
+    auto info = device_->getDeviceInfo();
+    if (info->pid() == FEMTO_BOLT_PID) {
       RCLCPP_INFO_STREAM(logger_, "set align mode ALIGN_D2C_SW_MODE.");
       pipeline_config_->setAlignMode(ALIGN_D2C_SW_MODE);
     } else {

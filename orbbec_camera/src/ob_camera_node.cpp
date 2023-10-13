@@ -896,6 +896,8 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   auto camera_info = convertToCameraInfo(intrinsic, distortion, width);
   camera_info.header.stamp = timestamp;
   camera_info.header.frame_id = frame_id;
+  camera_info.width = width;
+  camera_info.height = height;
   CHECK(camera_info_publishers_.count(stream_index) > 0);
   camera_info_publishers_[stream_index]->publish(camera_info);
   auto &image = images_[stream_index];

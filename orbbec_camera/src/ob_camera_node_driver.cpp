@@ -310,6 +310,7 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   }
   ob_camera_node_ = std::make_unique<OBCameraNode>(this, device_, parameters_);
   ob_camera_node_->startStreams();
+  ob_camera_node_->startIMU();
   device_connected_ = true;
   device_info_ = device_->getDeviceInfo();
   CHECK_NOTNULL(device_info_.get());

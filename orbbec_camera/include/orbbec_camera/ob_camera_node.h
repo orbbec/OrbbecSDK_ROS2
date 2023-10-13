@@ -137,6 +137,9 @@ class OBCameraNode {
   void clean();
 
   void startStreams();
+  
+  void startIMU();
+
 
  private:
   struct IMUData {
@@ -160,8 +163,6 @@ class OBCameraNode {
   void setupPipelineConfig();
 
   void setupCameraCtrlServices();
-
-  void startIMU();
 
   void stopStreams();
 

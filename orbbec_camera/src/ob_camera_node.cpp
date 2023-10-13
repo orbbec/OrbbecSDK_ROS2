@@ -92,6 +92,7 @@ void OBCameraNode::clean() {
   }
   RCLCPP_WARN_STREAM(logger_, "stop streams");
   stopStreams();
+  stopIMU();
   RCLCPP_WARN_STREAM(logger_, "Destroy ~OBCameraNode DONE");
   if (rgb_buffer_) {
     delete[] rgb_buffer_;
@@ -259,7 +260,6 @@ void OBCameraNode::startStreams() {
     pipeline_->enableFrameSync();
   }
   pipeline_started_.store(true);
-  startIMU();
 }
 
 void OBCameraNode::startIMU() {
@@ -316,7 +316,6 @@ void OBCameraNode::stopStreams() {
   }
   try {
     pipeline_->stop();
-    stopIMU();
   } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to stop pipeline: " << e.getMessage());
   }

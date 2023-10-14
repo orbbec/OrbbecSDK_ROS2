@@ -234,6 +234,9 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceBySerialNumber(
   std::transform(serial_number.begin(), serial_number.end(), std::back_inserter(lower_sn),
                  [](auto ch) { return isalpha(ch) ? tolower(ch) : static_cast<int>(ch); });
   for (size_t i = 0; i < list->deviceCount(); i++) {
+    RCLCPP_INFO_STREAM(logger_, "Before lock: Select device serial number: " << serial_number);
+    std::lock_guard<decltype(device_lock_)> lock(device_lock_);
+    RCLCPP_INFO_STREAM(logger_, "After lock: Select device serial number: " << serial_number);
     try {
       auto pid = list->pid(i);
       if (isOpenNIDevice(pid)) {

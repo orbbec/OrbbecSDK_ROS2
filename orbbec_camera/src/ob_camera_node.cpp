@@ -265,7 +265,7 @@ void OBCameraNode::startStreams() {
 
 void OBCameraNode::startIMU() {
   for (const auto &stream_index : HID_STREAMS) {
-    if (enable_stream_[stream_index]) {
+    if (enable_stream_[stream_index] && !imu_started_[stream_index]) {
       CHECK(sensors_.count(stream_index));
       auto profile_list = sensors_[stream_index]->getStreamProfileList();
       for (size_t i = 0; i < profile_list->count(); i++) {

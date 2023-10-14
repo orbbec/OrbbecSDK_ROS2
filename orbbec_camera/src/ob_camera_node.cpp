@@ -85,6 +85,7 @@ void OBCameraNode::setAndGetNodeParameter(
 OBCameraNode::~OBCameraNode() { clean(); }
 
 void OBCameraNode::clean() {
+  std::lock_guard<decltype(device_lock_)> lock(device_lock_);
   RCLCPP_WARN_STREAM(logger_, "Do destroy ~OBCameraNode");
   is_running_.store(false);
   if (tf_thread_ && tf_thread_->joinable()) {
@@ -750,6 +751,10 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
 }
 
 void OBCameraNode::onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet> &frame_set) {
+  if (!is_running_.load()) {
+    return;
+  }
+  std::lock_guard<decltype(device_lock_)> lock(device_lock_);
   if (frame_set == nullptr) {
     return;
   }
@@ -803,6 +808,9 @@ std::shared_ptr<ob::Frame> OBCameraNode::softwareDecodeColorFrame(
 bool OBCameraNode::decodeColorFrameToBuffer(const std::shared_ptr<ob::Frame> &frame,
                                             uint8_t *buffer) {
   if (frame == nullptr) {
+    return false;
+  }
+  if (!rgb_buffer_) {
     return false;
   }
   bool has_subscriber = image_publishers_[COLOR].getNumSubscribers() > 0;

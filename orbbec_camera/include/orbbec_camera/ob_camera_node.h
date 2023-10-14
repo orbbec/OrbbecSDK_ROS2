@@ -421,5 +421,6 @@ class OBCameraNode {
   std::shared_ptr<JPEGDecoder> jpeg_decoder_ = nullptr;
   uint8_t* rgb_buffer_ = nullptr;
   bool is_color_frame_decoded_ = false;
+  std::mutex device_lock_;
 };
 }  // namespace orbbec_camera

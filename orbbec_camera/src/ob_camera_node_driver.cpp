@@ -92,7 +92,7 @@ void OBCameraNodeDriver::init() {
   ctx_->enableNetDeviceEnumeration(enumerate_net_device_);
   ctx_->setDeviceChangedCallback([this](const std::shared_ptr<ob::DeviceList> &removed_list,
                                         const std::shared_ptr<ob::DeviceList> &added_list) {
-    (void)added_list;
+    onDeviceConnected(added_list);
     onDeviceDisconnected(removed_list);
   });
   check_connect_timer_ =
@@ -108,11 +108,6 @@ void OBCameraNodeDriver::onDeviceConnected(const std::shared_ptr<ob::DeviceList>
   if (device_list->deviceCount() == 0) {
     return;
   }
-  pthread_mutex_lock(orb_device_lock_);
-  std::shared_ptr<int> lock_holder(nullptr,
-                                   [this](int *) { pthread_mutex_unlock(orb_device_lock_); });
-  RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 1000,
-                              "device list count " << device_list->deviceCount());
   if (!device_) {
     startDevice(device_list);
   }
@@ -126,9 +121,12 @@ void OBCameraNodeDriver::onDeviceDisconnected(const std::shared_ptr<ob::DeviceLi
   RCLCPP_INFO_STREAM(logger_, "onDeviceDisconnected");
   for (size_t i = 0; i < device_list->deviceCount(); i++) {
     std::string uid = device_list->uid(i);
-    std::scoped_lock<decltype(device_lock_)> lock(device_lock_);
+    std::string serial_number = device_list->serialNumber(i);
+    std::lock_guard<decltype(device_lock_)> lock(device_lock_);
     RCLCPP_INFO_STREAM(logger_, "device with " << uid << " disconnected");
-    if (uid == device_unique_id_) {
+    if (uid == device_unique_id_ || serial_number_ == serial_number) {
+      RCLCPP_INFO_STREAM(logger_,
+                         "device with " << uid << " disconnected, notify reset device thread.");
       std::unique_lock<decltype(reset_device_mutex_)> reset_device_lock(reset_device_mutex_);
       reset_device_flag_ = true;
       reset_device_cond_.notify_all();
@@ -164,35 +162,13 @@ void OBCameraNodeDriver::checkConnectTimer() {
 }
 
 void OBCameraNodeDriver::queryDevice() {
-  while (is_alive_ && rclcpp::ok()) {
-    if (!device_connected_.load()) {
-      RCLCPP_DEBUG_STREAM_THROTTLE(logger_, *get_clock(), 1000, "Waiting for device connection...");
-      auto device_list = ctx_->queryDeviceList();
-      if (device_list->deviceCount() == 0) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        continue;
-      }
-      bool start_device_failed = false;
-      try {
-        onDeviceConnected(device_list);
-      } catch (ob::Error &e) {
-        RCLCPP_ERROR_STREAM(logger_, "Failed to start device " << e.getMessage());
-        start_device_failed = true;
-      } catch (std::exception &e) {
-        RCLCPP_ERROR_STREAM(logger_, "Failed to start device " << e.what());
-        start_device_failed = true;
-      } catch (...) {
-        RCLCPP_ERROR_STREAM(logger_, "Failed to start device");
-        start_device_failed = true;
-      }
-      if (start_device_failed) {
-        std::unique_lock<decltype(reset_device_mutex_)> lock(reset_device_mutex_);
-        reset_device_flag_ = true;
-        reset_device_cond_.notify_all();
-      }
-    } else {
-      std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  if (!device_connected_.load()) {
+    auto device_list = ctx_->queryDeviceList();
+    if (device_list->deviceCount() == 0) {
+      RCLCPP_INFO_STREAM(logger_, "queryDevice : No device found");
+      return;
     }
+    startDevice(device_list);
   }
 }
 
@@ -213,12 +189,18 @@ void OBCameraNodeDriver::resetDevice() {
     if (!is_alive_ || !rclcpp::ok()) {
       break;
     }
-    ob_camera_node_.reset();
-    device_.reset();
-    device_info_.reset();
-    device_connected_ = false;
-    device_unique_id_.clear();
-    reset_device_flag_ = false;
+    RCLCPP_INFO_STREAM(logger_, "resetDevice : Reset device uid: " << device_unique_id_);
+    std::lock_guard<decltype(device_lock_)> device_lock(device_lock_);
+    {
+      ob_camera_node_.reset();
+      device_.reset();
+      device_info_.reset();
+      device_connected_ = false;
+      device_unique_id_.clear();
+      serial_number_.clear();
+      reset_device_flag_ = false;
+    }
+    RCLCPP_INFO_STREAM(logger_, "Reset device uid: " << device_unique_id_ << " done");
   }
 }
 
@@ -231,12 +213,10 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDevice(
 
   std::shared_ptr<ob::Device> device = nullptr;
   if (!serial_number_.empty()) {
-    RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 1000,
-                                "Connecting to device with serial number: " << serial_number_);
+    RCLCPP_INFO_STREAM(logger_, "Connecting to device with serial number: " << serial_number_);
     device = selectDeviceBySerialNumber(list, serial_number_);
   } else if (!usb_port_.empty()) {
-    RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 1000,
-                                "Connecting to device with usb port: " << usb_port_);
+    RCLCPP_INFO_STREAM(logger_, "Connecting to device with usb port: " << usb_port_);
     device = selectDeviceByUSBPort(list, usb_port_);
   }
   if (device == nullptr) {
@@ -288,7 +268,11 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceBySerialNumber(
 std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByUSBPort(
     const std::shared_ptr<ob::DeviceList> &list, const std::string &usb_port) {
   try {
+    RCLCPP_INFO_STREAM(logger_, "Before lock: Select device usb port: " << usb_port);
+    std::lock_guard<decltype(device_lock_)> lock(device_lock_);
+    RCLCPP_INFO_STREAM(logger_, "After lock: Select device usb port: " << usb_port);
     auto device = list->getDeviceByUid(usb_port.c_str());
+    RCLCPP_INFO_STREAM(logger_, "Device usb port " << usb_port << " done");
     return device;
   } catch (ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to get device info " << e.getMessage());
@@ -313,6 +297,7 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   ob_camera_node_->startIMU();
   device_connected_ = true;
   device_info_ = device_->getDeviceInfo();
+  serial_number_ = device_info_->serialNumber();
   CHECK_NOTNULL(device_info_.get());
   device_unique_id_ = device_info_->uid();
   if (!isOpenNIDevice(device_info_->pid())) {
@@ -326,7 +311,6 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
 }
 
 void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list) {
-  std::scoped_lock<decltype(device_lock_)> lock(device_lock_);
   if (device_connected_) {
     return;
   }
@@ -337,14 +321,35 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
   if (device_) {
     device_.reset();
   }
-  auto device = selectDevice(list);
-  if (device == nullptr) {
-    RCLCPP_WARN_THROTTLE(logger_, *get_clock(), 1000, "Device with serial number %s not found",
-                         serial_number_.c_str());
-    device_connected_ = false;
-    return;
+  pthread_mutex_lock(orb_device_lock_);
+  std::shared_ptr<int> lock_holder(nullptr,
+                                   [this](int *) { pthread_mutex_unlock(orb_device_lock_); });
+  bool start_device_failed = false;
+  try {
+    auto device = selectDevice(list);
+    if (device == nullptr) {
+      RCLCPP_WARN_THROTTLE(logger_, *get_clock(), 1000, "Device with serial number %s not found",
+                           serial_number_.c_str());
+      device_connected_ = false;
+      return;
+    }
+    initializeDevice(device);
+  } catch (ob::Error &e) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to initialize device " << e.getMessage());
+    start_device_failed = true;
+  } catch (std::exception &e) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to initialize device " << e.what());
+    start_device_failed = true;
+  } catch (...) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to initialize device");
+    start_device_failed = true;
   }
-  initializeDevice(device);
+  if (start_device_failed) {
+    device_connected_ = false;
+    std::unique_lock<decltype(reset_device_mutex_)> reset_device_lock(reset_device_mutex_);
+    reset_device_flag_ = true;
+    reset_device_cond_.notify_all();
+  }
 }
 }  // namespace orbbec_camera
 

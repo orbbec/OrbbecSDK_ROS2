@@ -95,6 +95,16 @@ const char *ob_device_list_get_device_connection_type(ob_device_list *list, uint
 const char *ob_device_list_get_device_ip_address(ob_device_list *list, uint32_t index, ob_error **error);
 
 /**
+ * @brief Get the device extension information.
+ *
+ * @param[in] info Device Information
+ * @param[in] index Device index
+ * @param[out] error Log error messages
+ * @return const char* The device extension information
+ */
+const char *ob_device_list_get_extension_info(ob_device_list *list, uint32_t index, ob_error **error);
+
+/**
  * @brief Create a device.
  *
  * @attention If the device has already been acquired and created elsewhere, repeated acquisitions will return an error.
@@ -753,6 +763,15 @@ const char *ob_device_info_ip_address(ob_device_info *info, ob_error **error);
  * @return const char* The hardware version number
  */
 const char *ob_device_info_hardware_version(ob_device_info *info, ob_error **error);
+
+/**
+ * @brief Get the device extension information.
+ *
+ * @param[in] info Device Information
+ * @param[out] error Log error messages
+ * @return const char* The device extension information
+ */
+const char *ob_device_info_get_extension_info(ob_device_info *info, ob_error **error);
 
 /**
  * @brief Get the minimum SDK version number supported by the device

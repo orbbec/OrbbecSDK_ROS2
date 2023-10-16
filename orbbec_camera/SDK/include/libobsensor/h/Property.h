@@ -384,8 +384,6 @@ typedef enum {
      */
     OB_PROP_LASER_PULSE_WIDTH_PROTECTION_STATUS_BOOL = 149,
 
-    OB_PROP_UPDATE_BASE_TIME_BOOL = 150,
-
     /**
      * @brief Baseline calibration parameters
      */

@@ -392,7 +392,7 @@ XML launch 文件将会在后续的版本中删除。
 
 | **SDK version** | **products list** | **firmware version**                      |
 |-----------------|-------------------|-------------------------------------------|
-| v1.7.2          | Gemini 2 XL       | Obox: V1.2.5  VL:1.4.54                   |
+| v1.8.1          | Gemini 2 XL       | Obox: V1.2.5  VL:1.4.54                   |
 |                 | Astra 2           | 2.8.20                                    |
 |                 | Gemini 2 L        | 1.4.32                                    |
 |                 | Gemini 2          | 1.4.60 /1.4.76                            |
@@ -400,6 +400,7 @@ XML launch 文件将会在后续的版本中删除。
 |                 | Astra+            | 1.0.22/1.0.21/1.0.20/1.0.19               |
 |                 | Femto             | 1.6.7                                     |
 |                 | Femto W           | 1.1.8                                     |
+|                 | Femto Bolt        | 1.0.6 (unsupported ARNM32)                |
 |                 | DaBai             | 2436                                      |
 |                 | DaBai DCW         | 2460                                      |
 |                 | DaBai DW          | 2606                                      |

@@ -887,13 +887,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   int height = static_cast<int>(video_frame->height());
 
   auto timestamp = frameTimeStampToROSTime(video_frame->systemTimeStamp());
-  if (!camera_param_ && depth_registration_) {
-    camera_param_ = pipeline_->getCameraParam();
-  } else if (!camera_param_ && stream_index == COLOR) {
-    camera_param_ = getColorCameraParam();
-  } else if (!camera_param_ && (stream_index == DEPTH || stream_index == INFRA0)) {
-    camera_param_ = getDepthCameraParam();
-  }
+  camera_param_ = pipeline_->getCameraParam();
   auto &intrinsic =
       stream_index == COLOR ? camera_param_->rgbIntrinsic : camera_param_->depthIntrinsic;
   auto &distortion =

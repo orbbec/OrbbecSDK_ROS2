@@ -462,6 +462,7 @@ void OBCameraNode::getExposureCallback(const std::shared_ptr<GetInt32::Request>&
   auto stream = stream_index.first;
   try {
     switch (stream) {
+      case OB_STREAM_IR_LEFT:
       case OB_STREAM_IR_RIGHT:
       case OB_STREAM_IR:
         response->data = device_->getIntProperty(OB_PROP_IR_EXPOSURE_INT);

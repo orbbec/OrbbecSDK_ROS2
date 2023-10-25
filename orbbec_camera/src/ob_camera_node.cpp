@@ -934,7 +934,13 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   int height = static_cast<int>(video_frame->height());
 
   auto timestamp = frameTimeStampToROSTime(video_frame->systemTimeStamp());
-  camera_param_ = pipeline_->getCameraParam();
+  if (!camera_param_ && depth_registration_) {
+    camera_param_ = pipeline_->getCameraParam();
+  } else if (!camera_param_ && stream_index == COLOR) {
+    camera_param_ = getColorCameraParam();
+  } else if (!camera_param_ && (stream_index == DEPTH || stream_index == INFRA0)) {
+    camera_param_ = getDepthCameraParam();
+  }
   auto &intrinsic =
       stream_index == COLOR ? camera_param_->rgbIntrinsic : camera_param_->depthIntrinsic;
   auto &distortion =
@@ -1100,7 +1106,18 @@ std::optional<OBCameraParam> OBCameraNode::getDepthCameraParam() {
     auto param = camera_params->getCameraParam(i);
     int depth_w = param.depthIntrinsic.width;
     int depth_h = param.depthIntrinsic.height;
+    if (depth_w == width_[DEPTH] && depth_h == height_[DEPTH]) {
+      RCLCPP_INFO_STREAM(logger_, "getCameraDepthParam w: " << depth_w << ",h:" << depth_h);
+      return param;
+    }
+  }
+
+  for (size_t i = 0; i < camera_params->count(); i++) {
+    auto param = camera_params->getCameraParam(i);
+    int depth_w = param.depthIntrinsic.width;
+    int depth_h = param.depthIntrinsic.height;
     if (depth_w * height_[DEPTH] == depth_h * width_[DEPTH]) {
+      RCLCPP_INFO_STREAM(logger_, "getCameraDepthParam w: " << depth_w << ",h:" << depth_h);
       return param;
     }
   }
@@ -1113,7 +1130,18 @@ std::optional<OBCameraParam> OBCameraNode::getColorCameraParam() {
     auto param = camera_params->getCameraParam(i);
     int color_w = param.rgbIntrinsic.width;
     int color_h = param.rgbIntrinsic.height;
+    if (color_w == width_[COLOR] && color_h == height_[COLOR]) {
+      RCLCPP_INFO_STREAM(logger_, "getColorCameraParam w: " << color_w << ",h:" << color_h);
+      return param;
+    }
+  }
+
+  for (size_t i = 0; i < camera_params->count(); i++) {
+    auto param = camera_params->getCameraParam(i);
+    int color_w = param.rgbIntrinsic.width;
+    int color_h = param.rgbIntrinsic.height;
     if (color_w * height_[COLOR] == color_h * width_[COLOR]) {
+      RCLCPP_INFO_STREAM(logger_, "getColorCameraParam w: " << color_w << ",h:" << color_h);
       return param;
     }
   }

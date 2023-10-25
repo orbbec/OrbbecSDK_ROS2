@@ -393,6 +393,16 @@ void OBCameraNode::getParameters() {
                                     : sensor_msgs::image_encodings::MONO8;
       unit_step_size_[stream_index] = sizeof(uint8_t);
     }
+
+    if (format_[stream_index] == OB_FORMAT_MJPG) {
+      if (stream_index.first == OB_STREAM_IR || stream_index.first == OB_STREAM_IR_LEFT ||
+          stream_index.first == OB_STREAM_IR_RIGHT) {
+        image_format_[stream_index] = CV_8UC1;
+        encoding_[stream_index] = sensor_msgs::image_encodings::MONO8;
+        unit_step_size_[stream_index] = sizeof(uint8_t);
+      }
+    }
+
     param_name = stream_name_[stream_index] + "_qos";
     setAndGetNodeParameter<std::string>(image_qos_[stream_index], param_name, "default");
     param_name = stream_name_[stream_index] + "_camera_info_qos";
@@ -763,6 +773,7 @@ void OBCameraNode::onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet> &fr
       publishStaticTransforms();
       tf_published_ = true;
     }
+
     is_color_frame_decoded_ = decodeColorFrameToBuffer(frame_set->colorFrame(), rgb_buffer_);
     publishPointCloud(frame_set);
     for (const auto &stream_index : IMAGE_STREAMS) {
@@ -772,7 +783,14 @@ void OBCameraNode::onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet> &fr
         if (frame == nullptr) {
           continue;
         }
-        onNewFrameCallback(frame, stream_index);
+
+        std::shared_ptr<ob::Frame> irFrame = decodeIRMJPGFrame(frame);
+        if(irFrame) {
+          onNewFrameCallback(irFrame, stream_index);
+        } else {
+          onNewFrameCallback(frame, stream_index);
+        }
+
       }
     }
   } catch (const ob::Error &e) {
@@ -853,6 +871,35 @@ bool OBCameraNode::decodeColorFrameToBuffer(const std::shared_ptr<ob::Frame> &fr
     return true;
   }
   return true;
+}
+
+std::shared_ptr<ob::Frame> OBCameraNode::decodeIRMJPGFrame(const std::shared_ptr<ob::Frame> &frame) {
+  if (frame->format() == OB_FORMAT_MJPEG &&
+      (frame->type() == OB_FRAME_IR || frame->type() == OB_FRAME_IR_LEFT ||
+       frame->type() == OB_FRAME_IR_RIGHT)) {
+    auto video_frame = frame->as<ob::IRFrame>();
+
+    cv::Mat mjpgMat(1, video_frame->dataSize(), CV_8UC1, video_frame->data());
+    cv::Mat irRawMat = cv::imdecode(mjpgMat, cv::IMREAD_GRAYSCALE);
+
+    std::shared_ptr<ob::Frame> irFrame = ob::FrameHelper::createFrame(
+        video_frame->type(), video_frame->format(), video_frame->width(), video_frame->height(), 0);
+
+    uint32_t buffer_size = irRawMat.rows * irRawMat.cols * irRawMat.channels();
+
+    if(buffer_size > irFrame->dataSize()) {
+      RCLCPP_ERROR_STREAM(logger_, "Insufficient buffer size allocation,failed to decode ir mjpg frame!");
+      return nullptr;
+    }
+
+    memcpy(irFrame->data(), irRawMat.data, buffer_size);
+    ob::FrameHelper::setFrameDeviceTimestamp(irFrame, video_frame->timeStamp());
+    ob::FrameHelper::setFrameDeviceTimestampUs(irFrame, video_frame->timeStampUs());
+    ob::FrameHelper::setFrameSystemTimestamp(irFrame, video_frame->systemTimeStamp());
+    return irFrame;
+  }
+
+  return nullptr;
 }
 
 void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,

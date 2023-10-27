@@ -334,6 +334,7 @@ class OBCameraNode {
   ob::FormatConvertFilter format_convert_filter_;
 
   std::map<stream_index_pair, bool> enable_stream_;
+  std::map<stream_index_pair, bool> flip_stream_;
   std::map<stream_index_pair, std::string> stream_name_;
   std::map<stream_index_pair, image_transport::Publisher> image_publishers_;
   std::map<stream_index_pair, rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr>

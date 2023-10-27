@@ -149,6 +149,29 @@ void OBCameraNode::setupDevices() {
       }
     }
 
+    for (const auto &stream_index : IMAGE_STREAMS) {
+      if (enable_stream_[stream_index]) {
+        OBPropertyID mirrorPropertyID = OB_PROP_DEPTH_MIRROR_BOOL;
+        if(stream_index == COLOR){
+          mirrorPropertyID = OB_PROP_COLOR_MIRROR_BOOL;
+        } else if(stream_index == DEPTH) {
+          mirrorPropertyID = OB_PROP_DEPTH_MIRROR_BOOL;
+        } else if(stream_index == INFRA0) {
+          mirrorPropertyID = OB_PROP_IR_MIRROR_BOOL;
+
+        } else if(stream_index == INFRA1) {
+          mirrorPropertyID = OB_PROP_IR_MIRROR_BOOL;
+        }
+        else if(stream_index == INFRA2) {
+          mirrorPropertyID = OB_PROP_IR_RIGHT_MIRROR_BOOL;
+        }
+
+        if(device_->isPropertySupported(mirrorPropertyID, OB_PERMISSION_WRITE)) {
+          device_->setBoolProperty(mirrorPropertyID, flip_stream_[stream_index]);
+        }
+      }
+    }
+
     device_->setBoolProperty(OB_PROP_DEPTH_SOFT_FILTER_BOOL, enable_soft_filter_);
     device_->setBoolProperty(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, enable_color_auto_exposure_);
     device_->setBoolProperty(OB_PROP_IR_AUTO_EXPOSURE_BOOL, enable_ir_auto_exposure_);
@@ -374,6 +397,8 @@ void OBCameraNode::getParameters() {
     setAndGetNodeParameter(fps_[stream_index], param_name, IMAGE_FPS);
     param_name = "enable_" + stream_name_[stream_index];
     setAndGetNodeParameter(enable_stream_[stream_index], param_name, false);
+    param_name = "flip_" + stream_name_[stream_index];
+    setAndGetNodeParameter(flip_stream_[stream_index], param_name, false);
     param_name = camera_name_ + "_" + stream_name_[stream_index] + "_frame_id";
     std::string default_frame_id = camera_name_ + "_" + stream_name_[stream_index] + "_frame";
     setAndGetNodeParameter(frame_id_[stream_index], param_name, default_frame_id);

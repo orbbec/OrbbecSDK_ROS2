@@ -26,7 +26,6 @@ def generate_launch_description():
         DeclareLaunchArgument('color_fps', default_value='30'),
         DeclareLaunchArgument('color_format', default_value='RGB'),
         DeclareLaunchArgument('enable_color', default_value='true'),
-        DeclareLaunchArgument('flip_color', default_value='false'),
         DeclareLaunchArgument('color_qos', default_value='default'),
         DeclareLaunchArgument('color_camera_info_qos', default_value='default'),
         DeclareLaunchArgument('enable_color_auto_exposure', default_value='true'),

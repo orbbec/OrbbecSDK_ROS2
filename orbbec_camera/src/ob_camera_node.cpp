@@ -853,7 +853,7 @@ void OBCameraNode::onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet> &fr
   }
 }
 
-void OBCameraNode::noNewColorFrameCallback() {
+void OBCameraNode::onNewColorFrameCallback() {
   while (enable_stream_[COLOR] && rclcpp::ok() && is_running_.load()) {
     std::unique_lock<std::mutex> lock(colorFrameMtx_);
     colorFrameCV_.wait(lock, [this]() { return !colorFrameQueue_.empty() || !(is_running_.load()); });

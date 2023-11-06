@@ -279,7 +279,7 @@ class OBCameraNode {
   void onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
                           const stream_index_pair& stream_index);
 
-  void noNewColorFrameCallback();
+  void onNewColorFrameCallback();
 
   void saveImageToFile(const stream_index_pair& stream_index, const cv::Mat& image,
                        const sensor_msgs::msg::Image::SharedPtr& image_msg);

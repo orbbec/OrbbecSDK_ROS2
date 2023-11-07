@@ -5,7 +5,8 @@ from launch_ros.actions import PushRosNamespace
 from launch.actions import GroupAction
 from launch_ros.actions import ComposableNodeContainer
 from launch_ros.descriptions import ComposableNode
-
+from launch_ros.actions import Node
+import os
 
 def generate_launch_description():
     # Declare arguments
@@ -93,34 +94,50 @@ def generate_launch_description():
 
     # Node configuration
     parameters = [{arg.name: LaunchConfiguration(arg.name)} for arg in args]
+    # get  ROS_DISTRO
+    ros_distro = os.environ["ROS_DISTRO"]
+    if ros_distro == "foxy":
+        return LaunchDescription(
+            args
+            + [
+                Node(
+                    package="orbbec_camera",
+                    executable="orbbec_camera_node",
+                    name="ob_camera_node",
+                    namespace=LaunchConfiguration("camera_name"),
+                    parameters=parameters,
+                    output="screen",
+                )
+            ]
+        )
     # Define the ComposableNode
-    compose_node = ComposableNode(
-        package='orbbec_camera',
-        plugin='orbbec_camera::OBCameraNodeDriver',
-        name=LaunchConfiguration('camera_name'),
-        namespace='',
-        parameters=parameters,
-    )
-    # Define the ComposableNodeContainer
-    container = ComposableNodeContainer(
-        name='camera_container',
-        namespace='',
-        package='rclcpp_components',
-        executable='component_container',
-        composable_node_descriptions=[
-            compose_node,
-        ],
-        output='screen',
-    )
-
-    # Launch description
-    ld = LaunchDescription(
-        args +
-        [
-            GroupAction([
-                PushRosNamespace(LaunchConfiguration('camera_name')),
-                container
-            ])
-        ]
-    )
-    return ld
+    else:
+        # Define the ComposableNode
+        compose_node = ComposableNode(
+            package="orbbec_camera",
+            plugin="orbbec_camera::OBCameraNodeDriver",
+            name=LaunchConfiguration("camera_name"),
+            namespace="",
+            parameters=parameters,
+        )
+        # Define the ComposableNodeContainer
+        container = ComposableNodeContainer(
+            name="camera_container",
+            namespace="",
+            package="rclcpp_components",
+            executable="component_container",
+            composable_node_descriptions=[
+                compose_node,
+            ],
+            output="screen",
+        )
+        # Launch description
+        ld = LaunchDescription(
+            args
+            + [
+                GroupAction(
+                    [PushRosNamespace(LaunchConfiguration("camera_name")), container]
+                )
+            ]
+        )
+        return ld

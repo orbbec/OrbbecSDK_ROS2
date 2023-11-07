@@ -814,7 +814,6 @@ void OBCameraNode::onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet> &fr
     }
 
     //is_color_frame_decoded_ = decodeColorFrameToBuffer(frame_set->colorFrame(), rgb_buffer_);
-    //publishPointCloud(frame_set);
     std::shared_ptr<ob::ColorFrame> colorFrame = frame_set->colorFrame();
     if (enable_stream_[COLOR] && colorFrame){
       std::lock_guard<std::mutex> colorLock(colorFrameMtx_);

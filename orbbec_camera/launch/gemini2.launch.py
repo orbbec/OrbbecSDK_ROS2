@@ -83,7 +83,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_frame_sync', default_value='true'),
     ]
 
-# Node configuration
+    # Node configuration
     parameters = [{arg.name: LaunchConfiguration(arg.name)} for arg in args]
     # get  ROS_DISTRO
     ros_distro = os.environ["ROS_DISTRO"]

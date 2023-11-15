@@ -406,6 +406,21 @@ typedef struct {
 } ob_margin_filter_config, OBMarginFilterConfig;
 
 /**
+ * @brief Configuration for mgc filter
+*/
+typedef struct{
+    uint32_t width;
+    uint32_t height;
+    int max_width_left;
+    int max_width_right;
+    int max_radius;
+    int margin_x_th;
+    int margin_y_th;
+    int limit_x_th;
+    int limit_y_th;
+}OBMGCFilterConfig,ob_mgc_filter_config;
+
+/**
  * @brief Alignment mode
  */
 typedef enum {

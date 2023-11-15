@@ -618,6 +618,11 @@ typedef enum {
     OB_PROP_SDK_IR_RIGHT_FRAME_UNPACK_BOOL = 3012,
 
     /**
+     * @brief MGC Filter switch(on by default)
+     */
+    OB_PROP_SDK_DEPTH_RECTIFY_MGC_FILTER_BOOL = 3018,
+
+    /**
      * @brief Calibration JSON file read from device (Femto Mega, read only)
      */
     OB_RAW_DATA_CAMERA_CALIB_JSON_FILE = 4029,

@@ -665,8 +665,12 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
       valid_count++;
     }
   }
+
   auto timestamp = frameTimeStampToROSTime(depth_frame->systemTimeStamp());
+  // std::string frame_id =
+  //     depth_registration_ ? depth_aligned_frame_id_[COLOR] : optical_frame_id_[DEPTH];
   point_cloud_msg_.header.stamp = timestamp;
+  //point_cloud_msg_.header.frame_id = frame_id;
   point_cloud_msg_.header.frame_id = optical_frame_id_[DEPTH];
   point_cloud_msg_.is_dense = true;
   point_cloud_msg_.width = valid_count;

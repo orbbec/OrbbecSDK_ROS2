@@ -496,6 +496,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(soft_filter_speckle_size_, "soft_filter_speckle_size", -1);
   setAndGetNodeParameter<double>(liner_accel_cov_, "linear_accel_cov", 0.0003);
   setAndGetNodeParameter<double>(angular_vel_cov_, "angular_vel_cov", 0.02);
+  setAndGetNodeParameter<bool>(ordered_pc_, "ordered_pc", false);
 }
 
 void OBCameraNode::setupTopics() {
@@ -639,6 +640,7 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
   modifier.resize(width * height);
   point_cloud_msg_.width = depth_frame->width();
   point_cloud_msg_.height = depth_frame->height();
+  point_cloud_msg_.is_dense = false;
   point_cloud_msg_.row_step = point_cloud_msg_.width * point_cloud_msg_.point_step;
   point_cloud_msg_.data.resize(point_cloud_msg_.height * point_cloud_msg_.row_step);
   sensor_msgs::PointCloud2Iterator<float> iter_x(point_cloud_msg_, "x");
@@ -652,26 +654,31 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
   const static float max_depth = MAX_DISTANCE / depth_scale;
   for (uint32_t y = 0; y < height; y++) {
     for (uint32_t x = 0; x < width; x++) {
+      bool vaild_point = true;
       if (depth_data[y * width + x] < min_depth || depth_data[y * width + x] > max_depth) {
-        continue;
+        vaild_point = false;
       }
-      float xf = (x - u0) * fdx;
-      float yf = (y - v0) * fdy;
-      float zf = depth_data[y * width + x] * depth_scale;
-      *iter_x = zf * xf / 1000.0;
-      *iter_y = zf * yf / 1000.0;
-      *iter_z = zf / 1000.0;
-      ++iter_x, ++iter_y, ++iter_z;
-      valid_count++;
+      if(vaild_point || ordered_pc_) {
+        float xf = (x - u0) * fdx;
+        float yf = (y - v0) * fdy;
+        float zf = depth_data[y * width + x] * depth_scale;
+        *iter_x = zf * xf / 1000.0;
+        *iter_y = zf * yf / 1000.0;
+        *iter_z = zf / 1000.0;
+        ++iter_x, ++iter_y, ++iter_z;
+        valid_count++;
+      }
     }
   }
   auto timestamp = frameTimeStampToROSTime(depth_frame->systemTimeStamp());
+  if(!ordered_pc_){
+    point_cloud_msg_.is_dense = true;
+    point_cloud_msg_.width = valid_count;
+    point_cloud_msg_.height = 1;
+    modifier.resize(valid_count);
+  }
   point_cloud_msg_.header.stamp = timestamp;
   point_cloud_msg_.header.frame_id = optical_frame_id_[DEPTH];
-  point_cloud_msg_.is_dense = true;
-  point_cloud_msg_.width = valid_count;
-  point_cloud_msg_.height = 1;
-  modifier.resize(valid_count);
   depth_cloud_pub_->publish(point_cloud_msg_);
 
   if (save_point_cloud_) {
@@ -734,6 +741,7 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
   modifier.resize(color_width * color_height);
   point_cloud_msg_.width = color_frame->width();
   point_cloud_msg_.height = color_frame->height();
+  point_cloud_msg_.is_dense = false;
   std::string format_str = "rgb";
   point_cloud_msg_.point_step =
       addPointField(point_cloud_msg_, format_str, 1, sensor_msgs::msg::PointField::FLOAT32,
@@ -755,34 +763,39 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
   for (uint32_t y = 0; y < color_height; y++) {
     for (uint32_t x = 0; x < color_width; x++) {
       float depth = depth_data[y * depth_width + x];
+      bool vaild_point = true;
       if (depth < min_depth || depth > max_depth) {
-        continue;
+        vaild_point= false;
       }
-      float xf = (x - u0) * fdx;
-      float yf = (y - v0) * fdy;
-      float zf = depth * depth_scale;
-      *iter_x = zf * xf / 1000.0;
-      *iter_y = zf * yf / 1000.0;
-      *iter_z = zf / 1000.0;
-      *iter_r = color_data[(y * color_width + x) * 3];
-      *iter_g = color_data[(y * color_width + x) * 3 + 1];
-      *iter_b = color_data[(y * color_width + x) * 3 + 2];
-      ++iter_x;
-      ++iter_y;
-      ++iter_z;
-      ++iter_r;
-      ++iter_g;
-      ++iter_b;
-      ++valid_count;
+      if(vaild_point || ordered_pc_) {
+        float xf = (x - u0) * fdx;
+        float yf = (y - v0) * fdy;
+        float zf = depth * depth_scale;
+        *iter_x = zf * xf / 1000.0;
+        *iter_y = zf * yf / 1000.0;
+        *iter_z = zf / 1000.0;
+        *iter_r = color_data[(y * color_width + x) * 3];
+        *iter_g = color_data[(y * color_width + x) * 3 + 1];
+        *iter_b = color_data[(y * color_width + x) * 3 + 2];
+        ++iter_x;
+        ++iter_y;
+        ++iter_z;
+        ++iter_r;
+        ++iter_g;
+        ++iter_b;
+        ++valid_count;
+      }
     }
   }
   auto timestamp = frameTimeStampToROSTime(depth_frame->systemTimeStamp());
+  if(!ordered_pc_){
+    point_cloud_msg_.is_dense = true;
+    point_cloud_msg_.width = valid_count;
+    point_cloud_msg_.height = 1;
+    modifier.resize(valid_count);
+  }
   point_cloud_msg_.header.stamp = timestamp;
   point_cloud_msg_.header.frame_id = optical_frame_id_[COLOR];
-  point_cloud_msg_.is_dense = true;
-  point_cloud_msg_.width = valid_count;
-  point_cloud_msg_.height = 1;
-  modifier.resize(valid_count);
   depth_registration_cloud_pub_->publish(point_cloud_msg_);
   if (save_colored_point_cloud_) {
     save_colored_point_cloud_ = false;

@@ -409,6 +409,8 @@ XML launch 文件将会在后续的版本中删除。
 |                 | Gemini E Lite     | 3606                                      |
 |                 | Gemini            | 3.0.18                                    |
 |                 | Astra Mini S Pro  | 1.0.05                                    |
+|                 | DaBai Max Pro     | 1.0.06                                    |
+|                 | Gemini UW         | 1.0.060                                   |
 
 ## DDS Tuning
 

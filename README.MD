@@ -421,6 +421,8 @@ Actually, All launch files all most the same, the only difference is the default
 |                 | Gemini E Lite     | 3606                                      |
 |                 | Gemini            | 3.0.18                                    |
 |                 | Astra Mini S Pro  | 1.0.05                                    |
+|                 | DaBai Max Pro     | 1.0.06                                    |
+|                 | Gemini UW         | 1.0.060                                   |
 
 ## DDS Tuning
 

@@ -433,5 +433,6 @@ class OBCameraNode {
   std::mutex colorFrameMtx_;
   std::condition_variable colorFrameCV_;
 
+  bool ordered_pc_ = false;
 };
 }  // namespace orbbec_camera

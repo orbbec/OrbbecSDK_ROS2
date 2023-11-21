@@ -75,6 +75,7 @@ def generate_launch_description():
         DeclareLaunchArgument('trigger2image_delay_us', default_value='0'),
         DeclareLaunchArgument('trigger_out_delay_us', default_value='0'),
         DeclareLaunchArgument('trigger_out_enabled', default_value='false'),
+        DeclareLaunchArgument('ordered_pc', default_value='false'),
     ]
 
     # Node configuration

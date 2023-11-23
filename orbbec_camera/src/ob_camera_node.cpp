@@ -609,10 +609,8 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
       depth_cloud_pub_->get_subscription_count() == 0) {
     return;
   }
-  if (!camera_param_ && depth_registration_) {
+  if (!camera_param_) {
     camera_param_ = pipeline_->getCameraParam();
-  } else if (!camera_param_) {
-    camera_param_ = getDepthCameraParam();
   }
   if (!camera_param_) {
     RCLCPP_ERROR_STREAM(logger_, "camera_param_ is null");
@@ -883,9 +881,7 @@ void OBCameraNode::onNewColorFrameCallback() {
     std::shared_ptr<ob::FrameSet> frameSet = colorFrameQueue_.front();
     is_color_frame_decoded_ = decodeColorFrameToBuffer(frameSet->colorFrame(), rgb_buffer_);
     publishPointCloud(frameSet, true);
-    if (is_color_frame_decoded_) {
-      onNewFrameCallback(frameSet->colorFrame(), IMAGE_STREAMS.at(2));
-    }
+    onNewFrameCallback(frameSet->colorFrame(), IMAGE_STREAMS.at(2));
     colorFrameQueue_.pop();
   }
 
@@ -1024,12 +1020,8 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   int height = static_cast<int>(video_frame->height());
 
   auto timestamp = frameTimeStampToROSTime(video_frame->systemTimeStamp());
-  if (!camera_param_ && depth_registration_) {
+  if(!camera_param_) {
     camera_param_ = pipeline_->getCameraParam();
-  } else if (!camera_param_ && stream_index == COLOR) {
-    camera_param_ = getColorCameraParam();
-  } else if (!camera_param_ && (stream_index == DEPTH || stream_index == INFRA0)) {
-    camera_param_ = getDepthCameraParam();
   }
   auto &intrinsic =
       stream_index == COLOR ? camera_param_->rgbIntrinsic : camera_param_->depthIntrinsic;

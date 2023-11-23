@@ -415,7 +415,6 @@ void OBCameraNode::getParameters() {
         camera_name_ + "_" + stream_name_[stream_index] + "_optical_frame";
     param_name = stream_name_[stream_index] + "_optical_frame_id";
     setAndGetNodeParameter(optical_frame_id_[stream_index], param_name, default_optical_frame_id);
-    depth_aligned_frame_id_[stream_index] = stream_name_[COLOR] + "_optical_frame";
     param_name = stream_name_[stream_index] + "_format";
     setAndGetNodeParameter(format_str_[stream_index], param_name, format_str_[stream_index]);
     format_[stream_index] = OBFormatFromString(format_str_[stream_index]);
@@ -441,6 +440,10 @@ void OBCameraNode::getParameters() {
     setAndGetNodeParameter<std::string>(image_qos_[stream_index], param_name, "default");
     param_name = stream_name_[stream_index] + "_camera_info_qos";
     setAndGetNodeParameter<std::string>(camera_info_qos_[stream_index], param_name, "default");
+  }
+
+  for (auto stream_index : IMAGE_STREAMS) {
+    depth_aligned_frame_id_[stream_index] = optical_frame_id_[COLOR];
   }
 
   for (const auto &stream_index : HID_STREAMS) {
@@ -677,8 +680,11 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
     point_cloud_msg_.height = 1;
     modifier.resize(valid_count);
   }
+
+  std::string frame_id =
+      depth_registration_ ? depth_aligned_frame_id_[COLOR] : optical_frame_id_[DEPTH];
   point_cloud_msg_.header.stamp = timestamp;
-  point_cloud_msg_.header.frame_id = optical_frame_id_[DEPTH];
+  point_cloud_msg_.header.frame_id = frame_id;
   depth_cloud_pub_->publish(point_cloud_msg_);
 
   if (save_point_cloud_) {

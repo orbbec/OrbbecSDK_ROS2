@@ -436,14 +436,14 @@ void OBCameraNode::getParameters() {
       }
     }
 
-    for (auto stream_index : IMAGE_STREAMS) {
-      depth_aligned_frame_id_[stream_index] = optical_frame_id_[COLOR];
-    }
-
     param_name = stream_name_[stream_index] + "_qos";
     setAndGetNodeParameter<std::string>(image_qos_[stream_index], param_name, "default");
     param_name = stream_name_[stream_index] + "_camera_info_qos";
     setAndGetNodeParameter<std::string>(camera_info_qos_[stream_index], param_name, "default");
+  }
+
+  for (auto stream_index : IMAGE_STREAMS) {
+    depth_aligned_frame_id_[stream_index] = optical_frame_id_[COLOR];
   }
 
   for (const auto &stream_index : HID_STREAMS) {

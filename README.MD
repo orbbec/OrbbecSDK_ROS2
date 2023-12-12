@@ -378,7 +378,7 @@ The frame fps and resolution of IR must be consistent with the depth. The corres
 | product serials                              | launch file             |
 |----------------------------------------------|-------------------------|
 | astra+                                       | astra_adv.launch.py     |
-| astra /astra mini /astra mini pro /astra pro | astra.launch.py         |
+| astra mini /astra mini pro /astra pro        | astra.launch.py         |
 | astra mini pro s                             | astra.launch.py         |
 | astra2                                       | astra2.launch.py        |
 | astra stereo s                               | stereo_s_u3.launch.py   |

@@ -158,21 +158,20 @@ void OBCameraNode::setupDevices() {
     for (const auto &stream_index : IMAGE_STREAMS) {
       if (enable_stream_[stream_index]) {
         OBPropertyID mirrorPropertyID = OB_PROP_DEPTH_MIRROR_BOOL;
-        if(stream_index == COLOR){
+        if (stream_index == COLOR) {
           mirrorPropertyID = OB_PROP_COLOR_MIRROR_BOOL;
-        } else if(stream_index == DEPTH) {
+        } else if (stream_index == DEPTH) {
           mirrorPropertyID = OB_PROP_DEPTH_MIRROR_BOOL;
-        } else if(stream_index == INFRA0) {
+        } else if (stream_index == INFRA0) {
           mirrorPropertyID = OB_PROP_IR_MIRROR_BOOL;
 
-        } else if(stream_index == INFRA1) {
+        } else if (stream_index == INFRA1) {
           mirrorPropertyID = OB_PROP_IR_MIRROR_BOOL;
-        }
-        else if(stream_index == INFRA2) {
+        } else if (stream_index == INFRA2) {
           mirrorPropertyID = OB_PROP_IR_RIGHT_MIRROR_BOOL;
         }
 
-        if(device_->isPropertySupported(mirrorPropertyID, OB_PERMISSION_WRITE)) {
+        if (device_->isPropertySupported(mirrorPropertyID, OB_PERMISSION_WRITE)) {
           device_->setBoolProperty(mirrorPropertyID, flip_stream_[stream_index]);
         }
       }
@@ -500,6 +499,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<double>(liner_accel_cov_, "linear_accel_cov", 0.0003);
   setAndGetNodeParameter<double>(angular_vel_cov_, "angular_vel_cov", 0.02);
   setAndGetNodeParameter<bool>(ordered_pc_, "ordered_pc", false);
+  setAndGetNodeParameter<bool>(enable_zero_copy_, "enable_zero_copy", false);
 }
 
 void OBCameraNode::setupTopics() {
@@ -541,28 +541,38 @@ void OBCameraNode::setupPublishers() {
   using PointCloud2 = sensor_msgs::msg::PointCloud2;
   using CameraInfo = sensor_msgs::msg::CameraInfo;
   auto point_cloud_qos_profile = getRMWQosProfileFromString(point_cloud_qos_);
-  if (enable_colored_point_cloud_) {
-    depth_registration_cloud_pub_ = node_->create_publisher<PointCloud2>(
-        "depth_registered/points",
-        rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(point_cloud_qos_profile),
-                    point_cloud_qos_profile));
-  }
-  if (enable_point_cloud_) {
-    depth_cloud_pub_ = node_->create_publisher<PointCloud2>(
-        "depth/points", rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(point_cloud_qos_profile),
-                                    point_cloud_qos_profile));
+  if (enable_zero_copy_) {
+    setupZeroCopyPublishers();
+  } else {
+    if (enable_colored_point_cloud_) {
+      depth_registration_cloud_pub_ = node_->create_publisher<PointCloud2>(
+          "depth_registered/points",
+          rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(point_cloud_qos_profile),
+                      point_cloud_qos_profile));
+    }
+    if (enable_point_cloud_) {
+      depth_cloud_pub_ = node_->create_publisher<PointCloud2>(
+          "depth/points", rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(point_cloud_qos_profile),
+                                      point_cloud_qos_profile));
+    }
+    for (const auto &stream_index : IMAGE_STREAMS) {
+      if (!enable_stream_[stream_index]) {
+        continue;
+      }
+      std::string name = stream_name_[stream_index];
+      std::string topic = name + "/image_raw";
+      auto image_qos = image_qos_[stream_index];
+      auto image_qos_profile = getRMWQosProfileFromString(image_qos);
+      image_publishers_[stream_index] =
+          image_transport::create_publisher(node_, topic, image_qos_profile);
+    }
   }
   for (const auto &stream_index : IMAGE_STREAMS) {
     if (!enable_stream_[stream_index]) {
       continue;
     }
     std::string name = stream_name_[stream_index];
-    std::string topic = name + "/image_raw";
-    auto image_qos = image_qos_[stream_index];
-    auto image_qos_profile = getRMWQosProfileFromString(image_qos);
-    image_publishers_[stream_index] =
-        image_transport::create_publisher(node_, topic, image_qos_profile);
-    topic = name + "/camera_info";
+    std::string topic = name + "/camera_info";
     auto camera_info_qos = camera_info_qos_[stream_index];
     auto camera_info_qos_profile = getRMWQosProfileFromString(camera_info_qos);
     camera_info_publishers_[stream_index] = node_->create_publisher<CameraInfo>(
@@ -580,7 +590,36 @@ void OBCameraNode::setupPublishers() {
   }
 }
 
-void OBCameraNode::publishPointCloud(const std::shared_ptr<ob::FrameSet> &frame_set, bool isColorPointCloud) {
+void OBCameraNode::setupZeroCopyPublishers() {
+  // image and point cloud
+  for (const auto &stream_index : IMAGE_STREAMS) {
+    if (!enable_stream_[stream_index]) {
+      continue;
+    }
+    std::string name = stream_name_[stream_index];
+    std::string topic = name + "/image_raw";
+    auto image_qos = image_qos_[stream_index];
+    auto image_qos_profile = getRMWQosProfileFromString(image_qos);
+    image_zero_copy_publishers_[stream_index] = node_->create_publisher<ZeroCopyImage>(
+        topic,
+        rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(image_qos_profile), image_qos_profile));
+  }
+  auto point_cloud_qos_profile = getRMWQosProfileFromString(point_cloud_qos_);
+  if (enable_colored_point_cloud_) {
+    depth_registration_cloud_zero_copy_pub_ = node_->create_publisher<ZeroCopyPointCloud>(
+        "depth_registered/points",
+        rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(point_cloud_qos_profile),
+                    point_cloud_qos_profile));
+  }
+  if (enable_point_cloud_) {
+    depth_cloud_zero_copy_pub_ = node_->create_publisher<ZeroCopyPointCloud>(
+        "depth/points", rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(point_cloud_qos_profile),
+                                    point_cloud_qos_profile));
+  }
+}
+
+void OBCameraNode::publishPointCloud(const std::shared_ptr<ob::FrameSet> &frame_set,
+                                     bool isColorPointCloud) {
   try {
     if (isColorPointCloud) {
       if (depth_registration_ || enable_colored_point_cloud_) {
@@ -659,7 +698,7 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
       if (depth_data[y * width + x] < min_depth || depth_data[y * width + x] > max_depth) {
         vaild_point = false;
       }
-      if(vaild_point || ordered_pc_) {
+      if (vaild_point || ordered_pc_) {
         float xf = (x - u0) * fdx;
         float yf = (y - v0) * fdy;
         float zf = depth_data[y * width + x] * depth_scale;
@@ -672,7 +711,7 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
     }
   }
   auto timestamp = frameTimeStampToROSTime(depth_frame->systemTimeStamp());
-  if(!ordered_pc_){
+  if (!ordered_pc_) {
     point_cloud_msg_.is_dense = true;
     point_cloud_msg_.width = valid_count;
     point_cloud_msg_.height = 1;
@@ -683,20 +722,39 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
       depth_registration_ ? depth_aligned_frame_id_[COLOR] : optical_frame_id_[DEPTH];
   point_cloud_msg_.header.stamp = timestamp;
   point_cloud_msg_.header.frame_id = frame_id;
-  depth_cloud_pub_->publish(point_cloud_msg_);
+  auto point_size = point_cloud_msg_.data.size();
+  if (enable_zero_copy_ && point_size < MAX_POINT_CLOUD_SIZE && depth_cloud_zero_copy_pub_ &&
+      depth_cloud_zero_copy_pub_->get_subscription_count() > 0) {
+    auto loaned_msg = depth_cloud_zero_copy_pub_->borrow_loaned_message();
+    auto loaned_point_cloud_msg = loaned_msg.get();
+    loaned_point_cloud_msg.header.stamp = timestamp;
+    memcpy(loaned_point_cloud_msg.header.frame_id.data.data(), optical_frame_id_[COLOR].data(),
+           optical_frame_id_[COLOR].size());
+    loaned_point_cloud_msg.is_dense = point_cloud_msg_.is_dense;
+    loaned_point_cloud_msg.width = point_cloud_msg_.width;
+    loaned_point_cloud_msg.height = point_cloud_msg_.height;
+    loaned_point_cloud_msg.point_step = point_cloud_msg_.point_step;
+    loaned_point_cloud_msg.row_step = point_cloud_msg_.row_step;
+    memcpy(loaned_point_cloud_msg.data.data(), point_cloud_msg_.data.data(),
+           point_cloud_msg_.data.size());
+    depth_cloud_zero_copy_pub_->publish(std::move(loaned_msg));
 
-  if (save_point_cloud_) {
-    save_point_cloud_ = false;
-    auto now = std::time(nullptr);
-    std::stringstream ss;
-    ss << std::put_time(std::localtime(&now), "%Y%m%d_%H%M%S");
-    auto current_path = std::filesystem::current_path().string();
-    std::string filename = current_path + "/point_cloud/points_" + ss.str() + ".ply";
-    if (!std::filesystem::exists(current_path + "/point_cloud")) {
-      std::filesystem::create_directory(current_path + "/point_cloud");
+  } else {
+    depth_cloud_pub_->publish(point_cloud_msg_);
+
+    if (save_point_cloud_) {
+      save_point_cloud_ = false;
+      auto now = std::time(nullptr);
+      std::stringstream ss;
+      ss << std::put_time(std::localtime(&now), "%Y%m%d_%H%M%S");
+      auto current_path = std::filesystem::current_path().string();
+      std::string filename = current_path + "/point_cloud/points_" + ss.str() + ".ply";
+      if (!std::filesystem::exists(current_path + "/point_cloud")) {
+        std::filesystem::create_directory(current_path + "/point_cloud");
+      }
+      RCLCPP_INFO_STREAM(logger_, "Saving point cloud to " << filename);
+      saveDepthPointsToPly(point_cloud_msg_, filename);
     }
-    RCLCPP_INFO_STREAM(logger_, "Saving point cloud to " << filename);
-    saveDepthPointsToPly(point_cloud_msg_, filename);
   }
 }
 
@@ -769,9 +827,9 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
       float depth = depth_data[y * depth_width + x];
       bool vaild_point = true;
       if (depth < min_depth || depth > max_depth) {
-        vaild_point= false;
+        vaild_point = false;
       }
-      if(vaild_point || ordered_pc_) {
+      if (vaild_point || ordered_pc_) {
         float xf = (x - u0) * fdx;
         float yf = (y - v0) * fdy;
         float zf = depth * depth_scale;
@@ -792,7 +850,7 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
     }
   }
   auto timestamp = frameTimeStampToROSTime(depth_frame->systemTimeStamp());
-  if(!ordered_pc_){
+  if (!ordered_pc_) {
     point_cloud_msg_.is_dense = true;
     point_cloud_msg_.width = valid_count;
     point_cloud_msg_.height = 1;
@@ -800,19 +858,39 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
   }
   point_cloud_msg_.header.stamp = timestamp;
   point_cloud_msg_.header.frame_id = optical_frame_id_[COLOR];
-  depth_registration_cloud_pub_->publish(point_cloud_msg_);
-  if (save_colored_point_cloud_) {
-    save_colored_point_cloud_ = false;
-    auto now = std::time(nullptr);
-    std::stringstream ss;
-    ss << std::put_time(std::localtime(&now), "%Y%m%d_%H%M%S");
-    auto current_path = std::filesystem::current_path().string();
-    std::string filename = current_path + "/point_cloud/colored_points_" + ss.str() + ".ply";
-    if (!std::filesystem::exists(current_path + "/point_cloud")) {
-      std::filesystem::create_directory(current_path + "/point_cloud");
+  auto point_size = point_cloud_msg_.data.size();
+  if (enable_zero_copy_ && point_size < MAX_POINT_CLOUD_SIZE &&
+      depth_registration_cloud_zero_copy_pub_ &&
+      depth_registration_cloud_zero_copy_pub_->get_subscription_count() > 0) {
+    auto loaned_msg = depth_registration_cloud_zero_copy_pub_->borrow_loaned_message();
+    auto loaned_point_cloud_msg = loaned_msg.get();
+    loaned_point_cloud_msg.header.stamp = timestamp;
+    memcpy(loaned_point_cloud_msg.header.frame_id.data.data(), optical_frame_id_[COLOR].data(),
+           optical_frame_id_[COLOR].size());
+    loaned_point_cloud_msg.is_dense = point_cloud_msg_.is_dense;
+    loaned_point_cloud_msg.width = point_cloud_msg_.width;
+    loaned_point_cloud_msg.height = point_cloud_msg_.height;
+    loaned_point_cloud_msg.point_step = point_cloud_msg_.point_step;
+    loaned_point_cloud_msg.row_step = point_cloud_msg_.row_step;
+    memcpy(loaned_point_cloud_msg.data.data(), point_cloud_msg_.data.data(),
+           point_cloud_msg_.data.size());
+    depth_registration_cloud_zero_copy_pub_->publish(std::move(loaned_msg));
+
+  } else {
+    depth_registration_cloud_pub_->publish(point_cloud_msg_);
+    if (save_colored_point_cloud_) {
+      save_colored_point_cloud_ = false;
+      auto now = std::time(nullptr);
+      std::stringstream ss;
+      ss << std::put_time(std::localtime(&now), "%Y%m%d_%H%M%S");
+      auto current_path = std::filesystem::current_path().string();
+      std::string filename = current_path + "/point_cloud/colored_points_" + ss.str() + ".ply";
+      if (!std::filesystem::exists(current_path + "/point_cloud")) {
+        std::filesystem::create_directory(current_path + "/point_cloud");
+      }
+      RCLCPP_INFO_STREAM(logger_, "Saving point cloud to " << filename);
+      saveRGBPointCloudMsgToPly(point_cloud_msg_, filename);
     }
-    RCLCPP_INFO_STREAM(logger_, "Saving point cloud to " << filename);
-    saveRGBPointCloudMsgToPly(point_cloud_msg_, filename);
   }
 }
 
@@ -830,9 +908,9 @@ void OBCameraNode::onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet> &fr
       tf_published_ = true;
     }
 
-    //is_color_frame_decoded_ = decodeColorFrameToBuffer(frame_set->colorFrame(), rgb_buffer_);
+    // is_color_frame_decoded_ = decodeColorFrameToBuffer(frame_set->colorFrame(), rgb_buffer_);
     std::shared_ptr<ob::ColorFrame> colorFrame = frame_set->colorFrame();
-    if (enable_stream_[COLOR] && colorFrame){
+    if (enable_stream_[COLOR] && colorFrame) {
       std::lock_guard<std::mutex> colorLock(colorFrameMtx_);
       colorFrameQueue_.push(frame_set);
       colorFrameCV_.notify_all();
@@ -872,9 +950,10 @@ void OBCameraNode::onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet> &fr
 void OBCameraNode::onNewColorFrameCallback() {
   while (enable_stream_[COLOR] && rclcpp::ok() && is_running_.load()) {
     std::unique_lock<std::mutex> lock(colorFrameMtx_);
-    colorFrameCV_.wait(lock, [this]() { return !colorFrameQueue_.empty() || !(is_running_.load()); });
+    colorFrameCV_.wait(lock,
+                       [this]() { return !colorFrameQueue_.empty() || !(is_running_.load()); });
 
-    if(!rclcpp::ok() || !is_running_.load()) {
+    if (!rclcpp::ok() || !is_running_.load()) {
       break;
     }
 
@@ -959,7 +1038,8 @@ bool OBCameraNode::decodeColorFrameToBuffer(const std::shared_ptr<ob::Frame> &fr
   return true;
 }
 
-std::shared_ptr<ob::Frame> OBCameraNode::decodeIRMJPGFrame(const std::shared_ptr<ob::Frame> &frame) {
+std::shared_ptr<ob::Frame> OBCameraNode::decodeIRMJPGFrame(
+    const std::shared_ptr<ob::Frame> &frame) {
   if (frame->format() == OB_FORMAT_MJPEG &&
       (frame->type() == OB_FRAME_IR || frame->type() == OB_FRAME_IR_LEFT ||
        frame->type() == OB_FRAME_IR_RIGHT)) {
@@ -973,8 +1053,9 @@ std::shared_ptr<ob::Frame> OBCameraNode::decodeIRMJPGFrame(const std::shared_ptr
 
     uint32_t buffer_size = irRawMat.rows * irRawMat.cols * irRawMat.channels();
 
-    if(buffer_size > irFrame->dataSize()) {
-      RCLCPP_ERROR_STREAM(logger_, "Insufficient buffer size allocation,failed to decode ir mjpg frame!");
+    if (buffer_size > irFrame->dataSize()) {
+      RCLCPP_ERROR_STREAM(logger_,
+                          "Insufficient buffer size allocation,failed to decode ir mjpg frame!");
       return nullptr;
     }
 
@@ -1020,7 +1101,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   int height = static_cast<int>(video_frame->height());
 
   auto timestamp = frameTimeStampToROSTime(video_frame->systemTimeStamp());
-  if(!camera_param_) {
+  if (!camera_param_) {
     camera_param_ = pipeline_->getCameraParam();
   }
   auto &intrinsic =
@@ -1057,16 +1138,31 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
     auto depth_scale = video_frame->as<ob::DepthFrame>()->getValueScale();
     image = image * depth_scale;
   }
-  auto image_msg =
-      cv_bridge::CvImage(std_msgs::msg::Header(), encoding_[stream_index], image).toImageMsg();
-  image_msg->header.stamp = timestamp;
-  image_msg->is_bigendian = false;
-  image_msg->step = width * unit_step_size_[stream_index];
-  image_msg->header.frame_id = frame_id;
+  size_t curr_image_size = width * height * unit_step_size_[stream_index];
+  if (enable_zero_copy_ && curr_image_size < MAX_IMAGE_SIZE &&
+      image_zero_copy_publishers_[stream_index]->get_subscription_count() > 0) {
+    auto loaned_msg = image_zero_copy_publishers_[stream_index]->borrow_loaned_message();
+    auto image_msg = loaned_msg.get();
+    image_msg.header.stamp = timestamp;
+    image_msg.is_bigendian = false;
+    image_msg.step = width * unit_step_size_[stream_index];
+    memcpy(image_msg.header.frame_id.data.data(), frame_id.data(), frame_id.size());
+    memcpy(image_msg.data.data(), image.data, image.total() * image.elemSize());
+    CHECK(image_zero_copy_publishers_.count(stream_index) > 0);
+    image_zero_copy_publishers_[stream_index]->publish(std::move(loaned_msg));
 
-  CHECK(image_publishers_.count(stream_index) > 0);
-  image_publishers_[stream_index].publish(image_msg);
-  saveImageToFile(stream_index, image, image_msg);
+  } else {
+    auto image_msg =
+        cv_bridge::CvImage(std_msgs::msg::Header(), encoding_[stream_index], image).toImageMsg();
+    image_msg->header.stamp = timestamp;
+    image_msg->is_bigendian = false;
+    image_msg->step = width * unit_step_size_[stream_index];
+    image_msg->header.frame_id = frame_id;
+
+    CHECK(image_publishers_.count(stream_index) > 0);
+    image_publishers_[stream_index].publish(image_msg);
+    saveImageToFile(stream_index, image, image_msg);
+  }
 }
 
 void OBCameraNode::saveImageToFile(const stream_index_pair &stream_index, const cv::Mat &image,

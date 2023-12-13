@@ -62,6 +62,12 @@
 #include "magic_enum/magic_enum.hpp"
 #include "jpeg_decoder.h"
 
+#include "orbbec_camera_msgs/msg/image4m.hpp"
+#include "orbbec_camera_msgs/msg/point_cloud16m.hpp"
+
+#define MAX_IMAGE_SIZE (1280*720*3)
+#define MAX_POINT_CLOUD_SIZE (1280*720*15)
+
 #define STREAM_NAME(sip)                                                                       \
   (static_cast<std::ostringstream&&>(std::ostringstream()                                      \
                                      << _stream_name[sip.first]                                \
@@ -95,6 +101,10 @@ using GetString = orbbec_camera_msgs::srv::GetString;
 using SetString = orbbec_camera_msgs::srv::SetString;
 using SetBool = std_srvs::srv::SetBool;
 using GetBool = orbbec_camera_msgs::srv::GetBool;
+// NOTE: If you want bigger or smaller point cloud, you can change the type of ZeroCopyPointCloud
+// Image is same
+using ZeroCopyImage = orbbec_camera_msgs::msg::Image4m;
+using ZeroCopyPointCloud = orbbec_camera_msgs::msg::PointCloud16m;
 
 typedef std::pair<ob_stream_type, int> stream_index_pair;
 
@@ -137,7 +147,7 @@ class OBCameraNode {
   void clean();
 
   void startStreams();
-  
+
   void startIMU();
 
 
@@ -171,6 +181,8 @@ class OBCameraNode {
   void setupDefaultImageFormat();
 
   void setupPublishers();
+
+  void setupZeroCopyPublishers();
 
   void publishStaticTF(const rclcpp::Time& t, const tf2::Vector3& trans, const tf2::Quaternion& q,
                        const std::string& from, const std::string& to);
@@ -339,6 +351,7 @@ class OBCameraNode {
   std::map<stream_index_pair, bool> flip_stream_;
   std::map<stream_index_pair, std::string> stream_name_;
   std::map<stream_index_pair, image_transport::Publisher> image_publishers_;
+  std::map<stream_index_pair, rclcpp::Publisher<ZeroCopyImage>::SharedPtr> image_zero_copy_publishers_;
   std::map<stream_index_pair, rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr>
       camera_info_publishers_;
 
@@ -371,6 +384,8 @@ class OBCameraNode {
   std::vector<geometry_msgs::msg::TransformStamped> tf_msgs;
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr depth_registration_cloud_pub_;
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr depth_cloud_pub_;
+  rclcpp::Publisher<ZeroCopyPointCloud>::SharedPtr depth_cloud_zero_copy_pub_;
+  rclcpp::Publisher<ZeroCopyPointCloud>::SharedPtr depth_registration_cloud_zero_copy_pub_;
   bool enable_point_cloud_ = true;
   bool enable_colored_point_cloud_ = false;
   sensor_msgs::msg::PointCloud2 point_cloud_msg_;
@@ -434,5 +449,6 @@ class OBCameraNode {
   std::condition_variable colorFrameCV_;
 
   bool ordered_pc_ = false;
+  bool enable_zero_copy_ = false;
 };
 }  // namespace orbbec_camera

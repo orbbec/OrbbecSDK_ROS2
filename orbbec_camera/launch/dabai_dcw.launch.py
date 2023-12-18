@@ -20,7 +20,7 @@ def generate_launch_description():
         DeclareLaunchArgument('vendor_id', default_value='0x2bc5'),
         DeclareLaunchArgument('product_id', default_value=''),
         DeclareLaunchArgument('enable_point_cloud', default_value='true'),
-        DeclareLaunchArgument('enable_colored_point_cloud', default_value='false'),
+        DeclareLaunchArgument('enable_colored_point_cloud', default_value='true'),
         DeclareLaunchArgument('point_cloud_qos', default_value='default'),
         DeclareLaunchArgument('connection_delay', default_value='100'),
         DeclareLaunchArgument('color_width', default_value='640'),
@@ -62,6 +62,7 @@ def generate_launch_description():
         DeclareLaunchArgument('soft_filter_max_diff', default_value='-1'),
         DeclareLaunchArgument('soft_filter_speckle_size', default_value='-1'),
         DeclareLaunchArgument('ordered_pc', default_value='false'),
+        DeclareLaunchArgument('enable_zero_copy', default_value='true'),
     ]
 
     # Node configuration
@@ -102,6 +103,7 @@ def generate_launch_description():
                 compose_node,
             ],
             output="screen",
+            prefix=["xterm -e gdb -ex run --args"],
         )
         # Launch description
         ld = LaunchDescription(

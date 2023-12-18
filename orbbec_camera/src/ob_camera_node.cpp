@@ -500,6 +500,9 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<double>(angular_vel_cov_, "angular_vel_cov", 0.02);
   setAndGetNodeParameter<bool>(ordered_pc_, "ordered_pc", false);
   setAndGetNodeParameter<bool>(enable_zero_copy_, "enable_zero_copy", false);
+  if(enable_zero_copy_){
+    ordered_pc_ = true;
+  }
 }
 
 void OBCameraNode::setupTopics() {
@@ -644,8 +647,10 @@ void OBCameraNode::publishPointCloud(const std::shared_ptr<ob::FrameSet> &frame_
 }
 
 void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &frame_set) {
-  if (!enable_point_cloud_ || !depth_cloud_pub_ ||
-      depth_cloud_pub_->get_subscription_count() == 0) {
+  bool has_subscription = depth_cloud_pub_ && depth_cloud_pub_->get_subscription_count() > 0;
+  has_subscription |=
+      depth_cloud_zero_copy_pub_ && depth_cloud_zero_copy_pub_->get_subscription_count() > 0;
+  if (!enable_point_cloud_ || !has_subscription) {
     return;
   }
   if (!camera_param_) {
@@ -698,7 +703,7 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
       if (depth_data[y * width + x] < min_depth || depth_data[y * width + x] > max_depth) {
         vaild_point = false;
       }
-      if (vaild_point || ordered_pc_) {
+      if (vaild_point || ordered_pc_ || enable_zero_copy_) {
         float xf = (x - u0) * fdx;
         float yf = (y - v0) * fdy;
         float zf = depth_data[y * width + x] * depth_scale;
@@ -759,8 +764,11 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
 }
 
 void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> &frame_set) {
-  if (!enable_colored_point_cloud_ || !depth_registration_cloud_pub_ ||
-      depth_registration_cloud_pub_->get_subscription_count() == 0) {
+  bool has_subscription =
+      depth_registration_cloud_pub_ && depth_registration_cloud_pub_->get_subscription_count() > 0;
+  has_subscription |= depth_registration_cloud_zero_copy_pub_ &&
+                      depth_registration_cloud_zero_copy_pub_->get_subscription_count() > 0;
+  if (!enable_colored_point_cloud_ || !has_subscription) {
     return;
   }
   auto depth_frame = frame_set->depthFrame();
@@ -829,7 +837,7 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
       if (depth < min_depth || depth > max_depth) {
         vaild_point = false;
       }
-      if (vaild_point || ordered_pc_) {
+      if (vaild_point || ordered_pc_ || enable_zero_copy_) {
         float xf = (x - u0) * fdx;
         float yf = (y - v0) * fdy;
         float zf = depth * depth_scale;
@@ -996,8 +1004,11 @@ bool OBCameraNode::decodeColorFrameToBuffer(const std::shared_ptr<ob::Frame> &fr
   if (!rgb_buffer_) {
     return false;
   }
-  bool has_subscriber = image_publishers_[COLOR].getNumSubscribers() > 0;
-  if (enable_colored_point_cloud_ && depth_registration_cloud_pub_->get_subscription_count() > 0) {
+  bool has_subscriber = image_publishers_[COLOR].getNumSubscribers() > 0 ||
+                        (enable_zero_copy_ && image_zero_copy_publishers_[COLOR] &&
+                         image_zero_copy_publishers_[COLOR]->get_subscription_count() > 0);
+  has_subscriber |= depth_registration_cloud_pub_ && depth_registration_cloud_pub_->get_subscription_count() > 0;
+  if (enable_colored_point_cloud_ && has_subscriber) {
     has_subscriber = true;
   }
   if (!has_subscriber) {
@@ -1078,6 +1089,10 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   if (camera_info_publishers_[stream_index]->get_subscription_count() > 0) {
     has_subscriber = true;
   }
+  if (image_zero_copy_publishers_[stream_index] &&
+      image_zero_copy_publishers_[stream_index]->get_subscription_count() > 0) {
+    has_subscriber = true;
+  }
   if (!has_subscriber) {
     return;
   }
@@ -1121,7 +1136,9 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   if (image.empty() || image.cols != width || image.rows != height) {
     image.create(height, width, image_format_[stream_index]);
   }
-  has_subscriber = image_publishers_[stream_index].getNumSubscribers() > 0;
+  has_subscriber = image_publishers_[stream_index].getNumSubscribers() > 0 ||
+                   (image_zero_copy_publishers_[stream_index] &&
+                    image_zero_copy_publishers_[stream_index]->get_subscription_count() > 0);
   if (!has_subscriber) {
     return;
   }
@@ -1427,6 +1444,7 @@ void OBCameraNode::FillImuDataLinearInterpolation(const IMUData &imu_data,
                                                   std::deque<sensor_msgs::msg::Imu> &imu_msgs) {
   imu_history_.push_back(imu_data);
   stream_index_pair steam_index(imu_data.stream_);
+  (void)steam_index;
   imu_msgs.clear();
   std::deque<IMUData> gyros_data;
   IMUData accel0, accel1, current_imu;

@@ -500,7 +500,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<double>(angular_vel_cov_, "angular_vel_cov", 0.02);
   setAndGetNodeParameter<bool>(ordered_pc_, "ordered_pc", false);
   setAndGetNodeParameter<bool>(enable_zero_copy_, "enable_zero_copy", false);
-  if(enable_zero_copy_){
+  if (enable_zero_copy_) {
     ordered_pc_ = true;
   }
 }
@@ -731,10 +731,14 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
   if (enable_zero_copy_ && point_size < MAX_POINT_CLOUD_SIZE && depth_cloud_zero_copy_pub_ &&
       depth_cloud_zero_copy_pub_->get_subscription_count() > 0) {
     auto loaned_msg = depth_cloud_zero_copy_pub_->borrow_loaned_message();
-    auto loaned_point_cloud_msg = loaned_msg.get();
+    if (!loaned_msg.is_valid()) {
+      RCLCPP_ERROR_STREAM(logger_,
+                          "Failed to borrow loaned message from depth_cloud_zero_copy_pub_");
+      return;
+    }
+    auto& loaned_point_cloud_msg = loaned_msg.get();
     loaned_point_cloud_msg.header.stamp = timestamp;
-    memcpy(loaned_point_cloud_msg.header.frame_id.data.data(), optical_frame_id_[COLOR].data(),
-           optical_frame_id_[COLOR].size());
+    memcpy(loaned_point_cloud_msg.header.frame_id.data.data(), frame_id.data(), frame_id.size());
     loaned_point_cloud_msg.is_dense = point_cloud_msg_.is_dense;
     loaned_point_cloud_msg.width = point_cloud_msg_.width;
     loaned_point_cloud_msg.height = point_cloud_msg_.height;
@@ -871,7 +875,7 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
       depth_registration_cloud_zero_copy_pub_ &&
       depth_registration_cloud_zero_copy_pub_->get_subscription_count() > 0) {
     auto loaned_msg = depth_registration_cloud_zero_copy_pub_->borrow_loaned_message();
-    auto loaned_point_cloud_msg = loaned_msg.get();
+    auto& loaned_point_cloud_msg = loaned_msg.get();
     loaned_point_cloud_msg.header.stamp = timestamp;
     memcpy(loaned_point_cloud_msg.header.frame_id.data.data(), optical_frame_id_[COLOR].data(),
            optical_frame_id_[COLOR].size());
@@ -1007,7 +1011,8 @@ bool OBCameraNode::decodeColorFrameToBuffer(const std::shared_ptr<ob::Frame> &fr
   bool has_subscriber = image_publishers_[COLOR].getNumSubscribers() > 0 ||
                         (enable_zero_copy_ && image_zero_copy_publishers_[COLOR] &&
                          image_zero_copy_publishers_[COLOR]->get_subscription_count() > 0);
-  has_subscriber |= depth_registration_cloud_pub_ && depth_registration_cloud_pub_->get_subscription_count() > 0;
+  has_subscriber |=
+      depth_registration_cloud_pub_ && depth_registration_cloud_pub_->get_subscription_count() > 0;
   if (enable_colored_point_cloud_ && has_subscriber) {
     has_subscriber = true;
   }
@@ -1159,7 +1164,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   if (enable_zero_copy_ && curr_image_size < MAX_IMAGE_SIZE &&
       image_zero_copy_publishers_[stream_index]->get_subscription_count() > 0) {
     auto loaned_msg = image_zero_copy_publishers_[stream_index]->borrow_loaned_message();
-    auto image_msg = loaned_msg.get();
+    auto& image_msg = loaned_msg.get();
     image_msg.header.stamp = timestamp;
     image_msg.is_bigendian = false;
     image_msg.step = width * unit_step_size_[stream_index];

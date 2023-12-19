@@ -103,7 +103,6 @@ def generate_launch_description():
                 compose_node,
             ],
             output="screen",
-            prefix=["xterm -e gdb -ex run --args"],
         )
         # Launch description
         ld = LaunchDescription(

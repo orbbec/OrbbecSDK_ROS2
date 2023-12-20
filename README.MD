@@ -195,6 +195,9 @@ to `true` in the stream that corresponds to the argument of the launch file.
   is `true`.
 - `/camera/ir/camera_info`:  The IR camera info.
 - `/camera/ir/image_raw`: The IR stream image
+- `/camera/accel/sample`: Acceleration data stream `enable_sync_output_accel_gyro`turned off，`enable_accel`turned on
+- `/camera/gyro/sample`: Gyroscope data stream，enable_sync_output_accel_gyro`turned off，`enable_gyro`turned on
+- `camera/gyro_accel/sample`: Synchronized data stream of acceleration and gyroscope，`enable_sync_output_accel_gyro`turned on
 
 ### Multi-Camera
 

@@ -196,6 +196,9 @@ ros2 service call /camera/save_point_cloud std_srvs/srv/Empty "{}"
   都设置为 `true`才可用。
 - `/camera/ir/camera_info`:  IR相机信息。
 - `/camera/ir/image_raw`: 红外数据流图像。
+- `/camera/accel/sample`: 加速度数据流，`enable_sync_output_accel_gyro`配置关闭，`enable_accel`配置打开
+- `/camera/gyro/sample`: 陀螺仪数据流，enable_sync_output_accel_gyro`配置关闭，`enable_gyro`配置打开
+- `camera/gyro_accel/sample`: 加速度和陀螺仪同步数据流，通过`enable_sync_output_accel_gyro`配置打开
 
 ### 多相机
 

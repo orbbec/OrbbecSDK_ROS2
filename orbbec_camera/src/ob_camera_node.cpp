@@ -1259,6 +1259,7 @@ void OBCameraNode::calcAndPublishStaticTransform() {
                      "transform x " << ex.trans[0] << " y " << ex.trans[1] << " z " << trans[2]);
   Q = rotationMatrixToQuaternion(ex.rot);
   Q = quaternion_optical * Q * quaternion_optical.inverse();
+  Q = Q.inverse();
   trans[0] = ex.trans[0];
   trans[1] = ex.trans[1];
   trans[2] = ex.trans[2];

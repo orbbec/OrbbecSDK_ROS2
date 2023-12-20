@@ -47,6 +47,7 @@ def generate_launch_description():
         DeclareLaunchArgument('right_ir_qos', default_value='default'),
         DeclareLaunchArgument('right_ir_camera_info_qos', default_value='default'),
         DeclareLaunchArgument('enable_ir_auto_exposure', default_value='true'),
+        DeclareLaunchArgument('enable_sync_output_accel_gyro', default_value='true'),
         DeclareLaunchArgument('enable_accel', default_value='true'),
         DeclareLaunchArgument('accel_rate', default_value='100hz'),
         DeclareLaunchArgument('accel_range', default_value='4g'),

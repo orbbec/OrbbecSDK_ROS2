@@ -26,8 +26,10 @@ class CameraParamList;
 class OBDepthWorkModeList;
 
 class OB_EXTENSION_API Device {
-private:
+protected:
     std::unique_ptr<DeviceImpl> impl_;
+
+    Device(Device &&device);
 
 public:
     /**
@@ -300,6 +302,13 @@ public:
     bool isPropertySupported(OBPropertyID propertyId, OBPermissionType permission);
 
     /**
+     * @brief Check if the global timestamp is supported for the device
+     *
+     * @return Whether the global timestamp is supported
+     */
+    bool isGlobalTimestampSupported();
+
+    /**
      * @brief Upgrade the device firmware
      *
      * @param filePath Firmware path
@@ -530,8 +539,20 @@ public:
      */
     void timerSyncWithHost();
 
+    /**
+     * @brief Load depth filter config from file.
+     * @param filePath Path of the config file.
+     */
+    void loadDepthFilterConfig(const char *filePath);
+
+    /**
+     * @brief Reset depth filter config to device default define.
+     */
+    void resetDefaultDepthFilterConfig();
+
     friend class Pipeline;
     friend class Recorder;
+    friend class CoordinateTransformHelper;
 };
 
 /**

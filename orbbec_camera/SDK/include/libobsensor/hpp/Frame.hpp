@@ -109,6 +109,18 @@ public:
     uint64_t systemTimeStamp();
 
     /**
+     * @brief Get the global timestamp of the frame in microseconds.
+     * @brief The global timestamp is the time point when the frame was was captured by the device, and has been converted to the host clock domain. The
+     * conversion process base on the device timestamp and can eliminate the timer drift of the device
+     *
+     * @attention Only some devices support getting the global timestamp. If the device does not support it, this function will return 0. Check the device
+     * support status by @ref Device::isGlobalTimestampSupported() function.
+     *
+     * @return uint64_t The global timestamp of the frame in microseconds.
+     */
+    uint64_t globalTimeStampUs();
+
+    /**
      * @brief Check if the runtime type of the frame object is compatible with a given type.
      *
      * @tparam T The given type.
@@ -134,6 +146,7 @@ private:
     friend class Filter;
     friend class Recorder;
     friend class FrameHelper;
+    friend class CoordinateTransformHelper;
 };
 
 class OB_EXTENSION_API VideoFrame : public Frame {

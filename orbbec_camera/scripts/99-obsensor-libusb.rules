@@ -86,9 +86,15 @@ SUBSYSTEM=="usb", ATTR{idProduct}=="065e", ATTR{idVendor}=="2bc5", MODE:="0666",
 SUBSYSTEM=="usb", ATTR{idProduct}=="0698", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="j1"
 SUBSYSTEM=="usb", ATTR{idProduct}=="069c", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="TB2201"
 SUBSYSTEM=="usb", ATTR{idProduct}=="06a0", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="dabai_dcw2"
+SUBSYSTEM=="usb", ATTR{idProduct}=="0561", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="dabai_dcw2_rgb"
 SUBSYSTEM=="usb", ATTR{idProduct}=="069f", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="dabai_dw2"
-SUBSYSTEM=="usb", ATTR{idProduct}=="0561", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="dabai_dw2_rgb"
-
+SUBSYSTEM=="usb", ATTR{idProduct}=="069e", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="dabai_max_pro"
+SUBSYSTEM=="usb", ATTR{idProduct}=="0560", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="dabai_max_pro_rgb"
+SUBSYSTEM=="usb", ATTR{idProduct}=="06aa", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="dabai_gemini_uw"
+SUBSYSTEM=="usb", ATTR{idProduct}=="05aa", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="dabai_gemini_uw_rgb"
+SUBSYSTEM=="usb", ATTR{idProduct}=="06a6", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="gemini_ew"
+SUBSYSTEM=="usb", ATTR{idProduct}=="05a6", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="gemini_ew_rgb"
+SUBSYSTEM=="usb", ATTR{idProduct}=="06a7", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="gemini_ew_lite"
 
 
 

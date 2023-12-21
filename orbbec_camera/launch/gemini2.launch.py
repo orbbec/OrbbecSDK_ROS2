@@ -66,7 +66,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_publish_extrinsic', default_value='false'),
         DeclareLaunchArgument('enable_d2c_viewer', default_value='false'),
         DeclareLaunchArgument('enable_ldp', default_value='true'),
-        # Configure the path for depth filter file, for example: /config/depthfilter/Openni_device.json
+        # Configure the path for depth filter file, for example: /config/depthfilter/Gemini2_v1.7.json
         DeclareLaunchArgument('depth_filter_config', default_value=''),
         # Depth work mode support is as follows:
         # Unbinned Dense Default

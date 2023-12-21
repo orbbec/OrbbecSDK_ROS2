@@ -1383,7 +1383,6 @@ void OBCameraNode::calcAndPublishStaticTransform() {
                      "transform x " << ex.trans[0] << " y " << ex.trans[1] << " z " << trans[2]);
   Q = rotationMatrixToQuaternion(ex.rot);
   Q = quaternion_optical * Q * quaternion_optical.inverse();
-  Q = Q.inverse();
   trans[0] = ex.trans[0];
   trans[1] = ex.trans[1];
   trans[2] = ex.trans[2];
@@ -1392,8 +1391,14 @@ void OBCameraNode::calcAndPublishStaticTransform() {
   Q = transform.getRotation();
   trans = transform.getOrigin();
   rclcpp::Time tf_timestamp = node_->now();
+  auto device_info = device_->getDeviceInfo();
+  auto pid = device_info->pid();
   if (enable_stream_[COLOR]) {
-    publishStaticTF(tf_timestamp, trans, Q, camera_link_frame_id_, frame_id_[COLOR]);
+    if(pid != FEMTO_BOLT_PID){
+      publishStaticTF(tf_timestamp, trans, Q, camera_link_frame_id_, frame_id_[COLOR]);
+    } else {
+      publishStaticTF(tf_timestamp, trans, zero_rot, camera_link_frame_id_, frame_id_[COLOR]);
+    }
     publishStaticTF(tf_timestamp, zero_trans, quaternion_optical, frame_id_[COLOR],
                     optical_frame_id_[COLOR]);
   }
@@ -1401,8 +1406,13 @@ void OBCameraNode::calcAndPublishStaticTransform() {
     if (stream_index == COLOR || !enable_stream_[stream_index]) {
       continue;
     }
+    if(pid != FEMTO_BOLT_PID){
     publishStaticTF(tf_timestamp, zero_trans, zero_rot, camera_link_frame_id_,
                     frame_id_[stream_index]);
+    } else {
+      publishStaticTF(tf_timestamp, zero_trans, Q, camera_link_frame_id_,
+                      frame_id_[stream_index]);
+    }
     publishStaticTF(tf_timestamp, zero_trans, quaternion_optical, frame_id_[stream_index],
                     optical_frame_id_[stream_index]);
   }

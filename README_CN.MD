@@ -327,6 +327,7 @@ ros2 launch orbbec_camera multi_camera.launch.py
   。具体的值取决于当前的相机型号。
 - `enumerate_net_device` : 是否开启枚举网络设备的功能，true为开启，false为关闭，仅Femto mega和Gemini 2 XL设备支持。
   当通过网络方式访问以上设备时，需提前配置好设备的IP地址，使能开关需要配置成true。
+- `depth_filter_config` : 配置深度滤波配置文件加载路径，默认深度滤波配置文件在/config/depthfilter目录下。
 
 ## 深度模式切换：
 - 启动相机前,可通过配置对应相继的xxx.launch.py的深度模式(depth_work_mode)支持。

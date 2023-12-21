@@ -340,6 +340,7 @@ The following are the launch parameters available:
   camera.
 - `enumerate_net_device` : Whether to enable the function of enumerating network devices. True means enabled, false means disabled.
   This feature is only supported by Femto Mega and Gemini 2 XL devices. When accessing these devices through the network, the IP address of the device needs to be configured in advance. The enable switch needs to be set to true.
+- `depth_filter_config` : Configure the loading path for the depth filtering configuration file. By default, the depth filtering configuration file is located in the /config/depthfilter directory.
 
 ## Depth work mode switch
 - Before starting the camera, depth work mode (depth_work_mode) can be configured for the corresponding xxx.launch.py file's support.

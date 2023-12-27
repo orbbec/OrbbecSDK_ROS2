@@ -306,7 +306,9 @@ void OBCameraNode::startStreams() {
     throw std::runtime_error("Failed to start pipeline");
   }
   if (enable_stream_[COLOR]) {
-    colorFrameThread_ = std::make_shared<std::thread>([this]() { onNewColorFrameCallback(); });
+    if (colorFrameThread_) {
+      colorFrameThread_ = std::make_shared<std::thread>([this]() { onNewColorFrameCallback(); });
+    }
   }
   if (enable_frame_sync_) {
     pipeline_->enableFrameSync();

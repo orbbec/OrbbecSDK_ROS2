@@ -262,7 +262,7 @@ class OBCameraNode {
   void switchIRCameraCallback(const std::shared_ptr<SetString::Request>& request,
                               std::shared_ptr<SetString::Response>& response);
 
-  void publishPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set, bool isColorPointCloud);
+  void publishPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set);
 
   void publishDepthPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set);
 

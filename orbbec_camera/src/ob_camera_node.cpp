@@ -133,6 +133,13 @@ void OBCameraNode::setupDevices() {
   auto info = device_->getDeviceInfo();
   if (enable_hardware_d2d_ && info->pid() == GEMINI2_PID) {
     device_->setBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL, true);
+    bool isDISPARITY = device_->getBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL);
+    if(isDISPARITY == false) {
+      RCLCPP_INFO_STREAM(logger_, "Depth process is soft D2D.");
+    }
+    else {
+      RCLCPP_INFO_STREAM(logger_, "Depth process is HW D2D.");
+    }
   }
   try {
     if (!depth_work_mode_.empty()) {
@@ -153,6 +160,9 @@ void OBCameraNode::setupDevices() {
       if (default_precision_level != depth_precision_) {
         device_->setIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT, depth_precision_);
       }
+
+      int32_t PRECISION_LEVEL = device_->getIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT);
+      RCLCPP_INFO_STREAM(logger_, "Depth precision level:" << PRECISION_LEVEL);
     }
 
     for (const auto &stream_index : IMAGE_STREAMS) {

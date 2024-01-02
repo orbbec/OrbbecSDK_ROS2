@@ -72,6 +72,7 @@ def generate_launch_description():
         # Unbinned Dense Default
         # Unbinned Sparse Default
         # Binned Sparse Default
+        # Obstacle Avoidance
         DeclareLaunchArgument('depth_work_mode', default_value=''),
         DeclareLaunchArgument('sync_mode', default_value='free_run'),
         DeclareLaunchArgument('depth_delay_us', default_value='0'),

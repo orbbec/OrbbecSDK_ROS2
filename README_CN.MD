@@ -340,6 +340,7 @@ ros2 launch orbbec_camera multi_camera.launch.py
     # Unbinned Dense Default
     # Unbinned Sparse Default
     # Binned Sparse Default
+    # Obstacle Avoidance
     DeclareLaunchArgument('depth_work_mode', default_value='')
 ```
 

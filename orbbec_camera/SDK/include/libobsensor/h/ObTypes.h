@@ -161,6 +161,7 @@ typedef enum {
     OB_SENSOR_IR_LEFT   = 6, /**< left IR */
     OB_SENSOR_IR_RIGHT  = 7, /**< Right IR */
     OB_SENSOR_RAW_PHASE = 8, /**< Raw Phase */
+    OB_SENSOR_COUNT,
 } OBSensorType,
     ob_sensor_type;
 
@@ -367,7 +368,7 @@ typedef struct {
 typedef struct {
     float rot[9];    ///< Rotation matrix
     float trans[3];  ///< Transformation matrix
-} OBD2CTransform, ob_d2c_transform;
+} OBD2CTransform, ob_d2c_transform, OBTransform, ob_transform;
 
 /**
  * @brief Structure for camera parameters
@@ -380,6 +381,7 @@ typedef struct {
     OBD2CTransform     transform;        ///< Rotation/transformation matrix
     bool               isMirrored;       ///< Whether the image frame corresponding to this group of parameters is mirrored
 } OBCameraParam, ob_camera_param;
+
 /**
  * @brief Camera parameters
  */
@@ -391,6 +393,15 @@ typedef struct {
     OBCameraDistortion rgbDistortion;  ///< Distortion parameters for color camera
     OBD2CTransform     transform;      ///< Rotation/transformation matrix
 } OBCameraParam_V0, ob_camera_param_v0;
+
+/**
+ * @brief calibration parameters
+ */
+typedef struct {
+    OBCameraIntrinsic intrinsics[OB_SENSOR_COUNT];             ///< Sensor internal parameters
+    OBTransform extrinsics[OB_SENSOR_COUNT][OB_SENSOR_COUNT];  ///< The extrinsic parameters allow 3D coordinate conversions between sensor.To transform from a
+                                                               ///< source to a target 3D coordinate system,under extrinsics[source][target].
+} OBCalibrationParam, ob_calibration_param;
 
 /**
  * @brief Configuration for depth margin filter
@@ -456,6 +467,7 @@ typedef enum {
     FORMAT_MJPG_TO_BGRA,       /**< MJPG to BGRA */
     FORMAT_UYVY_TO_RGB888,     /**< UYVY to RGB888 */
     FORMAT_BGR_TO_RGB,         /**< BGR to RGB */
+    FORMAT_MJPG_TO_NV12,       /**< MJPG to NV12 */
 } OBConvertFormat,
     ob_convert_format;
 
@@ -632,7 +644,15 @@ typedef struct {
     float x;  ///< X coordinate
     float y;  ///< Y coordinate
     float z;  ///< Z coordinate
-} OBPoint, ob_point;
+} OBPoint, ob_point, OBPoint3f, ob_point3f;
+
+/**
+ * @brief 2D point structure in the SDK
+ */
+typedef struct {
+    float x;  ///< X coordinate
+    float y;  ///< Y coordinate
+} OBPoint2f, ob_point2f;
 
 /**
  * @brief 3D point structure with color information

@@ -1,0 +1,251 @@
+{
+	"device": "Orbbec Gemini 2",
+	"structVersion": "0.0.c",
+	"dataVersion": "1.7.0",
+	"description": "Gemini2 depth filter params",
+	"configDate": "20231212",
+	"vid": "0x2bc5",
+	"pid": "0x0670",
+	"depthFilters": [
+		{
+			"depthWorkMode": "Unbinned Dense Default",
+		    "width": 1280,
+			"height":800,
+			"bxf": 30500,
+			"invalid_value":0,
+			"NoiseRemovalFilter": {
+				"enable": true,
+				"size": 200,
+				"disp_diff": 100,
+				"type": "NR_OVERALL",
+				"lut": [
+					200, 100, 100, 200,
+					200, 100, 100, 200,
+					200, 100, 100, 200,
+					200, 100, 100, 200
+				]
+			},
+			"EdgeNoiseRemovalFilter": {
+				"enable": true,
+				"type": "MG_FILTER",
+				"x1_th": 6,
+				"x2_th": 6,
+				"y1_th": 6,
+				"y2_th": 6,
+				"limit_x": 70,
+				"limit_y": 70,
+				"R": 750,
+				"width1": 40,
+				"width2": 40
+			},
+			"SpatialFastFilter": {
+				"enable": false,
+				"size": 3
+			},
+			"SpatialModerateFilter": {
+				"enable": false,
+				"size": 3,
+				"iters": 1,
+				"disp_diff": 100
+			},
+			"SpatialAdvancedFilter": {
+				"enable": false,
+				"type": "SFA_ALL",
+				"iters": 1,
+				"alpha": 0.4,
+				"disp_diff": 100,
+				"radius": 5
+			},
+			"HoleFillingFilter": {
+				"enable": false,
+				"type": "FILL_TOP"
+			},
+			"TemporalFilter": {
+				"enable": false,
+				"fill": false,
+				"scale": 0.05,
+				"weight": 0.4
+			}
+		},
+        {
+			"depthWorkMode": "Binned Sparse Default",
+		    "width": 640,
+			"height":400,
+			"bxf": 15250,
+			"invalid_value":0,
+			"NoiseRemovalFilter": {
+				"enable": true,
+				"size": 50,
+				"disp_diff": 120,
+				"type": "NR_OVERALL",
+				"lut": [
+					50, 25, 25, 50,
+					50, 25, 25, 50,
+					50, 25, 25, 50,
+					50, 25, 25, 50
+				]
+			},
+			"EdgeNoiseRemovalFilter": {
+				"enable": true,
+				"type": "MG_FILTER",
+				"x1_th": 3,
+				"x2_th": 3,
+				"y1_th": 3,
+				"y2_th": 3,
+				"limit_x": 35,
+				"limit_y": 35,
+				"R": 375,
+				"width1": 20,
+				"width2": 20
+			},
+			"SpatialFastFilter": {
+				"enable": false,
+				"size": 3
+			},
+			"SpatialModerateFilter": {
+				"enable": false,
+				"size": 3,
+				"iters": 1,
+				"disp_diff": 120
+			},
+			"SpatialAdvancedFilter": {
+				"enable": false,
+				"type": "SFA_ALL",
+				"iters": 1,
+				"alpha": 0.4,
+				"disp_diff": 120,
+				"radius": 5
+			},
+			"HoleFillingFilter": {
+				"enable": false,
+				"type": "FILL_TOP"
+			},
+			"TemporalFilter": {
+				"enable": false,
+				"fill": false,
+				"scale": 0.05,
+				"weight": 0.4
+			}
+		},
+		{
+			"depthWorkMode": "Unbinned Sparse Default",
+		    "width": 1280,
+			"height": 800,
+			"bxf": 30500,
+			"invalid_value":0,
+			"NoiseRemovalFilter": {
+				"enable": true,
+				"size": 200,
+				"disp_diff": 100,
+				"type": "NR_OVERALL",
+				"lut": [
+					200, 100, 100, 200,
+					200, 100, 100, 200,
+					200, 100, 100, 200,
+					200, 100, 100, 200
+				]
+			},
+			"EdgeNoiseRemovalFilter": {
+				"enable": true,
+				"type": "MG_FILTER",
+				"x1_th": 6,
+				"x2_th": 6,
+				"y1_th": 6,
+				"y2_th": 6,
+				"limit_x": 70,
+				"limit_y": 70,
+				"R": 750,
+				"width1": 40,
+				"width2": 40
+			},
+			"SpatialFastFilter": {
+				"enable": false,
+				"size": 3
+			},
+			"SpatialModerateFilter": {
+				"enable": false,
+				"size": 3,
+				"iters": 1,
+				"disp_diff": 100
+			},
+			"SpatialAdvancedFilter": {
+				"enable": false,
+				"type": "SFA_ALL",
+				"iters": 1,
+				"alpha": 0.4,
+				"disp_diff": 100,
+				"radius": 5
+			},
+			"HoleFillingFilter": {
+				"enable": false,
+				"type": "FILL_TOP"
+			},
+			"TemporalFilter": {
+				"enable": false,
+				"fill": false,
+				"scale": 0.05,
+				"weight": 0.4
+			}
+		},
+		{
+			"depthWorkMode": "Obstacle Avoidance",
+		    "width": 640,
+			"height":400,
+			"bxf": 30500,
+			"invalid_value":0,
+			"NoiseRemovalFilter": {
+				"enable": true,
+				"size": 50,
+				"disp_diff": 100,
+				"type": "NR_OVERALL",
+				"lut": [
+					50, 25, 25, 50,
+					50, 25, 25, 50,
+					50, 25, 25, 50,
+					50, 25, 25, 50
+				]
+			},
+			"EdgeNoiseRemovalFilter": {
+				"enable": true,
+				"type": "MG_FILTER",
+				"x1_th": 3,
+				"x2_th": 3,
+				"y1_th": 3,
+				"y2_th": 3,
+				"limit_x": 20,
+				"limit_y": 20,
+				"R": 375,
+				"width1": 20,
+				"width2": 20
+			},
+			"SpatialFastFilter": {
+				"enable": false,
+				"size": 5
+			},
+			"SpatialModerateFilter": {
+				"enable": false,
+				"size": 5,
+				"iters": 1,
+				"disp_diff": 100
+			},
+			"SpatialAdvancedFilter": {
+				"enable": true,
+				"type": "SFA_ALL",
+				"iters": 1,
+				"alpha": 0.6,
+				"disp_diff": 100,
+				"radius": 5
+			},
+			"HoleFillingFilter": {
+				"enable": false,
+				"type": "FILL_TOP"
+			},
+			"TemporalFilter": {
+				"enable": false,
+				"fill": false,
+				"scale": 0.05,
+				"weight": 0.4
+			}
+		}
+	]
+}

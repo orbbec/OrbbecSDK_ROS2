@@ -1,5 +1,5 @@
 # orbbec_camera
-[![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-1.3.6-green)
+[![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-1.4.2-green)
 ---
 OrbbecSDK ROS2 is a wrapper for the Orbbec 3D camera that provides seamless integration with the ROS2 environment. It
 supports ROS2 Foxy, Galactic, and Humble distributions.
@@ -195,6 +195,9 @@ to `true` in the stream that corresponds to the argument of the launch file.
   is `true`.
 - `/camera/ir/camera_info`:  The IR camera info.
 - `/camera/ir/image_raw`: The IR stream image
+- `/camera/accel/sample`: Acceleration data stream `enable_sync_output_accel_gyro`turned off，`enable_accel`turned on
+- `/camera/gyro/sample`: Gyroscope data stream，enable_sync_output_accel_gyro`turned off，`enable_gyro`turned on
+- `camera/gyro_accel/sample`: Synchronized data stream of acceleration and gyroscope，`enable_sync_output_accel_gyro`turned on
 
 ### Multi-Camera
 
@@ -337,6 +340,7 @@ The following are the launch parameters available:
   camera.
 - `enumerate_net_device` : Whether to enable the function of enumerating network devices. True means enabled, false means disabled.
   This feature is only supported by Femto Mega and Gemini 2 XL devices. When accessing these devices through the network, the IP address of the device needs to be configured in advance. The enable switch needs to be set to true.
+- `depth_filter_config` : Configure the loading path for the depth filtering configuration file. By default, the depth filtering configuration file is located in the /config/depthfilter directory,Supported only on Gemini2.
 
 ## Depth work mode switch
 - Before starting the camera, depth work mode (depth_work_mode) can be configured for the corresponding xxx.launch.py file's support.
@@ -349,6 +353,7 @@ The following are the launch parameters available:
     # Unbinned Dense Default
     # Unbinned Sparse Default
     # Binned Sparse Default
+    # Obstacle Avoidance
     DeclareLaunchArgument('depth_work_mode', default_value='')
 ```
 
@@ -378,10 +383,11 @@ The frame fps and resolution of IR must be consistent with the depth. The corres
 | product serials                              | launch file             |
 |----------------------------------------------|-------------------------|
 | astra+                                       | astra_adv.launch.py     |
-| astra /astra mini /astra mini pro /astra pro | astra.launch.py         |
+| astra mini /astra mini pro /astra pro        | astra.launch.py         |
 | astra mini pro s                             | astra.launch.py         |
 | astra2                                       | astra2.launch.py        |
 | astra stereo s                               | stereo_s_u3.launch.py   |
+| astra pro2                                   | astra_pro2.launch.py    |
 | dabai                                        | dabai.launch.py         |
 | dabai d1                                     | dabai_d1.launch.py      |
 | dabai dcw                                    | dabai_dcw.launch.py     |
@@ -402,27 +408,25 @@ Actually, All launch files all most the same, the only difference is the default
 
 ## Supported hardware products
 
-| **SDK version** | **products list** | **firmware version**                      |
-|-----------------|-------------------|-------------------------------------------|
-| v1.8.1          | Gemini 2 XL       | Obox: V1.2.5  VL:1.4.54                   |
-|                 | Astra 2           | 2.8.20                                    |
-|                 | Gemini 2 L        | 1.4.32                                    |
-|                 | Gemini 2          | 1.4.60 /1.4.76                            |
-|                 | Femto Mega        | 1.1.7  (window10、ubuntu20.04、ubuntu22.04) |
-|                 | Astra+            | 1.0.22/1.0.21/1.0.20/1.0.19               |
-|                 | Femto             | 1.6.7                                     |
-|                 | Femto W           | 1.1.8                                     |
-|                 | Femto Bolt        | 1.0.6 (unsupported ARNM32)                |
-|                 | DaBai             | 2436                                      |
-|                 | DaBai DCW         | 2460                                      |
-|                 | DaBai DW          | 2606                                      |
-|                 | Astra Mini Pro    | 1007                                      |
-|                 | Gemini E          | 3460                                      |
-|                 | Gemini E Lite     | 3606                                      |
-|                 | Gemini            | 3.0.18                                    |
-|                 | Astra Mini S Pro  | 1.0.05                                    |
-|                 | DaBai Max Pro     | 1.0.06                                    |
-|                 | Gemini UW         | 1.0.060                                   |
+| **products list** | **firmware version**                      |
+|-------------------|-------------------------------------------|
+| Gemini 2 XL       | Obox: V1.2.5  VL:1.4.54                   |
+| Astra 2           | 2.8.20                                    |
+| Gemini 2 L        | 1.4.32                                    |
+| Gemini 2          | 1.4.60 /1.4.76                            |
+| Femto Mega        | 1.1.7  (window10、ubuntu20.04、ubuntu22.04) |
+| Astra+            | 1.0.22/1.0.21/1.0.20/1.0.19               |
+| Femto             | 1.6.7                                     |
+| Femto W           | 1.1.8                                     |
+| Femto Bolt        | 1.0.6 (unsupported ARM32)                 |
+| DaBai             | 2436                                      |
+| DaBai DCW         | 2460                                      |
+| DaBai DW          | 2606                                      |
+| Astra Mini Pro    | 1007                                      |
+| Gemini E          | 3460                                      |
+| Gemini E Lite     | 3606                                      |
+| Gemini            | 3.0.18                                    |
+| Astra Mini S Pro  | 1.0.05                                    |
 
 ## DDS Tuning
 

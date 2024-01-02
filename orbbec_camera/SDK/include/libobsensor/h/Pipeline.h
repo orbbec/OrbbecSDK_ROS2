@@ -169,7 +169,6 @@ ob_camera_param ob_pipeline_get_camera_param_with_profile(ob_pipeline *pipeline,
                                                           uint32_t depthHeight, ob_error **error);
 
 /**
- * \if English
  * @brief Get current camera parameters
  * @attention If D2C is enabled, it will return the camera parameters after D2C, if not, it will return to the default parameters
  *
@@ -178,6 +177,15 @@ ob_camera_param ob_pipeline_get_camera_param_with_profile(ob_pipeline *pipeline,
  * @return ob_camera_param The camera internal parameters
  */
 ob_camera_param ob_pipeline_get_camera_param(ob_pipeline *pipeline, ob_error **error);
+
+/**
+ * @brief Get device calibration parameters
+ *
+ * @param[in] pipeline pipeline object
+ * @param[out] error Log error messages
+ * @return ob_calibration_param The calibration parameters
+ */
+ob_calibration_param ob_pipeline_get_calibration_param(ob_pipeline *pipeline, ob_config *config, ob_error **error);
 
 /**
  * @brief Return a list of D2C-enabled depth sensor resolutions corresponding to the input color sensor resolution
@@ -314,7 +322,7 @@ void ob_config_set_d2c_target_resolution(ob_config *config, uint32_t d2c_target_
  * can be caused by different frame rates of each stream, or by the loss of frames of one stream): drop directly or output to the user.
  *
  * @param[in] config The pipeline configuration
- * @param[in] mode The frame aggregation output mode to be set (default mode is @ref OB_FRAME_AGGREGATE_OUTPUT_ANY_SITUATION)
+ * @param[in] mode The frame aggregation output mode to be set (default mode is @ref OB_FRAME_AGGREGATE_OUTPUT_FULL_FRAME_REQUIRE)
  * @param[out] error Log error messages
  */
 void ob_config_set_frame_aggregate_output_mode(ob_config *config, ob_frame_aggregate_output_mode mode, ob_error **error);

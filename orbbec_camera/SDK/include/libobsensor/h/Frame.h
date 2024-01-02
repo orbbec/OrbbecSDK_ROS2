@@ -69,6 +69,20 @@ uint64_t ob_frame_time_stamp_us(ob_frame *frame, ob_error **error);
 uint64_t ob_frame_system_time_stamp(ob_frame *frame, ob_error **error);
 
 /**
+ * @brief Get the global timestamp of the frame in microseconds.
+ * @brief The global timestamp is the time point when the frame was was captured by the device, and has been converted to the host clock domain. The
+ * conversion process base on the device timestamp and can eliminate the timer drift of the device
+ *
+ * @attention Only some devices support getting the global timestamp. If the device does not support it, this function will return 0. Check the device support
+ * status by @ref ob_device_is_global_timestamp_supported() function.
+ *
+ * @param[in] frame Frame object
+ * @param[out] error Log error messages
+ * @return uint64_t The global timestamp of the frame in microseconds.
+ */
+uint64_t ob_frame_global_time_stamp_us(ob_frame *frame, ob_error **error);
+
+/**
  * @brief Get frame data
  *
  * @param[in] frame Frame object

@@ -56,6 +56,7 @@ def generate_launch_description():
         DeclareLaunchArgument('right_ir_qos', default_value='default'),
         DeclareLaunchArgument('right_ir_camera_info_qos', default_value='default'),
         DeclareLaunchArgument('enable_ir_auto_exposure', default_value='true'),
+        DeclareLaunchArgument('enable_sync_output_accel_gyro', default_value='true'),
         DeclareLaunchArgument('enable_accel', default_value='false'),
         DeclareLaunchArgument('accel_rate', default_value='100hz'),
         DeclareLaunchArgument('accel_range', default_value='4g'),
@@ -90,6 +91,7 @@ def generate_launch_description():
         DeclareLaunchArgument('trigger_out_delay_us', default_value='0'),
         DeclareLaunchArgument('trigger_out_enabled', default_value='false'),
         DeclareLaunchArgument('enable_frame_sync', default_value='true'),
+        DeclareLaunchArgument('ordered_pc', default_value='false'),
     ]
 
     # Node configuration

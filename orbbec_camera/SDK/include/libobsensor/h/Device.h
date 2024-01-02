@@ -97,7 +97,7 @@ const char *ob_device_list_get_device_ip_address(ob_device_list *list, uint32_t 
 /**
  * @brief Get the device extension information.
  *
- * @param[in] info Device Information
+ * @param[in] list Device list object
  * @param[in] index Device index
  * @param[out] error Log error messages
  * @return const char* The device extension information
@@ -864,6 +864,30 @@ void ob_delete_depth_work_mode_list(ob_depth_work_mode_list *work_mode_list, ob_
  * @param[out] error Log error messages
  */
 void ob_delete_data_bundle(ob_data_bundle *data_bundle, ob_error **error);
+
+/**
+ * @brief Check if the device supports global timestamp.
+ *
+ * @param[in] device The device object.
+ * @param[out] error Log error messages.
+ * @return bool Whether the device supports global timestamp.
+ */
+bool ob_device_is_global_timestamp_supported(ob_device *device, ob_error **error);
+
+/**
+ * @brief Load depth filter config from file.
+ * @param[in] device The device object.
+ * @param[in] file_path Path of the config file.
+ * @param[out] error Log error messages.
+ */
+void ob_device_load_depth_filter_config(ob_device *device, const char *file_path, ob_error **error);
+
+/**
+ * @brief Reset depth filter config to device default define.
+ * @param[in] device The device object.
+ * @param[out] error Log error messages.
+ */
+void ob_device_reset_default_depth_filter_config(ob_device *device, ob_error **error);
 
 #ifdef __cplusplus
 }

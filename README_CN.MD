@@ -390,6 +390,13 @@ IR的分辨率和帧率必须和深度保持一致。不同模式和分辨率对
 | gemini2L                                     | gemini2L.launch.py      |
 | gemini e                                     | gemini_e.launch.py      |
 | gemini e lite                                | gemini_e_lite.launch.py |
+| dabai max                                    | dabai_max.launch.py     |
+| dabai max pro                                | dabai_max_pro.launch.py |
+| gemini uw                                    | gemini_uw.launch.py     |
+| dabai dcw2                                   | dabai_dcw2.launch.py    |
+| dabai dw2                                    | dabai_dw2.launch.py     |
+| gemini ew                                    | gemini_ew.launch.py     |
+| gemini ew lite                               | gemini_ew_lite.launch.py|
 
 实际上所有的launch文件都是差不多的内容，只是相机的分辨率和图像格式不同。
 XML launch 文件将会在后续的版本中删除。

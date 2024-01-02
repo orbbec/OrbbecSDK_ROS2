@@ -40,8 +40,6 @@ def generate_launch_description():
         DeclareLaunchArgument('flip_depth', default_value='false'),
         DeclareLaunchArgument('depth_qos', default_value='default'),
         DeclareLaunchArgument('depth_camera_info_qos', default_value='default'),
-        # /config/depthfilter/Openni_device.json，need config path.
-        DeclareLaunchArgument('depth_filter_config', default_value=''),
         DeclareLaunchArgument('ir_width', default_value='640'),
         DeclareLaunchArgument('ir_height', default_value='400'),
         DeclareLaunchArgument('ir_fps', default_value='10'),

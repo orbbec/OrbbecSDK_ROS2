@@ -374,6 +374,7 @@ IR的分辨率和帧率必须和深度保持一致。不同模式和分辨率对
 | astra mini pro s                             | astra.launch.py         |
 | astra2                                       | astra2.launch.py        |
 | astra stereo s                               | stereo_s_u3.launch.py   |
+| astra pro2                                   | astra_pro2.launch.py    |
 | dabai                                        | dabai.launch.py         |
 | dabai d1                                     | dabai_d1.launch.py      |
 | dabai dcw                                    | dabai_dcw.launch.py     |

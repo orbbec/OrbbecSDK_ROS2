@@ -191,10 +191,10 @@ void OBCameraNode::setupDevices() {
     if (!depth_filter_config_.empty() && enable_depth_filter_) {
       RCLCPP_INFO_STREAM(logger_, "Load depth filter config: " << depth_filter_config_);
       device_->loadDepthFilterConfig(depth_filter_config_.c_str());
-    }
-
-    if (device_->isPropertySupported(OB_PROP_DEPTH_SOFT_FILTER_BOOL, OB_PERMISSION_READ_WRITE)) {
-      device_->setBoolProperty(OB_PROP_DEPTH_SOFT_FILTER_BOOL, enable_soft_filter_);
+    } else {
+      if (device_->isPropertySupported(OB_PROP_DEPTH_SOFT_FILTER_BOOL, OB_PERMISSION_READ_WRITE)) {
+        device_->setBoolProperty(OB_PROP_DEPTH_SOFT_FILTER_BOOL, enable_soft_filter_);
+      }
     }
 
     if (device_->isPropertySupported(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
@@ -568,7 +568,6 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter(enable_soft_filter_, "enable_soft_filter", true);
   setAndGetNodeParameter<std::string>(depth_filter_config_, "depth_filter_config", "");
   if (!depth_filter_config_.empty()) {
-    enable_soft_filter_ = false;
     enable_depth_filter_ = true;
   }
   setAndGetNodeParameter(enable_frame_sync_, "enable_frame_sync", false);

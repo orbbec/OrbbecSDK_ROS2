@@ -522,11 +522,6 @@
                 <Format>Y11</Format>
                 <!--Whether to retry after open stream failure, 0 means no retry, >=1 retry and how many times to retry-->
 				<StreamFailedRetry>0</StreamFailedRetry>
-				<ProfileFilter>
-				<profile>
-				<FPS>30</FPS>
-				</profile>
-				</ProfileFilter>
             </Depth>
             <Color>
                 <!--The width of the default resolution, int type-->
@@ -551,11 +546,6 @@
                 <Format>Y10</Format>
                 <!--Whether to retry after open stream failure, 0 means no retry, >=1 retry and how many times to retry-->
 				<StreamFailedRetry>0</StreamFailedRetry>
-				<ProfileFilter>
-				<profile>
-				<FPS>30</FPS>
-				</profile>
-				</ProfileFilter>
             </IR>
         </GeminiEW>
 		<DaBaiMax>
@@ -737,11 +727,6 @@
                 <Format>Y11</Format>
                 <!--Whether to retry after open stream failure, 0 means no retry, >=1 retry and how many times to retry-->
 				<StreamFailedRetry>0</StreamFailedRetry>
-				<ProfileFilter>
-				<profile>
-				<FPS>30</FPS>
-				</profile>
-				</ProfileFilter>
             </Depth>
             <IR>
                 <!--The width of the default resolution, int type-->
@@ -754,11 +739,6 @@
                 <Format>Y10</Format>
                 <!--Whether to retry after open stream failure, 0 means no retry, >=1 retry and how many times to retry-->
 				<StreamFailedRetry>0</StreamFailedRetry>
-				<ProfileFilter>
-				<profile>
-				<FPS>30</FPS>
-				</profile>
-				</ProfileFilter>
             </IR>
         </GeminiEWLite>
         <DaBaiDC1>

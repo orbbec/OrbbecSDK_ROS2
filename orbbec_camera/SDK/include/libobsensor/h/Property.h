@@ -583,6 +583,16 @@ typedef enum {
     OB_PROP_COLOR_HDR_BOOL = 2034,
 
     /**
+     * @brief IR long exposure mode switch read and write.
+     */
+    OB_PROP_IR_LONG_EXPOSURE_BOOL = 2035,
+
+    /**
+     * @brief Setting and getting the USB device frame skipping mode status, true: frame skipping mode, false: non-frame skipping mode.
+     */
+    OB_PROP_SKIP_FRAME_BOOL = 2036,
+
+    /**
      * @brief Software disparity to depth
      */
     OB_PROP_SDK_DISPARITY_TO_DEPTH_BOOL = 3004,

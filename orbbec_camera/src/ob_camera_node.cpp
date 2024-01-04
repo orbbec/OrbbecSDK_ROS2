@@ -321,6 +321,9 @@ void OBCameraNode::startStreams() {
   if (enable_frame_sync_) {
     pipeline_->enableFrameSync();
   }
+  else {
+    pipeline_->disableFrameSync();
+  }
   pipeline_started_.store(true);
 }
 

@@ -351,11 +351,14 @@ void OBCameraNode::startIMU() {
     std::shared_ptr<ob::Config> imuConfig = std::make_shared<ob::Config>();
     imuConfig->enableStream(accelProfile);
     imuConfig->enableStream(gyroProfile);
-    imuPipeline_->start(imuConfig, [&](std::shared_ptr<ob::Frame> frame){
+    imuPipeline_->enableFrameSync();
+    imuPipeline_->start(imuConfig, [&](std::shared_ptr<ob::Frame> frame) {
       auto frameSet = frame->as<ob::FrameSet>();
       auto aFrame = frameSet->getFrame(OB_FRAME_ACCEL);
       auto gFrame = frameSet->getFrame(OB_FRAME_GYRO);
-      onNewIMUFrameSyncOutputCallback(aFrame, gFrame);
+      if (aFrame && gFrame) {
+        onNewIMUFrameSyncOutputCallback(aFrame, gFrame);
+      }
     });
 
     imu_sync_output_start_ = true;

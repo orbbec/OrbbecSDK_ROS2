@@ -321,6 +321,9 @@ void OBCameraNode::startStreams() {
   if (enable_frame_sync_) {
     pipeline_->enableFrameSync();
   }
+  else {
+    pipeline_->disableFrameSync();
+  }
   pipeline_started_.store(true);
 }
 
@@ -348,11 +351,14 @@ void OBCameraNode::startIMU() {
     std::shared_ptr<ob::Config> imuConfig = std::make_shared<ob::Config>();
     imuConfig->enableStream(accelProfile);
     imuConfig->enableStream(gyroProfile);
-    imuPipeline_->start(imuConfig, [&](std::shared_ptr<ob::Frame> frame){
+    imuPipeline_->enableFrameSync();
+    imuPipeline_->start(imuConfig, [&](std::shared_ptr<ob::Frame> frame) {
       auto frameSet = frame->as<ob::FrameSet>();
       auto aFrame = frameSet->getFrame(OB_FRAME_ACCEL);
       auto gFrame = frameSet->getFrame(OB_FRAME_GYRO);
-      onNewIMUFrameSyncOutputCallback(aFrame, gFrame);
+      if (aFrame && gFrame) {
+        onNewIMUFrameSyncOutputCallback(aFrame, gFrame);
+      }
     });
 
     imu_sync_output_start_ = true;
@@ -1215,8 +1221,7 @@ void OBCameraNode::onNewIMUFrameSyncOutputCallback(const std::shared_ptr<ob::Fra
   auto imu_msg = sensor_msgs::msg::Imu();
   setDefaultIMUMessage(imu_msg);
 
-  std::string imu_optical_frame_id ="camera_gyro_accel_optical_frame";
-  imu_msg.header.frame_id = imu_optical_frame_id;
+  imu_msg.header.frame_id = imu_optical_frame_id_;
   auto timestamp = frameTimeStampToROSTime(accelframe->systemTimeStamp());
   imu_msg.header.stamp = timestamp;
   auto gyro_frame = gryoframe->as<ob::GyroFrame>();
@@ -1423,14 +1428,16 @@ void OBCameraNode::calcAndPublishStaticTransform() {
     publishStaticTF(tf_timestamp, zero_trans, quaternion_optical, frame_id_[stream_index],
                     optical_frame_id_[stream_index]);
   }
-  for (const auto &stream_index : HID_STREAMS) {
-    if (enable_stream_[stream_index]) {
-      publishStaticTF(tf_timestamp, zero_trans, zero_rot, camera_link_frame_id_,
-                      frame_id_[stream_index]);
-      publishStaticTF(tf_timestamp, zero_trans, quaternion_optical, frame_id_[stream_index],
-                      optical_frame_id_[stream_index]);
-    }
-  }
+  // for (const auto &stream_index : HID_STREAMS) {
+  //   if (enable_stream_[stream_index]) {
+  //     publishStaticTF(tf_timestamp, zero_trans, zero_rot, camera_link_frame_id_,
+  //                     frame_id_[stream_index]);
+  //     publishStaticTF(tf_timestamp, zero_trans, quaternion_optical, frame_id_[stream_index],
+  //                     optical_frame_id_[stream_index]);
+  //   }
+  // }
+  publishStaticTF(tf_timestamp, zero_trans, zero_rot, camera_link_frame_id_, imu_frame_id_);
+  publishStaticTF(tf_timestamp, zero_trans, quaternion_optical, imu_frame_id_, imu_optical_frame_id_);
 }
 
 void OBCameraNode::publishStaticTransforms() {

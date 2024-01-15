@@ -398,7 +398,8 @@ typedef struct {
  * @brief calibration parameters
  */
 typedef struct {
-    OBCameraIntrinsic intrinsics[OB_SENSOR_COUNT];             ///< Sensor internal parameters
+    OBCameraIntrinsic  intrinsics[OB_SENSOR_COUNT];            ///< Sensor internal parameters
+    OBCameraDistortion distortion[OB_SENSOR_COUNT];            ///< Sensor distortion
     OBTransform extrinsics[OB_SENSOR_COUNT][OB_SENSOR_COUNT];  ///< The extrinsic parameters allow 3D coordinate conversions between sensor.To transform from a
                                                                ///< source to a target 3D coordinate system,under extrinsics[source][target].
 } OBCalibrationParam, ob_calibration_param;
@@ -418,18 +419,18 @@ typedef struct {
 
 /**
  * @brief Configuration for mgc filter
-*/
-typedef struct{
+ */
+typedef struct {
     uint32_t width;
     uint32_t height;
-    int max_width_left;
-    int max_width_right;
-    int max_radius;
-    int margin_x_th;
-    int margin_y_th;
-    int limit_x_th;
-    int limit_y_th;
-}OBMGCFilterConfig,ob_mgc_filter_config;
+    int      max_width_left;
+    int      max_width_right;
+    int      max_radius;
+    int      margin_x_th;
+    int      margin_y_th;
+    int      limit_x_th;
+    int      limit_y_th;
+} OBMGCFilterConfig, ob_mgc_filter_config;
 
 /**
  * @brief Alignment mode
@@ -653,6 +654,13 @@ typedef struct {
     float x;  ///< X coordinate
     float y;  ///< Y coordinate
 } OBPoint2f, ob_point2f;
+
+typedef struct {
+    float *xTable;  ///< table used to compute X coordinate
+    float *yTable;  ///< table used to compute Y coordinate
+    int    width;   ///< width of x and y tables
+    int    height;  ///< height of x and y tables
+} OBXYTables, ob_xy_tables;
 
 /**
  * @brief 3D point structure with color information

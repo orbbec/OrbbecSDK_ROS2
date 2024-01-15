@@ -1428,14 +1428,6 @@ void OBCameraNode::calcAndPublishStaticTransform() {
     publishStaticTF(tf_timestamp, zero_trans, quaternion_optical, frame_id_[stream_index],
                     optical_frame_id_[stream_index]);
   }
-  // for (const auto &stream_index : HID_STREAMS) {
-  //   if (enable_stream_[stream_index]) {
-  //     publishStaticTF(tf_timestamp, zero_trans, zero_rot, camera_link_frame_id_,
-  //                     frame_id_[stream_index]);
-  //     publishStaticTF(tf_timestamp, zero_trans, quaternion_optical, frame_id_[stream_index],
-  //                     optical_frame_id_[stream_index]);
-  //   }
-  // }
   publishStaticTF(tf_timestamp, zero_trans, zero_rot, camera_link_frame_id_, imu_frame_id_);
   publishStaticTF(tf_timestamp, zero_trans, quaternion_optical, imu_frame_id_, imu_optical_frame_id_);
 }

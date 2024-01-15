@@ -205,6 +205,10 @@ void OBCameraNode::setupDevices() {
       device_->setBoolProperty(OB_PROP_IR_AUTO_EXPOSURE_BOOL, enable_ir_auto_exposure_);
     }
 
+    if (device_->isPropertySupported(OB_PROP_IR_LONG_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
+      device_->setBoolProperty(OB_PROP_IR_LONG_EXPOSURE_BOOL, enable_ir_long_exposure_);
+    }
+
     if (device_->isPropertySupported(OB_PROP_DEPTH_MAX_DIFF_INT, OB_PERMISSION_WRITE)) {
       auto default_soft_filter_max_diff = device_->getIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT);
       if (soft_filter_max_diff_ != -1 && default_soft_filter_max_diff != soft_filter_max_diff_) {
@@ -579,6 +583,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter(enable_frame_sync_, "enable_frame_sync", false);
   setAndGetNodeParameter(enable_color_auto_exposure_, "enable_color_auto_exposure", true);
   setAndGetNodeParameter(enable_ir_auto_exposure_, "enable_ir_auto_exposure", true);
+  setAndGetNodeParameter(enable_ir_long_exposure_, "enable_ir_long_exposure", true);
   setAndGetNodeParameter<std::string>(depth_work_mode_, "depth_work_mode", "");
   setAndGetNodeParameter<std::string>(sync_mode_str_, "sync_mode", "close");
   setAndGetNodeParameter(depth_delay_us_, "depth_delay_us", 0);

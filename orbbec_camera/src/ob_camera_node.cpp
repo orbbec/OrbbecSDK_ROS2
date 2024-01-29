@@ -1181,17 +1181,19 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
 
 void OBCameraNode::saveImageToFile(const stream_index_pair &stream_index, const cv::Mat &image,
                                    const sensor_msgs::msg::Image::SharedPtr &image_msg) {
-  if (save_images_[stream_index]) {
+  if (save_images_[stream_index] && save_images_count_[stream_index] > 0) {
     auto now = time(nullptr);
     std::stringstream ss;
     ss << std::put_time(localtime(&now), "%Y%m%d_%H%M%S");
     auto current_path = std::filesystem::current_path().string();
     auto fps = fps_[stream_index];
+    int index = 10 - save_images_count_[stream_index];
+    --save_images_count_[stream_index];
     std::string file_suffix = stream_index == DEPTH ? ".raw" : ".png";
     std::string filename = current_path + "/image/" + stream_name_[stream_index] + "_" +
                            std::to_string(image_msg->width) + "x" +
                            std::to_string(image_msg->height) + "_" + std::to_string(fps) + "hz_" +
-                           ss.str() + file_suffix;
+                           ss.str() + "_" + std::to_string(index) + file_suffix;
     if (!std::filesystem::exists(current_path + "/image")) {
       std::filesystem::create_directory(current_path + "/image");
     }
@@ -1209,7 +1211,6 @@ void OBCameraNode::saveImageToFile(const stream_index_pair &stream_index, const 
     } else {
       RCLCPP_ERROR_STREAM(logger_, "Unsupported stream type: " << stream_index.first);
     }
-    save_images_[stream_index] = false;
   }
 }
 

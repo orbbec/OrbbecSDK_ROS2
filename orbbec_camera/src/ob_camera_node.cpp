@@ -603,6 +603,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<double>(liner_accel_cov_, "linear_accel_cov", 0.0003);
   setAndGetNodeParameter<double>(angular_vel_cov_, "angular_vel_cov", 0.02);
   setAndGetNodeParameter<bool>(ordered_pc_, "ordered_pc", false);
+  setAndGetNodeParameter<int>(max_save_images_count_, "max_save_images_count", 10);
 }
 
 void OBCameraNode::setupTopics() {
@@ -1182,15 +1183,14 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
 
 void OBCameraNode::saveImageToFile(const stream_index_pair &stream_index, const cv::Mat &image,
                                    const sensor_msgs::msg::Image::SharedPtr &image_msg) {
-  if (save_images_[stream_index] && save_images_count_[stream_index] > 0) {
+  if (save_images_[stream_index]) {
     auto now = time(nullptr);
     std::stringstream ss;
     ss << std::put_time(localtime(&now), "%Y%m%d_%H%M%S");
     auto current_path = std::filesystem::current_path().string();
     auto fps = fps_[stream_index];
-    int index = 10 - save_images_count_[stream_index];
-    --save_images_count_[stream_index];
-    std::string file_suffix = stream_index == DEPTH ? ".raw" : ".png";
+    int index = save_images_count_[stream_index];
+    std::string file_suffix = stream_index == COLOR ? ".png" : ".raw";
     std::string filename = current_path + "/image/" + stream_name_[stream_index] + "_" +
                            std::to_string(image_msg->width) + "x" +
                            std::to_string(image_msg->height) + "_" + std::to_string(fps) + "hz_" +
@@ -1199,19 +1199,32 @@ void OBCameraNode::saveImageToFile(const stream_index_pair &stream_index, const 
       std::filesystem::create_directory(current_path + "/image");
     }
     RCLCPP_INFO_STREAM(logger_, "Saving image to " << filename);
-    if (stream_index.first == OB_STREAM_DEPTH) {
-      std::ofstream ofs(filename, std::ios::binary);
-      ofs.write(reinterpret_cast<const char *>(image.data), image.total() * image.elemSize());
-      ofs.close();
-    } else if (stream_index.first == OB_STREAM_COLOR) {
+    if (stream_index.first == OB_STREAM_COLOR) {
       auto image_to_save =
           cv_bridge::toCvCopy(image_msg, sensor_msgs::image_encodings::BGR8)->image;
       cv::imwrite(filename, image_to_save);
     } else if (stream_index.first == OB_STREAM_IR || stream_index.first == OB_STREAM_IR_LEFT ||
-               stream_index.first == OB_STREAM_IR_RIGHT) {
-      cv::imwrite(filename, image);
+               stream_index.first == OB_STREAM_IR_RIGHT || stream_index.first == OB_STREAM_DEPTH) {
+      std::ofstream ofs(filename, std::ios::out | std::ios::binary);
+      if (!ofs.is_open()) {
+        RCLCPP_ERROR_STREAM(logger_, "Failed to open file: " << filename);
+        return;
+      }
+      if (image.isContinuous()) {
+        ofs.write(reinterpret_cast<const char *>(image.data), image.total() * image.elemSize());
+      } else {
+        int rows = image.rows;
+        int cols = image.cols * image.channels();
+        for (int r = 0; r < rows; ++r) {
+          ofs.write(reinterpret_cast<const char *>(image.ptr<uchar>(r)), cols);
+        }
+      }
+      ofs.close();
     } else {
       RCLCPP_ERROR_STREAM(logger_, "Unsupported stream type: " << stream_index.first);
+    }
+    if (++save_images_count_[stream_index] >= max_save_images_count_) {
+      save_images_[stream_index] = false;
     }
   }
 }

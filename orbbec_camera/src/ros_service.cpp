@@ -645,7 +645,7 @@ void OBCameraNode::saveImageCallback(const std::shared_ptr<std_srvs::srv::Empty:
   for (const auto& stream_index : IMAGE_STREAMS) {
     if (enable_stream_[stream_index]) {
       save_images_[stream_index] = true;
-      save_images_count_[stream_index] = 10;
+      save_images_count_[stream_index] = 0;
     }
   }
 }

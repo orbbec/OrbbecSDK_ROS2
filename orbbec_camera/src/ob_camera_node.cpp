@@ -1202,6 +1202,7 @@ void OBCameraNode::saveImageToFile(const stream_index_pair &stream_index, const 
     if (stream_index.first == OB_STREAM_DEPTH) {
       std::ofstream ofs(filename, std::ios::binary);
       ofs.write(reinterpret_cast<const char *>(image.data), image.total() * image.elemSize());
+      ofs.close();
     } else if (stream_index.first == OB_STREAM_COLOR) {
       auto image_to_save =
           cv_bridge::toCvCopy(image_msg, sensor_msgs::image_encodings::BGR8)->image;

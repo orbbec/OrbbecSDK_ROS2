@@ -75,6 +75,7 @@ def generate_launch_description():
         DeclareLaunchArgument('trigger_out_enabled', default_value='false'),
         DeclareLaunchArgument('enable_frame_sync', default_value='true'),
         DeclareLaunchArgument('ordered_pc', default_value='false'),
+        DeclareLaunchArgument('use_hardware_time', default_value='false'),
     ]
 
     # Node configuration

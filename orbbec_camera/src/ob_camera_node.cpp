@@ -604,6 +604,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<double>(angular_vel_cov_, "angular_vel_cov", 0.02);
   setAndGetNodeParameter<bool>(ordered_pc_, "ordered_pc", false);
   setAndGetNodeParameter<int>(max_save_images_count_, "max_save_images_count", 10);
+  setAndGetNodeParameter<bool>(use_hardware_time_, "use_hardware_time", false);
 }
 
 void OBCameraNode::setupTopics() {
@@ -1130,8 +1131,8 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   }
   int width = static_cast<int>(video_frame->width());
   int height = static_cast<int>(video_frame->height());
-
-  auto timestamp = frameTimeStampToROSTime(video_frame->systemTimeStamp());
+  auto frame_time_stamp = use_hardware_time_?video_frame->timeStamp():video_frame->systemTimeStamp();
+  auto timestamp = frameTimeStampToROSTime(frame_time_stamp);
   if (!camera_param_) {
     camera_param_ = pipeline_->getCameraParam();
   }

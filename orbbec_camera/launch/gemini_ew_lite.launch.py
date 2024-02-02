@@ -54,6 +54,8 @@ def generate_launch_description():
         DeclareLaunchArgument('jpeg_decoder', default_value='avdec_mjpeg'),
         DeclareLaunchArgument('video_convert', default_value='videoconvert'),
         DeclareLaunchArgument('ordered_pc', default_value='false'),
+        DeclareLaunchArgument('use_hardware_time', default_value='false'),
+
     ]
 
     # Node configuration

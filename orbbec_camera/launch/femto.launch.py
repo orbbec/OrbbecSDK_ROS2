@@ -71,6 +71,7 @@ def generate_launch_description():
         DeclareLaunchArgument('soft_filter_speckle_size', default_value='-1'),
         DeclareLaunchArgument('enable_frame_sync', default_value='false'),
         DeclareLaunchArgument('ordered_pc', default_value='false'),
+        DeclareLaunchArgument('use_hardware_time', default_value='false'),
     ]
 
     # Node configuration

@@ -449,5 +449,6 @@ class OBCameraNode {
 
   bool ordered_pc_ = false;
   bool use_hardware_time_ = false;
+  bool enable_depth_scale_ = true;
 };
 }  // namespace orbbec_camera

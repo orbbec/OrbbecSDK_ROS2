@@ -605,6 +605,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<bool>(ordered_pc_, "ordered_pc", false);
   setAndGetNodeParameter<int>(max_save_images_count_, "max_save_images_count", 10);
   setAndGetNodeParameter<bool>(use_hardware_time_, "use_hardware_time", false);
+  setAndGetNodeParameter<bool>(enable_depth_scale_, "enable_depth_scale", true);
 }
 
 void OBCameraNode::setupTopics() {
@@ -620,6 +621,7 @@ void OBCameraNode::setupPipelineConfig() {
     pipeline_config_.reset();
   }
   pipeline_config_ = std::make_shared<ob::Config>();
+  pipeline_config_->setDepthScaleRequire(enable_depth_scale_);
   if (depth_registration_ && enable_stream_[COLOR] && enable_stream_[DEPTH]) {
     auto info = device_->getDeviceInfo();
     if (info->pid() == FEMTO_BOLT_PID) {

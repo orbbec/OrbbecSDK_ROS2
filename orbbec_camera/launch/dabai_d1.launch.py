@@ -50,6 +50,7 @@ def generate_launch_description():
         DeclareLaunchArgument('soft_filter_speckle_size', default_value='-1'),
         DeclareLaunchArgument('ordered_pc', default_value='false'),
         DeclareLaunchArgument('use_hardware_time', default_value='false'),
+        DeclareLaunchArgument('enable_depth_scale', default_value='true'),
     ]
 
     # Node configuration

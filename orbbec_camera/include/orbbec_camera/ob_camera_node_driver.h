@@ -50,6 +50,8 @@ class OBCameraNodeDriver : public rclcpp::Node {
 
   void startDevice(const std::shared_ptr<ob::DeviceList>& list);
 
+  void connectNetDevice(const std::string& net_device_ip, int net_device_port);
+
   void onDeviceConnected(const std::shared_ptr<ob::DeviceList>& device_list);
 
   void onDeviceDisconnected(const std::shared_ptr<ob::DeviceList>& device_list);
@@ -76,6 +78,7 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::string serial_number_;
   std::string device_unique_id_;
   std::string usb_port_;
+  bool enumerate_net_device_ = false;  // default false
   std::shared_ptr<Parameters> parameters_ = nullptr;
   std::shared_ptr<std::thread> query_thread_ = nullptr;
   std::shared_ptr<std::thread> device_count_update_thread_ = nullptr;
@@ -92,5 +95,8 @@ class OBCameraNodeDriver : public rclcpp::Node {
   pthread_mutexattr_t orb_device_lock_attr_;
   uint8_t* orb_device_lock_shm_addr_ = nullptr;
   int orb_device_lock_shm_fd_ = -1;
+  // net config
+  std::string net_device_ip_;
+  int net_device_port_ = 0;
 };
 }  // namespace orbbec_camera

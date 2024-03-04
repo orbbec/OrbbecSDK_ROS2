@@ -63,6 +63,8 @@ def generate_launch_description():
         DeclareLaunchArgument('ir_info_url', default_value=''),
         DeclareLaunchArgument('color_info_url', default_value=''),
         DeclareLaunchArgument('enumerate_net_device', default_value='false'),
+        DeclareLaunchArgument('net_device_ip', default_value=''),
+        DeclareLaunchArgument('net_device_port', default_value='0'),
         DeclareLaunchArgument('log_level', default_value='none'),
         DeclareLaunchArgument('enable_publish_extrinsic', default_value='false'),
         DeclareLaunchArgument('enable_d2c_viewer', default_value='false'),

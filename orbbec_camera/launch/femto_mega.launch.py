@@ -62,6 +62,9 @@ def generate_launch_description():
         DeclareLaunchArgument('tf_publish_rate', default_value='10.0'),
         DeclareLaunchArgument('ir_info_url', default_value=''),
         DeclareLaunchArgument('color_info_url', default_value=''),
+        # Network device settings: default net_device_ip is 192.168.1.10 and net_device_port is 8090
+        # If you don't want to use ip addr and port, set enumerate_net_device to true
+        # and leave net_device_ip blank , it can enumerate automate
         DeclareLaunchArgument('enumerate_net_device', default_value='false'),
         DeclareLaunchArgument('net_device_ip', default_value=''),
         DeclareLaunchArgument('net_device_port', default_value='0'),

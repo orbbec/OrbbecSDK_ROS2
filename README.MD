@@ -1,4 +1,5 @@
 # orbbec_camera
+
 [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-1.4.6-green)
 ---
 OrbbecSDK ROS2 is a wrapper for the Orbbec 3D camera that provides seamless integration with the ROS2 environment. It
@@ -141,6 +142,7 @@ ros2 service call  /camera/set_laser_enable std_srvs/srv/SetBool "{data: true}"
 ros2 service call /camera/toggle_ir std_srvs/srv/SetBool "{data : true}"
 
 ```
+
 - save point cloud
 
 ```bash
@@ -198,6 +200,19 @@ to `true` in the stream that corresponds to the argument of the launch file.
 - `/camera/accel/sample`: Acceleration data stream `enable_sync_output_accel_gyro`turned off，`enable_accel`turned on
 - `/camera/gyro/sample`: Gyroscope data stream，enable_sync_output_accel_gyro`turned off，`enable_gyro`turned on
 - `camera/gyro_accel/sample`: Synchronized data stream of acceleration and gyroscope，`enable_sync_output_accel_gyro`turned on
+
+### Network device enumeration
+
+Currently, the network device enumeration function is supported only by the Femto Mega device. When accessing this
+device over the network, if `enumerate_net_device` is set to `true`, the device will be automatically enumerated,
+eliminating the need to configure the IP address in advance or set the enable switch to true. The specific configuration
+methods are as follows:
+
+- `enumerate_net_device`: enumeration network device automatically, only supported by Femto Mega.
+  if `enumerate_net_device` set to `true`, the device will be enumerated automatically,No need to set the `net_device_ip`
+  and `net_device_port` parameters.
+- `net_device_ip`: The IP address of the device.
+- `net_device_port`: The port number of the device.
 
 ### Multi-Camera
 
@@ -338,23 +353,29 @@ The following are the launch parameters available:
 - `gyro_range` : The range of the gyroscope, the optional values
   are `16dps`,`31dps`,`62dps`,`125dps`,`250dps`,`500dps`,`1000dps`,`2000dps`. The specific value depends on the current
   camera.
-- `enumerate_net_device` : Whether to enable the function of enumerating network devices. True means enabled, false means disabled.
-  This feature is only supported by Femto Mega and Gemini 2 XL devices. When accessing these devices through the network, the IP address of the device needs to be configured in advance. The enable switch needs to be set to true.
-- `depth_filter_config` : Configure the loading path for the depth filtering configuration file. By default, the depth filtering configuration file is located in the /config/depthfilter directory,Supported only on Gemini2.
+- `enumerate_net_device` : Whether to enable the function of enumerating network devices. True means enabled, false
+  means disabled.
+  This feature is only supported by Femto Mega and Gemini 2 XL devices. When accessing these devices through the
+  network, the IP address of the device needs to be configured in advance. The enable switch needs to be set to true.
+- `depth_filter_config` : Configure the loading path for the depth filtering configuration file. By default, the depth
+  filtering configuration file is located in the /config/depthfilter directory,Supported only on Gemini2.
 
 ## Depth work mode switch
-- Before starting the camera, depth work mode (depth_work_mode) can be configured for the corresponding xxx.launch.py file's support.
+
+- Before starting the camera, depth work mode (depth_work_mode) can be configured for the corresponding xxx.launch.py
+  file's support.
 - The depth work mode switch is supported by Gemini 2, Gemini 2 L, and Gemini 2 XL cameras.
-- The default depth work mode configuration of xxx.launch.py is the camera's default configuration. If you need to modify it, you can switch to the corresponding mode as needed.
+- The default depth work mode configuration of xxx.launch.py is the camera's default configuration. If you need to
+  modify it, you can switch to the corresponding mode as needed.
 - The specific camera depth work mode support types can be found in the comments of the depth mode.
 
 ```python
     # Depth work mode support is as follows:
-    # Unbinned Dense Default
-    # Unbinned Sparse Default
-    # Binned Sparse Default
-    # Obstacle Avoidance
-    DeclareLaunchArgument('depth_work_mode', default_value='')
+# Unbinned Dense Default
+# Unbinned Sparse Default
+# Binned Sparse Default
+# Obstacle Avoidance
+DeclareLaunchArgument('depth_work_mode', default_value='')
 ```
 
 - View depth work modes:
@@ -364,9 +385,14 @@ ros2 run orbbec_camera list_depth_work_mode_node
 ```
 
 ## Configuration of depth NFOV and WFOV modes
-For the Femto Mega and Femto Bolt devices, the NFOV and WFOV modes are implemented by configuring the resolution of Depth and IR in the launch file. 
-In launch file, depth_width、depth_height、ir_width、ir_height represents the resolution of the depth  and the resolution of the IR.
-The frame fps and resolution of IR must be consistent with the depth. The correspondence between different modes and resolutions is as follows:
+
+For the Femto Mega and Femto Bolt devices, the NFOV and WFOV modes are implemented by configuring the resolution of
+Depth and IR in the launch file.
+In launch file, depth_width、depth_height、ir_width、ir_height represents the resolution of the depth and the resolution of
+the IR.
+The frame fps and resolution of IR must be consistent with the depth. The correspondence between different modes and
+resolutions is as follows:
+
 - NFOV unbinned: 640 x 576.
 - NFOV binned: 320 x 288.
 - WFOV unbinned: 1024 x 1024.
@@ -380,36 +406,36 @@ The frame fps and resolution of IR must be consistent with the depth. The corres
 
 ## Launch files
 
-| product serials                              | launch file             |
-|----------------------------------------------|-------------------------|
-| astra+                                       | astra_adv.launch.py     |
-| astra mini /astra mini pro /astra pro        | astra.launch.py         |
-| astra mini pro s                             | astra.launch.py         |
-| astra2                                       | astra2.launch.py        |
-| astra stereo s                               | stereo_s_u3.launch.py   |
-| astra pro2                                   | astra_pro2.launch.py    |
-| dabai                                        | dabai.launch.py         |
-| dabai d1                                     | dabai_d1.launch.py      |
-| dabai dcw                                    | dabai_dcw.launch.py     |
-| dabai dw                                     | dabai_dw.launch.py      |
-| dabai pro                                    | dabai_pro.launch.py     |
-| deeya                                        | deeya.launch.py         |
-| femto  /femto w                              | femto.launch.py         |
-| femto mega                                   | femto_mega.launch.py    |
-| femto bolt                                   | femto_bolt.launch.py    |
-| gemini                                       | gemini.launch.py        |
-| gemini                                       | gemini.launch.py        |
-| gemini2 / dabai DCL                          | gemini2.launch.py       |
-| gemini2L                                     | gemini2L.launch.py      |
-| gemini e                                     | gemini_e.launch.py      |
-| gemini e lite                                | gemini_e_lite.launch.py |
-| dabai max                                    | dabai_max.launch.py     |
-| dabai max pro                                | dabai_max_pro.launch.py |
-| gemini uw                                    | gemini_uw.launch.py     |
-| dabai dcw2                                   | dabai_dcw2.launch.py    |
-| dabai dw2                                    | dabai_dw2.launch.py     |
-| gemini ew                                    | gemini_ew.launch.py     |
-| gemini ew lite                               | gemini_ew_lite.launch.py|
+| product serials                       | launch file              |
+|---------------------------------------|--------------------------|
+| astra+                                | astra_adv.launch.py      |
+| astra mini /astra mini pro /astra pro | astra.launch.py          |
+| astra mini pro s                      | astra.launch.py          |
+| astra2                                | astra2.launch.py         |
+| astra stereo s                        | stereo_s_u3.launch.py    |
+| astra pro2                            | astra_pro2.launch.py     |
+| dabai                                 | dabai.launch.py          |
+| dabai d1                              | dabai_d1.launch.py       |
+| dabai dcw                             | dabai_dcw.launch.py      |
+| dabai dw                              | dabai_dw.launch.py       |
+| dabai pro                             | dabai_pro.launch.py      |
+| deeya                                 | deeya.launch.py          |
+| femto  /femto w                       | femto.launch.py          |
+| femto mega                            | femto_mega.launch.py     |
+| femto bolt                            | femto_bolt.launch.py     |
+| gemini                                | gemini.launch.py         |
+| gemini                                | gemini.launch.py         |
+| gemini2 / dabai DCL                   | gemini2.launch.py        |
+| gemini2L                              | gemini2L.launch.py       |
+| gemini e                              | gemini_e.launch.py       |
+| gemini e lite                         | gemini_e_lite.launch.py  |
+| dabai max                             | dabai_max.launch.py      |
+| dabai max pro                         | dabai_max_pro.launch.py  |
+| gemini uw                             | gemini_uw.launch.py      |
+| dabai dcw2                            | dabai_dcw2.launch.py     |
+| dabai dw2                             | dabai_dw2.launch.py      |
+| gemini ew                             | gemini_ew.launch.py      |
+| gemini ew lite                        | gemini_ew_lite.launch.py |
 
 Actually, All launch files all most the same, the only difference is the default value of the parameters.
 

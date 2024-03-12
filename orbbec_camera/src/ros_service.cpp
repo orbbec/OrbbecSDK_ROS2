@@ -159,6 +159,11 @@ void OBCameraNode::setupCameraCtrlServices() {
                           std::shared_ptr<SetString::Response> response) {
         switchIRCameraCallback(request, response);
       });
+  set_ir_long_exposure_srv_ = node_->create_service<SetBool>(
+      "set_ir_long_exposure", [this](const std::shared_ptr<SetBool::Request> request,
+                                     std::shared_ptr<SetBool::Response> response) {
+        setIRLongExposureCallback(request, response);
+      });
 }
 
 void OBCameraNode::setExposureCallback(const std::shared_ptr<SetInt32::Request>& request,
@@ -675,6 +680,23 @@ void OBCameraNode::switchIRCameraCallback(const std::shared_ptr<SetString::Reque
     device_->setIntProperty(OB_PROP_IR_CHANNEL_DATA_SOURCE_INT, data);
     response->success = true;
     return;
+  } catch (const ob::Error& e) {
+    response->message = e.getMessage();
+    response->success = false;
+  } catch (const std::exception& e) {
+    response->message = e.what();
+    response->success = false;
+  } catch (...) {
+    response->message = "unknown error";
+    response->success = false;
+  }
+}
+void OBCameraNode::setIRLongExposureCallback(
+    const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
+    std::shared_ptr<std_srvs::srv::SetBool::Response>& response) {
+  try {
+    device_->setBoolProperty(OB_PROP_IR_LONG_EXPOSURE_BOOL, request->data);
+    response->success = true;
   } catch (const ob::Error& e) {
     response->message = e.getMessage();
     response->success = false;

@@ -35,7 +35,6 @@ sensor_msgs::msg::CameraInfo convertToCameraInfo(OBCameraIntrinsic intrinsic,
   info.d[6] = distortion.k5;
   info.d[7] = distortion.k6;
 
-
   info.k.fill(0.0);
   info.k[0] = intrinsic.fx;
   info.k[2] = intrinsic.cx;
@@ -235,8 +234,16 @@ orbbec_camera_msgs::msg::Extrinsics obExtrinsicsToMsg(const OBD2CTransform &extr
   return msg;
 }
 
-rclcpp::Time frameTimeStampToROSTime(uint64_t ms) {
+rclcpp::Time fromMsToROSTime(uint64_t ms) {
   auto total = static_cast<uint64_t>(ms * 1e6);
+  uint64_t sec = total / 1000000000;
+  uint64_t nano_sec = total % 1000000000;
+  rclcpp::Time stamp(sec, nano_sec);
+  return stamp;
+}
+
+rclcpp::Time fromUsToROSTime(uint64_t us) {
+  auto total = static_cast<uint64_t>(us * 1e3);
   uint64_t sec = total / 1000000000;
   uint64_t nano_sec = total % 1000000000;
   rclcpp::Time stamp(sec, nano_sec);

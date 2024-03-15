@@ -385,6 +385,29 @@ typedef enum {
     OB_PROP_LASER_PULSE_WIDTH_PROTECTION_STATUS_BOOL = 149,
 
     /**
+     * @brief Laser always on, true: always on, false: off, laser will be turned off when out of exposure time
+     */
+    OB_PROP_LASER_ALWAYS_ON_BOOL = 174,
+
+    /**
+     * @brief Laser on/off alternate mode, 0: off, 1: on-off alternate, 2: off-on alternate
+     * @attention When turn on this mode, the laser will turn on and turn off alternately each frame.
+     */
+    OB_PROP_LASER_ON_OFF_MODE_INT = 175,
+
+    /**
+     * @brief Depth unit flexible adjustment\
+     * @brief This property allows continuous adjustment of the depth unit, unlike @ref OB_PROP_DEPTH_PRECISION_LEVEL_INT must be set to some fixed value.
+     */
+    OB_PROP_DEPTH_UNIT_FLEXIBLE_ADJUSTMENT_FLOAT = 176,
+
+    /**
+     * @brief Laser control, 0: off, 1: on, 2: auto
+     *
+     */
+    OB_PROP_LASER_CONTROL_INT = 182,
+
+    /**
      * @brief Baseline calibration parameters
      */
     OB_STRUCT_BASELINE_CALIBRATION_PARAM = 1002,
@@ -441,6 +464,32 @@ typedef enum {
      * @attention read only
      */
     OB_STRUCT_DEVICE_STATIC_IP_CONFIG_RECORD = 1053,
+
+    /**
+     * @brief Using to configure the depth sensor's HDR mode
+     * @brief The Value type is @ref OBHdrConfig
+     *
+     * @attention After enable HDR mode, the depth sensor auto exposure will be disabled.
+     */
+    OB_STRUCT_DEPTH_HDR_CONFIG = 1059,
+
+    /**
+     * @brief Color Sensor AE ROI configuration
+     * @brief The Value type is @ref OBRegionOfInterest
+     */
+    OB_STRUCT_COLOR_AE_ROI = 1060,
+
+    /**
+     * @brief Depth Sensor AE ROI configuration
+     * @brief The Value type is @ref OBRegionOfInterest
+     * @brief Since the ir sensor is the same physical sensor as the depth sensor, this property will also effect the ir sensor.
+     */
+    OB_STRUCT_DEPTH_AE_ROI = 1061,
+
+    /**
+     * @brief ASIC serial number
+     */
+    OB_STRUCT_ASIC_SERIAL_NUMBER = 1063,
 
     /**
      * @brief Color camera auto exposure
@@ -591,6 +640,11 @@ typedef enum {
      * @brief Setting and getting the USB device frame skipping mode status, true: frame skipping mode, false: non-frame skipping mode.
      */
     OB_PROP_SKIP_FRAME_BOOL = 2036,
+
+    /**
+     * @brief Depth HDR merge, true: on, false: off.
+     */
+    OB_PROP_HDR_MERGE_BOOL = 2037,
 
     /**
      * @brief Software disparity to depth

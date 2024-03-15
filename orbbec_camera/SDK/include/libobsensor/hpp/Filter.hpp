@@ -8,6 +8,7 @@
 #include "Types.hpp"
 #include <functional>
 #include <memory>
+#include <map>
 
 namespace ob {
 class Frame;
@@ -148,6 +149,174 @@ public:
 class OB_EXTENSION_API DecompressionFilter : public Filter {
 public:
     DecompressionFilter();
+};
+
+/**
+ * @brief Hole filling filter
+ */
+class OB_EXTENSION_API HoleFillingFilter : public Filter {
+public:
+    HoleFillingFilter();
+
+    void enable(bool enable);
+
+    bool isEnabled();
+
+    void setFilterMode(OBHoleFillingMode mode);
+};
+
+/**
+ * @brief Temporal filter
+ */
+class OB_EXTENSION_API TemporalFilter : public Filter {
+public:
+    TemporalFilter();
+
+    void enable(bool enable);
+
+    bool isEnabled();
+
+    OBFloatPropertyRange getDiffScaleRange();
+
+    void setDiffScale(float value);
+
+    OBFloatPropertyRange getWeightRange();
+
+    void setWeight(float value);
+    
+};
+
+/**
+ * @brief Spatial advanced filter
+ */
+class OB_EXTENSION_API SpatialAdvancedFilter : public Filter {
+public:
+    SpatialAdvancedFilter();
+
+    void enable(bool enable);
+
+    bool isEnabled();
+
+    OBFloatPropertyRange getAlphaRange();
+
+    OBUint16PropertyRange getDispDiffRange();
+
+    OBUint16PropertyRange getRadiusRange();
+
+    OBIntPropertyRange getMagnitudeRange();
+
+    OBSpatialAdvancedFilterParams getFilterParams();
+
+    void setFilterParams(OBSpatialAdvancedFilterParams params);
+};
+
+/**
+ * @brief Depth to disparity or disparity to depth
+ */
+class OB_EXTENSION_API DisparityTransform : public Filter {
+public:
+    DisparityTransform();
+
+    DisparityTransform(bool depth_to_disparity);
+
+    void enable(bool enable);
+
+    bool isEnabled();
+};
+
+/**
+ * @brief Depth HDR merge
+ */
+class OB_EXTENSION_API HdrMerge : public Filter {
+public:
+    HdrMerge();
+
+    void enable(bool enable);
+
+    bool isEnabled();
+};
+
+/**
+ * @brief Align for depth to other or other to depth.
+ */
+class OB_EXTENSION_API Align : public Filter {
+public:
+    Align(OBStreamType align_to_stream, OBFrameType align_to_frame);
+
+    void enable(bool enable);
+
+    bool isEnabled();
+};
+
+/**
+ * @brief Creates depth Thresholding filter
+ * By controlling min and max options on the block
+ */
+class OB_EXTENSION_API ThresholdFilter : public Filter {
+public:
+    ThresholdFilter();
+
+    void enable(bool enable);
+
+    bool isEnabled();
+
+    OBIntPropertyRange getMinRange();
+
+    OBIntPropertyRange getMaxRange();
+
+    void setValueRange(uint16_t min, uint16_t max);
+};
+
+/**
+ * @brief
+ */
+class OB_EXTENSION_API SequenceIdFilter : public Filter {
+public:
+    SequenceIdFilter();
+
+    void enable(bool enable);
+
+    bool isEnabled();
+
+    void selectSequenceId(float sequence_id);
+
+    float getSelectSequenceId();
+
+    std::map<float, std::string> getSequenceIdList();
+};
+
+/**
+ * @brief
+ */
+class OB_EXTENSION_API NoiseRemovalFilter : public Filter {
+public:
+    NoiseRemovalFilter();
+
+    void enable(bool enable);
+
+    bool isEnabled();
+
+    void setNoiseRemovalFilterParams(OBNoiseRemovalFilterParams *filterParams);
+
+    OBUint16PropertyRange getDispDiffRange();
+
+    OBUint16PropertyRange getSizeRange();
+};
+
+/**
+ * @brief
+ */
+class OB_EXTENSION_API DecimationFilter : public Filter {
+public:
+    DecimationFilter();
+
+    void enable(bool enable);
+
+    bool isEnabled();
+
+    void setScaleValue(uint8_t value);
+
+    OBUint8PropertyRange getScaleRange();
 };
 
 }  // namespace ob

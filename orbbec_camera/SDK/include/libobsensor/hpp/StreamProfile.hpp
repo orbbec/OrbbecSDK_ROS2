@@ -43,6 +43,13 @@ public:
     OBStreamType type() const;
 
     /**
+     * @brief Get the extrinsic parameters from current stream profile to the given target stream profile
+     *
+     * @return OBExtrinsic Return the extrinsic parameters.
+     */
+    OBExtrinsic getExtrinsicTo(std::shared_ptr<StreamProfile> target);
+
+    /**
      * @brief Check if frame object is compatible with the given type
      *
      * @tparam T  Given type
@@ -100,6 +107,21 @@ public:
      * @return uint32_t Return the height of the stream.
      */
     uint32_t height() const;
+
+    /**
+     * @brief Get the intrinsic parameters of the stream.
+     *
+     * @return OBCameraIntrinsic Return the intrinsic parameters.
+     */
+    OBCameraIntrinsic getIntrinsic();
+
+    /**
+     * @brief Get the distortion parameters of the stream.
+     * @brief Brown distortion model
+     *
+     * @return OBCameraDistortion Return the distortion parameters.
+     */
+    OBCameraDistortion getDistortion();
 };
 
 /**
@@ -126,6 +148,13 @@ public:
      * @return OBAccelFullScaleRange Return the sampling frequency.
      */
     OBAccelSampleRate sampleRate() const;
+
+    /**
+     * @brief get the intrinsic parameters of the stream.
+     *
+     * @return OBAccelIntrinsic Return the intrinsic parameters.
+     */
+    OBAccelIntrinsic getIntrinsic();
 };
 
 /**
@@ -151,6 +180,13 @@ public:
      * @return OBAccelFullScaleRange Return the sampling frequency.
      */
     OBGyroSampleRate sampleRate() const;
+
+    /**
+     * @brief get the intrinsic parameters of the stream.
+     *
+     * @return OBGyroIntrinsic Return the intrinsic parameters.
+     */
+    OBGyroIntrinsic getIntrinsic();
 };
 
 template <typename T> bool StreamProfile::is() {

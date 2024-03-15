@@ -84,6 +84,7 @@ void ob_pipeline_stop(ob_pipeline *pipeline, ob_error **error);
 
 /**
  * @brief Get the configuration object associated with the pipeline
+ * @brief Returns default configuration if the user has not configured
  *
  * @param[in] pipeline The pipeline object
  * @param[out] error Log error messages
@@ -262,12 +263,22 @@ void ob_delete_config(ob_config *config, ob_error **error);
 void ob_config_enable_stream(ob_config *config, ob_stream_profile *profile, ob_error **error);
 
 /**
+ * @deprecated Use @ref ob_config_enable_stream instead
  * @brief Enable all streams in the pipeline configuration
  *
  * @param[in] config The pipeline configuration
  * @param[out] error Log error messages
  */
 void ob_config_enable_all_stream(ob_config *config, ob_error **error);
+
+/**
+ * @brief  Get the enabled stream profile list in the pipeline configuration
+ *
+ * @param config The pipeline configuration
+ * @param error Log error messages
+ * @return ob_stream_profile_list* The enabled stream profile list, should be released by @ref ob_delete_stream_profile_list after use
+ */
+ob_stream_profile_list *ob_config_get_enabled_stream_profile_list(ob_config *config, ob_error **error);
 
 /**
  * @brief Disable a specific stream in the pipeline configuration

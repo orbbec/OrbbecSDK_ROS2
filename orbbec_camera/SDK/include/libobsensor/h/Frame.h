@@ -103,6 +103,78 @@ void *ob_frame_data(ob_frame *frame, ob_error **error);
 uint32_t ob_frame_data_size(ob_frame *frame, ob_error **error);
 
 /**
+ * @brief Get the metadata of the frame
+ *
+ * @param[in] frame frame object
+ * @param[out] error Log error messages
+ * @return void* return the metadata pointer of the frame
+ */
+void *ob_frame_metadata(ob_frame *frame, ob_error **error);
+#define ob_video_frame_metadata ob_frame_metadata  // for compatibility
+
+/**
+ * @brief Get the metadata size of the frame
+ *
+ * @param[in] frame frame object
+ * @param[out] error Log error messages
+ * @return uint32_t return the metadata size of the frame
+ */
+uint32_t ob_frame_metadata_size(ob_frame *frame, ob_error **error);
+#define ob_video_frame_metadata_size ob_frame_metadata_size  // for compatibility
+
+/**
+ * @brief check if the frame contains the specified metadata
+ *
+ * @param[in] frame frame object
+ * @param[in] type metadata type, refer to @ref ob_frame_metadata_type
+ * @param[out] error Log error messages
+ */
+bool ob_frame_has_metadata(ob_frame *frame, ob_frame_metadata_type type, ob_error **error);
+
+/**
+ * @brief Get the metadata value of the frame
+ *
+ * @param[in] frame frame object
+ * @param[in] type  metadata type, refer to @ref ob_frame_metadata_type
+ * @param[out] error Log error messages
+ * @return int64_t return the metadata value of the frame
+ */
+int64_t ob_frame_get_metadata_value(ob_frame *frame, ob_frame_metadata_type type, ob_error **error);
+
+/**
+ * @brief Get the stream profile of the frame
+ *
+ * @attention Require @ref ob_delete_stream_profile() to release the return stream profile.
+ *
+ * @param frame frame object
+ * @param error Log error messages
+ * @return ob_stream_profile* Return the stream profile of the frame, if the frame is not captured by a sensor stream, it will return NULL
+ */
+ob_stream_profile* ob_frame_get_stream_profile(ob_frame *frame, ob_error **error);
+
+/**
+ * @brief Get the sensor of the frame
+ *
+ * @attention Require @ref ob_delete_sensor() to release the return sensor.
+ *
+ * @param[in] frame frame object
+ * @param[out] error Log error messages
+ * @return ob_sensor* return the sensor of the frame, if the frame is not captured by a sensor or the sensor stream has been destroyed, it will return NULL
+ */
+ob_sensor* ob_frame_get_sensor(ob_frame *frame, ob_error **error);
+
+/**
+ * @brief Get the device of the frame
+ *
+ * @attention Require @ref ob_delete_device() to release the return device.
+ *
+ * @param frame frame object
+ * @param[out] error Log error messages
+ * @return ob_device* return the device of the frame, if the frame is not captured by a sensor stream or the device has been destroyed, it will return NULL
+ */
+ob_device* ob_frame_get_device(ob_frame *frame, ob_error **error);
+
+/**
  * @brief Get video frame width
  *
  * @param[in] frame Frame object
@@ -119,24 +191,6 @@ uint32_t ob_video_frame_width(ob_frame *frame, ob_error **error);
  * @return uint32_t return the frame height
  */
 uint32_t ob_video_frame_height(ob_frame *frame, ob_error **error);
-
-/**
- * @brief Get the metadata of the frame
- *
- * @param[in] frame  Video frame object
- * @param[out] error Log error messages
- * @return void* return the metadata pointer of the frame
- */
-void *ob_video_frame_metadata(ob_frame *frame, ob_error **error);
-
-/**
- * @brief Get the metadata size of the frame
- *
- * @param[in] frame Video frame object
- * @param[out] error Log error messages
- * @return uint32_t return the metadata size of the frame
- */
-uint32_t ob_video_frame_metadata_size(ob_frame *frame, ob_error **error);
 
 /**
  * @brief  Get the effective number of pixels (such as Y16 format frame, but only the lower 10 bits are effective bits, and the upper 6 bits are filled with 0)
@@ -238,6 +292,16 @@ ob_frame *ob_frameset_points_frame(ob_frame *frameset, ob_error **error);
  * @return ob_frame* Return the frame of the specified type, or nullptr if it does not exist.
  */
 ob_frame *ob_frameset_get_frame(ob_frame *frameset, ob_frame_type frame_type, ob_error **error);
+
+/**
+ * @brief Get a frame at a specific index from the FrameSet
+ *
+ * @param[in] frameset Frameset object.
+ * @param[in] index The index of the frame.
+ * @param[out] error Log error messages.
+ * @return ob_frame* Return the frame at the specified index, or nullptr if it does not exist.
+ */
+ob_frame *ob_frameset_get_frame_by_index(ob_frame *frameset, int index, ob_error **error);
 
 /**
  * @brief Get accelerometer frame data.

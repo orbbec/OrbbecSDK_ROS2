@@ -137,9 +137,8 @@ class OBCameraNode {
   void clean();
 
   void startStreams();
-  
-  void startIMU();
 
+  void startIMU();
 
  private:
   struct IMUData {
@@ -445,7 +444,7 @@ class OBCameraNode {
   uint8_t* rgb_buffer_ = nullptr;
   bool is_color_frame_decoded_ = false;
   std::mutex device_lock_;
-  //For color
+  // For color
   std::queue<std::shared_ptr<ob::FrameSet>> colorFrameQueue_;
   std::shared_ptr<std::thread> colorFrameThread_ = nullptr;
   std::mutex colorFrameMtx_;
@@ -454,5 +453,6 @@ class OBCameraNode {
   bool ordered_pc_ = false;
   bool use_hardware_time_ = false;
   bool enable_depth_scale_ = true;
+  bool is_openni_device_ = false;
 };
 }  // namespace orbbec_camera

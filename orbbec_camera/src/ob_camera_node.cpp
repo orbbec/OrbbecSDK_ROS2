@@ -606,6 +606,14 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(max_save_images_count_, "max_save_images_count", 10);
   setAndGetNodeParameter<bool>(use_hardware_time_, "use_hardware_time", false);
   setAndGetNodeParameter<bool>(enable_depth_scale_, "enable_depth_scale", true);
+  auto info = device_->getDeviceInfo();
+  is_openni_device_ = isOpenNIDevice(info->pid());
+  if (is_openni_device_) {
+    RCLCPP_INFO_STREAM(logger_, "OpenNI device detected.");
+    use_hardware_time_ = false;
+  }else {
+    use_hardware_time_ = true;
+  }
 }
 
 void OBCameraNode::setupTopics() {

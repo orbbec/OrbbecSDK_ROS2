@@ -782,8 +782,8 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
       }
     }
   }
-  auto timestamp = use_hardware_time_ ? fromUsToROSTime(video_frame->timeStampUs())
-                                      : fromMsToROSTime(video_frame->systemTimeStamp());
+  auto timestamp = use_hardware_time_ ? fromUsToROSTime(depth_frame->timeStampUs())
+                                      : fromMsToROSTime(depth_frame->systemTimeStamp());
   if (!ordered_pc_) {
     point_cloud_msg_.is_dense = true;
     point_cloud_msg_.width = valid_count;

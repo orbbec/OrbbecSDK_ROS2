@@ -35,7 +35,6 @@ sensor_msgs::msg::CameraInfo convertToCameraInfo(OBCameraIntrinsic intrinsic,
   info.d[6] = distortion.k5;
   info.d[7] = distortion.k6;
 
-
   info.k.fill(0.0);
   info.k[0] = intrinsic.fx;
   info.k[2] = intrinsic.cx;
@@ -235,8 +234,16 @@ orbbec_camera_msgs::msg::Extrinsics obExtrinsicsToMsg(const OBD2CTransform &extr
   return msg;
 }
 
-rclcpp::Time frameTimeStampToROSTime(uint64_t ms) {
+rclcpp::Time fromMsToROSTime(uint64_t ms) {
   auto total = static_cast<uint64_t>(ms * 1e6);
+  uint64_t sec = total / 1000000000;
+  uint64_t nano_sec = total % 1000000000;
+  rclcpp::Time stamp(sec, nano_sec);
+  return stamp;
+}
+
+rclcpp::Time fromUsToROSTime(uint64_t us) {
+  auto total = static_cast<uint64_t>(us * 1e3);
   uint64_t sec = total / 1000000000;
   uint64_t nano_sec = total % 1000000000;
   rclcpp::Time stamp(sec, nano_sec);
@@ -585,4 +592,74 @@ bool isValidJPEG(const std::shared_ptr<ob::ColorFrame> &frame) {
   return true;
 }
 
+std::string metaDataTypeToString(const OBFrameMetadataType &meta_data_type) {
+  switch (meta_data_type) {
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_TIMESTAMP:
+      return "timestamp";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_SENSOR_TIMESTAMP:
+      return "sensor_timestamp";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_FRAME_NUMBER:
+      return "frame_number";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_AUTO_EXPOSURE:
+      return "auto_exposure";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_EXPOSURE:
+      return "exposure";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_GAIN:
+      return "gain";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_AUTO_WHITE_BALANCE:
+      return "auto_white_balance";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_WHITE_BALANCE:
+      return "white_balance";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_BRIGHTNESS:
+      return "brightness";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_CONTRAST:
+      return "contrast";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_SATURATION:
+      return "saturation";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_SHARPNESS:
+      return "sharpness";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_BACKLIGHT_COMPENSATION:
+      return "backlight_compensation";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_HUE:
+      return "hue";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_GAMMA:
+      return "gamma";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_POWER_LINE_FREQUENCY:
+      return "power_line_frequency";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_LOW_LIGHT_COMPENSATION:
+      return "low_light_compensation";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_MANUAL_WHITE_BALANCE:
+      return "manual_white_balance";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_ACTUAL_FRAME_RATE:
+      return "actual_frame_rate";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_FRAME_RATE:
+      return "frame_rate";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_AE_ROI_LEFT:
+      return "ae_roi_left";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_AE_ROI_TOP:
+      return "ae_roi_top";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_AE_ROI_RIGHT:
+      return "ae_roi_right";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_AE_ROI_BOTTOM:
+      return "ae_roi_bottom";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_EXPOSURE_PRIORITY:
+      return "exposure_priority";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_NAME:
+      return "hdr_sequence_name";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_SIZE:
+      return "hdr_sequence_size";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_INDEX:
+      return "hdr_sequence_index";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_LASER_POWER:
+      return "laser_power";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_LASER_POWER_MODE:
+      return "laser_power_mode";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_EMITTER_MODE:
+      return "emitter_mode";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_GPIO_INPUT_DATA:
+      return "gpio_input_data";
+    default:
+      return "unknown";
+  }
+}
 }  // namespace orbbec_camera

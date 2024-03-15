@@ -47,7 +47,9 @@ std::ostream& operator<<(std::ostream& os, const OBCameraParam& rhs);
 orbbec_camera_msgs::msg::Extrinsics obExtrinsicsToMsg(const OBD2CTransform& extrinsics,
                                                       const std::string& frame_id);
 
-rclcpp::Time frameTimeStampToROSTime(uint64_t ms);
+rclcpp::Time fromMsToROSTime(uint64_t ms);
+
+rclcpp::Time fromUsToROSTime(uint64_t us);
 
 std::string getObSDKVersion();
 
@@ -79,5 +81,7 @@ std::string fullAccelScaleRangeToString(const OBAccelFullScaleRange& full_scale_
 std::string parseUsbPort(const std::string& line);
 
 bool isValidJPEG(const std::shared_ptr<ob::ColorFrame>& frame);
+
+std::string metaDataTypeToString(const OBFrameMetadataType &meta_data_type);
 
 }  // namespace orbbec_camera

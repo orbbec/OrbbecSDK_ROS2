@@ -51,6 +51,7 @@
 #include "orbbec_camera_msgs/srv/get_device_info.hpp"
 #include "orbbec_camera_msgs/msg/extrinsics.hpp"
 #include "orbbec_camera_msgs/msg/metadata.hpp"
+#include "orbbec_camera_msgs/msg/imu_info.hpp"
 #include "orbbec_camera_msgs/srv/get_int32.hpp"
 #include "orbbec_camera_msgs/srv/get_string.hpp"
 #include "orbbec_camera_msgs/srv/set_int32.hpp"
@@ -137,16 +138,17 @@ class OBCameraNode {
   void clean();
 
   void startStreams();
-  
-  void startIMU();
 
+  void startIMUSyncStream();
+
+  void startIMU();
 
  private:
   struct IMUData {
     IMUData() = default;
     IMUData(stream_index_pair stream, Eigen::Vector3d data, double timestamp)
         : stream_(std::move(stream)), data_(std::move(data)), timestamp_(timestamp) {}
-    bool isSet() const { return timestamp_ >= 0; }
+    [[nodiscard]] bool isSet() const { return timestamp_ >= 0; }
     stream_index_pair stream_{};
     Eigen::Vector3d data_{};
     double timestamp_ = -1;  // in nanoseconds
@@ -282,6 +284,9 @@ class OBCameraNode {
   void onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
                           const stream_index_pair& stream_index);
 
+  void publishMetadata(const std::shared_ptr<ob::Frame>& frame,
+                       const stream_index_pair& stream_index, const std_msgs::msg::Header& header);
+
   void onNewColorFrameCallback();
 
   void saveImageToFile(const stream_index_pair& stream_index, const cv::Mat& image,
@@ -304,6 +309,8 @@ class OBCameraNode {
 
   bool setupFormatConvertType(OBFormat format);
 
+  orbbec_camera_msgs::msg::IMUInfo createIMUInfo(const stream_index_pair& stream_index);
+
  private:
   rclcpp::Node* node_ = nullptr;
   std::shared_ptr<ob::Device> device_ = nullptr;
@@ -321,6 +328,13 @@ class OBCameraNode {
   std::map<stream_index_pair, ob_camera_intrinsic> stream_intrinsics_;
   std::map<stream_index_pair, sensor_msgs::msg::CameraInfo> camera_infos_;
   std::map<stream_index_pair, OBCameraParam> ob_camera_param_;
+  std::map<stream_index_pair, OBExtrinsic> depth_to_other_extrinsics_;
+  std::map<stream_index_pair, rclcpp::Publisher<orbbec_camera_msgs::msg::Extrinsics>::SharedPtr>
+      depth_to_other_extrinsics_publishers_;
+  std::map<stream_index_pair, rclcpp::Publisher<orbbec_camera_msgs::msg::Metadata>::SharedPtr>
+      metadata_publishers_;
+  std::map<stream_index_pair, rclcpp::Publisher<orbbec_camera_msgs::msg::IMUInfo>::SharedPtr>
+      imu_info_publishers_;
   std::map<stream_index_pair, int> width_;
   std::map<stream_index_pair, int> height_;
   std::map<stream_index_pair, int> fps_;
@@ -337,6 +351,7 @@ class OBCameraNode {
   std::map<stream_index_pair, std::vector<std::shared_ptr<ob::VideoStreamProfile>>>
       supported_profiles_;
   std::map<stream_index_pair, std::shared_ptr<ob::StreamProfile>> stream_profile_;
+  const stream_index_pair base_stream_ = DEPTH;
   std::map<stream_index_pair, uint32_t> seq_;
   std::map<stream_index_pair, cv::Mat> images_;
   std::map<stream_index_pair, std::string> encoding_;
@@ -445,7 +460,7 @@ class OBCameraNode {
   uint8_t* rgb_buffer_ = nullptr;
   bool is_color_frame_decoded_ = false;
   std::mutex device_lock_;
-  //For color
+  // For color
   std::queue<std::shared_ptr<ob::FrameSet>> colorFrameQueue_;
   std::shared_ptr<std::thread> colorFrameThread_ = nullptr;
   std::mutex colorFrameMtx_;

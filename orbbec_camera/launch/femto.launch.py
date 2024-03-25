@@ -72,6 +72,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_frame_sync', default_value='false'),
         DeclareLaunchArgument('ordered_pc', default_value='false'),
         DeclareLaunchArgument('use_hardware_time', default_value='false'),
+        DeclareLaunchArgument('align_mode', default_value='HW'),
     ]
 
     # Node configuration

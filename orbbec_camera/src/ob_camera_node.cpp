@@ -606,6 +606,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(max_save_images_count_, "max_save_images_count", 10);
   setAndGetNodeParameter<bool>(use_hardware_time_, "use_hardware_time", false);
   setAndGetNodeParameter<bool>(enable_depth_scale_, "enable_depth_scale", true);
+  setAndGetNodeParameter<std::string>(align_mode_, "align_mode", "HW");
   auto info = device_->getDeviceInfo();
   is_openni_device_ = isOpenNIDevice(info->pid());
   if (is_openni_device_) {
@@ -637,7 +638,8 @@ void OBCameraNode::setupPipelineConfig() {
       pipeline_config_->setAlignMode(ALIGN_D2C_SW_MODE);
     } else {
       RCLCPP_INFO_STREAM(logger_, "set align mode ALIGN_D2C_HW_MODE.");
-      pipeline_config_->setAlignMode(ALIGN_D2C_HW_MODE);
+      OBAlignMode align_mode = align_mode_ == "HW"? ALIGN_D2C_HW_MODE : ALIGN_D2C_SW_MODE;
+      pipeline_config_->setAlignMode(align_mode);
     }
   }
   for (const auto &stream_index : IMAGE_STREAMS) {

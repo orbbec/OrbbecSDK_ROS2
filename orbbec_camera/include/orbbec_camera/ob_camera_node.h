@@ -454,5 +454,6 @@ class OBCameraNode {
   bool use_hardware_time_ = false;
   bool enable_depth_scale_ = true;
   bool is_openni_device_ = false;
+  std::string align_mode_ = "HW";
 };
 }  // namespace orbbec_camera

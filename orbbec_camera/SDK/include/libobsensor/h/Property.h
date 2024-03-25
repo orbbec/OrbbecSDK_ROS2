@@ -593,6 +593,11 @@ typedef enum {
     OB_PROP_SKIP_FRAME_BOOL = 2036,
 
     /**
+     * @brief Color camera FOCUS
+     */
+    OB_PROP_COLOR_FOCUS_INT = 2037,
+
+    /**
      * @brief Software disparity to depth
      */
     OB_PROP_SDK_DISPARITY_TO_DEPTH_BOOL = 3004,

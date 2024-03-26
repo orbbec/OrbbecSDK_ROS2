@@ -579,7 +579,7 @@ void OBCameraNode::getParameters() {
   if (!depth_filter_config_.empty()) {
     enable_depth_filter_ = true;
   }
-  setAndGetNodeParameter(enable_frame_sync_, "enable_frame_sync", false);
+  setAndGetNodeParameter(enable_frame_sync_, "enable_frame_sync", true);
   setAndGetNodeParameter(enable_color_auto_exposure_, "enable_color_auto_exposure", true);
   setAndGetNodeParameter(enable_ir_auto_exposure_, "enable_ir_auto_exposure", true);
   setAndGetNodeParameter(enable_ir_long_exposure_, "enable_ir_long_exposure", true);

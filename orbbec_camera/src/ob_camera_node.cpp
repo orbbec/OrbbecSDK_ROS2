@@ -142,8 +142,14 @@ void OBCameraNode::setupDevices() {
     }
   }
   try {
-    if (!depth_work_mode_.empty()) {
+    if (!depth_work_mode_.empty() &&
+        device_->isPropertySupported(OB_STRUCT_CURRENT_DEPTH_ALG_MODE, OB_PERMISSION_READ_WRITE)) {
+      auto current_depth_mode = device_->getCurrentDepthWorkMode();
+      RCLCPP_INFO_STREAM(logger_, "Depth work mode before switch: " << current_depth_mode.name);
+      RCLCPP_INFO_STREAM(logger_, "Switch depth work mode to: " << depth_work_mode_);
       device_->switchDepthWorkMode(depth_work_mode_.c_str());
+      current_depth_mode = device_->getCurrentDepthWorkMode();
+      RCLCPP_INFO_STREAM(logger_, "Current depth work mode: " << current_depth_mode.name);
     }
     if (sync_mode_ != OB_MULTI_DEVICE_SYNC_MODE_FREE_RUN) {
       auto sync_config = device_->getMultiDeviceSyncConfig();
@@ -612,7 +618,7 @@ void OBCameraNode::getParameters() {
   if (is_openni_device_) {
     RCLCPP_INFO_STREAM(logger_, "OpenNI device detected.");
     use_hardware_time_ = false;
-  }else {
+  } else {
     use_hardware_time_ = true;
   }
 }
@@ -638,7 +644,7 @@ void OBCameraNode::setupPipelineConfig() {
       pipeline_config_->setAlignMode(ALIGN_D2C_SW_MODE);
     } else {
       RCLCPP_INFO_STREAM(logger_, "set align mode ALIGN_D2C_HW_MODE.");
-      OBAlignMode align_mode = align_mode_ == "HW"? ALIGN_D2C_HW_MODE : ALIGN_D2C_SW_MODE;
+      OBAlignMode align_mode = align_mode_ == "HW" ? ALIGN_D2C_HW_MODE : ALIGN_D2C_SW_MODE;
       pipeline_config_->setAlignMode(align_mode);
     }
   }

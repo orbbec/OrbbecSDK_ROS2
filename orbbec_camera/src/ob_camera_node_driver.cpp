@@ -60,6 +60,7 @@ OBCameraNodeDriver::~OBCameraNodeDriver() {
 
 void OBCameraNodeDriver::init() {
   auto log_level_str = declare_parameter<std::string>("log_level", "none");
+  connection_delay_ = declare_parameter<int>("connection_delay", 100);
   auto log_level = obLogSeverityFromString(log_level_str);
   ob::Context::setLoggerSeverity(log_level);
   orb_device_lock_shm_fd_ = shm_open(ORB_DEFAULT_LOCK_NAME.c_str(), O_CREAT | O_RDWR, 0666);
@@ -164,7 +165,7 @@ void OBCameraNodeDriver::checkConnectTimer() {
 }
 
 void OBCameraNodeDriver::queryDevice() {
-  if (!device_connected_.load()) {
+  while (rclcpp::ok() && !device_connected_.load()) {
     if (!net_device_ip_.empty() && net_device_port_ != 0) {
       connectNetDevice(net_device_ip_, net_device_port_);
     } else {
@@ -175,6 +176,7 @@ void OBCameraNodeDriver::queryDevice() {
       }
       startDevice(device_list);
     }
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 }
 
@@ -343,6 +345,7 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
   if (device_) {
     device_.reset();
   }
+  std::this_thread::sleep_for(std::chrono::milliseconds(connection_delay_));
   pthread_mutex_lock(orb_device_lock_);
   std::shared_ptr<int> lock_holder(nullptr,
                                    [this](int *) { pthread_mutex_unlock(orb_device_lock_); });

@@ -165,7 +165,7 @@ void OBCameraNodeDriver::checkConnectTimer() {
 }
 
 void OBCameraNodeDriver::queryDevice() {
-  while (rclcpp::ok() && !device_connected_.load()) {
+  while (rclcpp::ok() && is_alive_ && !device_connected_.load()) {
     if (!net_device_ip_.empty() && net_device_port_ != 0) {
       connectNetDevice(net_device_ip_, net_device_port_);
     } else {

@@ -46,6 +46,7 @@
 #include <image_transport/publisher.hpp>
 #include <sensor_msgs/msg/imu.hpp>
 #include "libobsensor/ObSensor.hpp"
+#include "libobsensor/hpp/Utils.hpp"
 
 #include "orbbec_camera_msgs/msg/device_info.hpp"
 #include "orbbec_camera_msgs/srv/get_device_info.hpp"
@@ -396,6 +397,7 @@ class OBCameraNode {
   std::string color_info_url_;
   std::string ir_info_url_;
   std::optional<OBCameraParam> camera_param_;
+  std::optional<OBCalibrationParam> calibration_param_;
   bool enable_d2c_viewer_ = false;
   std::unique_ptr<D2CViewer> d2c_viewer_ = nullptr;
   std::map<stream_index_pair, std::atomic_bool> save_images_;

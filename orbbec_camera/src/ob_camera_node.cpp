@@ -836,6 +836,10 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
     RCLCPP_INFO_STREAM(logger_, "Saving point cloud to " << filename);
     saveDepthPointsToPly(point_cloud_msg_, filename);
   }
+  delete[] data;
+  data = nullptr;
+  delete[] pointcloudData;
+  pointcloudData = nullptr;
 }
 
 void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> &frame_set) {

@@ -743,31 +743,31 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
     RCLCPP_ERROR_STREAM(logger_, "camera_param_ is null");
     return;
   }
-  if (!calibration_param_) {
-    calibration_param_ = pipeline_->getCalibrationParam(pipeline_config_);
-  }
-  if (!calibration_param_) {
-    RCLCPP_ERROR_STREAM(logger_, "calibration_param_ is null");
-    return;
-  }
   auto depth_frame = frame_set->depthFrame();
   if (!depth_frame) {
     return;
   }
   auto width = depth_frame->width();
   auto height = depth_frame->height();
-  const auto *depth_data = (uint16_t *)depth_frame->data();
-  if (depth_data == nullptr) {
-    return;
+
+  if (!xy_tables_.has_value()) {
+    calibration_param_ = pipeline_->getCalibrationParam(pipeline_config_);
+
+    uint32_t tableSize = width * height * 2; // one for x-coordinate and one for y-coordinate LUT
+    xy_table_data_ = new float[tableSize];
+
+    xy_tables_ = OBXYTables();
+    if (!ob::CoordinateTransformHelper::transformationInitXYTables(
+        *calibration_param_, OB_SENSOR_DEPTH, *xy_table_data_,
+        &tableSize, &(*xy_tables_))) {
+      xy_tables_.reset();
+      RCLCPP_ERROR_STREAM(logger_, "Failed to init xy tables");
+      return;
+    }
   }
 
-  uint32_t tableSize = width * height * 2; // one for x-coordinate and one for y-coordinate LUT
-  float * data = new float[tableSize];
-
-  OBXYTables xyTables;
-  if (!ob::CoordinateTransformHelper::transformationInitXYTables(
-      *calibration_param_, OB_SENSOR_DEPTH, data,
-      &tableSize, &xyTables)) {
+  const auto *depth_data = (uint16_t *)depth_frame->data();
+  if (depth_data == nullptr) {
     return;
   }
 
@@ -777,7 +777,7 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
   OBPoint * pointPixel = (OBPoint *)pointcloudData;
 
   ob::CoordinateTransformHelper::transformationDepthToPointCloud(
-    &xyTables,
+    &(*xy_tables_),
     depth_data,
     pointPixel);
 
@@ -836,8 +836,6 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
     RCLCPP_INFO_STREAM(logger_, "Saving point cloud to " << filename);
     saveDepthPointsToPly(point_cloud_msg_, filename);
   }
-  delete[] data;
-  data = nullptr;
   delete[] pointcloudData;
   pointcloudData = nullptr;
 }

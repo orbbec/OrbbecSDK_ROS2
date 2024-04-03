@@ -398,6 +398,8 @@ class OBCameraNode {
   std::string ir_info_url_;
   std::optional<OBCameraParam> camera_param_;
   std::optional<OBCalibrationParam> calibration_param_;
+  std::optional<OBXYTables> xy_tables_;
+  std::optional<float *> xy_table_data_;
   bool enable_d2c_viewer_ = false;
   std::unique_ptr<D2CViewer> d2c_viewer_ = nullptr;
   std::map<stream_index_pair, std::atomic_bool> save_images_;

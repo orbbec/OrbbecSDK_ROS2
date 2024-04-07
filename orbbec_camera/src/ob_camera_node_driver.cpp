@@ -61,6 +61,7 @@ OBCameraNodeDriver::~OBCameraNodeDriver() {
 void OBCameraNodeDriver::init() {
   auto log_level_str = declare_parameter<std::string>("log_level", "none");
   auto log_level = obLogSeverityFromString(log_level_str);
+  connection_delay_ = declare_parameter<int>("connection_delay", 100);
   ob::Context::setLoggerToConsole(log_level);
   orb_device_lock_shm_fd_ = shm_open(ORB_DEFAULT_LOCK_NAME.c_str(), O_CREAT | O_RDWR, 0666);
   if (orb_device_lock_shm_fd_ < 0) {
@@ -343,6 +344,7 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
   if (device_) {
     device_.reset();
   }
+  std::this_thread::sleep_for(std::chrono::milliseconds(connection_delay_));
   pthread_mutex_lock(orb_device_lock_);
   std::shared_ptr<int> lock_holder(nullptr,
                                    [this](int *) { pthread_mutex_unlock(orb_device_lock_); });

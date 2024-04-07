@@ -179,7 +179,7 @@ typedef enum {
     OB_PROP_INDICATOR_LIGHT_BOOL = 83,
 
     /**
-     * @brief Disparity to depth switch, 0: off, the depth stream outputs the disparity map; 1. On, the depth stream outputs the depth map.
+     * @brief Disparity to depth switch, false: switch to software disparity convert to depth, true: switch to hardware disparity convert to depth
      */
     OB_PROP_DISPARITY_TO_DEPTH_BOOL = 85,
 
@@ -406,6 +406,11 @@ typedef enum {
      *
      */
     OB_PROP_LASER_CONTROL_INT = 182,
+
+    /**
+     * @brief IR brightness
+     */
+    OB_PROP_IR_BRIGHTNESS_INT = 184,
 
     /**
      * @brief Baseline calibration parameters

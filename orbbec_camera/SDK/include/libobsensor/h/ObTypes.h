@@ -67,6 +67,9 @@ typedef struct ConfigImpl              ob_config;
 typedef struct RecorderImpl            ob_recorder;
 typedef struct PlaybackImpl            ob_playback;
 typedef struct OBDepthWorkModeListImpl ob_depth_work_mode_list;
+typedef struct FilterListImpl          ob_filter_list;
+typedef struct OBFilterListImpl        ob_filters;
+typedef struct DevicePresetListImpl    ob_device_preset_list;
 
 #define OB_WIDTH_ANY 0
 #define OB_HEIGHT_ANY 0
@@ -236,6 +239,8 @@ typedef enum {
     OB_FORMAT_YV12       = 29,   /**< Is same as Y12, using for right ir stream*/
     OB_FORMAT_BA81       = 30,   /**< Is same as Y8, using for right ir stream*/
     OB_FORMAT_RGBA       = 31,   /**< RGBA format */
+    OB_FORMAT_BYR2       = 32,   /**< byr2 format */
+    OB_FORMAT_RW16       = 33,   /**< RAW16 format */
     OB_FORMAT_UNKNOWN    = 0xff, /**< unknown format */
 } OBFormat,
     ob_format;
@@ -345,10 +350,10 @@ typedef struct {
  */
 typedef struct {
     uint8_t cur;   ///< Current value
-    uint8_t  max;   ///< Maximum value
-    uint8_t  min;   ///< Minimum value
-    uint8_t  step;  ///< Step value
-    uint8_t  def;   ///< Default value
+    uint8_t max;   ///< Maximum value
+    uint8_t min;   ///< Minimum value
+    uint8_t step;  ///< Step value
+    uint8_t def;   ///< Default value
 } OBUint8PropertyRange, ob_uint8_property_range;
 
 /**
@@ -416,18 +421,20 @@ typedef struct {
 /** \brief Distortion model: defines how pixel coordinates should be mapped to sensor coordinates. */
 typedef enum {
     OB_DISTORTION_NONE,                  /**< Rectilinear images. No distortion compensation required. */
+    OB_DISTORTION_MODIFIED_BROWN_CONRADY, /**< Equivalent to Brown-Conrady distortion, except that tangential distortion is applied to radially distorted points */
     OB_DISTORTION_INVERSE_BROWN_CONRADY, /**< Equivalent to Brown-Conrady distortion, except undistorts image instead of distorting it */
     OB_DISTORTION_BROWN_CONRADY,         /**< Unmodified Brown-Conrady distortion model */
-} OBCameraDistortionModel, ob_camera_distortion_model;
+} OBCameraDistortionModel,
+    ob_camera_distortion_model;
 
 /** \brief Video stream intrinsics. */
 typedef struct {
-    int                 width;  /**< Width of the image in pixels */
-    int                 height; /**< Height of the image in pixels */
-    float               ppx;    /**< Horizontal coordinate of the principal point of the image, as a pixel offset from the left edge */
-    float               ppy;    /**< Vertical coordinate of the principal point of the image, as a pixel offset from the top edge */
-    float               fx;     /**< Focal length of the image plane, as a multiple of pixel width */
-    float               fy;     /**< Focal length of the image plane, as a multiple of pixel height */
+    int                     width;  /**< Width of the image in pixels */
+    int                     height; /**< Height of the image in pixels */
+    float                   ppx;    /**< Horizontal coordinate of the principal point of the image, as a pixel offset from the left edge */
+    float                   ppy;    /**< Vertical coordinate of the principal point of the image, as a pixel offset from the top edge */
+    float                   fx;     /**< Focal length of the image plane, as a multiple of pixel width */
+    float                   fy;     /**< Focal length of the image plane, as a multiple of pixel height */
     OBCameraDistortionModel model;  /**< Distortion model of the image */
     float coeffs[5]; /**< Distortion coefficients. Order for Brown-Conrady: [k1, k2, p1, p2, k3]. Order for F-Theta Fish-eye: [k1, k2, k3, k4, 0]. Other models
                         are subject to their own interpretations */
@@ -721,7 +728,6 @@ typedef enum {
     OB_TOF_FILTER_RANGE_DEBUG  = 100, /**< Debug range */
 } OBTofFilterRange,
     ob_tof_filter_range, TOF_FILTER_RANGE;
-
 /**
  * @brief 3D point structure in the SDK
  */
@@ -933,19 +939,28 @@ typedef struct {
 } OBDepthWorkMode, ob_depth_work_mode;
 
 /**
+ * @brief SequenceId fliter list item
+ */
+typedef struct {
+    int  sequenceSelectId;
+    char name[8];
+} OBSequenceIdItem, ob_sequence_id_item;
+
+/**
  * @brief Hole fillig mode
  */
 typedef enum {
     OB_HOLE_FILL_TOP     = 0,
     OB_HOLE_FILL_NEAREST = 1,  // "max" means farest for depth, and nearest for disparity; FILL_NEAREST
     OB_HOLE_FILL_FAREST  = 2,  // FILL_FAREST
-} OBHoleFillingMode, ob_hole_filling_mode;
+} OBHoleFillingMode,
+    ob_hole_filling_mode;
 
 typedef struct {
-    uint8_t               magnitude;  // magnitude
-    float                 alpha;      // smooth_alpha
-    uint16_t              disp_diff;  // smooth_delta
-    uint16_t              radius;     // hole_fill
+    uint8_t  magnitude;  // magnitude
+    float    alpha;      // smooth_alpha
+    uint16_t disp_diff;  // smooth_delta
+    uint16_t radius;     // hole_fill
 } OBSpatialAdvancedFilterParams, ob_spatial_advanced_filter_params;
 
 /**
@@ -954,11 +969,12 @@ typedef struct {
 typedef enum OB_DDO_NOISE_REMOVAL_TYPE {
     OB_NR_LUT     = 0,  // SPLIT
     OB_NR_OVERALL = 1,  // NON_SPLIT
-} OBDDONoiseRemovalType, ob_ddo_noise_removal_type;
+} OBDDONoiseRemovalType,
+    ob_ddo_noise_removal_type;
 
 typedef struct {
-    uint16_t            size;
-    uint16_t            disp_diff;
+    uint16_t              max_size;
+    uint16_t              disp_diff;
     OBDDONoiseRemovalType type;
 } OBNoiseRemovalFilterParams, ob_noise_removal_filter_params;
 ;
@@ -1583,6 +1599,7 @@ typedef enum {
 
     /**
      * @brief The number of frame metadata types, using for types iterating
+     * @attention It is not a valid frame metadata type
      */
     OB_FRAME_METADATA_TYPE_COUNT,
 } ob_frame_metadata_type,

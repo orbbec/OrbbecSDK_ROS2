@@ -9,9 +9,12 @@
 #include <functional>
 #include <memory>
 #include <map>
+#include <string>
+#include <iostream>
 
 namespace ob {
 class Frame;
+class OBFilterList;
 
 /**
  * @brief A callback function that takes a shared pointer to a Frame object as its argument.
@@ -21,9 +24,11 @@ typedef std::function<void(std::shared_ptr<Frame>)> FilterCallback;
 /**
  * @brief The Filter class is the base class for all filters in the SDK.
  */
-class OB_EXTENSION_API Filter {
+class OB_EXTENSION_API Filter : public std::enable_shared_from_this<Filter> {
 public:
     Filter();
+
+    Filter(std::shared_ptr<FilterImpl> impl);
 
     virtual ~Filter() = default;
 
@@ -32,6 +37,16 @@ public:
      * is used.
      */
     virtual void reset();
+
+    /**
+     * @brief enable the filter
+     */
+    void enable(bool enable);
+
+    /**
+     * @brief Return Enable State
+     */
+    bool isEnabled();
 
     /**
      * @brief Processes a frame synchronously.
@@ -55,8 +70,40 @@ public:
      */
     virtual void setCallBack(FilterCallback callback);
 
+    /**
+     * @brief Get the type of filter.
+     *
+     * @return string The type of filte.
+     */
+    virtual const char *type();
+
+    /**
+     * @brief Check if the runtime type of the filter object is compatible with a given type.
+     *
+     * @tparam T The given type.
+     * @return bool The result.
+     */
+    template <typename T> bool is();
+
+    /**
+     * @brief Convert the filter object to a target type.
+     *
+     * @tparam T The target type.
+     * @return std::shared_ptr<T> The result. If it cannot be converted, an exception will be thrown.
+     */
+    template <typename T> std::shared_ptr<T> as() {
+        if(!is<T>()) {
+            throw std::runtime_error("unsupported operation, object's type is not require type");
+        }
+
+        return std::static_pointer_cast<T>(shared_from_this());
+    }
+
 protected:
     std::shared_ptr<FilterImpl> impl_;
+    std::string                 type_;
+
+    friend class OBFilterList;
 };
 
 /**
@@ -152,17 +199,26 @@ public:
 };
 
 /**
- * @brief Hole filling filter
+ * @brief Hole filling filter,the processing performed depends on the selected hole filling mode.
  */
 class OB_EXTENSION_API HoleFillingFilter : public Filter {
 public:
     HoleFillingFilter();
 
-    void enable(bool enable);
-
-    bool isEnabled();
-
+    /**
+     * @brief Set the HoleFillingFilter mode.
+     *
+     * @param[in] filter A holefilling_filter object.
+     * @param mode OBHoleFillingMode, OB_HOLE_FILL_TOP,OB_HOLE_FILL_NEAREST or OB_HOLE_FILL_FAREST.
+     */
     void setFilterMode(OBHoleFillingMode mode);
+
+    /**
+     * @brief Get the HoleFillingFilter mode.
+     *
+     * @return OBHoleFillingMode
+     */
+    OBHoleFillingMode getFilterMode();
 };
 
 /**
@@ -172,41 +228,84 @@ class OB_EXTENSION_API TemporalFilter : public Filter {
 public:
     TemporalFilter();
 
-    void enable(bool enable);
-
-    bool isEnabled();
-
+    /**
+     * @brief Get the TemporalFilter diffscale range.
+     *
+     * @return OBFloatPropertyRange the diffscale value of property range.
+     */
     OBFloatPropertyRange getDiffScaleRange();
 
+    /**
+     * @brief Set the TemporalFilter diffscale value.
+     *
+     * @param value diffscale value.
+     */
     void setDiffScale(float value);
 
+    /**
+     * @brief Get the TemporalFilter weight range.
+     *
+     * @return OBFloatPropertyRange the weight value of property range.
+     */
     OBFloatPropertyRange getWeightRange();
 
+    /**
+     * @brief Set the TemporalFilter weight value.
+     *
+     * @param value weight value.
+     */
     void setWeight(float value);
-    
 };
 
 /**
- * @brief Spatial advanced filter
+ * @brief Spatial advanced filte smooths the image by calculating frame with alpha and delta settings
+ * alpha defines the weight of the current pixel for smoothing,
+ * delta defines the depth gradient below which the smoothing will occur as number of depth levels.
  */
 class OB_EXTENSION_API SpatialAdvancedFilter : public Filter {
 public:
     SpatialAdvancedFilter();
 
-    void enable(bool enable);
-
-    bool isEnabled();
-
+    /**
+     * @brief Get the spatial advanced filter alpha range.
+     *
+     * @return OBFloatPropertyRange the alpha value of property range.
+     */
     OBFloatPropertyRange getAlphaRange();
 
+    /**
+     * @brief Get the spatial advanced filter dispdiff range.
+     *
+     * @return OBFloatPropertyRange the dispdiff value of property range.
+     */
     OBUint16PropertyRange getDispDiffRange();
 
+    /**
+     * @brief Get the spatial advanced filter radius range.
+     *
+     * @return OBFloatPropertyRange the radius value of property range.
+     */
     OBUint16PropertyRange getRadiusRange();
 
+    /**
+     * @brief Get the spatial advanced filter magnitude range.
+     *
+     * @return OBFloatPropertyRange the magnitude value of property range.
+     */
     OBIntPropertyRange getMagnitudeRange();
 
+    /**
+     * @brief Get the spatial advanced filter params.
+     *
+     * @return OBSpatialAdvancedFilterParams
+     */
     OBSpatialAdvancedFilterParams getFilterParams();
 
+    /**
+     * @brief Set the spatial advanced filter params.
+     *
+     * @param params OBSpatialAdvancedFilterParams.
+     */
     void setFilterParams(OBSpatialAdvancedFilterParams params);
 };
 
@@ -215,25 +314,22 @@ public:
  */
 class OB_EXTENSION_API DisparityTransform : public Filter {
 public:
-    DisparityTransform();
 
+    /**
+     * @brief Create a disparity transform.
+     * @param depth_to_disparity disparity to depth or depth to disparity Conversion.
+     */
     DisparityTransform(bool depth_to_disparity);
-
-    void enable(bool enable);
-
-    bool isEnabled();
 };
 
 /**
- * @brief Depth HDR merge
+ * @brief HdrMerge processing block,
+ * the processing merges between depth frames with
+ * different sub-preset sequence ids.
  */
 class OB_EXTENSION_API HdrMerge : public Filter {
 public:
     HdrMerge();
-
-    void enable(bool enable);
-
-    bool isEnabled();
 };
 
 /**
@@ -241,11 +337,18 @@ public:
  */
 class OB_EXTENSION_API Align : public Filter {
 public:
-    Align(OBStreamType align_to_stream, OBFrameType align_to_frame);
+    /**
+     * @brief Creaet Align filter.
+     * @param OBStreamType alignment is performed between a depth image and another image.
+     */
+    Align(OBStreamType align_to_stream);
 
-    void enable(bool enable);
-
-    bool isEnabled();
+    /**
+     * @brief Get the stream type to be aligned with.
+     *
+     * @return OBStreamType The stream type of align to.
+     */
+    OBStreamType getAlignToStreamType();
 };
 
 /**
@@ -256,67 +359,167 @@ class OB_EXTENSION_API ThresholdFilter : public Filter {
 public:
     ThresholdFilter();
 
-    void enable(bool enable);
-
-    bool isEnabled();
-
+    /**
+     * @brief Get the threshold filter min range.
+     *
+     * @return OBIntPropertyRange The range of the threshold filter min.
+     */
     OBIntPropertyRange getMinRange();
 
+    /**
+     * @brief Get the threshold filter max range.
+     *
+     * @return OBIntPropertyRange The range of the threshold filter max.
+     */
     OBIntPropertyRange getMaxRange();
 
+    /**
+     * @brief Get the threshold filter max and min range.
+     */
     void setValueRange(uint16_t min, uint16_t max);
 };
 
 /**
- * @brief
+ * @brief Create SequenceIdFilter processing block.
  */
 class OB_EXTENSION_API SequenceIdFilter : public Filter {
 public:
     SequenceIdFilter();
 
-    void enable(bool enable);
+    /**
+     * @brief Set the sequenceId filter params.
+     *
+     * @param sequence id to pass the filter.
+     */
+    void selectSequenceId(int sequence_id);
 
-    bool isEnabled();
+    /**
+     * @brief Get the current sequence id.
+     *
+     * @return sequence id to pass the filter.
+     */
+    int getSelectSequenceId();
 
-    void selectSequenceId(float sequence_id);
+    /**
+     * @brief Get the current sequence id list.
+     *
+     * @return OBSequenceIdItem.
+     */
+    OBSequenceIdItem *getSequenceIdList();
 
-    float getSelectSequenceId();
-
-    std::map<float, std::string> getSequenceIdList();
+    /**
+     * @brief Get the sequenceId list size.
+     *
+     * @return the size of sequenceId list.
+     */
+    int getSequenceIdListSize();
 };
 
 /**
- * @brief
+ * @brief The noise removal filter,removing scattering depth pixels.
  */
 class OB_EXTENSION_API NoiseRemovalFilter : public Filter {
 public:
     NoiseRemovalFilter();
 
-    void enable(bool enable);
+    /**
+     * @brief Set the noise removal filter params.
+     *
+     * @param[in] params ob_noise_removal_filter_params.
+     */
+    void setFilterParams(OBNoiseRemovalFilterParams filterParams);
 
-    bool isEnabled();
+    /**
+     * @brief Get the noise removal filter params.
+     *
+     * @return OBNoiseRemovalFilterParams.
+     */
+    OBNoiseRemovalFilterParams getFilterParams();
 
-    void setNoiseRemovalFilterParams(OBNoiseRemovalFilterParams *filterParams);
-
+    /**
+     * @brief Get the noise removal filter disp diff range.
+     * @return OBUint16PropertyRange The disp diff of property range.
+     */
     OBUint16PropertyRange getDispDiffRange();
 
-    OBUint16PropertyRange getSizeRange();
+    /**
+     * @brief Get the noise removal filter max size range.
+     * @return OBUint16PropertyRange The max size of property range.
+     */
+    OBUint16PropertyRange getMaxSizeRange();
 };
 
 /**
- * @brief
+ * @brief Decimation filter,reducing complexity by subsampling depth maps and losing depth details.
  */
 class OB_EXTENSION_API DecimationFilter : public Filter {
 public:
     DecimationFilter();
 
-    void enable(bool enable);
-
-    bool isEnabled();
-
+    /**
+     * @brief Set the decimation filter scale value.
+     *
+     * @param type The decimation filter scale value.
+     */
     void setScaleValue(uint8_t value);
 
+    /**
+     * @brief Get the decimation filter scale value.
+     */
+    uint8_t getScaleValue();
+
+    /**
+     * @brief Get the property range of the decimation filter scale value.
+     */
     OBUint8PropertyRange getScaleRange();
 };
+
+// Define the is() template function for the Filter class
+template <typename T> bool Filter::is() {
+    std::string name = type();
+    if(name == "HdrMerge") {
+        return typeid(T) == typeid(HdrMerge);
+    }
+    if(name == "SequenceIdFilter") {
+        return typeid(T) == typeid(SequenceIdFilter);
+    }
+    if(name == "ThresholdFilter") {
+        return typeid(T) == typeid(ThresholdFilter);
+    }
+    if(name == "DisparityTransform") {
+        return typeid(T) == typeid(DisparityTransform);
+    }
+    if(name == "NoiseRemovalFilter") {
+        return typeid(T) == typeid(NoiseRemovalFilter);
+    }
+    if(name == "SpatialAdvancedFilter") {
+        return typeid(T) == typeid(SpatialAdvancedFilter);
+    }
+    if(name == "TemporalFilter") {
+        return typeid(T) == typeid(TemporalFilter);
+    }
+    if(name == "HoleFillingFilter") {
+        return typeid(T) == typeid(HoleFillingFilter);
+    }
+    if(name == "DecimationFilter") {
+        return typeid(T) == typeid(DecimationFilter);
+    }
+    if(name == "PointCloudFilter") {
+        return typeid(T) == typeid(PointCloudFilter);
+    }
+    if(name == "CompressionFilter") {
+        return typeid(T) == typeid(CompressionFilter);
+    }
+    if(name == "DecompressionFilter") {
+        return typeid(T) == typeid(DecompressionFilter);
+    }
+    if(name == "FormatConverter") {
+        return typeid(T) == typeid(FormatConvertFilter);
+    }
+    if(name == "Align") {
+        return typeid(T) == typeid(Align);
+    }
+    return false;
+}
 
 }  // namespace ob

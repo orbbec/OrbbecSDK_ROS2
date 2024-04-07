@@ -467,7 +467,7 @@ class OBCameraNode {
   std::condition_variable colorFrameCV_;
 
   bool ordered_pc_ = false;
-  bool use_hardware_time_ = false;
+  bool use_hardware_time_ = true;
   bool enable_depth_scale_ = true;
 };
 }  // namespace orbbec_camera

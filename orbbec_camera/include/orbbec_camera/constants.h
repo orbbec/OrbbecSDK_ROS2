@@ -111,6 +111,7 @@ const int32_t OPENNI_END_PID = 0x06FF;
 const int32_t ASTRA_MINI_PID = 0x0404;
 const int32_t ASTRA_MINI_S_PID = 0x0407;
 const int GEMINI2_PID = 0x0670;
+const int GEMINI2R_PID = 0x06d0;
 const std::string ORB_DEFAULT_LOCK_NAME = "orbbec_device_lock";
 
 }  // namespace orbbec_camera

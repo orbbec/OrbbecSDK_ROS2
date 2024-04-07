@@ -602,7 +602,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<double>(angular_vel_cov_, "angular_vel_cov", 0.02);
   setAndGetNodeParameter<bool>(ordered_pc_, "ordered_pc", false);
   setAndGetNodeParameter<int>(max_save_images_count_, "max_save_images_count", 10);
-  setAndGetNodeParameter<bool>(use_hardware_time_, "use_hardware_time", false);
+  setAndGetNodeParameter<bool>(use_hardware_time_, "use_hardware_time", true);
   setAndGetNodeParameter<bool>(enable_depth_scale_, "enable_depth_scale", true);
 }
 
@@ -622,7 +622,8 @@ void OBCameraNode::setupPipelineConfig() {
   pipeline_config_->setDepthScaleRequire(enable_depth_scale_);
   if (depth_registration_ && enable_stream_[COLOR] && enable_stream_[DEPTH]) {
     auto info = device_->getDeviceInfo();
-    if (info->pid() == FEMTO_BOLT_PID) {
+    auto pid = info->pid();
+    if (pid == FEMTO_BOLT_PID || pid == GEMINI2R_PID) {
       RCLCPP_INFO_STREAM(logger_, "set align mode ALIGN_D2C_SW_MODE.");
       pipeline_config_->setAlignMode(ALIGN_D2C_SW_MODE);
     } else {
@@ -1169,15 +1170,12 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   int height = static_cast<int>(video_frame->height());
   auto timestamp = use_hardware_time_ ? fromUsToROSTime(video_frame->timeStampUs())
                                       : fromMsToROSTime(video_frame->systemTimeStamp());
-  if (!camera_param_) {
-    camera_param_ = pipeline_->getCameraParam();
-  }
   auto stream_profile = frame->getStreamProfile();
   CHECK_NOTNULL(stream_profile);
   auto video_stream_profile = stream_profile->as<ob::VideoStreamProfile>();
   CHECK_NOTNULL(video_stream_profile);
-  const auto& intrinsic = video_stream_profile->getIntrinsic();
-  const auto& distortion = video_stream_profile->getDistortion();
+  const auto &intrinsic = video_stream_profile->getIntrinsic();
+  const auto &distortion = video_stream_profile->getDistortion();
   std::string frame_id =
       depth_registration_ ? depth_aligned_frame_id_[stream_index] : optical_frame_id_[stream_index];
   auto camera_info = convertToCameraInfo(intrinsic, distortion, width);

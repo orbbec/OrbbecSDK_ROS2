@@ -62,6 +62,7 @@
 #include "orbbec_camera/d2c_viewer.h"
 #include "magic_enum/magic_enum.hpp"
 #include "jpeg_decoder.h"
+#include <std_msgs/msg/string.hpp>
 
 #define STREAM_NAME(sip)                                                                       \
   (static_cast<std::ostringstream&&>(std::ostringstream()                                      \
@@ -469,5 +470,33 @@ class OBCameraNode {
   bool ordered_pc_ = false;
   bool use_hardware_time_ = true;
   bool enable_depth_scale_ = true;
+  std::shared_ptr<ob::Frame> depth_frame_ = nullptr;
+  std::string device_preset_ = "Default";
+  // filter switch
+  bool enable_decimation_filter_ = false;
+  bool enable_hdr_merge_ = false;
+  bool enable_sequence_id_filter_ = false;
+  bool enable_threshold_filter_ = false;
+  bool enable_noise_removal_filter_ = true;
+  bool enable_spatial_filter_ = true;
+  bool enable_temporal_filter_ = false;
+  bool enable_hole_filling_filter_ = false;
+  // filter params
+  int decimation_filter_scale_range_ = 2;
+  int sequence_id_filter_id_ = 1;
+  int threshold_filter_max_ = 16000;
+  int threshold_filter_min_ = 0;
+  int noise_removal_filter_min_diff_ = 8;
+  int noise_removal_filter_max_size_ = 80;
+  float spatial_filter_alpha_ = 0.5;
+  int spatial_filter_diff_threshold_ = 8;
+  int spatial_filter_magnitude_ = 1;
+  int spatial_filter_radius_ = 1;
+  float temporal_filter_diff_threshold_ = 0.1;
+  float temporal_filter_weight_ = 0.4;
+  std::string hole_filling_filter_mode_ = "FILL_TOP";
+
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr filter_status_pub_;
+  nlohmann::json filter_status_;
 };
 }  // namespace orbbec_camera

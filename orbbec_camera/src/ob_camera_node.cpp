@@ -198,6 +198,8 @@ void OBCameraNode::setupDevices() {
         params.disp_diff = noise_removal_filter_min_diff_;
         params.max_size = noise_removal_filter_max_size_;
         noise_removal_filter->setFilterParams(params);
+      } else if (filter_name == "HdrMerge") {
+        // do nothing
       } else {
         RCLCPP_ERROR_STREAM(logger_, "Unsupported filter: " << filter_name);
       }

@@ -688,6 +688,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<float>(temporal_filter_weight_, "temporal_filter_weight", 0.4);
   setAndGetNodeParameter<std::string>(hole_filling_filter_mode_, "hole_filling_filter_mode",
                                       "FILL_TOP");
+  setAndGetNodeParameter<std::string>(align_mode_, "align_mode", "HW");
 }
 
 void OBCameraNode::setupTopics() {
@@ -712,7 +713,8 @@ void OBCameraNode::setupPipelineConfig() {
       pipeline_config_->setAlignMode(ALIGN_D2C_SW_MODE);
     } else {
       RCLCPP_INFO_STREAM(logger_, "set align mode ALIGN_D2C_HW_MODE.");
-      pipeline_config_->setAlignMode(ALIGN_D2C_HW_MODE);
+      OBAlignMode align_mode = align_mode_ == "HW" ? ALIGN_D2C_HW_MODE : ALIGN_D2C_SW_MODE;
+      pipeline_config_->setAlignMode(align_mode);
     }
   }
   for (const auto &stream_index : IMAGE_STREAMS) {

@@ -498,5 +498,6 @@ class OBCameraNode {
 
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr filter_status_pub_;
   nlohmann::json filter_status_;
+  std::string align_mode_ = "HW";
 };
 }  // namespace orbbec_camera

@@ -274,6 +274,8 @@ class OBCameraNode {
 
   void publishColoredPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set);
 
+  std::shared_ptr<ob::Frame> processDepthFrameFilter(std::shared_ptr<ob::Frame>& frame);
+
   void onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet>& frame_set);
 
   std::shared_ptr<ob::Frame> softwareDecodeColorFrame(const std::shared_ptr<ob::Frame>& frame);

@@ -1514,12 +1514,6 @@ void OBCameraNode::calcAndPublishStaticTransform() {
     publishStaticTF(timestamp, trans, Q, camera_link_frame_id_, frame_id_[stream_index]);
     publishStaticTF(timestamp, zero_trans, quaternion_optical, frame_id_[stream_index],
                     optical_frame_id_[stream_index]);
-    if (depth_registration_ && depth_aligned_frame_id_.count(stream_index) > 0) {
-      publishStaticTF(timestamp, trans, Q, camera_link_frame_id_,
-                      depth_aligned_frame_id_[stream_index]);
-      publishStaticTF(timestamp, zero_trans, quaternion_optical,
-                      depth_aligned_frame_id_[stream_index], optical_frame_id_[stream_index]);
-    }
   }
 }
 

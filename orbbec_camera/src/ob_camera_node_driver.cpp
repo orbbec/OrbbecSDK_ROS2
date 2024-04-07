@@ -61,7 +61,7 @@ OBCameraNodeDriver::~OBCameraNodeDriver() {
 void OBCameraNodeDriver::init() {
   auto log_level_str = declare_parameter<std::string>("log_level", "none");
   auto log_level = obLogSeverityFromString(log_level_str);
-  ob::Context::setLoggerSeverity(log_level);
+  ob::Context::setLoggerToConsole(log_level);
   orb_device_lock_shm_fd_ = shm_open(ORB_DEFAULT_LOCK_NAME.c_str(), O_CREAT | O_RDWR, 0666);
   if (orb_device_lock_shm_fd_ < 0) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to open shared memory " << ORB_DEFAULT_LOCK_NAME);

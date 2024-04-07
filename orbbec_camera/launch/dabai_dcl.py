@@ -84,6 +84,7 @@ def generate_launch_description():
         DeclareLaunchArgument('ordered_pc', default_value='false'),
         DeclareLaunchArgument('use_hardware_time', default_value='false'),
         DeclareLaunchArgument('enable_depth_scale', default_value='true'),
+        DeclareLaunchArgument('align_mode', default_value='HW'),
     ]
 
     # Node configuration

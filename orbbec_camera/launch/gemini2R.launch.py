@@ -108,6 +108,7 @@ def generate_launch_description():
         DeclareLaunchArgument('temporal_filter_diff_threshold', default_value='0.1'),
         DeclareLaunchArgument('temporal_filter_weight', default_value='0.4'),
         DeclareLaunchArgument('hole_filling_filter_mode', default_value='FILL_TOP'),
+        DeclareLaunchArgument('align_mode', default_value='HW'),
     ]
 
     # Node configuration

@@ -53,6 +53,7 @@ OBCameraNode::OBCameraNode(rclcpp::Node *node, std::shared_ptr<ob::Device> devic
   compression_params_.push_back(cv::IMWRITE_PNG_STRATEGY_DEFAULT);
   setupDefaultImageFormat();
   setupTopics();
+  setupDiagnosticUpdater();
 #if defined(USE_RK_HW_DECODER)
   jpeg_decoder_ = std::make_unique<RKJPEGDecoder>(width_[COLOR], height_[COLOR]);
 #elif defined(USE_NV_HW_DECODER)
@@ -629,6 +630,40 @@ void OBCameraNode::setupTopics() {
   setupProfiles();
   setupCameraCtrlServices();
   setupPublishers();
+}
+
+void OBCameraNode::setupDiagnosticUpdater() {
+  if (diagnostic_period_ < 0.0) {
+    return;
+  }
+  diagnostic_updater_ = std::make_unique<diagnostic_updater::Updater>(node_, diagnostic_period_);
+  auto info = device_->getDeviceInfo();
+  CHECK_NOTNULL(info);
+  std::string serial_number = info->serialNumber();
+  diagnostic_updater_->setHardwareID(serial_number);
+  diagnostic_updater_->add("Temperature", this, &OBCameraNode::onTemperatureUpdate);
+}
+
+void OBCameraNode::onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapper &status) {
+  try {
+    OBDeviceTemperature temperature;
+    uint32_t data_size = sizeof(OBDeviceTemperature);
+    device_->getStructuredData(OB_STRUCT_DEVICE_TEMPERATURE, &temperature, &data_size);
+    status.add("CPU Temperature", temperature.cpuTemp);
+    status.add("IR Temperature", temperature.irTemp);
+    status.add("LDM Temperature", temperature.ldmTemp);
+    status.add("MainBoard Temperature", temperature.mainBoardTemp);
+    status.add("TEC Temperature", temperature.tecTemp);
+    status.add("IMU Temperature", temperature.imuTemp);
+    status.add("RGB Temperature", temperature.rgbTemp);
+    status.add("Left IR Temperature", temperature.irLeftTemp);
+    status.add("Right IR Temperature", temperature.irRightTemp);
+    status.add("Chip Top Temperature", temperature.chipTopTemp);
+    status.add("Chip Bottom Temperature", temperature.chipBottomTemp);
+    status.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, "Temperature is normal");
+  } catch (const ob::Error &e) {
+    status.summary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, e.getMessage());
+  }
 }
 
 void OBCameraNode::setupPipelineConfig() {

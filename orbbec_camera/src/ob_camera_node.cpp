@@ -1298,6 +1298,14 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   camera_info.header.frame_id = frame_id;
   camera_info.width = width;
   camera_info.height = height;
+  if (frame->type() == OB_FRAME_IR_RIGHT) {
+    auto left_video_profile = stream_profile_[INFRA1]->as<ob::VideoStreamProfile>();
+    auto ex = video_stream_profile->getExtrinsicTo(left_video_profile);
+    float fx = camera_info.k.at(0);
+    float fy = camera_info.k.at(4);
+    camera_info.p.at(3) = -fx * ex.trans[0] + 0.0;
+    camera_info.p.at(7) = -fy * ex.trans[1] + 0.0;
+  }
   CHECK(camera_info_publishers_.count(stream_index) > 0);
   camera_info_publishers_[stream_index]->publish(camera_info);
   auto &image = images_[stream_index];
@@ -1629,6 +1637,62 @@ void OBCameraNode::calcAndPublishStaticTransform() {
     publishStaticTF(timestamp, trans, Q, camera_link_frame_id_, frame_id_[stream_index]);
     publishStaticTF(timestamp, zero_trans, quaternion_optical, frame_id_[stream_index],
                     optical_frame_id_[stream_index]);
+  }
+  if (enable_stream_[DEPTH] && enable_stream_[COLOR]) {
+    static const char *frame_id = "depth_to_color_extrinsics";
+    OBExtrinsic ex;
+    try {
+      ex = base_stream_profile->getExtrinsicTo(stream_profile_[COLOR]);
+    } catch (const ob::Error &e) {
+      RCLCPP_ERROR_STREAM(logger_,
+                          "Failed to get " << frame_id << " extrinsic: " << e.getMessage());
+      ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
+    }
+    depth_to_other_extrinsics_[COLOR] = ex;
+    auto ex_msg = obExtrinsicsToMsg(ex, frame_id);
+    depth_to_other_extrinsics_publishers_[COLOR]->publish(ex_msg);
+  }
+  if (enable_stream_[DEPTH] && enable_stream_[INFRA0]) {
+    static const char *frame_id = "depth_to_ir_extrinsics";
+    OBExtrinsic ex;
+    try {
+      ex = base_stream_profile->getExtrinsicTo(stream_profile_[INFRA0]);
+    } catch (const ob::Error &e) {
+      RCLCPP_ERROR_STREAM(logger_,
+                          "Failed to get " << frame_id << " extrinsic: " << e.getMessage());
+      ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
+    }
+    depth_to_other_extrinsics_[INFRA0] = ex;
+    auto ex_msg = obExtrinsicsToMsg(ex, frame_id);
+    depth_to_other_extrinsics_publishers_[INFRA0]->publish(ex_msg);
+  }
+  if (enable_stream_[DEPTH] && enable_stream_[INFRA1]) {
+    static const char *frame_id = "depth_to_left_ir_extrinsics";
+    OBExtrinsic ex;
+    try {
+      ex = base_stream_profile->getExtrinsicTo(stream_profile_[INFRA1]);
+    } catch (const ob::Error &e) {
+      RCLCPP_ERROR_STREAM(logger_,
+                          "Failed to get " << frame_id << " extrinsic: " << e.getMessage());
+      ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
+    }
+    depth_to_other_extrinsics_[INFRA1] = ex;
+    auto ex_msg = obExtrinsicsToMsg(ex, frame_id);
+    depth_to_other_extrinsics_publishers_[INFRA1]->publish(ex_msg);
+  }
+  if (enable_stream_[DEPTH] && enable_stream_[INFRA2]) {
+    static const char *frame_id = "depth_to_right_ir_extrinsics";
+    OBExtrinsic ex;
+    try {
+      ex = base_stream_profile->getExtrinsicTo(stream_profile_[INFRA2]);
+    } catch (const ob::Error &e) {
+      RCLCPP_ERROR_STREAM(logger_,
+                          "Failed to get " << frame_id << " extrinsic: " << e.getMessage());
+      ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
+    }
+    depth_to_other_extrinsics_[INFRA2] = ex;
+    auto ex_msg = obExtrinsicsToMsg(ex, frame_id);
+    depth_to_other_extrinsics_publishers_[INFRA2]->publish(ex_msg);
   }
 }
 

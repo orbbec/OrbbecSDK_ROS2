@@ -22,6 +22,7 @@
 #include "orbbec_camera/utils.h"
 #include <filesystem>
 #include <fstream>
+#include "diagnostic_msgs/msg/diagnostic_status.hpp"
 
 #if defined(USE_RK_HW_DECODER)
 #include "orbbec_camera/rk_mpp_decoder.h"
@@ -694,6 +695,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<std::string>(hole_filling_filter_mode_, "hole_filling_filter_mode",
                                       "FILL_TOP");
   setAndGetNodeParameter<std::string>(align_mode_, "align_mode", "HW");
+  setAndGetNodeParameter<double>(diagnostic_period_, "diagnostic_period", 1.0);
 }
 
 void OBCameraNode::setupTopics() {
@@ -702,6 +704,41 @@ void OBCameraNode::setupTopics() {
   setupProfiles();
   setupCameraCtrlServices();
   setupPublishers();
+  setupDiagnosticUpdater();
+}
+
+void OBCameraNode::onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapper &status) {
+  try {
+    OBDeviceTemperature temperature;
+    uint32_t data_size = sizeof(OBDeviceTemperature);
+    device_->getStructuredData(OB_STRUCT_DEVICE_TEMPERATURE, &temperature, &data_size);
+    status.add("CPU Temperature", temperature.cpuTemp);
+    status.add("IR Temperature", temperature.irTemp);
+    status.add("LDM Temperature", temperature.ldmTemp);
+    status.add("MainBoard Temperature", temperature.mainBoardTemp);
+    status.add("TEC Temperature", temperature.tecTemp);
+    status.add("IMU Temperature", temperature.imuTemp);
+    status.add("RGB Temperature", temperature.rgbTemp);
+    status.add("Left IR Temperature", temperature.irLeftTemp);
+    status.add("Right IR Temperature", temperature.irRightTemp);
+    status.add("Chip Top Temperature", temperature.chipTopTemp);
+    status.add("Chip Bottom Temperature", temperature.chipBottomTemp);
+    status.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, "Temperature is normal");
+  } catch (const ob::Error &e) {
+    status.summary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, e.getMessage());
+  }
+}
+
+void OBCameraNode::setupDiagnosticUpdater() {
+  if (diagnostic_period_ <= 0.0) {
+    return;
+  }
+  RCLCPP_INFO_STREAM(logger_, "Publish diagnostics every " << diagnostic_period_ << " seconds");
+  auto info = device_->getDeviceInfo();
+  std::string serial_number = info->serialNumber();
+  diagnostic_updater_ = std::make_unique<diagnostic_updater::Updater>(node_, diagnostic_period_);
+  diagnostic_updater_->setHardwareID(serial_number);
+  diagnostic_updater_->add("Temperatures", this, &OBCameraNode::onTemperatureUpdate);
 }
 
 void OBCameraNode::setupPipelineConfig() {

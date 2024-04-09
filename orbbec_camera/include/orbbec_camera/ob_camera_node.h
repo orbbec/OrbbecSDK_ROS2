@@ -38,6 +38,7 @@
 #include <tf2/LinearMath/Transform.h>
 #include <std_srvs/srv/set_bool.hpp>
 #include <std_srvs/srv/empty.hpp>
+#include <diagnostic_updater/diagnostic_updater.hpp>
 
 #include <sensor_msgs/msg/camera_info.hpp>
 #include <camera_info_manager/camera_info_manager.hpp>
@@ -164,6 +165,10 @@ class OBCameraNode {
   void setupTopics();
 
   void setupPipelineConfig();
+
+  void setupDiagnosticUpdater();
+
+  void onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapper &status);
 
   void setupCameraCtrlServices();
 
@@ -501,5 +506,7 @@ class OBCameraNode {
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr filter_status_pub_;
   nlohmann::json filter_status_;
   std::string align_mode_ = "HW";
+  std::unique_ptr<diagnostic_updater::Updater> diagnostic_updater_ = nullptr;
+  double diagnostic_period_ = 1.0;
 };
 }  // namespace orbbec_camera

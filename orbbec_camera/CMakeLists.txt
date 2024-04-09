@@ -39,6 +39,8 @@ set(dependencies
   tf2_ros
   tf2_sensor_msgs
   Threads
+  diagnostic_updater
+  diagnostic_msgs
 )
 
 foreach (dep IN LISTS dependencies)

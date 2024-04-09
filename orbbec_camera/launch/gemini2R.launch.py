@@ -109,6 +109,7 @@ def generate_launch_description():
         DeclareLaunchArgument('temporal_filter_weight', default_value='0.4'),
         DeclareLaunchArgument('hole_filling_filter_mode', default_value='FILL_TOP'),
         DeclareLaunchArgument('align_mode', default_value='SW'),
+        DeclareLaunchArgument('diagnostic_period', default_value='1.0'),
     ]
 
     # Node configuration

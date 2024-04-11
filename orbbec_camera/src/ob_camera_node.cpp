@@ -143,6 +143,7 @@ void OBCameraNode::setupDevices() {
     }
   }
   try {
+    device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, enable_laser_);
     device_->loadPreset(device_preset_.c_str());
     auto depth_sensor = device_->getSensor(OB_SENSOR_DEPTH);
     // set depth sensor to filter
@@ -696,6 +697,7 @@ void OBCameraNode::getParameters() {
                                       "FILL_TOP");
   setAndGetNodeParameter<std::string>(align_mode_, "align_mode", "HW");
   setAndGetNodeParameter<double>(diagnostic_period_, "diagnostic_period", 1.0);
+  setAndGetNodeParameter<bool>(enable_laser_, "enable_laser", false);
 }
 
 void OBCameraNode::setupTopics() {
@@ -1466,7 +1468,7 @@ void OBCameraNode::onNewIMUFrameSyncOutputCallback(const std::shared_ptr<ob::Fra
   setDefaultIMUMessage(imu_msg);
 
   imu_msg.header.frame_id = imu_optical_frame_id_;
-  auto timestamp = fromUsToROSTime(accelframe->timeStampUs());
+  auto timestamp = fromUsToROSTime(accelframe->globalTimeStampUs());
   imu_msg.header.stamp = timestamp;
   auto gyro_frame = gryoframe->as<ob::GyroFrame>();
   auto gyroData = gyro_frame->value();

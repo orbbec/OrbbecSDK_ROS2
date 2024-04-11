@@ -508,5 +508,6 @@ class OBCameraNode {
   std::string align_mode_ = "HW";
   std::unique_ptr<diagnostic_updater::Updater> diagnostic_updater_ = nullptr;
   double diagnostic_period_ = 1.0;
+  bool enable_laser_ = false;
 };
 }  // namespace orbbec_camera

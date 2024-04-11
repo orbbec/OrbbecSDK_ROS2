@@ -595,7 +595,7 @@ bool isValidJPEG(const std::shared_ptr<ob::ColorFrame> &frame) {
 std::string metaDataTypeToString(const OBFrameMetadataType &meta_data_type) {
   switch (meta_data_type) {
     case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_TIMESTAMP:
-      return "timestamp";
+      return "frame_timestamp";
     case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_SENSOR_TIMESTAMP:
       return "sensor_timestamp";
     case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_FRAME_NUMBER:
@@ -651,15 +651,15 @@ std::string metaDataTypeToString(const OBFrameMetadataType &meta_data_type) {
     case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_INDEX:
       return "hdr_sequence_index";
     case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_LASER_POWER:
-      return "laser_power";
+      return "frame_laser_power";
     case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_LASER_POWER_MODE:
-      return "laser_power_mode";
+      return "frame_laser_power_mode";
     case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_EMITTER_MODE:
-      return "emitter_mode";
+      return "frame_emitter_mode";
     case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_GPIO_INPUT_DATA:
       return "gpio_input_data";
     default:
-      return "unknown";
+      return "unknown_field";
   }
 }
 OBHoleFillingMode holeFillingModeFromString(const std::string &hole_filling_mode) {

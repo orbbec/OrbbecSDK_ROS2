@@ -99,15 +99,3 @@ SUBSYSTEM=="usb", ATTR{idProduct}=="06d0", ATTR{idVendor}=="2bc5", MODE:="0666",
 SUBSYSTEM=="usb", ATTR{idProduct}=="06d1", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="geminiRL"
 SUBSYSTEM=="usb", ATTR{idProduct}=="0800", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="geminiR"
 SUBSYSTEM=="usb", ATTR{idProduct}=="0804", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="geminiRL"
-
-
-
-
-
-
-
-
-
-
-
-

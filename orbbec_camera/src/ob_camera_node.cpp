@@ -133,16 +133,14 @@ void OBCameraNode::setupDevices() {
     }
   }
   auto info = device_->getDeviceInfo();
-  if (enable_hardware_d2d_ && info->pid() == GEMINI2_PID) {
-    device_->setBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL, true);
-    bool isHWD2D = device_->getBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL);
-    if (isHWD2D == false) {
-      RCLCPP_INFO_STREAM(logger_, "Depth process is soft D2D.");
-    } else {
-      RCLCPP_INFO_STREAM(logger_, "Depth process is HW D2D.");
-    }
-  }
   try {
+    if (enable_hardware_d2d_ &&
+        device_->isPropertySupported(OB_PROP_DISPARITY_TO_DEPTH_BOOL, OB_PERMISSION_READ_WRITE)) {
+      device_->setBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL, true);
+      bool is_hardware_d2d = device_->getBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL);
+      std::string d2d_mode = is_hardware_d2d ? "HW D2D" : "SW D2D";
+      RCLCPP_INFO_STREAM(logger_, "Depth process is " << d2d_mode);
+    }
     device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, enable_laser_);
     device_->loadPreset(device_preset_.c_str());
     auto depth_sensor = device_->getSensor(OB_SENSOR_DEPTH);
@@ -750,16 +748,9 @@ void OBCameraNode::setupPipelineConfig() {
   pipeline_config_ = std::make_shared<ob::Config>();
   pipeline_config_->setDepthScaleRequire(enable_depth_scale_);
   if (depth_registration_ && enable_stream_[COLOR] && enable_stream_[DEPTH]) {
-    auto info = device_->getDeviceInfo();
-    auto pid = info->pid();
-    if (pid == FEMTO_BOLT_PID || pid == GEMINI2R_PID || pid == GEMINI2RL_PID) {
-      RCLCPP_INFO_STREAM(logger_, "set align mode ALIGN_D2C_SW_MODE.");
-      pipeline_config_->setAlignMode(ALIGN_D2C_SW_MODE);
-    } else {
-      RCLCPP_INFO_STREAM(logger_, "set align mode ALIGN_D2C_HW_MODE.");
-      OBAlignMode align_mode = align_mode_ == "HW" ? ALIGN_D2C_HW_MODE : ALIGN_D2C_SW_MODE;
-      pipeline_config_->setAlignMode(align_mode);
-    }
+    RCLCPP_INFO_STREAM(logger_, "===set align mode to =====" << align_mode_);
+    OBAlignMode align_mode = align_mode_ == "HW" ? ALIGN_D2C_HW_MODE : ALIGN_D2C_SW_MODE;
+    pipeline_config_->setAlignMode(align_mode);
   }
   for (const auto &stream_index : IMAGE_STREAMS) {
     if (enable_stream_[stream_index]) {

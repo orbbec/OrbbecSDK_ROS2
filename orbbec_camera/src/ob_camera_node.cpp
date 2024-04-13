@@ -967,7 +967,11 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
       std::filesystem::create_directory(current_path + "/point_cloud");
     }
     RCLCPP_INFO_STREAM(logger_, "Saving point cloud to " << filename);
-    saveDepthPointsToPly(point_cloud_msg_, filename);
+    try {
+      saveDepthPointsToPly(point_cloud_msg_, filename);
+    } catch (const std::exception &e) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to save point cloud: " << e.what());
+    }
   }
 }
 
@@ -1075,7 +1079,13 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
       std::filesystem::create_directory(current_path + "/point_cloud");
     }
     RCLCPP_INFO_STREAM(logger_, "Saving point cloud to " << filename);
-    saveRGBPointCloudMsgToPly(point_cloud_msg_, filename);
+    try {
+      saveRGBPointCloudMsgToPly(point_cloud_msg_, filename);
+    } catch (const std::exception &e) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to save point cloud: " << e.what());
+    } catch (...) {
+      RCLCPP_ERROR(logger_, "Failed to save point cloud");
+    }
   }
 }
 

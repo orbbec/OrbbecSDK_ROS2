@@ -1338,7 +1338,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   camera_info.header.frame_id = frame_id;
   camera_info.width = width;
   camera_info.height = height;
-  if (frame->type() == OB_FRAME_IR_RIGHT) {
+  if (frame->type() == OB_FRAME_IR_RIGHT && enable_stream_[INFRA1]) {
     auto left_video_profile = stream_profile_[INFRA1]->as<ob::VideoStreamProfile>();
     auto ex = video_stream_profile->getExtrinsicTo(left_video_profile);
     float fx = camera_info.k.at(0);

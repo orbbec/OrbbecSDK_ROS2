@@ -306,10 +306,10 @@ void OBCameraNode::setupProfiles() {
       for (size_t i = 0; i < profiles->count(); i++) {
         auto profile = profiles->getProfile(i)->as<ob::VideoStreamProfile>();
         RCLCPP_DEBUG_STREAM(
-            logger_, "Sensor profile: "
-                         << "stream_type: " << magic_enum::enum_name(profile->type())
-                         << "Format: " << profile->format() << ", Width: " << profile->width()
-                         << ", Height: " << profile->height() << ", FPS: " << profile->fps());
+            logger_,
+            "Sensor profile: " << "stream_type: " << magic_enum::enum_name(profile->type())
+                               << "Format: " << profile->format() << ", Width: " << profile->width()
+                               << ", Height: " << profile->height() << ", FPS: " << profile->fps());
         supported_profiles_[elem].emplace_back(profile);
       }
       std::shared_ptr<ob::VideoStreamProfile> selected_profile;
@@ -1657,6 +1657,10 @@ void OBCameraNode::calcAndPublishStaticTransform() {
   quaternion_optical.setRPY(-M_PI / 2, 0.0, -M_PI / 2);
   tf2::Vector3 zero_trans(0, 0, 0);
   auto base_stream_profile = stream_profile_[base_stream_];
+  if (!base_stream_profile) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to get base stream profile");
+    return;
+  }
   CHECK_NOTNULL(base_stream_profile.get());
   for (const auto &item : stream_profile_) {
     auto stream_index = item.first;

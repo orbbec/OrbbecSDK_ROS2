@@ -17,6 +17,7 @@
 #include <regex>
 #include "orbbec_camera/utils.h"
 #include <sensor_msgs/point_cloud2_iterator.hpp>
+#include "orbbec_camera/constants.h"
 namespace orbbec_camera {
 sensor_msgs::msg::CameraInfo convertToCameraInfo(OBCameraIntrinsic intrinsic,
                                                  OBCameraDistortion distortion, int width) {
@@ -380,6 +381,13 @@ OB_DEPTH_PRECISION_LEVEL depthPrecisionLevelFromString(
   }
 }
 
+float depthPrecisionFromString(const std::string &depth_precision_level_str) {
+  // covert 0.8mm to 0.8
+  std::string depth_precision_level_str_num =
+      depth_precision_level_str.substr(0, depth_precision_level_str.size() - 2);
+  return std::stof(depth_precision_level_str_num);
+}
+
 OBMultiDeviceSyncMode OBSyncModeFromString(const std::string &mode) {
   if (mode == "FREE_RUN") {
     return OBMultiDeviceSyncMode::OB_MULTI_DEVICE_SYNC_MODE_FREE_RUN;
@@ -672,5 +680,15 @@ OBHoleFillingMode holeFillingModeFromString(const std::string &hole_filling_mode
   } else {
     return OB_HOLE_FILL_NEAREST;
   }
+}
+
+bool isGemini2R(int pid) {
+  if (pid == GEMINI2R_PID || pid == GEMINI2RL_PID) {
+    return true;
+  }
+  if (pid == GEMINI2R_PID2 || pid == GEMINI2RL_PID2) {
+    return true;
+  }
+  return false;
 }
 }  // namespace orbbec_camera

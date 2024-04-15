@@ -359,6 +359,7 @@ The following are the launch parameters available:
   network, the IP address of the device needs to be configured in advance. The enable switch needs to be set to true.
 - `depth_filter_config` : Configure the loading path for the depth filtering configuration file. By default, the depth
   filtering configuration file is located in the /config/depthfilter directory,Supported only on Gemini2.
+- `depth_precision` : The depth precision, should be like `1mm` format. The default value is `1mm`.
 
 ## Depth work mode switch
 

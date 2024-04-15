@@ -217,7 +217,7 @@ void OBCameraNode::setupDevices() {
       sync_config.triggerOutEnable = trigger_out_enabled_;
       device_->setMultiDeviceSyncConfig(sync_config);
     }
-    if (info->pid() == GEMINI2_PID) {
+    if (device_->isPropertySupported(OB_PROP_DEPTH_PRECISION_LEVEL_INT, OB_PERMISSION_READ_WRITE)) {
       auto default_precision_level = device_->getIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT);
       if (default_precision_level != depth_precision_) {
         device_->setIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT, depth_precision_);
@@ -225,6 +225,22 @@ void OBCameraNode::setupDevices() {
 
       int32_t precisionLevel = device_->getIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT);
       RCLCPP_INFO_STREAM(logger_, "Depth precision level:" << precisionLevel);
+    }
+    if (device_->isPropertySupported(OB_PROP_DEPTH_UNIT_FLEXIBLE_ADJUSTMENT_FLOAT,
+                                     OB_PERMISSION_READ_WRITE)) {
+      auto depth_unit_flexible_adjustment = depthPrecisionFromString(depth_precision_str_);
+      auto range = device_->getFloatPropertyRange(OB_PROP_DEPTH_UNIT_FLEXIBLE_ADJUSTMENT_FLOAT);
+      RCLCPP_INFO_STREAM(
+          logger_, "Depth unit flexible adjustment range: " << range.min << " - " << range.max);
+      if (depth_unit_flexible_adjustment < range.min ||
+          depth_unit_flexible_adjustment > range.max) {
+        RCLCPP_ERROR_STREAM(
+            logger_,
+            "depth unit flexible adjustment value is out of range, please check the value");
+      } else {
+        device_->setFloatProperty(OB_PROP_DEPTH_UNIT_FLEXIBLE_ADJUSTMENT_FLOAT,
+                                  depth_unit_flexible_adjustment);
+      }
     }
 
     for (const auto &stream_index : IMAGE_STREAMS) {

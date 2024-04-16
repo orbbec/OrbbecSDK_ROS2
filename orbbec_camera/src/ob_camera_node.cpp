@@ -308,6 +308,19 @@ void OBCameraNode::setupDevices() {
   }
 }
 
+void OBCameraNode::selectBaseStream() {
+  if (enable_stream_[DEPTH]) {
+    base_stream_ = DEPTH;
+  } else if (enable_stream_[INFRA0]) {
+    base_stream_ = INFRA0;
+  } else if (enable_stream_[INFRA1]) {
+    base_stream_ = INFRA1;
+  } else if (enable_stream_[INFRA2]) {
+    base_stream_ = INFRA2;
+  } else if (enable_stream_[COLOR]) {
+    base_stream_ = COLOR;
+  }
+}
 void OBCameraNode::setupProfiles() {
   // Image stream
   for (const auto &elem : IMAGE_STREAMS) {
@@ -718,6 +731,7 @@ void OBCameraNode::setupTopics() {
   getParameters();
   setupDevices();
   setupProfiles();
+  selectBaseStream();
   setupCameraCtrlServices();
   setupPublishers();
   setupDiagnosticUpdater();
@@ -1339,6 +1353,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   }
   int width = static_cast<int>(video_frame->width());
   int height = static_cast<int>(video_frame->height());
+  use_hardware_time_ = true;
   auto timestamp = use_hardware_time_ ? fromUsToROSTime(video_frame->timeStampUs())
                                       : fromMsToROSTime(video_frame->systemTimeStamp());
   auto stream_profile = frame->getStreamProfile();
@@ -1359,8 +1374,8 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
     auto ex = video_stream_profile->getExtrinsicTo(left_video_profile);
     float fx = camera_info.k.at(0);
     float fy = camera_info.k.at(4);
-    camera_info.p.at(3) = -fx * ex.trans[0] + 0.0;
-    camera_info.p.at(7) = -fy * ex.trans[1] + 0.0;
+    camera_info.p.at(3) = fx * ex.trans[0] / 1000.0 + 0.0;
+    camera_info.p.at(7) = fy * ex.trans[1] / 1000.0 + 0.0;
   }
   CHECK(camera_info_publishers_.count(stream_index) > 0);
   camera_info_publishers_[stream_index]->publish(camera_info);
@@ -1485,25 +1500,25 @@ void OBCameraNode::onNewIMUFrameSyncOutputCallback(const std::shared_ptr<ob::Fra
   setDefaultIMUMessage(imu_msg);
 
   imu_msg.header.frame_id = imu_optical_frame_id_;
-  auto timestamp = fromUsToROSTime(accelframe->globalTimeStampUs());
+  auto timestamp = fromUsToROSTime(accelframe->timeStampUs());
   imu_msg.header.stamp = timestamp;
   auto gyro_frame = gryoframe->as<ob::GyroFrame>();
+  auto gyro_info = createIMUInfo(GYRO);
+  gyro_info.header = imu_msg.header;
+  gyro_info.header.frame_id = imu_optical_frame_id_;
+  imu_info_publishers_[GYRO]->publish(gyro_info);
   auto gyroData = gyro_frame->value();
-  imu_msg.angular_velocity.x = gyroData.x;
-  imu_msg.angular_velocity.y = gyroData.y;
-  imu_msg.angular_velocity.z = gyroData.z;
+  imu_msg.angular_velocity.x = gyroData.x - gyro_info.bias[0];
+  imu_msg.angular_velocity.y = gyroData.y - gyro_info.bias[1];
+  imu_msg.angular_velocity.z = gyroData.z - gyro_info.bias[2];
   auto accel_frame = accelframe->as<ob::AccelFrame>();
   auto accelData = accel_frame->value();
-  imu_msg.linear_acceleration.x = accelData.x;
-  imu_msg.linear_acceleration.y = accelData.y;
-  imu_msg.linear_acceleration.z = accelData.z;
+  auto accel_info = createIMUInfo(ACCEL);
+  imu_msg.linear_acceleration.x = accelData.x - accel_info.bias[0];
+  imu_msg.linear_acceleration.y = accelData.y - accel_info.bias[1];
+  imu_msg.linear_acceleration.z = accelData.z - accel_info.bias[2];
+  imu_info_publishers_[ACCEL]->publish(accel_info);
   imu_gyro_accel_publisher_->publish(imu_msg);
-  for (const auto &stream_index : {GYRO, ACCEL}) {
-    auto imu_info = createIMUInfo(stream_index);
-    imu_info.header = imu_msg.header;
-    imu_info.header.frame_id = imu_optical_frame_id_;
-    imu_info_publishers_[stream_index]->publish(imu_info);
-  }
 }
 
 void OBCameraNode::onNewIMUFrameCallback(const std::shared_ptr<ob::Frame> &frame,
@@ -1525,27 +1540,27 @@ void OBCameraNode::onNewIMUFrameCallback(const std::shared_ptr<ob::Frame> &frame
   auto timestamp = fromUsToROSTime(frame->timeStampUs());
 
   imu_msg.header.stamp = timestamp;
+  auto imu_info = createIMUInfo(stream_index);
+  imu_info.header = imu_msg.header;
+  imu_info.header.frame_id = imu_optical_frame_id_;
+  imu_info_publishers_[stream_index]->publish(imu_info);
   if (frame->type() == OB_FRAME_GYRO) {
     auto gyro_frame = frame->as<ob::GyroFrame>();
     auto data = gyro_frame->value();
-    imu_msg.angular_velocity.x = data.x;
-    imu_msg.angular_velocity.y = data.y;
-    imu_msg.angular_velocity.z = data.z;
+    imu_msg.angular_velocity.x = data.x - imu_info.bias[0];
+    imu_msg.angular_velocity.y = data.y - imu_info.bias[1];
+    imu_msg.angular_velocity.z = data.z - imu_info.bias[2];
   } else if (frame->type() == OB_FRAME_ACCEL) {
     auto accel_frame = frame->as<ob::AccelFrame>();
     auto data = accel_frame->value();
-    imu_msg.linear_acceleration.x = data.x;
-    imu_msg.linear_acceleration.y = data.y;
-    imu_msg.linear_acceleration.z = data.z;
+    imu_msg.linear_acceleration.x = data.x - imu_info.bias[0];
+    imu_msg.linear_acceleration.y = data.y - imu_info.bias[1];
+    imu_msg.linear_acceleration.z = data.z - imu_info.bias[2];
   } else {
     RCLCPP_ERROR(logger_, "Unsupported IMU frame type");
     return;
   }
   imu_publishers_[stream_index]->publish(imu_msg);
-  auto imu_info = createIMUInfo(stream_index);
-  imu_info.header = imu_msg.header;
-  imu_info.header.frame_id = imu_optical_frame_id_;
-  imu_info_publishers_[stream_index]->publish(imu_info);
 }
 
 void OBCameraNode::setDefaultIMUMessage(sensor_msgs::msg::Imu &imu_msg) {

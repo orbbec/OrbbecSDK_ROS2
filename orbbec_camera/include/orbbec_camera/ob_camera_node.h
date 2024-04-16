@@ -160,6 +160,8 @@ class OBCameraNode {
 
   void setupProfiles();
 
+  void selectBaseStream();
+
   void getParameters();
 
   void setupTopics();
@@ -168,7 +170,7 @@ class OBCameraNode {
 
   void setupDiagnosticUpdater();
 
-  void onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapper &status);
+  void onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapper& status);
 
   void setupCameraCtrlServices();
 
@@ -359,7 +361,7 @@ class OBCameraNode {
   std::map<stream_index_pair, std::vector<std::shared_ptr<ob::VideoStreamProfile>>>
       supported_profiles_;
   std::map<stream_index_pair, std::shared_ptr<ob::StreamProfile>> stream_profile_;
-  const stream_index_pair base_stream_ = DEPTH;
+  stream_index_pair base_stream_ = DEPTH;
   std::map<stream_index_pair, uint32_t> seq_;
   std::map<stream_index_pair, cv::Mat> images_;
   std::map<stream_index_pair, std::string> encoding_;

@@ -12,11 +12,11 @@ def generate_launch_description():
     launch_file_dir = os.path.join(package_dir, 'launch')
     launch1_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, 'dabai_dcw.launch.py')
+            os.path.join(launch_file_dir, 'gemini2R.launch.py')
         ),
         launch_arguments={
             'camera_name': 'camera_01',
-            'usb_port': '5-3.4.4.2.1',
+            'usb_port': '2-3.4.4.4.1',
             'device_num': '2',
             'sync_mode': 'free_run'
         }.items()
@@ -24,11 +24,11 @@ def generate_launch_description():
 
     launch2_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, 'dabai_dcw.launch.py')
+            os.path.join(launch_file_dir, 'gemini2R.launch.py')
         ),
         launch_arguments={
             'camera_name': 'camera_02',
-            'usb_port': '5-3.4.3.1',
+            'usb_port': '2-3.4.4.4.3',
             'device_num': '2',
             'sync_mode': 'free_run'
         }.items()

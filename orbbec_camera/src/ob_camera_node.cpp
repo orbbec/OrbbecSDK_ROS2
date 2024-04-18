@@ -222,10 +222,8 @@ void OBCameraNode::setupDevices() {
       auto default_precision_level = device_->getIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT);
       if (default_precision_level != depth_precision_) {
         device_->setIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT, depth_precision_);
+              RCLCPP_INFO_STREAM(logger_, "set depth precision to " << depth_precision_str_);
       }
-
-      int32_t precisionLevel = device_->getIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT);
-      RCLCPP_INFO_STREAM(logger_, "Depth precision level:" << precisionLevel);
     }
     if (device_->isPropertySupported(OB_PROP_DEPTH_UNIT_FLEXIBLE_ADJUSTMENT_FLOAT,
                                      OB_PERMISSION_READ_WRITE)) {
@@ -239,6 +237,8 @@ void OBCameraNode::setupDevices() {
             logger_,
             "depth unit flexible adjustment value is out of range, please check the value");
       } else {
+        RCLCPP_INFO_STREAM(logger_, "set depth unit to "
+                                        << depth_unit_flexible_adjustment << "mm");
         device_->setFloatProperty(OB_PROP_DEPTH_UNIT_FLEXIBLE_ADJUSTMENT_FLOAT,
                                   depth_unit_flexible_adjustment);
       }
@@ -780,7 +780,7 @@ void OBCameraNode::setupPipelineConfig() {
   pipeline_config_ = std::make_shared<ob::Config>();
   pipeline_config_->setDepthScaleRequire(enable_depth_scale_);
   if (depth_registration_ && enable_stream_[COLOR] && enable_stream_[DEPTH]) {
-    RCLCPP_INFO_STREAM(logger_, "===set align mode to =====" << align_mode_);
+    RCLCPP_INFO_STREAM(logger_, "set align mode to " << align_mode_);
     OBAlignMode align_mode = align_mode_ == "HW" ? ALIGN_D2C_HW_MODE : ALIGN_D2C_SW_MODE;
     pipeline_config_->setAlignMode(align_mode);
   }

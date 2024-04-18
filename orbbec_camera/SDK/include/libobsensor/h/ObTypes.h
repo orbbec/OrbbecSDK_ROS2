@@ -241,6 +241,7 @@ typedef enum {
     OB_FORMAT_RGBA       = 31,   /**< RGBA format */
     OB_FORMAT_BYR2       = 32,   /**< byr2 format */
     OB_FORMAT_RW16       = 33,   /**< RAW16 format */
+    OB_FORMAT_DISP16     = 34,   /**< Y16 format for disparity map*/
     OB_FORMAT_UNKNOWN    = 0xff, /**< unknown format */
 } OBFormat,
     ob_format;
@@ -420,10 +421,11 @@ typedef struct {
 
 /** \brief Distortion model: defines how pixel coordinates should be mapped to sensor coordinates. */
 typedef enum {
-    OB_DISTORTION_NONE,                  /**< Rectilinear images. No distortion compensation required. */
-    OB_DISTORTION_MODIFIED_BROWN_CONRADY, /**< Equivalent to Brown-Conrady distortion, except that tangential distortion is applied to radially distorted points */
-    OB_DISTORTION_INVERSE_BROWN_CONRADY, /**< Equivalent to Brown-Conrady distortion, except undistorts image instead of distorting it */
-    OB_DISTORTION_BROWN_CONRADY,         /**< Unmodified Brown-Conrady distortion model */
+    OB_DISTORTION_NONE,                   /**< Rectilinear images. No distortion compensation required. */
+    OB_DISTORTION_MODIFIED_BROWN_CONRADY, /**< Equivalent to Brown-Conrady distortion, except that tangential distortion is applied to radially distorted points
+                                           */
+    OB_DISTORTION_INVERSE_BROWN_CONRADY,  /**< Equivalent to Brown-Conrady distortion, except undistorts image instead of distorting it */
+    OB_DISTORTION_BROWN_CONRADY,          /**< Unmodified Brown-Conrady distortion model */
 } OBCameraDistortionModel,
     ob_camera_distortion_model;
 

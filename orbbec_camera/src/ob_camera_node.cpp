@@ -150,7 +150,7 @@ void OBCameraNode::setupDevices() {
       auto filter = filter_list->getFilter(i);
       std::map<std::string, bool> filter_params = {
           {"DecimationFilter", enable_decimation_filter_},
-          {"HdrMerge", enable_hdr_merge_},
+          {"HDRMerge", enable_hdr_merge_},
           {"SequencedFilter", enable_sequence_id_filter_},
           {"ThresholdFilter", enable_threshold_filter_},
           {"NoiseRemovalFilter", enable_noise_removal_filter_},
@@ -201,7 +201,7 @@ void OBCameraNode::setupDevices() {
       } else if (filter_name == "HdrMerge") {
         // do nothing
       } else {
-        RCLCPP_ERROR_STREAM(logger_, "Unsupported filter: " << filter_name);
+        RCLCPP_INFO_STREAM(logger_, "Skip setting filter: " << filter_name);
       }
     }
     if (!depth_work_mode_.empty()) {

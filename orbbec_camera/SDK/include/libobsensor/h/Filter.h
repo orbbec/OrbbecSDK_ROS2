@@ -361,7 +361,7 @@ ob_int_property_range ob_threshold_filter_get_max_range(ob_filter *filter, ob_er
  * @param[in] max threshold filter scale max value.
  * @param[out] error Log error messages.
  */
-void ob_threshold_filter_set_scale_value(ob_filter *filter, uint16_t min, uint16_t max, ob_error **error);
+bool ob_threshold_filter_set_scale_value(ob_filter *filter, uint16_t min, uint16_t max, ob_error **error);
 
 /**
  * @brief Create a SequenceId filter.

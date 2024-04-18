@@ -376,7 +376,7 @@ public:
     /**
      * @brief Get the threshold filter max and min range.
      */
-    void setValueRange(uint16_t min, uint16_t max);
+    bool setValueRange(uint16_t min, uint16_t max);
 };
 
 /**
@@ -477,7 +477,7 @@ public:
 // Define the is() template function for the Filter class
 template <typename T> bool Filter::is() {
     std::string name = type();
-    if(name == "HdrMerge") {
+    if(name == "HDRMerge") {
         return typeid(T) == typeid(HdrMerge);
     }
     if(name == "SequenceIdFilter") {
@@ -486,7 +486,7 @@ template <typename T> bool Filter::is() {
     if(name == "ThresholdFilter") {
         return typeid(T) == typeid(ThresholdFilter);
     }
-    if(name == "DisparityTransform") {
+    if(name == "Disparity to Depth") {
         return typeid(T) == typeid(DisparityTransform);
     }
     if(name == "NoiseRemovalFilter") {

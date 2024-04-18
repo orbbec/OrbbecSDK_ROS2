@@ -86,7 +86,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_sequence_id_filter', default_value='false'),
         DeclareLaunchArgument('enable_threshold_filter', default_value='false'),
         DeclareLaunchArgument('enable_noise_removal_filter', default_value='true'),
-        DeclareLaunchArgument('enable_spatial_filter', default_value='true'),
+        DeclareLaunchArgument('enable_spatial_filter', default_value='false'),
         DeclareLaunchArgument('enable_temporal_filter', default_value='false'),
         DeclareLaunchArgument('enable_hole_filling_filter', default_value='false'),
         DeclareLaunchArgument('decimation_filter_scale_range', default_value='2'),

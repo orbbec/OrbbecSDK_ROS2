@@ -144,6 +144,7 @@ void OBCameraNode::setupDevices() {
     device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, enable_laser_);
     device_->setIntProperty(OB_PROP_LASER_ON_OFF_MODE_INT, laser_on_off_mode_);
     device_->loadPreset(device_preset_.c_str());
+    return;
     auto depth_sensor = device_->getSensor(OB_SENSOR_DEPTH);
     // set depth sensor to filter
     auto filter_list = depth_sensor->getRecommendedFilters();
@@ -168,13 +169,13 @@ void OBCameraNode::setupDevices() {
         filter->enable(filter_params[filter_name]);
         filter_status_[filter_name] = filter_params[filter_name];
       }
-      if (filter_name == "DecimationFilter") {
+      if (filter_name == "DecimationFilter" && enable_decimation_filter_) {
         auto decimation_filter = filter->as<ob::DecimationFilter>();
         decimation_filter->setScaleValue(decimation_filter_scale_range_);
-      } else if (filter_name == "ThresholdFilter") {
+      } else if (filter_name == "ThresholdFilter" && enable_threshold_filter_) {
         auto threshold_filter = filter->as<ob::ThresholdFilter>();
         threshold_filter->setValueRange(threshold_filter_min_, threshold_filter_max_);
-      } else if (filter_name == "SpatialAdvancedFilter") {
+      } else if (filter_name == "SpatialAdvancedFilter" && enable_spatial_filter_) {
         auto spatial_filter = filter->as<ob::SpatialAdvancedFilter>();
         OBSpatialAdvancedFilterParams params{};
         params.alpha = spatial_filter_alpha_;
@@ -182,18 +183,18 @@ void OBCameraNode::setupDevices() {
         params.radius = spatial_filter_radius_;
         params.disp_diff = spatial_filter_diff_threshold_;
         spatial_filter->setFilterParams(params);
-      } else if (filter_name == "TemporalFilter") {
+      } else if (filter_name == "TemporalFilter" && enable_temporal_filter_) {
         auto temporal_filter = filter->as<ob::TemporalFilter>();
         temporal_filter->setDiffScale(temporal_filter_diff_threshold_);
         temporal_filter->setWeight(temporal_filter_weight_);
-      } else if (filter_name == "HoleFillingFilter") {
+      } else if (filter_name == "HoleFillingFilter" && enable_hole_filling_filter_) {
         auto hole_filling_filter = filter->as<ob::HoleFillingFilter>();
         OBHoleFillingMode hole_filling_mode = holeFillingModeFromString(hole_filling_filter_mode_);
         hole_filling_filter->setFilterMode(hole_filling_mode);
-      } else if (filter_name == "SequenceIdFilter") {
+      } else if (filter_name == "SequenceIdFilter" && enable_sequence_id_filter_) {
         auto sequenced_filter = filter->as<ob::SequenceIdFilter>();
         sequenced_filter->selectSequenceId(sequence_id_filter_id_);
-      } else if (filter_name == "NoiseRemovalFilter") {
+      } else if (filter_name == "NoiseRemovalFilter" && enable_noise_removal_filter_) {
         auto noise_removal_filter = filter->as<ob::NoiseRemovalFilter>();
         OBNoiseRemovalFilterParams params{};
         params.disp_diff = noise_removal_filter_min_diff_;
@@ -222,7 +223,7 @@ void OBCameraNode::setupDevices() {
       auto default_precision_level = device_->getIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT);
       if (default_precision_level != depth_precision_) {
         device_->setIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT, depth_precision_);
-              RCLCPP_INFO_STREAM(logger_, "set depth precision to " << depth_precision_str_);
+        RCLCPP_INFO_STREAM(logger_, "set depth precision to " << depth_precision_str_);
       }
     }
     if (device_->isPropertySupported(OB_PROP_DEPTH_UNIT_FLEXIBLE_ADJUSTMENT_FLOAT,
@@ -237,8 +238,7 @@ void OBCameraNode::setupDevices() {
             logger_,
             "depth unit flexible adjustment value is out of range, please check the value");
       } else {
-        RCLCPP_INFO_STREAM(logger_, "set depth unit to "
-                                        << depth_unit_flexible_adjustment << "mm");
+        RCLCPP_INFO_STREAM(logger_, "set depth unit to " << depth_unit_flexible_adjustment << "mm");
         device_->setFloatProperty(OB_PROP_DEPTH_UNIT_FLEXIBLE_ADJUSTMENT_FLOAT,
                                   depth_unit_flexible_adjustment);
       }

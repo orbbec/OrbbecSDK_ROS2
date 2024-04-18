@@ -360,6 +360,9 @@ The following are the launch parameters available:
 - `depth_filter_config` : Configure the loading path for the depth filtering configuration file. By default, the depth
   filtering configuration file is located in the /config/depthfilter directory,Supported only on Gemini2.
 - `depth_precision` : The depth precision, should be like `1mm` format. The default value is `1mm`.
+- `enable_laser` : Whether to enable the laser. The default value is `true`.
+- `laser_on_off_mode`: Laser on/off alternate mode, 0: off, 1: on-off alternate, 2: off-on alternate. The default value
+  is `0`.
 
 ## Depth work mode switch
 

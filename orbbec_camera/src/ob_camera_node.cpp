@@ -142,6 +142,7 @@ void OBCameraNode::setupDevices() {
       RCLCPP_INFO_STREAM(logger_, "Depth process is " << d2d_mode);
     }
     device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, enable_laser_);
+    device_->setIntProperty(OB_PROP_LASER_ON_OFF_MODE_INT, laser_on_off_mode_);
     device_->loadPreset(device_preset_.c_str());
     auto depth_sensor = device_->getSensor(OB_SENSOR_DEPTH);
     // set depth sensor to filter
@@ -198,7 +199,7 @@ void OBCameraNode::setupDevices() {
         params.disp_diff = noise_removal_filter_min_diff_;
         params.max_size = noise_removal_filter_max_size_;
         noise_removal_filter->setFilterParams(params);
-      } else if (filter_name == "HdrMerge") {
+      } else if (filter_name == "HDRMerge") {
         // do nothing
       } else {
         RCLCPP_INFO_STREAM(logger_, "Skip setting filter: " << filter_name);
@@ -725,6 +726,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<std::string>(align_mode_, "align_mode", "HW");
   setAndGetNodeParameter<double>(diagnostic_period_, "diagnostic_period", 1.0);
   setAndGetNodeParameter<bool>(enable_laser_, "enable_laser", false);
+  setAndGetNodeParameter<int>(laser_on_off_mode_, "laser_on_off_mode", 0);
 }
 
 void OBCameraNode::setupTopics() {

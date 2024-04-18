@@ -512,5 +512,6 @@ class OBCameraNode {
   std::unique_ptr<diagnostic_updater::Updater> diagnostic_updater_ = nullptr;
   double diagnostic_period_ = 1.0;
   bool enable_laser_ = false;
+  int laser_on_off_mode_ = 0;
 };
 }  // namespace orbbec_camera

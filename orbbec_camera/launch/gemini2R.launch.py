@@ -104,7 +104,10 @@ def generate_launch_description():
         DeclareLaunchArgument('hole_filling_filter_mode', default_value='FILL_TOP'),
         DeclareLaunchArgument('align_mode', default_value='SW'),
         DeclareLaunchArgument('diagnostic_period', default_value='1.0'),
-        DeclareLaunchArgument('enable_laser', default_value='false'),
+        DeclareLaunchArgument('enable_laser', default_value='true'),
+        DeclareLaunchArgument('depth_precision', default_value='1mm'),
+        # Laser on/off alternate mode, 0: off, 1: on-off alternate, 2: off-on alternate.
+        DeclareLaunchArgument('laser_on_off_mode', default_value='0'),
     ]
 
     # Node configuration

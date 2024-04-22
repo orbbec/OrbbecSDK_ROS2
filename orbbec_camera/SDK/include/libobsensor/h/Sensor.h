@@ -41,7 +41,7 @@ ob_filter_list *ob_sensor_get_recommended_filter_list(ob_sensor *sensor, ob_erro
 /**
  * @brief Get the number of recommended filter list
  *
- * @param ob_filter_list Recommended filter list
+ * @param filter_list Recommended filter list
  * @param error Log error messages
  * @return uint32_t The number of list
  */
@@ -50,7 +50,7 @@ uint32_t ob_filter_list_get_count(ob_filter_list *filter_list, ob_error **error)
 /**
  * @brief Get the number of recommended filter list
  *
- * @param ob_filter_list Recommended filter list
+ * @param filter_list Recommended filter list
  * @param index Recommended filter index
  * @param error Log error messages
  * @return ob_filter The index of ob_filter

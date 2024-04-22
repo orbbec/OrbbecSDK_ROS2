@@ -180,9 +180,10 @@ ob_camera_param ob_pipeline_get_camera_param_with_profile(ob_pipeline *pipeline,
 ob_camera_param ob_pipeline_get_camera_param(ob_pipeline *pipeline, ob_error **error);
 
 /**
- * @brief Get device calibration parameters
+ * @brief Get device calibration parameters with the specified configuration
  *
  * @param[in] pipeline pipeline object
+ * @param[in] config The pipeline configuration
  * @param[out] error Log error messages
  * @return ob_calibration_param The calibration parameters
  */

@@ -486,7 +486,7 @@ template <typename T> bool Filter::is() {
     if(name == "ThresholdFilter") {
         return typeid(T) == typeid(ThresholdFilter);
     }
-    if(name == "Disparity to Depth") {
+    if(name == "DisparityTransform") {
         return typeid(T) == typeid(DisparityTransform);
     }
     if(name == "NoiseRemovalFilter") {

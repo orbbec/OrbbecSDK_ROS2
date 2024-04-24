@@ -16,7 +16,7 @@ This command initiates the camera node and enables the colored point cloud.
 
 Once the camera node is running, it will publish data on several ROS topics. Below is a list of the available topics:
 
-- **IMU and Gyro Information:**
+- **IMU Data and IMU Information:**
   - `camera/accel/imu_info`
   - `camera/gyro/imu_info`
   - `camera/gyro_accel/sample`

@@ -314,11 +314,13 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   if (!isOpenNIDevice(device_info_->pid())) {
     ctx_->enableDeviceClockSync(0);  // sync time stamp
   }
+  RCLCPP_INFO_STREAM(logger_, "Current node process id: " << getpid());
   RCLCPP_INFO_STREAM(logger_, "Device " << device_info_->name() << " connected");
   RCLCPP_INFO_STREAM(logger_, "Serial number: " << device_info_->serialNumber());
   RCLCPP_INFO_STREAM(logger_, "Firmware version: " << device_info_->firmwareVersion());
   RCLCPP_INFO_STREAM(logger_, "Hardware version: " << device_info_->hardwareVersion());
   RCLCPP_INFO_STREAM(logger_, "device unique id: " << device_unique_id_);
+  RCLCPP_INFO_STREAM(logger_, "Orbbec camera node is up and running");
 }
 
 void OBCameraNodeDriver::connectNetDevice(const std::string &net_device_ip, int net_device_port) {

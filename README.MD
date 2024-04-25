@@ -363,6 +363,15 @@ The following are the launch parameters available:
 - `enable_laser` : Whether to enable the laser. The default value is `true`.
 - `laser_on_off_mode`: Laser on/off alternate mode, 0: off, 1: on-off alternate, 2: off-on alternate. The default value
   is `0`.
+- `device_preset`: The device preset options are `Default` or `High Accuracy`.
+- `enable_decimation_filter`: This filter effectively reduces the depth scene complexity. The filter runs on kernel sizes [2x2] to [8x8] pixels. The image size is scaled down proportionally in both dimensions to preserve the aspect ratio.
+- `enable_hdr_merge`: This filter is used jointly with depth HDR function. By merging consecutive depth images of alternating exposure values, we can over come challenges in acquiring depth values for under-illuminated and over-illuminated objects simultaneously.
+- `enable_sequence_id_filter`: This filter is used jointly with depth HDR function and outputs only the sequence with specified sequence ID.
+- `enable_threshold_filter`: This filter preserves depth values of interest and omits depth values out of scope.
+- `enable_noise_removal_filter`: This filter removes speckle noise in clusters and gives rise to a less-filled depth map.
+- `enable_spatial_filter`: This filter performs multiple iterations of processing as specified by the magnitude parameter, to enhance the smoothness of depth data. It is also capable of filling small holes in depth maps.
+- `enable_temporal_filter`:This filter is intended to improve the depth data persistency by manipulating per-pixel values based on previous frames. The filter performs a single pass on the data, adjusting the depth values while also updating the tracking history.
+- `enable_hole_filling_filter`: This filter fills all holes in the depth map using the specified mode.
 
 ## Depth work mode switch
 
@@ -374,7 +383,7 @@ The following are the launch parameters available:
 - The specific camera depth work mode support types can be found in the comments of the depth mode.
 
 ```python
-    # Depth work mode support is as follows:
+# Depth work mode support is as follows:
 # Unbinned Dense Default
 # Unbinned Sparse Default
 # Binned Sparse Default

@@ -298,6 +298,69 @@ void ob_noise_removal_filter_set_filter_params(ob_filter *filter, ob_noise_remov
 ob_noise_removal_filter_params ob_noise_removal_filter_get_filter_params(ob_filter *filter, ob_error **error);
 
 /**
+ * @brief Create a edge noise removal filter.
+ * @param[out] error Log error messages.
+ * @return A depth_filter object.
+ */
+ob_filter *ob_create_edge_noise_removal_filter(ob_error **error);
+
+/**
+ * @brief Set the edge noise removal filter params.
+ *
+ * @param[in] filter edge noise removal filter object.
+ * @param[in] params ob_edge_noise_removal_filter_params.
+ * @param[out] error Log error messages.
+ */
+void ob_edge_noise_removal_filter_set_filter_params(ob_filter *filter, ob_edge_noise_removal_filter_params params, ob_error **error);
+
+/**
+ * @brief Get the edge noise removal filter params.
+ *
+ * @param[in] filter edge noise removal filter object.
+ * @param[out] error Log error messages.
+ * @return ob_edge_noise_removal_filter_params.
+ */
+ob_edge_noise_removal_filter_params ob_edge_noise_removal_filter_get_filter_params(ob_filter *filter, ob_error **error);
+
+
+/**
+ * @brief Get the noise removal filter margin left th range.
+ *
+ * @param[in] filter A edge noise removal filter object.
+ * @param[out] error Log error messages.
+ * @return ob_uint16_property_range the margin_left_th value of property range.
+ */
+ob_uint16_property_range ob_edge_noise_removal_filter_get_margin_left_th_range(ob_filter *filter, ob_error **error);
+
+/**
+ * @brief Get the noise removal filter margin right th range.
+ *
+ * @param[in] filter A edge noise removal filter object.
+ * @param[out] error Log error messages.
+ * @return ob_uint16_property_range the margin_right_th value of property range.
+ */
+ob_uint16_property_range ob_edge_noise_removal_filter_get_margin_right_th_range(ob_filter *filter, ob_error **error);
+
+/**
+ * @brief Get the noise removal filter margin top th range.
+ *
+ * @param[in] filter A edge noise removal filter object.
+ * @param[out] error Log error messages.
+ * @return ob_uint16_property_range the margin_top_th value of property range.
+ */
+ob_uint16_property_range ob_edge_noise_removal_filter_get_margin_top_th_range(ob_filter *filter, ob_error **error);
+
+/**
+ * @brief Get the noise removal filter margin bottom th range.
+ *
+ * @param[in] filter A edge noise removal filter object.
+ * @param[out] error Log error messages.
+ * @return ob_uint16_property_range the margin_bottom_th value of property range.
+ */
+ob_uint16_property_range ob_edge_noise_removal_filter_get_margin_bottom_th_range(ob_filter *filter, ob_error **error);
+
+
+/**
  * @brief Create a decimation filter.
  * @param[out] error Log error messages.
  * @return A depth_filter object.

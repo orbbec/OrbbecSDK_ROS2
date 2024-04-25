@@ -105,7 +105,7 @@ public:
      * @param calibrationParam Device calibration param,see pipeline::getCalibrationParam
      * @param sensorType sensor type
      * @param data input data,needs to be allocated externally.During initialization, the external allocation size is 'dataSize', for example, dataSize = 1920 *
-     * 1080 * 2 (1920 * 1080 represents the image resolution, and 2 represents two LUTs, one for x-coordinate and one for y-coordinate).
+     * 1080 * 2*sizeof(float) (1920 * 1080 represents the image resolution, and 2 represents two LUTs, one for x-coordinate and one for y-coordinate).
      * @param dataSize input data size
      * @param xyTables output xy tables
      *
@@ -123,5 +123,16 @@ public:
      *
      */
     static void transformationDepthToPointCloud(OBXYTables *xyTables, const void *depthImageData, void *pointCloudData);
+
+    /**
+     * @brief Transform depth image to RGBD point cloud data
+     *
+     * @param xyTables input xy tables,see CoordinateTransformHelper::transformationInitXYTables
+     * @param depthImageData input depth image data
+     * @param colorImageData input color image data (only RGB888 support)
+     * @param pointCloudData output RGBD point cloud data
+     *
+     */
+    static void transformationDepthToRGBDPointCloud(OBXYTables *xyTables, const void *depthImageData, const void *colorImageData, void *pointCloudData);
 };
 }  // namespace ob

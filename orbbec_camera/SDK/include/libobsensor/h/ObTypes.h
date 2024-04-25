@@ -965,6 +965,22 @@ typedef struct {
     uint16_t radius;     // hole_fill
 } OBSpatialAdvancedFilterParams, ob_spatial_advanced_filter_params;
 
+typedef enum OB_EDGE_NOISE_REMOVAL_TYPE {
+    OB_MG_FILTER = 0,
+    OB_MGH_FILTER = 1,  // horizontal MG
+    OB_MGA_FILTER = 2,  // asym MG
+    OB_MGC_FILTER = 3,
+} OBEdgeNoiseRemovalType,
+    ob_edge_noise_removal_type;
+
+typedef struct {
+    OBEdgeNoiseRemovalType type;
+    uint16_t               marginLeftTh;
+    uint16_t               marginRightTh;
+    uint16_t               marginTopTh;
+    uint16_t               marginBottomTh;
+} OBEdgeNoiseRemovalFilterParams, ob_edge_noise_removal_filter_params;
+
 /**
  * @brief 去噪方式
  */

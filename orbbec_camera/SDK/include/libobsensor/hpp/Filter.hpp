@@ -474,6 +474,53 @@ public:
     OBUint8PropertyRange getScaleRange();
 };
 
+/**
+ * @brief The edge noise removal filter,removing scattering depth pixels.
+ */
+class OB_EXTENSION_API EdgeNoiseRemovalFilter : public Filter {
+public:
+    EdgeNoiseRemovalFilter();
+
+    /**
+     * @brief Set the edge noise removal filter params.
+     *
+     * @param[in] params ob_edge_noise_removal_filter_params.
+     */
+    void setFilterParams(OBEdgeNoiseRemovalFilterParams filterParams);
+
+    /**
+     * @brief Get the edge noise removal filter params.
+     *
+     * @return OBEdgeNoiseRemovalFilterParams.
+     */
+    OBEdgeNoiseRemovalFilterParams getFilterParams();
+
+    /**
+     * @brief Get the edge noise removal filter margin left th range.
+     * @return OBUint16PropertyRange The disp diff of property range.
+     */
+    OBUint16PropertyRange getMarginLeftThRange();
+
+    /**
+     * @brief Get the edge noise removal filter margin right th range.
+     * @return OBUint16PropertyRange The max size of property range.
+     */
+    OBUint16PropertyRange getMarginRightThRange();
+
+    /**
+     * @brief Get the edge noise removal filter margin top th range.
+     * @return OBUint16PropertyRange The disp diff of property range.
+     */
+    OBUint16PropertyRange getMarginTopThRange();
+
+    /**
+     * @brief Get the edge noise removal filter margin bottom th range.
+     * @return OBUint16PropertyRange The max size of property range.
+     */
+    OBUint16PropertyRange getMarginBottomThRange();
+};
+
+
 // Define the is() template function for the Filter class
 template <typename T> bool Filter::is() {
     std::string name = type();
@@ -517,6 +564,9 @@ template <typename T> bool Filter::is() {
         return typeid(T) == typeid(FormatConvertFilter);
     }
     if(name == "Align") {
+        return typeid(T) == typeid(Align);
+    }
+    if(name == "EdgeNoiseRemovalFilter") {
         return typeid(T) == typeid(Align);
     }
     return false;

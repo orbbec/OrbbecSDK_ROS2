@@ -248,10 +248,10 @@ void OBCameraNode::setupProfiles() {
       for (size_t i = 0; i < profiles->count(); i++) {
         auto profile = profiles->getProfile(i)->as<ob::VideoStreamProfile>();
         RCLCPP_DEBUG_STREAM(
-            logger_, "Sensor profile: "
-                         << "stream_type: " << magic_enum::enum_name(profile->type())
-                         << "Format: " << profile->format() << ", Width: " << profile->width()
-                         << ", Height: " << profile->height() << ", FPS: " << profile->fps());
+            logger_,
+            "Sensor profile: " << "stream_type: " << magic_enum::enum_name(profile->type())
+                               << "Format: " << profile->format() << ", Width: " << profile->width()
+                               << ", Height: " << profile->height() << ", FPS: " << profile->fps());
         supported_profiles_[elem].emplace_back(profile);
       }
       std::shared_ptr<ob::VideoStreamProfile> selected_profile;
@@ -634,6 +634,10 @@ void OBCameraNode::setupTopics() {
 
 void OBCameraNode::setupDiagnosticUpdater() {
   if (diagnostic_period_ < 0.0) {
+    return;
+  }
+  if (!device_->isPropertySupported(OB_STRUCT_DEVICE_TEMPERATURE, OB_PERMISSION_READ)) {
+    RCLCPP_WARN_STREAM(logger_, "Device doesn't support temperature reading.");
     return;
   }
   diagnostic_updater_ = std::make_unique<diagnostic_updater::Updater>(node_, diagnostic_period_);

@@ -567,7 +567,7 @@ template <typename T> bool Filter::is() {
         return typeid(T) == typeid(Align);
     }
     if(name == "EdgeNoiseRemovalFilter") {
-        return typeid(T) == typeid(Align);
+        return typeid(T) == typeid(EdgeNoiseRemovalFilter);
     }
     return false;
 }

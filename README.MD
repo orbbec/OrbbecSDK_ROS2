@@ -2,18 +2,18 @@
 
 [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-1.4.6-green)
 ---
-OrbbecSDK ROS2 is a wrapper for the Orbbec 3D camera that provides seamless integration with the ROS2 environment. It
-supports ROS2 Foxy, Galactic, and Humble distributions.
+OrbbecSDK ROS 2 is a wrapper for the Orbbec 3D camera that provides seamless integration with the ROS 2 environment. It
+supports ROS 2 Foxy, Galactic, and Humble distributions.
 
 ## Installation Instructions
 
-Install ROS2
+Install ROS 2
 
 - Please refer to the
   official [ROS 2 installation guide](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)
   guidance
 
-> If your ROS2 command does not auto-complete, put the following two lines into your `.bashrc`
+> If your ROS 2 command does not auto-complete, put the following two lines into your `.bashrc`
 > or `.zshrc`
 
 ```bash
@@ -304,7 +304,7 @@ The following are the launch parameters available:
   firmware crashes when hot plugging.
 - `enable_point_cloud`: Enables the point cloud.
 - `enable_colored_point_cloud`: Enables the RGB point cloud.
-- `point_cloud_qos`, `[color|depth|ir]_qos,``[color|depth|ir]_camera_info_qos`: ROS2 Message Quality of Service (QoS)
+- `point_cloud_qos`, `[color|depth|ir]_qos,``[color|depth|ir]_camera_info_qos`: ROS 2 Message Quality of Service (QoS)
   settings. The possible values
   are `SYSTEM_DEFAULT`, `DEFAULT`,`PARAMETER_EVENTS`, `SERVICES_DEFAULT`, `PARAMETERS`, `SENSOR_DATA`
   and are case-insensitive. These correspond to `rmw_qos_profile_system_default`, `rmw_qos_profile_default`,

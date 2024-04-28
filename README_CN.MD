@@ -3,10 +3,10 @@
 ---
 OrbbecSDK ROS2是用于Orbbec 3D相机的ROS2 wrapper ，可与ROS2环境无缝集成，并支持ROS2 Foxy、Galactic和Humble发行版。## 安装指南
 
-安装 ROS2
+安装 ROS 2
 
 - 请参考官方
-  [ROS2 安装指南](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)
+  [ROS 2 安装指南](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)
 
 > 如果你的ROS2 命令不能自动补全，把下面两行代码放在你的 `.bashrc`
 > 或者 `.zshrc`

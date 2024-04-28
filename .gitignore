@@ -338,7 +338,7 @@ qtcreator-*
 # Catkin custom files
 CATKIN_IGNORE
 
-### ROS2 ###
+### ROS 2 ###
 install/
 log/
 .obj-x86_64-linux-gnu/

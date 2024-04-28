@@ -65,7 +65,7 @@ Launch camera node
 
 ```bash
 . ./install/setup.bash 
-ros2 launch orbbec_camera astra.launch.py # or other launch file, see below table
+ros2 launch orbbec_camera gemini2R.launch.py
 ```
 
 - On terminal 2
@@ -140,7 +140,9 @@ ros2 service call  /camera/set_laser_enable std_srvs/srv/SetBool "{data: true}"
 - toggle sensor
 
 ```bash
-ros2 service call /camera/toggle_ir std_srvs/srv/SetBool "{data : true}"
+ros2 service call /camera/toggle_left_ir std_srvs/srv/SetBool "{data : true}" # left ir
+
+ros2 service call /camera/toggle_left_ir std_srvs/srv/SetBool "{data : true}" # right ir
 
 ```
 
@@ -153,8 +155,8 @@ ros2 service call /camera/save_point_cloud std_srvs/srv/Empty "{}"
 ### All available service for camera control
 
 The name of the following service already expresses its function.
-However, it should be noted that the corresponding `set_[ir|depth|color]*`
-and `get[ir|depth|color]*` **services are only available if you set** `enable[ir|depth|color]`
+However, it should be noted that the corresponding `set_[left_ir|right_ir|depth|color]*`
+and `get[left_ir|right_ir|depth|color]*` **services are only available if you set** `enable[left_ir|right_ir|depth|color]`
 to `true` in the stream that corresponds to the argument of the launch file.
 
 - `/camera/get_auto_white_balance`
@@ -163,9 +165,10 @@ to `true` in the stream that corresponds to the argument of the launch file.
 - `/camera/get_depth_exposure`
 - `/camera/get_depth_gain`
 - `/camera/get_device_info`
-- `/camera/get_ir_exposure`
-- `/camera/get_ir_gain`
-- `/camera/get_ldp_status`
+- `/camera/get_left_ir_exposure`
+- `/camera/get_left_ir_gain`
+- `/camera/get_right_ir_exposure`
+- `/camera/get_right_ir_gain`
 - `/camera/get_sdk_version`
 - `/camera/get_white_balance`
 - `/camera/set_auto_white_balance`
@@ -177,15 +180,20 @@ to `true` in the stream that corresponds to the argument of the launch file.
 - `/camera/set_depth_gain`
 - `/camera/set_fan_work_mode`
 - `/camera/set_floor_enable`
-- `/camera/set_ir_auto_exposure`
-- `/camera/set_ir_exposure`
-- `/camera/set_ir_gain`
+- `/camera/set_left_ir_auto_exposure`
+- `/camera/set_left_ir_exposure`
+- `/camera/set_left_ir_gain`
+- `/camera/set_right_ir_auto_exposure`
+- `/camera/set_right_ir_exposure`
+- `/camera/set_right_ir_gain`
 - `/camera/set_laser_enable`
 - `/camera/set_ldp_enable`
 - `/camera/set_white_balance`
 - `/camera/toggle_color`
 - `/camera/toggle_depth`
-- `/camera/toggle_ir`
+- `/camera/toggle_left_ir`
+- `/camera/toggle_right_ir`
+
 
 ### All available topics
 
@@ -196,24 +204,15 @@ to `true` in the stream that corresponds to the argument of the launch file.
 - `/camera/depth/points` : The point cloud, only available when  `enable_point_cloud` is `true`.
 - `/camera/depth_registered/points`: The colored point cloud, only available when  `enable_colored_point_cloud`
   is `true`.
-- `/camera/ir/camera_info`:  The IR camera info.
-- `/camera/ir/image_raw`: The IR stream image
+- `/camera/left_ir/camera_info`:  The left IR camera info.
+- `/camera/left_ir/image_raw`: The left IR stream image
+- `/camera/right_ir/camera_info`:  The right IR camera info.
+- `/camera/right_ir/image_raw`: The right IR stream image
 - `/camera/accel/sample`: Acceleration data stream `enable_sync_output_accel_gyro`turned off，`enable_accel`turned on
 - `/camera/gyro/sample`: Gyroscope data stream，enable_sync_output_accel_gyro`turned off，`enable_gyro`turned on
 - `camera/gyro_accel/sample`: Synchronized data stream of acceleration and gyroscope，`enable_sync_output_accel_gyro`turned on
 
-### Network device enumeration
 
-Currently, the network device enumeration function is supported only by the Femto Mega device. When accessing this
-device over the network, if `enumerate_net_device` is set to `true`, the device will be automatically enumerated,
-eliminating the need to configure the IP address in advance or set the enable switch to true. The specific configuration
-methods are as follows:
-
-- `enumerate_net_device`: enumeration network device automatically, only supported by Femto Mega.
-  if `enumerate_net_device` set to `true`, the device will be enumerated automatically,No need to set the `net_device_ip`
-  and `net_device_port` parameters.
-- `net_device_ip`: The IP address of the device.
-- `net_device_port`: The port number of the device.
 
 ### Multi-Camera
 
@@ -243,7 +242,7 @@ def generate_launch_description():
     launch_file_dir = os.path.join(package_dir, 'launch')
     launch1_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, 'gemini2L.launch.py')
+            os.path.join(launch_file_dir, 'gemini2R.launch.py')
         ),
         launch_arguments={
             'camera_name': 'camera_01',
@@ -254,7 +253,7 @@ def generate_launch_description():
 
     launch2_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, 'gemini2L.launch.py')
+            os.path.join(launch_file_dir, 'gemini2R.launch.py')
         ),
         launch_arguments={
             'camera_name': 'camera_02',
@@ -314,11 +313,13 @@ The following are the launch parameters available:
 - `enable_d2c_viewer`: Publishes the D2C overlay image (for testing only).
 - `device_num`: The number of devices. This must be filled in if multiple cameras are required.
 - `color_width`, `color_height`, `color_fps`: The resolution and frame rate of the color stream.
-- `ir_width`, `ir_height`, `ir_fps`: The resolution and frame rate of the IR stream.
+- `left_ir_width`, `left_ir_height`, `left_ir_fps`: The resolution and frame rate of the left IR stream.
+- `right_ir_width`, `right_ir_height`, `right_ir_fps`: The resolution and frame rate of the right IR stream.
 - `depth_width`, `depth_height`, `depth_fps`: The resolution and frame rate of the depth stream.
 - `enable_color`: Enables the RGB camera.
 - `enable_depth`: Enables the depth camera.
-- `enable_ir`: Enables the IR camera.
+- `enable_left_ir`: Enables the left IR camera.
+- `enable_right_ir`: Enables the right camera.
 - `depth_registration`: Enables hardware alignment the depth frame to color frame.
   This field is required when the `enable_colored_point_cloud` is set to `true`.
 - `usb_port`: The USB port of the camera. This is required when multiple cameras are used.
@@ -335,12 +336,6 @@ The following are the launch parameters available:
 - `gyro_range` : The range of the gyroscope, the optional values
   are `16dps`,`31dps`,`62dps`,`125dps`,`250dps`,`500dps`,`1000dps`,`2000dps`. The specific value depends on the current
   camera.
-- `enumerate_net_device` : Whether to enable the function of enumerating network devices. True means enabled, false
-  means disabled.
-  This feature is only supported by Femto Mega and Gemini 2 XL devices. When accessing these devices through the
-  network, the IP address of the device needs to be configured in advance. The enable switch needs to be set to true.
-- `depth_filter_config` : Configure the loading path for the depth filtering configuration file. By default, the depth
-  filtering configuration file is located in the /config/depthfilter directory,Supported only on Gemini2.
 - `depth_precision` : The depth precision, should be like `1mm` format. The default value is `1mm`.
 - `enable_laser` : Whether to enable the laser. The default value is `true`.
 - `laser_on_off_mode`: Laser on/off alternate mode, 0: off, 1: on-off alternate, 2: off-on alternate. The default value
@@ -353,109 +348,7 @@ The following are the launch parameters available:
 - `enable_noise_removal_filter`: This filter removes speckle noise in clusters and gives rise to a less-filled depth map.
 - `enable_spatial_filter`: This filter performs multiple iterations of processing as specified by the magnitude parameter, to enhance the smoothness of depth data. It is also capable of filling small holes in depth maps.
 - `enable_temporal_filter`:This filter is intended to improve the depth data persistency by manipulating per-pixel values based on previous frames. The filter performs a single pass on the data, adjusting the depth values while also updating the tracking history.
-- `enable_hole_filling_filter`: This filter fills all holes in the depth map using the specified mode.
-
-## Depth work mode switch
-
-- Before starting the camera, depth work mode (depth_work_mode) can be configured for the corresponding xxx.launch.py
-  file's support.
-- The depth work mode switch is supported by Gemini 2, Gemini 2 L, and Gemini 2 XL cameras.
-- The default depth work mode configuration of xxx.launch.py is the camera's default configuration. If you need to
-  modify it, you can switch to the corresponding mode as needed.
-- The specific camera depth work mode support types can be found in the comments of the depth mode.
-
-```python
-# Depth work mode support is as follows:
-# Unbinned Dense Default
-# Unbinned Sparse Default
-# Binned Sparse Default
-# Obstacle Avoidance
-DeclareLaunchArgument('depth_work_mode', default_value='')
-```
-
-- View depth work modes:
-
-```bash
-ros2 run orbbec_camera list_depth_work_mode_node
-```
-
-## Configuration of depth NFOV and WFOV modes
-
-For the Femto Mega and Femto Bolt devices, the NFOV and WFOV modes are implemented by configuring the resolution of
-Depth and IR in the launch file.
-In launch file, depth_width、depth_height、ir_width、ir_height represents the resolution of the depth and the resolution of
-the IR.
-The frame fps and resolution of IR must be consistent with the depth. The correspondence between different modes and
-resolutions is as follows:
-
-- NFOV unbinned: 640 x 576.
-- NFOV binned: 320 x 288.
-- WFOV unbinned: 1024 x 1024.
-- WFOV binned: 512 x 512.
-
-## Check which profiles the camera supports
-
-  ```bash
-  ros2 run orbbec_camera list_camera_profile_mode_node
-  ```
-
-## Launch files
-
-| product serials                       | launch file              |
-|---------------------------------------|--------------------------|
-| astra+                                | astra_adv.launch.py      |
-| astra mini /astra mini pro /astra pro | astra.launch.py          |
-| astra mini pro s                      | astra.launch.py          |
-| astra2                                | astra2.launch.py         |
-| astra stereo s                        | stereo_s_u3.launch.py    |
-| astra pro2                            | astra_pro2.launch.py     |
-| dabai                                 | dabai.launch.py          |
-| dabai d1                              | dabai_d1.launch.py       |
-| dabai dcw                             | dabai_dcw.launch.py      |
-| dabai dw                              | dabai_dw.launch.py       |
-| dabai pro                             | dabai_pro.launch.py      |
-| deeya                                 | deeya.launch.py          |
-| femto  /femto w                       | femto.launch.py          |
-| femto mega                            | femto_mega.launch.py     |
-| femto bolt                            | femto_bolt.launch.py     |
-| gemini                                | gemini.launch.py         |
-| gemini                                | gemini.launch.py         |
-| gemini2 / dabai DCL                   | gemini2.launch.py        |
-| gemini2L                              | gemini2L.launch.py       |
-| gemini e                              | gemini_e.launch.py       |
-| gemini e lite                         | gemini_e_lite.launch.py  |
-| dabai max                             | dabai_max.launch.py      |
-| dabai max pro                         | dabai_max_pro.launch.py  |
-| gemini uw                             | gemini_uw.launch.py      |
-| dabai dcw2                            | dabai_dcw2.launch.py     |
-| dabai dw2                             | dabai_dw2.launch.py      |
-| gemini ew                             | gemini_ew.launch.py      |
-| gemini ew lite                        | gemini_ew_lite.launch.py |
-| gemini 335/335L                       | gemini2R.launch.py       |
-
-Actually, All launch files all most the same, the only difference is the default value of the parameters.
-
-## Supported hardware products
-
-| **products list** | **firmware version**                      |
-|-------------------|-------------------------------------------|
-| Gemini 2 XL       | Obox: V1.2.5  VL:1.4.54                   |
-| Astra 2           | 2.8.20                                    |
-| Gemini 2 L        | 1.4.32                                    |
-| Gemini 2          | 1.4.60 /1.4.76                            |
-| Femto Mega        | 1.1.7  (window10、ubuntu20.04、ubuntu22.04) |
-| Astra+            | 1.0.22/1.0.21/1.0.20/1.0.19               |
-| Femto             | 1.6.7                                     |
-| Femto W           | 1.1.8                                     |
-| Femto Bolt        | 1.0.6 (unsupported ARM32)                 |
-| DaBai             | 2436                                      |
-| DaBai DCW         | 2460                                      |
-| DaBai DW          | 2606                                      |
-| Astra Mini Pro    | 1007                                      |
-| Gemini E          | 3460                                      |
-| Gemini E Lite     | 3606                                      |
-| Gemini            | 3.0.18                                    |
-| Astra Mini S Pro  | 1.0.05                                    |
+- `enable_hole_filling_filter`: This filter fills all holes in the depth map using the specified mode.  |
 
 ## DDS Tuning
 

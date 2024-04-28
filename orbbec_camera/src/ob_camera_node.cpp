@@ -880,6 +880,16 @@ void OBCameraNode::setupPublishers() {
         node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
             "/" + camera_name_ + "/depth_to_right_ir", rclcpp::QoS(1).transient_local());
   }
+  if (enable_stream_[DEPTH] && enable_stream_[ACCEL]) {
+    depth_to_other_extrinsics_publishers_[ACCEL] =
+        node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
+            "/" + camera_name_ + "/depth_to_accel", rclcpp::QoS(1).transient_local());
+  }
+  if (enable_stream_[DEPTH] && enable_stream_[GYRO]) {
+    depth_to_other_extrinsics_publishers_[GYRO] =
+        node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
+            "/" + camera_name_ + "/depth_to_gyro", rclcpp::QoS(1).transient_local());
+  }
   filter_status_pub_ = node_->create_publisher<std_msgs::msg::String>(
       "depth_filter_status", rclcpp::QoS(1).transient_local());
   std_msgs::msg::String msg;
@@ -1770,6 +1780,34 @@ void OBCameraNode::calcAndPublishStaticTransform() {
     depth_to_other_extrinsics_[INFRA2] = ex;
     auto ex_msg = obExtrinsicsToMsg(ex, frame_id);
     depth_to_other_extrinsics_publishers_[INFRA2]->publish(ex_msg);
+  }
+  if (enable_stream_[DEPTH] && enable_stream_[ACCEL]) {
+    static const char *frame_id = "depth_to_accel_extrinsics";
+    OBExtrinsic ex;
+    try {
+      ex = base_stream_profile->getExtrinsicTo(stream_profile_[ACCEL]);
+    } catch (const ob::Error &e) {
+      RCLCPP_ERROR_STREAM(logger_,
+                          "Failed to get " << frame_id << " extrinsic: " << e.getMessage());
+      ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
+    }
+    depth_to_other_extrinsics_[ACCEL] = ex;
+    auto ex_msg = obExtrinsicsToMsg(ex, frame_id);
+    depth_to_other_extrinsics_publishers_[ACCEL]->publish(ex_msg);
+  }
+  if (enable_stream_[DEPTH] && enable_stream_[GYRO]) {
+    static const char *frame_id = "depth_to_gyro_extrinsics";
+    OBExtrinsic ex;
+    try {
+      ex = base_stream_profile->getExtrinsicTo(stream_profile_[GYRO]);
+    } catch (const ob::Error &e) {
+      RCLCPP_ERROR_STREAM(logger_,
+                          "Failed to get " << frame_id << " extrinsic: " << e.getMessage());
+      ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
+    }
+    depth_to_other_extrinsics_[GYRO] = ex;
+    auto ex_msg = obExtrinsicsToMsg(ex, frame_id);
+    depth_to_other_extrinsics_publishers_[GYRO]->publish(ex_msg);
   }
 }
 

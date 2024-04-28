@@ -237,20 +237,12 @@ import os
 
 
 def generate_launch_description():
-    # Node configuration
-    cleanup_node = Node(
-        package='orbbec_camera',
-        executable='ob_cleanup_shm_node',
-        name='camera',
-        output='screen'
-    )
-
     # Include launch files
     package_dir = get_package_share_directory('orbbec_camera')
     launch_file_dir = os.path.join(package_dir, 'launch')
     launch1_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, 'gemini2.launch.py')
+            os.path.join(launch_file_dir, 'gemini2L.launch.py')
         ),
         launch_arguments={
             'camera_name': 'camera_01',
@@ -261,7 +253,7 @@ def generate_launch_description():
 
     launch2_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, 'gemini2.launch.py')
+            os.path.join(launch_file_dir, 'gemini2L.launch.py')
         ),
         launch_arguments={
             'camera_name': 'camera_02',
@@ -274,7 +266,6 @@ def generate_launch_description():
 
     # Launch description
     ld = LaunchDescription([
-        cleanup_node,
         GroupAction([launch1_include]),
         GroupAction([launch2_include]),
     ])
@@ -282,16 +273,6 @@ def generate_launch_description():
     return ld
 
 ```
-
-- Note that the astra camera uses semaphores for process synchronization.
-  If the camera start fails, the semaphore file may be left in `/dev/shm`,
-  causing the next start to become stuck. To avoid this, run the following command before launching:
-
-```bash
-ros2 run orbbec_camera ob_cleanup_shm_node
-```
-
-This will clean up `/dev/shm/`.
 
 - To launch the cameras, run the following command:
 
@@ -449,6 +430,7 @@ resolutions is as follows:
 | dabai dw2                             | dabai_dw2.launch.py      |
 | gemini ew                             | gemini_ew.launch.py      |
 | gemini ew lite                        | gemini_ew_lite.launch.py |
+| gemini 335/335L                       | gemini2R.launch.py       |
 
 Actually, All launch files all most the same, the only difference is the default value of the parameters.
 

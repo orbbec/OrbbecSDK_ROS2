@@ -109,6 +109,14 @@ public:
     uint64_t systemTimeStamp();
 
     /**
+     * @brief Get the system timestamp of the frame in microseconds.
+     * @brief The system timestamp is the time point when the frame was received by the host, on host clock domain.
+     *
+     * @return uint64_t The system timestamp of the frame in microseconds.
+     */
+    uint64_t systemTimeStampUs();
+
+    /**
      * @brief Get the global timestamp of the frame in microseconds.
      * @brief The global timestamp is the time point when the frame was was captured by the device, and has been converted to the host clock domain. The
      * conversion process base on the device timestamp and can eliminate the timer drift of the device

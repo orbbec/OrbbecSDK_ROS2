@@ -227,7 +227,7 @@ orbbec_camera_msgs::msg::Extrinsics obExtrinsicsToMsg(const OBD2CTransform &extr
   for (int i = 0; i < 9; ++i) {
     msg.rotation[i] = extrinsics.rot[i];
     if (i < 3) {
-      msg.translation[i] = extrinsics.trans[i];
+      msg.translation[i] = extrinsics.trans[i] / 1000.0;
     }
   }
 
@@ -383,7 +383,10 @@ OB_DEPTH_PRECISION_LEVEL depthPrecisionLevelFromString(
 
 float depthPrecisionFromString(const std::string &depth_precision_level_str) {
   // covert 0.8mm to 0.8
-   if (depth_precision_level_str.size() < 2) {
+  if (depth_precision_level_str.size() < 2) {
+    RCLCPP_WARN_STREAM(rclcpp::get_logger("utils"),
+                       "Invalid depth precision level: " << depth_precision_level_str
+                                                          << ". Using default precision level 1mm");
     return 1.0;
   }
   std::string depth_precision_level_str_num =

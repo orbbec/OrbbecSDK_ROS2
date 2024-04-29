@@ -240,23 +240,34 @@ void OBCameraNode::setGainCallback(const std::shared_ptr<SetInt32 ::Request>& re
                                    std::shared_ptr<SetInt32::Response>& response,
                                    const stream_index_pair& stream_index) {
   auto stream = stream_index.first;
+  OBPropertyID prop_id = OB_PROP_IR_GAIN_INT;
   try {
     switch (stream) {
       case OB_STREAM_IR_LEFT:
       case OB_STREAM_IR_RIGHT:
       case OB_STREAM_IR:
-        device_->setIntProperty(OB_PROP_IR_GAIN_INT, request->data);
+        prop_id = OB_PROP_IR_GAIN_INT;
         break;
       case OB_STREAM_DEPTH:
-        device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, request->data);
+        prop_id = OB_PROP_DEPTH_GAIN_INT;
         break;
       case OB_STREAM_COLOR:
-        device_->setIntProperty(OB_PROP_COLOR_GAIN_INT, request->data);
+        prop_id = OB_PROP_COLOR_GAIN_INT;
         break;
       default:
         RCLCPP_ERROR(logger_, "%s NOT a video stream", __FUNCTION__);
-        break;
+        response->success = false;
+        response->message = "NOT a video stream";
+        return;
     }
+    auto range = device_->getIntPropertyRange(prop_id);
+    if (request->data < range.min || request->data > range.max) {
+      response->success = false;
+      RCLCPP_INFO_STREAM(logger_, "set gain value out of range");
+      response->message = "value out of range";
+      return;
+    }
+    device_->setIntProperty(prop_id, request->data);
     response->success = true;
   } catch (const ob::Error& e) {
     response->success = false;
@@ -291,6 +302,20 @@ void OBCameraNode::getWhiteBalanceCallback(const std::shared_ptr<GetInt32::Reque
 void OBCameraNode::setWhiteBalanceCallback(const std::shared_ptr<SetInt32 ::Request>& request,
                                            std::shared_ptr<SetInt32 ::Response>& response) {
   try {
+    auto range = device_->getIntPropertyRange(OB_PROP_COLOR_WHITE_BALANCE_INT);
+    if (request->data < range.min || request->data > range.max) {
+      response->success = false;
+      RCLCPP_INFO_STREAM(logger_, "set white balance value out of range");
+      response->message = "value out of range";
+      return;
+    }
+    bool auto_white_balance = device_->getBoolProperty(OB_PROP_COLOR_AUTO_WHITE_BALANCE_BOOL);
+    if (auto_white_balance) {
+      RCLCPP_WARN(logger_, "auto white balance is enabled, set white balance will be ignored");
+      response->success = false;
+      response->message = "auto white balance is enabled";
+      return;
+    }
     device_->setIntProperty(OB_PROP_COLOR_WHITE_BALANCE_INT, request->data);
     response->success = true;
   } catch (const ob::Error& e) {
@@ -342,28 +367,35 @@ void OBCameraNode::setAutoExposureCallback(
     std::shared_ptr<std_srvs::srv::SetBool::Response>& response,
     const stream_index_pair& stream_index) {
   auto stream = stream_index.first;
+  OBPropertyID prop_id = OB_PROP_IR_AUTO_EXPOSURE_BOOL;
   try {
     switch (stream) {
       case OB_STREAM_IR_LEFT:
       case OB_STREAM_IR_RIGHT:
       case OB_STREAM_IR:
-        response->success = true;
-        device_->setIntProperty(OB_PROP_IR_AUTO_EXPOSURE_BOOL, request->data);
+        prop_id = OB_PROP_IR_AUTO_EXPOSURE_BOOL;
         break;
       case OB_STREAM_DEPTH:
-        device_->setIntProperty(OB_PROP_DEPTH_AUTO_EXPOSURE_BOOL, request->data);
-        response->success = true;
+        prop_id = OB_PROP_DEPTH_AUTO_EXPOSURE_BOOL;
         break;
       case OB_STREAM_COLOR:
-        device_->setIntProperty(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, request->data);
-        response->success = true;
+        prop_id = OB_PROP_COLOR_AUTO_EXPOSURE_BOOL;
         break;
       default:
         RCLCPP_ERROR(logger_, "%s NOT a video stream", __FUNCTION__);
         response->success = false;
         response->message = "NOT a video stream";
-        break;
+        return;
     }
+    auto range = device_->getIntPropertyRange(prop_id);
+    if (request->data < range.min || request->data > range.max) {
+      response->success = false;
+      RCLCPP_INFO_STREAM(logger_, "set auto exposure value out of range");
+      response->message = "value out of range";
+      return;
+    }
+    device_->setIntProperty(prop_id, request->data);
+    response->success = true;
   } catch (const ob::Error& e) {
     response->success = false;
     response->message = e.getMessage();

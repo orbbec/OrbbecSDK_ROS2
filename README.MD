@@ -399,6 +399,42 @@ resolutions is as follows:
   ros2 run orbbec_camera list_camera_profile_mode_node
   ```
 
+## Building a Debian Package
+
+### Preparing the Environment
+Before starting, install the required tools:
+```bash
+sudo apt install debhelper fakeroot python3-bloom
+```
+
+### Configuring ROS Dependencies
+Add the following YAML file to your system at `/etc/ros/rosdep/sources.list.d/00-orbbec.yaml`. Make sure to replace `focal` with the codename of your Ubuntu version and `humble` with your ROS2 distribution name:
+```yaml
+orbbec_camera_msgs:
+  ubuntu:
+    focal: [ros-humble-orbbec-camera-msgs]
+```
+
+Next, create a new file `/etc/ros/rosdep/sources.list.d/50-orbbec.list` and add this line to specify the path to the YAML file:
+```bash
+yaml file:///etc/ros/rosdep/sources.list.d/00-orbbec.yaml
+```
+
+Update the rosdep database to reflect these changes:
+```bash
+rosdep update
+```
+
+### Building the Package
+Navigate to your workspace and build the project:
+```bash
+cd ~/ros2_ws/
+colcon build --event-handlers console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=Release
+. install/setup.bash
+cd src/OrbbecSDK_ROS2/
+bash .make_deb.sh
+```
+
 ## Launch files
 
 | product serials                       | launch file              |
@@ -437,25 +473,27 @@ Actually, All launch files all most the same, the only difference is the default
 
 ## Supported hardware products
 
-| **products list** | **firmware version**                      |
-|-------------------|-------------------------------------------|
-| Gemini 2 XL       | Obox: V1.2.5  VL:1.4.54                   |
-| Astra 2           | 2.8.20                                    |
-| Gemini 2 L        | 1.4.32                                    |
-| Gemini 2          | 1.4.60 /1.4.76                            |
-| Femto Mega        | 1.1.7  (window10、ubuntu20.04、ubuntu22.04) |
-| Astra+            | 1.0.22/1.0.21/1.0.20/1.0.19               |
-| Femto             | 1.6.7                                     |
-| Femto W           | 1.1.8                                     |
-| Femto Bolt        | 1.0.6 (unsupported ARM32)                 |
-| DaBai             | 2436                                      |
-| DaBai DCW         | 2460                                      |
-| DaBai DW          | 2606                                      |
-| Astra Mini Pro    | 1007                                      |
-| Gemini E          | 3460                                      |
-| Gemini E Lite     | 3606                                      |
-| Gemini            | 3.0.18                                    |
-| Astra Mini S Pro  | 1.0.05                                    |
+| **Products List** | **Firmware Version**        |
+|-------------------|-----------------------------|
+| Gemini 335        | 1.2.20                      |
+| Gemini 335L       | 1.2.20                      |
+| Femto Bolt        | 1.0.6/1.0.9                 |
+| Femto Mega        | 1.1.7/1.2.7                 |
+| Gemini 2 XL       | Obox: V1.2.5  VL:1.4.54     |
+| Astra 2           | 2.8.20                      |
+| Gemini 2 L        | 1.4.32                      |
+| Gemini 2          | 1.4.60 /1.4.76              |
+| Astra+            | 1.0.22/1.0.21/1.0.20/1.0.19 |
+| Femto             | 1.6.7                       |
+| Femto W           | 1.1.8                       |
+| DaBai             | 2436                        |
+| DaBai DCW         | 2460                        |
+| DaBai DW          | 2606                        |
+| Astra Mini Pro    | 1007                        |
+| Gemini E          | 3460                        |
+| Gemini E Lite     | 3606                        |
+| Gemini            | 3.0.18                      |
+| Astra Mini S Pro  | 1.0.05                      |
 
 ## DDS Tuning
 

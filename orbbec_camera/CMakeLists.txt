@@ -221,6 +221,21 @@ install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY ${ORBBEC_INCLUDE_DIR} DESTINATION include)
 install(DIRECTORY ${ORBBEC_LIBS_DIR}/ DESTINATION lib/ FILES_MATCHING PATTERN "*.so*")
+if(DEFINED ENV{BUILDING_PACKAGE})
+  set(UDEV_RULES_PATH "/etc/udev/rules.d/99-obsensor-libusb.rules")
+
+  # Check if the udev rules file already exists
+  if(NOT EXISTS ${UDEV_RULES_PATH})
+    # Install udev rules only if they do not exist
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/99-obsensor-libusb.rules
+      DESTINATION /etc/udev/rules.d
+    )
+
+    # Setup script to reload udev rules and trigger
+    install(CODE "execute_process(COMMAND udevadm control --reload-rules && udevadm trigger)")
+  endif()
+endif()
+
 install(TARGETS list_devices_node
   list_depth_work_mode_node
   list_camera_profile_mode_node

@@ -757,6 +757,9 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+.obj-aarch64-linux-gnu/
+*.deb
+*.ddeb
 
 # JetBrains Rider
 *.sln.iml

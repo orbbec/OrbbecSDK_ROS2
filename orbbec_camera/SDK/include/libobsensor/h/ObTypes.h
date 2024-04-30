@@ -966,7 +966,7 @@ typedef struct {
 } OBSpatialAdvancedFilterParams, ob_spatial_advanced_filter_params;
 
 typedef enum OB_EDGE_NOISE_REMOVAL_TYPE {
-    OB_MG_FILTER = 0,
+    OB_MG_FILTER  = 0,
     OB_MGH_FILTER = 1,  // horizontal MG
     OB_MGA_FILTER = 2,  // asym MG
     OB_MGC_FILTER = 3,
@@ -1595,20 +1595,21 @@ typedef enum {
 
     /**
      * @brief Laser power value in mW
+     *
+     * @attention The laser power value is an approximate estimation.
      */
     OB_FRAME_METADATA_TYPE_LASER_POWER = 28,
 
     /**
-     * @brief Laser power mode
-     * @brief 0: Laser off, 1: Laser on
+     * @brief Laser power level
      */
-    OB_FRAME_METADATA_TYPE_LASER_POWER_MODE = 29,
+    OB_FRAME_METADATA_TYPE_LASER_POWER_LEVEL = 29,
 
     /**
-     * @brief Emitter mode
-     * @brief 0: Laser off, 1: Laser on, 2: auto
+     * @brief Laser status
+     * @brief 0: Laser off, 1: Laser on
      */
-    OB_FRAME_METADATA_TYPE_EMITTER_MODE = 30,
+    OB_FRAME_METADATA_TYPE_LASER_STATUS = 30,
 
     /**
      * @brief GPIO input data
@@ -1622,6 +1623,10 @@ typedef enum {
     OB_FRAME_METADATA_TYPE_COUNT,
 } ob_frame_metadata_type,
     OBFrameMetadataType;
+
+// For compatibility
+#define OB_FRAME_METADATA_TYPE_LASER_POWER_MODE OB_FRAME_METADATA_TYPE_LASER_POWER_LEVEL
+#define OB_FRAME_METADATA_TYPE_EMITTER_MODE OB_FRAME_METADATA_TYPE_LASER_STATUS
 
 /**
  * @brief Callback for file transfer

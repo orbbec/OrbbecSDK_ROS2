@@ -234,9 +234,9 @@ typedef enum {
     OB_PROP_SWITCH_IR_MODE_INT = 98,
 
     /**
-     * @brief Laser energy level
+     * @brief Laser power level
      */
-    OB_PROP_LASER_ENERGY_LEVEL_INT = 99,
+    OB_PROP_LASER_POWER_LEVEL_CONTROL_INT = 99,
 
     /**
      * @brief LDP's measure distance, unit: mm
@@ -299,10 +299,10 @@ typedef enum {
     OB_PROP_DEPTH_ROTATE_INT = 118,
 
     /**
-     * @brief Get hardware laser energy level which real state of laser element. OB_PROP_LASER_ENERGY_LEVEL_INT（99）will effect this command
+     * @brief Get hardware laser power actual level which real state of laser element. OB_PROP_LASER_POWER_LEVEL_CONTROL_INT99）will effect this command
      * which it setting and changed the hardware laser energy level.
      */
-    OB_PROP_LASER_HW_ENERGY_LEVEL_INT = 119,
+    OB_PROP_LASER_POWER_ACTUAL_LEVEL_INT = 119,
 
     /**
      * @brief USB's power state, enum type: OBUSBPowerState
@@ -393,7 +393,7 @@ typedef enum {
      * @brief Laser on/off alternate mode, 0: off, 1: on-off alternate, 2: off-on alternate
      * @attention When turn on this mode, the laser will turn on and turn off alternately each frame.
      */
-    OB_PROP_LASER_ON_OFF_MODE_INT = 175,
+    OB_PROP_LASER_ON_OFF_PATTERN_INT = 175,
 
     /**
      * @brief Depth unit flexible adjustment\
@@ -698,7 +698,11 @@ typedef enum {
 } OBPropertyID,
     ob_property_id;
 
+// For backward compatibility
 #define OB_PROP_TIMER_RESET_TRIGGLE_OUT_ENABLE_BOOL OB_PROP_TIMER_RESET_TRIGGER_OUT_ENABLE_BOOL
+#define OB_PROP_LASER_ON_OFF_MODE_INT OB_PROP_LASER_ON_OFF_PATTERN_INT
+#define OB_PROP_LASER_ENERGY_LEVEL_INT OB_PROP_LASER_POWER_LEVEL_CONTROL_INT
+#define OB_PROP_LASER_HW_ENERGY_LEVEL_INT OB_PROP_LASER_POWER_ACTUAL_LEVEL_INT
 
 /**
  * @brief The data type used to describe all property settings

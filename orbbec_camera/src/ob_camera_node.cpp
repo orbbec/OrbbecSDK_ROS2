@@ -446,8 +446,10 @@ void OBCameraNode::startStreams() {
     colorFrameThread_ = std::make_shared<std::thread>([this]() { onNewColorFrameCallback(); });
   }
   if (enable_frame_sync_) {
+    RCLCPP_INFO_STREAM(logger_, "Enable frame sync");
     pipeline_->enableFrameSync();
   } else {
+    RCLCPP_INFO_STREAM(logger_, "Disable frame sync");
     pipeline_->disableFrameSync();
   }
   pipeline_started_.store(true);
@@ -786,6 +788,7 @@ void OBCameraNode::setupPipelineConfig() {
     pipeline_config_.reset();
   }
   pipeline_config_ = std::make_shared<ob::Config>();
+  RCLCPP_INFO_STREAM(logger_, "enable depth scale " << (enable_depth_scale_ ? "ON" : "OFF"));
   pipeline_config_->setDepthScaleRequire(enable_depth_scale_);
   if (depth_registration_ && enable_stream_[COLOR] && enable_stream_[DEPTH]) {
     OBAlignMode align_mode = align_mode_ == "HW" ? ALIGN_D2C_HW_MODE : ALIGN_D2C_SW_MODE;
@@ -1171,7 +1174,7 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
     depth_frame_ = frame_set->getFrame(OB_FRAME_DEPTH);
     if (depth_registration_ && align_filter_) {
       auto new_frame = align_filter_->process(frame_set);
-     if(new_frame) {
+      if (new_frame) {
         auto new_frame_set = new_frame->as<ob::FrameSet>();
         CHECK_NOTNULL(new_frame_set.get());
         depth_frame_ = new_frame_set->getFrame(OB_FRAME_DEPTH);
@@ -1197,6 +1200,9 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
         auto frame = frame_set->getFrame(frame_type);
         if (frame == nullptr) {
           continue;
+        }
+        if (stream_index == DEPTH) {
+          frame = depth_frame_;
         }
 
         std::shared_ptr<ob::Frame> irFrame = decodeIRMJPGFrame(frame);

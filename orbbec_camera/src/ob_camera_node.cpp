@@ -144,9 +144,15 @@ void OBCameraNode::setupDevices() {
       std::string d2d_mode = is_hardware_d2d ? "HW D2D" : "SW D2D";
       RCLCPP_INFO_STREAM(logger_, "Depth process is " << d2d_mode);
     }
-    device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, enable_laser_);
-    device_->setIntProperty(OB_PROP_LASER_ON_OFF_MODE_INT, laser_on_off_mode_);
-    device_->loadPreset(device_preset_.c_str());
+    if (device_->isPropertySupported(OB_PROP_LASER_CONTROL_INT, OB_PERMISSION_READ_WRITE)) {
+      device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, enable_laser_);
+    }
+    if (device_->isPropertySupported(OB_PROP_LASER_ON_OFF_MODE_INT, OB_PERMISSION_READ_WRITE)) {
+      device_->setIntProperty(OB_PROP_LASER_ON_OFF_MODE_INT, laser_on_off_mode_);
+    }
+    if (!device_preset_.empty()) {
+      device_->loadPreset(device_preset_.c_str());
+    }
     auto depth_sensor = device_->getSensor(OB_SENSOR_DEPTH);
     // set depth sensor to filter
     auto filter_list = depth_sensor->getRecommendedFilters();
@@ -706,7 +712,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(max_save_images_count_, "max_save_images_count", 10);
   setAndGetNodeParameter<bool>(use_hardware_time_, "use_hardware_time", true);
   setAndGetNodeParameter<bool>(enable_depth_scale_, "enable_depth_scale", true);
-  setAndGetNodeParameter<std::string>(device_preset_, "device_preset", "Default");
+  setAndGetNodeParameter<std::string>(device_preset_, "device_preset", "");
   setAndGetNodeParameter<bool>(enable_decimation_filter_, "enable_decimation_filter", false);
   setAndGetNodeParameter<bool>(enable_hdr_merge_, "enable_hdr_merge", false);
   setAndGetNodeParameter<bool>(enable_sequence_id_filter_, "enable_sequence_id_filter", false);

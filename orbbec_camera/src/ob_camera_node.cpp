@@ -1171,10 +1171,11 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
     depth_frame_ = frame_set->getFrame(OB_FRAME_DEPTH);
     if (depth_registration_ && align_filter_) {
       auto new_frame = align_filter_->process(frame_set);
-      CHECK_NOTNULL(new_frame.get());
-      auto new_frame_set = new_frame->as<ob::FrameSet>();
-      CHECK_NOTNULL(new_frame_set.get());
-      depth_frame_ = new_frame_set->getFrame(OB_FRAME_DEPTH);
+     if(new_frame) {
+        auto new_frame_set = new_frame->as<ob::FrameSet>();
+        CHECK_NOTNULL(new_frame_set.get());
+        depth_frame_ = new_frame_set->getFrame(OB_FRAME_DEPTH);
+      }
     }
     depth_frame_ = processDepthFrameFilter(depth_frame_);
 

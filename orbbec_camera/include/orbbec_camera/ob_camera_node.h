@@ -283,7 +283,7 @@ class OBCameraNode {
 
   std::shared_ptr<ob::Frame> processDepthFrameFilter(std::shared_ptr<ob::Frame>& frame);
 
-  void onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet>& frame_set);
+  void onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set);
 
   std::shared_ptr<ob::Frame> softwareDecodeColorFrame(const std::shared_ptr<ob::Frame>& frame);
 
@@ -513,5 +513,7 @@ class OBCameraNode {
   double diagnostic_period_ = 1.0;
   bool enable_laser_ = false;
   int laser_on_off_mode_ = 0;
+  std::unique_ptr<ob::Align> align_filter_ = nullptr;
+  OBStreamType align_target_stream_ = OB_STREAM_COLOR;
 };
 }  // namespace orbbec_camera

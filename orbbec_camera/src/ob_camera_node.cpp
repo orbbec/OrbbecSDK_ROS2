@@ -134,6 +134,9 @@ void OBCameraNode::setupDevices() {
   }
   auto info = device_->getDeviceInfo();
   try {
+    if (depth_registration_) {
+      align_filter_ = std::make_unique<ob::Align>(align_target_stream_);
+    }
     if (enable_hardware_d2d_ &&
         device_->isPropertySupported(OB_PROP_DISPARITY_TO_DEPTH_BOOL, OB_PERMISSION_READ_WRITE)) {
       device_->setBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL, true);
@@ -144,7 +147,6 @@ void OBCameraNode::setupDevices() {
     device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, enable_laser_);
     device_->setIntProperty(OB_PROP_LASER_ON_OFF_MODE_INT, laser_on_off_mode_);
     device_->loadPreset(device_preset_.c_str());
-    return;
     auto depth_sensor = device_->getSensor(OB_SENSOR_DEPTH);
     // set depth sensor to filter
     auto filter_list = depth_sensor->getRecommendedFilters();
@@ -219,15 +221,16 @@ void OBCameraNode::setupDevices() {
       sync_config.triggerOutEnable = trigger_out_enabled_;
       device_->setMultiDeviceSyncConfig(sync_config);
     }
-    if (device_->isPropertySupported(OB_PROP_DEPTH_PRECISION_LEVEL_INT, OB_PERMISSION_READ_WRITE)) {
+    if (device_->isPropertySupported(OB_PROP_DEPTH_PRECISION_LEVEL_INT, OB_PERMISSION_READ_WRITE) &&
+        !depth_precision_str_.empty()) {
       auto default_precision_level = device_->getIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT);
       if (default_precision_level != depth_precision_) {
         device_->setIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT, depth_precision_);
         RCLCPP_INFO_STREAM(logger_, "set depth precision to " << depth_precision_str_);
       }
-    }
-    if (device_->isPropertySupported(OB_PROP_DEPTH_UNIT_FLEXIBLE_ADJUSTMENT_FLOAT,
-                                     OB_PERMISSION_READ_WRITE)) {
+    } else if (device_->isPropertySupported(OB_PROP_DEPTH_UNIT_FLEXIBLE_ADJUSTMENT_FLOAT,
+                                            OB_PERMISSION_READ_WRITE) &&
+               !depth_precision_str_.empty()) {
       auto depth_unit_flexible_adjustment = depthPrecisionFromString(depth_precision_str_);
       auto range = device_->getFloatPropertyRange(OB_PROP_DEPTH_UNIT_FLEXIBLE_ADJUSTMENT_FLOAT);
       RCLCPP_INFO_STREAM(
@@ -683,10 +686,12 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter(trigger2image_delay_us_, "trigger2image_delay_us", 0);
   setAndGetNodeParameter(trigger_out_delay_us_, "trigger_out_delay_us", 0);
   setAndGetNodeParameter(trigger_out_enabled_, "trigger_out_enabled", false);
-  setAndGetNodeParameter<std::string>(depth_precision_str_, "depth_precision", "1mm");
-  std::transform(sync_mode_str_.begin(), sync_mode_str_.end(), sync_mode_str_.begin(), ::toupper);
-  sync_mode_ = OBSyncModeFromString(sync_mode_str_);
-  depth_precision_ = depthPrecisionLevelFromString(depth_precision_str_);
+  setAndGetNodeParameter<std::string>(depth_precision_str_, "depth_precision", "");
+  if (!depth_precision_str_.empty()) {
+    std::transform(sync_mode_str_.begin(), sync_mode_str_.end(), sync_mode_str_.begin(), ::toupper);
+    sync_mode_ = OBSyncModeFromString(sync_mode_str_);
+    depth_precision_ = depthPrecisionLevelFromString(depth_precision_str_);
+  }
   if (enable_colored_point_cloud_) {
     depth_registration_ = true;
   }
@@ -727,6 +732,9 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<double>(diagnostic_period_, "diagnostic_period", 1.0);
   setAndGetNodeParameter<bool>(enable_laser_, "enable_laser", false);
   setAndGetNodeParameter<int>(laser_on_off_mode_, "laser_on_off_mode", 0);
+  std::string align_target_stream_str_;
+  setAndGetNodeParameter<std::string>(align_target_stream_str_, "align_target_stream", "COLOR");
+  align_target_stream_ = obStreamTypeFromString(align_target_stream_str_);
 }
 
 void OBCameraNode::setupTopics() {
@@ -780,8 +788,8 @@ void OBCameraNode::setupPipelineConfig() {
   pipeline_config_ = std::make_shared<ob::Config>();
   pipeline_config_->setDepthScaleRequire(enable_depth_scale_);
   if (depth_registration_ && enable_stream_[COLOR] && enable_stream_[DEPTH]) {
-    RCLCPP_INFO_STREAM(logger_, "set align mode to " << align_mode_);
     OBAlignMode align_mode = align_mode_ == "HW" ? ALIGN_D2C_HW_MODE : ALIGN_D2C_SW_MODE;
+    RCLCPP_INFO_STREAM(logger_, "set align mode to " << magic_enum::enum_name(align_mode));
     pipeline_config_->setAlignMode(align_mode);
   }
   for (const auto &stream_index : IMAGE_STREAMS) {
@@ -1144,7 +1152,7 @@ std::shared_ptr<ob::Frame> OBCameraNode::processDepthFrameFilter(
   return frame;
 }
 
-void OBCameraNode::onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet> &frame_set) {
+void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set) {
   if (!is_running_.load()) {
     return;
   }
@@ -1161,7 +1169,15 @@ void OBCameraNode::onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet> &fr
     // is_color_frame_decoded_ = decodeColorFrameToBuffer(frame_set->colorFrame(), rgb_buffer_);
     std::shared_ptr<ob::ColorFrame> colorFrame = frame_set->colorFrame();
     depth_frame_ = frame_set->getFrame(OB_FRAME_DEPTH);
+    if (depth_registration_ && align_filter_) {
+      auto new_frame = align_filter_->process(frame_set);
+      CHECK_NOTNULL(new_frame.get());
+      auto new_frame_set = new_frame->as<ob::FrameSet>();
+      CHECK_NOTNULL(new_frame_set.get());
+      depth_frame_ = new_frame_set->getFrame(OB_FRAME_DEPTH);
+    }
     depth_frame_ = processDepthFrameFilter(depth_frame_);
+
     if (enable_stream_[COLOR] && colorFrame) {
       std::lock_guard<std::mutex> colorLock(colorFrameMtx_);
       colorFrameQueue_.push(frame_set);
@@ -1180,9 +1196,6 @@ void OBCameraNode::onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet> &fr
         auto frame = frame_set->getFrame(frame_type);
         if (frame == nullptr) {
           continue;
-        }
-        if (frame_type == OB_FRAME_DEPTH) {
-          frame = depth_frame_;
         }
 
         std::shared_ptr<ob::Frame> irFrame = decodeIRMJPGFrame(frame);

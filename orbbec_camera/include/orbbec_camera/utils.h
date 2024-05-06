@@ -65,7 +65,7 @@ bool isOpenNIDevice(int pid);
 OB_DEPTH_PRECISION_LEVEL depthPrecisionLevelFromString(
     const std::string& depth_precision_level_str);
 
-float depthPrecisionFromString(const std::string &depth_precision_level_str) ;
+float depthPrecisionFromString(const std::string& depth_precision_level_str);
 
 OBMultiDeviceSyncMode OBSyncModeFromString(const std::string& mode);
 
@@ -90,5 +90,7 @@ std::string metaDataTypeToString(const OBFrameMetadataType& meta_data_type);
 OBHoleFillingMode holeFillingModeFromString(const std::string& hole_filling_mode);
 
 bool isGemini2R(int pid);
+
+OBStreamType obStreamTypeFromString(const std::string& stream_type);
 
 }  // namespace orbbec_camera

@@ -305,8 +305,8 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
     ob_camera_node_.reset();
   }
   ob_camera_node_ = std::make_unique<OBCameraNode>(this, device_, parameters_);
-  ob_camera_node_->startStreams();
   ob_camera_node_->startIMU();
+  ob_camera_node_->startStreams();
   device_connected_ = true;
   device_info_ = device_->getDeviceInfo();
   serial_number_ = device_info_->serialNumber();
@@ -320,6 +320,7 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   RCLCPP_INFO_STREAM(logger_, "Firmware version: " << device_info_->firmwareVersion());
   RCLCPP_INFO_STREAM(logger_, "Hardware version: " << device_info_->hardwareVersion());
   RCLCPP_INFO_STREAM(logger_, "device unique id: " << device_unique_id_);
+  RCLCPP_INFO_STREAM(logger_, "Current node pid: " << getpid());
 }
 
 void OBCameraNodeDriver::connectNetDevice(const std::string &net_device_ip, int net_device_port) {

@@ -321,6 +321,8 @@ class OBCameraNode {
 
   orbbec_camera_msgs::msg::IMUInfo createIMUInfo(const stream_index_pair& stream_index);
 
+  static bool isGemini335PID(uint32_t pid);
+
  private:
   rclcpp::Node* node_ = nullptr;
   std::shared_ptr<ob::Device> device_ = nullptr;

@@ -354,6 +354,9 @@ The following are the launch parameters available:
 - `enable_spatial_filter`: This filter performs multiple iterations of processing as specified by the magnitude parameter, to enhance the smoothness of depth data. It is also capable of filling small holes in depth maps.
 - `enable_temporal_filter`:This filter is intended to improve the depth data persistency by manipulating per-pixel values based on previous frames. The filter performs a single pass on the data, adjusting the depth values while also updating the tracking history.
 - `enable_hole_filling_filter`: This filter fills all holes in the depth map using the specified mode.
+- `retry_on_usb3_detection_failure`: If the camera is connected to a USB 2.0 port and is not detected, the system will attempt to reset the camera up to three times. This setting aims to prevent USB 3.0 devices from being incorrectly recognized as USB 2.0.
+It is recommended to set this parameter to `false` when using a USB 2.0 connection to avoid unnecessary resets.
+
 
 ## Depth work mode switch
 

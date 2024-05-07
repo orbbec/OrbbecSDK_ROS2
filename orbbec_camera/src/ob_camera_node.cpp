@@ -134,6 +134,8 @@ void OBCameraNode::setupDevices() {
   }
   auto info = device_->getDeviceInfo();
   try {
+    device_->setBoolProperty(OB_PROP_DEVICE_USB3_REPEAT_IDENTIFY_BOOL,
+                             retry_on_usb3_detection_failure_);
     if (depth_registration_) {
       align_filter_ = std::make_unique<ob::Align>(align_target_stream_);
     }
@@ -743,6 +745,7 @@ void OBCameraNode::getParameters() {
   std::string align_target_stream_str_;
   setAndGetNodeParameter<std::string>(align_target_stream_str_, "align_target_stream", "COLOR");
   align_target_stream_ = obStreamTypeFromString(align_target_stream_str_);
+  setAndGetNodeParameter<bool>(retry_on_usb3_detection_failure_, "retry_on_usb3_detection_failure", false);
 }
 
 void OBCameraNode::setupTopics() {

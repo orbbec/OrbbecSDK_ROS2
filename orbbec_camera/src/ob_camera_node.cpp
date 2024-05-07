@@ -1197,7 +1197,7 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
     CHECK_NOTNULL(device_info.get());
     auto pid = device_info->pid();
     if (isGemini335PID(pid)) {
-      if (depth_registration_ && align_filter_) {
+      if (depth_registration_ && align_filter_ && depth_frame_) {
         auto new_frame = align_filter_->process(frame_set);
         if (new_frame) {
           auto new_frame_set = new_frame->as<ob::FrameSet>();
@@ -1485,6 +1485,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   }
   auto image_msg =
       cv_bridge::CvImage(std_msgs::msg::Header(), encoding_[stream_index], image).toImageMsg();
+  CHECK_NOTNULL(image_msg.get());
   image_msg->header.stamp = timestamp;
   image_msg->is_bigendian = false;
   image_msg->step = width * unit_step_size_[stream_index];

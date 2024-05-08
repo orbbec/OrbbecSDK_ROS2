@@ -313,9 +313,109 @@ OBFormat OBFormatFromString(const std::string &format) {
     return OB_FORMAT_BGR;
   } else if (fixed_format == "Y14") {
     return OB_FORMAT_Y14;
+  } else if (fixed_format == "BGRA") {
+    return OB_FORMAT_BGRA;
+  } else if (fixed_format == "COMPRESSED") {
+    return OB_FORMAT_COMPRESSED;
+  } else if (fixed_format == "RVL") {
+    return OB_FORMAT_RVL;
+  } else if (fixed_format == "Z16") {
+    return OB_FORMAT_Z16;
+  } else if (fixed_format == "YV12") {
+    return OB_FORMAT_YV12;
+  } else if (fixed_format == "BA81") {
+    return OB_FORMAT_BA81;
+  } else if (fixed_format == "RGBA") {
+    return OB_FORMAT_RGBA;
+  } else if (fixed_format == "BYR2") {
+    return OB_FORMAT_BYR2;
+  } else if (fixed_format == "RW16") {
+    return OB_FORMAT_RW16;
+  } else if (fixed_format == "DISP16") {
+    return OB_FORMAT_DISP16;
   } else {
     return OB_FORMAT_UNKNOWN;
   }
+}
+
+std::string OBFormatToString(const OBFormat &format) {
+  switch (format) {
+    case OB_FORMAT_MJPG:
+      return "MJPG";
+    case OB_FORMAT_YUYV:
+      return "YUYV";
+    case OB_FORMAT_YUY2:
+      return "YUYV2";
+    case OB_FORMAT_UYVY:
+      return "UYVY";
+    case OB_FORMAT_NV12:
+      return "NV12";
+    case OB_FORMAT_NV21:
+      return "NV21";
+    case OB_FORMAT_H264:
+      return "H264";
+    case OB_FORMAT_H265:
+      return "H265";
+    case OB_FORMAT_Y16:
+      return "Y16";
+    case OB_FORMAT_Y8:
+      return "Y8";
+    case OB_FORMAT_Y10:
+      return "Y10";
+    case OB_FORMAT_Y11:
+      return "Y11";
+    case OB_FORMAT_Y12:
+      return "Y12";
+    case OB_FORMAT_GRAY:
+      return "GRAY";
+    case OB_FORMAT_HEVC:
+      return "HEVC";
+    case OB_FORMAT_I420:
+      return "I420";
+    case OB_FORMAT_ACCEL:
+      return "ACCEL";
+    case OB_FORMAT_GYRO:
+      return "GYRO";
+    case OB_FORMAT_POINT:
+      return "POINT";
+    case OB_FORMAT_RGB_POINT:
+      return "RGB_POINT";
+    case OB_FORMAT_RLE:
+      return "REL";
+    case OB_FORMAT_RGB888:
+      return "RGB888";
+    case OB_FORMAT_BGR:
+      return "BGR";
+    case OB_FORMAT_Y14:
+      return "Y14";
+    case OB_FORMAT_BGRA:
+      return "BGRA";
+    case OB_FORMAT_COMPRESSED:
+      return "COMPRESSED";
+    case OB_FORMAT_RVL:
+      return "RVL";
+    case OB_FORMAT_Z16:
+      return "Z16";
+    case OB_FORMAT_YV12:
+      return "YV12";
+    case OB_FORMAT_BA81:
+      return "BA81";
+    case OB_FORMAT_RGBA:
+      return "RGBA";
+    case OB_FORMAT_BYR2:
+      return "BYR2";
+    case OB_FORMAT_RW16:
+      return "RW16";
+    case OB_FORMAT_DISP16:
+      return "DISP16";
+    default:
+      return "UNKNOWN";
+  }
+}
+
+std::ostream &operator<<(std::ostream &os, const OBFormat &rhs) {
+  os << OBFormatToString(rhs);
+  return os;
 }
 
 std::string ObDeviceTypeToString(const OBDeviceType &type) {
@@ -490,6 +590,11 @@ std::string sampleRateToString(const OB_SAMPLE_RATE &sample_rate) {
   }
 }
 
+std::ostream &operator<<(std::ostream &os, const OB_SAMPLE_RATE &rhs) {
+  os << sampleRateToString(rhs);
+  return os;
+}
+
 OB_GYRO_FULL_SCALE_RANGE fullGyroScaleRangeFromString(std::string &full_scale_range) {
   std::transform(full_scale_range.begin(), full_scale_range.end(), full_scale_range.begin(),
                  ::tolower);
@@ -539,6 +644,11 @@ std::string fullGyroScaleRangeToString(const OB_GYRO_FULL_SCALE_RANGE &full_scal
   }
 }
 
+std::ostream &operator<<(std::ostream &os, const OB_GYRO_FULL_SCALE_RANGE &rhs) {
+  os << fullGyroScaleRangeToString(rhs);
+  return os;
+}
+
 OBAccelFullScaleRange fullAccelScaleRangeFromString(std::string &full_scale_range) {
   std::transform(full_scale_range.begin(), full_scale_range.end(), full_scale_range.begin(),
                  ::tolower);
@@ -570,6 +680,11 @@ std::string fullAccelScaleRangeToString(const OBAccelFullScaleRange &full_scale_
     default:
       return "2g";
   }
+}
+
+std::ostream &operator<<(std::ostream &os, const OBAccelFullScaleRange &rhs) {
+  os << fullAccelScaleRangeToString(rhs);
+  return os;
 }
 
 std::string parseUsbPort(const std::string &line) {
@@ -676,6 +791,12 @@ std::string metaDataTypeToString(const OBFrameMetadataType &meta_data_type) {
       return "unknown_field";
   }
 }
+
+std::ostream &operator<<(std::ostream &os, const OBFrameMetadataType &rhs) {
+  os << metaDataTypeToString(rhs);
+  return os;
+}
+
 OBHoleFillingMode holeFillingModeFromString(const std::string &hole_filling_mode) {
   if (hole_filling_mode == "FILL_TOP") {
     return OB_HOLE_FILL_TOP;

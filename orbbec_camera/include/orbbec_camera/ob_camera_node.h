@@ -160,6 +160,8 @@ class OBCameraNode {
 
   void setupProfiles();
 
+   void printSensorProfiles(const std::shared_ptr<ob::Sensor>& sensor);
+
   void selectBaseStream();
 
   void getParameters();

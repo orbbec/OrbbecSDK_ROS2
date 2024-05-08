@@ -56,6 +56,10 @@ std::string getObSDKVersion();
 
 OBFormat OBFormatFromString(const std::string& format);
 
+std::string OBFormatToString(const OBFormat& format);
+
+std::ostream &operator<<(std::ostream &os, const OBFormat &rhs);
+
 std::string ObDeviceTypeToString(const OBDeviceType& type);
 
 rmw_qos_profile_t getRMWQosProfileFromString(const std::string& str_qos);
@@ -73,19 +77,27 @@ OB_SAMPLE_RATE sampleRateFromString(std::string& sample_rate);
 
 std::string sampleRateToString(const OB_SAMPLE_RATE& sample_rate);
 
+std::ostream &operator<<(std::ostream &os, const OB_SAMPLE_RATE &rhs);
+
 OB_GYRO_FULL_SCALE_RANGE fullGyroScaleRangeFromString(std::string& full_scale_range);
 
 std::string fullGyroScaleRangeToString(const OB_GYRO_FULL_SCALE_RANGE& full_scale_range);
 
+std::ostream &operator<<(std::ostream &os, const OB_GYRO_FULL_SCALE_RANGE &rhs);
+
 OBAccelFullScaleRange fullAccelScaleRangeFromString(std::string& full_scale_range);
 
 std::string fullAccelScaleRangeToString(const OBAccelFullScaleRange& full_scale_range);
+
+std::ostream &operator<<(std::ostream &os, const OBAccelFullScaleRange &rhs);
 
 std::string parseUsbPort(const std::string& line);
 
 bool isValidJPEG(const std::shared_ptr<ob::ColorFrame>& frame);
 
 std::string metaDataTypeToString(const OBFrameMetadataType& meta_data_type);
+
+std::ostream &operator<<(std::ostream &os, const OBFrameMetadataType &rhs);
 
 OBHoleFillingMode holeFillingModeFromString(const std::string& hole_filling_mode);
 

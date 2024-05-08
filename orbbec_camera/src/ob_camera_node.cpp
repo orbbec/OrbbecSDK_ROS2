@@ -333,6 +333,42 @@ void OBCameraNode::selectBaseStream() {
     base_stream_ = COLOR;
   }
 }
+
+void OBCameraNode::printSensorProfiles(const std::shared_ptr<ob::Sensor> &sensor) {
+  auto profiles = sensor->getStreamProfileList();
+  for (size_t i = 0; i < profiles->count(); i++) {
+    auto origin_profile = profiles->getProfile(i);
+    if (sensor->type() == OB_SENSOR_COLOR) {
+      auto profile = origin_profile->as<ob::VideoStreamProfile>();
+      RCLCPP_INFO_STREAM(logger_, "color profile: " << profile->width() << "x" << profile->height()
+                                                    << " " << profile->fps() << "fps "
+                                                    << profile->format());
+    } else if (sensor->type() == OB_SENSOR_DEPTH) {
+      auto profile = origin_profile->as<ob::VideoStreamProfile>();
+      RCLCPP_INFO_STREAM(logger_, "depth profile: " << profile->width() << "x" << profile->height()
+                                                    << " " << profile->fps() << "fps "
+                                                    << profile->format());
+    } else if (sensor->type() == OB_SENSOR_IR) {
+      auto profile = origin_profile->as<ob::VideoStreamProfile>();
+      RCLCPP_INFO_STREAM(logger_, "ir profile: " << profile->width() << "x" << profile->height()
+                                                 << " " << profile->fps() << "fps "
+                                                 << profile->format());
+    } else if (sensor->type() == OB_SENSOR_ACCEL) {
+      auto profile = origin_profile->as<ob::AccelStreamProfile>();
+      RCLCPP_INFO_STREAM(logger_, "accel profile: sampleRate " << profile->sampleRate()
+                                                               << "  full scale_range "
+                                                               << profile->fullScaleRange());
+    } else if (sensor->type() == OB_SENSOR_GYRO) {
+      auto profile = origin_profile->as<ob::GyroStreamProfile>();
+      RCLCPP_INFO_STREAM(logger_, "gyro profile: sampleRate " << profile->sampleRate()
+                                                              << "  full scale_range "
+                                                              << profile->fullScaleRange());
+    } else {
+      RCLCPP_INFO_STREAM(logger_, "unknown profile: " << magic_enum::enum_name(sensor->type()));
+    }
+  }
+}
+
 void OBCameraNode::setupProfiles() {
   // Image stream
   for (const auto &elem : IMAGE_STREAMS) {
@@ -360,12 +396,17 @@ void OBCameraNode::setupProfiles() {
             profiles->getVideoStreamProfile(width_[elem], height_[elem], format_[elem]);
       } catch (const ob::Error &ex) {
         RCLCPP_ERROR_STREAM(
-            logger_, "Failed to get " << stream_name_[elem] << " << profile: " << ex.getMessage());
+            logger_, "Failed to get " << stream_name_[elem] << "  profile: " << ex.getMessage());
         RCLCPP_ERROR_STREAM(
             logger_, "Stream: " << magic_enum::enum_name(elem.first)
                                 << ", Stream Index: " << elem.second << ", Width: " << width_[elem]
                                 << ", Height: " << height_[elem] << ", FPS: " << fps_[elem]
                                 << ", Format: " << magic_enum::enum_name(format_[elem]));
+        RCLCPP_ERROR(logger_,
+                     "Error: The device might be connected via USB 2.0. Please verify your "
+                     "configuration and try again. The current process will now exit.");
+        RCLCPP_INFO_STREAM(logger_, "Available profiles:");
+        printSensorProfiles(sensor);
         exit(-1);
       }
 
@@ -745,7 +786,8 @@ void OBCameraNode::getParameters() {
   std::string align_target_stream_str_;
   setAndGetNodeParameter<std::string>(align_target_stream_str_, "align_target_stream", "COLOR");
   align_target_stream_ = obStreamTypeFromString(align_target_stream_str_);
-  setAndGetNodeParameter<bool>(retry_on_usb3_detection_failure_, "retry_on_usb3_detection_failure", false);
+  setAndGetNodeParameter<bool>(retry_on_usb3_detection_failure_, "retry_on_usb3_detection_failure",
+                               false);
 }
 
 void OBCameraNode::setupTopics() {

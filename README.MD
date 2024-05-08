@@ -472,7 +472,10 @@ bash .make_deb.sh
 | gemini ew lite                        | gemini_ew_lite.launch.py |
 | gemini 335/335L                       | gemini2R.launch.py       |
 
-Actually, All launch files all most the same, the only difference is the default value of the parameters.
+**All launch files are essentially similar, with the primary difference being the default values of the parameters set for different models 
+within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you
+encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution settings in the launch
+file, as well as other parameters, to ensure compatibility and optimal performance.**
 
 ## Supported hardware products
 

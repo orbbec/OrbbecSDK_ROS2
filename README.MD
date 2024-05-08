@@ -200,7 +200,8 @@ to `true` in the stream that corresponds to the argument of the launch file.
 - `/camera/ir/image_raw`: The IR stream image
 - `/camera/accel/sample`: Acceleration data stream `enable_sync_output_accel_gyro`turned off，`enable_accel`turned on
 - `/camera/gyro/sample`: Gyroscope data stream，enable_sync_output_accel_gyro`turned off，`enable_gyro`turned on
-- `camera/gyro_accel/sample`: Synchronized data stream of acceleration and gyroscope，`enable_sync_output_accel_gyro`turned on
+- `camera/gyro_accel/sample`: Synchronized data stream of acceleration and gyroscope，`enable_sync_output_accel_gyro`
+  turned on
 
 ### Network device enumeration
 
@@ -210,7 +211,8 @@ eliminating the need to configure the IP address in advance or set the enable sw
 methods are as follows:
 
 - `enumerate_net_device`: enumeration network device automatically, only supported by Femto Mega.
-  if `enumerate_net_device` set to `true`, the device will be enumerated automatically,No need to set the `net_device_ip`
+  if `enumerate_net_device` set to `true`, the device will be enumerated automatically,No need to set
+  the `net_device_ip`
   and `net_device_port` parameters.
 - `net_device_ip`: The IP address of the device.
 - `net_device_port`: The port number of the device.
@@ -346,17 +348,27 @@ The following are the launch parameters available:
 - `laser_on_off_mode`: Laser on/off alternate mode, 0: off, 1: on-off alternate, 2: off-on alternate. The default value
   is `0`.
 - `device_preset`: The device preset options are `Default` or `High Accuracy`.
-- `enable_decimation_filter`: This filter effectively reduces the depth scene complexity. The filter runs on kernel sizes [2x2] to [8x8] pixels. The image size is scaled down proportionally in both dimensions to preserve the aspect ratio.
-- `enable_hdr_merge`: This filter is used jointly with depth HDR function. By merging consecutive depth images of alternating exposure values, we can over come challenges in acquiring depth values for under-illuminated and over-illuminated objects simultaneously.
-- `enable_sequence_id_filter`: This filter is used jointly with depth HDR function and outputs only the sequence with specified sequence ID.
+- `enable_decimation_filter`: This filter effectively reduces the depth scene complexity. The filter runs on kernel
+  sizes [2x2] to [8x8] pixels. The image size is scaled down proportionally in both dimensions to preserve the aspect
+  ratio.
+- `enable_hdr_merge`: This filter is used jointly with depth HDR function. By merging consecutive depth images of
+  alternating exposure values, we can over come challenges in acquiring depth values for under-illuminated and
+  over-illuminated objects simultaneously.
+- `enable_sequence_id_filter`: This filter is used jointly with depth HDR function and outputs only the sequence with
+  specified sequence ID.
 - `enable_threshold_filter`: This filter preserves depth values of interest and omits depth values out of scope.
-- `enable_noise_removal_filter`: This filter removes speckle noise in clusters and gives rise to a less-filled depth map.
-- `enable_spatial_filter`: This filter performs multiple iterations of processing as specified by the magnitude parameter, to enhance the smoothness of depth data. It is also capable of filling small holes in depth maps.
-- `enable_temporal_filter`:This filter is intended to improve the depth data persistency by manipulating per-pixel values based on previous frames. The filter performs a single pass on the data, adjusting the depth values while also updating the tracking history.
+- `enable_noise_removal_filter`: This filter removes speckle noise in clusters and gives rise to a less-filled depth
+  map.
+- `enable_spatial_filter`: This filter performs multiple iterations of processing as specified by the magnitude
+  parameter, to enhance the smoothness of depth data. It is also capable of filling small holes in depth maps.
+- `enable_temporal_filter`:This filter is intended to improve the depth data persistency by manipulating per-pixel
+  values based on previous frames. The filter performs a single pass on the data, adjusting the depth values while also
+  updating the tracking history.
 - `enable_hole_filling_filter`: This filter fills all holes in the depth map using the specified mode.
-- `retry_on_usb3_detection_failure`: If the camera is connected to a USB 2.0 port and is not detected, the system will attempt to reset the camera up to three times. This setting aims to prevent USB 3.0 devices from being incorrectly recognized as USB 2.0.
-It is recommended to set this parameter to `false` when using a USB 2.0 connection to avoid unnecessary resets.
-
+- `retry_on_usb3_detection_failure`: If the camera is connected to a USB 2.0 port and is not detected, the system will
+  attempt to reset the camera up to three times. This setting aims to prevent USB 3.0 devices from being incorrectly
+  recognized as USB 2.0.
+  It is recommended to set this parameter to `false` when using a USB 2.0 connection to avoid unnecessary resets.
 
 ## Depth work mode switch
 
@@ -405,31 +417,41 @@ resolutions is as follows:
 ## Building a Debian Package
 
 ### Preparing the Environment
+
 Before starting, install the required tools:
+
 ```bash
 sudo apt install debhelper fakeroot python3-bloom
 ```
 
 ### Configuring ROS Dependencies
-Add the following YAML file to your system at `/etc/ros/rosdep/sources.list.d/00-orbbec.yaml`. Make sure to replace `focal` with the codename of your Ubuntu version and `humble` with your ROS2 distribution name:
+
+Add the following YAML file to your system at `/etc/ros/rosdep/sources.list.d/00-orbbec.yaml`. Make sure to
+replace `focal` with the codename of your Ubuntu version and `humble` with your ROS2 distribution name:
+
 ```yaml
 orbbec_camera_msgs:
   ubuntu:
-    focal: [ros-humble-orbbec-camera-msgs]
+    focal: [ ros-humble-orbbec-camera-msgs ]
 ```
 
-Next, create a new file `/etc/ros/rosdep/sources.list.d/50-orbbec.list` and add this line to specify the path to the YAML file:
+Next, create a new file `/etc/ros/rosdep/sources.list.d/50-orbbec.list` and add this line to specify the path to the
+YAML file:
+
 ```bash
 yaml file:///etc/ros/rosdep/sources.list.d/00-orbbec.yaml
 ```
 
 Update the rosdep database to reflect these changes:
+
 ```bash
 rosdep update
 ```
 
 ### Building the Package
+
 Navigate to your workspace and build the project:
+
 ```bash
 cd ~/ros2_ws/
 colcon build --event-handlers console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=Release
@@ -470,7 +492,7 @@ bash .make_deb.sh
 | dabai dw2                             | dabai_dw2.launch.py      |
 | gemini ew                             | gemini_ew.launch.py      |
 | gemini ew lite                        | gemini_ew_lite.launch.py |
-| gemini 335/335L                       | gemini2R.launch.py       |
+| gemini 335/335L                       | gemini_generic.launch.py |
 
 **All launch files are essentially similar, with the primary difference being the default values of the parameters set for different models
 within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you

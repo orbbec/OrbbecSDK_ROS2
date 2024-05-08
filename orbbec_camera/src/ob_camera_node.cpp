@@ -153,6 +153,7 @@ void OBCameraNode::setupDevices() {
       device_->setIntProperty(OB_PROP_LASER_ON_OFF_MODE_INT, laser_on_off_mode_);
     }
     if (!device_preset_.empty()) {
+      RCLCPP_INFO_STREAM(logger_, "Load device preset: " << device_preset_);
       device_->loadPreset(device_preset_.c_str());
     }
     auto depth_sensor = device_->getSensor(OB_SENSOR_DEPTH);
@@ -788,6 +789,12 @@ void OBCameraNode::getParameters() {
   align_target_stream_ = obStreamTypeFromString(align_target_stream_str_);
   setAndGetNodeParameter<bool>(retry_on_usb3_detection_failure_, "retry_on_usb3_detection_failure",
                                false);
+  auto device_info = device_->getDeviceInfo();
+  CHECK_NOTNULL(device_info.get());
+  auto pid = device_info->pid();
+  if (isGemini335PID(pid)) {
+    device_preset_ = selectPreset(pid);
+  }
 }
 
 void OBCameraNode::setupTopics() {
@@ -2040,20 +2047,20 @@ bool OBCameraNode::setupFormatConvertType(OBFormat format) {
 }
 
 bool OBCameraNode::isGemini335PID(uint32_t pid) {
-  const uint16_t GEMINI_335_PID = 0x0800;    // Gemini 335 / 335e
-  const uint16_t GEMINI_330_PID = 0x0801;    // Gemini 330
-  const uint16_t GEMINI_336_PID = 0x0803;    // Gemini 336 / 336e
-  const uint16_t GEMINI_335L_PID = 0x0804;   // Gemini 335L
-  const uint16_t GEMINI_330L_PID = 0x0805;   // Gemini 336L
-  const uint16_t GEMINI_336L_PID = 0x0807;   // Gemini 335Lg
-  const uint16_t GEMINI_335LG_PID = 0x080B;  // Gemini 336Lg
-  const uint16_t GEMINI_336LG_PID = 0x080D;
-  const uint16_t GEMINI_335LE_PID = 0x080E;  // Gemini 335Le
-  const uint16_t GEMINI_336LE_PID = 0x0810;  // Gemini 335Le
   return pid == GEMINI_335_PID || pid == GEMINI_330_PID || pid == GEMINI_336_PID ||
          pid == GEMINI_335L_PID || pid == GEMINI_330L_PID || pid == GEMINI_336L_PID ||
          pid == GEMINI_335LG_PID || pid == GEMINI_336LG_PID || pid == GEMINI_335LE_PID ||
          pid == GEMINI_336LE_PID;
+}
+
+std::string OBCameraNode::selectPreset(uint32_t pid) {
+  switch (pid) {
+    case GEMINI_336_PID:
+    case GEMINI_336L_PID:
+      return "AMR with IR-Pass";
+    default:
+      return "Default";
+  }
 }
 
 orbbec_camera_msgs::msg::IMUInfo OBCameraNode::createIMUInfo(

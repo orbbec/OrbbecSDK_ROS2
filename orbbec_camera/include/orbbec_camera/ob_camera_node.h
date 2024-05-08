@@ -325,6 +325,8 @@ class OBCameraNode {
 
   static bool isGemini335PID(uint32_t pid);
 
+  std::string selectPreset(uint32_t pid);
+
  private:
   rclcpp::Node* node_ = nullptr;
   std::shared_ptr<ob::Device> device_ = nullptr;

@@ -260,6 +260,9 @@ std::string getObSDKVersion() {
 }
 
 OBFormat OBFormatFromString(const std::string &format) {
+  if (format.empty()) {
+    return OB_FORMAT_UNKNOWN;
+  }
   std::string fixed_format;
   std::transform(format.begin(), format.end(), std::back_inserter(fixed_format),
                  [](const auto ch) { return std::isalpha(ch) ? toupper(ch) : ch; });

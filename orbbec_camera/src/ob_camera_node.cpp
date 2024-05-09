@@ -134,8 +134,11 @@ void OBCameraNode::setupDevices() {
   }
   auto info = device_->getDeviceInfo();
   try {
-    device_->setBoolProperty(OB_PROP_DEVICE_USB3_REPEAT_IDENTIFY_BOOL,
-                             retry_on_usb3_detection_failure_);
+    if (device_->isPropertySupported(OB_PROP_DEVICE_USB3_REPEAT_IDENTIFY_BOOL,
+                                     OB_PERMISSION_READ_WRITE)) {
+      device_->setBoolProperty(OB_PROP_DEVICE_USB3_REPEAT_IDENTIFY_BOOL,
+                               retry_on_usb3_detection_failure_);
+    }
     if (depth_registration_) {
       align_filter_ = std::make_unique<ob::Align>(align_target_stream_);
     }
@@ -153,6 +156,11 @@ void OBCameraNode::setupDevices() {
       device_->setIntProperty(OB_PROP_LASER_ON_OFF_MODE_INT, laser_on_off_mode_);
     }
     if (!device_preset_.empty()) {
+      RCLCPP_INFO_STREAM(logger_, "Available presets:");
+      auto preset_list = device_->getAvailablePresetList();
+      for (uint32_t i = 0; i < preset_list->count(); i++) {
+        RCLCPP_INFO_STREAM(logger_, "Preset " << i << ": " << preset_list->getName(i));
+      }
       RCLCPP_INFO_STREAM(logger_, "Load device preset: " << device_preset_);
       device_->loadPreset(device_preset_.c_str());
     }
@@ -391,10 +399,14 @@ void OBCameraNode::setupProfiles() {
       std::shared_ptr<ob::VideoStreamProfile> selected_profile;
       std::shared_ptr<ob::VideoStreamProfile> default_profile;
       try {
-        selected_profile =
-            profiles->getVideoStreamProfile(width_[elem], height_[elem], format_[elem], fps_[elem]);
-        default_profile =
-            profiles->getVideoStreamProfile(width_[elem], height_[elem], format_[elem]);
+        if (width_[elem] == 0 && height_[elem] == 0 && fps_[elem] == 0 &&
+            format_[elem] == OB_FORMAT_UNKNOWN) {
+          selected_profile = profiles->getProfile(0)->as<ob::VideoStreamProfile>();
+        } else {
+          selected_profile = profiles->getVideoStreamProfile(width_[elem], height_[elem],
+                                                             format_[elem], fps_[elem]);
+        }
+
       } catch (const ob::Error &ex) {
         RCLCPP_ERROR_STREAM(
             logger_, "Failed to get " << stream_name_[elem] << "  profile: " << ex.getMessage());
@@ -435,8 +447,10 @@ void OBCameraNode::setupProfiles() {
       images_[elem] =
           cv::Mat(height_[elem], width_[elem], image_format_[elem], cv::Scalar(0, 0, 0));
       RCLCPP_INFO_STREAM(
-          logger_, " stream " << stream_name_[elem] << " is enabled - width: " << width_[elem]
-                              << ", height: " << height_[elem] << ", fps: " << fps_[elem] << ", "
+          logger_, " stream " << stream_name_[elem]
+                              << " is enabled - width: " << selected_profile->width()
+                              << ", height: " << selected_profile->height()
+                              << ", fps: " << selected_profile->fps() << ", "
                               << "Format: " << magic_enum::enum_name(selected_profile->format()));
     }
   }
@@ -637,11 +651,11 @@ void OBCameraNode::getParameters() {
   camera_link_frame_id_ = camera_name_ + "_link";
   for (auto stream_index : IMAGE_STREAMS) {
     std::string param_name = stream_name_[stream_index] + "_width";
-    setAndGetNodeParameter(width_[stream_index], param_name, IMAGE_WIDTH);
+    setAndGetNodeParameter(width_[stream_index], param_name, 0);
     param_name = stream_name_[stream_index] + "_height";
-    setAndGetNodeParameter(height_[stream_index], param_name, IMAGE_HEIGHT);
+    setAndGetNodeParameter(height_[stream_index], param_name, 0);
     param_name = stream_name_[stream_index] + "_fps";
-    setAndGetNodeParameter(fps_[stream_index], param_name, IMAGE_FPS);
+    setAndGetNodeParameter(fps_[stream_index], param_name, 0);
     param_name = "enable_" + stream_name_[stream_index];
     setAndGetNodeParameter(enable_stream_[stream_index], param_name, false);
     param_name = "flip_" + stream_name_[stream_index];
@@ -789,12 +803,6 @@ void OBCameraNode::getParameters() {
   align_target_stream_ = obStreamTypeFromString(align_target_stream_str_);
   setAndGetNodeParameter<bool>(retry_on_usb3_detection_failure_, "retry_on_usb3_detection_failure",
                                false);
-  auto device_info = device_->getDeviceInfo();
-  CHECK_NOTNULL(device_info.get());
-  auto pid = device_info->pid();
-  if (isGemini335PID(pid)) {
-    device_preset_ = selectPreset(pid);
-  }
 }
 
 void OBCameraNode::setupTopics() {
@@ -856,10 +864,11 @@ void OBCameraNode::setupPipelineConfig() {
   for (const auto &stream_index : IMAGE_STREAMS) {
     if (enable_stream_[stream_index]) {
       RCLCPP_INFO_STREAM(logger_, "Enable " << stream_name_[stream_index] << " stream");
-      RCLCPP_INFO_STREAM(
-          logger_, "Stream " << stream_name_[stream_index] << " width: " << width_[stream_index]
-                             << " height: " << height_[stream_index] << " fps: "
-                             << fps_[stream_index] << " format: " << format_str_[stream_index]);
+      auto profile = stream_profile_[stream_index]->as<ob::VideoStreamProfile>();
+      RCLCPP_INFO_STREAM(logger_,
+                         "Stream " << stream_name_[stream_index] << " width: " << profile->width()
+                                   << " height: " << profile->height() << " fps: " << profile->fps()
+                                   << " format: " << profile->format());
       pipeline_config_->enableStream(stream_profile_[stream_index]);
     }
   }
@@ -2051,16 +2060,6 @@ bool OBCameraNode::isGemini335PID(uint32_t pid) {
          pid == GEMINI_335L_PID || pid == GEMINI_330L_PID || pid == GEMINI_336L_PID ||
          pid == GEMINI_335LG_PID || pid == GEMINI_336LG_PID || pid == GEMINI_335LE_PID ||
          pid == GEMINI_336LE_PID;
-}
-
-std::string OBCameraNode::selectPreset(uint32_t pid) {
-  switch (pid) {
-    case GEMINI_336_PID:
-    case GEMINI_336L_PID:
-      return "AMR with IR-Pass";
-    default:
-      return "Default";
-  }
 }
 
 orbbec_camera_msgs::msg::IMUInfo OBCameraNode::createIMUInfo(

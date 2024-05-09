@@ -160,7 +160,7 @@ class OBCameraNode {
 
   void setupProfiles();
 
-   void printSensorProfiles(const std::shared_ptr<ob::Sensor>& sensor);
+  void printSensorProfiles(const std::shared_ptr<ob::Sensor>& sensor);
 
   void selectBaseStream();
 
@@ -324,8 +324,6 @@ class OBCameraNode {
   orbbec_camera_msgs::msg::IMUInfo createIMUInfo(const stream_index_pair& stream_index);
 
   static bool isGemini335PID(uint32_t pid);
-
-  std::string selectPreset(uint32_t pid);
 
  private:
   rclcpp::Node* node_ = nullptr;

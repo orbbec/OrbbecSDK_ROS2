@@ -160,6 +160,8 @@ class OBCameraNode {
 
   void setupProfiles();
 
+  void updateImageConfig(const stream_index_pair& stream_index);
+
   void printSensorProfiles(const std::shared_ptr<ob::Sensor>& sensor);
 
   void selectBaseStream();
@@ -414,6 +416,7 @@ class OBCameraNode {
   bool enable_point_cloud_ = true;
   bool enable_colored_point_cloud_ = false;
   sensor_msgs::msg::PointCloud2 point_cloud_msg_;
+  std::recursive_mutex point_cloud_mutex_;
 
   orbbec_camera_msgs::msg::DeviceInfo device_info_;
   std::string point_cloud_qos_;
@@ -476,10 +479,10 @@ class OBCameraNode {
   bool is_color_frame_decoded_ = false;
   std::mutex device_lock_;
   // For color
-  std::queue<std::shared_ptr<ob::FrameSet>> colorFrameQueue_;
+  std::queue<std::shared_ptr<ob::FrameSet>> color_frame_queue_;
   std::shared_ptr<std::thread> colorFrameThread_ = nullptr;
-  std::mutex colorFrameMtx_;
-  std::condition_variable colorFrameCV_;
+  std::mutex color_frame_queue_lock_;
+  std::condition_variable color_frame_queue_cv_;
 
   bool ordered_pc_ = false;
   bool use_hardware_time_ = true;
@@ -520,5 +523,6 @@ class OBCameraNode {
   std::unique_ptr<ob::Align> align_filter_ = nullptr;
   OBStreamType align_target_stream_ = OB_STREAM_COLOR;
   bool retry_on_usb3_detection_failure_ = false;
+  std::atomic_bool is_camera_node_initialized_{false};
 };
 }  // namespace orbbec_camera

@@ -67,7 +67,7 @@ void printPreset(const std::shared_ptr<ob::Device>& device) {
   std::cout << "Preset list:" << std::endl;
   for (uint32_t i = 0; i < preset_list->count(); i++) {
     auto name = preset_list->getName(i);
-    std::cout << "Preset list[ " << i << "]: " << name << std::endl;
+    std::cout << "Preset list[" << i << "]: " << name << std::endl;
   }
 }
 int main() {

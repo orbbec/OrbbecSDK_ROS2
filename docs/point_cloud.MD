@@ -9,7 +9,7 @@ This section demonstrates how to enable point cloud data output from the camera 
 To activate the point cloud data stream for depth information, use the following command:
 
 ```bash
-ros2 launch orbbec_camera gemini_generic.launch.py enable_point_cloud:=true
+ros2 launch orbbec_camera gemini_camera.launch.py enable_point_cloud:=true
 ```
 
 #### Visualizing Depth Point Cloud in RViz2
@@ -34,7 +34,7 @@ Here is what the depth point cloud might look like in RViz2:
 To enable the colored point cloud feature, enter the following command:
 
 ```bash
-ros2 launch orbbec_camera gemini_generic.launch.py enable_colored_point_cloud:=true
+ros2 launch orbbec_camera gemini_camera.launch.py enable_colored_point_cloud:=true
 ```
 
 #### Visualizing Colored Point Cloud in RViz2

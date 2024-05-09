@@ -492,7 +492,7 @@ bash .make_deb.sh
 | dabai dw2                             | dabai_dw2.launch.py      |
 | gemini ew                             | gemini_ew.launch.py      |
 | gemini ew lite                        | gemini_ew_lite.launch.py |
-| gemini 335/335L                       | gemini_generic.launch.py |
+| gemini 300 serial                     | gemini_camera.launch.py  |
 
 **All launch files are essentially similar, with the primary difference being the default values of the parameters set for different models
 within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you

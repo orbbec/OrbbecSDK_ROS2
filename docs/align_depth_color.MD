@@ -9,7 +9,7 @@ This section explains how to align depth images with color images to create an o
    To simply align the depth image to the color image, use the following command:
 
    ```bash
-   ros2 launch orbbec_camera gemini_generic.launch.py depth_registration:=true
+   ros2 launch orbbec_camera gemini_camera.launch.py depth_registration:=true
    ```
 
    This command activates the depth registration feature without opening a viewer.
@@ -19,7 +19,7 @@ This section explains how to align depth images with color images to create an o
    If you wish to view the depth to color overlay, you need to enable the viewer by using the command below:
 
    ```bash
-   ros2 launch orbbec_camera gemini_generic.launch.py depth_registration:=true enable_d2c_viewer:=true
+   ros2 launch orbbec_camera gemini_camera.launch.py depth_registration:=true enable_d2c_viewer:=true
    ```
 
    This launches the camera node with depth to color registration and opens a viewer to display the overlay image.

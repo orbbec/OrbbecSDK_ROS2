@@ -462,37 +462,37 @@ bash .make_deb.sh
 
 ## Launch files
 
-| product serials                       | launch file              |
-|---------------------------------------|--------------------------|
-| astra+                                | astra_adv.launch.py      |
-| astra mini /astra mini pro /astra pro | astra.launch.py          |
-| astra mini pro s                      | astra.launch.py          |
-| astra2                                | astra2.launch.py         |
-| astra stereo s                        | stereo_s_u3.launch.py    |
-| astra pro2                            | astra_pro2.launch.py     |
-| dabai                                 | dabai.launch.py          |
-| dabai d1                              | dabai_d1.launch.py       |
-| dabai dcw                             | dabai_dcw.launch.py      |
-| dabai dw                              | dabai_dw.launch.py       |
-| dabai pro                             | dabai_pro.launch.py      |
-| deeya                                 | deeya.launch.py          |
-| femto  /femto w                       | femto.launch.py          |
-| femto mega                            | femto_mega.launch.py     |
-| femto bolt                            | femto_bolt.launch.py     |
-| gemini                                | gemini.launch.py         |
-| gemini                                | gemini.launch.py         |
-| gemini2 / dabai DCL                   | gemini2.launch.py        |
-| gemini2L                              | gemini2L.launch.py       |
-| gemini e                              | gemini_e.launch.py       |
-| gemini e lite                         | gemini_e_lite.launch.py  |
-| dabai max                             | dabai_max.launch.py      |
-| dabai max pro                         | dabai_max_pro.launch.py  |
-| gemini uw                             | gemini_uw.launch.py      |
-| dabai dcw2                            | dabai_dcw2.launch.py     |
-| dabai dw2                             | dabai_dw2.launch.py      |
-| gemini ew                             | gemini_ew.launch.py      |
-| gemini ew lite                        | gemini_ew_lite.launch.py |
-| gemini 300 serial                     | gemini_camera.launch.py  |
+| product serials                       | launch file                 |
+|---------------------------------------|-----------------------------|
+| astra+                                | astra_adv.launch.py         |
+| astra mini /astra mini pro /astra pro | astra.launch.py             |
+| astra mini pro s                      | astra.launch.py             |
+| astra2                                | astra2.launch.py            |
+| astra stereo s                        | stereo_s_u3.launch.py       |
+| astra pro2                            | astra_pro2.launch.py        |
+| dabai                                 | dabai.launch.py             |
+| dabai d1                              | dabai_d1.launch.py          |
+| dabai dcw                             | dabai_dcw.launch.py         |
+| dabai dw                              | dabai_dw.launch.py          |
+| dabai pro                             | dabai_pro.launch.py         |
+| deeya                                 | deeya.launch.py             |
+| femto  /femto w                       | femto.launch.py             |
+| femto mega                            | femto_mega.launch.py        |
+| femto bolt                            | femto_bolt.launch.py        |
+| gemini                                | gemini.launch.py            |
+| gemini                                | gemini.launch.py            |
+| gemini2 / dabai DCL                   | gemini2.launch.py           |
+| gemini2L                              | gemini2L.launch.py          |
+| gemini e                              | gemini_e.launch.py          |
+| gemini e lite                         | gemini_e_lite.launch.py     |
+| dabai max                             | dabai_max.launch.py         |
+| dabai max pro                         | dabai_max_pro.launch.py     |
+| gemini uw                             | gemini_uw.launch.py         |
+| dabai dcw2                            | dabai_dcw2.launch.py        |
+| dabai dw2                             | dabai_dw2.launch.py         |
+| gemini ew                             | gemini_ew.launch.py         |
+| gemini ew lite                        | gemini_ew_lite.launch.py    |
+| gemini 300 series                     | gemini_330_series.launch.py |
 
 **All launch files are essentially similar, with the primary difference being the default values of the parameters set for different models
 within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you

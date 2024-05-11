@@ -1090,7 +1090,7 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
     modifier.resize(valid_count);
   }
   auto timestamp = use_hardware_time_ ? fromUsToROSTime(depth_frame->timeStampUs())
-                                      : fromMsToROSTime(depth_frame->systemTimeStamp());
+                                      : fromUsToROSTime(depth_frame->systemTimeStampUs());
   std::string frame_id = depth_registration_ ? optical_frame_id_[COLOR] : optical_frame_id_[DEPTH];
   point_cloud_msg_.header.stamp = timestamp;
   point_cloud_msg_.header.frame_id = frame_id;
@@ -1219,7 +1219,7 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
     modifier.resize(valid_count);
   }
   auto timestamp = use_hardware_time_ ? fromUsToROSTime(depth_frame->timeStampUs())
-                                      : fromMsToROSTime(depth_frame->systemTimeStamp());
+                                      : fromUsToROSTime(depth_frame->systemTimeStampUs());
   point_cloud_msg_.header.stamp = timestamp;
   point_cloud_msg_.header.frame_id = optical_frame_id_[COLOR];
   depth_registration_cloud_pub_->publish(point_cloud_msg_);
@@ -1255,7 +1255,7 @@ std::shared_ptr<ob::Frame> OBCameraNode::processDepthFrameFilter(
   for (size_t i = 0; i < filter_list->count(); i++) {
     auto filter = filter_list->getFilter(i);
     CHECK_NOTNULL(filter.get());
-    if (filter->isEnabled() && frame != nullptr) {
+    if (filter->isEnabled() && frame != nullptr && frame != nullptr) {
       frame = filter->process(frame);
       if (frame == nullptr) {
         RCLCPP_ERROR_STREAM(logger_, "Depth filter process failed");
@@ -1298,7 +1298,7 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
       }
       depth_frame_ = processDepthFrameFilter(depth_frame_);
     }
-   
+    auto color_frame = frame_set->getFrame(OB_FRAME_COLOR);
     if (enable_stream_[COLOR] && color_frame) {
       std::unique_lock<std::mutex> lock(color_frame_queue_lock_);
       color_frame_queue_.push(frame_set);
@@ -1507,7 +1507,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   int width = static_cast<int>(video_frame->width());
   int height = static_cast<int>(video_frame->height());
   auto timestamp = use_hardware_time_ ? fromUsToROSTime(video_frame->timeStampUs())
-                                      : fromMsToROSTime(video_frame->systemTimeStamp());
+                                      : fromUsToROSTime(video_frame->systemTimeStampUs());
   auto device_info = device_->getDeviceInfo();
   CHECK_NOTNULL(device_info);
   auto pid = device_info->pid();

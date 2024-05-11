@@ -117,6 +117,7 @@ set(COMMON_LIBRARIES
   -lOrbbecSDK
   -L${ORBBEC_LIBS_DIR}
   Threads::Threads
+  -lrt
 )
 if (USE_RK_HW_DECODER)
   list(APPEND COMMON_LIBRARIES

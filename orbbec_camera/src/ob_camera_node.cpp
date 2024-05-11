@@ -1255,7 +1255,7 @@ std::shared_ptr<ob::Frame> OBCameraNode::processDepthFrameFilter(
   for (size_t i = 0; i < filter_list->count(); i++) {
     auto filter = filter_list->getFilter(i);
     CHECK_NOTNULL(filter.get());
-    if (filter->isEnabled()) {
+    if (filter->isEnabled() && frame != nullptr) {
       frame = filter->process(frame);
       if (frame == nullptr) {
         RCLCPP_ERROR_STREAM(logger_, "Depth filter process failed");
@@ -1286,9 +1286,9 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
     auto device_info = device_->getDeviceInfo();
     CHECK_NOTNULL(device_info.get());
     auto pid = device_info->pid();
-
+    auto color_frame = frame_set->getFrame(OB_FRAME_COLOR);
     if (isGemini335PID(pid)) {
-      if (depth_registration_ && align_filter_ && depth_frame_) {
+      if (depth_registration_ && align_filter_ && depth_frame_ && color_frame) {
         auto new_frame = align_filter_->process(frame_set);
         if (new_frame) {
           auto new_frame_set = new_frame->as<ob::FrameSet>();
@@ -1298,7 +1298,7 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
       }
       depth_frame_ = processDepthFrameFilter(depth_frame_);
     }
-    auto color_frame = frame_set->getFrame(OB_FRAME_COLOR);
+   
     if (enable_stream_[COLOR] && color_frame) {
       std::unique_lock<std::mutex> lock(color_frame_queue_lock_);
       color_frame_queue_.push(frame_set);

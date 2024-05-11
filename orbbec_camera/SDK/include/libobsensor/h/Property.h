@@ -365,9 +365,10 @@ typedef enum {
     OB_PROP_TIMER_RESET_ENABLE_BOOL = 140,
 
     /**
-     * @brief Enable switch for USB3.0 repeated recognition on the device.
+     * @brief Enable or disable the device to retry USB2.0 re-identification when the device is connected to a USB2.0 port.
+     * @brief This feature ensures that the device is not mistakenly identified as a USB 2.0 device when connected to a USB 3.0 port.
      */
-    OB_PROP_DEVICE_USB3_REPEAT_IDENTIFY_BOOL = 141,
+    OB_PROP_DEVICE_USB2_REPEAT_IDENTIFY_BOOL = 141,
 
     /**
      * @brief Reboot device delay mode. Delay time unit: ms, range: [0, 8000).
@@ -703,6 +704,7 @@ typedef enum {
 #define OB_PROP_LASER_ON_OFF_MODE_INT OB_PROP_LASER_ON_OFF_PATTERN_INT
 #define OB_PROP_LASER_ENERGY_LEVEL_INT OB_PROP_LASER_POWER_LEVEL_CONTROL_INT
 #define OB_PROP_LASER_HW_ENERGY_LEVEL_INT OB_PROP_LASER_POWER_ACTUAL_LEVEL_INT
+#define OB_PROP_DEVICE_USB3_REPEAT_IDENTIFY_BOOL OB_PROP_DEVICE_USB2_REPEAT_IDENTIFY_BOOL
 
 /**
  * @brief The data type used to describe all property settings

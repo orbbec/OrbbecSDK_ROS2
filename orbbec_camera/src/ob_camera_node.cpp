@@ -1298,7 +1298,6 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
       }
       depth_frame_ = processDepthFrameFilter(depth_frame_);
     }
-    auto color_frame = frame_set->getFrame(OB_FRAME_COLOR);
     if (enable_stream_[COLOR] && color_frame) {
       std::unique_lock<std::mutex> lock(color_frame_queue_lock_);
       color_frame_queue_.push(frame_set);

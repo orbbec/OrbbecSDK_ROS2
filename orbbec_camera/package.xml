@@ -28,6 +28,9 @@
   <depend>tf2_msgs</depend>
   <depend>diagnostic_updater</depend>
   <depend>diagnostic_msgs</depend>
+  <depend>libgflags-dev</depend>
+  <depend>nlohmann-json-dev</depend>
+  <depend>libgoogle-glog-dev</depend>
   <export>
     <build_type>ament_cmake</build_type>
   </export>

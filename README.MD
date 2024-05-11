@@ -1,7 +1,7 @@
 # orbbec_camera
 
-[![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-1.5.0-green)
----
+## [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-1.5.0-green)
+
 OrbbecSDK ROS 2 is a wrapper for the Orbbec 3D camera that provides seamless integration with the ROS 2 environment. It
 supports ROS 2 Foxy, Galactic, and Humble distributions.
 
@@ -64,14 +64,14 @@ Launch camera node
 - On terminal 1
 
 ```bash
-. ./install/setup.bash 
+. ./install/setup.bash
 ros2 launch orbbec_camera astra.launch.py # or other launch file, see below table
 ```
 
 - On terminal 2
 
 ```bash
-. ./install/setup.bash 
+. ./install/setup.bash
 rviz2
 ```
 
@@ -105,7 +105,7 @@ ros2 service call /camera/get_color_exposure orbbec_camera_msgs/srv/GetInt32 '{}
 ```
 
 > If your check `ir` or `depth`, please change `/camera/get_color_exposure`
-> to  `/camera/get_ir_exposure` or `/camera/get_depth_exposure`, Same below.
+> to `/camera/get_ir_exposure` or `/camera/get_depth_exposure`, Same below.
 
 - Get gain
 
@@ -134,7 +134,7 @@ ros2 service call /camera/set_white_balance orbbec_camera_msgs/srv/SetInt32 '{da
 - Set laser enable
 
 ```bash
-ros2 service call  /camera/set_laser_enable std_srvs/srv/SetBool "{data: true}" 
+ros2 service call  /camera/set_laser_enable std_srvs/srv/SetBool "{data: true}"
 ```
 
 - toggle sensor
@@ -193,10 +193,10 @@ to `true` in the stream that corresponds to the argument of the launch file.
 - `/camera/color/image_raw`: The color stream image.
 - `/camera/depth/camera_info`: The depth stream image.
 - `/camera/depth/image_raw`: The depth stream image
-- `/camera/depth/points` : The point cloud, only available when  `enable_point_cloud` is `true`.
-- `/camera/depth_registered/points`: The colored point cloud, only available when  `enable_colored_point_cloud`
+- `/camera/depth/points` : The point cloud, only available when `enable_point_cloud` is `true`.
+- `/camera/depth_registered/points`: The colored point cloud, only available when `enable_colored_point_cloud`
   is `true`.
-- `/camera/ir/camera_info`:  The IR camera info.
+- `/camera/ir/camera_info`: The IR camera info.
 - `/camera/ir/image_raw`: The IR stream image
 - `/camera/accel/sample`: Acceleration data stream `enable_sync_output_accel_gyro`turned off，`enable_accel`turned on
 - `/camera/gyro/sample`: Gyroscope data stream，enable_sync_output_accel_gyro`turned off，`enable_gyro`turned on
@@ -249,7 +249,7 @@ def generate_launch_description():
         ),
         launch_arguments={
             'camera_name': 'camera_01',
-            'usb_port': '6-2.4.4.2',  # replace your usb port here 
+            'usb_port': '6-2.4.4.2',  # replace your usb port here
             'device_num': '2'
         }.items()
     )
@@ -306,7 +306,7 @@ The following are the launch parameters available:
   firmware crashes when hot plugging.
 - `enable_point_cloud`: Enables the point cloud.
 - `enable_colored_point_cloud`: Enables the RGB point cloud.
-- `point_cloud_qos`, `[color|depth|ir]_qos,``[color|depth|ir]_camera_info_qos`: ROS 2 Message Quality of Service (QoS)
+- `point_cloud_qos`, ` [color|depth|ir]_qos,``[color|depth|ir]_camera_info_qos `: ROS 2 Message Quality of Service (QoS)
   settings. The possible values
   are `SYSTEM_DEFAULT`, `DEFAULT`,`PARAMETER_EVENTS`, `SERVICES_DEFAULT`, `PARAMETERS`, `SENSOR_DATA`
   and are case-insensitive. These correspond to `rmw_qos_profile_system_default`, `rmw_qos_profile_default`,
@@ -410,9 +410,9 @@ resolutions is as follows:
 
 ## Check which profiles the camera supports
 
-  ```bash
-  ros2 run orbbec_camera list_camera_profile_mode_node
-  ```
+```bash
+ros2 run orbbec_camera list_camera_profile_mode_node
+```
 
 ## Building a Debian Package
 
@@ -432,7 +432,7 @@ replace `focal` with the codename of your Ubuntu version and `humble` with your 
 ```yaml
 orbbec_camera_msgs:
   ubuntu:
-    focal: [ ros-humble-orbbec-camera-msgs ]
+    focal: [ros-humble-orbbec-camera-msgs]
 ```
 
 Next, create a new file `/etc/ros/rosdep/sources.list.d/50-orbbec.list` and add this line to specify the path to the
@@ -463,7 +463,7 @@ bash .make_deb.sh
 ## Launch files
 
 | product serials                       | launch file                 |
-|---------------------------------------|-----------------------------|
+| ------------------------------------- | --------------------------- |
 | astra+                                | astra_adv.launch.py         |
 | astra mini /astra mini pro /astra pro | astra.launch.py             |
 | astra mini pro s                      | astra.launch.py             |
@@ -476,7 +476,7 @@ bash .make_deb.sh
 | dabai dw                              | dabai_dw.launch.py          |
 | dabai pro                             | dabai_pro.launch.py         |
 | deeya                                 | deeya.launch.py             |
-| femto  /femto w                       | femto.launch.py             |
+| femto /femto w                        | femto.launch.py             |
 | femto mega                            | femto_mega.launch.py        |
 | femto bolt                            | femto_bolt.launch.py        |
 | gemini                                | gemini.launch.py            |
@@ -492,22 +492,22 @@ bash .make_deb.sh
 | dabai dw2                             | dabai_dw2.launch.py         |
 | gemini ew                             | gemini_ew.launch.py         |
 | gemini ew lite                        | gemini_ew_lite.launch.py    |
-| gemini 300 series                     | gemini_330_series.launch.py |
+| gemini 330 series                     | gemini_330_series.launch.py |
 
 **All launch files are essentially similar, with the primary difference being the default values of the parameters set for different models
 within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you
 encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution settings in the launch
 file, as well as other parameters, to ensure compatibility and optimal performance.**
 
-## Supported hardware products
+## Product support
 
-| **Products List** | **Firmware Version**        |
-|-------------------|-----------------------------|
+| **products list** | **firmware version**        |
+| ----------------- | --------------------------- |
 | Gemini 335        | 1.2.20                      |
 | Gemini 335L       | 1.2.20                      |
 | Femto Bolt        | 1.0.6/1.0.9                 |
 | Femto Mega        | 1.1.7/1.2.7                 |
-| Gemini 2 XL       | Obox: V1.2.5  VL:1.4.54     |
+| Gemini 2 XL       | Obox: V1.2.5 VL:1.4.54      |
 | Astra 2           | 2.8.20                      |
 | Gemini 2 L        | 1.4.32                      |
 | Gemini 2          | 1.4.60 /1.4.76              |

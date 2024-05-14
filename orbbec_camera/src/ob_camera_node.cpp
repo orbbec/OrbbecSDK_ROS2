@@ -216,9 +216,15 @@ void OBCameraNode::setupDevices() {
         sequenced_filter->selectSequenceId(sequence_id_filter_id_);
       } else if (filter_name == "NoiseRemovalFilter" && enable_noise_removal_filter_) {
         auto noise_removal_filter = filter->as<ob::NoiseRemovalFilter>();
-        OBNoiseRemovalFilterParams params{};
+        OBNoiseRemovalFilterParams params = noise_removal_filter->getFilterParams();
+        RCLCPP_INFO_STREAM(
+            logger_, "Default noise removal filter params: " << "disp_diff: " << params.disp_diff
+                                                             << ", max_size: " << params.max_size);
         params.disp_diff = noise_removal_filter_min_diff_;
         params.max_size = noise_removal_filter_max_size_;
+        RCLCPP_INFO_STREAM(
+            logger_, "Set noise removal filter params: " << "disp_diff: " << params.disp_diff
+                                                         << ", max_size: " << params.max_size);
         noise_removal_filter->setFilterParams(params);
       } else if (filter_name == "HDRMerge") {
         // do nothing
@@ -1246,7 +1252,6 @@ std::shared_ptr<ob::Frame> OBCameraNode::processDepthFrameFilter(
     auto filter = filter_list->getFilter(i);
     CHECK_NOTNULL(filter.get());
     if (filter->isEnabled() && frame != nullptr) {
-      RCLCPP_INFO_STREAM(logger_, "Processing depth frame with filter: " << filter->type());
       frame = filter->process(frame);
       if (frame == nullptr) {
         RCLCPP_ERROR_STREAM(logger_, "Depth filter process failed");

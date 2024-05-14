@@ -12,16 +12,16 @@ supports ROS 2 Foxy, Galactic, and Humble distributions.
   * [Table of Contents](#table-of-contents)
   * [Installation Instructions](#installation-instructions)
   * [Getting start](#getting-start)
-    * [All available service for camera control](#all-available-service-for-camera-control)
-    * [All available topics](#all-available-topics)
-    * [Network device enumeration](#network-device-enumeration)
-    * [Multi-Camera](#multi-camera)
-  * [Use hardware decoder to decode JPEG](#use-hardware-decoder-to-decode-jpeg)
-    * [rockchip and Amlogic](#rockchip-and-amlogic)
-    * [Nvidia Jetson](#nvidia-jetson)
   * [Launch parameters](#launch-parameters)
   * [Depth work mode switch](#depth-work-mode-switch)
   * [Configuration of depth NFOV and WFOV modes](#configuration-of-depth-nfov-and-wfov-modes)
+  * [All available service for camera control](#all-available-service-for-camera-control)
+  * [All available topics](#all-available-topics)
+  * [Network device enumeration](#network-device-enumeration)
+  * [Multi-Camera](#multi-camera)
+  * [Use hardware decoder to decode JPEG](#use-hardware-decoder-to-decode-jpeg)
+    * [rockchip and Amlogic](#rockchip-and-amlogic)
+    * [Nvidia Jetson](#nvidia-jetson)
   * [Check which profiles the camera supports](#check-which-profiles-the-camera-supports)
   * [Building a Debian Package](#building-a-debian-package)
     * [Preparing the Environment](#preparing-the-environment)
@@ -34,7 +34,6 @@ supports ROS 2 Foxy, Galactic, and Humble distributions.
   * [Other useful links](#other-useful-links)
   * [License](#license)
 <!-- TOC -->
-
 ## Installation Instructions
 
 Install ROS 2
@@ -180,152 +179,6 @@ ros2 service call /camera/toggle_ir std_srvs/srv/SetBool "{data : true}"
 ros2 service call /camera/save_point_cloud std_srvs/srv/Empty "{}"
 ```
 
-### All available service for camera control
-
-The name of the following service already expresses its function.
-However, it should be noted that the corresponding `set_[ir|depth|color]*`
-and `get[ir|depth|color]*` **services are only available if you set** `enable[ir|depth|color]`
-to `true` in the stream that corresponds to the argument of the launch file.
-
-- `/camera/get_auto_white_balance`
-- `/camera/get_color_exposure`
-- `/camera/get_color_gain`
-- `/camera/get_depth_exposure`
-- `/camera/get_depth_gain`
-- `/camera/get_device_info`
-- `/camera/get_ir_exposure`
-- `/camera/get_ir_gain`
-- `/camera/get_ldp_status`
-- `/camera/get_sdk_version`
-- `/camera/get_white_balance`
-- `/camera/set_auto_white_balance`
-- `/camera/set_color_auto_exposure`
-- `/camera/set_color_exposure`
-- `/camera/set_color_gain`
-- `/camera/set_depth_auto_exposure`
-- `/camera/set_depth_exposure`
-- `/camera/set_depth_gain`
-- `/camera/set_fan_work_mode`
-- `/camera/set_floor_enable`
-- `/camera/set_ir_auto_exposure`
-- `/camera/set_ir_exposure`
-- `/camera/set_ir_gain`
-- `/camera/set_laser_enable`
-- `/camera/set_ldp_enable`
-- `/camera/set_white_balance`
-- `/camera/toggle_color`
-- `/camera/toggle_depth`
-- `/camera/toggle_ir`
-
-### All available topics
-
-- `/camera/color/camera_info` : The color camera info.
-- `/camera/color/image_raw`: The color stream image.
-- `/camera/depth/camera_info`: The depth stream image.
-- `/camera/depth/image_raw`: The depth stream image
-- `/camera/depth/points` : The point cloud, only available when `enable_point_cloud` is `true`.
-- `/camera/depth_registered/points`: The colored point cloud, only available when `enable_colored_point_cloud`
-  is `true`.
-- `/camera/ir/camera_info`: The IR camera info.
-- `/camera/ir/image_raw`: The IR stream image
-- `/camera/accel/sample`: Acceleration data stream `enable_sync_output_accel_gyro`turned off，`enable_accel`turned on
-- `/camera/gyro/sample`: Gyroscope data stream，enable_sync_output_accel_gyro`turned off，`enable_gyro`turned on
-- `camera/gyro_accel/sample`: Synchronized data stream of acceleration and gyroscope，`enable_sync_output_accel_gyro`
-  turned on
-
-### Network device enumeration
-
-Currently, the network device enumeration function is supported only by the Femto Mega device. When accessing this
-device over the network, if `enumerate_net_device` is set to `true`, the device will be automatically enumerated,
-eliminating the need to configure the IP address in advance or set the enable switch to true. The specific configuration
-methods are as follows:
-
-- `enumerate_net_device`: enumeration network device automatically, only supported by Femto Mega.
-  if `enumerate_net_device` set to `true`, the device will be enumerated automatically,No need to set
-  the `net_device_ip`
-  and `net_device_port` parameters.
-- `net_device_ip`: The IP address of the device.
-- `net_device_port`: The port number of the device.
-
-### Multi-Camera
-
-- To get the `usb_port` of the camera, plug in the camera and run the following command in the terminal:
-
-```bash
-ros2 run orbbec_camera list_devices_node
-```
-
-- Set the `device_num` parameter to the number of cameras you have.
-- Go to the `OrbbecSDK_ROS2/launch/multi_xxx.launch.py` file and change the `usb_port`.
-- Don't forget to put the `include` tag inside the `group` tag.
-  Otherwise, the parameter values of different cameras may become contaminated.
-
-```python
-from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, GroupAction, ExecuteProcess
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch_ros.actions import Node
-from ament_index_python.packages import get_package_share_directory
-import os
-
-
-def generate_launch_description():
-    # Include launch files
-    package_dir = get_package_share_directory('orbbec_camera')
-    launch_file_dir = os.path.join(package_dir, 'launch')
-    launch1_include = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, 'gemini2L.launch.py')
-        ),
-        launch_arguments={
-            'camera_name': 'camera_01',
-            'usb_port': '6-2.4.4.2',  # replace your usb port here
-            'device_num': '2'
-        }.items()
-    )
-
-    launch2_include = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, 'gemini2L.launch.py')
-        ),
-        launch_arguments={
-            'camera_name': 'camera_02',
-            'usb_port': '6-2.4.1',  # replace your usb port here
-            'device_num': '2'
-        }.items()
-    )
-
-    # If you need more cameras, just add more launch_include here, and change the usb_port and device_num
-
-    # Launch description
-    ld = LaunchDescription([
-        GroupAction([launch1_include]),
-        GroupAction([launch2_include]),
-    ])
-
-    return ld
-
-```
-
-- To launch the cameras, run the following command:
-
-```bash
-ros2 launch orbbec_camera multi_camera.launch.py
-```
-
-## Use hardware decoder to decode JPEG
-
-### rockchip and Amlogic
-
-Depends on `rockchip-mpp-dev` and `rockchip-rga-dev`, not all systems have these two packages, the names may be
-different, please search by yourself.
-Open `CMakeLists.txt` and set `USE_RK_HW_DECODER` to `ON`.
-
-### Nvidia Jetson
-
-Depends on: `jetson_multimedia_api`,`libyuv`.
-Open `CMakeLists.txt` and set `USE_NV_HW_DECODER` to `ON`.
-
 ## Launch parameters
 
 The following are the launch parameters available:
@@ -441,6 +294,154 @@ resolutions is as follows:
 - NFOV binned: 320 x 288.
 - WFOV unbinned: 1024 x 1024.
 - WFOV binned: 512 x 512.
+
+## All available service for camera control
+
+The name of the following service already expresses its function.
+However, it should be noted that the corresponding `set_[ir|depth|color]*`
+and `get[ir|depth|color]*` **services are only available if you set** `enable[ir|depth|color]`
+to `true` in the stream that corresponds to the argument of the launch file.
+
+- `/camera/get_auto_white_balance`
+- `/camera/get_color_exposure`
+- `/camera/get_color_gain`
+- `/camera/get_depth_exposure`
+- `/camera/get_depth_gain`
+- `/camera/get_device_info`
+- `/camera/get_ir_exposure`
+- `/camera/get_ir_gain`
+- `/camera/get_ldp_status`
+- `/camera/get_sdk_version`
+- `/camera/get_white_balance`
+- `/camera/set_auto_white_balance`
+- `/camera/set_color_auto_exposure`
+- `/camera/set_color_exposure`
+- `/camera/set_color_gain`
+- `/camera/set_depth_auto_exposure`
+- `/camera/set_depth_exposure`
+- `/camera/set_depth_gain`
+- `/camera/set_fan_work_mode`
+- `/camera/set_floor_enable`
+- `/camera/set_ir_auto_exposure`
+- `/camera/set_ir_exposure`
+- `/camera/set_ir_gain`
+- `/camera/set_laser_enable`
+- `/camera/set_ldp_enable`
+- `/camera/set_white_balance`
+- `/camera/toggle_color`
+- `/camera/toggle_depth`
+- `/camera/toggle_ir`
+
+## All available topics
+
+- `/camera/color/camera_info` : The color camera info.
+- `/camera/color/image_raw`: The color stream image.
+- `/camera/depth/camera_info`: The depth stream image.
+- `/camera/depth/image_raw`: The depth stream image
+- `/camera/depth/points` : The point cloud, only available when `enable_point_cloud` is `true`.
+- `/camera/depth_registered/points`: The colored point cloud, only available when `enable_colored_point_cloud`
+  is `true`.
+- `/camera/ir/camera_info`: The IR camera info.
+- `/camera/ir/image_raw`: The IR stream image
+- `/camera/accel/sample`: Acceleration data stream `enable_sync_output_accel_gyro`turned off，`enable_accel`turned on
+- `/camera/gyro/sample`: Gyroscope data stream，enable_sync_output_accel_gyro`turned off，`enable_gyro`turned on
+- `camera/gyro_accel/sample`: Synchronized data stream of acceleration and gyroscope，`enable_sync_output_accel_gyro`
+  turned on
+
+## Network device enumeration
+
+Currently, the network device enumeration function is supported only by the Femto Mega device. When accessing this
+device over the network, if `enumerate_net_device` is set to `true`, the device will be automatically enumerated,
+eliminating the need to configure the IP address in advance or set the enable switch to true. The specific configuration
+methods are as follows:
+
+- `enumerate_net_device`: enumeration network device automatically, only supported by Femto Mega.
+  if `enumerate_net_device` set to `true`, the device will be enumerated automatically,No need to set
+  the `net_device_ip`
+  and `net_device_port` parameters.
+- `net_device_ip`: The IP address of the device.
+- `net_device_port`: The port number of the device.
+
+## Multi-Camera
+
+- To get the `usb_port` of the camera, plug in the camera and run the following command in the terminal:
+
+```bash
+ros2 run orbbec_camera list_devices_node
+```
+
+- Set the `device_num` parameter to the number of cameras you have.
+- Go to the `OrbbecSDK_ROS2/launch/multi_xxx.launch.py` file and change the `usb_port`.
+- Don't forget to put the `include` tag inside the `group` tag.
+  Otherwise, the parameter values of different cameras may become contaminated.
+
+```python
+from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, GroupAction, ExecuteProcess
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch_ros.actions import Node
+from ament_index_python.packages import get_package_share_directory
+import os
+
+
+def generate_launch_description():
+    # Include launch files
+    package_dir = get_package_share_directory('orbbec_camera')
+    launch_file_dir = os.path.join(package_dir, 'launch')
+    launch1_include = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(launch_file_dir, 'gemini2L.launch.py')
+        ),
+        launch_arguments={
+            'camera_name': 'camera_01',
+            'usb_port': '6-2.4.4.2',  # replace your usb port here
+            'device_num': '2'
+        }.items()
+    )
+
+    launch2_include = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(launch_file_dir, 'gemini2L.launch.py')
+        ),
+        launch_arguments={
+            'camera_name': 'camera_02',
+            'usb_port': '6-2.4.1',  # replace your usb port here
+            'device_num': '2'
+        }.items()
+    )
+
+    # If you need more cameras, just add more launch_include here, and change the usb_port and device_num
+
+    # Launch description
+    ld = LaunchDescription([
+        GroupAction([launch1_include]),
+        GroupAction([launch2_include]),
+    ])
+
+    return ld
+
+```
+
+- To launch the cameras, run the following command:
+
+```bash
+ros2 launch orbbec_camera multi_camera.launch.py
+```
+
+## Use hardware decoder to decode JPEG
+
+### rockchip and Amlogic
+
+Depends on `rockchip-mpp-dev` and `rockchip-rga-dev`, not all systems have these two packages, the names may be
+different, please search by yourself.
+Open `CMakeLists.txt` and set `USE_RK_HW_DECODER` to `ON`.
+
+### Nvidia Jetson
+
+Depends on: `jetson_multimedia_api`,`libyuv`.
+Open `CMakeLists.txt` and set `USE_NV_HW_DECODER` to `ON`.
+
+
 
 ## Check which profiles the camera supports
 

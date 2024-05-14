@@ -1139,18 +1139,8 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
                  depth_height, color_width, color_height);
     return;
   }
-  auto device_info = device_->getDeviceInfo();
-  CHECK_NOTNULL(device_info);
-  auto pid = device_info->pid();
-  OBCameraIntrinsic intrinsics;
-  if (isGemini335PID(pid)) {
-    auto color_profile = stream_profile_[COLOR]->as<ob::VideoStreamProfile>();
-    CHECK_NOTNULL(color_profile.get());
-    intrinsics = color_profile->getIntrinsic();
-  } else {
-    auto camera_params = pipeline_->getCameraParam();
-    intrinsics = camera_params.rgbIntrinsic;
-  }
+  auto camera_params = pipeline_->getCameraParam();
+  auto intrinsics = camera_params.rgbIntrinsic;
   float fdx = intrinsics.fx * ((float)(color_width) / intrinsics.width);
   float fdy = intrinsics.fy * ((float)(color_height) / intrinsics.height);
   fdx = 1 / fdx;
@@ -1255,7 +1245,8 @@ std::shared_ptr<ob::Frame> OBCameraNode::processDepthFrameFilter(
   for (size_t i = 0; i < filter_list->count(); i++) {
     auto filter = filter_list->getFilter(i);
     CHECK_NOTNULL(filter.get());
-    if (filter->isEnabled() && frame != nullptr && frame != nullptr) {
+    if (filter->isEnabled() && frame != nullptr) {
+      RCLCPP_INFO_STREAM(logger_, "Processing depth frame with filter: " << filter->type());
       frame = filter->process(frame);
       if (frame == nullptr) {
         RCLCPP_ERROR_STREAM(logger_, "Depth filter process failed");
@@ -1288,15 +1279,24 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
     auto pid = device_info->pid();
     auto color_frame = frame_set->getFrame(OB_FRAME_COLOR);
     if (isGemini335PID(pid)) {
+      if (depth_frame_) {
+        auto new_depth_frame = processDepthFrameFilter(depth_frame_);
+        if (new_depth_frame && frame_set->getFrame(OB_FRAME_DEPTH) &&
+            frame_set->getFrame(OB_FRAME_DEPTH)->data()) {
+          memcpy(frame_set->getFrame(OB_FRAME_DEPTH)->data(), new_depth_frame->data(),
+                 new_depth_frame->dataSize());
+        }
+      }
       if (depth_registration_ && align_filter_ && depth_frame_ && color_frame) {
         auto new_frame = align_filter_->process(frame_set);
         if (new_frame) {
           auto new_frame_set = new_frame->as<ob::FrameSet>();
           CHECK_NOTNULL(new_frame_set.get());
           depth_frame_ = new_frame_set->getFrame(OB_FRAME_DEPTH);
+        } else {
+          RCLCPP_ERROR(logger_, "Failed to align depth frame to color frame");
         }
       }
-      depth_frame_ = processDepthFrameFilter(depth_frame_);
     }
     if (enable_stream_[COLOR] && color_frame) {
       std::unique_lock<std::mutex> lock(color_frame_queue_lock_);

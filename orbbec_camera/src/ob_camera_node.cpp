@@ -878,11 +878,15 @@ void OBCameraNode::setupPipelineConfig() {
   }
   pipeline_config_ = std::make_shared<ob::Config>();
   RCLCPP_INFO_STREAM(logger_, "enable depth scale " << (enable_depth_scale_ ? "ON" : "OFF"));
-  pipeline_config_->setDepthScaleRequire(enable_depth_scale_);
-  if (depth_registration_ && enable_stream_[COLOR] && enable_stream_[DEPTH]) {
+  auto device_info = device_->getDeviceInfo();
+  CHECK_NOTNULL(device_info.get());
+  auto pid = device_info->pid();
+  if (depth_registration_ && enable_stream_[COLOR] && enable_stream_[DEPTH] &&
+      !isGemini335PID(pid)) {
     OBAlignMode align_mode = align_mode_ == "HW" ? ALIGN_D2C_HW_MODE : ALIGN_D2C_SW_MODE;
     RCLCPP_INFO_STREAM(logger_, "set align mode to " << magic_enum::enum_name(align_mode));
     pipeline_config_->setAlignMode(align_mode);
+    pipeline_config_->setDepthScaleRequire(enable_depth_scale_);
   }
   for (const auto &stream_index : IMAGE_STREAMS) {
     if (enable_stream_[stream_index]) {
@@ -1141,7 +1145,7 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
   auto color_width = color_frame->width();
   auto color_height = color_frame->height();
   if (depth_width != color_width || depth_height != color_height) {
-    RCLCPP_ERROR(logger_, "Depth (%d x %d) and color (%d x %d) frame size mismatch", depth_width,
+    RCLCPP_DEBUG(logger_, "Depth (%d x %d) and color (%d x %d) frame size mismatch", depth_width,
                  depth_height, color_width, color_height);
     return;
   }
@@ -1284,14 +1288,7 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
     auto pid = device_info->pid();
     auto color_frame = frame_set->getFrame(OB_FRAME_COLOR);
     if (isGemini335PID(pid)) {
-      if (depth_frame_) {
-        auto new_depth_frame = processDepthFrameFilter(depth_frame_);
-        if (new_depth_frame && frame_set->getFrame(OB_FRAME_DEPTH) &&
-            frame_set->getFrame(OB_FRAME_DEPTH)->data()) {
-          memcpy(frame_set->getFrame(OB_FRAME_DEPTH)->data(), new_depth_frame->data(),
-                 new_depth_frame->dataSize());
-        }
-      }
+      depth_frame_ = processDepthFrameFilter(depth_frame_);
       if (depth_registration_ && align_filter_ && depth_frame_ && color_frame) {
         auto new_frame = align_filter_->process(frame_set);
         if (new_frame) {
@@ -1301,6 +1298,10 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
         } else {
           RCLCPP_ERROR(logger_, "Failed to align depth frame to color frame");
         }
+      } else {
+        RCLCPP_DEBUG(logger_,
+                     "Depth registration is disabled or align filter is null or depth frame is "
+                     "null or color frame is null");
       }
     }
     if (enable_stream_[COLOR] && color_frame) {

@@ -1,9 +1,39 @@
-# orbbec_camera
+# Orbbec ROS2 SDK
 
 ## [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-1.5.2-green)
 
-OrbbecSDK ROS 2 is a wrapper for the Orbbec 3D camera that provides seamless integration with the ROS 2 environment. It
+Orbbec SDK ROS 2 is a wrapper for the Orbbec 3D camera that provides seamless integration with the ROS 2 environment. It
 supports ROS 2 Foxy, Galactic, and Humble distributions.
+
+## Table of Contents
+<!-- TOC -->
+* [Orbbec ROS2 SDK](#orbbec-ros2-sdk)
+  * [![stable](http://badges.github.io/stability-badges/dist/stable.svg) ![version](https://img.shields.io/badge/version-1.5.2-green)](#-)
+  * [Table of Contents](#table-of-contents)
+  * [Installation Instructions](#installation-instructions)
+  * [Getting start](#getting-start)
+    * [All available service for camera control](#all-available-service-for-camera-control)
+    * [All available topics](#all-available-topics)
+    * [Network device enumeration](#network-device-enumeration)
+    * [Multi-Camera](#multi-camera)
+  * [Use hardware decoder to decode JPEG](#use-hardware-decoder-to-decode-jpeg)
+    * [rockchip and Amlogic](#rockchip-and-amlogic)
+    * [Nvidia Jetson](#nvidia-jetson)
+  * [Launch parameters](#launch-parameters)
+  * [Depth work mode switch](#depth-work-mode-switch)
+  * [Configuration of depth NFOV and WFOV modes](#configuration-of-depth-nfov-and-wfov-modes)
+  * [Check which profiles the camera supports](#check-which-profiles-the-camera-supports)
+  * [Building a Debian Package](#building-a-debian-package)
+    * [Preparing the Environment](#preparing-the-environment)
+    * [Configuring ROS Dependencies](#configuring-ros-dependencies)
+    * [Building the Package](#building-the-package)
+  * [Launch files](#launch-files)
+  * [Product support](#product-support)
+  * [DDS Tuning](#dds-tuning)
+  * [Frequently Asked Questions](#frequently-asked-questions)
+  * [Other useful links](#other-useful-links)
+  * [License](#license)
+<!-- TOC -->
 
 ## Installation Instructions
 
@@ -347,7 +377,8 @@ The following are the launch parameters available:
 - `enable_laser` : Whether to enable the laser. The default value is `true`.
 - `laser_on_off_mode`: Laser on/off alternate mode, 0: off, 1: on-off alternate, 2: off-on alternate. The default value
   is `0`.
-- `device_preset`: The device preset options are `Default` or `High Accuracy`.
+- `device_preset`: The default value is `Default`. Only the G330 series is supported. For more information, refer to
+  the [G330 documentation](https://www.orbbec.com/docs/g330-use-depth-presets/).
 - `enable_decimation_filter`: This filter effectively reduces the depth scene complexity. The filter runs on kernel
   sizes [2x2] to [8x8] pixels. The image size is scaled down proportionally in both dimensions to preserve the aspect
   ratio.
@@ -372,7 +403,9 @@ The following are the launch parameters available:
 
 ## Depth work mode switch
 
-Orbbec SDK ROS 2 supports the depth work mode switch. The depth work mode switch is supported by Gemini 2, Gemini 2 L, and Femto and Femto Bolt cameras.
+Orbbec SDK ROS 2 supports the depth work mode switch. The depth work mode switch is supported by Gemini 2, Gemini 2 L,
+and Femto and Femto Bolt cameras.
+
 - Before starting the camera, depth work mode (depth_work_mode) can be configured for the corresponding xxx.launch.py
   file's support.
 - The depth work mode switch is supported by Gemini 2, Gemini 2 L, and Gemini 2 XL cameras.
@@ -433,7 +466,7 @@ replace `focal` with the codename of your Ubuntu version and `humble` with your 
 ```yaml
 orbbec_camera_msgs:
   ubuntu:
-    focal: [ros-humble-orbbec-camera-msgs]
+    focal: [ ros-humble-orbbec-camera-msgs ]
 ```
 
 Next, create a new file `/etc/ros/rosdep/sources.list.d/50-orbbec.list` and add this line to specify the path to the
@@ -464,7 +497,7 @@ bash .make_deb.sh
 ## Launch files
 
 | product serials                       | launch file                 |
-| ------------------------------------- | --------------------------- |
+|---------------------------------------|-----------------------------|
 | astra+                                | astra_adv.launch.py         |
 | astra mini /astra mini pro /astra pro | astra.launch.py             |
 | astra mini pro s                      | astra.launch.py             |
@@ -502,27 +535,8 @@ file, as well as other parameters, to ensure compatibility and optimal performan
 
 ## Product support
 
-| **products list** | **firmware version**        |
-| ----------------- | --------------------------- |
-| Gemini 335        | 1.2.20                      |
-| Gemini 335L       | 1.2.20                      |
-| Femto Bolt        | 1.0.6/1.0.9                 |
-| Femto Mega        | 1.1.7/1.2.7                 |
-| Gemini 2 XL       | Obox: V1.2.5 VL:1.4.54      |
-| Astra 2           | 2.8.20                      |
-| Gemini 2 L        | 1.4.32                      |
-| Gemini 2          | 1.4.60 /1.4.76              |
-| Astra+            | 1.0.22/1.0.21/1.0.20/1.0.19 |
-| Femto             | 1.6.7                       |
-| Femto W           | 1.1.8                       |
-| DaBai             | 2436                        |
-| DaBai DCW         | 2460                        |
-| DaBai DW          | 2606                        |
-| Astra Mini Pro    | 1007                        |
-| Gemini E          | 3460                        |
-| Gemini E Lite     | 3606                        |
-| Gemini            | 3.0.18                      |
-| Astra Mini S Pro  | 1.0.05                      |
+Please refer to the OrbbecSDK supported
+products: [Product Support](https://github.com/orbbec/OrbbecSDK?tab=readme-ov-file#product-support)
 
 ## DDS Tuning
 
@@ -600,6 +614,11 @@ Why are there so many launch files here
 - The reason for the presence of multiple launch
   files is due to the fact that the default resolutions and image formats of different cameras vary.
   To make it easier to use, the launch files have been separated for each camera.
+
+## Other useful links
+
+- [Orbbec SDK](https://orbbec.github.io/OrbbecSDK/)
+- [Gemini 330 depth presets](https://www.orbbec.com/docs/g330-use-depth-presets/)
 
 ## License
 

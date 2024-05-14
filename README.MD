@@ -372,6 +372,7 @@ The following are the launch parameters available:
 
 ## Depth work mode switch
 
+Orbbec SDK ROS 2 supports the depth work mode switch. The depth work mode switch is supported by Gemini 2, Gemini 2 L, and Femto and Femto Bolt cameras.
 - Before starting the camera, depth work mode (depth_work_mode) can be configured for the corresponding xxx.launch.py
   file's support.
 - The depth work mode switch is supported by Gemini 2, Gemini 2 L, and Gemini 2 XL cameras.
@@ -602,7 +603,7 @@ Why are there so many launch files here
 
 ## License
 
-Copyright 2023 Orbbec Ltd.
+Copyright 2024 Orbbec Ltd.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this project except in compliance with
 the License. You may obtain a copy of the License at

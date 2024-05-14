@@ -13,6 +13,7 @@ supports ROS 2 Foxy, Galactic, and Humble distributions.
   * [Installation Instructions](#installation-instructions)
   * [Getting start](#getting-start)
   * [Launch parameters](#launch-parameters)
+  * [Predefined presets](#predefined-presets)
   * [Depth work mode switch](#depth-work-mode-switch)
   * [Configuration of depth NFOV and WFOV modes](#configuration-of-depth-nfov-and-wfov-modes)
   * [All available service for camera control](#all-available-service-for-camera-control)
@@ -183,19 +184,16 @@ ros2 service call /camera/save_point_cloud std_srvs/srv/Empty "{}"
 
 The following are the launch parameters available:
 
-- `connection_delay`: The delay time in milliseconds for reopening the device.
-  Some devices, such as Astra mini, require a longer time to initialize and
-  reopening the device immediately can cause
-  firmware crashes when hot plugging.
+- `connection_delay`: The delay time in milliseconds for reopening the device. Some devices, such as Astra mini, require
+  a longer time to initialize and reopening the device immediately can cause firmware crashes when hot plugging.
 - `enable_point_cloud`: Enables the point cloud.
 - `enable_colored_point_cloud`: Enables the RGB point cloud.
-- `point_cloud_qos`, ` [color|depth|ir]_qos,``[color|depth|ir]_camera_info_qos `: ROS 2 Message Quality of Service (QoS)
+- `point_cloud_qos`, `[color|depth|ir]_qos`, `[color|depth|ir]_camera_info_qos`: ROS 2 Message Quality of Service (QoS)
   settings. The possible values
-  are `SYSTEM_DEFAULT`, `DEFAULT`,`PARAMETER_EVENTS`, `SERVICES_DEFAULT`, `PARAMETERS`, `SENSOR_DATA`
-  and are case-insensitive. These correspond to `rmw_qos_profile_system_default`, `rmw_qos_profile_default`,
-  `rmw_qos_profile_parameter_events`, `rmw_qos_profile_services_default`, `rmw_qos_profile_parameters`,
-  and `SENSOR_DATA`,
-  respectively.
+  are `SYSTEM_DEFAULT`, `DEFAULT`, `PARAMETER_EVENTS`, `SERVICES_DEFAULT`, `PARAMETERS`, `SENSOR_DATA` and are
+  case-insensitive. These correspond
+  to `rmw_qos_profile_system_default`, `rmw_qos_profile_default`, `rmw_qos_profile_parameter_events`, `rmw_qos_profile_services_default`, `rmw_qos_profile_parameters`,
+  and `SENSOR_DATA`, respectively.
 - `enable_d2c_viewer`: Publishes the D2C overlay image (for testing only).
 - `device_num`: The number of devices. This must be filled in if multiple cameras are required.
 - `color_width`, `color_height`, `color_fps`: The resolution and frame rate of the color stream.
@@ -204,55 +202,70 @@ The following are the launch parameters available:
 - `enable_color`: Enables the RGB camera.
 - `enable_depth`: Enables the depth camera.
 - `enable_ir`: Enables the IR camera.
-- `depth_registration`: Enables hardware alignment the depth frame to color frame.
-  This field is required when the `enable_colored_point_cloud` is set to `true`.
+- `depth_registration`: Enables hardware alignment of the depth frame to the color frame. This field is required when
+  the `enable_colored_point_cloud` is set to `true`.
 - `usb_port`: The USB port of the camera. This is required when multiple cameras are used.
-- `enable_accel` : Enables the accelerometer.
+- `enable_accel`: Enables the accelerometer.
 - `accel_rate`: The frequency of the accelerometer, the optional values
-  are `1.5625hz`,`3.125hz`,`6.25hz`,`12.5hz`,`25hz`,`50hz`,
-  `100hz`,`200hz`,`500hz`,`1khz`,`2khz`,`4khz`,`8khz`,`16khz`,`32khz`. The specific value depends on the current camera.
-- `accel_range` : The range of the accelerometer, the optional values are `2g`,`4g`,`8g`,`16g`. The specific value
+  are `1.5625hz`, `3.125hz`, `6.25hz`, `12.5hz`, `25hz`, `50hz`, `100hz`, `200hz`, `500hz`, `1khz`, `2khz`, `4khz`, `8khz`, `16khz`, `32khz`.
+  The specific value depends on the current camera.
+- `accel_range`: The range of the accelerometer, the optional values are `2g`, `4g`, `8g`, `16g`. The specific value
   depends on the current camera.
-- `enable_gyro`: Whether to enable the gyroscope.
-- `gyro_rate` : The frequency of the gyroscope, the optional values
-  are `1.5625hz`,`3.125hz`,`6.25hz`,`12.5hz`,`25hz`,`50hz`,
-  `100hz`,`200hz`,`500hz`,`1khz`,`2khz`,`4khz`,`8khz`,`16khz`,`32khz`. The specific value depends on the current camera.
-- `gyro_range` : The range of the gyroscope, the optional values
-  are `16dps`,`31dps`,`62dps`,`125dps`,`250dps`,`500dps`,`1000dps`,`2000dps`. The specific value depends on the current
-  camera.
-- `enumerate_net_device` : Whether to enable the function of enumerating network devices. True means enabled, false
-  means disabled.
+- `enable_gyro`: Enables the gyroscope.
+- `gyro_rate`: The frequency of the gyroscope, the optional values
+  are `1.5625hz`, `3.125hz`, `6.25hz`, `12.5hz`, `25hz`, `50hz`, `100hz`, `200hz`, `500hz`, `1khz`, `2khz`, `4khz`, `8khz`, `16khz`, `32khz`.
+  The specific value depends on the current camera.
+- `gyro_range`: The range of the gyroscope, the optional values
+  are `16dps`, `31dps`, `62dps`, `125dps`, `250dps`, `500dps`, `1000dps`, `2000dps`. The specific value depends on the
+  current camera.
+- `enumerate_net_device`: Enables the function of enumerating network devices. True means enabled, false means disabled.
   This feature is only supported by Femto Mega and Gemini 2 XL devices. When accessing these devices through the
   network, the IP address of the device needs to be configured in advance. The enable switch needs to be set to true.
-- `depth_filter_config` : Configure the loading path for the depth filtering configuration file. By default, the depth
-  filtering configuration file is located in the /config/depthfilter directory,Supported only on Gemini2.
-- `depth_precision` : The depth precision, should be like `1mm` format. The default value is `1mm`.
-- `enable_laser` : Whether to enable the laser. The default value is `true`.
+- `depth_filter_config`: Configures the loading path for the depth filtering configuration file. By default, the depth
+  filtering configuration file is located in the /config/depthfilter directory. Supported only on Gemini2.
+- `depth_precision`: The depth precision should be in the format `1mm`. The default value is `1mm`.
+- `enable_laser`: Enables the laser. The default value is `true`.
 - `laser_on_off_mode`: Laser on/off alternate mode, 0: off, 1: on-off alternate, 2: off-on alternate. The default value
   is `0`.
 - `device_preset`: The default value is `Default`. Only the G330 series is supported. For more information, refer to
-  the [G330 documentation](https://www.orbbec.com/docs/g330-use-depth-presets/).
+  the [G330 documentation](https://www.orbbec.com/docs/g330-use-depth-presets/). Please refer to the table below to set
+  the `device_preset` value based on your use case. The value should be one of the preset names
+  listed [in the table](#predefined-presets).
 - `enable_decimation_filter`: This filter effectively reduces the depth scene complexity. The filter runs on kernel
   sizes [2x2] to [8x8] pixels. The image size is scaled down proportionally in both dimensions to preserve the aspect
   ratio.
-- `enable_hdr_merge`: This filter is used jointly with depth HDR function. By merging consecutive depth images of
-  alternating exposure values, we can over come challenges in acquiring depth values for under-illuminated and
+- `enable_hdr_merge`: This filter is used jointly with the depth HDR function. By merging consecutive depth images of
+  alternating exposure values, we can overcome challenges in acquiring depth values for under-illuminated and
   over-illuminated objects simultaneously.
-- `enable_sequence_id_filter`: This filter is used jointly with depth HDR function and outputs only the sequence with
-  specified sequence ID.
+- `enable_sequence_id_filter`: This filter is used jointly with the depth HDR function and outputs only the sequence
+  with the specified sequence ID.
 - `enable_threshold_filter`: This filter preserves depth values of interest and omits depth values out of scope.
 - `enable_noise_removal_filter`: This filter removes speckle noise in clusters and gives rise to a less-filled depth
   map.
 - `enable_spatial_filter`: This filter performs multiple iterations of processing as specified by the magnitude
-  parameter, to enhance the smoothness of depth data. It is also capable of filling small holes in depth maps.
-- `enable_temporal_filter`:This filter is intended to improve the depth data persistency by manipulating per-pixel
+  parameter to enhance the smoothness of depth data. It is also capable of filling small holes in depth maps.
+- `enable_temporal_filter`: This filter is intended to improve the depth data persistency by manipulating per-pixel
   values based on previous frames. The filter performs a single pass on the data, adjusting the depth values while also
   updating the tracking history.
 - `enable_hole_filling_filter`: This filter fills all holes in the depth map using the specified mode.
 - `retry_on_usb3_detection_failure`: If the camera is connected to a USB 2.0 port and is not detected, the system will
   attempt to reset the camera up to three times. This setting aims to prevent USB 3.0 devices from being incorrectly
-  recognized as USB 2.0.
-  It is recommended to set this parameter to `false` when using a USB 2.0 connection to avoid unnecessary resets.
+  recognized as USB 2.0. It is recommended to set this parameter to `false` when using a USB 2.0 connection to avoid
+  unnecessary resets.
+
+## Predefined presets
+
+| Preset         | Features                                                                                                                                                                                                      | Recommended use cases                                                                                                                                         |
+|----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Default        | - Best visual perception<br/>- Overall good performance in accuracy, fill rate, tiny objects, etc.                                                                                                            | - Generic<br>- Robotics                                                                                                                                       |
+| Hand           | - Clear hand and finger edges                                                                                                                                                                                 | - Gesture recognition                                                                                                                                         |
+| High Accuracy  | - Depth of high confidence<br>- Barely noise depth values<br>- Lower fill rate                                                                                                                                | - Collision avoidance<br>- Object scanning                                                                                                                    |
+| High Density   | - Higher fill rate<br>- More tiny objects<br>- May suffer from noise depth values                                                                                                                             | - Object recognition<br>- Pick & place<br>- Foreground & background animation                                                                                 |
+| Medium Density | - Balanced performance in fill rate and accuracy<br>- In comparison to Default: lower fill rate, better edge quality                                                                                          | - Generic and alternative to Default                                                                                                                          |
+| Custom         | - User defined Preset<br>- Derived from Presets above, with customized modifications, e.g. a new configuration for the post-processing pipeline, modified mean intensity set point of depth AE function, etc. | - Better depth performance achieved using customized configurations in comparison to using predefined presets<br>- For well-established custom configurations |
+
+Choose the appropriate preset name based on your specific use case and set it as the value for the `device_preset`
+parameter.
 
 ## Depth work mode switch
 
@@ -441,8 +454,6 @@ Open `CMakeLists.txt` and set `USE_RK_HW_DECODER` to `ON`.
 Depends on: `jetson_multimedia_api`,`libyuv`.
 Open `CMakeLists.txt` and set `USE_NV_HW_DECODER` to `ON`.
 
-
-
 ## Check which profiles the camera supports
 
 ```bash
@@ -529,9 +540,12 @@ bash .make_deb.sh
 | gemini ew lite                        | gemini_ew_lite.launch.py    |
 | gemini 330 series                     | gemini_330_series.launch.py |
 
-**All launch files are essentially similar, with the primary difference being the default values of the parameters set for different models
-within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you
-encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution settings in the launch
+**All launch files are essentially similar, with the primary difference being the default values of the parameters set
+for different models
+within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these
+parameters. If you
+encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution
+settings in the launch
 file, as well as other parameters, to ensure compatibility and optimal performance.**
 
 ## Product support

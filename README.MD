@@ -362,6 +362,7 @@ to `true` in the stream that corresponds to the argument of the launch file.
 - `/camera/gyro/sample`: Gyroscope data stream，enable_sync_output_accel_gyro`turned off，`enable_gyro`turned on
 - `camera/gyro_accel/sample`: Synchronized data stream of acceleration and gyroscope，`enable_sync_output_accel_gyro`
   turned on
+- `/diagnostics`: The diagnostic information of the camera, Currently, the diagnostic information only includes the temperature of the camera.
 
 ## Network device enumeration
 

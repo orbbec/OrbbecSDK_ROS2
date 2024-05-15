@@ -164,6 +164,7 @@ void OBCameraNode::setupDevices() {
       }
       RCLCPP_INFO_STREAM(logger_, "Load device preset: " << device_preset_);
       device_->loadPreset(device_preset_.c_str());
+      RCLCPP_INFO_STREAM(logger_, "Device preset " << device_->getCurrentPresetName() << " loaded");
     }
     auto depth_sensor = device_->getSensor(OB_SENSOR_DEPTH);
     // set depth sensor to filter
@@ -278,10 +279,18 @@ void OBCameraNode::setupDevices() {
       }
     }
     if (!depth_work_mode_.empty()) {
+      RCLCPP_INFO_STREAM(logger_, "Set depth work mode: " << depth_work_mode_);
       device_->switchDepthWorkMode(depth_work_mode_.c_str());
     }
-    if (sync_mode_ != OB_MULTI_DEVICE_SYNC_MODE_STANDALONE) {
+    if (!sync_mode_str_.empty() &&
+        device_->isPropertySupported(OB_PROP_SYNC_SIGNAL_TRIGGER_OUT_BOOL,
+                                     OB_PERMISSION_READ_WRITE)) {
       auto sync_config = device_->getMultiDeviceSyncConfig();
+      RCLCPP_INFO_STREAM(logger_,
+                         "Current sync mode: " << magic_enum::enum_name(sync_config.syncMode));
+      std::transform(sync_mode_str_.begin(), sync_mode_str_.end(), sync_mode_str_.begin(),
+                     ::toupper);
+      sync_mode_ = OBSyncModeFromString(sync_mode_str_);
       sync_config.syncMode = sync_mode_;
       sync_config.depthDelayUs = depth_delay_us_;
       sync_config.colorDelayUs = color_delay_us_;
@@ -289,7 +298,10 @@ void OBCameraNode::setupDevices() {
       sync_config.triggerOutDelayUs = trigger_out_delay_us_;
       sync_config.triggerOutEnable = trigger_out_enabled_;
       device_->setMultiDeviceSyncConfig(sync_config);
+      sync_config = device_->getMultiDeviceSyncConfig();
+      RCLCPP_INFO_STREAM(logger_, "Set sync mode: " << magic_enum::enum_name(sync_config.syncMode));
     }
+
     if (device_->isPropertySupported(OB_PROP_DEPTH_PRECISION_LEVEL_INT, OB_PERMISSION_READ_WRITE) &&
         !depth_precision_str_.empty()) {
       auto default_precision_level = device_->getIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT);
@@ -814,7 +826,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter(enable_ir_auto_exposure_, "enable_ir_auto_exposure", true);
   setAndGetNodeParameter(enable_ir_long_exposure_, "enable_ir_long_exposure", true);
   setAndGetNodeParameter<std::string>(depth_work_mode_, "depth_work_mode", "");
-  setAndGetNodeParameter<std::string>(sync_mode_str_, "sync_mode", "standalone");
+  setAndGetNodeParameter<std::string>(sync_mode_str_, "sync_mode", "");
   setAndGetNodeParameter(depth_delay_us_, "depth_delay_us", 0);
   setAndGetNodeParameter(color_delay_us_, "color_delay_us", 0);
   setAndGetNodeParameter(trigger2image_delay_us_, "trigger2image_delay_us", 0);
@@ -822,8 +834,6 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter(trigger_out_enabled_, "trigger_out_enabled", false);
   setAndGetNodeParameter<std::string>(depth_precision_str_, "depth_precision", "");
   if (!depth_precision_str_.empty()) {
-    std::transform(sync_mode_str_.begin(), sync_mode_str_.end(), sync_mode_str_.begin(), ::toupper);
-    sync_mode_ = OBSyncModeFromString(sync_mode_str_);
     depth_precision_ = depthPrecisionLevelFromString(depth_precision_str_);
   }
   if (enable_colored_point_cloud_) {
@@ -925,7 +935,6 @@ void OBCameraNode::setupPipelineConfig() {
     pipeline_config_.reset();
   }
   pipeline_config_ = std::make_shared<ob::Config>();
-  RCLCPP_INFO_STREAM(logger_, "enable depth scale " << (enable_depth_scale_ ? "ON" : "OFF"));
   auto device_info = device_->getDeviceInfo();
   CHECK_NOTNULL(device_info.get());
   auto pid = device_info->pid();
@@ -934,6 +943,7 @@ void OBCameraNode::setupPipelineConfig() {
     OBAlignMode align_mode = align_mode_ == "HW" ? ALIGN_D2C_HW_MODE : ALIGN_D2C_SW_MODE;
     RCLCPP_INFO_STREAM(logger_, "set align mode to " << magic_enum::enum_name(align_mode));
     pipeline_config_->setAlignMode(align_mode);
+    RCLCPP_INFO_STREAM(logger_, "enable depth scale " << (enable_depth_scale_ ? "ON" : "OFF"));
     pipeline_config_->setDepthScaleRequire(enable_depth_scale_);
   }
   for (const auto &stream_index : IMAGE_STREAMS) {

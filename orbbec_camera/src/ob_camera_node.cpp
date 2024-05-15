@@ -191,29 +191,58 @@ void OBCameraNode::setupDevices() {
       }
       if (filter_name == "DecimationFilter" && enable_decimation_filter_) {
         auto decimation_filter = filter->as<ob::DecimationFilter>();
-        decimation_filter->setScaleValue(decimation_filter_scale_range_);
+        auto range = decimation_filter->getScaleRange();
+        if (decimation_filter_scale_ != -1 && decimation_filter_scale_ < range.max &&
+            decimation_filter_scale_ > range.min) {
+          RCLCPP_INFO_STREAM(logger_,
+                             "Set decimation filter scale value to " << decimation_filter_scale_);
+          decimation_filter->setScaleValue(decimation_filter_scale_);
+        }
+        if (decimation_filter_scale_ != -1 &&
+            (decimation_filter_scale_ < range.min || decimation_filter_scale_ > range.max)) {
+          RCLCPP_ERROR_STREAM(logger_, "Decimation filter scale value is out of range "
+                                           << range.min << " - " << range.max);
+        }
       } else if (filter_name == "ThresholdFilter" && enable_threshold_filter_) {
         auto threshold_filter = filter->as<ob::ThresholdFilter>();
-        threshold_filter->setValueRange(threshold_filter_min_, threshold_filter_max_);
+        if (threshold_filter_min_ != -1 && threshold_filter_max_ != -1) {
+          RCLCPP_INFO_STREAM(logger_, "Set threshold filter value range to "
+                                          << threshold_filter_min_ << " - "
+                                          << threshold_filter_max_);
+          threshold_filter->setValueRange(threshold_filter_min_, threshold_filter_max_);
+        }
       } else if (filter_name == "SpatialAdvancedFilter" && enable_spatial_filter_) {
         auto spatial_filter = filter->as<ob::SpatialAdvancedFilter>();
-        OBSpatialAdvancedFilterParams params{};
-        params.alpha = spatial_filter_alpha_;
-        params.magnitude = spatial_filter_magnitude_;
-        params.radius = spatial_filter_radius_;
-        params.disp_diff = spatial_filter_diff_threshold_;
-        spatial_filter->setFilterParams(params);
+        if (spatial_filter_alpha_ != -1.0 && spatial_filter_magnitude_ != -1 &&
+            spatial_filter_radius_ != -1 && spatial_filter_diff_threshold_ != -1) {
+          OBSpatialAdvancedFilterParams params{};
+          params.alpha = spatial_filter_alpha_;
+          params.magnitude = spatial_filter_magnitude_;
+          params.radius = spatial_filter_radius_;
+          params.disp_diff = spatial_filter_diff_threshold_;
+          spatial_filter->setFilterParams(params);
+        }
       } else if (filter_name == "TemporalFilter" && enable_temporal_filter_) {
         auto temporal_filter = filter->as<ob::TemporalFilter>();
-        temporal_filter->setDiffScale(temporal_filter_diff_threshold_);
-        temporal_filter->setWeight(temporal_filter_weight_);
-      } else if (filter_name == "HoleFillingFilter" && enable_hole_filling_filter_) {
+        if (temporal_filter_diff_threshold_ != -1.0 && temporal_filter_weight_ != -1.0) {
+          RCLCPP_INFO_STREAM(logger_, "Set temporal filter value to "
+                                          << temporal_filter_diff_threshold_ << " - "
+                                          << temporal_filter_weight_);
+          temporal_filter->setDiffScale(temporal_filter_diff_threshold_);
+          temporal_filter->setWeight(temporal_filter_weight_);
+        }
+      } else if (filter_name == "HoleFillingFilter" && enable_hole_filling_filter_ &&
+                 !hole_filling_filter_mode_.empty()) {
         auto hole_filling_filter = filter->as<ob::HoleFillingFilter>();
+        RCLCPP_INFO_STREAM(logger_,
+                           "Default hole filling filter mode: " << hole_filling_filter_mode_);
         OBHoleFillingMode hole_filling_mode = holeFillingModeFromString(hole_filling_filter_mode_);
         hole_filling_filter->setFilterMode(hole_filling_mode);
       } else if (filter_name == "SequenceIdFilter" && enable_sequence_id_filter_) {
         auto sequenced_filter = filter->as<ob::SequenceIdFilter>();
-        sequenced_filter->selectSequenceId(sequence_id_filter_id_);
+        if (sequence_id_filter_id_ != -1) {
+          sequenced_filter->selectSequenceId(sequence_id_filter_id_);
+        }
       } else if (filter_name == "NoiseRemovalFilter" && enable_noise_removal_filter_) {
         auto noise_removal_filter = filter->as<ob::NoiseRemovalFilter>();
         OBNoiseRemovalFilterParams params = noise_removal_filter->getFilterParams();
@@ -225,9 +254,25 @@ void OBCameraNode::setupDevices() {
         RCLCPP_INFO_STREAM(
             logger_, "Set noise removal filter params: " << "disp_diff: " << params.disp_diff
                                                          << ", max_size: " << params.max_size);
-        noise_removal_filter->setFilterParams(params);
-      } else if (filter_name == "HDRMerge") {
-        // do nothing
+        if (noise_removal_filter_min_diff_ != -1 && noise_removal_filter_max_size_ != -1) {
+          noise_removal_filter->setFilterParams(params);
+        }
+      } else if (filter_name == "HDRMerge" && enable_hdr_merge_) {
+        if (hdr_merge_exposure_1_ != -1 && hdr_merge_gain_1_ != -1 && hdr_merge_exposure_2_ != -1 &&
+            hdr_merge_gain_2_ != -1) {
+          RCLCPP_INFO_STREAM(
+              logger_, "Set HDR merge filter params: " << "exposure_1: " << hdr_merge_exposure_1_
+                                                       << ", gain_1: " << hdr_merge_gain_1_
+                                                       << ", exposure_2: " << hdr_merge_exposure_2_
+                                                       << ", gain_2: " << hdr_merge_gain_2_);
+          auto config = OBHdrConfig();
+          config.enable = true;
+          config.exposure_1 = hdr_merge_exposure_1_;
+          config.gain_1 = hdr_merge_gain_1_;
+          config.exposure_2 = hdr_merge_exposure_2_;
+          config.gain_2 = hdr_merge_gain_2_;
+          device_->setStructuredData(OB_STRUCT_DEPTH_HDR_CONFIG, &config, sizeof(config));
+        }
       } else {
         RCLCPP_INFO_STREAM(logger_, "Skip setting filter: " << filter_name);
       }
@@ -235,7 +280,7 @@ void OBCameraNode::setupDevices() {
     if (!depth_work_mode_.empty()) {
       device_->switchDepthWorkMode(depth_work_mode_.c_str());
     }
-    if (sync_mode_ != OB_MULTI_DEVICE_SYNC_MODE_FREE_RUN) {
+    if (sync_mode_ != OB_MULTI_DEVICE_SYNC_MODE_STANDALONE) {
       auto sync_config = device_->getMultiDeviceSyncConfig();
       sync_config.syncMode = sync_mode_;
       sync_config.depthDelayUs = depth_delay_us_;
@@ -769,7 +814,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter(enable_ir_auto_exposure_, "enable_ir_auto_exposure", true);
   setAndGetNodeParameter(enable_ir_long_exposure_, "enable_ir_long_exposure", true);
   setAndGetNodeParameter<std::string>(depth_work_mode_, "depth_work_mode", "");
-  setAndGetNodeParameter<std::string>(sync_mode_str_, "sync_mode", "close");
+  setAndGetNodeParameter<std::string>(sync_mode_str_, "sync_mode", "standalone");
   setAndGetNodeParameter(depth_delay_us_, "depth_delay_us", 0);
   setAndGetNodeParameter(color_delay_us_, "color_delay_us", 0);
   setAndGetNodeParameter(trigger2image_delay_us_, "trigger2image_delay_us", 0);
@@ -799,27 +844,30 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<bool>(enable_sequence_id_filter_, "enable_sequence_id_filter", false);
   setAndGetNodeParameter<bool>(enable_threshold_filter_, "enable_threshold_filter", false);
   setAndGetNodeParameter<bool>(enable_noise_removal_filter_, "enable_noise_removal_filter", true);
-  setAndGetNodeParameter<bool>(enable_spatial_filter_, "enable_spatial_filter", true);
+  setAndGetNodeParameter<bool>(enable_spatial_filter_, "enable_spatial_filter", false);
   setAndGetNodeParameter<bool>(enable_temporal_filter_, "enable_temporal_filter", false);
   setAndGetNodeParameter<bool>(enable_hole_filling_filter_, "enable_hole_filling_filter", false);
-  setAndGetNodeParameter<int>(decimation_filter_scale_range_, "decimation_filter_scale_range", 2);
-  setAndGetNodeParameter<int>(sequence_id_filter_id_, "sequence_id_filter_id", 1);
-  setAndGetNodeParameter<int>(threshold_filter_max_, "threshold_filter_max", 16000);
-  setAndGetNodeParameter<int>(threshold_filter_min_, "threshold_filter_min", 0);
-  setAndGetNodeParameter<int>(noise_removal_filter_min_diff_, "noise_removal_filter_min_diff", 8);
+  setAndGetNodeParameter<int>(decimation_filter_scale_, "decimation_filter_scale_", -1);
+  setAndGetNodeParameter<int>(sequence_id_filter_id_, "sequence_id_filter_id", -1);
+  setAndGetNodeParameter<int>(threshold_filter_max_, "threshold_filter_max", -1);
+  setAndGetNodeParameter<int>(threshold_filter_min_, "threshold_filter_min", -1);
+  setAndGetNodeParameter<int>(noise_removal_filter_min_diff_, "noise_removal_filter_min_diff", 256);
   setAndGetNodeParameter<int>(noise_removal_filter_max_size_, "noise_removal_filter_max_size", 80);
-  setAndGetNodeParameter<float>(spatial_filter_alpha_, "spatial_filter_alpha", 0.5);
-  setAndGetNodeParameter<int>(spatial_filter_diff_threshold_, "spatial_filter_diff_threshold", 8);
-  setAndGetNodeParameter<int>(spatial_filter_magnitude_, "spatial_filter_magnitude", 1);
-  setAndGetNodeParameter<int>(spatial_filter_radius_, "spatial_filter_radius", 1);
+  setAndGetNodeParameter<float>(spatial_filter_alpha_, "spatial_filter_alpha", -1.0);
+  setAndGetNodeParameter<int>(spatial_filter_diff_threshold_, "spatial_filter_diff_threshold", -1);
+  setAndGetNodeParameter<int>(spatial_filter_magnitude_, "spatial_filter_magnitude", -1);
+  setAndGetNodeParameter<int>(spatial_filter_radius_, "spatial_filter_radius", -1);
   setAndGetNodeParameter<float>(temporal_filter_diff_threshold_, "temporal_filter_diff_threshold",
-                                0.1);
-  setAndGetNodeParameter<float>(temporal_filter_weight_, "temporal_filter_weight", 0.4);
-  setAndGetNodeParameter<std::string>(hole_filling_filter_mode_, "hole_filling_filter_mode",
-                                      "FILL_TOP");
+                                -1.0);
+  setAndGetNodeParameter<float>(temporal_filter_weight_, "temporal_filter_weight", -1.0);
+  setAndGetNodeParameter<std::string>(hole_filling_filter_mode_, "hole_filling_filter_mode", "");
+  setAndGetNodeParameter<int>(hdr_merge_exposure_1_, "hdr_merge_exposure_1", -1);
+  setAndGetNodeParameter<int>(hdr_merge_gain_1_, "hdr_merge_gain_1", -1);
+  setAndGetNodeParameter<int>(hdr_merge_exposure_2_, "hdr_merge_exposure_2", -1);
+  setAndGetNodeParameter<int>(hdr_merge_gain_2_, "hdr_merge_gain_2", -1);
   setAndGetNodeParameter<std::string>(align_mode_, "align_mode", "HW");
   setAndGetNodeParameter<double>(diagnostic_period_, "diagnostic_period", 1.0);
-  setAndGetNodeParameter<bool>(enable_laser_, "enable_laser", false);
+  setAndGetNodeParameter<bool>(enable_laser_, "enable_laser", true);
   setAndGetNodeParameter<int>(laser_on_off_mode_, "laser_on_off_mode", 0);
   std::string align_target_stream_str_;
   setAndGetNodeParameter<std::string>(align_target_stream_str_, "align_target_stream", "COLOR");

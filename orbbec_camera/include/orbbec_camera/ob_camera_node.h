@@ -499,19 +499,23 @@ class OBCameraNode {
   bool enable_temporal_filter_ = false;
   bool enable_hole_filling_filter_ = false;
   // filter params
-  int decimation_filter_scale_range_ = 2;
-  int sequence_id_filter_id_ = 1;
-  int threshold_filter_max_ = 16000;
-  int threshold_filter_min_ = 0;
-  int noise_removal_filter_min_diff_ = 8;
+  int decimation_filter_scale_ = -1;
+  int sequence_id_filter_id_ = -1;
+  int threshold_filter_max_ = -1;
+  int threshold_filter_min_ = -1;
+  int noise_removal_filter_min_diff_ = 256;
   int noise_removal_filter_max_size_ = 80;
-  float spatial_filter_alpha_ = 0.5;
-  int spatial_filter_diff_threshold_ = 8;
-  int spatial_filter_magnitude_ = 1;
-  int spatial_filter_radius_ = 1;
-  float temporal_filter_diff_threshold_ = 0.1;
-  float temporal_filter_weight_ = 0.4;
-  std::string hole_filling_filter_mode_ = "FILL_TOP";
+  float spatial_filter_alpha_ = -1;
+  int spatial_filter_diff_threshold_ = -1;
+  int spatial_filter_magnitude_ = -1;
+  int spatial_filter_radius_ = -1;
+  float temporal_filter_diff_threshold_ = -1.0;
+  float temporal_filter_weight_ = -1.0;
+  std::string hole_filling_filter_mode_;
+  int hdr_merge_exposure_1_ = -1;
+  int hdr_merge_gain_1_ = -1;
+  int hdr_merge_exposure_2_ = -1;
+  int hdr_merge_gain_2_ = -1;
 
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr filter_status_pub_;
   nlohmann::json filter_status_;

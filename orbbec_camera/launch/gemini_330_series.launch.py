@@ -18,7 +18,7 @@ def generate_launch_description():
         DeclareLaunchArgument('usb_port', default_value=''),
         DeclareLaunchArgument('device_num', default_value='1'),
         DeclareLaunchArgument('point_cloud_qos', default_value='default'),
-        DeclareLaunchArgument('enable_point_cloud', default_value='true'),
+        DeclareLaunchArgument('enable_point_cloud', default_value='false'),
         DeclareLaunchArgument('enable_colored_point_cloud', default_value='true'),
         DeclareLaunchArgument('connection_delay', default_value='100'),
         DeclareLaunchArgument('color_width', default_value='0'),

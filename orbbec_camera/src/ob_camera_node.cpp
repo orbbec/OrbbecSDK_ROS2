@@ -1113,16 +1113,17 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
   float v0 = depth_intrinsics.cy * ((float)(height) / depth_intrinsics.height);
 
   const auto *depth_data = (uint16_t *)depth_frame->data();
-  sensor_msgs::PointCloud2Modifier modifier(point_cloud_msg_);
+  auto point_cloud_msg = std::make_unique<sensor_msgs::msg::PointCloud2>();
+  sensor_msgs::PointCloud2Modifier modifier(*point_cloud_msg);
   modifier.setPointCloud2FieldsByString(1, "xyz");
   modifier.resize(width * height);
-  point_cloud_msg_.width = depth_frame->width();
-  point_cloud_msg_.height = depth_frame->height();
-  point_cloud_msg_.row_step = point_cloud_msg_.width * point_cloud_msg_.point_step;
-  point_cloud_msg_.data.resize(point_cloud_msg_.height * point_cloud_msg_.row_step);
-  sensor_msgs::PointCloud2Iterator<float> iter_x(point_cloud_msg_, "x");
-  sensor_msgs::PointCloud2Iterator<float> iter_y(point_cloud_msg_, "y");
-  sensor_msgs::PointCloud2Iterator<float> iter_z(point_cloud_msg_, "z");
+  point_cloud_msg->width = depth_frame->width();
+  point_cloud_msg->height = depth_frame->height();
+  point_cloud_msg->row_step = point_cloud_msg->width * point_cloud_msg->point_step;
+  point_cloud_msg->data.resize(point_cloud_msg->height * point_cloud_msg->row_step);
+  sensor_msgs::PointCloud2Iterator<float> iter_x(*point_cloud_msg, "x");
+  sensor_msgs::PointCloud2Iterator<float> iter_y(*point_cloud_msg, "y");
+  sensor_msgs::PointCloud2Iterator<float> iter_z(*point_cloud_msg, "z");
   size_t valid_count = 0;
   const static float MIN_DISTANCE = 20.0;
   const static float MAX_DISTANCE = 10000.0;
@@ -1152,17 +1153,17 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
     return;
   }
   if (!ordered_pc_) {
-    point_cloud_msg_.is_dense = true;
-    point_cloud_msg_.width = valid_count;
-    point_cloud_msg_.height = 1;
+    point_cloud_msg->is_dense = true;
+    point_cloud_msg->width = valid_count;
+    point_cloud_msg->height = 1;
     modifier.resize(valid_count);
   }
   auto timestamp = use_hardware_time_ ? fromUsToROSTime(depth_frame->timeStampUs())
                                       : fromUsToROSTime(depth_frame->systemTimeStampUs());
   std::string frame_id = depth_registration_ ? optical_frame_id_[COLOR] : optical_frame_id_[DEPTH];
-  point_cloud_msg_.header.stamp = timestamp;
-  point_cloud_msg_.header.frame_id = frame_id;
-  depth_cloud_pub_->publish(point_cloud_msg_);
+  point_cloud_msg->header.stamp = timestamp;
+  point_cloud_msg->header.frame_id = frame_id;
+  depth_cloud_pub_->publish(std::move(point_cloud_msg));
 
   if (save_point_cloud_) {
     save_point_cloud_ = false;
@@ -1176,7 +1177,7 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
     }
     RCLCPP_INFO_STREAM(logger_, "Saving point cloud to " << filename);
     try {
-      saveDepthPointsToPly(point_cloud_msg_, filename);
+      saveDepthPointsToPly(point_cloud_msg, filename);
     } catch (const std::exception &e) {
       RCLCPP_ERROR_STREAM(logger_, "Failed to save point cloud: " << e.what());
     }
@@ -1217,22 +1218,23 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
   float v0 = intrinsics.cy * ((float)(color_height) / intrinsics.height);
   const auto *depth_data = (uint16_t *)depth_frame->data();
   const auto *color_data = (uint8_t *)(rgb_buffer_);
-  sensor_msgs::PointCloud2Modifier modifier(point_cloud_msg_);
+  auto point_cloud_msg = std::make_unique<sensor_msgs::msg::PointCloud2>();
+  sensor_msgs::PointCloud2Modifier modifier(*point_cloud_msg);
   modifier.setPointCloud2FieldsByString(1, "xyz");
-  point_cloud_msg_.width = color_frame->width();
-  point_cloud_msg_.height = color_frame->height();
+  point_cloud_msg->width = color_frame->width();
+  point_cloud_msg->height = color_frame->height();
   std::string format_str = "rgb";
-  point_cloud_msg_.point_step =
-      addPointField(point_cloud_msg_, format_str, 1, sensor_msgs::msg::PointField::FLOAT32,
-                    static_cast<int>(point_cloud_msg_.point_step));
-  point_cloud_msg_.row_step = point_cloud_msg_.width * point_cloud_msg_.point_step;
-  point_cloud_msg_.data.resize(point_cloud_msg_.height * point_cloud_msg_.row_step);
-  sensor_msgs::PointCloud2Iterator<float> iter_x(point_cloud_msg_, "x");
-  sensor_msgs::PointCloud2Iterator<float> iter_y(point_cloud_msg_, "y");
-  sensor_msgs::PointCloud2Iterator<float> iter_z(point_cloud_msg_, "z");
-  sensor_msgs::PointCloud2Iterator<uint8_t> iter_r(point_cloud_msg_, "r");
-  sensor_msgs::PointCloud2Iterator<uint8_t> iter_g(point_cloud_msg_, "g");
-  sensor_msgs::PointCloud2Iterator<uint8_t> iter_b(point_cloud_msg_, "b");
+  point_cloud_msg->point_step =
+      addPointField(*point_cloud_msg, format_str, 1, sensor_msgs::msg::PointField::FLOAT32,
+                    static_cast<int>(point_cloud_msg->point_step));
+  point_cloud_msg->row_step = point_cloud_msg->width * point_cloud_msg->point_step;
+  point_cloud_msg->data.resize(point_cloud_msg->height * point_cloud_msg->row_step);
+  sensor_msgs::PointCloud2Iterator<float> iter_x(*point_cloud_msg, "x");
+  sensor_msgs::PointCloud2Iterator<float> iter_y(*point_cloud_msg, "y");
+  sensor_msgs::PointCloud2Iterator<float> iter_z(*point_cloud_msg, "z");
+  sensor_msgs::PointCloud2Iterator<uint8_t> iter_r(*point_cloud_msg, "r");
+  sensor_msgs::PointCloud2Iterator<uint8_t> iter_g(*point_cloud_msg, "g");
+  sensor_msgs::PointCloud2Iterator<uint8_t> iter_b(*point_cloud_msg, "b");
   size_t valid_count = 0;
   static const float MIN_DISTANCE = 20.0;
   static const float MAX_DISTANCE = 10000.0;
@@ -1271,16 +1273,16 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
     return;
   }
   if (!ordered_pc_) {
-    point_cloud_msg_.is_dense = true;
-    point_cloud_msg_.width = valid_count;
-    point_cloud_msg_.height = 1;
+    point_cloud_msg->is_dense = true;
+    point_cloud_msg->width = valid_count;
+    point_cloud_msg->height = 1;
     modifier.resize(valid_count);
   }
   auto timestamp = use_hardware_time_ ? fromUsToROSTime(depth_frame->timeStampUs())
                                       : fromUsToROSTime(depth_frame->systemTimeStampUs());
-  point_cloud_msg_.header.stamp = timestamp;
-  point_cloud_msg_.header.frame_id = optical_frame_id_[COLOR];
-  depth_registration_cloud_pub_->publish(point_cloud_msg_);
+  point_cloud_msg->header.stamp = timestamp;
+  point_cloud_msg->header.frame_id = optical_frame_id_[COLOR];
+  depth_registration_cloud_pub_->publish(std::move(point_cloud_msg));
   if (save_colored_point_cloud_) {
     save_colored_point_cloud_ = false;
     auto now = std::time(nullptr);
@@ -1293,7 +1295,7 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
     }
     RCLCPP_INFO_STREAM(logger_, "Saving point cloud to " << filename);
     try {
-      saveRGBPointCloudMsgToPly(point_cloud_msg_, filename);
+      saveRGBPointCloudMsgToPly(point_cloud_msg, filename);
     } catch (const std::exception &e) {
       RCLCPP_ERROR_STREAM(logger_, "Failed to save point cloud: " << e.what());
     } catch (...) {
@@ -1643,7 +1645,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   image_msg->step = width * unit_step_size_[stream_index];
   image_msg->header.frame_id = frame_id;
   CHECK(image_publishers_.count(stream_index) > 0);
-  image_publishers_[stream_index].publish(image_msg);
+  image_publishers_[stream_index].publish(std::move(image_msg));
   saveImageToFile(stream_index, image, image_msg);
 }
 

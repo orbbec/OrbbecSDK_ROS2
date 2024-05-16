@@ -83,14 +83,15 @@ void saveRGBPointsToPly(const std::shared_ptr<ob::Frame> &frame, const std::stri
   }
 }
 
-void saveRGBPointCloudMsgToPly(const sensor_msgs::msg::PointCloud2 &msg,
+void saveRGBPointCloudMsgToPly(const sensor_msgs::msg::PointCloud2::UniquePtr &msg,
                                const std::string &fileName) {
   FILE *fp = fopen(fileName.c_str(), "wb+");
   CHECK_NOTNULL(fp);
+  CHECK_NOTNULL(msg);
 
-  sensor_msgs::PointCloud2ConstIterator<float> iter_x(msg, "x");
-  sensor_msgs::PointCloud2ConstIterator<float> iter_y(msg, "y");
-  sensor_msgs::PointCloud2ConstIterator<float> iter_z(msg, "z");
+  sensor_msgs::PointCloud2ConstIterator<float> iter_x(*msg, "x");
+  sensor_msgs::PointCloud2ConstIterator<float> iter_y(*msg, "y");
+  sensor_msgs::PointCloud2ConstIterator<float> iter_z(*msg, "z");
 
   // First, count the actual number of valid points
   size_t valid_points = 0;
@@ -101,12 +102,12 @@ void saveRGBPointCloudMsgToPly(const sensor_msgs::msg::PointCloud2 &msg,
   }
 
   // Reset the iterators
-  iter_x = sensor_msgs::PointCloud2ConstIterator<float>(msg, "x");
-  iter_y = sensor_msgs::PointCloud2ConstIterator<float>(msg, "y");
-  iter_z = sensor_msgs::PointCloud2ConstIterator<float>(msg, "z");
-  sensor_msgs::PointCloud2ConstIterator<uint8_t> iter_r(msg, "r");
-  sensor_msgs::PointCloud2ConstIterator<uint8_t> iter_g(msg, "g");
-  sensor_msgs::PointCloud2ConstIterator<uint8_t> iter_b(msg, "b");
+  iter_x = sensor_msgs::PointCloud2ConstIterator<float>(*msg, "x");
+  iter_y = sensor_msgs::PointCloud2ConstIterator<float>(*msg, "y");
+  iter_z = sensor_msgs::PointCloud2ConstIterator<float>(*msg, "z");
+  sensor_msgs::PointCloud2ConstIterator<uint8_t> iter_r(*msg, "r");
+  sensor_msgs::PointCloud2ConstIterator<uint8_t> iter_g(*msg, "g");
+  sensor_msgs::PointCloud2ConstIterator<uint8_t> iter_b(*msg, "b");
 
   fprintf(fp, "ply\n");
   fprintf(fp, "format ascii 1.0\n");
@@ -130,13 +131,14 @@ void saveRGBPointCloudMsgToPly(const sensor_msgs::msg::PointCloud2 &msg,
   fclose(fp);
 }
 
-void saveDepthPointsToPly(const sensor_msgs::msg::PointCloud2 &msg, const std::string &fileName) {
+void saveDepthPointsToPly(const sensor_msgs::msg::PointCloud2::UniquePtr &msg,
+                          const std::string &fileName) {
   FILE *fp = fopen(fileName.c_str(), "wb+");
   CHECK_NOTNULL(fp);
-
-  sensor_msgs::PointCloud2ConstIterator<float> iter_x(msg, "x");
-  sensor_msgs::PointCloud2ConstIterator<float> iter_y(msg, "y");
-  sensor_msgs::PointCloud2ConstIterator<float> iter_z(msg, "z");
+  CHECK_NOTNULL(msg);
+  sensor_msgs::PointCloud2ConstIterator<float> iter_x(*msg, "x");
+  sensor_msgs::PointCloud2ConstIterator<float> iter_y(*msg, "y");
+  sensor_msgs::PointCloud2ConstIterator<float> iter_z(*msg, "z");
 
   // First, count the actual number of valid points
   size_t valid_points = 0;
@@ -147,9 +149,9 @@ void saveDepthPointsToPly(const sensor_msgs::msg::PointCloud2 &msg, const std::s
   }
 
   // Reset the iterators
-  iter_x = sensor_msgs::PointCloud2ConstIterator<float>(msg, "x");
-  iter_y = sensor_msgs::PointCloud2ConstIterator<float>(msg, "y");
-  iter_z = sensor_msgs::PointCloud2ConstIterator<float>(msg, "z");
+  iter_x = sensor_msgs::PointCloud2ConstIterator<float>(*msg, "x");
+  iter_y = sensor_msgs::PointCloud2ConstIterator<float>(*msg, "y");
+  iter_z = sensor_msgs::PointCloud2ConstIterator<float>(*msg, "z");
 
   fprintf(fp, "ply\n");
   fprintf(fp, "format ascii 1.0\n");
@@ -176,6 +178,8 @@ void savePointsToPly(const std::shared_ptr<ob::Frame> &frame, const std::string 
     fflush(fp);
     fclose(fp);
   });
+  CHECK_NOTNULL(fp);
+  CHECK_NOTNULL(frame);
   fprintf(fp, "ply\n");
   fprintf(fp, "format ascii 1.0\n");
   fprintf(fp, "element vertex %zu\n", point_size);

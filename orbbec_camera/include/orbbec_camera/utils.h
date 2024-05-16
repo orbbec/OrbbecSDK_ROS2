@@ -34,10 +34,10 @@ sensor_msgs::msg::CameraInfo convertToCameraInfo(OBCameraIntrinsic intrinsic,
 
 void saveRGBPointsToPly(const std::shared_ptr<ob::Frame>& frame, const std::string& fileName);
 
-void saveRGBPointCloudMsgToPly(const sensor_msgs::msg::PointCloud2& msg,
+void saveRGBPointCloudMsgToPly(const sensor_msgs::msg::PointCloud2::UniquePtr& msg,
                                const std::string& fileName);
 
-void saveDepthPointsToPly(const sensor_msgs::msg::PointCloud2& msg, const std::string& fileName);
+void saveDepthPointsToPly(const sensor_msgs::msg::PointCloud2::UniquePtr& msg, const std::string& fileName);
 
 void savePointsToPly(const std::shared_ptr<ob::Frame>& frame, const std::string& fileName);
 

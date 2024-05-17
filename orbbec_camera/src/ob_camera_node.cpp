@@ -922,12 +922,16 @@ void OBCameraNode::setupDiagnosticUpdater() {
   if (diagnostic_period_ <= 0.0) {
     return;
   }
+  try{
   RCLCPP_INFO_STREAM(logger_, "Publish diagnostics every " << diagnostic_period_ << " seconds");
   auto info = device_->getDeviceInfo();
   std::string serial_number = info->serialNumber();
   diagnostic_updater_ = std::make_unique<diagnostic_updater::Updater>(node_, diagnostic_period_);
   diagnostic_updater_->setHardwareID(serial_number);
   diagnostic_updater_->add("Temperatures", this, &OBCameraNode::onTemperatureUpdate);
+  } catch (const std::exception &e) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to setup diagnostic updater: " << e.what());
+  }
 }
 
 void OBCameraNode::setupPipelineConfig() {

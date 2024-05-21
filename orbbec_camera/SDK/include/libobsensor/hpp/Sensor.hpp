@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Types.hpp"
+#include "libobsensor/hpp/Filter.hpp"
 
 #include <functional>
 #include <memory>
@@ -18,6 +19,7 @@ class StreamProfileList;
 class Device;
 class Frame;
 class ImuFrame;
+class OBFilterList;
 
 /**
  * @brief Callback function for frame data.
@@ -47,6 +49,12 @@ public:
      * @return std::shared_ptr<StreamProfileList> The stream profile list.
      */
     const std::shared_ptr<StreamProfileList> getStreamProfileList();
+
+    /**
+     * @brief Request recommended filters
+     * @return OBFilterList list of frame processing block
+     */
+    const std::shared_ptr<OBFilterList> getRecommendedFilters();
 
     /**
      * @brief Open a frame data stream and set up a callback.
@@ -109,4 +117,33 @@ public:
      */
     std::shared_ptr<Sensor> getSensor(OBSensorType sensorType);
 };
+
+
+/**
+ * @brief Class representing a list of FrameProcessingBlock
+ */
+class OB_EXTENSION_API OBFilterList {
+private:
+    std::unique_ptr<OBFilterListImpl> impl_;
+
+public:
+    OBFilterList(std::unique_ptr<OBFilterListImpl> impl_);
+    ~OBFilterList() noexcept;
+
+    /**
+     * @brief Get the number of OBDepthWorkMode FrameProcessingBlock in the list
+     *
+     * @return uint32_t the number of FrameProcessingBlock objects in the list
+     */
+    uint32_t count();
+
+    /**
+     * @brief Get the Filter object at the specified index
+     *
+     * @param index the index of the target Filter object
+     * @return the Filter object at the specified index
+     */
+    std::shared_ptr<Filter> getFilter(uint32_t index);
+};
+
 }  // namespace ob

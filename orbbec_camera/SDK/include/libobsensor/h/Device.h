@@ -889,6 +889,94 @@ void ob_device_load_depth_filter_config(ob_device *device, const char *file_path
  */
 void ob_device_reset_default_depth_filter_config(ob_device *device, ob_error **error);
 
+/**
+ * @breif Get the current preset name.
+ * @brief The preset mean a set of parameters or configurations that can be applied to the device to achieve a specific effect or function.
+ *
+ * @param device The device object.
+ * @param error  Log error messages.
+ * @return  The current preset name, it should be one of the preset names returned by @ref ob_device_get_available_preset_list.
+ */
+const char *ob_device_get_current_preset_name(ob_device *device, ob_error **error);
+
+/**
+ * @brief Get the available preset list.
+ * @attention After loading the preset, the settings in the preset will set to the device immediately. Therefore, it is recommended to re-read the device
+ * settings to update the user program temporarily.
+ *
+ * @param device The device object.
+ * @param preset_name  Log error messages. The name should be one of the preset names returned by @ref ob_device_get_available_preset_list.
+ * @param error  Log error messages.
+ */
+void ob_device_load_preset(ob_device *device, const char *preset_name, ob_error **error);
+
+/**
+ * @brief Load preset from json string.
+ * @brief After loading the custom preset, the settings in the custom preset will set to the device immediately.
+ * @brief After loading the custom preset, the available preset list will be appended with the custom preset and named as the file name.
+ *
+ * @param device   The device object.
+ * @param json_file_path  The json file path.
+ * @param error   Log error messages.
+ */
+void ob_device_load_preset_from_json_file(ob_device *device, const char *json_file_path, ob_error **error);
+
+/**
+ * @brief Export current settings as a preset json file.
+ * @brief After exporting the custom preset, the available preset list will be appended with the custom preset and named as the file name.
+ *
+ * @param device   The device object.
+ * @param json_file_path  The json file path.
+ * @param error   Log error messages.
+ */
+void ob_device_export_current_settings_as_preset_json_file(ob_device *device, const char *json_file_path, ob_error **error);
+
+/**
+ * @brief Get the available preset list.
+ *
+ * @param device The device object.
+ * @param error  Log error messages.
+ * @return  The available preset list.
+ */
+ob_device_preset_list *ob_device_get_available_preset_list(ob_device *device, ob_error **error);
+
+/**
+ * @brief Delete the available preset list.
+ *
+ * @param preset_list The available preset list.
+ * @param error  Log error messages.
+ */
+void ob_delete_preset_list(ob_device_preset_list *preset_list, ob_error **error);
+
+/**
+ * @brief Get the number of preset in the preset list.
+ *
+ * @param preset_list The available preset list.
+ * @param error  Log error messages.
+ * @return  The number of preset in the preset list.
+ */
+uint32_t ob_device_preset_list_count(ob_device_preset_list *preset_list, ob_error **error);
+
+/**
+ * @brief Get the name of the preset in the preset list.
+ *
+ * @param preset_list The available preset list.
+ * @param index  The index of the preset in the preset list.
+ * @param error  Log error messages.
+ * @return  The name of the preset in the preset list.
+ */
+const char *ob_device_preset_list_get_name(ob_device_preset_list *preset_list, uint32_t index, ob_error **error);
+
+/**
+ * @brief Check if the preset list has the preset.
+ *
+ * @param preset_list The available preset list.
+ * @param preset_name  The name of the preset.
+ * @param error  Log error messages.
+ * @return  Whether the preset list has the preset. If true, the preset list has the preset. If false, the preset list does not have the preset.
+ */
+bool ob_device_preset_list_has_preset(ob_device_preset_list *preset_list, const char *preset_name, ob_error **error);
+
 #ifdef __cplusplus
 }
 #endif

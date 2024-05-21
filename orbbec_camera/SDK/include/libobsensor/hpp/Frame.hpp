@@ -31,6 +31,8 @@
 struct FrameImpl;
 
 namespace ob {
+class Device;
+class Sensor;
 class StreamProfile;
 class Filter;
 class FrameHelper;
@@ -109,6 +111,14 @@ public:
     uint64_t systemTimeStamp();
 
     /**
+     * @brief Get the system timestamp of the frame in microseconds.
+     * @brief The system timestamp is the time point when the frame was received by the host, on host clock domain.
+     *
+     * @return uint64_t The system timestamp of the frame in microseconds.
+     */
+    uint64_t systemTimeStampUs();
+
+    /**
      * @brief Get the global timestamp of the frame in microseconds.
      * @brief The global timestamp is the time point when the frame was was captured by the device, and has been converted to the host clock domain. The
      * conversion process base on the device timestamp and can eliminate the timer drift of the device
@@ -119,6 +129,57 @@ public:
      * @return uint64_t The global timestamp of the frame in microseconds.
      */
     uint64_t globalTimeStampUs();
+
+    /**
+     * @brief Get the metadata of the frame.
+     *
+     * @return void* The metadata of the frame.
+     */
+    void *metadata();
+
+    /**
+     * @brief Get the size of the metadata of the frame.
+     *
+     * @return uint32_t The size of the metadata of the frame.
+     */
+    uint32_t metadataSize();
+
+    /**
+     * @brief Check if the frame object has metadata of a given type.
+     *
+     * @param type The metadata type. refer to @ref OBFrameMetadataType
+     * @return bool The result.
+     */
+    bool hasMetadata(OBFrameMetadataType type);
+
+    /**
+     * @brief Get the metadata value
+     *
+     * @param type The metadata type. refer to @ref OBFrameMetadataType
+     * @return int64_t The metadata value.
+     */
+    int64_t getMetadataValue(OBFrameMetadataType type);
+
+    /**
+     * @brief get StreamProfile of the frame
+     *
+     * @return std::shared_ptr<StreamProfile> The StreamProfile of the frame, may return nullptr if the frame is not captured from a stream.
+     */
+    std::shared_ptr<StreamProfile> getStreamProfile();
+
+    /**
+     * @brief get owner sensor of the frame
+     *
+     * @return std::shared_ptr<Sensor> The owner sensor of the frame, return nullptr if the frame is not owned by any sensor or the sensor is destroyed
+     */
+    std::shared_ptr<Sensor> getSensor();
+
+    /**
+     * @brief get owner device of the frame
+     *
+     * @return std::shared_ptr<Device> The owner device of the frame, return nullptr if the frame is not owned by any device or the device is destroyed
+     */
+    std::shared_ptr<Device> getDevice();
 
     /**
      * @brief Check if the runtime type of the frame object is compatible with a given type.
@@ -170,20 +231,6 @@ public:
      * @return uint32_t The height of the frame.
      */
     uint32_t height();
-
-    /**
-     * @brief Get the metadata of the frame.
-     *
-     * @return void* The metadata of the frame.
-     */
-    void *metadata();
-
-    /**
-     * @brief Get the size of the metadata of the frame.
-     *
-     * @return uint32_t The size of the metadata of the frame.
-     */
-    uint32_t metadataSize();
 
     /**
      * @brief Get the effective number of pixels in the frame.

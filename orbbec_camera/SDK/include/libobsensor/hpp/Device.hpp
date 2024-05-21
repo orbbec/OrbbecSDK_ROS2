@@ -7,7 +7,7 @@
 #include "Types.hpp"
 
 #include "libobsensor/h/Property.h"
-
+#include "libobsensor/hpp/Filter.hpp"
 #include <memory>
 #include <string>
 #include <vector>
@@ -24,6 +24,7 @@ class DeviceInfo;
 class Sensor;
 class CameraParamList;
 class OBDepthWorkModeList;
+class DevicePresetList;
 
 class OB_EXTENSION_API Device {
 protected:
@@ -550,6 +551,77 @@ public:
      */
     void resetDefaultDepthFilterConfig();
 
+    /**
+     * @brief Get current preset name
+     * @brief The preset mean a set of parameters or configurations that can be applied to the device to achieve a specific effect or function.
+     * @return const char* return the current preset name, it should be one of the preset names returned by @ref getAvailablePresetList.
+     */
+    const char *getCurrentPresetName();
+
+    /**
+     * @brief load the preset according to the preset name.
+     * @attention After loading the preset, the settings in the preset will set to the device immediately. Therefore, it is recommended to re-read the device
+     * settings to update the user program temporarily.
+     * @param presetName The preset name to set. The name should be one of the preset names returned by @ref getAvailablePresetList.
+     */
+    void loadPreset(const char *presetName);
+
+    /**
+     * @brief Get available preset list
+     * @brief The available preset list usually defined by the device manufacturer and restores on the device.
+     * @brief User can load the custom preset by calling @ref loadPresetFromJsonFile to append the available preset list.
+     *
+     * @return DevicePresetList return the available preset list.
+     */
+    std::shared_ptr<DevicePresetList> getAvailablePresetList();
+
+    /**
+     * @brief Load custom preset from file.
+     * @brief After loading the custom preset, the settings in the custom preset will set to the device immediately.
+     * @brief After loading the custom preset, the available preset list will be appended with the custom preset and named as the file name.
+     *
+     * @attention The user should ensure that the custom preset file is adapted to the device and the settings in the file are valid.
+     * @attention It is recommended to re-read the device settings to update the user program temporarily after successfully loading the custom preset.
+     *
+     * @param filePath The path of the custom preset file.
+     */
+    void loadPresetFromJsonFile(const char *filePath);
+
+    /**
+     * @brief Load custom preset from data.
+     * @brief After loading the custom preset, the settings in the custom preset will set to the device immediately.
+     * @brief After loading the custom preset, the available preset list will be appended with the custom preset and named as the @ref presetName.
+     *
+     * @attention The user should ensure that the custom preset data is adapted to the device and the settings in the data are valid.
+     * @attention It is recommended to re-read the device settings to update the user program temporarily after successfully loading the custom preset.
+     *
+     * @param data The custom preset data.
+     * @param size The size of the custom preset data.
+     */
+    void loadPresetFromJsonData(const char *presetName, const uint8_t *data, uint32_t size);
+
+    /**
+     * @brief Export current device settings as a preset json file.
+     * @brief The exported preset file can be loaded by calling @ref loadPresetFromJsonFile to restore the device setting.
+     * @brief After exporting the preset, a new preset named as the @ref filePath will be added to the available preset list.
+     *
+     * @param filePath The path of the preset file to be exported.
+     */
+    void exportSettingsAsPresetJsonFile(const char *filePath);
+
+    /**
+     * @brief Export current device settings as a preset json data.
+     * @brief After exporting the preset, a new preset named as the @ref presetName will be added to the available preset list.
+     *
+     * @attention The memory of the data is allocated by the SDK, and will automatically be released by the SDK.
+     * @attention The memory of the data will be reused by the SDK on the next call, so the user should copy the data to a new buffer if it needs to be
+     * preserved.
+     *
+     * @param[out] data return the preset json data.
+     * @param[out] dataSize return the size of the preset json data.
+     */
+    void exportSettingsAsPresetJsonData(const char *presetName, const uint8_t **data, uint32_t *dataSize);
+
     friend class Pipeline;
     friend class Recorder;
     friend class CoordinateTransformHelper;
@@ -850,6 +922,41 @@ public:
      * @return OBDepthWorkMode the OBDepthWorkMode object at the specified index
      */
     OBDepthWorkMode operator[](uint32_t index);
+};
+
+/**
+ * @brief Class representing a list of device presets
+ * @breif A device preset is a set of parameters or configurations that can be applied to the device to achieve a specific effect or function.
+ */
+class OB_EXTENSION_API DevicePresetList {
+private:
+    std::unique_ptr<DevicePresetListImpl> impl_;
+
+public:
+    DevicePresetList(std::unique_ptr<DevicePresetListImpl> impl);
+    ~DevicePresetList() noexcept;
+
+    /**
+     * @brief Get the number of device presets in the list
+     *
+     * @return uint32_t the number of device presets in the list
+     */
+    uint32_t count();
+
+    /**
+     * @brief Get the name of the device preset at the specified index
+     *
+     * @param index the index of the device preset
+     * @return const char* the name of the device preset
+     */
+    const char *getName(uint32_t index);
+
+    /**
+     * @breif check if the preset list contains the special name preset.
+     * @param name The name of the preset
+     * @return bool Returns true if the special name is found in the preset list, otherwise returns false.
+     */
+    bool hasPreset(const char *name);
 };
 
 }  // namespace ob

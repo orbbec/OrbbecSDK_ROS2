@@ -75,9 +75,10 @@ def generate_launch_description():
         DeclareLaunchArgument('trigger_out_enabled', default_value='false'),
         DeclareLaunchArgument('enable_frame_sync', default_value='true'),
         DeclareLaunchArgument('ordered_pc', default_value='false'),
-        DeclareLaunchArgument('use_hardware_time', default_value='false'),
+        DeclareLaunchArgument('use_hardware_time', default_value='true'),
         DeclareLaunchArgument('enable_depth_scale', default_value='true'),
         DeclareLaunchArgument('align_mode', default_value='HW'),
+        DeclareLaunchArgument('retry_on_usb3_detection_failure', default_value='false'),
     ]
 
     # Node configuration

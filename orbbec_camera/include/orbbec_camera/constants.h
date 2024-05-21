@@ -1,18 +1,18 @@
 /*******************************************************************************
-* Copyright (c) 2023 Orbbec 3D Technology, Inc
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*******************************************************************************/
+ * Copyright (c) 2023 Orbbec 3D Technology, Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
 
 #pragma once
 
@@ -22,8 +22,8 @@
 #define THREAD_NUM 4
 
 #define OB_ROS_MAJOR_VERSION 1
-#define OB_ROS_MINOR_VERSION 4
-#define OB_ROS_PATCH_VERSION 6
+#define OB_ROS_MINOR_VERSION 5
+#define OB_ROS_PATCH_VERSION 4
 
 #ifndef STRINGIFY
 #define STRINGIFY(arg) #arg
@@ -111,6 +111,21 @@ const int32_t OPENNI_END_PID = 0x06FF;
 const int32_t ASTRA_MINI_PID = 0x0404;
 const int32_t ASTRA_MINI_S_PID = 0x0407;
 const int GEMINI2_PID = 0x0670;
+const int GEMINI2R_PID = 0x06d0;
+const int GEMINI2RL_PID = 0x06d1;
+
+const int GEMINI2R_PID2 = 0x0800;
+const int GEMINI2RL_PID2 = 0x0804;
 const std::string ORB_DEFAULT_LOCK_NAME = "orbbec_device_lock";
+const int32_t GEMINI_335_PID = 0x0800;    // Gemini 335 / 335e
+const int32_t GEMINI_330_PID = 0x0801;    // Gemini 330
+const int32_t GEMINI_336_PID = 0x0803;    // Gemini 336 / 336e
+const int32_t GEMINI_335L_PID = 0x0804;   // Gemini 335L
+const int32_t GEMINI_330L_PID = 0x0805;   // Gemini 336L
+const int32_t GEMINI_336L_PID = 0x0807;   // Gemini 335Lg
+const int32_t GEMINI_335LG_PID = 0x080B;  // Gemini 336Lg
+const int32_t GEMINI_336LG_PID = 0x080D;
+const int32_t GEMINI_335LE_PID = 0x080E;  // Gemini 335Le
+const int32_t GEMINI_336LE_PID = 0x0810;  // Gemini 335Le
 
 }  // namespace orbbec_camera

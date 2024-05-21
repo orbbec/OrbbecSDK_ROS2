@@ -62,7 +62,8 @@ void OBCameraNodeDriver::init() {
   auto log_level_str = declare_parameter<std::string>("log_level", "none");
   connection_delay_ = declare_parameter<int>("connection_delay", 100);
   auto log_level = obLogSeverityFromString(log_level_str);
-  ob::Context::setLoggerSeverity(log_level);
+  connection_delay_ = static_cast<int>(declare_parameter<int>("connection_delay", 100));
+  ob::Context::setLoggerToConsole(log_level);
   orb_device_lock_shm_fd_ = shm_open(ORB_DEFAULT_LOCK_NAME.c_str(), O_CREAT | O_RDWR, 0666);
   if (orb_device_lock_shm_fd_ < 0) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to open shared memory " << ORB_DEFAULT_LOCK_NAME);
@@ -165,13 +166,15 @@ void OBCameraNodeDriver::checkConnectTimer() {
 }
 
 void OBCameraNodeDriver::queryDevice() {
-  while (rclcpp::ok() && is_alive_ && !device_connected_.load()) {
+  while (is_alive_ && rclcpp::ok() && !device_connected_.load()) {
     if (!net_device_ip_.empty() && net_device_port_ != 0) {
       connectNetDevice(net_device_ip_, net_device_port_);
     } else {
       auto device_list = ctx_->queryDeviceList();
       if (device_list->deviceCount() == 0) {
-        RCLCPP_INFO_STREAM(logger_, "queryDevice : No device found");
+        RCLCPP_INFO_STREAM(logger_,
+                           "queryDevice :No Device found, using usb event to trigger  "
+                           "OBCameraNodeDriver::onDeviceConnected");
         return;
       }
       startDevice(device_list);
@@ -304,8 +307,8 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
     ob_camera_node_.reset();
   }
   ob_camera_node_ = std::make_unique<OBCameraNode>(this, device_, parameters_);
-  ob_camera_node_->startStreams();
   ob_camera_node_->startIMU();
+  ob_camera_node_->startStreams();
   device_connected_ = true;
   device_info_ = device_->getDeviceInfo();
   serial_number_ = device_info_->serialNumber();
@@ -319,6 +322,7 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   RCLCPP_INFO_STREAM(logger_, "Firmware version: " << device_info_->firmwareVersion());
   RCLCPP_INFO_STREAM(logger_, "Hardware version: " << device_info_->hardwareVersion());
   RCLCPP_INFO_STREAM(logger_, "device unique id: " << device_unique_id_);
+  RCLCPP_INFO_STREAM(logger_, "Current node pid: " << getpid());
 }
 
 void OBCameraNodeDriver::connectNetDevice(const std::string &net_device_ip, int net_device_port) {
@@ -326,6 +330,7 @@ void OBCameraNodeDriver::connectNetDevice(const std::string &net_device_ip, int 
     RCLCPP_ERROR_STREAM(logger_, "Invalid net device ip or port");
     return;
   }
+  std::this_thread::sleep_for(std::chrono::milliseconds(connection_delay_));
   auto device = ctx_->createNetDevice(net_device_ip.c_str(), net_device_port);
   if (device == nullptr) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to connect to net device " << net_device_ip);

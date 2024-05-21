@@ -67,6 +67,9 @@ typedef struct ConfigImpl              ob_config;
 typedef struct RecorderImpl            ob_recorder;
 typedef struct PlaybackImpl            ob_playback;
 typedef struct OBDepthWorkModeListImpl ob_depth_work_mode_list;
+typedef struct FilterListImpl          ob_filter_list;
+typedef struct OBFilterListImpl        ob_filters;
+typedef struct DevicePresetListImpl    ob_device_preset_list;
 
 #define OB_WIDTH_ANY 0
 #define OB_HEIGHT_ANY 0
@@ -213,11 +216,11 @@ typedef enum {
     OB_FORMAT_MJPG       = 5,    /**< MJPEG encoding format */
     OB_FORMAT_H264       = 6,    /**< H.264 encoding format */
     OB_FORMAT_H265       = 7,    /**< H.265 encoding format */
-    OB_FORMAT_Y16        = 8,    /**< Y16 format, single channel 16-bit depth */
-    OB_FORMAT_Y8         = 9,    /**< Y8 format, single channel 8-bit depth */
-    OB_FORMAT_Y10        = 10,   /**< Y10 format, single channel 10-bit depth (SDK will unpack into Y16 by default) */
-    OB_FORMAT_Y11        = 11,   /**< Y11 format, single channel 11-bit depth (SDK will unpack into Y16 by default) */
-    OB_FORMAT_Y12        = 12,   /**< Y12 format, single channel 12-bit depth (SDK will unpack into Y16 by default) */
+    OB_FORMAT_Y16        = 8,    /**< Y16 format, 16-bit per pixel, single-channel*/
+    OB_FORMAT_Y8         = 9,    /**< Y8 format, 8-bit per pixel, single-channel */
+    OB_FORMAT_Y10        = 10,   /**< Y10 format, 10-bit per pixel, single-channel(SDK will unpack into Y16 by default) */
+    OB_FORMAT_Y11        = 11,   /**< Y11 format, 11-bit per pixel, single-channel (SDK will unpack into Y16 by default) */
+    OB_FORMAT_Y12        = 12,   /**< Y12 format, 12-bit per pixel, single-channel(SDK will unpack into Y16 by default) */
     OB_FORMAT_GRAY       = 13,   /**< GRAY (the actual format is the same as YUYV) */
     OB_FORMAT_HEVC       = 14,   /**< HEVC encoding format (the actual format is the same as H265) */
     OB_FORMAT_I420       = 15,   /**< I420 format */
@@ -228,10 +231,17 @@ typedef enum {
     OB_FORMAT_RLE        = 21,   /**< RLE pressure test format (SDK will be unpacked into Y16 by default) */
     OB_FORMAT_RGB        = 22,   /**< RGB format (actual RGB888)  */
     OB_FORMAT_BGR        = 23,   /**< BGR format (actual BGR888) */
-    OB_FORMAT_Y14        = 24,   /**< Y14 format, single channel 14-bit depth (SDK will unpack into Y16 by default) */
+    OB_FORMAT_Y14        = 24,   /**< Y14 format, 14-bit per pixel, single-channel (SDK will unpack into Y16 by default) */
     OB_FORMAT_BGRA       = 25,   /**< BGRA format */
     OB_FORMAT_COMPRESSED = 26,   /**< Compression format */
     OB_FORMAT_RVL        = 27,   /**< RVL pressure test format (SDK will be unpacked into Y16 by default) */
+    OB_FORMAT_Z16        = 28,   /**< Is same as Y16*/
+    OB_FORMAT_YV12       = 29,   /**< Is same as Y12, using for right ir stream*/
+    OB_FORMAT_BA81       = 30,   /**< Is same as Y8, using for right ir stream*/
+    OB_FORMAT_RGBA       = 31,   /**< RGBA format */
+    OB_FORMAT_BYR2       = 32,   /**< byr2 format */
+    OB_FORMAT_RW16       = 33,   /**< RAW16 format */
+    OB_FORMAT_DISP16     = 34,   /**< Y16 format for disparity map*/
     OB_FORMAT_UNKNOWN    = 0xff, /**< unknown format */
 } OBFormat,
     ob_format;
@@ -326,6 +336,28 @@ typedef struct {
 } OBFloatPropertyRange, ob_float_property_range;
 
 /**
+ * @brief Structure for float range
+ */
+typedef struct {
+    uint16_t cur;   ///< Current value
+    uint16_t max;   ///< Maximum value
+    uint16_t min;   ///< Minimum value
+    uint16_t step;  ///< Step value
+    uint16_t def;   ///< Default value
+} OBUint16PropertyRange, ob_uint16_property_range;
+
+/**
+ * @brief Structure for float range
+ */
+typedef struct {
+    uint8_t cur;   ///< Current value
+    uint8_t max;   ///< Maximum value
+    uint8_t min;   ///< Minimum value
+    uint8_t step;  ///< Step value
+    uint8_t def;   ///< Default value
+} OBUint8PropertyRange, ob_uint8_property_range;
+
+/**
  * @brief Structure for boolean range
  */
 typedef struct {
@@ -337,7 +369,7 @@ typedef struct {
 } OBBoolPropertyRange, ob_bool_property_range;
 
 /**
- * @brief Structure for camera internal parameters
+ * @brief Structure for camera intrinsic parameters
  */
 typedef struct {
     float   fx;      ///< Focal length in x direction
@@ -347,6 +379,31 @@ typedef struct {
     int16_t width;   ///< Image width
     int16_t height;  ///< Image height
 } OBCameraIntrinsic, ob_camera_intrinsic;
+
+/**
+ * @brief Structure for accelerometer intrinsic parameters
+ */
+typedef struct {
+    double noiseDensity;          ///< In-run bias instability
+    double randomWalk;            ///< random walk
+    double referenceTemp;         ///< reference temperature
+    double bias[3];               ///< bias for x, y, z axis
+    double gravity[3];            ///< gravity direction for x, y, z axis
+    double scaleMisalignment[9];  ///< scale factor and three-axis non-orthogonal error
+    double tempSlope[9];          ///< linear temperature drift coefficient
+} OBAccelIntrinsic, ob_accel_intrinsic;
+
+/**
+ * @brief Structure for gyroscope intrinsic parameters
+ */
+typedef struct {
+    double noiseDensity;          ///< In-run bias instability
+    double randomWalk;            ///< random walk
+    double referenceTemp;         ///< reference temperature
+    double bias[3];               ///< bias for x, y, z axis
+    double scaleMisalignment[9];  ///< scale factor and three-axis non-orthogonal error
+    double tempSlope[9];          ///< linear temperature drift coefficient
+} OBGyroIntrinsic, ob_gyro_intrinsic;
 
 /**
  * @brief Structure for distortion parameters
@@ -362,13 +419,36 @@ typedef struct {
     float p2;  ///< Tangential distortion factor 2
 } OBCameraDistortion, ob_camera_distortion;
 
+/** \brief Distortion model: defines how pixel coordinates should be mapped to sensor coordinates. */
+typedef enum {
+    OB_DISTORTION_NONE,                   /**< Rectilinear images. No distortion compensation required. */
+    OB_DISTORTION_MODIFIED_BROWN_CONRADY, /**< Equivalent to Brown-Conrady distortion, except that tangential distortion is applied to radially distorted points
+                                           */
+    OB_DISTORTION_INVERSE_BROWN_CONRADY,  /**< Equivalent to Brown-Conrady distortion, except undistorts image instead of distorting it */
+    OB_DISTORTION_BROWN_CONRADY,          /**< Unmodified Brown-Conrady distortion model */
+} OBCameraDistortionModel,
+    ob_camera_distortion_model;
+
+/** \brief Video stream intrinsics. */
+typedef struct {
+    int                     width;  /**< Width of the image in pixels */
+    int                     height; /**< Height of the image in pixels */
+    float                   ppx;    /**< Horizontal coordinate of the principal point of the image, as a pixel offset from the left edge */
+    float                   ppy;    /**< Vertical coordinate of the principal point of the image, as a pixel offset from the top edge */
+    float                   fx;     /**< Focal length of the image plane, as a multiple of pixel width */
+    float                   fy;     /**< Focal length of the image plane, as a multiple of pixel height */
+    OBCameraDistortionModel model;  /**< Distortion model of the image */
+    float coeffs[5]; /**< Distortion coefficients. Order for Brown-Conrady: [k1, k2, p1, p2, k3]. Order for F-Theta Fish-eye: [k1, k2, k3, k4, 0]. Other models
+                        are subject to their own interpretations */
+} OBCameraAlignIntrinsic, ob_camera_align_intrinsic;
+
 /**
  * @brief Structure for rotation/transformation
  */
 typedef struct {
     float rot[9];    ///< Rotation matrix
-    float trans[3];  ///< Transformation matrix
-} OBD2CTransform, ob_d2c_transform, OBTransform, ob_transform;
+    float trans[3];  ///< Transformation matrix in millimeters
+} OBD2CTransform, ob_d2c_transform, OBTransform, ob_transform, OBExtrinsic, ob_extrinsic;
 
 /**
  * @brief Structure for camera parameters
@@ -400,7 +480,7 @@ typedef struct {
 typedef struct {
     OBCameraIntrinsic  intrinsics[OB_SENSOR_COUNT];            ///< Sensor internal parameters
     OBCameraDistortion distortion[OB_SENSOR_COUNT];            ///< Sensor distortion
-    OBTransform extrinsics[OB_SENSOR_COUNT][OB_SENSOR_COUNT];  ///< The extrinsic parameters allow 3D coordinate conversions between sensor.To transform from a
+    OBExtrinsic extrinsics[OB_SENSOR_COUNT][OB_SENSOR_COUNT];  ///< The extrinsic parameters allow 3D coordinate conversions between sensor.To transform from a
                                                                ///< source to a target 3D coordinate system,under extrinsics[source][target].
 } OBCalibrationParam, ob_calibration_param;
 
@@ -456,28 +536,41 @@ typedef struct {
  * @brief Enumeration of format conversion types
  */
 typedef enum {
-    FORMAT_YUYV_TO_RGB888 = 0, /**< YUYV to RGB888 */
-    FORMAT_I420_TO_RGB888,     /**< I420 to RGB888 */
-    FORMAT_NV21_TO_RGB888,     /**< NV21 to RGB888 */
-    FORMAT_NV12_TO_RGB888,     /**< NV12 to RGB888 */
-    FORMAT_MJPG_TO_I420,       /**< MJPG to I420 */
-    FORMAT_RGB888_TO_BGR,      /**< RGB888 to BGR */
-    FORMAT_MJPG_TO_NV21,       /**< MJPG to NV21 */
-    FORMAT_MJPG_TO_RGB888,     /**< MJPG to RGB888 */
-    FORMAT_MJPG_TO_BGR888,     /**< MJPG to BGR888 */
-    FORMAT_MJPG_TO_BGRA,       /**< MJPG to BGRA */
-    FORMAT_UYVY_TO_RGB888,     /**< UYVY to RGB888 */
-    FORMAT_BGR_TO_RGB,         /**< BGR to RGB */
-    FORMAT_MJPG_TO_NV12,       /**< MJPG to NV12 */
+    FORMAT_YUYV_TO_RGB = 0, /**< YUYV to RGB */
+    FORMAT_I420_TO_RGB,     /**< I420 to RGB */
+    FORMAT_NV21_TO_RGB,     /**< NV21 to RGB */
+    FORMAT_NV12_TO_RGB,     /**< NV12 to RGB */
+    FORMAT_MJPG_TO_I420,    /**< MJPG to I420 */
+    FORMAT_RGB_TO_BGR,      /**< RGB888 to BGR */
+    FORMAT_MJPG_TO_NV21,    /**< MJPG to NV21 */
+    FORMAT_MJPG_TO_RGB,     /**< MJPG to RGB */
+    FORMAT_MJPG_TO_BGR,     /**< MJPG to BGR */
+    FORMAT_MJPG_TO_BGRA,    /**< MJPG to BGRA */
+    FORMAT_UYVY_TO_RGB,     /**< UYVY to RGB */
+    FORMAT_BGR_TO_RGB,      /**< BGR to RGB */
+    FORMAT_MJPG_TO_NV12,    /**< MJPG to NV12 */
+    FORMAT_YUYV_TO_BGR,     /**< YUYV to BGR */
+    FORMAT_YUYV_TO_RGBA,    /**< YUYV to RGBA */
+    FORMAT_YUYV_TO_BGRA,    /**< YUYV to BGRA */
+    FORMAT_YUYV_TO_Y16,     /**< YUYV to Y16 */
+    FORMAT_YUYV_TO_Y8,      /**< YUYV to Y8 */
 } OBConvertFormat,
     ob_convert_format;
 
 // DEPRECATED: Only used for old version program compatibility, will be completely deleted in subsequent iterative versions
 #define FORMAT_MJPEG_TO_I420 FORMAT_MJPG_TO_I420
 #define FORMAT_MJPEG_TO_NV21 FORMAT_MJPG_TO_NV21
-#define FORMAT_MJPEG_TO_RGB888 FORMAT_MJPG_TO_RGB888
-#define FORMAT_MJPEG_TO_BGR888 FORMAT_MJPG_TO_BGR888
 #define FORMAT_MJPEG_TO_BGRA FORMAT_MJPG_TO_BGRA
+#define FORMAT_YUYV_TO_RGB888 FORMAT_YUYV_TO_RGB
+#define FORMAT_I420_TO_RGB888 FORMAT_I420_TO_RGB
+#define FORMAT_NV21_TO_RGB888 FORMAT_NV21_TO_RGB
+#define FORMAT_NV12_TO_RGB888 FORMAT_NV12_TO_RGB
+#define FORMAT_UYVY_TO_RGB888 FORMAT_UYVY_TO_RGB
+#define FORMAT_MJPG_TO_RGB888 FORMAT_MJPG_TO_RGB
+#define FORMAT_MJPG_TO_BGR888 FORMAT_MJPG_TO_BGR
+#define FORMAT_MJPEG_TO_RGB888 FORMAT_MJPG_TO_RGB
+#define FORMAT_MJPEG_TO_BGR888 FORMAT_MJPG_TO_BGR
+#define FORMAT_RGB888_TO_BGR FORMAT_RGB_TO_BGR
 
 /**
  * @brief Enumeration of IMU sample rate values (gyroscope or accelerometer)
@@ -637,7 +730,6 @@ typedef enum {
     OB_TOF_FILTER_RANGE_DEBUG  = 100, /**< Debug range */
 } OBTofFilterRange,
     ob_tof_filter_range, TOF_FILTER_RANGE;
-
 /**
  * @brief 3D point structure in the SDK
  */
@@ -847,6 +939,63 @@ typedef struct {
      */
     char name[32];
 } OBDepthWorkMode, ob_depth_work_mode;
+
+/**
+ * @brief SequenceId fliter list item
+ */
+typedef struct {
+    int  sequenceSelectId;
+    char name[8];
+} OBSequenceIdItem, ob_sequence_id_item;
+
+/**
+ * @brief Hole fillig mode
+ */
+typedef enum {
+    OB_HOLE_FILL_TOP     = 0,
+    OB_HOLE_FILL_NEAREST = 1,  // "max" means farest for depth, and nearest for disparity; FILL_NEAREST
+    OB_HOLE_FILL_FAREST  = 2,  // FILL_FAREST
+} OBHoleFillingMode,
+    ob_hole_filling_mode;
+
+typedef struct {
+    uint8_t  magnitude;  // magnitude
+    float    alpha;      // smooth_alpha
+    uint16_t disp_diff;  // smooth_delta
+    uint16_t radius;     // hole_fill
+} OBSpatialAdvancedFilterParams, ob_spatial_advanced_filter_params;
+
+typedef enum OB_EDGE_NOISE_REMOVAL_TYPE {
+    OB_MG_FILTER  = 0,
+    OB_MGH_FILTER = 1,  // horizontal MG
+    OB_MGA_FILTER = 2,  // asym MG
+    OB_MGC_FILTER = 3,
+} OBEdgeNoiseRemovalType,
+    ob_edge_noise_removal_type;
+
+typedef struct {
+    OBEdgeNoiseRemovalType type;
+    uint16_t               marginLeftTh;
+    uint16_t               marginRightTh;
+    uint16_t               marginTopTh;
+    uint16_t               marginBottomTh;
+} OBEdgeNoiseRemovalFilterParams, ob_edge_noise_removal_filter_params;
+
+/**
+ * @brief 去噪方式
+ */
+typedef enum OB_DDO_NOISE_REMOVAL_TYPE {
+    OB_NR_LUT     = 0,  // SPLIT
+    OB_NR_OVERALL = 1,  // NON_SPLIT
+} OBDDONoiseRemovalType,
+    ob_ddo_noise_removal_type;
+
+typedef struct {
+    uint16_t              max_size;
+    uint16_t              disp_diff;
+    OBDDONoiseRemovalType type;
+} OBNoiseRemovalFilterParams, ob_noise_removal_filter_params;
+;
 
 /**
  * @brief Control command protocol version number
@@ -1255,6 +1404,231 @@ typedef struct {
 } BASELINE_CALIBRATION_PARAM, ob_baseline_calibration_param, OBBaselineCalibrationParam;
 
 /**
+ * @brief HDR Configuration
+ */
+typedef struct {
+
+    /**
+     * @brief Enable/disable HDR, after enabling HDR, the exposure_1 and gain_1 will be used as the first exposure and gain, and the exposure_2 and gain_2 will
+     * be used as the second exposure and gain. The output image will be alternately exposed and gain between the first and second
+     * exposure and gain.
+     *
+     * @attention After enabling HDR, the auto exposure will be disabled.
+     */
+    uint8_t  enable;
+    uint8_t  sequence_name;  ///< Sequence name
+    uint32_t exposure_1;     ///< Exposure time 1
+    uint32_t gain_1;         ///< Gain 1
+    uint32_t exposure_2;     ///< Exposure time 2
+    uint32_t gain_2;         ///< Gain 2
+} HDR_CONFIG, ob_hdr_config, OBHdrConfig;
+
+/**
+ * @brief The rect of the region of interest
+ */
+typedef struct {
+    int16_t x0_left;
+    int16_t y0_top;
+    int16_t x1_right;
+    int16_t y1_bottom;
+} AE_ROI, ob_region_of_interest, OBRegionOfInterest;
+
+/**
+ * @brief Frame metadata types
+ * @brief The frame metadata is a set of meta info generated by the device for current individual frame.
+ */
+typedef enum {
+    /**
+     * @brief Timestamp when the frame is captured.
+     * @attention Different device models may have different units. It is recommended to use the timestamp related functions to get the timestamp in the
+     * correct units.
+     */
+    OB_FRAME_METADATA_TYPE_TIMESTAMP = 0,
+
+    /**
+     * @brief Timestamp in the middle of the capture.
+     * @brief Usually is the middle of the exposure time.
+     *
+     * @attention Different device models may have different units.
+     */
+    OB_FRAME_METADATA_TYPE_SENSOR_TIMESTAMP = 1,
+
+    /**
+     * @brief The number of current frame.
+     */
+    OB_FRAME_METADATA_TYPE_FRAME_NUMBER = 2,
+
+    /**
+     * @brief Auto exposure status
+     * @brief If the value is 0, it means the auto exposure is disabled. Otherwise, it means the auto exposure is enabled.
+     */
+    OB_FRAME_METADATA_TYPE_AUTO_EXPOSURE = 3,
+
+    /**
+     * @brief Exposure time
+     *
+     * @attention Different sensor may have different units. Usually, it is 100us for color sensor and 1us for depth/infrared sensor.
+     */
+    OB_FRAME_METADATA_TYPE_EXPOSURE = 4,
+
+    /**
+     * @brief Gain
+     *
+     * @attention For some device models, the gain value represents the gain level, not the multiplier.
+     */
+    OB_FRAME_METADATA_TYPE_GAIN = 5,
+
+    /**
+     * @brief Auto white balance status
+     * @brief If the value is 0, it means the auto white balance is disabled. Otherwise, it means the auto white balance is enabled.
+     */
+    OB_FRAME_METADATA_TYPE_AUTO_WHITE_BALANCE = 6,
+
+    /**
+     * @brief White balance
+     */
+    OB_FRAME_METADATA_TYPE_WHITE_BALANCE = 7,
+
+    /**
+     * @brief Brightness
+     */
+    OB_FRAME_METADATA_TYPE_BRIGHTNESS = 8,
+
+    /**
+     * @brief Contrast
+     */
+    OB_FRAME_METADATA_TYPE_CONTRAST = 9,
+
+    /**
+     * @brief Saturation
+     */
+    OB_FRAME_METADATA_TYPE_SATURATION = 10,
+
+    /**
+     * @brief Sharpness
+     */
+    OB_FRAME_METADATA_TYPE_SHARPNESS = 11,
+
+    /**
+     * @brief Backlight compensation
+     */
+    OB_FRAME_METADATA_TYPE_BACKLIGHT_COMPENSATION = 12,
+
+    /**
+     * @brief Hue
+     */
+    OB_FRAME_METADATA_TYPE_HUE = 13,
+
+    /**
+     * @brief Gamma
+     */
+    OB_FRAME_METADATA_TYPE_GAMMA = 14,
+
+    /**
+     * @brief Power line frequency
+     * @brief For anti-flickering， 0：Close， 1： 50Hz， 2： 60Hz， 3： Auto
+     */
+    OB_FRAME_METADATA_TYPE_POWER_LINE_FREQUENCY = 15,
+
+    /**
+     * @brief Low light compensation
+     *
+     * @attention The low light compensation is a feature inside the device，and can not manually control it.
+     */
+    OB_FRAME_METADATA_TYPE_LOW_LIGHT_COMPENSATION = 16,
+
+    /**
+     * @brief Manual white balance setting
+     */
+    OB_FRAME_METADATA_TYPE_MANUAL_WHITE_BALANCE = 17,
+
+    /**
+     * @brief Actual frame rate
+     * @brief The actual frame rate will be calculated according to the exposure time and other parameters.
+     */
+    OB_FRAME_METADATA_TYPE_ACTUAL_FRAME_RATE = 18,
+
+    /**
+     * @brief Frame rate
+     */
+    OB_FRAME_METADATA_TYPE_FRAME_RATE = 19,
+
+    /**
+     * @brief Left region of interest for the auto exposure Algorithm.
+     */
+    OB_FRAME_METADATA_TYPE_AE_ROI_LEFT = 20,
+
+    /**
+     * @brief Top region of interest for the auto exposure Algorithm.
+     */
+    OB_FRAME_METADATA_TYPE_AE_ROI_TOP = 21,
+
+    /**
+     * @brief Right region of interest for the auto exposure Algorithm.
+     */
+    OB_FRAME_METADATA_TYPE_AE_ROI_RIGHT = 22,
+
+    /**
+     * @brief Bottom region of interest for the auto exposure Algorithm.
+     */
+    OB_FRAME_METADATA_TYPE_AE_ROI_BOTTOM = 23,
+
+    /**
+     * @brief Exposure priority
+     */
+    OB_FRAME_METADATA_TYPE_EXPOSURE_PRIORITY = 24,
+
+    /**
+     * @brief HDR sequence name
+     */
+    OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_NAME = 25,
+
+    /**
+     * @brief HDR sequence size
+     */
+    OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_SIZE = 26,
+
+    /**
+     * @brief HDR sequence index
+     */
+    OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_INDEX = 27,
+
+    /**
+     * @brief Laser power value in mW
+     *
+     * @attention The laser power value is an approximate estimation.
+     */
+    OB_FRAME_METADATA_TYPE_LASER_POWER = 28,
+
+    /**
+     * @brief Laser power level
+     */
+    OB_FRAME_METADATA_TYPE_LASER_POWER_LEVEL = 29,
+
+    /**
+     * @brief Laser status
+     * @brief 0: Laser off, 1: Laser on
+     */
+    OB_FRAME_METADATA_TYPE_LASER_STATUS = 30,
+
+    /**
+     * @brief GPIO input data
+     */
+    OB_FRAME_METADATA_TYPE_GPIO_INPUT_DATA = 31,
+
+    /**
+     * @brief The number of frame metadata types, using for types iterating
+     * @attention It is not a valid frame metadata type
+     */
+    OB_FRAME_METADATA_TYPE_COUNT,
+} ob_frame_metadata_type,
+    OBFrameMetadataType;
+
+// For compatibility
+#define OB_FRAME_METADATA_TYPE_LASER_POWER_MODE OB_FRAME_METADATA_TYPE_LASER_POWER_LEVEL
+#define OB_FRAME_METADATA_TYPE_EMITTER_MODE OB_FRAME_METADATA_TYPE_LASER_STATUS
+
+/**
  * @brief Callback for file transfer
  *
  * @param state Transmission status
@@ -1355,8 +1729,6 @@ typedef void(ob_frame_destroy_callback)(void *buffer, void *user_data);
  * @param user_data User-defined data
  */
 typedef void(ob_log_callback)(ob_log_severity severity, const char *message, void *user_data);
-
-typedef void(ob_get_imu_data_callback)(const uint8_t *data, uint32_t dataLen);
 
 /**
  * @brief Check if sensor_type is an IR sensor

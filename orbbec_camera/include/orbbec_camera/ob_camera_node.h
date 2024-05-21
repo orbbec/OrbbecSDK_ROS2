@@ -38,6 +38,7 @@
 #include <tf2/LinearMath/Transform.h>
 #include <std_srvs/srv/set_bool.hpp>
 #include <std_srvs/srv/empty.hpp>
+#include <diagnostic_updater/diagnostic_updater.hpp>
 
 #include <sensor_msgs/msg/camera_info.hpp>
 #include <camera_info_manager/camera_info_manager.hpp>
@@ -51,6 +52,7 @@
 #include "orbbec_camera_msgs/srv/get_device_info.hpp"
 #include "orbbec_camera_msgs/msg/extrinsics.hpp"
 #include "orbbec_camera_msgs/msg/metadata.hpp"
+#include "orbbec_camera_msgs/msg/imu_info.hpp"
 #include "orbbec_camera_msgs/srv/get_int32.hpp"
 #include "orbbec_camera_msgs/srv/get_string.hpp"
 #include "orbbec_camera_msgs/srv/set_int32.hpp"
@@ -61,6 +63,7 @@
 #include "orbbec_camera/d2c_viewer.h"
 #include "magic_enum/magic_enum.hpp"
 #include "jpeg_decoder.h"
+#include <std_msgs/msg/string.hpp>
 
 #define STREAM_NAME(sip)                                                                       \
   (static_cast<std::ostringstream&&>(std::ostringstream()                                      \
@@ -138,6 +141,8 @@ class OBCameraNode {
 
   void startStreams();
 
+  void startIMUSyncStream();
+
   void startIMU();
 
  private:
@@ -145,7 +150,7 @@ class OBCameraNode {
     IMUData() = default;
     IMUData(stream_index_pair stream, Eigen::Vector3d data, double timestamp)
         : stream_(std::move(stream)), data_(std::move(data)), timestamp_(timestamp) {}
-    bool isSet() const { return timestamp_ >= 0; }
+    [[nodiscard]] bool isSet() const { return timestamp_ >= 0; }
     stream_index_pair stream_{};
     Eigen::Vector3d data_{};
     double timestamp_ = -1;  // in nanoseconds
@@ -155,11 +160,21 @@ class OBCameraNode {
 
   void setupProfiles();
 
+  void updateImageConfig(const stream_index_pair& stream_index);
+
+  void printSensorProfiles(const std::shared_ptr<ob::Sensor>& sensor);
+
+  void selectBaseStream();
+
   void getParameters();
 
   void setupTopics();
 
   void setupPipelineConfig();
+
+  void setupDiagnosticUpdater();
+
+  void onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapper& status);
 
   void setupCameraCtrlServices();
 
@@ -270,7 +285,9 @@ class OBCameraNode {
 
   void publishColoredPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set);
 
-  void onNewFrameSetCallback(const std::shared_ptr<ob::FrameSet>& frame_set);
+  std::shared_ptr<ob::Frame> processDepthFrameFilter(std::shared_ptr<ob::Frame>& frame);
+
+  void onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set);
 
   std::shared_ptr<ob::Frame> softwareDecodeColorFrame(const std::shared_ptr<ob::Frame>& frame);
 
@@ -280,6 +297,9 @@ class OBCameraNode {
 
   void onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
                           const stream_index_pair& stream_index);
+
+  void publishMetadata(const std::shared_ptr<ob::Frame>& frame,
+                       const stream_index_pair& stream_index, const std_msgs::msg::Header& header);
 
   void onNewColorFrameCallback();
 
@@ -303,6 +323,10 @@ class OBCameraNode {
 
   bool setupFormatConvertType(OBFormat format);
 
+  orbbec_camera_msgs::msg::IMUInfo createIMUInfo(const stream_index_pair& stream_index);
+
+  static bool isGemini335PID(uint32_t pid);
+
  private:
   rclcpp::Node* node_ = nullptr;
   std::shared_ptr<ob::Device> device_ = nullptr;
@@ -313,13 +337,20 @@ class OBCameraNode {
   std::unique_ptr<ob::Pipeline> imuPipeline_ = nullptr;
   std::atomic_bool pipeline_started_{false};
   std::string camera_name_ = "camera";
-  const std::string imu_optical_frame_id_ = "camera_gyro_accel_optical_frame";
-  const std::string imu_frame_id_ = "camera_gyro_accel_frame";
+  const std::string imu_optical_frame_id_ = "camera_gyro_optical_frame";
+  const std::string imu_frame_id_ = "camera_gyro_frame";
   std::shared_ptr<ob::Config> pipeline_config_ = nullptr;
   std::map<stream_index_pair, std::shared_ptr<ob::Sensor>> sensors_;
   std::map<stream_index_pair, ob_camera_intrinsic> stream_intrinsics_;
   std::map<stream_index_pair, sensor_msgs::msg::CameraInfo> camera_infos_;
   std::map<stream_index_pair, OBCameraParam> ob_camera_param_;
+  std::map<stream_index_pair, OBExtrinsic> depth_to_other_extrinsics_;
+  std::map<stream_index_pair, rclcpp::Publisher<orbbec_camera_msgs::msg::Extrinsics>::SharedPtr>
+      depth_to_other_extrinsics_publishers_;
+  std::map<stream_index_pair, rclcpp::Publisher<orbbec_camera_msgs::msg::Metadata>::SharedPtr>
+      metadata_publishers_;
+  std::map<stream_index_pair, rclcpp::Publisher<orbbec_camera_msgs::msg::IMUInfo>::SharedPtr>
+      imu_info_publishers_;
   std::map<stream_index_pair, int> width_;
   std::map<stream_index_pair, int> height_;
   std::map<stream_index_pair, int> fps_;
@@ -336,6 +367,7 @@ class OBCameraNode {
   std::map<stream_index_pair, std::vector<std::shared_ptr<ob::VideoStreamProfile>>>
       supported_profiles_;
   std::map<stream_index_pair, std::shared_ptr<ob::StreamProfile>> stream_profile_;
+  stream_index_pair base_stream_ = DEPTH;
   std::map<stream_index_pair, uint32_t> seq_;
   std::map<stream_index_pair, cv::Mat> images_;
   std::map<stream_index_pair, std::string> encoding_;
@@ -383,7 +415,7 @@ class OBCameraNode {
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr depth_cloud_pub_;
   bool enable_point_cloud_ = true;
   bool enable_colored_point_cloud_ = false;
-  sensor_msgs::msg::PointCloud2 point_cloud_msg_;
+  std::recursive_mutex point_cloud_mutex_;
 
   orbbec_camera_msgs::msg::DeviceInfo device_info_;
   std::string point_cloud_qos_;
@@ -427,6 +459,7 @@ class OBCameraNode {
   bool trigger_out_enabled_ = false;
   std::string depth_precision_str_;
   OB_DEPTH_PRECISION_LEVEL depth_precision_ = OB_PRECISION_0MM8;
+  double depth_precision_float_ = 0.10;
   // IMU
   std::map<stream_index_pair, rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr> imu_publishers_;
   rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_gyro_accel_publisher_;
@@ -445,15 +478,54 @@ class OBCameraNode {
   bool is_color_frame_decoded_ = false;
   std::mutex device_lock_;
   // For color
-  std::queue<std::shared_ptr<ob::FrameSet>> colorFrameQueue_;
+  std::queue<std::shared_ptr<ob::FrameSet>> color_frame_queue_;
   std::shared_ptr<std::thread> colorFrameThread_ = nullptr;
-  std::mutex colorFrameMtx_;
-  std::condition_variable colorFrameCV_;
+  std::mutex color_frame_queue_lock_;
+  std::condition_variable color_frame_queue_cv_;
 
   bool ordered_pc_ = false;
-  bool use_hardware_time_ = false;
+  bool use_hardware_time_ = true;
   bool enable_depth_scale_ = true;
-  bool is_openni_device_ = false;
+  std::shared_ptr<ob::Frame> depth_frame_ = nullptr;
+  std::string device_preset_ = "Default";
+  // filter switch
+  bool enable_decimation_filter_ = false;
+  bool enable_hdr_merge_ = false;
+  bool enable_sequence_id_filter_ = false;
+  bool enable_threshold_filter_ = false;
+  bool enable_noise_removal_filter_ = true;
+  bool enable_spatial_filter_ = true;
+  bool enable_temporal_filter_ = false;
+  bool enable_hole_filling_filter_ = false;
+  // filter params
+  int decimation_filter_scale_ = -1;
+  int sequence_id_filter_id_ = -1;
+  int threshold_filter_max_ = -1;
+  int threshold_filter_min_ = -1;
+  int noise_removal_filter_min_diff_ = 256;
+  int noise_removal_filter_max_size_ = 80;
+  float spatial_filter_alpha_ = -1;
+  int spatial_filter_diff_threshold_ = -1;
+  int spatial_filter_magnitude_ = -1;
+  int spatial_filter_radius_ = -1;
+  float temporal_filter_diff_threshold_ = -1.0;
+  float temporal_filter_weight_ = -1.0;
+  std::string hole_filling_filter_mode_;
+  int hdr_merge_exposure_1_ = -1;
+  int hdr_merge_gain_1_ = -1;
+  int hdr_merge_exposure_2_ = -1;
+  int hdr_merge_gain_2_ = -1;
+
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr filter_status_pub_;
+  nlohmann::json filter_status_;
   std::string align_mode_ = "HW";
+  std::unique_ptr<diagnostic_updater::Updater> diagnostic_updater_ = nullptr;
+  double diagnostic_period_ = 1.0;
+  bool enable_laser_ = false;
+  int laser_on_off_mode_ = 0;
+  std::unique_ptr<ob::Align> align_filter_ = nullptr;
+  OBStreamType align_target_stream_ = OB_STREAM_COLOR;
+  bool retry_on_usb3_detection_failure_ = false;
+  std::atomic_bool is_camera_node_initialized_{false};
 };
 }  // namespace orbbec_camera

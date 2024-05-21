@@ -4,16 +4,16 @@ project(orbbec_camera)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -O3")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -fPIC -g")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -fPIC -g3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O3")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fPIC -g")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fPIC -g3")
 set(CMAKE_BUILD_TYPE "Release")
 option(USE_RK_HW_DECODER "Use Rockchip hardware decoder" OFF)
 option(USE_NV_HW_DECODER "Use Nvidia hardware decoder" OFF)
 
 
 if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Werror -Wno-pedantic)
+  add_compile_options(-Wall -Wextra -Werror -Wno-pedantic -Wno-array-bounds)
 endif ()
 
 # find dependencies
@@ -39,6 +39,8 @@ set(dependencies
   tf2_ros
   tf2_sensor_msgs
   Threads
+  diagnostic_updater
+  diagnostic_msgs
 )
 
 foreach (dep IN LISTS dependencies)
@@ -115,6 +117,7 @@ set(COMMON_LIBRARIES
   -lOrbbecSDK
   -L${ORBBEC_LIBS_DIR}
   Threads::Threads
+  -lrt
 )
 if (USE_RK_HW_DECODER)
   list(APPEND COMMON_LIBRARIES
@@ -219,6 +222,13 @@ install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY ${ORBBEC_INCLUDE_DIR} DESTINATION include)
 install(DIRECTORY ${ORBBEC_LIBS_DIR}/ DESTINATION lib/ FILES_MATCHING PATTERN "*.so*")
+if(DEFINED ENV{BUILDING_PACKAGE})
+  # Install udev rules
+  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/99-obsensor-libusb.rules
+    DESTINATION /etc/udev/rules.d
+  )
+endif()
+
 install(TARGETS list_devices_node
   list_depth_work_mode_node
   list_camera_profile_mode_node

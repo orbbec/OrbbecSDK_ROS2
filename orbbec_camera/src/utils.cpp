@@ -17,6 +17,7 @@
 #include <regex>
 #include "orbbec_camera/utils.h"
 #include <sensor_msgs/point_cloud2_iterator.hpp>
+#include "orbbec_camera/constants.h"
 namespace orbbec_camera {
 sensor_msgs::msg::CameraInfo convertToCameraInfo(OBCameraIntrinsic intrinsic,
                                                  OBCameraDistortion distortion, int width) {
@@ -82,14 +83,15 @@ void saveRGBPointsToPly(const std::shared_ptr<ob::Frame> &frame, const std::stri
   }
 }
 
-void saveRGBPointCloudMsgToPly(const sensor_msgs::msg::PointCloud2 &msg,
+void saveRGBPointCloudMsgToPly(const sensor_msgs::msg::PointCloud2::UniquePtr &msg,
                                const std::string &fileName) {
   FILE *fp = fopen(fileName.c_str(), "wb+");
   CHECK_NOTNULL(fp);
+  CHECK_NOTNULL(msg);
 
-  sensor_msgs::PointCloud2ConstIterator<float> iter_x(msg, "x");
-  sensor_msgs::PointCloud2ConstIterator<float> iter_y(msg, "y");
-  sensor_msgs::PointCloud2ConstIterator<float> iter_z(msg, "z");
+  sensor_msgs::PointCloud2ConstIterator<float> iter_x(*msg, "x");
+  sensor_msgs::PointCloud2ConstIterator<float> iter_y(*msg, "y");
+  sensor_msgs::PointCloud2ConstIterator<float> iter_z(*msg, "z");
 
   // First, count the actual number of valid points
   size_t valid_points = 0;
@@ -100,12 +102,12 @@ void saveRGBPointCloudMsgToPly(const sensor_msgs::msg::PointCloud2 &msg,
   }
 
   // Reset the iterators
-  iter_x = sensor_msgs::PointCloud2ConstIterator<float>(msg, "x");
-  iter_y = sensor_msgs::PointCloud2ConstIterator<float>(msg, "y");
-  iter_z = sensor_msgs::PointCloud2ConstIterator<float>(msg, "z");
-  sensor_msgs::PointCloud2ConstIterator<uint8_t> iter_r(msg, "r");
-  sensor_msgs::PointCloud2ConstIterator<uint8_t> iter_g(msg, "g");
-  sensor_msgs::PointCloud2ConstIterator<uint8_t> iter_b(msg, "b");
+  iter_x = sensor_msgs::PointCloud2ConstIterator<float>(*msg, "x");
+  iter_y = sensor_msgs::PointCloud2ConstIterator<float>(*msg, "y");
+  iter_z = sensor_msgs::PointCloud2ConstIterator<float>(*msg, "z");
+  sensor_msgs::PointCloud2ConstIterator<uint8_t> iter_r(*msg, "r");
+  sensor_msgs::PointCloud2ConstIterator<uint8_t> iter_g(*msg, "g");
+  sensor_msgs::PointCloud2ConstIterator<uint8_t> iter_b(*msg, "b");
 
   fprintf(fp, "ply\n");
   fprintf(fp, "format ascii 1.0\n");
@@ -129,13 +131,14 @@ void saveRGBPointCloudMsgToPly(const sensor_msgs::msg::PointCloud2 &msg,
   fclose(fp);
 }
 
-void saveDepthPointsToPly(const sensor_msgs::msg::PointCloud2 &msg, const std::string &fileName) {
+void saveDepthPointsToPly(const sensor_msgs::msg::PointCloud2::UniquePtr &msg,
+                          const std::string &fileName) {
   FILE *fp = fopen(fileName.c_str(), "wb+");
   CHECK_NOTNULL(fp);
-
-  sensor_msgs::PointCloud2ConstIterator<float> iter_x(msg, "x");
-  sensor_msgs::PointCloud2ConstIterator<float> iter_y(msg, "y");
-  sensor_msgs::PointCloud2ConstIterator<float> iter_z(msg, "z");
+  CHECK_NOTNULL(msg);
+  sensor_msgs::PointCloud2ConstIterator<float> iter_x(*msg, "x");
+  sensor_msgs::PointCloud2ConstIterator<float> iter_y(*msg, "y");
+  sensor_msgs::PointCloud2ConstIterator<float> iter_z(*msg, "z");
 
   // First, count the actual number of valid points
   size_t valid_points = 0;
@@ -146,9 +149,9 @@ void saveDepthPointsToPly(const sensor_msgs::msg::PointCloud2 &msg, const std::s
   }
 
   // Reset the iterators
-  iter_x = sensor_msgs::PointCloud2ConstIterator<float>(msg, "x");
-  iter_y = sensor_msgs::PointCloud2ConstIterator<float>(msg, "y");
-  iter_z = sensor_msgs::PointCloud2ConstIterator<float>(msg, "z");
+  iter_x = sensor_msgs::PointCloud2ConstIterator<float>(*msg, "x");
+  iter_y = sensor_msgs::PointCloud2ConstIterator<float>(*msg, "y");
+  iter_z = sensor_msgs::PointCloud2ConstIterator<float>(*msg, "z");
 
   fprintf(fp, "ply\n");
   fprintf(fp, "format ascii 1.0\n");
@@ -175,6 +178,8 @@ void savePointsToPly(const std::shared_ptr<ob::Frame> &frame, const std::string 
     fflush(fp);
     fclose(fp);
   });
+  CHECK_NOTNULL(fp);
+  CHECK_NOTNULL(frame);
   fprintf(fp, "ply\n");
   fprintf(fp, "format ascii 1.0\n");
   fprintf(fp, "element vertex %zu\n", point_size);
@@ -226,7 +231,7 @@ orbbec_camera_msgs::msg::Extrinsics obExtrinsicsToMsg(const OBD2CTransform &extr
   for (int i = 0; i < 9; ++i) {
     msg.rotation[i] = extrinsics.rot[i];
     if (i < 3) {
-      msg.translation[i] = extrinsics.trans[i];
+      msg.translation[i] = extrinsics.trans[i] / 1000.0;
     }
   }
 
@@ -259,6 +264,9 @@ std::string getObSDKVersion() {
 }
 
 OBFormat OBFormatFromString(const std::string &format) {
+  if (format.empty()) {
+    return OB_FORMAT_UNKNOWN;
+  }
   std::string fixed_format;
   std::transform(format.begin(), format.end(), std::back_inserter(fixed_format),
                  [](const auto ch) { return std::isalpha(ch) ? toupper(ch) : ch; });
@@ -312,9 +320,109 @@ OBFormat OBFormatFromString(const std::string &format) {
     return OB_FORMAT_BGR;
   } else if (fixed_format == "Y14") {
     return OB_FORMAT_Y14;
+  } else if (fixed_format == "BGRA") {
+    return OB_FORMAT_BGRA;
+  } else if (fixed_format == "COMPRESSED") {
+    return OB_FORMAT_COMPRESSED;
+  } else if (fixed_format == "RVL") {
+    return OB_FORMAT_RVL;
+  } else if (fixed_format == "Z16") {
+    return OB_FORMAT_Z16;
+  } else if (fixed_format == "YV12") {
+    return OB_FORMAT_YV12;
+  } else if (fixed_format == "BA81") {
+    return OB_FORMAT_BA81;
+  } else if (fixed_format == "RGBA") {
+    return OB_FORMAT_RGBA;
+  } else if (fixed_format == "BYR2") {
+    return OB_FORMAT_BYR2;
+  } else if (fixed_format == "RW16") {
+    return OB_FORMAT_RW16;
+  } else if (fixed_format == "DISP16") {
+    return OB_FORMAT_DISP16;
   } else {
     return OB_FORMAT_UNKNOWN;
   }
+}
+
+std::string OBFormatToString(const OBFormat &format) {
+  switch (format) {
+    case OB_FORMAT_MJPG:
+      return "MJPG";
+    case OB_FORMAT_YUYV:
+      return "YUYV";
+    case OB_FORMAT_YUY2:
+      return "YUYV2";
+    case OB_FORMAT_UYVY:
+      return "UYVY";
+    case OB_FORMAT_NV12:
+      return "NV12";
+    case OB_FORMAT_NV21:
+      return "NV21";
+    case OB_FORMAT_H264:
+      return "H264";
+    case OB_FORMAT_H265:
+      return "H265";
+    case OB_FORMAT_Y16:
+      return "Y16";
+    case OB_FORMAT_Y8:
+      return "Y8";
+    case OB_FORMAT_Y10:
+      return "Y10";
+    case OB_FORMAT_Y11:
+      return "Y11";
+    case OB_FORMAT_Y12:
+      return "Y12";
+    case OB_FORMAT_GRAY:
+      return "GRAY";
+    case OB_FORMAT_HEVC:
+      return "HEVC";
+    case OB_FORMAT_I420:
+      return "I420";
+    case OB_FORMAT_ACCEL:
+      return "ACCEL";
+    case OB_FORMAT_GYRO:
+      return "GYRO";
+    case OB_FORMAT_POINT:
+      return "POINT";
+    case OB_FORMAT_RGB_POINT:
+      return "RGB_POINT";
+    case OB_FORMAT_RLE:
+      return "REL";
+    case OB_FORMAT_RGB888:
+      return "RGB888";
+    case OB_FORMAT_BGR:
+      return "BGR";
+    case OB_FORMAT_Y14:
+      return "Y14";
+    case OB_FORMAT_BGRA:
+      return "BGRA";
+    case OB_FORMAT_COMPRESSED:
+      return "COMPRESSED";
+    case OB_FORMAT_RVL:
+      return "RVL";
+    case OB_FORMAT_Z16:
+      return "Z16";
+    case OB_FORMAT_YV12:
+      return "YV12";
+    case OB_FORMAT_BA81:
+      return "BA81";
+    case OB_FORMAT_RGBA:
+      return "RGBA";
+    case OB_FORMAT_BYR2:
+      return "BYR2";
+    case OB_FORMAT_RW16:
+      return "RW16";
+    case OB_FORMAT_DISP16:
+      return "DISP16";
+    default:
+      return "UNKNOWN";
+  }
+}
+
+std::ostream &operator<<(std::ostream &os, const OBFormat &rhs) {
+  os << OBFormatToString(rhs);
+  return os;
 }
 
 std::string ObDeviceTypeToString(const OBDeviceType &type) {
@@ -378,6 +486,19 @@ OB_DEPTH_PRECISION_LEVEL depthPrecisionLevelFromString(
   } else {
     return OB_PRECISION_0MM8;
   }
+}
+
+float depthPrecisionFromString(const std::string &depth_precision_level_str) {
+  // covert 0.8mm to 0.8
+  if (depth_precision_level_str.size() < 2) {
+    RCLCPP_WARN_STREAM(rclcpp::get_logger("utils"),
+                       "Invalid depth precision level: " << depth_precision_level_str
+                                                         << ". Using default precision level 1mm");
+    return 1.0;
+  }
+  std::string depth_precision_level_str_num =
+      depth_precision_level_str.substr(0, depth_precision_level_str.size() - 2);
+  return std::stof(depth_precision_level_str_num);
 }
 
 OBMultiDeviceSyncMode OBSyncModeFromString(const std::string &mode) {
@@ -476,6 +597,11 @@ std::string sampleRateToString(const OB_SAMPLE_RATE &sample_rate) {
   }
 }
 
+std::ostream &operator<<(std::ostream &os, const OB_SAMPLE_RATE &rhs) {
+  os << sampleRateToString(rhs);
+  return os;
+}
+
 OB_GYRO_FULL_SCALE_RANGE fullGyroScaleRangeFromString(std::string &full_scale_range) {
   std::transform(full_scale_range.begin(), full_scale_range.end(), full_scale_range.begin(),
                  ::tolower);
@@ -525,6 +651,11 @@ std::string fullGyroScaleRangeToString(const OB_GYRO_FULL_SCALE_RANGE &full_scal
   }
 }
 
+std::ostream &operator<<(std::ostream &os, const OB_GYRO_FULL_SCALE_RANGE &rhs) {
+  os << fullGyroScaleRangeToString(rhs);
+  return os;
+}
+
 OBAccelFullScaleRange fullAccelScaleRangeFromString(std::string &full_scale_range) {
   std::transform(full_scale_range.begin(), full_scale_range.end(), full_scale_range.begin(),
                  ::tolower);
@@ -556,6 +687,11 @@ std::string fullAccelScaleRangeToString(const OBAccelFullScaleRange &full_scale_
     default:
       return "2g";
   }
+}
+
+std::ostream &operator<<(std::ostream &os, const OBAccelFullScaleRange &rhs) {
+  os << fullAccelScaleRangeToString(rhs);
+  return os;
 }
 
 std::string parseUsbPort(const std::string &line) {
@@ -592,4 +728,128 @@ bool isValidJPEG(const std::shared_ptr<ob::ColorFrame> &frame) {
   return true;
 }
 
+std::string metaDataTypeToString(const OBFrameMetadataType &meta_data_type) {
+  switch (meta_data_type) {
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_TIMESTAMP:
+      return "frame_timestamp";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_SENSOR_TIMESTAMP:
+      return "sensor_timestamp";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_FRAME_NUMBER:
+      return "frame_number";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_AUTO_EXPOSURE:
+      return "auto_exposure";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_EXPOSURE:
+      return "exposure";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_GAIN:
+      return "gain";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_AUTO_WHITE_BALANCE:
+      return "auto_white_balance";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_WHITE_BALANCE:
+      return "white_balance";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_BRIGHTNESS:
+      return "brightness";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_CONTRAST:
+      return "contrast";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_SATURATION:
+      return "saturation";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_SHARPNESS:
+      return "sharpness";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_BACKLIGHT_COMPENSATION:
+      return "backlight_compensation";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_HUE:
+      return "hue";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_GAMMA:
+      return "gamma";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_POWER_LINE_FREQUENCY:
+      return "power_line_frequency";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_LOW_LIGHT_COMPENSATION:
+      return "low_light_compensation";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_MANUAL_WHITE_BALANCE:
+      return "manual_white_balance";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_ACTUAL_FRAME_RATE:
+      return "actual_frame_rate";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_FRAME_RATE:
+      return "frame_rate";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_AE_ROI_LEFT:
+      return "ae_roi_left";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_AE_ROI_TOP:
+      return "ae_roi_top";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_AE_ROI_RIGHT:
+      return "ae_roi_right";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_AE_ROI_BOTTOM:
+      return "ae_roi_bottom";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_EXPOSURE_PRIORITY:
+      return "exposure_priority";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_NAME:
+      return "hdr_sequence_name";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_SIZE:
+      return "hdr_sequence_size";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_INDEX:
+      return "hdr_sequence_index";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_LASER_POWER:
+      return "frame_laser_power";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_LASER_POWER_MODE:
+      return "frame_laser_power_mode";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_EMITTER_MODE:
+      return "frame_emitter_mode";
+    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_GPIO_INPUT_DATA:
+      return "gpio_input_data";
+    default:
+      return "unknown_field";
+  }
+}
+
+std::ostream &operator<<(std::ostream &os, const OBFrameMetadataType &rhs) {
+  os << metaDataTypeToString(rhs);
+  return os;
+}
+
+OBHoleFillingMode holeFillingModeFromString(const std::string &hole_filling_mode) {
+  if (hole_filling_mode == "FILL_TOP") {
+    return OB_HOLE_FILL_TOP;
+  } else if (hole_filling_mode == "FILL_NEAREST") {
+    return OB_HOLE_FILL_NEAREST;
+  } else if (hole_filling_mode == "FILL_FAREST") {
+    return OB_HOLE_FILL_FAREST;
+  } else {
+    return OB_HOLE_FILL_NEAREST;
+  }
+}
+
+bool isGemini2R(int pid) {
+  if (pid == GEMINI2R_PID || pid == GEMINI2RL_PID) {
+    return true;
+  }
+  if (pid == GEMINI2R_PID2 || pid == GEMINI2RL_PID2) {
+    return true;
+  }
+  return false;
+}
+
+OBStreamType obStreamTypeFromString(const std::string &stream_type) {
+  std::string upper_stream_type = stream_type;
+  std::transform(upper_stream_type.begin(), upper_stream_type.end(), upper_stream_type.begin(),
+                 ::toupper);
+  if (upper_stream_type == "VIDEO") {
+    return OB_STREAM_VIDEO;
+  } else if (upper_stream_type == "IR") {
+    return OB_STREAM_IR;
+  } else if (upper_stream_type == "COLOR") {
+    return OB_STREAM_COLOR;
+  } else if (upper_stream_type == "DEPTH") {
+    return OB_STREAM_DEPTH;
+  } else if (upper_stream_type == "ACCEL") {
+    return OB_STREAM_ACCEL;
+  } else if (upper_stream_type == "GYRO") {
+    return OB_STREAM_GYRO;
+  } else if (upper_stream_type == "IR_LEFT") {
+    return OB_STREAM_IR_LEFT;
+  } else if (upper_stream_type == "IR_RIGHT") {
+    return OB_STREAM_IR_RIGHT;
+  } else if (upper_stream_type == "RAW_PHASE") {
+    return OB_STREAM_RAW_PHASE;
+  } else {
+    return OB_STREAM_UNKNOWN;
+  }
+}
 }  // namespace orbbec_camera

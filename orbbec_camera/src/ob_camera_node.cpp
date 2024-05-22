@@ -922,13 +922,13 @@ void OBCameraNode::setupDiagnosticUpdater() {
   if (diagnostic_period_ <= 0.0) {
     return;
   }
-  try{
-  RCLCPP_INFO_STREAM(logger_, "Publish diagnostics every " << diagnostic_period_ << " seconds");
-  auto info = device_->getDeviceInfo();
-  std::string serial_number = info->serialNumber();
-  diagnostic_updater_ = std::make_unique<diagnostic_updater::Updater>(node_, diagnostic_period_);
-  diagnostic_updater_->setHardwareID(serial_number);
-  diagnostic_updater_->add("Temperatures", this, &OBCameraNode::onTemperatureUpdate);
+  try {
+    RCLCPP_INFO_STREAM(logger_, "Publish diagnostics every " << diagnostic_period_ << " seconds");
+    auto info = device_->getDeviceInfo();
+    std::string serial_number = info->serialNumber();
+    diagnostic_updater_ = std::make_unique<diagnostic_updater::Updater>(node_, diagnostic_period_);
+    diagnostic_updater_->setHardwareID(serial_number);
+    diagnostic_updater_->add("Temperatures", this, &OBCameraNode::onTemperatureUpdate);
   } catch (const std::exception &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to setup diagnostic updater: " << e.what());
   }
@@ -1092,6 +1092,9 @@ void OBCameraNode::publishPointCloud(const std::shared_ptr<ob::FrameSet> &frame_
 
 void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &frame_set) {
   (void)frame_set;
+  if (!depth_cloud_pub_) {
+    return;
+  }
   if (depth_cloud_pub_->get_subscription_count() == 0 || !enable_point_cloud_) {
     return;
   }
@@ -1189,6 +1192,9 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
 }
 
 void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> &frame_set) {
+  if (!depth_registration_cloud_pub_) {
+    return;
+  }
   if (depth_registration_cloud_pub_->get_subscription_count() == 0 ||
       !enable_colored_point_cloud_) {
     return;

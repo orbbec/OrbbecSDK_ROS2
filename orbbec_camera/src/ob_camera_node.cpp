@@ -839,6 +839,10 @@ void OBCameraNode::getParameters() {
   if (enable_colored_point_cloud_) {
     depth_registration_ = true;
   }
+  if (!enable_stream_[COLOR]) {
+    enable_colored_point_cloud_ = false;
+    depth_registration_ = false;
+  }
   setAndGetNodeParameter<bool>(enable_ldp_, "enable_ldp", true);
   setAndGetNodeParameter<int>(soft_filter_max_diff_, "soft_filter_max_diff", -1);
   setAndGetNodeParameter<int>(soft_filter_speckle_size_, "soft_filter_speckle_size", -1);

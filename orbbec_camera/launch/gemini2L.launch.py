@@ -74,7 +74,7 @@ def generate_launch_description():
         # Unbinned Sparse Default
         # Binned Sparse Default
         DeclareLaunchArgument('depth_work_mode', default_value=''),
-        DeclareLaunchArgument('sync_mode', default_value='free_run'),
+        DeclareLaunchArgument('sync_mode', default_value='standalone'),
         DeclareLaunchArgument('depth_delay_us', default_value='0'),
         DeclareLaunchArgument('color_delay_us', default_value='0'),
         DeclareLaunchArgument('trigger2image_delay_us', default_value='0'),
@@ -82,7 +82,7 @@ def generate_launch_description():
         DeclareLaunchArgument('trigger_out_enabled', default_value='false'),
         DeclareLaunchArgument('enable_frame_sync', default_value='true'),
         DeclareLaunchArgument('ordered_pc', default_value='false'),
-        DeclareLaunchArgument('use_hardware_time', default_value='false'),
+        DeclareLaunchArgument('use_hardware_time', default_value='true'),
         DeclareLaunchArgument('enable_depth_scale', default_value='true'),
         DeclareLaunchArgument('align_mode', default_value='HW'),
         DeclareLaunchArgument('retry_on_usb3_detection_failure', default_value='false'),

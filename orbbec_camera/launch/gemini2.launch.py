@@ -74,7 +74,7 @@ def generate_launch_description():
         # Binned Sparse Default
         # Obstacle Avoidance
         DeclareLaunchArgument('depth_work_mode', default_value=''),
-        DeclareLaunchArgument('sync_mode', default_value='free_run'),
+        DeclareLaunchArgument('sync_mode', default_value='standalone'),
         DeclareLaunchArgument('depth_delay_us', default_value='0'),
         DeclareLaunchArgument('color_delay_us', default_value='0'),
         DeclareLaunchArgument('trigger2image_delay_us', default_value='0'),

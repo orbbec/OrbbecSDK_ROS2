@@ -776,6 +776,7 @@ void OBCameraNode::getParameters() {
       use_hardware_time_ = true;
     }
   }
+  RCLCPP_INFO_STREAM(logger_, "use_hardware_time: " << (use_hardware_time_ ? "true" : "false"));
 
   for (auto stream_index : IMAGE_STREAMS) {
     depth_aligned_frame_id_[stream_index] = optical_frame_id_[COLOR];

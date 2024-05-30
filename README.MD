@@ -1,6 +1,6 @@
 # Orbbec ROS2 SDK
 
-## [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-1.5.2-green)
+## [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-1.5.6-green)
 
 Orbbec SDK ROS 2 is a wrapper for the Orbbec 3D camera that provides seamless integration with the ROS 2 environment. It
 supports ROS 2 Foxy, Galactic, and Humble distributions.

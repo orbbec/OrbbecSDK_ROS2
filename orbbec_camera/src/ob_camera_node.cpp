@@ -947,13 +947,13 @@ void OBCameraNode::setupPipelineConfig() {
   auto device_info = device_->getDeviceInfo();
   CHECK_NOTNULL(device_info.get());
   auto pid = device_info->pid();
+  RCLCPP_INFO_STREAM(logger_, "enable depth scale " << (enable_depth_scale_ ? "ON" : "OFF"));
+  pipeline_config_->setDepthScaleRequire(enable_depth_scale_);
   if (depth_registration_ && enable_stream_[COLOR] && enable_stream_[DEPTH] &&
       !isGemini335PID(pid)) {
     OBAlignMode align_mode = align_mode_ == "HW" ? ALIGN_D2C_HW_MODE : ALIGN_D2C_SW_MODE;
     RCLCPP_INFO_STREAM(logger_, "set align mode to " << magic_enum::enum_name(align_mode));
     pipeline_config_->setAlignMode(align_mode);
-    RCLCPP_INFO_STREAM(logger_, "enable depth scale " << (enable_depth_scale_ ? "ON" : "OFF"));
-    pipeline_config_->setDepthScaleRequire(enable_depth_scale_);
   }
   for (const auto &stream_index : IMAGE_STREAMS) {
     if (enable_stream_[stream_index]) {

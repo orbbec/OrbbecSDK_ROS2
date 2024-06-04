@@ -1175,8 +1175,6 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
   std::string frame_id = depth_registration_ ? optical_frame_id_[COLOR] : optical_frame_id_[DEPTH];
   point_cloud_msg->header.stamp = timestamp;
   point_cloud_msg->header.frame_id = frame_id;
-  depth_cloud_pub_->publish(std::move(point_cloud_msg));
-
   if (save_point_cloud_) {
     save_point_cloud_ = false;
     auto now = std::time(nullptr);
@@ -1194,6 +1192,7 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
       RCLCPP_ERROR_STREAM(logger_, "Failed to save point cloud: " << e.what());
     }
   }
+  depth_cloud_pub_->publish(std::move(point_cloud_msg));
 }
 
 void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> &frame_set) {
@@ -1297,7 +1296,6 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
                                       : fromUsToROSTime(depth_frame->systemTimeStampUs());
   point_cloud_msg->header.stamp = timestamp;
   point_cloud_msg->header.frame_id = optical_frame_id_[COLOR];
-  depth_registration_cloud_pub_->publish(std::move(point_cloud_msg));
   if (save_colored_point_cloud_) {
     save_colored_point_cloud_ = false;
     auto now = std::time(nullptr);
@@ -1317,6 +1315,7 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
       RCLCPP_ERROR(logger_, "Failed to save point cloud");
     }
   }
+  depth_registration_cloud_pub_->publish(std::move(point_cloud_msg));
 }
 
 std::shared_ptr<ob::Frame> OBCameraNode::processDepthFrameFilter(

@@ -1659,8 +1659,8 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   image_msg->step = width * unit_step_size_[stream_index];
   image_msg->header.frame_id = frame_id;
   CHECK(image_publishers_.count(stream_index) > 0);
-  image_publishers_[stream_index].publish(std::move(image_msg));
   saveImageToFile(stream_index, image, image_msg);
+  image_publishers_[stream_index].publish(std::move(image_msg));
 }
 
 void OBCameraNode::publishMetadata(const std::shared_ptr<ob::Frame> &frame,

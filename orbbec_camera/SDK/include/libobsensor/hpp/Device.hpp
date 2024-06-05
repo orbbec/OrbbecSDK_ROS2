@@ -559,6 +559,13 @@ public:
     const char *getCurrentPresetName();
 
     /**
+     * @brief Get current depth mode name
+     * @brief According the current preset name to return current depth mode name 
+     * @return const char* return the current depth mode name.
+     */
+    const char *getCurrentDepthModeName();
+
+    /**
      * @brief load the preset according to the preset name.
      * @attention After loading the preset, the settings in the preset will set to the device immediately. Therefore, it is recommended to re-read the device
      * settings to update the user program temporarily.

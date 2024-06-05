@@ -414,6 +414,26 @@ typedef enum {
     OB_PROP_IR_BRIGHTNESS_INT = 184,
 
     /**
+     * @brief slave device sync status
+    */
+    OB_PROP_SLAVE_DEVICE_SYNC_STATUS_BOOL = 188, 
+
+        /**
+     * @brief Color AE max exposure
+    */
+    OB_PROP_COLOR_AE_MAX_EXPOSURE_INT     = 189, 
+
+    /**
+     * @brief IR AE max exposure
+    */
+    OB_PROP_IR_AE_MAX_EXPOSURE_INT        = 190,
+
+    /**
+     * @brief disparity search range mode
+    */
+    OB_PROP_DISP_SEARCH_RANGE_MODE_INT    = 191, 
+
+    /**
      * @brief Baseline calibration parameters
      */
     OB_STRUCT_BASELINE_CALIBRATION_PARAM = 1002,

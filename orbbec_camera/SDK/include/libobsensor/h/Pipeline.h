@@ -264,6 +264,51 @@ void ob_delete_config(ob_config *config, ob_error **error);
 void ob_config_enable_stream(ob_config *config, ob_stream_profile *profile, ob_error **error);
 
 /**
+ * @brief Enable a video stream to be used in the configuration.
+ *
+ * This function configures and enables a video stream with specific parameters.
+ * Users must specify all parameters explicitly as C does not support default arguments.
+ * Refer to the product manual for details on supported resolutions and formats for different camera models.
+ *
+ * @param config Pointer to the configuration structure.
+ * @param type The video stream type.
+ * @param width The video stream width.
+ * @param height The video stream height.
+ * @param fps The video stream frame rate.
+ * @param format The video stream format.
+ * @param error Pointer to store the error if operation fails.
+ */
+void ob_config_enable_video_stream(ob_config *config, ob_stream_type type, int width, int height, int fps, ob_format format, ob_error **error);
+
+/**
+ * @brief Enable an accelerometer stream to be used in the configuration.
+ *
+ * This function configures and enables an accelerometer stream with specific parameters.
+ * Users must specify all parameters explicitly. For details on available full-scale ranges and sample rates,
+ * please refer to the product manual.
+ *
+ * @param config Pointer to the configuration structure.
+ * @param fullScaleRange The full-scale range of the accelerometer.
+ * @param sampleRate The sample rate of the accelerometer.
+ * @param error Pointer to store the error if operation fails.
+ */
+void ob_config_enable_accel_stream(ob_config *config, ob_accel_full_scale_range full_scale_range, ob_accel_sample_rate sample_rate, ob_error **error);
+
+/**
+ * @brief Enable a gyroscope stream to be used in the configuration.
+ *
+ * This function configures and enables a gyroscope stream with specific parameters.
+ * Users must specify all parameters explicitly. For details on available full-scale ranges and sample rates,
+ * please refer to the product manual.
+ *
+ * @param config Pointer to the configuration structure.
+ * @param fullScaleRange The full-scale range of the gyroscope.
+ * @param sampleRate The sample rate of the gyroscope.
+ * @param error Pointer to store the error if operation fails.
+ */
+void ob_config_enable_gyro_stream(ob_config *config, ob_gyro_full_scale_range full_scale_range, ob_gyro_sample_rate sample_rate, ob_error **error);
+
+/**
  * @deprecated Use @ref ob_config_enable_stream instead
  * @brief Enable all streams in the pipeline configuration
  *

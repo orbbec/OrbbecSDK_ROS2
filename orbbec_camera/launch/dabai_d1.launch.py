@@ -52,6 +52,7 @@ def generate_launch_description():
         DeclareLaunchArgument('use_hardware_time', default_value='false'),
         DeclareLaunchArgument('enable_depth_scale', default_value='true'),
         DeclareLaunchArgument('align_mode', default_value='HW'),
+        DeclareLaunchArgument('laser_energy_level', default_value='-1'),
     ]
 
     # Node configuration

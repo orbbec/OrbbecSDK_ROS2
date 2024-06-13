@@ -114,6 +114,7 @@ def generate_launch_description():
         # Laser on/off alternate mode, 0: off, 1: on-off alternate, 2: off-on alternate.
         DeclareLaunchArgument('laser_on_off_mode', default_value='0'),
         DeclareLaunchArgument('retry_on_usb3_detection_failure', default_value='false'),
+        DeclareLaunchArgument('laser_energy_level', default_value='-1'),
     ]
 
     # Node configuration

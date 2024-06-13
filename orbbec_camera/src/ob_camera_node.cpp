@@ -140,6 +140,14 @@ void OBCameraNode::setupDevices() {
       device_->setBoolProperty(OB_PROP_DEVICE_USB3_REPEAT_IDENTIFY_BOOL,
                                retry_on_usb3_detection_failure_);
     }
+    if (laser_energy_level_ != -1 &&
+        device_->isPropertySupported(OB_PROP_LASER_ENERGY_LEVEL_INT, OB_PERMISSION_READ_WRITE)) {
+      RCLCPP_INFO_STREAM(logger_, "Setting laser energy level to " << laser_energy_level_);
+      device_->setIntProperty(OB_PROP_LASER_ENERGY_LEVEL_INT, laser_energy_level_);
+      auto new_laser_energy_level = device_->getIntProperty(OB_PROP_LASER_ENERGY_LEVEL_INT);
+      RCLCPP_INFO_STREAM(logger_,
+                         "Laser energy level set to " << new_laser_energy_level << " (new value)");
+    }
     if (depth_registration_) {
       align_filter_ = std::make_unique<ob::Align>(align_target_stream_);
     }
@@ -898,6 +906,7 @@ void OBCameraNode::getParameters() {
   align_target_stream_ = obStreamTypeFromString(align_target_stream_str_);
   setAndGetNodeParameter<bool>(retry_on_usb3_detection_failure_, "retry_on_usb3_detection_failure",
                                false);
+  setAndGetNodeParameter<int>(laser_energy_level_, "laser_energy_level", -1);
 }
 
 void OBCameraNode::setupTopics() {

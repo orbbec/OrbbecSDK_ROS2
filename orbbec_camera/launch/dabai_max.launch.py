@@ -53,6 +53,7 @@ def generate_launch_description():
         DeclareLaunchArgument('ordered_pc', default_value='false'),
         DeclareLaunchArgument('use_hardware_time', default_value='false'),
         DeclareLaunchArgument('align_mode', default_value='HW'),
+        DeclareLaunchArgument('laser_energy_level', default_value='-1'),
     ]
 
     # Node configuration

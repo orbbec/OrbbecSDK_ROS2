@@ -6,8 +6,7 @@ find_package(ament_cmake REQUIRED)
 # Install files
 install(DIRECTORY 
         launch 
-        meshes 
-        rviz 
+        meshes
         urdf
         DESTINATION share/${PROJECT_NAME})
 

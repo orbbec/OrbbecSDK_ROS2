@@ -143,10 +143,16 @@ void OBCameraNode::setupDevices() {
     if (laser_energy_level_ != -1 &&
         device_->isPropertySupported(OB_PROP_LASER_ENERGY_LEVEL_INT, OB_PERMISSION_READ_WRITE)) {
       RCLCPP_INFO_STREAM(logger_, "Setting laser energy level to " << laser_energy_level_);
-      device_->setIntProperty(OB_PROP_LASER_ENERGY_LEVEL_INT, laser_energy_level_);
-      auto new_laser_energy_level = device_->getIntProperty(OB_PROP_LASER_ENERGY_LEVEL_INT);
-      RCLCPP_INFO_STREAM(logger_,
-                         "Laser energy level set to " << new_laser_energy_level << " (new value)");
+      auto range = device_->getIntPropertyRange(OB_PROP_LASER_ENERGY_LEVEL_INT);
+      if (laser_energy_level_ < range.min || laser_energy_level_ > range.max) {
+        RCLCPP_ERROR_STREAM(
+            logger_, "Laser energy level is out of range " << range.min << " - " << range.max);
+      } else {
+        device_->setIntProperty(OB_PROP_LASER_ENERGY_LEVEL_INT, laser_energy_level_);
+        auto new_laser_energy_level = device_->getIntProperty(OB_PROP_LASER_ENERGY_LEVEL_INT);
+        RCLCPP_INFO_STREAM(
+            logger_, "Laser energy level set to " << new_laser_energy_level << " (new value)");
+      }
     }
     if (depth_registration_) {
       align_filter_ = std::make_unique<ob::Align>(align_target_stream_);

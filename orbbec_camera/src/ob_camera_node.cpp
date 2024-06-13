@@ -373,17 +373,26 @@ void OBCameraNode::setupDevices() {
 
     if (device_->isPropertySupported(OB_PROP_DEPTH_MAX_DIFF_INT, OB_PERMISSION_WRITE)) {
       auto default_soft_filter_max_diff = device_->getIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT);
+      RCLCPP_INFO_STREAM(logger_, "default_soft_filter_max_diff: " << default_soft_filter_max_diff);
       if (soft_filter_max_diff_ != -1 && default_soft_filter_max_diff != soft_filter_max_diff_) {
         device_->setIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT, soft_filter_max_diff_);
+        auto new_soft_filter_max_diff = device_->getIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT);
+        RCLCPP_INFO_STREAM(logger_, "after set soft_filter_max_diff: " << new_soft_filter_max_diff);
       }
     }
 
     if (device_->isPropertySupported(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT, OB_PERMISSION_WRITE)) {
       auto default_soft_filter_speckle_size =
           device_->getIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT);
+      RCLCPP_INFO_STREAM(logger_,
+                         "default_soft_filter_speckle_size: " << default_soft_filter_speckle_size);
       if (soft_filter_speckle_size_ != -1 &&
           default_soft_filter_speckle_size != soft_filter_speckle_size_) {
         device_->setIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT, soft_filter_speckle_size_);
+        auto new_soft_filter_speckle_size =
+            device_->getIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT);
+        RCLCPP_INFO_STREAM(logger_,
+                           "after set soft_filter_speckle_size: " << new_soft_filter_speckle_size);
       }
     }
   } catch (const ob::Error &e) {

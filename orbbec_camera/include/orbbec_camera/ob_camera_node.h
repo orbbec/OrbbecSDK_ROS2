@@ -441,9 +441,15 @@ class OBCameraNode {
   bool enable_depth_filter_ = false;
   bool enable_soft_filter_ = true;
   bool enable_color_auto_exposure_ = true;
+  bool enable_color_auto_white_balance_ = true;
   bool enable_ir_auto_exposure_ = true;
   bool enable_ir_long_exposure_ = false;
   bool enable_ldp_ = true;
+  int color_exposure_ = -1;
+  int color_gain_ = -1;
+  int color_white_balance_ = -1;
+  int ir_exposure_ = -1;
+  int ir_gain_ = -1;
   int soft_filter_max_diff_ = -1;
   int soft_filter_speckle_size_ = -1;
   bool enable_frame_sync_ = false;

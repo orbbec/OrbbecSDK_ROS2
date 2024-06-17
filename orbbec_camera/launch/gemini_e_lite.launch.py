@@ -38,6 +38,8 @@ def generate_launch_description():
         DeclareLaunchArgument('ir_qos', default_value='default'),
         DeclareLaunchArgument('ir_camera_info_qos', default_value='default'),
         DeclareLaunchArgument('enable_ir_auto_exposure', default_value='true'),
+        DeclareLaunchArgument('ir_exposure', default_value='-1'),
+        DeclareLaunchArgument('ir_gain', default_value='-1'),
         DeclareLaunchArgument('publish_tf', default_value='true'),
         DeclareLaunchArgument('tf_publish_rate', default_value='10.0'),
         DeclareLaunchArgument('ir_info_url', default_value=''),

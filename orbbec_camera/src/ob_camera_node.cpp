@@ -376,9 +376,68 @@ void OBCameraNode::setupDevices() {
     if (device_->isPropertySupported(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
       device_->setBoolProperty(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, enable_color_auto_exposure_);
     }
+    if (device_->isPropertySupported(OB_PROP_COLOR_AUTO_WHITE_BALANCE_BOOL, OB_PERMISSION_WRITE)) {
+      device_->setBoolProperty(OB_PROP_COLOR_AUTO_WHITE_BALANCE_BOOL,
+                               enable_color_auto_white_balance_);
+    }
+    if (color_exposure_ != -1 &&
+        device_->isPropertySupported(OB_PROP_COLOR_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
+      device_->setBoolProperty(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, false);
+      auto range = device_->getIntPropertyRange(OB_PROP_COLOR_EXPOSURE_INT);
+      if (color_exposure_ < range.min || color_exposure_ > range.max) {
+        RCLCPP_ERROR(logger_, "color exposure value is out of range[%d,%d], please check the value",
+                     range.min, range.max);
+      } else {
+        device_->setIntProperty(OB_PROP_COLOR_EXPOSURE_INT, color_exposure_);
+      }
+    }
+    if (color_gain_ != -1 &&
+        device_->isPropertySupported(OB_PROP_COLOR_GAIN_INT, OB_PERMISSION_WRITE)) {
+      device_->setBoolProperty(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, false);
+      auto range = device_->getIntPropertyRange(OB_PROP_COLOR_GAIN_INT);
+      if (color_gain_ < range.min || color_gain_ > range.max) {
+        RCLCPP_ERROR(logger_, "color gain value is out of range[%d,%d], please check the value",
+                     range.min, range.max);
+      } else {
+        device_->setIntProperty(OB_PROP_COLOR_GAIN_INT, color_gain_);
+      }
+    }
+    if (color_white_balance_ != -1 &&
+        device_->isPropertySupported(OB_PROP_COLOR_WHITE_BALANCE_INT, OB_PERMISSION_WRITE)) {
+      device_->setBoolProperty(OB_PROP_COLOR_AUTO_WHITE_BALANCE_BOOL, false);
+      auto range = device_->getIntPropertyRange(OB_PROP_COLOR_WHITE_BALANCE_INT);
+      if (color_white_balance_ < range.min || color_white_balance_ > range.max) {
+        RCLCPP_ERROR(logger_,
+                     "color white balance value is out of range[%d,%d], please check the value",
+                     range.min, range.max);
+      } else {
+        device_->setIntProperty(OB_PROP_COLOR_WHITE_BALANCE_INT, color_white_balance_);
+      }
+    }
 
     if (device_->isPropertySupported(OB_PROP_IR_AUTO_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
       device_->setBoolProperty(OB_PROP_IR_AUTO_EXPOSURE_BOOL, enable_ir_auto_exposure_);
+    }
+    if (ir_exposure_ != -1 &&
+        device_->isPropertySupported(OB_PROP_IR_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
+      device_->setBoolProperty(OB_PROP_IR_AUTO_EXPOSURE_BOOL, false);
+      auto range = device_->getIntPropertyRange(OB_PROP_IR_EXPOSURE_INT);
+      if (ir_exposure_ < range.min || ir_exposure_ > range.max) {
+        RCLCPP_ERROR(logger_, "ir exposure value is out of range[%d,%d], please check the value",
+                     range.min, range.max);
+      } else {
+        device_->setIntProperty(OB_PROP_IR_EXPOSURE_INT, ir_exposure_);
+      }
+    }
+    if (ir_gain_ != -1 && device_->isPropertySupported(OB_PROP_IR_GAIN_INT, OB_PERMISSION_WRITE)) {
+      device_->setBoolProperty(OB_PROP_IR_AUTO_EXPOSURE_BOOL, false);
+      auto range = device_->getIntPropertyRange(OB_PROP_IR_GAIN_INT);
+      if (ir_gain_ < range.min || ir_gain_ > range.max) {
+        RCLCPP_ERROR(logger_, "ir gain value is out of range[%d,%d], please check the value",
+                     range.min, range.max);
+      } else {
+        device_->setIntProperty(OB_PROP_IR_GAIN_INT, ir_gain_);
+      }
     }
 
     if (device_->isPropertySupported(OB_PROP_IR_LONG_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
@@ -847,7 +906,13 @@ void OBCameraNode::getParameters() {
   }
   setAndGetNodeParameter(enable_frame_sync_, "enable_frame_sync", false);
   setAndGetNodeParameter(enable_color_auto_exposure_, "enable_color_auto_exposure", true);
+  setAndGetNodeParameter(enable_color_auto_white_balance_, "enable_color_auto_white_balance", true);
+  setAndGetNodeParameter<int>(color_exposure_, "color_exposure", -1);
+  setAndGetNodeParameter<int>(color_gain_, "color_gain", -1);
+  setAndGetNodeParameter<int>(color_white_balance_, "color_white_balance", -1);
   setAndGetNodeParameter(enable_ir_auto_exposure_, "enable_ir_auto_exposure", true);
+  setAndGetNodeParameter<int>(ir_exposure_, "ir_exposure", -1);
+  setAndGetNodeParameter<int>(ir_gain_, "ir_gain", -1);
   setAndGetNodeParameter(enable_ir_long_exposure_, "enable_ir_long_exposure", true);
   setAndGetNodeParameter<std::string>(depth_work_mode_, "depth_work_mode", "");
   setAndGetNodeParameter<std::string>(sync_mode_str_, "sync_mode", "");

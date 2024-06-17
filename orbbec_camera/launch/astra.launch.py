@@ -1,12 +1,12 @@
+import os
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
-from launch_ros.actions import PushRosNamespace
 from launch.actions import GroupAction
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import ComposableNodeContainer
-from launch_ros.descriptions import ComposableNode
 from launch_ros.actions import Node
-import os
+from launch_ros.actions import PushRosNamespace
+from launch_ros.descriptions import ComposableNode
 
 
 def generate_launch_description():
@@ -32,6 +32,10 @@ def generate_launch_description():
         DeclareLaunchArgument('color_qos', default_value='default'),
         DeclareLaunchArgument('color_camera_info_qos', default_value='default'),
         DeclareLaunchArgument('enable_color_auto_exposure', default_value='true'),
+        DeclareLaunchArgument('color_exposure', default_value='-1'),
+        DeclareLaunchArgument('color_gain', default_value='-1'),
+        DeclareLaunchArgument('enable_color_auto_white_balance', default_value='true'),
+        DeclareLaunchArgument('color_white_balance', default_value='-1'),
         DeclareLaunchArgument('depth_width', default_value='640'),
         DeclareLaunchArgument('depth_height', default_value='480'),
         DeclareLaunchArgument('depth_fps', default_value='10'),
@@ -49,6 +53,8 @@ def generate_launch_description():
         DeclareLaunchArgument('ir_qos', default_value='default'),
         DeclareLaunchArgument('ir_camera_info_qos', default_value='default'),
         DeclareLaunchArgument('enable_ir_auto_exposure', default_value='true'),
+        DeclareLaunchArgument('ir_exposure', default_value='-1'),
+        DeclareLaunchArgument('ir_gain', default_value='-1'),
         DeclareLaunchArgument('publish_tf', default_value='true'),
         DeclareLaunchArgument('tf_publish_rate', default_value='10.0'),
         DeclareLaunchArgument('ir_info_url', default_value=''),

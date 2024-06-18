@@ -1,14 +1,13 @@
 # Orbbec ROS2 SDK
-
-## [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-1.5.6-green)
+ [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-1.5.7-green)
 
 Orbbec SDK ROS 2 is a wrapper for the Orbbec 3D camera that provides seamless integration with the ROS 2 environment. It
 supports ROS 2 Foxy, Galactic, and Humble distributions.
 
 ## Table of Contents
+
 <!-- TOC -->
 * [Orbbec ROS2 SDK](#orbbec-ros2-sdk)
-  * [![stable](http://badges.github.io/stability-badges/dist/stable.svg) ![version](https://img.shields.io/badge/version-1.5.2-green)](#-)
   * [Table of Contents](#table-of-contents)
   * [Installation Instructions](#installation-instructions)
   * [Getting start](#getting-start)
@@ -35,6 +34,7 @@ supports ROS 2 Foxy, Galactic, and Humble distributions.
   * [Other useful links](#other-useful-links)
   * [License](#license)
 <!-- TOC -->
+
 ## Installation Instructions
 
 Install ROS 2
@@ -253,7 +253,9 @@ The following are the launch parameters available:
   recognized as USB 2.0. It is recommended to set this parameter to `false` when using a USB 2.0 connection to avoid
   unnecessary resets.
 
-**IMPORTANT**: *Please carefully read the instructions regarding software filtering settings at [this link](https://www.orbbec.com/docs/g330-use-depth-post-processing-blocks/). If you are uncertain, do not modify these settings.*
+**IMPORTANT**: *Please carefully read the instructions regarding software filtering settings
+at [this link](https://www.orbbec.com/docs/g330-use-depth-post-processing-blocks/). If you are uncertain, do not modify
+these settings.*
 
 ## Predefined presets
 
@@ -362,7 +364,8 @@ to `true` in the stream that corresponds to the argument of the launch file.
 - `/camera/gyro/sample`: Gyroscope data stream，enable_sync_output_accel_gyro`turned off，`enable_gyro`turned on
 - `camera/gyro_accel/sample`: Synchronized data stream of acceleration and gyroscope，`enable_sync_output_accel_gyro`
   turned on
-- `/diagnostics`: The diagnostic information of the camera, Currently, the diagnostic information only includes the temperature of the camera.
+- `/diagnostics`: The diagnostic information of the camera, Currently, the diagnostic information only includes the
+  temperature of the camera.
 
 ## Network device enumeration
 

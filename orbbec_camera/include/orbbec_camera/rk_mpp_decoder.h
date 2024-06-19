@@ -24,6 +24,8 @@
 #include <rockchip/mpp_rc_defs.h>
 #include <rockchip/mpp_task.h>
 #include <rockchip/rk_mpi.h>
+#include "utils.h"
+
 #if defined(USE_LIBYUV)
 #include <libyuv.h>
 #else

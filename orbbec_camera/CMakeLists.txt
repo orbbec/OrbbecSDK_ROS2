@@ -48,11 +48,7 @@ foreach (dep IN LISTS dependencies)
 endforeach ()
 
 find_package(PkgConfig REQUIRED)
-pkg_search_module(GLOG REQUIRED libglog)
 
-if (NOT GLOG_FOUND)
-  message(FATAL_ERROR "glog is not found")
-endif ()
 
 if (USE_RK_HW_DECODER)
   pkg_search_module(RK_MPP REQUIRED rockchip_mpp)
@@ -106,14 +102,12 @@ set(COMMON_INCLUDE_DIRS
   $<INSTALL_INTERFACE:include>
   ${ORBBEC_INCLUDE_DIR}
   ${OpenCV_INCLUDED_DIRS}
-  ${GLOG_INCLUDED_DIRS}
 )
 
 set(COMMON_LIBRARIES
   ${ORBBEC_SDK_LIBRARIES}
   ${OpenCV_LIBS}
   Eigen3::Eigen
-  ${GLOG_LIBRARIES}
   -lOrbbecSDK
   -L${ORBBEC_LIBS_DIR}
   Threads::Threads

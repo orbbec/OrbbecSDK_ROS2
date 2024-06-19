@@ -16,7 +16,6 @@
 
 #pragma once
 #include <rclcpp/rclcpp.hpp>
-#include <glog/logging.h>
 #include <sensor_msgs/msg/imu.hpp>
 #include <queue>
 #include <mutex>

@@ -16,7 +16,6 @@
 
 #include "orbbec_camera/rk_mpp_decoder.h"
 #include <rclcpp/rclcpp.hpp>
-#include <glog/logging.h>
 #include <magic_enum/magic_enum.hpp>
 
 namespace orbbec_camera {

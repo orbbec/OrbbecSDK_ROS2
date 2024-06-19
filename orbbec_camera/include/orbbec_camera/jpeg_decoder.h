@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 #include "libobsensor/ObSensor.hpp"
+#include "utils.h"
 
 namespace orbbec_camera {
 

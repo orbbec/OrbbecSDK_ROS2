@@ -22,6 +22,8 @@
 #include <rclcpp_components/register_node_macro.hpp>
 #include <csignal>
 #include <sys/mman.h>
+#include <unistd.h>
+
 
 namespace orbbec_camera {
 OBCameraNodeDriver::OBCameraNodeDriver(const rclcpp::NodeOptions &node_options)

@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include <glog/logging.h>
 #include <nlohmann/json.hpp>
 
 #include <memory>

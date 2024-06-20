@@ -13,7 +13,11 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *******************************************************************************/
+#if defined(ROS_JAZZY)
+#include <cv_bridge/cv_bridge.hpp>
+#else
 #include <cv_bridge/cv_bridge.h>
+#endif
 #include <sensor_msgs/image_encodings.hpp>
 
 #include <opencv2/opencv.hpp>

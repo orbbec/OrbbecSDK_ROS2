@@ -27,7 +27,6 @@
 #include <vector>
 #include <atomic>
 #include <opencv2/opencv.hpp>
-#include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <sensor_msgs/point_cloud2_iterator.hpp>
 #include <tf2_ros/static_transform_broadcaster.h>
@@ -63,6 +62,12 @@
 #include "magic_enum/magic_enum.hpp"
 #include "jpeg_decoder.h"
 #include <std_msgs/msg/string.hpp>
+
+#if defined(ROS_JAZZY)
+#include <cv_bridge/cv_bridge.hpp>
+#else
+#include <cv_bridge/cv_bridge.h>
+#endif
 
 #define STREAM_NAME(sip)                                                                       \
   (static_cast<std::ostringstream&&>(std::ostringstream()                                      \

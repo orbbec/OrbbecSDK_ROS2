@@ -788,20 +788,38 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
   }
   auto width = depth_frame->width();
   auto height = depth_frame->height();
+
+  if (!xy_tables_.has_value()) {
+    calibration_param_ = pipeline_->getCalibrationParam(pipeline_config_);
+
+    uint32_t tableSize = width * height * 2; // one for x-coordinate and one for y-coordinate LUT
+    xy_table_data_ = new float[tableSize];
+
+    xy_tables_ = OBXYTables();
+    if (!ob::CoordinateTransformHelper::transformationInitXYTables(
+        *calibration_param_, OB_SENSOR_DEPTH, *xy_table_data_,
+        &tableSize, &(*xy_tables_))) {
+      xy_tables_.reset();
+      RCLCPP_ERROR_STREAM(logger_, "Failed to init xy tables");
+      return;
+    }
+  }
+
   const auto *depth_data = (uint16_t *)depth_frame->data();
   if (depth_data == nullptr) {
     return;
   }
-  float fdx =
-      camera_param_->depthIntrinsic.fx * ((float)(width) / camera_param_->depthIntrinsic.width);
-  float fdy =
-      camera_param_->depthIntrinsic.fy * ((float)(height) / camera_param_->depthIntrinsic.height);
-  fdx = 1 / fdx;
-  fdy = 1 / fdy;
-  float u0 =
-      camera_param_->depthIntrinsic.cx * ((float)(width) / camera_param_->depthIntrinsic.width);
-  float v0 =
-      camera_param_->depthIntrinsic.cy * ((float)(height) / camera_param_->depthIntrinsic.height);
+
+  uint32_t pointcloudSize = width * height * sizeof(OBPoint3f);
+  uint8_t * pointcloudData = new uint8_t[pointcloudSize];
+  memset(pointcloudData, 0, pointcloudSize);
+  OBPoint * pointPixel = (OBPoint *)pointcloudData;
+
+  ob::CoordinateTransformHelper::transformationDepthToPointCloud(
+    &(*xy_tables_),
+    depth_data,
+    pointPixel);
+
   sensor_msgs::PointCloud2Modifier modifier(point_cloud_msg_);
   modifier.setPointCloud2FieldsByString(1, "xyz");
   modifier.resize(width * height);
@@ -816,25 +834,17 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
   size_t valid_count = 0;
   const static float MIN_DISTANCE = 20.0;
   const static float MAX_DISTANCE = 10000.0;
-  double depth_scale = depth_frame->getValueScale();
-  const static float min_depth = MIN_DISTANCE / depth_scale;
-  const static float max_depth = MAX_DISTANCE / depth_scale;
-  for (uint32_t y = 0; y < height; y++) {
-    for (uint32_t x = 0; x < width; x++) {
-      bool vaild_point = true;
-      if (depth_data[y * width + x] < min_depth || depth_data[y * width + x] > max_depth) {
-        vaild_point = false;
-      }
-      if (vaild_point || ordered_pc_) {
-        float xf = (x - u0) * fdx;
-        float yf = (y - v0) * fdy;
-        float zf = depth_data[y * width + x] * depth_scale;
-        *iter_x = zf * xf / 1000.0;
-        *iter_y = zf * yf / 1000.0;
-        *iter_z = zf / 1000.0;
-        ++iter_x, ++iter_y, ++iter_z;
-        valid_count++;
-      }
+  for (uint32_t i = 0; i < width * height; i++) {
+    bool valid_point = true;
+    if (pointPixel[i].z<MIN_DISTANCE || pointPixel[i].z> MAX_DISTANCE) {
+      valid_point = false;
+    }
+    if (valid_point || ordered_pc_) {
+      *iter_x = pointPixel[i].x / 1000.0;
+      *iter_y = pointPixel[i].y / 1000.0;
+      *iter_z = pointPixel[i].z / 1000.0;
+      ++iter_x, ++iter_y, ++iter_z;
+      valid_count++;
     }
   }
   auto timestamp = use_hardware_time_ ? fromUsToROSTime(depth_frame->timeStampUs())
@@ -865,6 +875,8 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
     RCLCPP_INFO_STREAM(logger_, "Saving point cloud to " << filename);
     saveDepthPointsToPly(point_cloud_msg_, filename);
   }
+  delete[] pointcloudData;
+  pointcloudData = nullptr;
 }
 
 void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> &frame_set) {

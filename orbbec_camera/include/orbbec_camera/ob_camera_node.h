@@ -63,7 +63,7 @@
 #include "jpeg_decoder.h"
 #include <std_msgs/msg/string.hpp>
 
-#if defined(ROS_JAZZY)
+#if defined(ROS_JAZZY) || defined(ROS_IRON)
 #include <cv_bridge/cv_bridge.hpp>
 #else
 #include <cv_bridge/cv_bridge.h>

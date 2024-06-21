@@ -26,7 +26,7 @@ ParametersBackend::~ParametersBackend() {
     ros_callback_.reset();
   }
 }
-#if defined(ROS_JAZZY)
+#if defined(ROS_JAZZY) || defined(ROS_IRON)
 void ParametersBackend::addOnSetParametersCallback(
     rclcpp::node_interfaces::NodeParametersInterface::OnSetParametersCallbackType callback) {
   ros_callback_ = node_->add_on_set_parameters_callback(callback);

@@ -22,7 +22,7 @@ class ParametersBackend {
  public:
   explicit ParametersBackend(rclcpp::Node* node);
   ~ParametersBackend();
-#if defined(ROS_JAZZY)
+#if defined(ROS_JAZZY) || defined(ROS_IRON)
   void addOnSetParametersCallback(
       rclcpp::node_interfaces::NodeParametersInterface::OnSetParametersCallbackType callback);
 #else

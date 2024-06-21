@@ -15,10 +15,12 @@ option(USE_NV_HW_DECODER "Use Nvidia hardware decoder" OFF)
 if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Werror -Wno-pedantic -Wno-array-bounds)
 endif ()
-# Check if ROS Jazzy is installed
-if("$ENV{ROS_DISTRO}" STREQUAL "jazzy")
+# Check if ROS Jazzy or iron is installed
+if ("$ENV{ROS_DISTRO}" STREQUAL "jazzy")
   add_compile_definitions(ROS_JAZZY)
-endif()
+elseif ("$ENV{ROS_DISTRO}" STREQUAL "iron")
+  add_compile_definitions(ROS_IRON)
+endif ()
 
 # find dependencies
 set(dependencies
@@ -220,12 +222,12 @@ install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY ${ORBBEC_INCLUDE_DIR} DESTINATION include)
 install(DIRECTORY ${ORBBEC_LIBS_DIR}/ DESTINATION lib/ FILES_MATCHING PATTERN "*.so*")
-if(DEFINED ENV{BUILDING_PACKAGE})
+if (DEFINED ENV{BUILDING_PACKAGE})
   # Install udev rules
   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/99-obsensor-libusb.rules
     DESTINATION /etc/udev/rules.d
   )
-endif()
+endif ()
 
 install(TARGETS list_devices_node
   list_depth_work_mode_node

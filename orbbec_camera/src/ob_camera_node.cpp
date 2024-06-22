@@ -69,8 +69,8 @@ OBCameraNode::OBCameraNode(rclcpp::Node *node, std::shared_ptr<ob::Device> devic
     rgb_buffer_ = new uint8_t[width_[COLOR] * height_[COLOR] * 3];
   }
   if (enable_colored_point_cloud_ && enable_stream_[DEPTH] && enable_stream_[COLOR]) {
-    rgb_pint_cloud_buffer_size_ = width_[COLOR] * height_[COLOR] * sizeof(OBColorPoint);
-    rgb_pint_cloud_buffer_ = new uint8_t[rgb_pint_cloud_buffer_size_];
+    rgb_point_cloud_buffer_size_ = width_[COLOR] * height_[COLOR] * sizeof(OBColorPoint);
+    rgb_point_cloud_buffer_ = new uint8_t[rgb_point_cloud_buffer_size_];
     xy_table_data_size_ = width_[DEPTH] * height_[DEPTH] * 2;
     xy_table_data_ = new float[xy_table_data_size_];
   }
@@ -115,9 +115,9 @@ void OBCameraNode::clean() noexcept {
     delete[] rgb_buffer_;
     rgb_buffer_ = nullptr;
   }
-  if (rgb_pint_cloud_buffer_) {
-    delete[] rgb_pint_cloud_buffer_;
-    rgb_pint_cloud_buffer_ = nullptr;
+  if (rgb_point_cloud_buffer_) {
+    delete[] rgb_point_cloud_buffer_;
+    rgb_point_cloud_buffer_ = nullptr;
   }
   if (xy_table_data_) {
     delete[] xy_table_data_;
@@ -1216,6 +1216,9 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
   }
   CHECK_NOTNULL(pipeline_);
   auto camera_params = pipeline_->getCameraParam();
+  if (depth_registration_) {
+    camera_params.depthIntrinsic = camera_params.rgbIntrinsic;
+  }
   depth_point_cloud_filter_.setCameraParam(camera_params);
   float depth_scale = depth_frame->getValueScale();
   depth_point_cloud_filter_.setPositionDataScaled(depth_scale);
@@ -1336,15 +1339,15 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
 
   const auto *depth_data = (uint8_t *)depth_frame->data();
   const auto *color_data = (uint8_t *)(rgb_buffer_);
-  CHECK_NOTNULL(rgb_pint_cloud_buffer_);
+  CHECK_NOTNULL(rgb_point_cloud_buffer_);
   uint32_t point_cloud_buffer_size = color_width * color_height * sizeof(OBColorPoint);
-  if (point_cloud_buffer_size > rgb_pint_cloud_buffer_size_) {
-    delete[] rgb_pint_cloud_buffer_;
-    rgb_pint_cloud_buffer_ = new uint8_t[point_cloud_buffer_size];
-    rgb_pint_cloud_buffer_size_ = point_cloud_buffer_size;
+  if (point_cloud_buffer_size > rgb_point_cloud_buffer_size_) {
+    delete[] rgb_point_cloud_buffer_;
+    rgb_point_cloud_buffer_ = new uint8_t[point_cloud_buffer_size];
+    rgb_point_cloud_buffer_size_ = point_cloud_buffer_size;
   }
-  memset(rgb_pint_cloud_buffer_, 0, rgb_pint_cloud_buffer_size_);
-  auto *point_cloud = (OBColorPoint *)rgb_pint_cloud_buffer_;
+  memset(rgb_point_cloud_buffer_, 0, rgb_point_cloud_buffer_size_);
+  auto *point_cloud = (OBColorPoint *)rgb_point_cloud_buffer_;
   ob::CoordinateTransformHelper::transformationDepthToRGBDPointCloud(&(*xy_tables_), depth_data,
                                                                      color_data, point_cloud);
   auto point_cloud_msg = std::make_unique<sensor_msgs::msg::PointCloud2>();

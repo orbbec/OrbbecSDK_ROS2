@@ -539,12 +539,11 @@ class OBCameraNode {
   std::atomic_bool is_camera_node_initialized_{false};
   int laser_energy_level_ = -1;
   ob::PointCloudFilter depth_point_cloud_filter_;
-  ob::PointCloudFilter colored_point_cloud_filter_;
   std::optional<OBCalibrationParam> calibration_param_;
   std::optional<OBXYTables> xy_tables_;
   float* xy_table_data_ = nullptr;
   uint32_t xy_table_data_size_ = 0;
-  uint8_t* rgb_pint_cloud_buffer_ = nullptr;
-  uint32_t rgb_pint_cloud_buffer_size_ = 0;
+  uint8_t* rgb_point_cloud_buffer_ = nullptr;
+  uint32_t rgb_point_cloud_buffer_size_ = 0;
 };
 }  // namespace orbbec_camera

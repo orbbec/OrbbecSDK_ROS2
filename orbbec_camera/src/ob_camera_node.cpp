@@ -909,7 +909,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter(publish_tf_, "publish_tf", true);
   setAndGetNodeParameter(tf_publish_rate_, "tf_publish_rate", 10.0);
   setAndGetNodeParameter(depth_registration_, "depth_registration", false);
-  setAndGetNodeParameter(enable_point_cloud_, "enable_point_cloud", true);
+  setAndGetNodeParameter(enable_point_cloud_, "enable_point_cloud", false);
   setAndGetNodeParameter<std::string>(ir_info_url_, "ir_info_url", "");
   setAndGetNodeParameter<std::string>(color_info_url_, "color_info_url", "");
   setAndGetNodeParameter(enable_colored_point_cloud_, "enable_colored_point_cloud", false);
@@ -917,7 +917,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<std::string>(point_cloud_qos_, "point_cloud_qos", "default");
   setAndGetNodeParameter(enable_d2c_viewer_, "enable_d2c_viewer", false);
   setAndGetNodeParameter(enable_hardware_d2d_, "enable_hardware_d2d", true);
-  setAndGetNodeParameter(enable_soft_filter_, "enable_soft_filter", true);
+  setAndGetNodeParameter(enable_soft_filter_, "enable_soft_filter", false);
   setAndGetNodeParameter<std::string>(depth_filter_config_, "depth_filter_config", "");
   if (!depth_filter_config_.empty()) {
     enable_depth_filter_ = true;

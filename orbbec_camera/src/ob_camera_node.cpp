@@ -913,7 +913,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<std::string>(ir_info_url_, "ir_info_url", "");
   setAndGetNodeParameter<std::string>(color_info_url_, "color_info_url", "");
   setAndGetNodeParameter(enable_colored_point_cloud_, "enable_colored_point_cloud", false);
-  setAndGetNodeParameter(enable_point_cloud_, "enable_point_cloud", true);
+  setAndGetNodeParameter(enable_point_cloud_, "enable_point_cloud", false);
   setAndGetNodeParameter<std::string>(point_cloud_qos_, "point_cloud_qos", "default");
   setAndGetNodeParameter(enable_d2c_viewer_, "enable_d2c_viewer", false);
   setAndGetNodeParameter(enable_hardware_d2d_, "enable_hardware_d2d", true);

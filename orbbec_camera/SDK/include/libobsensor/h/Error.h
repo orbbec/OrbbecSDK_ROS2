@@ -24,7 +24,7 @@ ob_status ob_error_status(ob_error *error);
  * @param[in] error The error object.
  * @return The error message.
  */
-const char *ob_error_message(ob_error *error);
+const char *ob_error_message(const ob_error *error);
 
 /**
  * @brief Get the name of the API function that caused the error.

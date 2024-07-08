@@ -2044,6 +2044,9 @@ void OBCameraNode::calcAndPublishStaticTransform() {
   quaternion_optical.setRPY(-M_PI / 2, 0.0, -M_PI / 2);
   tf2::Vector3 zero_trans(0, 0, 0);
   auto base_stream_profile = stream_profile_[base_stream_];
+  auto device_info = device_->getDeviceInfo();
+  CHECK_NOTNULL(device_info);
+  auto pid = device_info->pid();
   if (!base_stream_profile) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to get base stream profile");
     return;
@@ -2051,6 +2054,7 @@ void OBCameraNode::calcAndPublishStaticTransform() {
   CHECK_NOTNULL(base_stream_profile.get());
   for (const auto &item : stream_profile_) {
     auto stream_index = item.first;
+
     auto stream_profile = item.second;
     if (!stream_profile) {
       continue;
@@ -2067,17 +2071,33 @@ void OBCameraNode::calcAndPublishStaticTransform() {
     auto Q = rotationMatrixToQuaternion(ex.rot);
     Q = quaternion_optical * Q * quaternion_optical.inverse();
     tf2::Vector3 trans(ex.trans[0], ex.trans[1], ex.trans[2]);
-    RCLCPP_INFO_STREAM(logger_, "Publishing static transform from " << camera_link_frame_id_
+    RCLCPP_INFO_STREAM(logger_, "Publishing static transform from " << stream_name_[base_stream_]
                                                                     << " to "
                                                                     << stream_name_[stream_index]);
     RCLCPP_INFO_STREAM(logger_, "Translation " << trans[0] << ", " << trans[1] << ", " << trans[2]);
     RCLCPP_INFO_STREAM(logger_, "Rotation " << Q.getX() << ", " << Q.getY() << ", " << Q.getZ()
                                             << ", " << Q.getW());
     auto timestamp = node_->now();
-    publishStaticTF(timestamp, trans, Q, camera_link_frame_id_, frame_id_[stream_index]);
+    if (stream_index.first != base_stream_.first) {
+      publishStaticTF(timestamp, trans, Q, frame_id_[base_stream_], frame_id_[stream_index]);
+    }
     publishStaticTF(timestamp, zero_trans, quaternion_optical, frame_id_[stream_index],
                     optical_frame_id_[stream_index]);
   }
+
+  if ((pid == FEMTO_BOLT_PID || pid == FEMTO_MEGA_PID) && enable_stream_[DEPTH] &&
+      enable_stream_[COLOR]) {
+    // calc depth to color
+    CHECK_NOTNULL(stream_profile_[COLOR]);
+    auto depth_to_color_extrinsics = base_stream_profile->getExtrinsicTo(stream_profile_[COLOR]);
+    auto Q = rotationMatrixToQuaternion(depth_to_color_extrinsics.rot);
+    Q = quaternion_optical * Q * quaternion_optical.inverse();
+    publishStaticTF(node_->now(), zero_trans, Q, camera_link_frame_id_, frame_id_[base_stream_]);
+  } else {
+    publishStaticTF(node_->now(), zero_trans, zero_rot, camera_link_frame_id_,
+                    frame_id_[base_stream_]);
+  }
+
   if (enable_stream_[DEPTH] && enable_stream_[COLOR]) {
     static const char *frame_id = "depth_to_color_extrinsics";
     OBExtrinsic ex;

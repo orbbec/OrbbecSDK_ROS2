@@ -125,7 +125,7 @@ def generate_launch_description():
         # - The laser will switch to on-off mode
         # - IR images without the laser will be used for SLAM localization
         # - Depth images with the laser will be used because they provide better depth quality
-        DeclareLaunchArgument('enable_3d_reconstruction_mode', default_value='true'),
+        DeclareLaunchArgument('enable_3d_reconstruction_mode', default_value='false'),
     ]
 
     # Node configuration

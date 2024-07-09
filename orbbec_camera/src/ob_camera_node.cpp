@@ -2079,6 +2079,9 @@ void OBCameraNode::calcAndPublishStaticTransform() {
                                             << ", " << Q.getW());
     auto timestamp = node_->now();
     if (stream_index.first != base_stream_.first) {
+      if (stream_index.first == OB_STREAM_IR_RIGHT) {
+        trans[0] = std::abs(trans[0]);  // because left and right ir calibration is error
+      }
       publishStaticTF(timestamp, trans, Q, frame_id_[base_stream_], frame_id_[stream_index]);
     }
     publishStaticTF(timestamp, zero_trans, quaternion_optical, frame_id_[stream_index],
@@ -2150,6 +2153,7 @@ void OBCameraNode::calcAndPublishStaticTransform() {
                           "Failed to get " << frame_id << " extrinsic: " << e.getMessage());
       ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
     }
+    ex.trans[0] = std::abs(ex.trans[0]);  // because left and right ir calibration is error
     depth_to_other_extrinsics_[INFRA2] = ex;
     auto ex_msg = obExtrinsicsToMsg(ex, frame_id);
     depth_to_other_extrinsics_publishers_[INFRA2]->publish(ex_msg);

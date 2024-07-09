@@ -545,5 +545,6 @@ class OBCameraNode {
   uint32_t xy_table_data_size_ = 0;
   uint8_t* rgb_point_cloud_buffer_ = nullptr;
   uint32_t rgb_point_cloud_buffer_size_ = 0;
+  bool enable_3d_reconstruction_mode_ = false;
 };
 }  // namespace orbbec_camera

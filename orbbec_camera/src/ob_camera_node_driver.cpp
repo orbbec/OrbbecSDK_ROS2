@@ -24,7 +24,6 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-
 namespace orbbec_camera {
 OBCameraNodeDriver::OBCameraNodeDriver(const rclcpp::NodeOptions &node_options)
     : Node("orbbec_camera_node", "/", node_options),
@@ -47,9 +46,6 @@ OBCameraNodeDriver::~OBCameraNodeDriver() {
   is_alive_.store(false);
   if (device_count_update_thread_ && device_count_update_thread_->joinable()) {
     device_count_update_thread_->join();
-  }
-  if (sync_time_thread_ && sync_time_thread_->joinable()) {
-    sync_time_thread_->join();
   }
   if (query_thread_ && query_thread_->joinable()) {
     query_thread_->join();
@@ -104,7 +100,6 @@ void OBCameraNodeDriver::init() {
       this->create_wall_timer(std::chrono::milliseconds(1000), [this]() { checkConnectTimer(); });
   CHECK_NOTNULL(check_connect_timer_);
   query_thread_ = std::make_shared<std::thread>([this]() { queryDevice(); });
-  sync_time_thread_ = std::make_shared<std::thread>([this]() { syncTime(); });
   reset_device_thread_ = std::make_shared<std::thread>([this]() { resetDevice(); });
 }
 
@@ -180,15 +175,6 @@ void OBCameraNodeDriver::queryDevice() {
       }
       startDevice(device_list);
     }
-  }
-}
-
-void OBCameraNodeDriver::syncTime() {
-  while (is_alive_ && rclcpp::ok()) {
-    if (device_ && device_info_ && !isOpenNIDevice(device_info_->pid())) {
-      ctx_->enableDeviceClockSync(0);
-    }
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
   }
 }
 
@@ -315,7 +301,7 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   CHECK_NOTNULL(device_info_.get());
   device_unique_id_ = device_info_->uid();
   if (!isOpenNIDevice(device_info_->pid())) {
-    ctx_->enableDeviceClockSync(0);  // sync time stamp
+    ctx_->enableDeviceClockSync(30000);  // every 30s sync time
   }
   RCLCPP_INFO_STREAM(logger_, "Device " << device_info_->name() << " connected");
   RCLCPP_INFO_STREAM(logger_, "Serial number: " << device_info_->serialNumber());

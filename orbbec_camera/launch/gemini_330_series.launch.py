@@ -121,6 +121,11 @@ def generate_launch_description():
         DeclareLaunchArgument('laser_on_off_mode', default_value='0'),
         DeclareLaunchArgument('retry_on_usb3_detection_failure', default_value='false'),
         DeclareLaunchArgument('laser_energy_level', default_value='-1'),
+        # When 3D reconstruction mode is enabled:
+        # - The laser will switch to on-off mode
+        # - IR images without the laser will be used for SLAM localization
+        # - Depth images with the laser will be used because they provide better depth quality
+        DeclareLaunchArgument('enable_3d_reconstruction_mode', default_value='true'),
     ]
 
     # Node configuration

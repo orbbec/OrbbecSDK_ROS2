@@ -2094,21 +2094,21 @@ void OBCameraNode::calcAndPublishStaticTransform() {
     auto Q = rotationMatrixToQuaternion(ex.rot);
     Q = quaternion_optical * Q * quaternion_optical.inverse();
     tf2::Vector3 trans(ex.trans[0], ex.trans[1], ex.trans[2]);
-    RCLCPP_INFO_STREAM(logger_, "Publishing static transform from " << stream_name_[base_stream_]
-                                                                    << " to "
-                                                                    << stream_name_[stream_index]);
-    RCLCPP_INFO_STREAM(logger_, "Translation " << trans[0] << ", " << trans[1] << ", " << trans[2]);
-    RCLCPP_INFO_STREAM(logger_, "Rotation " << Q.getX() << ", " << Q.getY() << ", " << Q.getZ()
-                                            << ", " << Q.getW());
     auto timestamp = node_->now();
     if (stream_index.first != base_stream_.first) {
-      if (stream_index.first == OB_STREAM_IR_RIGHT) {
+      if (stream_index.first == OB_STREAM_IR_RIGHT && base_stream_.first == OB_STREAM_DEPTH) {
         trans[0] = std::abs(trans[0]);  // because left and right ir calibration is error
       }
       publishStaticTF(timestamp, trans, Q, frame_id_[base_stream_], frame_id_[stream_index]);
     }
     publishStaticTF(timestamp, zero_trans, quaternion_optical, frame_id_[stream_index],
                     optical_frame_id_[stream_index]);
+    RCLCPP_INFO_STREAM(logger_, "Publishing static transform from " << stream_name_[stream_index]
+                                                                    << " to "
+                                                                    << stream_name_[base_stream_]);
+    RCLCPP_INFO_STREAM(logger_, "Translation " << trans[0] << ", " << trans[1] << ", " << trans[2]);
+    RCLCPP_INFO_STREAM(logger_, "Rotation " << Q.getX() << ", " << Q.getY() << ", " << Q.getZ()
+                                            << ", " << Q.getW());
   }
 
   if ((pid == FEMTO_BOLT_PID || pid == FEMTO_MEGA_PID) && enable_stream_[DEPTH] &&
@@ -2176,7 +2176,7 @@ void OBCameraNode::calcAndPublishStaticTransform() {
                           "Failed to get " << frame_id << " extrinsic: " << e.getMessage());
       ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
     }
-    ex.trans[0] = -std::abs( ex.trans[0]);
+    ex.trans[0] = -std::abs(ex.trans[0]);
     depth_to_other_extrinsics_[INFRA2] = ex;
     auto ex_msg = obExtrinsicsToMsg(ex, frame_id);
     depth_to_other_extrinsics_publishers_[INFRA2]->publish(ex_msg);

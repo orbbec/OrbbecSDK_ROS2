@@ -164,6 +164,11 @@ void OBCameraNode::setupCameraCtrlServices() {
                                      std::shared_ptr<SetBool::Response> response) {
         setIRLongExposureCallback(request, response);
       });
+  get_ldp_measure_distance_srv_ = node_->create_service<GetInt32>(
+      "get_ldp_measure_distance", [this](const std::shared_ptr<GetInt32::Request> request,
+                                         std::shared_ptr<GetInt32::Response> response) {
+        getLdpMeasureDistanceCallback(request, response);
+      });
 }
 
 void OBCameraNode::setExposureCallback(const std::shared_ptr<SetInt32::Request>& request,
@@ -615,6 +620,24 @@ void OBCameraNode::getLdpStatusCallback(const std::shared_ptr<GetBool::Request>&
   (void)request;
   try {
     response->data = device_->getBoolProperty(OB_PROP_LDP_STATUS_BOOL);
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->message = e.getMessage();
+    response->success = false;
+  } catch (const std::exception& e) {
+    response->message = e.what();
+    response->success = false;
+  } catch (...) {
+    response->message = "unknown error";
+    response->success = false;
+  }
+}
+
+void OBCameraNode::getLdpMeasureDistanceCallback(const std::shared_ptr<GetInt32::Request>& request,
+                                                 std::shared_ptr<GetInt32::Response>& response) {
+  (void)request;
+  try {
+    response->data = device_->getIntProperty(OB_PROP_LDP_MEASURE_DISTANCE_INT);
     response->success = true;
   } catch (const ob::Error& e) {
     response->message = e.getMessage();

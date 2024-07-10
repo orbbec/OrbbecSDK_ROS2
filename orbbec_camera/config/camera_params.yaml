@@ -33,12 +33,14 @@ ir_exposure: 5000 # 5ms
 ir_gain: 40
 
 #left ir params
+enable_left_ir: true
 left_ir_width: 640
 left_ir_height: 480
 left_ir_fps: 60
 left_ir_format: "Y8"
 
 #right ir params
+enable_right_ir: true
 right_ir_width: 640
 right_ir_height: 480
 right_ir_fps: 60

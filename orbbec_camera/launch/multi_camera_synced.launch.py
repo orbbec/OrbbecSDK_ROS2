@@ -21,7 +21,7 @@ def generate_launch_description():
             'usb_port': '2-1.1',
             'device_num': '4',
             'sync_mode': 'primary',
-            'config_file': config_file_path,
+            'config_file_path': config_file_path,
         }.items()
     )
 
@@ -34,7 +34,7 @@ def generate_launch_description():
             'usb_port': '2-1.2.1',
             'device_num': '4',
             'sync_mode': 'secondary_synced',
-            'config_file': config_file_path,
+            'config_file_path': config_file_path,
         }.items()
     )
     launch3_include = IncludeLaunchDescription(
@@ -46,7 +46,7 @@ def generate_launch_description():
             'usb_port': '2-1.2.1',
             'device_num': '4',
             'sync_mode': 'secondary_synced',
-            'config_file': config_file_path,
+            'config_file_path': config_file_path,
         }.items()
     )
     launch4_include = IncludeLaunchDescription(

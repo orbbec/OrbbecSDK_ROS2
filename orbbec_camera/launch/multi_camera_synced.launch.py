@@ -10,6 +10,8 @@ def generate_launch_description():
     # Include launch files
     package_dir = get_package_share_directory('orbbec_camera')
     launch_file_dir = os.path.join(package_dir, 'launch')
+    config_file_dir = os.path.join(package_dir, 'config')
+    config_file_path = os.path.join(config_file_dir, 'camera_params.yaml')
     launch1_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(launch_file_dir, 'gemini_330_series.launch.py')
@@ -18,7 +20,8 @@ def generate_launch_description():
             'camera_name': 'front_camera',
             'usb_port': '2-1.1',
             'device_num': '4',
-            'sync_mode': 'primary'
+            'sync_mode': 'primary',
+            'config_file': config_file_path,
         }.items()
     )
 
@@ -30,7 +33,8 @@ def generate_launch_description():
             'camera_name': 'left_camera',
             'usb_port': '2-1.2.1',
             'device_num': '4',
-            'sync_mode': 'secondary_synced'
+            'sync_mode': 'secondary_synced',
+            'config_file': config_file_path,
         }.items()
     )
     launch3_include = IncludeLaunchDescription(
@@ -41,7 +45,8 @@ def generate_launch_description():
             'camera_name': 'right_camera',
             'usb_port': '2-1.2.1',
             'device_num': '4',
-            'sync_mode': 'secondary_synced'
+            'sync_mode': 'secondary_synced',
+            'config_file': config_file_path,
         }.items()
     )
     launch4_include = IncludeLaunchDescription(
@@ -52,7 +57,8 @@ def generate_launch_description():
             'camera_name': 'right_camera',
             'usb_port': '2-1.2.1',
             'device_num': '4',
-            'sync_mode': 'secondary_synced'
+            'sync_mode': 'secondary_synced',
+            'config_file': config_file_path,
         }.items()
     )
 
@@ -63,7 +69,7 @@ def generate_launch_description():
         GroupAction([launch2_include]),
         GroupAction([launch3_include]),
         GroupAction([launch4_include]),
-        GroupAction([launch1_include]),
+        GroupAction([launch1_include]), # The primary camera should be launched at last
     ])
 
     return ld

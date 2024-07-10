@@ -2176,6 +2176,7 @@ void OBCameraNode::calcAndPublishStaticTransform() {
                           "Failed to get " << frame_id << " extrinsic: " << e.getMessage());
       ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
     }
+    ex.trans[0] = -std::abs( ex.trans[0]);
     depth_to_other_extrinsics_[INFRA2] = ex;
     auto ex_msg = obExtrinsicsToMsg(ex, frame_id);
     depth_to_other_extrinsics_publishers_[INFRA2]->publish(ex_msg);

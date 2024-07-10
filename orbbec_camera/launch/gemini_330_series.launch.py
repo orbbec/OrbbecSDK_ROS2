@@ -38,9 +38,11 @@ def load_parameters(context, args):
     if config_file_path:
         yaml_params = load_yaml(config_file_path)
         default_params = merge_params(default_params, yaml_params)
-    skip_convert = ['config_file_path', 'usb_port', 'serial_number']
-    return {key: convert_value(value) if key not in skip_convert else value for key, value in default_params.items()}
-
+    skip_convert = {'config_file_path', 'usb_port', 'serial_number'}
+    return {
+        key: (value if key in skip_convert else convert_value(value))
+        for key, value in default_params.items()
+    }
 
 def generate_launch_description():
     args = [

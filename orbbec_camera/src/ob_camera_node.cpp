@@ -907,7 +907,7 @@ void OBCameraNode::getParameters() {
   }
 
   setAndGetNodeParameter(publish_tf_, "publish_tf", true);
-  setAndGetNodeParameter(tf_publish_rate_, "tf_publish_rate", 10.0);
+  setAndGetNodeParameter(tf_publish_rate_, "tf_publish_rate", 0.0);
   setAndGetNodeParameter(depth_registration_, "depth_registration", false);
   setAndGetNodeParameter(enable_point_cloud_, "enable_point_cloud", false);
   setAndGetNodeParameter<std::string>(ir_info_url_, "ir_info_url", "");

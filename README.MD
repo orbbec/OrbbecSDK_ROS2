@@ -255,6 +255,7 @@ The following are the launch parameters available:
 
 - `enable_3d_reconstruction_mode`: Enables 3D reconstruction mode. Default is `false`. When set to `true`, the camera 
 laser operates in on-off mode, capturing IR images (laser off) for VSLAM localization and depth images (laser on) for point cloud computation.
+- `tf_publish_rate`: The rate at which the camera publishes dynamic transforms. The default value is `0.0`, which means static transforms are published.
 
 **IMPORTANT**: *Please carefully read the instructions regarding software filtering settings
 at [this link](https://www.orbbec.com/docs/g330-use-depth-post-processing-blocks/). If you are uncertain, do not modify

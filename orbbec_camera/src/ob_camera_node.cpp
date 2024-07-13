@@ -1465,7 +1465,7 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
       tf_published_ = true;
     }
     depth_frame_ = frame_set->getFrame(OB_FRAME_DEPTH);
-    bool depth_laser_status = true;
+    bool depth_laser_status = false;
     if (depth_frame_ && depth_frame_->hasMetadata(OB_FRAME_METADATA_TYPE_LASER_STATUS)) {
       depth_laser_status = depth_frame_->getMetadataValue(OB_FRAME_METADATA_TYPE_LASER_STATUS) == 1;
     }
@@ -1513,16 +1513,16 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
           continue;
         }
         if (stream_index == DEPTH) {
-          frame = depth_laser_status ? depth_frame_ : nullptr;
+          frame = (enable_3d_reconstruction_mode_ && !depth_laser_status) ? nullptr : depth_frame_;
         }
         auto is_ir_frame = frame_type == OB_FRAME_IR_LEFT || frame_type == OB_FRAME_IR_RIGHT ||
                            frame_type == OB_FRAME_IR;
         if (is_ir_frame) {
           std::shared_ptr<ob::Frame> ir_frame =
               frame->format() == OB_FORMAT_MJPG ? decodeIRMJPGFrame(frame) : frame;
-          bool ir_laser_status = true;
+          bool ir_laser_status = false;
           if (ir_frame && ir_frame->hasMetadata(OB_FRAME_METADATA_TYPE_LASER_STATUS)) {
-            ir_laser_status = ir_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_LASER_STATUS) == 0;
+            ir_laser_status = ir_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_LASER_STATUS) == 1;
           }
           if (ir_frame && (!enable_3d_reconstruction_mode_ || !ir_laser_status)) {
             onNewFrameCallback(ir_frame, stream_index);

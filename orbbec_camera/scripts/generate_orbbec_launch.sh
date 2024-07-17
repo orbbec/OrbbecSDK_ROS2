@@ -101,7 +101,7 @@ def generate_launch_description():
         GroupAction([rear_camera]),
         GroupAction([left_camera]),
         GroupAction([right_camera]),
-        TimerAction(period=3.0, actions=[GroupAction([front_camera])]),
+        TimerAction(period=3.0, actions=[GroupAction([front_camera])]), # The primary camera should be launched at last
 
     ])
 

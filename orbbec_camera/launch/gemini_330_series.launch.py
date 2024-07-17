@@ -1,20 +1,23 @@
+import os
+import yaml
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, OpaqueFunction, GroupAction
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import PushRosNamespace, ComposableNodeContainer, Node
 from launch_ros.descriptions import ComposableNode
-import os
-import yaml
+
 
 def load_yaml(file_path):
     with open(file_path, 'r') as f:
         return yaml.safe_load(f)
+
 
 def merge_params(default_params, yaml_params):
     for key, value in yaml_params.items():
         if key in default_params:
             default_params[key] = value
     return default_params
+
 
 def convert_value(value):
     if isinstance(value, str):
@@ -32,6 +35,7 @@ def convert_value(value):
             return False
     return value
 
+
 def load_parameters(context, args):
     default_params = {arg.name: LaunchConfiguration(arg.name).perform(context) for arg in args}
     config_file_path = LaunchConfiguration('config_file_path').perform(context)
@@ -43,6 +47,7 @@ def load_parameters(context, args):
         key: (value if key in skip_convert else convert_value(value))
         for key, value in default_params.items()
     }
+
 
 def generate_launch_description():
     args = [
@@ -155,6 +160,9 @@ def generate_launch_description():
         DeclareLaunchArgument('retry_on_usb3_detection_failure', default_value='false'),
         DeclareLaunchArgument('laser_energy_level', default_value='-1'),
         DeclareLaunchArgument('enable_3d_reconstruction_mode', default_value='false'),
+        # If you want to use the depth_limit, you need to set the min_depth_limit and max_depth_limit to the desired values
+        DeclareLaunchArgument('min_depth_limit', default_value='0'),
+        DeclareLaunchArgument('max_depth_limit', default_value='0'),
         DeclareLaunchArgument('config_file_path', default_value=''),
     ]
 

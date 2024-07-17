@@ -24,7 +24,7 @@ from launch_utils import to_urdf
 
 
 def generate_launch_description():
-    available_urdf_files = [f for f in os.listdir(os.path.join(get_package_share_directory('orbbec_description'), 'urdf')) if f.startswith('test_')]
+    available_urdf_files = [f for f in os.listdir(os.path.join(get_package_share_directory('orbbec_description'), 'urdf'))]
     params = dict([aa for aa in [aa.split(':=') for aa in sys.argv] if len(aa) == 2])
     if ('model' not in params or params['model'] not in available_urdf_files):
         print('USAGE:')

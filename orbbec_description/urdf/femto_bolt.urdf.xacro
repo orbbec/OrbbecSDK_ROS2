@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<robot name="femto_bolt" xmlns:xacro="http://wiki.ros.org/xacro">
+
+  <!--
+  This is the URDF model for the Orbbec Femto Bolt camera
+  -->
+
+  <!-- Include files -->
+
+  <!-- Properties -->
+  <xacro:property name="M_PI" value="3.1415926535897931" />
+
+  <!-- Dimensions from the provided specifications -->
+  <xacro:property name="cam_width" value="0.1153"/>
+  <xacro:property name="cam_height" value="0.06495"/>
+  <xacro:property name="cam_depth" value="0.04026"/>
+  <xacro:property name="mesh_path" value="package://orbbec_description/meshes/femto_bolt/" />
+
+  <!-- The following values are approximate but the camera node
+     publishes TF values with actual calibrated camera extrinsic values -->
+  <xacro:property name="base_link_to_link_x" value="0.03645"/>
+  <xacro:property name="base_link_to_link_y" value="0.00198"/>
+  <xacro:property name="base_link_to_link_z" value="0.021"/>
+  <xacro:property name="depth_to_ir_offset" value="0.0"/>
+  <xacro:property name="camera_link_to_depth_rotation_roll" value="-0.0063718"/>
+  <xacro:property name="camera_link_to_depth_rotation_pitch" value="0.1061316"/>
+  <xacro:property name="camera_link_to_depth_rotation_yaw" value="0.000231"/>
+  <xacro:property name="depth_to_color_offset_x" value="-0.0021445322036743163"/>
+  <xacro:property name="depth_to_color_offset_y" value="-0.03267627716064453"/>
+  <xacro:property name="depth_to_color_offset_z" value="-0.0010942233800888062"/>
+  <xacro:property name="depth_to_color_rotation_roll" value="0.006371800289866152"/>
+  <xacro:property name="depth_to_color_rotation_pitch" value="-0.10613163835054795"/>
+  <xacro:property name="depth_to_color_rotation_yaw" value="-0.00023102465978322808"/>
+
+  <xacro:macro name="femto_bolt" params="prefix parent *origin use_nominal_extrinsics:=true">
+
+    <!-- camera with origin at bottom screw mount -->
+    <joint name="${prefix}_base_joint" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent}"/>
+      <child link="${prefix}_base_link" />
+    </joint>
+
+    <link name="${prefix}_base_link" >
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="${mesh_path}femto_bolt.stl" />
+        </geometry>
+        <material name="">
+          <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="${mesh_path}femto_bolt.stl" />
+        </geometry>
+      </collision>
+      <inertial>
+      <!-- The following are not reliable values, and should not be used for modeling -->
+        <mass value="0.2"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+      </inertial>
+    </link>
+
+    <!-- Camera Link -->
+    <joint name="${prefix}_link_joint" type="fixed">
+      <origin xyz="${base_link_to_link_x} ${base_link_to_link_y} ${base_link_to_link_z}" rpy="0 0 0"/>
+      <parent link="${prefix}_base_link"/>
+      <child link="${prefix}_link"/>
+    </joint>
+
+    <link name="${prefix}_link" />
+
+    <!-- Use the nominal extrinsics between camera frames if the calibrated extrinsics aren't being published. e.g. running the device in simulation  -->
+    <xacro:if value="${use_nominal_extrinsics}">
+      <!-- Depth Camera Frame -->
+      <joint name="${prefix}_depth_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="${camera_link_to_depth_rotation_roll} ${camera_link_to_depth_rotation_pitch} ${camera_link_to_depth_rotation_yaw}"/>
+        <parent link="${prefix}_link"/>
+        <child link="${prefix}_depth_frame" />
+      </joint>
+      <link name="${prefix}_depth_frame"/>
+
+      <joint name="${prefix}_depth_optical_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
+        <parent link="${prefix}_depth_frame" />
+        <child link="${prefix}_depth_optical_frame" />
+      </joint>
+      <link name="${prefix}_depth_optical_frame"/>
+
+      <!-- IR Camera Frame -->
+      <joint name="${prefix}_ir_joint" type="fixed">
+        <origin xyz="0 ${depth_to_ir_offset} 0" rpy="0 0 0" />
+        <parent link="${prefix}_depth_frame" />
+        <child link="${prefix}_ir_frame" />
+      </joint>
+      <link name="${prefix}_ir_frame"/>
+
+      <joint name="${prefix}_ir_optical_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
+        <parent link="${prefix}_ir_frame"/>
+        <child link="${prefix}_ir_optical_frame"/>
+      </joint>
+      <link name="${prefix}_ir_optical_frame"/>
+
+      <!-- Color Camera Frame -->
+      <joint name="${prefix}_color_joint" type="fixed">
+        <origin xyz="${depth_to_color_offset_x} ${depth_to_color_offset_y} ${depth_to_color_offset_z}"
+          rpy="${depth_to_color_rotation_roll} ${depth_to_color_rotation_pitch} ${depth_to_color_rotation_yaw}" />
+        <parent link="${prefix}_depth_frame"/>
+        <child link="${prefix}_color_frame"/>
+      </joint>
+      <link name="${prefix}_color_frame"/>
+
+      <joint name="${prefix}_color_optical_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
+        <parent link="${prefix}_color_frame"/>
+        <child link="${prefix}_color_optical_frame"/>
+      </joint>
+      <link name="${prefix}_color_optical_frame"/>
+    </xacro:if>
+  </xacro:macro>
+</robot>

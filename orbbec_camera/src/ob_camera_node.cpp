@@ -155,6 +155,14 @@ void OBCameraNode::setupDevices() {
       device_->setBoolProperty(OB_PROP_DEVICE_USB3_REPEAT_IDENTIFY_BOOL,
                                retry_on_usb3_detection_failure_);
     }
+    if (max_depth_limit_ > 0 &&
+        device_->isPropertySupported(OB_PROP_MAX_DEPTH_INT, OB_PERMISSION_READ_WRITE)) {
+      device_->setIntProperty(OB_PROP_MAX_DEPTH_INT, max_depth_limit_);
+    }
+    if (min_depth_limit_ > 0 &&
+        device_->isPropertySupported(OB_PROP_MIN_DEPTH_INT, OB_PERMISSION_READ_WRITE)) {
+      device_->setIntProperty(OB_PROP_MIN_DEPTH_INT, min_depth_limit_);
+    }
     if (laser_energy_level_ != -1 &&
         device_->isPropertySupported(OB_PROP_LASER_ENERGY_LEVEL_INT, OB_PERMISSION_READ_WRITE)) {
       RCLCPP_INFO_STREAM(logger_, "Setting laser energy level to " << laser_energy_level_);
@@ -1001,6 +1009,8 @@ void OBCameraNode::getParameters() {
   if (enable_3d_reconstruction_mode_) {
     laser_on_off_mode_ = 1;  // 0 off, 1 on-off, 1 off-on
   }
+  setAndGetNodeParameter<int>(min_depth_limit_, "min_depth_limit", 0);
+  setAndGetNodeParameter<int>(max_depth_limit_, "max_depth_limit", 0);
 }
 
 void OBCameraNode::setupTopics() {

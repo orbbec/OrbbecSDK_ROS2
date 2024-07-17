@@ -270,7 +270,7 @@ class OBCameraNode {
                             std::shared_ptr<GetBool::Response>& response);
 
   void getLdpMeasureDistanceCallback(const std::shared_ptr<GetInt32::Request>& request,
-                          std::shared_ptr<GetInt32::Response>& response);
+                                     std::shared_ptr<GetInt32::Response>& response);
 
   bool toggleSensor(const stream_index_pair& stream_index, bool enabled, std::string& msg);
 
@@ -550,5 +550,7 @@ class OBCameraNode {
   uint8_t* rgb_point_cloud_buffer_ = nullptr;
   uint32_t rgb_point_cloud_buffer_size_ = 0;
   bool enable_3d_reconstruction_mode_ = false;
+  int min_depth_limit_ = 0;
+  int max_depth_limit_ = 0;
 };
 }  // namespace orbbec_camera

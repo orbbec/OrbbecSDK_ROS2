@@ -160,9 +160,6 @@ def generate_launch_description():
         DeclareLaunchArgument('retry_on_usb3_detection_failure', default_value='false'),
         DeclareLaunchArgument('laser_energy_level', default_value='-1'),
         DeclareLaunchArgument('enable_3d_reconstruction_mode', default_value='false'),
-        # If you want to use the depth_limit, you need to set the min_depth_limit and max_depth_limit to the desired values
-        DeclareLaunchArgument('min_depth_limit', default_value='0'),
-        DeclareLaunchArgument('max_depth_limit', default_value='0'),
         DeclareLaunchArgument('config_file_path', default_value=''),
     ]
 

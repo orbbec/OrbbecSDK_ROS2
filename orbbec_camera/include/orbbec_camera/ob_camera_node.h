@@ -294,6 +294,8 @@ class OBCameraNode {
 
   std::shared_ptr<ob::Frame> processDepthFrameFilter(std::shared_ptr<ob::Frame>& frame);
 
+  uint64_t getFrameTimestampUs(const std::shared_ptr<ob::Frame> & frame);
+
   void onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set);
 
   std::shared_ptr<ob::Frame> softwareDecodeColorFrame(const std::shared_ptr<ob::Frame>& frame);
@@ -471,6 +473,7 @@ class OBCameraNode {
   int trigger2image_delay_us_ = 0;
   int trigger_out_delay_us_ = 0;
   bool trigger_out_enabled_ = false;
+  int frames_per_trigger_ = 2;
   std::string depth_precision_str_;
   OB_DEPTH_PRECISION_LEVEL depth_precision_ = OB_PRECISION_0MM8;
   double depth_precision_float_ = 0.10;
@@ -498,7 +501,6 @@ class OBCameraNode {
   std::condition_variable color_frame_queue_cv_;
 
   bool ordered_pc_ = false;
-  bool use_hardware_time_ = true;
   bool enable_depth_scale_ = true;
   std::shared_ptr<ob::Frame> depth_frame_ = nullptr;
   std::string device_preset_ = "Default";
@@ -552,5 +554,9 @@ class OBCameraNode {
   bool enable_3d_reconstruction_mode_ = false;
   int min_depth_limit_ = 0;
   int max_depth_limit_ = 0;
+  std::string time_domain_ = "device"; // device, system, global
+  // soft ware trigger
+  rclcpp::TimerBase::SharedPtr software_trigger_timer_;
+  std::chrono::milliseconds software_trigger_period_{33};
 };
 }  // namespace orbbec_camera

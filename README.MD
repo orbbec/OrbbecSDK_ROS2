@@ -256,6 +256,13 @@ The following are the launch parameters available:
 - `enable_3d_reconstruction_mode`: Enables 3D reconstruction mode. Default is `false`. When set to `true`, the camera 
 laser operates in on-off mode, capturing IR images (laser off) for VSLAM localization and depth images (laser on) for point cloud computation.
 - `tf_publish_rate`: The rate at which the camera publishes dynamic transforms. The default value is `0.0`, which means static transforms are published.
+- `time_domain`: The frame time domain, string type, can be `device`, `global`, or `system`. `device` means using the hardware timestamp from the camera,
+`system` means using the timestamp when the PC received the first packet of data or frame, and `global` is used for synchronized time across multiple
+devices, aligning data from different sources to a common time base.
+- `enable_sync_host_time`: Enables synchronization of the host time with the camera time. The default value is `true`, if
+use global time, set to `false`. Some old devices may not support this feature.
+- `config_file_path`: The path to the YAML configuration file. The default value is `""`. If the configuration file is not specified,
+the default parameters from the launch file will be used. If you want to use a custom configuration file, please refer to `gemini_330_series.launch.py`.
 
 **IMPORTANT**: *Please carefully read the instructions regarding software filtering settings
 at [this link](https://www.orbbec.com/docs/g330-use-depth-post-processing-blocks/). If you are uncertain, do not modify

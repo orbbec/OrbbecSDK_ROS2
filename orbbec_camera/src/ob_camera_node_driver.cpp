@@ -60,6 +60,7 @@ void OBCameraNodeDriver::init() {
   auto log_level_str = declare_parameter<std::string>("log_level", "none");
   auto log_level = obLogSeverityFromString(log_level_str);
   connection_delay_ = static_cast<int>(declare_parameter<int>("connection_delay", 100));
+  enable_sync_host_time_ = declare_parameter<bool>("enable_sync_host_time", true);
   ob::Context::setLoggerToConsole(log_level);
   orb_device_lock_shm_fd_ = shm_open(ORB_DEFAULT_LOCK_NAME.c_str(), O_CREAT | O_RDWR, 0666);
   if (orb_device_lock_shm_fd_ < 0) {
@@ -300,7 +301,8 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   serial_number_ = device_info_->serialNumber();
   CHECK_NOTNULL(device_info_.get());
   device_unique_id_ = device_info_->uid();
-  if (!isOpenNIDevice(device_info_->pid())) {
+  if (enable_sync_host_time_ && !isOpenNIDevice(device_info_->pid())) {
+    device_->timerSyncWithHost();
     sync_host_time_timer_ = this->create_wall_timer(std::chrono::milliseconds(30000), [this]() {
       if (device_) {
         device_->timerSyncWithHost();

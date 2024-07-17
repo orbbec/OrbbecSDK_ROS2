@@ -337,9 +337,17 @@ void OBCameraNode::setupDevices() {
       sync_config.trigger2ImageDelayUs = trigger2image_delay_us_;
       sync_config.triggerOutDelayUs = trigger_out_delay_us_;
       sync_config.triggerOutEnable = trigger_out_enabled_;
+      sync_config.framesPerTrigger = frames_per_trigger_;
       device_->setMultiDeviceSyncConfig(sync_config);
       sync_config = device_->getMultiDeviceSyncConfig();
       RCLCPP_INFO_STREAM(logger_, "Set sync mode: " << magic_enum::enum_name(sync_config.syncMode));
+      if (sync_mode_ == OB_MULTI_DEVICE_SYNC_MODE_SOFTWARE_TRIGGERING) {
+        RCLCPP_INFO_STREAM(logger_, "Frames per trigger: " << sync_config.framesPerTrigger);
+        RCLCPP_INFO_STREAM(logger_,
+                           "Software trigger period " << software_trigger_period_.count() << " ms");
+        software_trigger_timer_ = node_->create_wall_timer(software_trigger_period_,
+                                                           [this]() { device_->triggerCapture(); });
+      }
     }
 
     if (device_->isPropertySupported(OB_PROP_DEPTH_PRECISION_LEVEL_INT, OB_PERMISSION_READ_WRITE) &&
@@ -874,17 +882,7 @@ void OBCameraNode::getParameters() {
     setAndGetNodeParameter<std::string>(image_qos_[stream_index], param_name, "default");
     param_name = stream_name_[stream_index] + "_camera_info_qos";
     setAndGetNodeParameter<std::string>(camera_info_qos_[stream_index], param_name, "default");
-    auto device_info = device_->getDeviceInfo();
-    CHECK_NOTNULL(device_info.get());
-    auto pid = device_info->pid();
-    if (isOpenNIDevice(pid)) {
-      use_hardware_time_ = false;
-    }
-    if (isGemini335PID(pid)) {
-      use_hardware_time_ = true;
-    }
   }
-  RCLCPP_INFO_STREAM(logger_, "use_hardware_time: " << (use_hardware_time_ ? "true" : "false"));
 
   for (auto stream_index : IMAGE_STREAMS) {
     depth_aligned_frame_id_[stream_index] = optical_frame_id_[COLOR];
@@ -965,7 +963,6 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<double>(angular_vel_cov_, "angular_vel_cov", 0.02);
   setAndGetNodeParameter<bool>(ordered_pc_, "ordered_pc", false);
   setAndGetNodeParameter<int>(max_save_images_count_, "max_save_images_count", 10);
-  setAndGetNodeParameter<bool>(use_hardware_time_, "use_hardware_time", true);
   setAndGetNodeParameter<bool>(enable_depth_scale_, "enable_depth_scale", true);
   setAndGetNodeParameter<std::string>(device_preset_, "device_preset", "");
   setAndGetNodeParameter<bool>(enable_decimation_filter_, "enable_decimation_filter", false);
@@ -1006,11 +1003,23 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(laser_energy_level_, "laser_energy_level", -1);
   setAndGetNodeParameter<bool>(enable_3d_reconstruction_mode_, "enable_3d_reconstruction_mode",
                                false);
+  setAndGetNodeParameter<int>(min_depth_limit_, "min_depth_limit", 0);
+  setAndGetNodeParameter<int>(max_depth_limit_, "max_depth_limit", 0);
   if (enable_3d_reconstruction_mode_) {
     laser_on_off_mode_ = 1;  // 0 off, 1 on-off, 1 off-on
   }
-  setAndGetNodeParameter<int>(min_depth_limit_, "min_depth_limit", 0);
-  setAndGetNodeParameter<int>(max_depth_limit_, "max_depth_limit", 0);
+  setAndGetNodeParameter<std::string>(time_domain_, "time_domain", "device");
+  auto device_info = device_->getDeviceInfo();
+  CHECK_NOTNULL(device_info.get());
+  auto pid = device_info->pid();
+  if (isOpenNIDevice(pid)) {
+    time_domain_ = "system";
+  }
+  RCLCPP_INFO_STREAM(logger_, "current time domain: " << time_domain_);
+  setAndGetNodeParameter<int>(frames_per_trigger_, "frames_per_trigger", 2);
+  long software_trigger_period = 33;
+  setAndGetNodeParameter<long>(software_trigger_period, "software_trigger_period", 33);
+  software_trigger_period_ = std::chrono::milliseconds(software_trigger_period);
 }
 
 void OBCameraNode::setupTopics() {
@@ -1283,8 +1292,8 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
     point_cloud_msg->height = 1;
     modifier.resize(valid_count);
   }
-  auto timestamp = use_hardware_time_ ? fromUsToROSTime(depth_frame->timeStampUs())
-                                      : fromUsToROSTime(depth_frame->systemTimeStampUs());
+  auto frame_timestamp = getFrameTimestampUs(depth_frame);
+  auto timestamp = fromUsToROSTime(frame_timestamp);
   std::string frame_id = depth_registration_ ? optical_frame_id_[COLOR] : optical_frame_id_[DEPTH];
   point_cloud_msg->header.stamp = timestamp;
   point_cloud_msg->header.frame_id = frame_id;
@@ -1411,8 +1420,8 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
     point_cloud_msg->height = 1;
     modifier.resize(valid_count);
   }
-  auto timestamp = use_hardware_time_ ? fromUsToROSTime(depth_frame->timeStampUs())
-                                      : fromUsToROSTime(depth_frame->systemTimeStampUs());
+  auto frame_timestamp = getFrameTimestampUs(depth_frame);
+  auto timestamp = fromUsToROSTime(frame_timestamp);
   point_cloud_msg->header.stamp = timestamp;
   point_cloud_msg->header.frame_id = optical_frame_id_[COLOR];
   if (save_colored_point_cloud_) {
@@ -1459,6 +1468,19 @@ std::shared_ptr<ob::Frame> OBCameraNode::processDepthFrameFilter(
   return frame;
 }
 
+uint64_t OBCameraNode::getFrameTimestampUs(const std::shared_ptr<ob::Frame> &frame) {
+  if (frame == nullptr) {
+    RCLCPP_WARN(logger_, "getFrameTimestampUs: frame is nullptr, return 0");
+    return 0;
+  }
+  if (time_domain_ == "device") {
+    return frame->timeStampUs();
+  } else if (time_domain_ == "global") {
+    return frame->globalTimeStampUs();
+  } else {
+    return frame->systemTimeStampUs();
+  }
+}
 void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set) {
   if (!is_running_.load()) {
     return;
@@ -1723,8 +1745,8 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   }
   int width = static_cast<int>(video_frame->width());
   int height = static_cast<int>(video_frame->height());
-  auto timestamp = use_hardware_time_ ? fromUsToROSTime(video_frame->timeStampUs())
-                                      : fromUsToROSTime(video_frame->systemTimeStampUs());
+  auto frame_timestamp = getFrameTimestampUs(frame);
+  auto timestamp = fromUsToROSTime(frame_timestamp);
   auto device_info = device_->getDeviceInfo();
   CHECK_NOTNULL(device_info);
   auto pid = device_info->pid();
@@ -1895,7 +1917,8 @@ void OBCameraNode::onNewIMUFrameSyncOutputCallback(const std::shared_ptr<ob::Fra
   setDefaultIMUMessage(imu_msg);
 
   imu_msg.header.frame_id = imu_optical_frame_id_;
-  auto timestamp = fromUsToROSTime(accelframe->timeStampUs());
+  auto frame_timestamp = getFrameTimestampUs(accelframe);
+  auto timestamp = fromUsToROSTime(frame_timestamp);
   imu_msg.header.stamp = timestamp;
   auto gyro_frame = gryoframe->as<ob::GyroFrame>();
   auto gyro_info = createIMUInfo(GYRO);

@@ -97,5 +97,6 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::string net_device_ip_;
   int net_device_port_ = 0;
   int connection_delay_ = 100;
+  bool enable_sync_host_time_ = true;
 };
 }  // namespace orbbec_camera

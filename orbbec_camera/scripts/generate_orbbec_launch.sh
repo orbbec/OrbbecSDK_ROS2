@@ -30,7 +30,7 @@ right_port=$(get_usb_port "CP3L44P00054") #  secondary-synced camera
 # Generate the launch file
 cat << EOF > multi_camera_synced.launch.py
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, GroupAction
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, GroupAction, TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from ament_index_python.packages import get_package_share_directory
 import os
@@ -49,7 +49,7 @@ def generate_launch_description():
             'camera_name': 'front_camera',
             'usb_port': '$front_port',
             'device_num': '4',
-            'sync_mode': 'primary',
+            'sync_mode': 'software_triggering',
             'config_file_path': config_file_path
 
         }.items()
@@ -63,7 +63,7 @@ def generate_launch_description():
             'camera_name': 'rear_camera',
             'usb_port': '$rear_port',
             'device_num': '4',
-            'sync_mode': 'secondary_synced',
+            'sync_mode': 'hardware_triggering',
             'config_file_path': config_file_path
 
         }.items()
@@ -77,7 +77,7 @@ def generate_launch_description():
             'camera_name': 'left_camera',
             'usb_port': '$left_port',
             'device_num': '4',
-            'sync_mode': 'secondary_synced',
+            'sync_mode': 'hardware_triggering',
             'config_file_path': config_file_path
 
         }.items()
@@ -91,7 +91,7 @@ def generate_launch_description():
             'camera_name': 'right_camera',
             'usb_port': '$right_port',
             'device_num': '4',
-            'sync_mode': 'secondary_synced',
+            'sync_mode': 'hardware_triggering',
             'config_file_path': config_file_path
 
         }.items()
@@ -101,7 +101,7 @@ def generate_launch_description():
         GroupAction([rear_camera]),
         GroupAction([left_camera]),
         GroupAction([right_camera]),
-        GroupAction([front_camera]),
+        TimerAction(period=3.0, actions=[GroupAction([front_camera])]),
 
     ])
 

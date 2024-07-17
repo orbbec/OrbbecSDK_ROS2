@@ -121,7 +121,9 @@ def generate_launch_description():
         DeclareLaunchArgument('color_delay_us', default_value='0'),
         DeclareLaunchArgument('trigger2image_delay_us', default_value='0'),
         DeclareLaunchArgument('trigger_out_delay_us', default_value='0'),
-        DeclareLaunchArgument('trigger_out_enabled', default_value='false'),
+        DeclareLaunchArgument('trigger_out_enabled', default_value='true'),
+        DeclareLaunchArgument('frames_per_trigger', default_value='2'),
+        DeclareLaunchArgument('software_trigger_period', default_value='33'),  # ms
         DeclareLaunchArgument('enable_frame_sync', default_value='true'),
         DeclareLaunchArgument('ordered_pc', default_value='false'),
         DeclareLaunchArgument('use_hardware_time', default_value='true'),
@@ -161,6 +163,7 @@ def generate_launch_description():
         DeclareLaunchArgument('laser_energy_level', default_value='-1'),
         DeclareLaunchArgument('enable_3d_reconstruction_mode', default_value='false'),
         DeclareLaunchArgument('enable_sync_host_time', default_value='true'),
+        DeclareLaunchArgument('time_domain', default_value='device'),
         DeclareLaunchArgument('config_file_path', default_value=''),
     ]
 

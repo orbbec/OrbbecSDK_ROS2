@@ -6,6 +6,7 @@ device_preset: "High Accuracy"
 laser_on_off_mode: 1 # 0: off, 1: on-off, 1: off-on
 time_domain: "global" # global, device, system
 enable_sync_host_time: false
+frames_per_trigger: 2
 
 # When 3D reconstruction mode is enabled:
 # - The laser will switch to on-off mode

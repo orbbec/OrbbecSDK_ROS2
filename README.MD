@@ -31,6 +31,8 @@ supports ROS 2 Foxy, Humble, and Jazzy distributions.
   * [Product support](#product-support)
   * [DDS Tuning](#dds-tuning)
   * [Frequently Asked Questions](#frequently-asked-questions)
+    * [No Data Stream from Multiple Cameras](#no-data-stream-from-multiple-cameras)
+    * [Why Are There So Many Launch Files Here?](#why-are-there-so-many-launch-files-here)
   * [Other useful links](#other-useful-links)
   * [License](#license)
 <!-- TOC -->
@@ -631,21 +633,29 @@ net.core.rmem_max=2147483647
 net.core.rmem_default=2147483647
 ```
 
+If you use Fast DDS, you can refer to the [Fast DDS Configuration](./docs/fastdds_tuning.md) file.
+
 ## Frequently Asked Questions
 
-No Picture from Multiple Cameras
+### No Data Stream from Multiple Cameras
 
-- it's possible that the power supply is insufficient.
-  To avoid this, do not connect all cameras to the same hub and use a powered hub instead.
+**Insufficient Power Supply**:
+  - Ensure that all cameras are not connected to the same hub.
+  - Use a powered hub to provide sufficient power to each camera.
+**High Resolution**:
+  - Try lowering the resolution to resolve data stream issues.
 
-- It's also possible that the resolution is too high.
-  To resolve this, try lowering the resolution.
+**Increase usbfs_memory_mb Value**:
+  - Increase the `usbfs_memory_mb` value to 128MB by running the following command:
+    ```bash
+    echo 128 | sudo tee /sys/module/usbcore/parameters/usbfs_memory_mb
+    ```
+  - For making this change permanent, check [this link](https://github.com/OpenKinect/libfreenect2/issues/807).
 
-Why are there so many launch files here
+### Why Are There So Many Launch Files Here?
 
-- The reason for the presence of multiple launch
-  files is due to the fact that the default resolutions and image formats of different cameras vary.
-  To make it easier to use, the launch files have been separated for each camera.
+- Multiple launch files exist because different cameras have varying default resolutions and image formats.
+- To simplify usage, each camera has its own launch file.
 
 ## Other useful links
 

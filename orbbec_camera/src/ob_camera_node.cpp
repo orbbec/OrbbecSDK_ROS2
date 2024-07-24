@@ -301,6 +301,8 @@ void OBCameraNode::setupDevices() {
       } else if (filter_name == "HDRMerge" && enable_hdr_merge_) {
         if (hdr_merge_exposure_1_ != -1 && hdr_merge_gain_1_ != -1 && hdr_merge_exposure_2_ != -1 &&
             hdr_merge_gain_2_ != -1) {
+          auto hdr_merge_filter = filter->as<ob::HdrMerge>();
+          hdr_merge_filter->enable(true);
           RCLCPP_INFO_STREAM(
               logger_, "Set HDR merge filter params: " << "exposure_1: " << hdr_merge_exposure_1_
                                                        << ", gain_1: " << hdr_merge_gain_1_

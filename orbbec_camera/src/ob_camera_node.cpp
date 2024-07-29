@@ -1768,8 +1768,10 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
     distortion = stream_index.first == OB_STREAM_COLOR ? camera_params.rgbDistortion
                                                        : camera_params.depthDistortion;
   }
-  std::string frame_id =
-      depth_registration_ ? depth_aligned_frame_id_[stream_index] : optical_frame_id_[stream_index];
+  std::string frame_id = optical_frame_id_[stream_index];
+  if (depth_registration_ && stream_index == DEPTH) {
+    frame_id = depth_aligned_frame_id_[stream_index];
+  }
   auto camera_info = convertToCameraInfo(intrinsic, distortion, width);
   camera_info.header.stamp = timestamp;
   camera_info.header.frame_id = frame_id;

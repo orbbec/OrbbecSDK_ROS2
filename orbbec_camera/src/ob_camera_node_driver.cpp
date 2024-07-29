@@ -79,6 +79,9 @@ void OBCameraNodeDriver::init() {
     RCLCPP_ERROR_STREAM(logger_, "Failed to map shared memory " << ORB_DEFAULT_LOCK_NAME);
     return;
   }
+  reboot_device_srv_ = this->create_service<std_srvs::srv::Empty>(
+      "reboot_device", std::bind(&OBCameraNodeDriver::rebootDeviceCallback, this,
+                                 std::placeholders::_1, std::placeholders::_2));
   pthread_mutexattr_init(&orb_device_lock_attr_);
   pthread_mutexattr_setpshared(&orb_device_lock_attr_, PTHREAD_PROCESS_SHARED);
   orb_device_lock_ = (pthread_mutex_t *)orb_device_lock_shm_addr_;
@@ -200,6 +203,21 @@ void OBCameraNodeDriver::resetDevice() {
     }
     RCLCPP_INFO_STREAM(logger_, "Reset device uid: " << device_unique_id_ << " done");
   }
+}
+
+void OBCameraNodeDriver::rebootDeviceCallback(
+    const std::shared_ptr<std_srvs::srv::Empty::Request> request,
+    std::shared_ptr<std_srvs::srv::Empty::Response> response) {
+  (void)request;
+  (void)response;
+  if (!device_connected_) {
+    RCLCPP_WARN(logger_, "Device not connected");
+    return;
+  }
+  RCLCPP_INFO(logger_, "Reboot device");
+  ob_camera_node_->rebootDevice();
+  device_connected_ = false;
+  device_ = nullptr;
 }
 
 std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDevice(

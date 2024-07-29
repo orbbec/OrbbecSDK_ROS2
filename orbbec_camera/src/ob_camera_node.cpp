@@ -94,6 +94,13 @@ void OBCameraNode::setAndGetNodeParameter(
 
 OBCameraNode::~OBCameraNode() noexcept { clean(); }
 
+void OBCameraNode::rebootDevice() {
+  clean();
+  if (device_) {
+    device_->reboot();
+  }
+}
+
 void OBCameraNode::clean() noexcept {
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
   RCLCPP_WARN_STREAM(logger_, "Do destroy ~OBCameraNode");

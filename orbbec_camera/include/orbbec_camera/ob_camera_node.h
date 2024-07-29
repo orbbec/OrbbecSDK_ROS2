@@ -143,6 +143,8 @@ class OBCameraNode {
 
   void clean() noexcept;
 
+ void rebootDevice();
+
   void startStreams();
 
   void startIMUSyncStream();

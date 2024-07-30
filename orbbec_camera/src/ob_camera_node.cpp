@@ -1794,8 +1794,8 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
     auto ex = video_stream_profile->getExtrinsicTo(left_video_profile);
     float fx = camera_info.k.at(0);
     float fy = camera_info.k.at(4);
-    camera_info.p.at(3) = fx * ex.trans[0] / 1000.0 + 0.0;
-    camera_info.p.at(7) = fy * ex.trans[1] / 1000.0 + 0.0;
+    camera_info.p.at(3) = -fx * ex.trans[0] / 1000.0 + 0.0;
+    camera_info.p.at(7) = -fy * ex.trans[1] / 1000.0 + 0.0;
   }
   CHECK(camera_info_publishers_.count(stream_index) > 0);
   camera_info_publishers_[stream_index]->publish(camera_info);

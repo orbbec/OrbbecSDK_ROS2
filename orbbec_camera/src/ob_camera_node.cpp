@@ -1033,6 +1033,7 @@ void OBCameraNode::getParameters() {
                                false);
   setAndGetNodeParameter<int>(min_depth_limit_, "min_depth_limit", 0);
   setAndGetNodeParameter<int>(max_depth_limit_, "max_depth_limit", 0);
+  setAndGetNodeParameter<bool>(enable_heartbeat_, "enable_heartbeat", false);
   if (enable_3d_reconstruction_mode_) {
     laser_on_off_mode_ = 1;  // 0 off, 1 on-off, 1 off-on
   }

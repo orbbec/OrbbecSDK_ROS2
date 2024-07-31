@@ -33,6 +33,7 @@ supports ROS 2 Foxy, Humble, and Jazzy distributions.
   * [Frequently Asked Questions](#frequently-asked-questions)
     * [No Data Stream from Multiple Cameras](#no-data-stream-from-multiple-cameras)
     * [Why Are There So Many Launch Files Here?](#why-are-there-so-many-launch-files-here)
+    * [If You Encounter Additional Issues](#if-you-encounter-additional-issues)
   * [Other useful links](#other-useful-links)
   * [License](#license)
 <!-- TOC -->
@@ -265,7 +266,9 @@ devices, aligning data from different sources to a common time base.
 use global time, set to `false`. Some old devices may not support this feature.
 - `config_file_path`: The path to the YAML configuration file. The default value is `""`. If the configuration file is not specified,
 the default parameters from the launch file will be used. If you want to use a custom configuration file, please refer to `gemini_330_series.launch.py`.
-
+  `enable_heartbeat` enables the heartbeat function, which is set to `false` by default. If set to `true`, the camera node will send heartbeat signals to 
+the firmware, and if hardware logging is desired, it should also be set to `true`.
+- `log_level` : SDK log level, the default value is `info`, the optional values are `debug`, `info`, `warn`, `error`, `fatal`.
 **IMPORTANT**: *Please carefully read the instructions regarding software filtering settings
 at [this link](https://www.orbbec.com/docs/g330-use-depth-post-processing-blocks/). If you are uncertain, do not modify
 these settings.*
@@ -656,6 +659,11 @@ If you use Fast DDS, you can refer to the [Fast DDS Configuration](./docs/fastdd
 
 - Multiple launch files exist because different cameras have varying default resolutions and image formats.
 - To simplify usage, each camera has its own launch file.
+
+### If You Encounter Additional Issues
+
+- If you encounter other issues, set the `log_level` parameter to `debug`. This will generate an SDK Log file in the running directory. Provide this file to the support team for further assistance.
+- If firmware logs are required, set `enable_heartbeat` to `true` to activate this feature.
 
 ## Other useful links
 

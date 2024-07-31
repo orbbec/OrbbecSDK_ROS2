@@ -561,5 +561,6 @@ class OBCameraNode {
   rclcpp::TimerBase::SharedPtr software_trigger_timer_;
   std::chrono::milliseconds software_trigger_period_{33};
   bool enable_heartbeat_ = false;
+  void setupDepthPostProcessFilter();
 };
 }  // namespace orbbec_camera

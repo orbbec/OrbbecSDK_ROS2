@@ -421,6 +421,10 @@ void OBCameraNode::setupDepthPostProcessFilter() {
   auto depth_sensor = device_->getSensor(OB_SENSOR_DEPTH);
   // set depth sensor to filter
   auto filter_list = depth_sensor->getRecommendedFilters();
+  if (!filter_list) {
+    RCLCPP_ERROR(logger_, "Failed to get depth sensor filter list");
+    return;
+  }
   for (size_t i = 0; i < filter_list->count(); i++) {
     auto filter = filter_list->getFilter(i);
     std::map<std::string, bool> filter_params = {

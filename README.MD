@@ -19,6 +19,7 @@ supports ROS 2 Foxy, Humble, and Jazzy distributions.
   * [All available topics](#all-available-topics)
   * [Network device enumeration](#network-device-enumeration)
   * [Multi-Camera](#multi-camera)
+  * [Compressed Image](#compressed-image)
   * [Use hardware decoder to decode JPEG](#use-hardware-decoder-to-decode-jpeg)
     * [rockchip and Amlogic](#rockchip-and-amlogic)
     * [Nvidia Jetson](#nvidia-jetson)
@@ -205,7 +206,7 @@ The following are the launch parameters available:
 - `enable_color`: Enables the RGB camera.
 - `enable_depth`: Enables the depth camera.
 - `enable_ir`: Enables the IR camera.
-- `depth_registration`: Enables hardware alignment of the depth frame to the color frame. This field is required when
+- `depth_registration`: Enables alignment of the depth frame to the color frame. This field is required when
   the `enable_colored_point_cloud` is set to `true`.
 - `usb_port`: The USB port of the camera. This is required when multiple cameras are used.
 - `enable_accel`: Enables the accelerometer.
@@ -464,6 +465,16 @@ def generate_launch_description():
 ```bash
 ros2 launch orbbec_camera multi_camera.launch.py
 ```
+
+## Compressed Image
+You can use `image_transport` to compress the image using `jpeg`. Below is an example of how to use it:
+
+To access the compressed color image, you can use the following command:
+```bash
+ros2 topic echo /camera/color/image_raw/compressed --no-arr
+```
+
+This command will allow you to receive the compressed color image from the specified topic.
 
 ## Use hardware decoder to decode JPEG
 

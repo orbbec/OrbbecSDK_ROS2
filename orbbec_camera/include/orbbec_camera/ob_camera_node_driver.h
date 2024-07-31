@@ -66,7 +66,7 @@ class OBCameraNodeDriver : public rclcpp::Node {
   void resetDevice();
 
   void rebootDeviceCallback(const std::shared_ptr<std_srvs::srv::Empty::Request> request,
-                    std::shared_ptr<std_srvs::srv::Empty::Response> response);
+                            std::shared_ptr<std_srvs::srv::Empty::Response> response);
 
  private:
   std::string config_path_;
@@ -103,5 +103,6 @@ class OBCameraNodeDriver : public rclcpp::Node {
   int connection_delay_ = 100;
   bool enable_sync_host_time_ = true;
   rclcpp::Service<std_srvs::srv::Empty>::SharedPtr reboot_device_srv_ = nullptr;
+  std::chrono::time_point<std::chrono::system_clock> start_time_;
 };
 }  // namespace orbbec_camera

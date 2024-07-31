@@ -333,6 +333,9 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   RCLCPP_INFO_STREAM(logger_, "Hardware version: " << device_info_->hardwareVersion());
   RCLCPP_INFO_STREAM(logger_, "device unique id: " << device_unique_id_);
   RCLCPP_INFO_STREAM(logger_, "Current node pid: " << getpid());
+  auto time_cost = std::chrono::duration_cast<std::chrono::milliseconds>(
+      std::chrono::system_clock::now() - start_time_);
+  RCLCPP_INFO_STREAM(logger_, "Start device cost " << time_cost.count() << " ms");
 }
 
 void OBCameraNodeDriver::connectNetDevice(const std::string &net_device_ip, int net_device_port) {
@@ -357,6 +360,7 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
     RCLCPP_WARN(logger_, "No device found");
     return;
   }
+  start_time_ = std::chrono::system_clock::now();
   if (device_) {
     device_.reset();
   }

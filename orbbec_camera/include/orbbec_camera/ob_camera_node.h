@@ -143,7 +143,7 @@ class OBCameraNode {
 
   void clean() noexcept;
 
- void rebootDevice();
+  void rebootDevice();
 
   void startStreams();
 
@@ -296,7 +296,7 @@ class OBCameraNode {
 
   std::shared_ptr<ob::Frame> processDepthFrameFilter(std::shared_ptr<ob::Frame>& frame);
 
-  uint64_t getFrameTimestampUs(const std::shared_ptr<ob::Frame> & frame);
+  uint64_t getFrameTimestampUs(const std::shared_ptr<ob::Frame>& frame);
 
   void onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set);
 
@@ -556,9 +556,10 @@ class OBCameraNode {
   bool enable_3d_reconstruction_mode_ = false;
   int min_depth_limit_ = 0;
   int max_depth_limit_ = 0;
-  std::string time_domain_ = "device"; // device, system, global
+  std::string time_domain_ = "device";  // device, system, global
   // soft ware trigger
   rclcpp::TimerBase::SharedPtr software_trigger_timer_;
   std::chrono::milliseconds software_trigger_period_{33};
+  bool enable_heartbeat_ = false;
 };
 }  // namespace orbbec_camera

@@ -334,7 +334,7 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   RCLCPP_INFO_STREAM(logger_, "device unique id: " << device_unique_id_);
   RCLCPP_INFO_STREAM(logger_, "Current node pid: " << getpid());
   auto time_cost = std::chrono::duration_cast<std::chrono::milliseconds>(
-      std::chrono::system_clock::now() - start_time_);
+      std::chrono::high_resolution_clock::now() - start_time_);
   RCLCPP_INFO_STREAM(logger_, "Start device cost " << time_cost.count() << " ms");
 }
 
@@ -360,7 +360,7 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
     RCLCPP_WARN(logger_, "No device found");
     return;
   }
-  start_time_ = std::chrono::system_clock::now();
+  start_time_ = std::chrono::high_resolution_clock::now();
   if (device_) {
     device_.reset();
   }
@@ -370,14 +370,22 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
                                    [this](int *) { pthread_mutex_unlock(orb_device_lock_); });
   bool start_device_failed = false;
   try {
+    auto start_time = std::chrono::high_resolution_clock::now();
     auto device = selectDevice(list);
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto time_cost = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+    RCLCPP_INFO_STREAM(logger_, "Select device cost " << time_cost.count() << " ms");
     if (device == nullptr) {
       RCLCPP_WARN_THROTTLE(logger_, *get_clock(), 1000, "Device with serial number %s not found",
                            serial_number_.c_str());
       device_connected_ = false;
       return;
     }
+    start_time = std::chrono::high_resolution_clock::now();
     initializeDevice(device);
+    end_time = std::chrono::high_resolution_clock::now();
+    time_cost = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+    RCLCPP_INFO_STREAM(logger_, "Initialize device cost " << time_cost.count() << " ms");
   } catch (ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to initialize device " << e.getMessage());
     start_device_failed = true;

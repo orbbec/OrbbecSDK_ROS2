@@ -1034,6 +1034,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(min_depth_limit_, "min_depth_limit", 0);
   setAndGetNodeParameter<int>(max_depth_limit_, "max_depth_limit", 0);
   setAndGetNodeParameter<bool>(enable_heartbeat_, "enable_heartbeat", false);
+  setAndGetNodeParameter<bool>(enable_color_undistortion_, "enable_color_undistortion", false);
   if (enable_3d_reconstruction_mode_) {
     laser_on_off_mode_ = 1;  // 0 off, 1 on-off, 1 off-on
   }
@@ -1169,6 +1170,10 @@ void OBCameraNode::setupPublishers() {
               name + "/metadata",
               rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(camera_info_qos_profile),
                           camera_info_qos_profile));
+    }
+    if (stream_index == COLOR && enable_color_undistortion_) {
+      color_undistortion_publisher_ =
+          image_transport::create_publisher(node_, "color/image_undistorted", image_qos_profile);
     }
   }
 
@@ -1853,6 +1858,19 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   CHECK(image_publishers_.count(stream_index) > 0);
   saveImageToFile(stream_index, image, image_msg);
   image_publishers_[stream_index].publish(std::move(image_msg));
+  if (stream_index == COLOR && enable_color_undistortion_ &&
+      color_undistortion_publisher_.getNumSubscribers() > 0) {
+    auto undistorted_image = undistortImage(image, intrinsic, distortion);
+    auto undistorted_image_msg =
+        cv_bridge::CvImage(std_msgs::msg::Header(), encoding_[stream_index], undistorted_image)
+            .toImageMsg();
+    CHECK_NOTNULL(undistorted_image_msg.get());
+    undistorted_image_msg->header.stamp = timestamp;
+    undistorted_image_msg->is_bigendian = false;
+    undistorted_image_msg->step = width * unit_step_size_[stream_index];
+    undistorted_image_msg->header.frame_id = frame_id;
+    color_undistortion_publisher_.publish(std::move(undistorted_image_msg));
+  }
 }
 
 void OBCameraNode::publishMetadata(const std::shared_ptr<ob::Frame> &frame,

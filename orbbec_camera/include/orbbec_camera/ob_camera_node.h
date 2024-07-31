@@ -338,6 +338,8 @@ class OBCameraNode {
 
   static bool isGemini335PID(uint32_t pid);
 
+  void setupDepthPostProcessFilter();
+
  private:
   rclcpp::Node* node_ = nullptr;
   std::shared_ptr<ob::Device> device_ = nullptr;
@@ -561,6 +563,7 @@ class OBCameraNode {
   rclcpp::TimerBase::SharedPtr software_trigger_timer_;
   std::chrono::milliseconds software_trigger_period_{33};
   bool enable_heartbeat_ = false;
-  void setupDepthPostProcessFilter();
+  bool enable_color_undistortion_ = false;
+  image_transport::Publisher color_undistortion_publisher_;
 };
 }  // namespace orbbec_camera

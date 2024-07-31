@@ -93,7 +93,6 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::condition_variable reset_device_cond_;
   std::atomic_bool reset_device_flag_{false};
   pthread_mutex_t* orb_device_lock_ = nullptr;
-  sem_t* orb_device_sem_ = nullptr;
   pthread_mutexattr_t orb_device_lock_attr_;
   uint8_t* orb_device_lock_shm_addr_ = nullptr;
   int orb_device_lock_shm_fd_ = -1;

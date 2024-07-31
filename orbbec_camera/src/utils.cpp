@@ -852,4 +852,24 @@ OBStreamType obStreamTypeFromString(const std::string &stream_type) {
     return OB_STREAM_UNKNOWN;
   }
 }
+
+cv::Mat undistortImage(const cv::Mat &image, const OBCameraIntrinsic &intrinsic,
+                       const OBCameraDistortion &distortion) {
+  cv::Mat undistorted_image;
+  cv::Mat camera_matrix = cv::Mat::eye(3, 3, CV_64F);
+  camera_matrix.at<double>(0, 0) = intrinsic.fx;
+  camera_matrix.at<double>(1, 1) = intrinsic.fy;
+  camera_matrix.at<double>(0, 2) = intrinsic.cx;
+  camera_matrix.at<double>(1, 2) = intrinsic.cy;
+
+  // Create the distortion coefficients matrix using the extended distortion model
+  cv::Mat dist_coeffs = (cv::Mat_<float>(8, 1) << distortion.k1, distortion.k2, distortion.p1,
+                         distortion.p2, distortion.k3, distortion.k4, distortion.k5, distortion.k6);
+
+  // Undistort the image using OpenCV's undistort function
+  // This function corrects for lens distortion
+  cv::undistort(image, undistorted_image, camera_matrix, dist_coeffs);
+
+  return undistorted_image;
+}
 }  // namespace orbbec_camera

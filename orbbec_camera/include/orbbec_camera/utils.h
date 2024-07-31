@@ -26,10 +26,10 @@
 #include "orbbec_camera_msgs/msg/extrinsics.hpp"
 #include "magic_enum/magic_enum.hpp"
 #include <sensor_msgs/msg/point_cloud2.hpp>
-
+#include <opencv2/opencv.hpp>
 
 namespace orbbec_camera {
-inline void LogFatal(const char *file, int line, const std::string &message) {
+inline void LogFatal(const char* file, int line, const std::string& message) {
   std::cerr << "Check failed at " << file << ":" << line << ": " << message << std::endl;
   std::abort();
 }
@@ -40,7 +40,7 @@ inline void LogFatal(const char *file, int line, const std::string &message) {
   (!(condition) ? LogFatal(__FILE__, __LINE__, "Check failed: " #condition) : (void)0)
 
 template <typename T1, typename T2>
-void CheckOp(const char *expr, const char *file, int line, T1 val1, T2 val2, bool result) {
+void CheckOp(const char* expr, const char* file, int line, T1 val1, T2 val2, bool result) {
   if (!result) {
     std::ostringstream os;
     os << "Check failed: " << expr << " (" << val1 << " vs. " << val2 << ")";
@@ -60,7 +60,7 @@ void CheckOp(const char *expr, const char *file, int line, T1 val1, T2 val2, boo
 
 // Overload for raw pointers
 template <typename T>
-T *CheckNotNull(T *ptr, const char *file, int line) {
+T* CheckNotNull(T* ptr, const char* file, int line) {
   if (ptr == nullptr) {
     std::ostringstream os;
     os << "Null pointer passed to CheckNotNull at " << file << ":" << line;
@@ -71,7 +71,7 @@ T *CheckNotNull(T *ptr, const char *file, int line) {
 
 // Template for smart pointers like std::shared_ptr, std::unique_ptr
 template <typename T>
-T &CheckNotNull(T &ptr, const char *file, int line) {
+T& CheckNotNull(T& ptr, const char* file, int line) {
   if (ptr == nullptr) {
     std::ostringstream os;
     os << "Null pointer passed to CheckNotNull at " << file << ":" << line;
@@ -94,7 +94,8 @@ void saveRGBPointsToPly(const std::shared_ptr<ob::Frame>& frame, const std::stri
 void saveRGBPointCloudMsgToPly(const sensor_msgs::msg::PointCloud2::UniquePtr& msg,
                                const std::string& fileName);
 
-void saveDepthPointsToPly(const sensor_msgs::msg::PointCloud2::UniquePtr& msg, const std::string& fileName);
+void saveDepthPointsToPly(const sensor_msgs::msg::PointCloud2::UniquePtr& msg,
+                          const std::string& fileName);
 
 void savePointsToPly(const std::shared_ptr<ob::Frame>& frame, const std::string& fileName);
 
@@ -115,7 +116,7 @@ OBFormat OBFormatFromString(const std::string& format);
 
 std::string OBFormatToString(const OBFormat& format);
 
-std::ostream &operator<<(std::ostream &os, const OBFormat &rhs);
+std::ostream& operator<<(std::ostream& os, const OBFormat& rhs);
 
 std::string ObDeviceTypeToString(const OBDeviceType& type);
 
@@ -134,19 +135,19 @@ OB_SAMPLE_RATE sampleRateFromString(std::string& sample_rate);
 
 std::string sampleRateToString(const OB_SAMPLE_RATE& sample_rate);
 
-std::ostream &operator<<(std::ostream &os, const OB_SAMPLE_RATE &rhs);
+std::ostream& operator<<(std::ostream& os, const OB_SAMPLE_RATE& rhs);
 
 OB_GYRO_FULL_SCALE_RANGE fullGyroScaleRangeFromString(std::string& full_scale_range);
 
 std::string fullGyroScaleRangeToString(const OB_GYRO_FULL_SCALE_RANGE& full_scale_range);
 
-std::ostream &operator<<(std::ostream &os, const OB_GYRO_FULL_SCALE_RANGE &rhs);
+std::ostream& operator<<(std::ostream& os, const OB_GYRO_FULL_SCALE_RANGE& rhs);
 
 OBAccelFullScaleRange fullAccelScaleRangeFromString(std::string& full_scale_range);
 
 std::string fullAccelScaleRangeToString(const OBAccelFullScaleRange& full_scale_range);
 
-std::ostream &operator<<(std::ostream &os, const OBAccelFullScaleRange &rhs);
+std::ostream& operator<<(std::ostream& os, const OBAccelFullScaleRange& rhs);
 
 std::string parseUsbPort(const std::string& line);
 
@@ -154,12 +155,15 @@ bool isValidJPEG(const std::shared_ptr<ob::ColorFrame>& frame);
 
 std::string metaDataTypeToString(const OBFrameMetadataType& meta_data_type);
 
-std::ostream &operator<<(std::ostream &os, const OBFrameMetadataType &rhs);
+std::ostream& operator<<(std::ostream& os, const OBFrameMetadataType& rhs);
 
 OBHoleFillingMode holeFillingModeFromString(const std::string& hole_filling_mode);
 
 bool isGemini2R(int pid);
 
 OBStreamType obStreamTypeFromString(const std::string& stream_type);
+
+cv::Mat undistortImage(const cv::Mat& image, const OBCameraIntrinsic& intrinsic,
+                       const OBCameraDistortion& distortion);
 
 }  // namespace orbbec_camera

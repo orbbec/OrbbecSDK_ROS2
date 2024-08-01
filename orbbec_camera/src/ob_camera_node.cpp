@@ -373,22 +373,22 @@ void OBCameraNode::setupDevices() {
       RCLCPP_ERROR(logger_, "ir exposure value is out of range[%d,%d], please check the value",
                    range.min, range.max);
     } else {
-      device_->setIntProperty(OB_PROP_IR_EXPOSURE_INT, ir_exposure_);
+     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_EXPOSURE_INT, ir_exposure_);
     }
   }
   if (ir_gain_ != -1 && device_->isPropertySupported(OB_PROP_IR_GAIN_INT, OB_PERMISSION_WRITE)) {
-    device_->setBoolProperty(OB_PROP_IR_AUTO_EXPOSURE_BOOL, false);
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_IR_AUTO_EXPOSURE_BOOL, false);
     auto range = device_->getIntPropertyRange(OB_PROP_IR_GAIN_INT);
     if (ir_gain_ < range.min || ir_gain_ > range.max) {
       RCLCPP_ERROR(logger_, "ir gain value is out of range[%d,%d], please check the value",
                    range.min, range.max);
     } else {
-      device_->setIntProperty(OB_PROP_IR_GAIN_INT, ir_gain_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_GAIN_INT, ir_gain_);
     }
   }
 
   if (device_->isPropertySupported(OB_PROP_IR_LONG_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
-    device_->setBoolProperty(OB_PROP_IR_LONG_EXPOSURE_BOOL, enable_ir_long_exposure_);
+   TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_IR_LONG_EXPOSURE_BOOL, enable_ir_long_exposure_);
   }
 
   if (device_->isPropertySupported(OB_PROP_DEPTH_MAX_DIFF_INT, OB_PERMISSION_WRITE)) {
@@ -1053,6 +1053,7 @@ void OBCameraNode::getParameters() {
 }
 
 void OBCameraNode::setupTopics() {
+  try {
   getParameters();
   setupDevices();
   setupDepthPostProcessFilter();
@@ -1061,6 +1062,13 @@ void OBCameraNode::setupTopics() {
   setupCameraCtrlServices();
   setupPublishers();
   setupDiagnosticUpdater();
+  } catch (const ob::Error &e) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to setup topics: " << e.getMessage());
+  } catch (const std::exception &e) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to setup topics: " << e.what());
+  } catch (...) {
+    RCLCPP_ERROR(logger_, "Failed to setup topics");
+  }
 }
 
 void OBCameraNode::onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapper &status) {

@@ -166,6 +166,7 @@ def generate_launch_description():
         DeclareLaunchArgument('time_domain', default_value='device'),
         DeclareLaunchArgument('enable_color_undistortion', default_value='false'),
         DeclareLaunchArgument('config_file_path', default_value=''),
+        DeclareLaunchArgument('enable_heartbeat', default_value='false'),
     ]
 
     def get_params(context, args):

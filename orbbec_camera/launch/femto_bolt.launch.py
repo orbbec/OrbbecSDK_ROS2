@@ -87,6 +87,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_depth_scale', default_value='true'),
         DeclareLaunchArgument('align_mode', default_value='SW'),
         DeclareLaunchArgument('laser_energy_level', default_value='-1'),
+        DeclareLaunchArgument('enable_heartbeat', default_value='false'),
     ]
 
     # Node configuration

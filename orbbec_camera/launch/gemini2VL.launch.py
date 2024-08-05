@@ -86,6 +86,7 @@ def generate_launch_description():
         DeclareLaunchArgument('align_mode', default_value='HW'),
         DeclareLaunchArgument('retry_on_usb3_detection_failure', default_value='false'),
         DeclareLaunchArgument('laser_energy_level', default_value='-1'),
+        DeclareLaunchArgument('enable_heartbeat', default_value='false'),
     ]
 
     # Node configuration

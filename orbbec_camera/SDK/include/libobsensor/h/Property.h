@@ -438,6 +438,11 @@ typedef enum {
     OB_PROP_DISP_SEARCH_RANGE_MODE_INT = 191,
 
     /**
+     * @brief cpu temperature correction . true: calibrate temperature
+     */
+    OB_PROP_CPU_TEMPERATURE_CALIBRATION_BOOL = 199,
+
+    /**
      * @brief Baseline calibration parameters
      */
     OB_STRUCT_BASELINE_CALIBRATION_PARAM = 1002,

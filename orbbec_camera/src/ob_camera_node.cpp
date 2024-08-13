@@ -169,7 +169,8 @@ void OBCameraNode::setupDevices() {
     }
   }
   auto info = device_->getDeviceInfo();
-  if (device_->isPropertySupported(OB_PROP_DEVICE_USB3_REPEAT_IDENTIFY_BOOL,
+  if (retry_on_usb3_detection_failure_ &&
+      device_->isPropertySupported(OB_PROP_DEVICE_USB3_REPEAT_IDENTIFY_BOOL,
                                    OB_PERMISSION_READ_WRITE)) {
     TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_DEVICE_USB3_REPEAT_IDENTIFY_BOOL,
                         retry_on_usb3_detection_failure_);
@@ -373,7 +374,7 @@ void OBCameraNode::setupDevices() {
       RCLCPP_ERROR(logger_, "ir exposure value is out of range[%d,%d], please check the value",
                    range.min, range.max);
     } else {
-     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_EXPOSURE_INT, ir_exposure_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_EXPOSURE_INT, ir_exposure_);
     }
   }
   if (ir_gain_ != -1 && device_->isPropertySupported(OB_PROP_IR_GAIN_INT, OB_PERMISSION_WRITE)) {
@@ -388,7 +389,7 @@ void OBCameraNode::setupDevices() {
   }
 
   if (device_->isPropertySupported(OB_PROP_IR_LONG_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
-   TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_IR_LONG_EXPOSURE_BOOL, enable_ir_long_exposure_);
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_IR_LONG_EXPOSURE_BOOL, enable_ir_long_exposure_);
   }
 
   if (device_->isPropertySupported(OB_PROP_DEPTH_MAX_DIFF_INT, OB_PERMISSION_WRITE)) {
@@ -1054,14 +1055,14 @@ void OBCameraNode::getParameters() {
 
 void OBCameraNode::setupTopics() {
   try {
-  getParameters();
-  setupDevices();
-  setupDepthPostProcessFilter();
-  setupProfiles();
-  selectBaseStream();
-  setupCameraCtrlServices();
-  setupPublishers();
-  setupDiagnosticUpdater();
+    getParameters();
+    setupDevices();
+    setupDepthPostProcessFilter();
+    setupProfiles();
+    selectBaseStream();
+    setupCameraCtrlServices();
+    setupPublishers();
+    setupDiagnosticUpdater();
   } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to setup topics: " << e.getMessage());
   } catch (const std::exception &e) {

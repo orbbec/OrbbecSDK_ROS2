@@ -47,6 +47,7 @@ set(dependencies
   Threads
   diagnostic_updater
   diagnostic_msgs
+  statistics_msgs
 )
 
 foreach (dep IN LISTS dependencies)
@@ -210,6 +211,8 @@ add_orbbec_executable(list_devices_node tools/list_devices_node.cpp)
 add_orbbec_executable(list_depth_work_mode_node tools/list_depth_work_mode.cpp)
 add_orbbec_executable(list_camera_profile_mode_node tools/list_camera_profile.cpp)
 
+add_orbbec_executable(topic_statistics_node tools/topic_statistics.cpp)
+
 # Install rules
 install(TARGETS ${PROJECT_NAME}
   ARCHIVE DESTINATION lib
@@ -232,6 +235,7 @@ endif ()
 install(TARGETS list_devices_node
   list_depth_work_mode_node
   list_camera_profile_mode_node
+  topic_statistics_node
   DESTINATION lib/${PROJECT_NAME}/)
 
 if (BUILD_TESTING)

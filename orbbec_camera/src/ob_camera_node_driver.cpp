@@ -333,6 +333,7 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   RCLCPP_INFO_STREAM(logger_, "Hardware version: " << device_info_->hardwareVersion());
   RCLCPP_INFO_STREAM(logger_, "device unique id: " << device_unique_id_);
   RCLCPP_INFO_STREAM(logger_, "Current node pid: " << getpid());
+  RCLCPP_INFO_STREAM(logger_, "usb connect type: " << device_info_->connectionType());
   auto time_cost = std::chrono::duration_cast<std::chrono::milliseconds>(
       std::chrono::high_resolution_clock::now() - start_time_);
   RCLCPP_INFO_STREAM(logger_, "Start device cost " << time_cost.count() << " ms");

@@ -1571,6 +1571,10 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
                      "Depth registration is disabled or align filter is null or depth frame is "
                      "null or color frame is null");
       }
+      if(depth_registration_ && align_filter_ && depth_frame_ && !color_frame){
+        RCLCPP_ERROR(logger_, "Color frame is null, cannot align depth frame to color frame, droped");
+        return;
+      }
     }
     if (enable_stream_[COLOR] && color_frame) {
       std::unique_lock<std::mutex> lock(color_frame_queue_lock_);

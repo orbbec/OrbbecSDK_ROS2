@@ -175,6 +175,11 @@ void OBCameraNode::setupDevices() {
     TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_DEVICE_USB3_REPEAT_IDENTIFY_BOOL,
                         retry_on_usb3_detection_failure_);
   }
+  if (device_->isPropertySupported(OB_PROP_DEPTH_NOISE_REMOVAL_FILTER_BOOL,
+                                   OB_PERMISSION_READ_WRITE)) {
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_DEPTH_NOISE_REMOVAL_FILTER_BOOL,
+                        enable_noise_removal_filter_);
+  }
   if (device_->isPropertySupported(OB_PROP_HEARTBEAT_BOOL, OB_PERMISSION_READ_WRITE)) {
     TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_HEARTBEAT_BOOL, enable_heartbeat_);
   }

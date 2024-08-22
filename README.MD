@@ -11,6 +11,7 @@ supports ROS 2 Foxy, Humble, and Jazzy distributions.
   * [Table of Contents](#table-of-contents)
   * [Installation Instructions](#installation-instructions)
   * [Getting start](#getting-start)
+  * [Use V4L2 backend](#use-v4l2-backend)
   * [Launch parameters](#launch-parameters)
   * [Predefined presets](#predefined-presets)
   * [Depth work mode switch](#depth-work-mode-switch)
@@ -183,6 +184,15 @@ ros2 service call /camera/toggle_ir std_srvs/srv/SetBool "{data : true}"
 ```bash
 ros2 service call /camera/save_point_cloud std_srvs/srv/Empty "{}"
 ```
+## Use V4L2 backend
+To enable the V4L2 backend for the Gemini2 series cameras, follow these steps:
+
+1. The Gemini2 series cameras support the V4L2 backend.
+2. Open the `config/OrbbecSDKConfig_v1.0.xml` file.
+3. Set the navigation option to `LinuxUVCBackend`.
+4. Change the backend setting to `V4L2`.
+
+Note: The V4L2 backend is not enabled by default.
 
 ## Launch parameters
 

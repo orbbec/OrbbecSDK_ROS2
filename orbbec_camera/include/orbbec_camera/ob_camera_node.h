@@ -565,5 +565,6 @@ class OBCameraNode {
   bool enable_heartbeat_ = false;
   bool enable_color_undistortion_ = false;
   image_transport::Publisher color_undistortion_publisher_;
+  bool has_first_color_frame_ = false;
 };
 }  // namespace orbbec_camera

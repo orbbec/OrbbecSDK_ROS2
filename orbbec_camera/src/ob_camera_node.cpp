@@ -1569,9 +1569,10 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
     CHECK_NOTNULL(device_info.get());
     auto pid = device_info->pid();
     auto color_frame = frame_set->getFrame(OB_FRAME_COLOR);
+    has_first_color_frame_ = has_first_color_frame_ || color_frame;
     if (isGemini335PID(pid)) {
       depth_frame_ = processDepthFrameFilter(depth_frame_);
-      if (depth_registration_ && align_filter_ && depth_frame_ && color_frame) {
+      if (depth_registration_ && align_filter_ && depth_frame_ && has_first_color_frame_) {
         auto new_frame = align_filter_->process(frame_set);
         if (new_frame) {
           auto new_frame_set = new_frame->as<ob::FrameSet>();
@@ -1585,9 +1586,8 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
                      "Depth registration is disabled or align filter is null or depth frame is "
                      "null or color frame is null");
       }
-      if (depth_registration_ && align_filter_ && depth_frame_ && !color_frame) {
-        RCLCPP_ERROR(logger_,
-                     "Color frame is null, cannot align depth frame to color frame, droped");
+      if(depth_registration_ && align_filter_ && depth_frame_ && !has_first_color_frame_) {
+        RCLCPP_WARN(logger_, "Waiting for the first color frame to align depth frame");
         return;
       }
     }

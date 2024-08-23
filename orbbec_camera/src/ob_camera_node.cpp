@@ -95,20 +95,23 @@ void OBCameraNode::setAndGetNodeParameter(
 OBCameraNode::~OBCameraNode() noexcept { clean(); }
 
 void OBCameraNode::rebootDevice() {
+  RCLCPP_WARN_STREAM(logger_, "Reboot device");
   clean();
   if (device_) {
     device_->reboot();
   }
+  RCLCPP_WARN_STREAM(logger_, "Reboot device DONE");
 }
 
 void OBCameraNode::clean() noexcept {
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
   RCLCPP_WARN_STREAM(logger_, "Do destroy ~OBCameraNode");
   is_running_.store(false);
+  RCLCPP_WARN_STREAM(logger_, "Stop tf thread");
   if (tf_thread_ && tf_thread_->joinable()) {
     tf_thread_->join();
   }
-
+  RCLCPP_WARN_STREAM(logger_, "Stop color frame thread");
   if (colorFrameThread_ && colorFrameThread_->joinable()) {
     color_frame_queue_cv_.notify_all();
     colorFrameThread_->join();
@@ -117,7 +120,6 @@ void OBCameraNode::clean() noexcept {
   RCLCPP_WARN_STREAM(logger_, "stop streams");
   stopStreams();
   stopIMU();
-  RCLCPP_WARN_STREAM(logger_, "Destroy ~OBCameraNode DONE");
   if (rgb_buffer_) {
     delete[] rgb_buffer_;
     rgb_buffer_ = nullptr;
@@ -130,6 +132,7 @@ void OBCameraNode::clean() noexcept {
     delete[] xy_table_data_;
     xy_table_data_ = nullptr;
   }
+  RCLCPP_WARN_STREAM(logger_, "Destroy ~OBCameraNode DONE");
 }
 
 #define TRY_TO_SET_PROPERTY(func, property, value)                                            \
@@ -827,31 +830,42 @@ void OBCameraNode::startIMU() {
 
 void OBCameraNode::stopStreams() {
   if (!pipeline_started_ || !pipeline_) {
+    RCLCPP_INFO_STREAM(logger_, "pipeline not started or not exist, skip stop pipeline");
     return;
   }
   try {
     pipeline_->stop();
   } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to stop pipeline: " << e.getMessage());
+  } catch (...) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to stop pipeline");
   }
 }
 
 void OBCameraNode::stopIMU() {
   if (enable_sync_output_accel_gyro_) {
     if (!imu_sync_output_start_ || !imuPipeline_) {
+      RCLCPP_INFO_STREAM(logger_, "imu pipeline not started or not exist, skip stop imu pipeline");
       return;
     }
     try {
       imuPipeline_->stop();
     } catch (const ob::Error &e) {
       RCLCPP_ERROR_STREAM(logger_, "Failed to stop imu pipeline: " << e.getMessage());
+    } catch (...) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to stop imu pipeline");
     }
   } else {
     for (const auto &stream_index : HID_STREAMS) {
       if (imu_started_[stream_index]) {
         CHECK(sensors_.count(stream_index));
         RCLCPP_INFO_STREAM(logger_, "stop " << stream_name_[stream_index] << " stream");
-        sensors_[stream_index]->stop();
+        try {
+          sensors_[stream_index]->stop();
+        } catch (const ob::Error &e) {
+          RCLCPP_ERROR_STREAM(logger_, "Failed to stop " << stream_name_[stream_index]
+                                                         << " stream: " << e.getMessage());
+        }
         imu_started_[stream_index] = false;
       }
     }
@@ -1571,8 +1585,9 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
                      "Depth registration is disabled or align filter is null or depth frame is "
                      "null or color frame is null");
       }
-      if(depth_registration_ && align_filter_ && depth_frame_ && !color_frame){
-        RCLCPP_ERROR(logger_, "Color frame is null, cannot align depth frame to color frame, droped");
+      if (depth_registration_ && align_filter_ && depth_frame_ && !color_frame) {
+        RCLCPP_ERROR(logger_,
+                     "Color frame is null, cannot align depth frame to color frame, droped");
         return;
       }
     }

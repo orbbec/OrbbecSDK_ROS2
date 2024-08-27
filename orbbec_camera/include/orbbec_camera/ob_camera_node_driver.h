@@ -69,6 +69,7 @@ class OBCameraNodeDriver : public rclcpp::Node {
                             std::shared_ptr<std_srvs::srv::Empty::Response> response);
 
  private:
+ const rclcpp::NodeOptions node_options_;
   std::string config_path_;
   std::unique_ptr<ob::Context> ctx_ = nullptr;
   rclcpp::Logger logger_;

@@ -11,6 +11,10 @@ supports ROS 2 Foxy, Humble, and Jazzy distributions.
   * [Table of Contents](#table-of-contents)
   * [Installation Instructions](#installation-instructions)
   * [Getting start](#getting-start)
+  * [Efficient intra-process communication:](#efficient-intra-process-communication)
+    * [Example](#example)
+      * [Manually loading multiple components into the same process](#manually-loading-multiple-components-into-the-same-process)
+    * [Limitations](#limitations)
   * [Use V4L2 backend](#use-v4l2-backend)
   * [Launch parameters](#launch-parameters)
   * [Predefined presets](#predefined-presets)
@@ -184,6 +188,39 @@ ros2 service call /camera/toggle_ir std_srvs/srv/SetBool "{data : true}"
 ```bash
 ros2 service call /camera/save_point_cloud std_srvs/srv/Empty "{}"
 ```
+
+## Efficient intra-process communication:
+  
+Our ROS2 Wrapper node supports zero-copy communications if loaded in the same process as a subscriber node. This can reduce copy times on image/pointcloud topics, especially with big frame resolutions and high FPS.
+
+You will need to launch a component container and launch our node as a component together with other component nodes. Further details on "Composing multiple nodes in a single process" can be found [here](https://docs.ros.org/en/rolling/Tutorials/Composition.html).
+
+Further details on efficient intra-process communication can be found [here](https://docs.ros.org/en/humble/Tutorials/Intra-Process-Communication.html#efficient-intra-process-communication).
+
+### Example
+#### Manually loading multiple components into the same process
+* Start the component:
+  ```bash
+  ros2 run rclcpp_components component_container
+  ```
+
+* Add the wrapper:
+  ```bash
+  ros2 component load /ComponentManager orbbec_camera orbbec_camera::OBCameraNodeDriver -e use_intra_process_comms:=true
+  ```
+  Load other component nodes (consumers of the wrapper topics) in the same way.
+
+#### Using a launch file
+
+```bash
+ros2 launch orbbec_camera gemini_intra_process_demo_launch.py
+```
+
+### Limitations
+
+* Node components are currently not supported on RCLPY
+* Compressed images using `image_transport` will be disabled as this isn't supported with intra-process communication
+
 ## Use V4L2 backend
 To enable the V4L2 backend for the Gemini2 series cameras, follow these steps:
 

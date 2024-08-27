@@ -109,6 +109,7 @@ set(COMMON_INCLUDE_DIRS
   $<INSTALL_INTERFACE:include>
   ${ORBBEC_INCLUDE_DIR}
   ${OpenCV_INCLUDED_DIRS}
+  ${CMAKE_CURRENT_SOURCE_DIR}/tools
 )
 
 set(COMMON_LIBRARIES
@@ -137,6 +138,7 @@ endif ()
 set(SOURCE_FILES
   src/d2c_viewer.cpp
   src/dynamic_params.cpp
+  src/image_publisher.cpp
   src/ob_camera_node_driver.cpp
   src/ob_camera_node.cpp
   src/ros_param_backend.cpp
@@ -213,8 +215,18 @@ add_orbbec_executable(list_camera_profile_mode_node tools/list_camera_profile.cp
 
 add_orbbec_executable(topic_statistics_node tools/topic_statistics.cpp)
 
+
+add_library(frame_latency SHARED tools/frame_latency.cpp)
+target_include_directories(frame_latency PUBLIC ${COMMON_INCLUDE_DIRS})
+target_link_libraries(frame_latency ${COMMON_LIBRARIES})
+ament_target_dependencies(frame_latency ${dependencies})
+
+rclcpp_components_register_node(frame_latency
+        PLUGIN "orbbec_camera::FrameLatencyNode"
+        EXECUTABLE frame_latency_node
+)
 # Install rules
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS ${PROJECT_NAME} frame_latency
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin

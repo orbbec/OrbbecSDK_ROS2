@@ -27,6 +27,7 @@
 namespace orbbec_camera {
 OBCameraNodeDriver::OBCameraNodeDriver(const rclcpp::NodeOptions &node_options)
     : Node("orbbec_camera_node", "/", node_options),
+      node_options_(node_options),
       config_path_(ament_index_cpp::get_package_share_directory("orbbec_camera") +
                    "/config/OrbbecSDKConfig_v1.0.xml"),
       ctx_(std::make_unique<ob::Context>(config_path_.c_str())),
@@ -37,6 +38,7 @@ OBCameraNodeDriver::OBCameraNodeDriver(const rclcpp::NodeOptions &node_options)
 OBCameraNodeDriver::OBCameraNodeDriver(const std::string &node_name, const std::string &ns,
                                        const rclcpp::NodeOptions &node_options)
     : Node(node_name, ns, node_options),
+      node_options_(node_options),
       ctx_(std::make_unique<ob::Context>()),
       logger_(this->get_logger()) {
   init();
@@ -311,7 +313,8 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   if (ob_camera_node_) {
     ob_camera_node_.reset();
   }
-  ob_camera_node_ = std::make_unique<OBCameraNode>(this, device_, parameters_);
+  ob_camera_node_ = std::make_unique<OBCameraNode>(this, device_, parameters_,
+                                                   node_options_.use_intra_process_comms());
   ob_camera_node_->startIMU();
   ob_camera_node_->startStreams();
   device_connected_ = true;

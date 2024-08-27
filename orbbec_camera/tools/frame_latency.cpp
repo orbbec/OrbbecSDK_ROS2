@@ -33,6 +33,7 @@
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
+#include <chrono>
 
 using namespace std::chrono_literals;
 #include "frame_latency.hpp"
@@ -50,11 +51,18 @@ template <typename MsgType>
 void FrameLatencyNode::createListener(const std::string& topic_name,
                                       const rmw_qos_profile_t qos_profile) {
   RCLCPP_INFO_STREAM(logger_, "createListener");
+  using namespace std::chrono_literals;
+  timer_ = this->create_wall_timer(1s, [this, topic_name=topic_name]() {
+    // print fps
+    RCLCPP_INFO_STREAM(logger_, "topic: " << topic_name << " fps: " << frame_count_ / 1.0);
+    frame_count_ = 0;
+  });
   sub_ = this->create_subscription<MsgType>(
       topic_name, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(qos_profile), qos_profile),
       [&, this](const std::shared_ptr<MsgType> msg) {
         rclcpp::Time curr_time = this->get_clock()->now();
         auto latency = (curr_time - msg->header.stamp).seconds();
+        frame_count_++;
         RCLCPP_INFO_STREAM_THROTTLE(logger_, *this->get_clock(), 1000.0,
                                     "Got msg with "
                                         << msg->header.frame_id << " frame id at address 0x"

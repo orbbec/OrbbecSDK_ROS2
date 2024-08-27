@@ -49,5 +49,7 @@ class FrameLatencyNode : public rclcpp::Node {
   std::shared_ptr<void> sub_ = nullptr;
 
   rclcpp::Logger logger_;
+  rclcpp::TimerBase::SharedPtr timer_;
+  size_t frame_count_ = 0;
 };
 }  // namespace orbbec_camera

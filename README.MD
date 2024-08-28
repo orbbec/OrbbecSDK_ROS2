@@ -14,6 +14,7 @@ supports ROS 2 Foxy, Humble, and Jazzy distributions.
   * [Efficient intra-process communication:](#efficient-intra-process-communication)
     * [Example](#example)
       * [Manually loading multiple components into the same process](#manually-loading-multiple-components-into-the-same-process)
+      * [Using a launch file](#using-a-launch-file)
     * [Limitations](#limitations)
   * [Use V4L2 backend](#use-v4l2-backend)
   * [Launch parameters](#launch-parameters)
@@ -40,6 +41,7 @@ supports ROS 2 Foxy, Humble, and Jazzy distributions.
     * [No Data Stream from Multiple Cameras](#no-data-stream-from-multiple-cameras)
     * [Why Are There So Many Launch Files Here?](#why-are-there-so-many-launch-files-here)
     * [If You Encounter Additional Issues](#if-you-encounter-additional-issues)
+    * [Unexpected crash](#unexpected-crash)
   * [Other useful links](#other-useful-links)
   * [License](#license)
 <!-- TOC -->
@@ -725,6 +727,10 @@ If you use Fast DDS, you can refer to the [Fast DDS Configuration](./docs/fastdd
 
 - If you encounter other issues, set the `log_level` parameter to `debug`. This will generate an SDK Log file in the running directory. Provide this file to the support team for further assistance.
 - If firmware logs are required, set `enable_heartbeat` to `true` to activate this feature.
+
+### Unexpected crash
+If the camera node crashes unexpectedly, it will generate a crash log in the current running directory: `Log/camera_crash_stack_trace_xx.log`. 
+Please send this log to the support team or submit it to a GitHub issue for further assistance.
 
 ## Other useful links
 

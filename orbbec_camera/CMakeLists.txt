@@ -48,6 +48,7 @@ set(dependencies
   diagnostic_updater
   diagnostic_msgs
   statistics_msgs
+  backward_ros
 )
 
 foreach (dep IN LISTS dependencies)
@@ -120,6 +121,7 @@ set(COMMON_LIBRARIES
   -L${ORBBEC_LIBS_DIR}
   Threads::Threads
   -lrt
+  -ldw
 )
 if (USE_RK_HW_DECODER)
   list(APPEND COMMON_LIBRARIES

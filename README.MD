@@ -38,10 +38,10 @@ supports ROS 2 Foxy, Humble, and Jazzy distributions.
   * [Product support](#product-support)
   * [DDS Tuning](#dds-tuning)
   * [Frequently Asked Questions](#frequently-asked-questions)
+    * [Unexpected Crash](#unexpected-crash)
     * [No Data Stream from Multiple Cameras](#no-data-stream-from-multiple-cameras)
-    * [Why Are There So Many Launch Files Here?](#why-are-there-so-many-launch-files-here)
-    * [If You Encounter Additional Issues](#if-you-encounter-additional-issues)
-    * [Unexpected crash](#unexpected-crash)
+    * [Additional Troubleshooting](#additional-troubleshooting)
+    * [Why Are There So Many Launch Files?](#why-are-there-so-many-launch-files)
   * [Other useful links](#other-useful-links)
   * [License](#license)
 <!-- TOC -->
@@ -701,36 +701,41 @@ net.core.rmem_default=2147483647
 
 If you use Fast DDS, you can refer to the [Fast DDS Configuration](./docs/fastdds_tuning.md) file.
 
+
 ## Frequently Asked Questions
+
+### Unexpected Crash
+
+If the camera node crashes unexpectedly, it will generate a crash log in the current running directory: `Log/camera_crash_stack_trace_xx.log`.
+Please send this log to the support team or submit it to a GitHub issue for further assistance.
 
 ### No Data Stream from Multiple Cameras
 
 **Insufficient Power Supply**:
-  - Ensure that all cameras are not connected to the same hub.
-  - Use a powered hub to provide sufficient power to each camera.
+- Ensure that each camera is connected to a separate hub.
+- Use a powered hub to provide sufficient power to each camera.
+
 **High Resolution**:
-  - Try lowering the resolution to resolve data stream issues.
+- Try lowering the resolution to resolve data stream issues.
 
 **Increase usbfs_memory_mb Value**:
-  - Increase the `usbfs_memory_mb` value to 128MB by running the following command:
-    ```bash
+- Increase the `usbfs_memory_mb` value to 128MB (this is a reference value and can be adjusted based on your system’s needs) 
+by running the following command:
+```bash
     echo 128 | sudo tee /sys/module/usbcore/parameters/usbfs_memory_mb
-    ```
-  - For making this change permanent, check [this link](https://github.com/OpenKinect/libfreenect2/issues/807).
+```
+- To make this change permanent, check [this link](https://github.com/OpenKinect/libfreenect2/issues/807).
 
-### Why Are There So Many Launch Files Here?
+### Additional Troubleshooting
 
-- Multiple launch files exist because different cameras have varying default resolutions and image formats.
-- To simplify usage, each camera has its own launch file.
-
-### If You Encounter Additional Issues
-
-- If you encounter other issues, set the `log_level` parameter to `debug`. This will generate an SDK Log file in the running directory. Provide this file to the support team for further assistance.
+- If you encounter other issues, set the `log_level` parameter to `debug`. This will generate an SDK log file in the running directory: `Log/OrbbecSDK.log.txt`. 
+Please provide this file to the support team for further assistance.
 - If firmware logs are required, set `enable_heartbeat` to `true` to activate this feature.
 
-### Unexpected crash
-If the camera node crashes unexpectedly, it will generate a crash log in the current running directory: `Log/camera_crash_stack_trace_xx.log`. 
-Please send this log to the support team or submit it to a GitHub issue for further assistance.
+### Why Are There So Many Launch Files?
+
+- Different cameras have varying default resolutions and image formats.
+- To simplify usage, each camera has its own launch file.
 
 ## Other useful links
 

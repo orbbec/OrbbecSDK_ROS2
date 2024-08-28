@@ -25,6 +25,8 @@
 #include <unistd.h>
 
 namespace orbbec_camera {
+
+backward::SignalHandling OBCameraNodeDriver::sh;
 OBCameraNodeDriver::OBCameraNodeDriver(const rclcpp::NodeOptions &node_options)
     : Node("orbbec_camera_node", "/", node_options),
       node_options_(node_options),

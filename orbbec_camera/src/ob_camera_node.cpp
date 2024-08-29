@@ -608,7 +608,14 @@ void OBCameraNode::setupProfiles() {
       CHECK_NOTNULL(profiles.get());
       CHECK(profiles->count() > 0);
       for (size_t i = 0; i < profiles->count(); i++) {
-        auto profile = profiles->getProfile(i)->as<ob::VideoStreamProfile>();
+        auto base_profile = profiles->getProfile(i);
+        if (base_profile == nullptr) {
+          throw std::runtime_error("Failed to get profile " + std::to_string(i));
+        }
+        auto profile = base_profile->as<ob::VideoStreamProfile>();
+        if (profile == nullptr) {
+          throw std::runtime_error("Failed cast profile to VideoStreamProfile");
+        }
         RCLCPP_DEBUG_STREAM(
             logger_, "Sensor profile: "
                          << "stream_type: " << magic_enum::enum_name(profile->type())
@@ -640,6 +647,7 @@ void OBCameraNode::setupProfiles() {
                      "configuration and try again. The current process will now exit.");
         RCLCPP_INFO_STREAM(logger_, "Available profiles:");
         printSensorProfiles(sensor);
+        RCLCPP_ERROR(logger_, "Because can not set this stream, so exit.");
         exit(-1);
       }
 
@@ -1091,10 +1099,13 @@ void OBCameraNode::setupTopics() {
     setupDiagnosticUpdater();
   } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to setup topics: " << e.getMessage());
+    throw std::runtime_error(e.getMessage());
   } catch (const std::exception &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to setup topics: " << e.what());
+    throw std::runtime_error(e.what());
   } catch (...) {
     RCLCPP_ERROR(logger_, "Failed to setup topics");
+    throw std::runtime_error("Failed to setup topics");
   }
 }
 

@@ -363,12 +363,42 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   if (ob_camera_node_) {
     ob_camera_node_.reset();
   }
-  ob_camera_node_ = std::make_unique<OBCameraNode>(this, device_, parameters_,
-                                                   node_options_.use_intra_process_comms());
+  int retry_count = 0;
+  const int max_retries = 3;
+  bool initialized = false;
+  device_info_ = device_->getDeviceInfo();
+  RCLCPP_INFO_STREAM(logger_, "Try to connect device via " << device_info_->connectionType());
+
+  while (retry_count < max_retries && !initialized) {
+    try {
+      ob_camera_node_ = std::make_unique<OBCameraNode>(this, device_, parameters_,
+                                                       node_options_.use_intra_process_comms());
+      initialized = true;
+    } catch (const ob::Error &e) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to initialize device (Attempt "
+                                       << retry_count + 1 << " of " << max_retries
+                                       << "): " << e.getMessage());
+    } catch (const std::exception &e) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to initialize device (Attempt " << retry_count + 1
+                                                                           << " of " << max_retries
+                                                                           << "): " << e.what());
+    } catch (...) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to initialize device (Attempt "
+                                       << retry_count + 1 << " of " << max_retries << ")");
+    }
+    retry_count++;
+  }
+
+  if (!initialized) {
+    RCLCPP_ERROR_STREAM(logger_,
+                        "Device initialization failed after " << max_retries << " attempts.");
+    throw std::runtime_error("Device initialization failed after " + std::to_string(max_retries) +
+                             " attempts.");
+  }
+
   ob_camera_node_->startIMU();
   ob_camera_node_->startStreams();
   device_connected_ = true;
-  device_info_ = device_->getDeviceInfo();
   serial_number_ = device_info_->serialNumber();
   CHECK_NOTNULL(device_info_.get());
   device_unique_id_ = device_info_->uid();
@@ -390,7 +420,7 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   auto time_cost = std::chrono::duration_cast<std::chrono::milliseconds>(
       std::chrono::high_resolution_clock::now() - start_time_);
   RCLCPP_INFO_STREAM(logger_, "Start device cost " << time_cost.count() << " ms");
-}
+}  // namespace orbbec_camera
 
 void OBCameraNodeDriver::connectNetDevice(const std::string &net_device_ip, int net_device_port) {
   if (net_device_ip.empty() || net_device_port == 0) {

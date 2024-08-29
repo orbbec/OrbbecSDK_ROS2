@@ -343,7 +343,14 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByUSBPort(
     std::lock_guard<decltype(device_lock_)> lock(device_lock_);
     RCLCPP_INFO_STREAM(logger_, "After lock: Select device usb port: " << usb_port);
     auto device = list->getDeviceByUid(usb_port.c_str());
-    RCLCPP_INFO_STREAM(logger_, "Device usb port " << usb_port << " done");
+    if (device) {
+      RCLCPP_INFO_STREAM(logger_, "getDeviceByUid device usb port " << usb_port << " done");
+    } else {
+      RCLCPP_ERROR_STREAM(logger_, "getDeviceByUid device usb port " << usb_port << " failed");
+      RCLCPP_ERROR_STREAM(logger_,
+                          "Please use script to get usb port: "
+                          "ros2 run orbbec_camera list_devices_node");
+    }
     return device;
   } catch (ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to get device info " << e.getMessage());

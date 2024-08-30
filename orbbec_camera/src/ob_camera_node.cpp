@@ -224,7 +224,7 @@ void OBCameraNode::setupDevices() {
         RCLCPP_INFO_STREAM(logger_, "Preset " << i << ": " << preset_list->getName(i));
       }
       RCLCPP_INFO_STREAM(logger_, "Load device preset: " << device_preset_);
-      device_->loadPreset(device_preset_.c_str());
+      TRY_EXECUTE_BLOCK(device_->loadPreset(device_preset_.c_str()));
       RCLCPP_INFO_STREAM(logger_, "Device preset " << device_->getCurrentPresetName() << " loaded");
     } catch (const ob::Error &e) {
       RCLCPP_ERROR_STREAM(logger_, "Failed to load device preset: " << e.getMessage());
@@ -236,7 +236,7 @@ void OBCameraNode::setupDevices() {
   }
   if (!depth_work_mode_.empty()) {
     RCLCPP_INFO_STREAM(logger_, "Set depth work mode: " << depth_work_mode_);
-    device_->switchDepthWorkMode(depth_work_mode_.c_str());
+    TRY_EXECUTE_BLOCK(device_->switchDepthWorkMode(depth_work_mode_.c_str()));
   }
   if (!sync_mode_str_.empty() && device_->isPropertySupported(OB_PROP_SYNC_SIGNAL_TRIGGER_OUT_BOOL,
                                                               OB_PERMISSION_READ_WRITE)) {
@@ -252,15 +252,15 @@ void OBCameraNode::setupDevices() {
     sync_config.triggerOutDelayUs = trigger_out_delay_us_;
     sync_config.triggerOutEnable = trigger_out_enabled_;
     sync_config.framesPerTrigger = frames_per_trigger_;
-    device_->setMultiDeviceSyncConfig(sync_config);
+    TRY_EXECUTE_BLOCK(device_->setMultiDeviceSyncConfig(sync_config));
     sync_config = device_->getMultiDeviceSyncConfig();
     RCLCPP_INFO_STREAM(logger_, "Set sync mode: " << magic_enum::enum_name(sync_config.syncMode));
     if (sync_mode_ == OB_MULTI_DEVICE_SYNC_MODE_SOFTWARE_TRIGGERING) {
       RCLCPP_INFO_STREAM(logger_, "Frames per trigger: " << sync_config.framesPerTrigger);
       RCLCPP_INFO_STREAM(logger_,
                          "Software trigger period " << software_trigger_period_.count() << " ms");
-      software_trigger_timer_ = node_->create_wall_timer(software_trigger_period_,
-                                                         [this]() { device_->triggerCapture(); });
+      software_trigger_timer_ = node_->create_wall_timer(
+          software_trigger_period_, [this]() { TRY_EXECUTE_BLOCK(device_->triggerCapture()); });
     }
   }
 
@@ -283,8 +283,8 @@ void OBCameraNode::setupDevices() {
           logger_, "depth unit flexible adjustment value is out of range, please check the value");
     } else {
       RCLCPP_INFO_STREAM(logger_, "set depth unit to " << depth_unit_flexible_adjustment << "mm");
-      device_->setFloatProperty(OB_PROP_DEPTH_UNIT_FLEXIBLE_ADJUSTMENT_FLOAT,
-                                depth_unit_flexible_adjustment);
+      TRY_TO_SET_PROPERTY(setFloatProperty, OB_PROP_DEPTH_UNIT_FLEXIBLE_ADJUSTMENT_FLOAT,
+                          depth_unit_flexible_adjustment);
     }
   }
 
@@ -305,68 +305,69 @@ void OBCameraNode::setupDevices() {
       }
 
       if (device_->isPropertySupported(mirrorPropertyID, OB_PERMISSION_WRITE)) {
-        device_->setBoolProperty(mirrorPropertyID, flip_stream_[stream_index]);
+        TRY_TO_SET_PROPERTY(setBoolProperty, mirrorPropertyID, flip_stream_[stream_index]);
       }
     }
   }
 
   if (!depth_filter_config_.empty() && enable_depth_filter_) {
     RCLCPP_INFO_STREAM(logger_, "Load depth filter config: " << depth_filter_config_);
-    device_->loadDepthFilterConfig(depth_filter_config_.c_str());
+    TRY_EXECUTE_BLOCK(device_->loadDepthFilterConfig(depth_filter_config_.c_str()));
   } else {
     if (device_->isPropertySupported(OB_PROP_DEPTH_SOFT_FILTER_BOOL, OB_PERMISSION_READ_WRITE)) {
-      device_->setBoolProperty(OB_PROP_DEPTH_SOFT_FILTER_BOOL, enable_soft_filter_);
+      TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_DEPTH_SOFT_FILTER_BOOL, enable_soft_filter_);
     }
   }
 
   if (device_->isPropertySupported(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
-    device_->setBoolProperty(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, enable_color_auto_exposure_);
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_COLOR_AUTO_EXPOSURE_BOOL,
+                        enable_color_auto_exposure_);
   }
   if (device_->isPropertySupported(OB_PROP_COLOR_AUTO_WHITE_BALANCE_BOOL, OB_PERMISSION_WRITE)) {
-    device_->setBoolProperty(OB_PROP_COLOR_AUTO_WHITE_BALANCE_BOOL,
-                             enable_color_auto_white_balance_);
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_COLOR_AUTO_WHITE_BALANCE_BOOL,
+                        enable_color_auto_white_balance_);
   }
   if (color_exposure_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
-    device_->setBoolProperty(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, false);
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, false);
     auto range = device_->getIntPropertyRange(OB_PROP_COLOR_EXPOSURE_INT);
     if (color_exposure_ < range.min || color_exposure_ > range.max) {
       RCLCPP_ERROR(logger_, "color exposure value is out of range[%d,%d], please check the value",
                    range.min, range.max);
     } else {
-      device_->setIntProperty(OB_PROP_COLOR_EXPOSURE_INT, color_exposure_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_EXPOSURE_INT, color_exposure_);
     }
   }
   if (color_gain_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_GAIN_INT, OB_PERMISSION_WRITE)) {
-    device_->setBoolProperty(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, false);
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, false);
     auto range = device_->getIntPropertyRange(OB_PROP_COLOR_GAIN_INT);
     if (color_gain_ < range.min || color_gain_ > range.max) {
       RCLCPP_ERROR(logger_, "color gain value is out of range[%d,%d], please check the value",
                    range.min, range.max);
     } else {
-      device_->setIntProperty(OB_PROP_COLOR_GAIN_INT, color_gain_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_GAIN_INT, color_gain_);
     }
   }
   if (color_white_balance_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_WHITE_BALANCE_INT, OB_PERMISSION_WRITE)) {
-    device_->setBoolProperty(OB_PROP_COLOR_AUTO_WHITE_BALANCE_BOOL, false);
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_COLOR_AUTO_WHITE_BALANCE_BOOL, false);
     auto range = device_->getIntPropertyRange(OB_PROP_COLOR_WHITE_BALANCE_INT);
     if (color_white_balance_ < range.min || color_white_balance_ > range.max) {
       RCLCPP_ERROR(logger_,
                    "color white balance value is out of range[%d,%d], please check the value",
                    range.min, range.max);
     } else {
-      device_->setIntProperty(OB_PROP_COLOR_WHITE_BALANCE_INT, color_white_balance_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_WHITE_BALANCE_INT, color_white_balance_);
     }
   }
 
   if (device_->isPropertySupported(OB_PROP_IR_AUTO_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
-    device_->setBoolProperty(OB_PROP_IR_AUTO_EXPOSURE_BOOL, enable_ir_auto_exposure_);
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_IR_AUTO_EXPOSURE_BOOL, enable_ir_auto_exposure_);
   }
   if (ir_exposure_ != -1 &&
       device_->isPropertySupported(OB_PROP_IR_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
-    device_->setBoolProperty(OB_PROP_IR_AUTO_EXPOSURE_BOOL, false);
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_IR_AUTO_EXPOSURE_BOOL, false);
     auto range = device_->getIntPropertyRange(OB_PROP_IR_EXPOSURE_INT);
     if (ir_exposure_ < range.min || ir_exposure_ > range.max) {
       RCLCPP_ERROR(logger_, "ir exposure value is out of range[%d,%d], please check the value",
@@ -407,7 +408,8 @@ void OBCameraNode::setupDevices() {
                        "default_soft_filter_speckle_size: " << default_soft_filter_speckle_size);
     if (soft_filter_speckle_size_ != -1 &&
         default_soft_filter_speckle_size != soft_filter_speckle_size_) {
-      device_->setIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT, soft_filter_speckle_size_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT,
+                          soft_filter_speckle_size_);
       auto new_soft_filter_speckle_size =
           device_->getIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT);
       RCLCPP_INFO_STREAM(logger_,
@@ -753,10 +755,10 @@ void OBCameraNode::startStreams() {
   }
   if (enable_frame_sync_) {
     RCLCPP_INFO_STREAM(logger_, "Enable frame sync");
-    pipeline_->enableFrameSync();
+    TRY_EXECUTE_BLOCK(pipeline_->enableFrameSync());
   } else {
     RCLCPP_INFO_STREAM(logger_, "Disable frame sync");
-    pipeline_->disableFrameSync();
+    TRY_EXECUTE_BLOCK(pipeline_->disableFrameSync());
   }
   pipeline_started_.store(true);
 }
@@ -784,7 +786,7 @@ void OBCameraNode::startIMUSyncStream() {
   std::shared_ptr<ob::Config> imuConfig = std::make_shared<ob::Config>();
   imuConfig->enableStream(accelProfile);
   imuConfig->enableStream(gyroProfile);
-  imuPipeline_->enableFrameSync();
+  TRY_EXECUTE_BLOCK(imuPipeline_->enableFrameSync());
   imuPipeline_->start(imuConfig, [&](std::shared_ptr<ob::Frame> frame) {
     auto frameSet = frame->as<ob::FrameSet>();
     auto aFrame = frameSet->getFrame(OB_FRAME_ACCEL);

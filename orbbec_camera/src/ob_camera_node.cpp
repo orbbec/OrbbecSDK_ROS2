@@ -138,19 +138,6 @@ void OBCameraNode::clean() noexcept {
   RCLCPP_WARN_STREAM(logger_, "Destroy ~OBCameraNode DONE");
 }
 
-#define TRY_TO_SET_PROPERTY(func, property, value)                                            \
-  try {                                                                                       \
-    device_->func(property, value);                                                           \
-  } catch (const ob::Error &e) {                                                              \
-    RCLCPP_ERROR_STREAM(                                                                      \
-        logger_, "Failed to set " << property << " to " << value << ": " << e.getMessage());  \
-  } catch (const std::exception &e) {                                                         \
-    RCLCPP_ERROR_STREAM(logger_,                                                              \
-                        "Failed to set " << property << " to " << value << ": " << e.what()); \
-  } catch (...) {                                                                             \
-    RCLCPP_ERROR_STREAM(logger_, "Failed to set " << property << " to " << value);            \
-  }
-
 void OBCameraNode::setupDevices() {
   auto sensor_list = device_->getSensorList();
   for (size_t i = 0; i < sensor_list->count(); i++) {

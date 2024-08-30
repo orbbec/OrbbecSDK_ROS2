@@ -15,6 +15,7 @@
  *******************************************************************************/
 
 #include "orbbec_camera/ob_camera_node_driver.h"
+#include "orbbec_camera/utils.h"
 #include <fcntl.h>
 #include <semaphore.h>
 #include <sys/shm.h>
@@ -371,7 +372,7 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
     ob_camera_node_.reset();
   }
   int retry_count = 0;
-  const int max_retries = 3;
+  constexpr int max_retries = 3;
   bool initialized = false;
   device_info_ = device_->getDeviceInfo();
   RCLCPP_INFO_STREAM(logger_, "Try to connect device via " << device_info_->connectionType());
@@ -410,10 +411,10 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   CHECK_NOTNULL(device_info_.get());
   device_unique_id_ = device_info_->uid();
   if (enable_sync_host_time_ && !isOpenNIDevice(device_info_->pid())) {
-    device_->timerSyncWithHost();
+    TRY_EXECUTE_BLOCK(device_->timerSyncWithHost());
     sync_host_time_timer_ = this->create_wall_timer(std::chrono::milliseconds(30000), [this]() {
       if (device_) {
-        device_->timerSyncWithHost();
+        TRY_EXECUTE_BLOCK(device_->timerSyncWithHost());
       }
     });
   }

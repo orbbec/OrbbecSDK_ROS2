@@ -26,8 +26,6 @@
 #include "libobsensor/ObSensor.hpp"
 #include <pthread.h>
 #include <std_srvs/srv/empty.hpp>
-#include <backward_ros/backward.hpp>
-
 
 namespace orbbec_camera {
 
@@ -71,7 +69,6 @@ class OBCameraNodeDriver : public rclcpp::Node {
                             std::shared_ptr<std_srvs::srv::Empty::Response> response);
 
  private:
-  const rclcpp::NodeOptions node_options_;
   std::string config_path_;
   std::unique_ptr<ob::Context> ctx_ = nullptr;
   rclcpp::Logger logger_;
@@ -106,6 +103,5 @@ class OBCameraNodeDriver : public rclcpp::Node {
   bool enable_sync_host_time_ = true;
   rclcpp::Service<std_srvs::srv::Empty>::SharedPtr reboot_device_srv_ = nullptr;
   std::chrono::time_point<std::chrono::system_clock> start_time_;
-  static backward::SignalHandling sh;  // for stack trace
 };
 }  // namespace orbbec_camera

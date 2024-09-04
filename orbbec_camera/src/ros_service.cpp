@@ -537,10 +537,10 @@ void OBCameraNode::getDeviceInfoCallback(const std::shared_ptr<GetDeviceInfo::Re
   (void)request;
   try {
     auto device_info = device_->getDeviceInfo();
-    response->info.name = device_info->name();
-    response->info.serial_number = device_info->serialNumber();
-    response->info.firmware_version = device_info->firmwareVersion();
-    response->info.supported_min_sdk_version = device_info->supportedMinSdkVersion();
+    response->info.name = device_info->getName();
+    response->info.serial_number = device_info->getSerialNumber();
+    response->info.firmware_version = device_info->getFirmwareVersion();
+    response->info.supported_min_sdk_version = device_info->getSupportedMinSdkVersion();
     response->success = true;
   } catch (const ob::Error& e) {
     response->success = false;
@@ -560,8 +560,8 @@ void OBCameraNode::getSDKVersion(const std::shared_ptr<GetString::Request>& requ
   try {
     auto device_info = device_->getDeviceInfo();
     nlohmann::json data;
-    data["firmware_version"] = device_info->firmwareVersion();
-    data["supported_min_sdk_version"] = device_info->supportedMinSdkVersion();
+    data["firmware_version"] = device_info->getFirmwareVersion();
+    data["supported_min_sdk_version"] = device_info->getSupportedMinSdkVersion();
     data["ros_sdk_version"] = OB_ROS_VERSION_STR;
     data["ob_sdk_version"] = getObSDKVersion();
     response->data = data.dump(2);

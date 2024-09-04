@@ -35,33 +35,6 @@ inline void LogFatal(const char* file, int line, const std::string& message) {
 }
 }  // namespace orbbec_camera
 
-#define TRY_EXECUTE_BLOCK(block)                                                                 \
-  try {                                                                                          \
-    block;                                                                                       \
-  } catch (const ob::Error& e) {                                                                 \
-    RCLCPP_ERROR(logger_, "Error in %s at line %d: %s", __FUNCTION__, __LINE__, e.getMessage()); \
-  } catch (const std::exception& e) {                                                            \
-    RCLCPP_ERROR(logger_, "Exception in %s at line %d: %s", __FUNCTION__, __LINE__, e.what());   \
-  } catch (...) {                                                                                \
-    RCLCPP_ERROR(logger_, "Unknown exception in %s at line %d", __FUNCTION__, __LINE__);         \
-  }
-
-#define TRY_TO_SET_PROPERTY(func, property, value)                                             \
-  try {                                                                                        \
-    device_->func(property, value);                                                            \
-  } catch (const ob::Error& e) {                                                               \
-    RCLCPP_ERROR_STREAM(logger_, "Failed to set " << property << " to " << value << " in "     \
-                                                  << __FUNCTION__ << " at line " << __LINE__   \
-                                                  << ": " << e.getMessage());                  \
-  } catch (const std::exception& e) {                                                          \
-    RCLCPP_ERROR_STREAM(logger_, "Failed to set " << property << " to " << value << " in "     \
-                                                  << __FUNCTION__ << " at line " << __LINE__   \
-                                                  << ": " << e.what());                        \
-  } catch (...) {                                                                              \
-    RCLCPP_ERROR_STREAM(logger_, "Failed to set " << property << " to " << value << " in "     \
-                                                  << __FUNCTION__ << " at line " << __LINE__); \
-  }
-
 // Macros for checking conditions and comparing values
 #define CHECK(condition) \
   (!(condition) ? LogFatal(__FILE__, __LINE__, "Check failed: " #condition) : (void)0)

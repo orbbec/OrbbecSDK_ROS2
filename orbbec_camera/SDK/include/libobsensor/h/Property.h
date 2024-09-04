@@ -6,11 +6,7 @@
  * @brief Control command property list maintenance
  */
 
-#ifdef OB_SENSOR_SDK_DEVELOPER
-#include "libobsensor/internal/InternalProperty.h"
-#else  // not define OB_SENSOR_SDK_DEVELOPER
-#ifndef _OB_PROPERTY_H_
-#define _OB_PROPERTY_H_
+#pragma once
 
 #include "ObTypes.h"
 
@@ -51,6 +47,12 @@ typedef enum {
      * @brief IR flood level
      */
     OB_PROP_FLOOD_LEVEL_INT = 7,
+
+    /**
+     * @brief Enable/disable temperature compensation
+     *
+     */
+    OB_PROP_TEMPERATURE_COMPENSATION_BOOL = 8,
 
     /**
      * @brief Depth mirror
@@ -212,6 +214,11 @@ typedef enum {
      * @brief D2C preprocessing switch (such as RGB cropping), 0: off, 1: on
      */
     OB_PROP_D2C_PREPROCESS_BOOL = 91,
+
+    /**
+     * @brief Enable/disable GPM function
+     */
+    OB_PROP_GPM_BOOL = 93,
 
     /**
      * @brief Custom RGB cropping switch, 0 is off, 1 is on custom cropping, and the ROI cropping area is issued
@@ -384,10 +391,6 @@ typedef enum {
      * @brief Query the status of laser pulse width protection (read-only)
      */
     OB_PROP_LASER_PULSE_WIDTH_PROTECTION_STATUS_BOOL = 149,
-    /**
-     * @brief depth noise removal filter
-     */
-    OB_PROP_DEPTH_NOISE_REMOVAL_FILTER_BOOL = 165,
 
     /**
      * @brief Laser always on, true: always on, false: off, laser will be turned off when out of exposure time
@@ -418,7 +421,7 @@ typedef enum {
     OB_PROP_IR_BRIGHTNESS_INT = 184,
 
     /**
-     * @brief slave device sync status
+     * @brief Slave/secondary device synchronization status (read-only)
      */
     OB_PROP_SLAVE_DEVICE_SYNC_STATUS_BOOL = 188,
 
@@ -428,19 +431,14 @@ typedef enum {
     OB_PROP_COLOR_AE_MAX_EXPOSURE_INT = 189,
 
     /**
-     * @brief IR AE max exposure
+     * @brief Max exposure time of IR auto exposure
      */
     OB_PROP_IR_AE_MAX_EXPOSURE_INT = 190,
 
     /**
-     * @brief disparity search range mode
+     * @brief Disparity search range mode, 1: 128, 2: 256
      */
     OB_PROP_DISP_SEARCH_RANGE_MODE_INT = 191,
-
-    /**
-     * @brief cpu temperature correction . true: calibrate temperature
-     */
-    OB_PROP_CPU_TEMPERATURE_CALIBRATION_BOOL = 199,
 
     /**
      * @brief Baseline calibration parameters
@@ -722,11 +720,6 @@ typedef enum {
     OB_PROP_SDK_IR_RIGHT_FRAME_UNPACK_BOOL = 3012,
 
     /**
-     * @brief depth Margin Filter
-     */
-    OB_PROP_SDK_DEPTH_RECTIFY_MG_FILTER_BOOL = 3013,
-
-    /**
      * @brief Calibration JSON file read from device (Femto Mega, read only)
      */
     OB_RAW_DATA_CAMERA_CALIB_JSON_FILE = 4029,
@@ -764,6 +757,3 @@ typedef struct OBPropertyItem {
 #ifdef __cplusplus
 }
 #endif
-
-#endif  // _OB_PROPERTY_H_
-#endif  // OB_SENSOR_SDK_DEVELOPER

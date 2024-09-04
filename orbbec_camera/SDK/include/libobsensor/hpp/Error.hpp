@@ -6,44 +6,109 @@
 #pragma once
 
 #include "Types.hpp"
+#include "libobsensor/h/Error.h"
 #include <memory>
 
-struct ErrorImpl;
-
 namespace ob {
-class OB_EXTENSION_API Error {
+class Error : public std::exception {
 private:
-    std::unique_ptr<ErrorImpl> impl_;
+    ob_error *impl_;
+
+    /**
+     * @brief Construct a new Error object
+     *
+     * @attention This constructor should not be called directly, use the handle() function instead.
+     *
+     * @param error
+     */
+    explicit Error(ob_error *error) : impl_(error) {};
 
 public:
-    Error(std::unique_ptr<ErrorImpl> impl) noexcept;
+    /**
+     * @brief A static function to handle the ob_error and throw an exception if needed.
+     *
+     * @param error The ob_error pointer to be handled.
+     * @param throw_exception A boolean value to indicate whether to throw an exception or not, the default value is true.
+     */
+    static void handle(ob_error **error, bool throw_exception = true) {
+        if(!error || !*error) {  // no error
+            return;
+        }
 
-    Error(const Error &error) noexcept;
-
-    ~Error() noexcept;
+        if(throw_exception) {
+            throw Error(*error);
+        }
+        else {
+            ob_delete_error(*error);
+            *error = nullptr;
+        }
+    }
 
     /**
-     * @brief Get the detailed error logs of SDK internal exceptions.
-     * @return A C-style string containing the error message.
+     * @brief Destroy the Error object
      */
-    const char *getMessage() const noexcept;
+    ~Error() override {
+        if(impl_) {
+            ob_delete_error(impl_);
+            impl_ = nullptr;
+        }
+    }
 
     /**
-     * @brief Get the exception type of the error, which can be used to determine which module is abnormal.
-     * @return The OBExceptionType enum value.
+     * @brief Returns the error message of the exception.
+     *
+     * @return const char* The error message.
      */
-    OBExceptionType getExceptionType() const noexcept;
+    const char *what() const noexcept override {
+        return impl_->message;
+    }
 
     /**
-     * @brief Get the name of the error function.
-     * @return A C-style string containing the name of the error function.
+     * @brief Returns the exception type of the exception.
+     * @brief Read the comments of the OBExceptionType enum in the libobsensor/h/ObTypes.h file for more information.
+     *
+     * @return OBExceptionType The exception type.
      */
-    const char *getName() const noexcept;
+    OBExceptionType getExceptionType() const noexcept {
+        return impl_->exception_type;
+    }
 
     /**
-     * @brief Get the parameter passed to the error interface.
-     * @return A C-style string containing the error interface parameter.
+     * @brief Returns the name of the function where the exception occurred.
+     *
+     * @return const char* The function name.
      */
-    const char *getArgs() const noexcept;
+    const char *getFunction() const noexcept {
+        return impl_->function;
+    }
+
+    /**
+     * @brief Returns the arguments of the function where the exception occurred.
+     *
+     * @return const char*  The arguments.
+     */
+    const char *getArgs() const noexcept {
+        return impl_->args;
+    }
+
+    /**
+     * @brief Returns the error message of the exception.
+     * @brief It is recommended to use the what() function instead.
+     *
+     * @return const char* The error message.
+     */
+    const char *getMessage() const noexcept {
+        return impl_->message;
+    }
+
+    /**
+     * @brief (Deprecated) Returns the name of the function where the exception occurred.
+     * @brief Use the getFunction() function instead.
+     *
+     * @return const char* The function name.
+     */
+    OB_DEPRECATED const char *getName() const noexcept {
+        return impl_->function;
+    }
 };
 }  // namespace ob

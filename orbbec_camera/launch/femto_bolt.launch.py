@@ -19,7 +19,7 @@ def generate_launch_description():
         DeclareLaunchArgument('device_num', default_value='1'),
         DeclareLaunchArgument('vendor_id', default_value='0x2bc5'),
         DeclareLaunchArgument('product_id', default_value=''),
-        DeclareLaunchArgument('enable_point_cloud', default_value='true'),
+        DeclareLaunchArgument('enable_point_cloud', default_value='false'),
         DeclareLaunchArgument('enable_colored_point_cloud', default_value='false'),
         DeclareLaunchArgument('point_cloud_qos', default_value='default'),
         DeclareLaunchArgument('connection_delay', default_value='100'),

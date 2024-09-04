@@ -18,28 +18,28 @@ std::shared_ptr<ob::Device> initializeDevice(std::shared_ptr<ob::Pipeline> pipel
 
 void listSensorProfiles(const std::shared_ptr<ob::Device>& device) {
   auto sensor_list = device->getSensorList();
-  for (size_t i = 0; i < sensor_list->count(); i++) {
+  for (size_t i = 0; i < sensor_list->getCount(); i++) {
     auto sensor = sensor_list->getSensor(i);
     auto profile_list = sensor->getStreamProfileList();
-    for (size_t j = 0; j < profile_list->count(); j++) {
+    for (size_t j = 0; j < profile_list->getCount(); j++) {
       auto origin_profile = profile_list->getProfile(j);
-      if (sensor->type() == OB_SENSOR_COLOR || sensor->type() == OB_SENSOR_DEPTH ||
-          sensor->type() == OB_SENSOR_IR || sensor->type() == OB_SENSOR_IR_LEFT ||
-          sensor->type() == OB_SENSOR_IR_RIGHT) {
+      if (sensor->getType() == OB_SENSOR_COLOR || sensor->getType() == OB_SENSOR_DEPTH ||
+          sensor->getType() == OB_SENSOR_IR || sensor->getType() == OB_SENSOR_IR_LEFT ||
+          sensor->getType() == OB_SENSOR_IR_RIGHT) {
         auto profile = origin_profile->as<ob::VideoStreamProfile>();
-        std::cout << magic_enum::enum_name(sensor->type()) << " profile: " << profile->width()
-                  << "x" << profile->height() << " " << profile->fps() << "fps "
-                  << magic_enum::enum_name(profile->format()) << std::endl;
-      } else if (sensor->type() == OB_SENSOR_ACCEL) {
+        std::cout << magic_enum::enum_name(sensor->getType()) << " profile: " << profile->getWidth()
+                  << "x" << profile->getHeight() << " " << profile->getFps() << "fps "
+                  << magic_enum::enum_name(profile->getFormat()) << std::endl;
+      } else if (sensor->getType() == OB_SENSOR_ACCEL) {
         auto profile = origin_profile->as<ob::AccelStreamProfile>();
-        std::cout << magic_enum::enum_name(sensor->type()) << " profile: " << profile->sampleRate()
-                  << "  full scale_range " << profile->fullScaleRange() << std::endl;
-      } else if (sensor->type() == OB_SENSOR_GYRO) {
+        std::cout << magic_enum::enum_name(sensor->getType()) << " profile: " << profile->getSampleRate()
+                  << "  full scale_range " << profile->getFullScaleRange() << std::endl;
+      } else if (sensor->getType() == OB_SENSOR_GYRO) {
         auto profile = origin_profile->as<ob::GyroStreamProfile>();
-        std::cout << magic_enum::enum_name(sensor->type()) << " profile: " << profile->sampleRate()
-                  << "  full scale_range " << profile->fullScaleRange() << std::endl;
+        std::cout << magic_enum::enum_name(sensor->getType()) << " profile: " << profile->getSampleRate()
+                  << "  full scale_range " << profile->getFullScaleRange() << std::endl;
       } else {
-        std::cout << "Unknown profile: " << magic_enum::enum_name(sensor->type()) << std::endl;
+        std::cout << "Unknown profile: " << magic_enum::enum_name(sensor->getType()) << std::endl;
       }
     }
   }
@@ -54,18 +54,18 @@ void printDeviceProperties(const std::shared_ptr<ob::Device>& device) {
   std::cout << "Current depth mode: " << current_depth_mode.name << std::endl;
   auto depth_mode_list = device->getDepthWorkModeList();
   std::cout << "Depth mode list: " << std::endl;
-  for (uint32_t i = 0; i < depth_mode_list->count(); i++) {
+  for (uint32_t i = 0; i < depth_mode_list->getCount(); i++) {
     std::cout << "Depth_mode_list[" << i << "]: " << (*depth_mode_list)[i].name << std::endl;
   }
 }
 
 void printPreset(const std::shared_ptr<ob::Device>& device) {
   auto preset_list = device->getAvailablePresetList();
-  if (!preset_list || preset_list->count() == 0) {
+  if (!preset_list || preset_list->getCount() == 0) {
     return;
   }
   std::cout << "Preset list:" << std::endl;
-  for (uint32_t i = 0; i < preset_list->count(); i++) {
+  for (uint32_t i = 0; i < preset_list->getCount(); i++) {
     auto name = preset_list->getName(i);
     std::cout << "Preset list[" << i << "]: " << name << std::endl;
   }

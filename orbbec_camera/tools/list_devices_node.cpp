@@ -32,10 +32,10 @@ int main() {
       RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), "serial: " << serial);
       RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), "usb port: " << usb_port);
     }
-  } catch (const std::exception &e) {
-    RCLCPP_ERROR_STREAM(rclcpp::get_logger("list_device_node"), e.what());
-  } catch (ob::Error &e) {
+  }  catch (ob::Error &e) {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger("list_device_node"), e.getMessage());
+  }catch (const std::exception &e) {
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("list_device_node"), e.what());
   } catch (...) {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger("list_device_node"), "unknown error");
   }

@@ -17,7 +17,7 @@ extern "C" {
  * @param[out] error Logs error messages.
  * @return The sensor type.
  */
-ob_sensor_type ob_sensor_get_type(ob_sensor *sensor, ob_error **error);
+OB_EXPORT ob_sensor_type ob_sensor_get_type(const ob_sensor *sensor, ob_error **error);
 
 /**
  * @brief Get a list of all supported stream profiles.
@@ -26,53 +26,7 @@ ob_sensor_type ob_sensor_get_type(ob_sensor *sensor, ob_error **error);
  * @param[out] error Logs error messages.
  * @return A list of stream profiles.
  */
-ob_stream_profile_list *ob_sensor_get_stream_profile_list(ob_sensor *sensor, ob_error **error);
-
-/**
- * @brief Request the list of recommended filter list
- *
- * @param[in] sensor The ob_sensor object.
- * @param[out] error Log error messages.
- *
- * @return ob_filter_list
- */
-ob_filter_list *ob_sensor_get_recommended_filter_list(ob_sensor *sensor, ob_error **error);
-
-/**
- * @brief Get the number of recommended filter list
- *
- * @param filter_list Recommended filter list
- * @param error Log error messages
- * @return uint32_t The number of list
- */
-uint32_t ob_filter_list_get_count(ob_filter_list *filter_list, ob_error **error);
-
-/**
- * @brief Get the number of recommended filter list
- *
- * @param filter_list Recommended filter list
- * @param index Recommended filter index
- * @param error Log error messages
- * @return ob_filter The index of ob_filter
- */
-ob_filter *ob_get_filter(ob_filter_list *filter_list, uint32_t index, ob_error **error);
-
-/**
- * @brief Get the name of ob_filter
- *
- * @param filter ob_filter object
- * @param error Log error messages
- * @return char The filter of name
- */
-const char *ob_get_filter_name(ob_filter *filter, ob_error **error);
-
-/**
- * @brief Delete a list of ob_filter objects.
- *
- * @param[in] filter_list The list of ob_filter objects to delete.
- * @param[out] error Logs error messages.
- */
-void ob_delete_filter_list(ob_filter_list *filter_list, ob_error **error);
+OB_EXPORT ob_stream_profile_list *ob_sensor_get_stream_profile_list(const ob_sensor *sensor, ob_error **error);
 
 /**
  * @brief Open the current sensor and set the callback data frame.
@@ -83,7 +37,7 @@ void ob_delete_filter_list(ob_filter_list *filter_list, ob_error **error);
  * @param[in] user_data Any user data to pass in and get from the callback.
  * @param[out] error Logs error messages.
  */
-void ob_sensor_start(ob_sensor *sensor, ob_stream_profile *profile, ob_frame_callback callback, void *user_data, ob_error **error);
+OB_EXPORT void ob_sensor_start(ob_sensor *sensor, const ob_stream_profile *profile, ob_frame_callback callback, void *user_data, ob_error **error);
 
 /**
  * @brief Stop the sensor stream.
@@ -91,24 +45,34 @@ void ob_sensor_start(ob_sensor *sensor, ob_stream_profile *profile, ob_frame_cal
  * @param[in] sensor The sensor object.
  * @param[out] error Logs error messages.
  */
-void ob_sensor_stop(ob_sensor *sensor, ob_error **error);
+OB_EXPORT void ob_sensor_stop(ob_sensor *sensor, ob_error **error);
 
 /**
- * @brief Dynamically switch resolutions.
+ * @brief Switch resolutions.
  *
  * @param[in] sensor The sensor object.
  * @param[in] profile The stream configuration information.
  * @param[out] error Logs error messages.
  */
-void ob_sensor_switch_profile(ob_sensor *sensor, ob_stream_profile *profile, ob_error **error);
+OB_EXPORT void ob_sensor_switch_profile(ob_sensor *sensor, ob_stream_profile *profile, ob_error **error);
 
 /**
- * @brief Delete a list of sensor objects.
+ * @brief Delete a sensor object.
  *
- * @param[in] sensor_list The list of sensor objects to delete.
+ * @param[in] sensor The sensor object to delete.
  * @param[out] error Logs error messages.
  */
-void ob_delete_sensor_list(ob_sensor_list *sensor_list, ob_error **error);
+OB_EXPORT void ob_delete_sensor(ob_sensor *sensor, ob_error **error);
+
+/**
+ * @brief Request the list of recommended filter list.
+ *
+ * @param[in] sensor The ob_sensor object.
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
+ * @return ob_filter_list
+ */
+OB_EXPORT ob_filter_list *ob_sensor_get_recommended_filter_list(const ob_sensor *sensor, ob_error **error);
 
 /**
  * @brief Get the number of sensors in the sensor list.
@@ -117,7 +81,7 @@ void ob_delete_sensor_list(ob_sensor_list *sensor_list, ob_error **error);
  * @param[out] error Logs error messages.
  * @return The number of sensors in the list.
  */
-uint32_t ob_sensor_list_get_sensor_count(ob_sensor_list *sensor_list, ob_error **error);
+OB_EXPORT uint32_t ob_sensor_list_get_count(const ob_sensor_list *sensor_list, ob_error **error);
 
 /**
  * @brief Get the sensor type.
@@ -127,7 +91,7 @@ uint32_t ob_sensor_list_get_sensor_count(ob_sensor_list *sensor_list, ob_error *
  * @param[out] error Logs error messages.
  * @return The sensor type.
  */
-ob_sensor_type ob_sensor_list_get_sensor_type(ob_sensor_list *sensor_list, uint32_t index, ob_error **error);
+OB_EXPORT ob_sensor_type ob_sensor_list_get_sensor_type(const ob_sensor_list *sensor_list, uint32_t index, ob_error **error);
 
 /**
  * @brief Get a sensor by sensor type.
@@ -137,7 +101,7 @@ ob_sensor_type ob_sensor_list_get_sensor_type(ob_sensor_list *sensor_list, uint3
  * @param[out] error Logs error messages.
  * @return The sensor pointer. If the specified type of sensor does not exist, it will return null.
  */
-ob_sensor *ob_sensor_list_get_sensor_by_type(ob_sensor_list *sensor_list, ob_sensor_type sensorType, ob_error **error);
+OB_EXPORT ob_sensor *ob_sensor_list_get_sensor_by_type(const ob_sensor_list *sensor_list, ob_sensor_type sensorType, ob_error **error);
 
 /**
  * @brief Get a sensor by index number.
@@ -147,15 +111,17 @@ ob_sensor *ob_sensor_list_get_sensor_by_type(ob_sensor_list *sensor_list, ob_sen
  * @param[out] error Logs error messages.
  * @return The sensor object.
  */
-ob_sensor *ob_sensor_list_get_sensor(ob_sensor_list *sensor_list, uint32_t index, ob_error **error);
+OB_EXPORT ob_sensor *ob_sensor_list_get_sensor(const ob_sensor_list *sensor_list, uint32_t index, ob_error **error);
 
 /**
- * @brief Delete a sensor object.
+ * @brief Delete a list of sensor objects.
  *
- * @param[in] sensor The sensor object to delete.
+ * @param[in] sensor_list The list of sensor objects to delete.
  * @param[out] error Logs error messages.
  */
-void ob_delete_sensor(ob_sensor *sensor, ob_error **error);
+OB_EXPORT void ob_delete_sensor_list(ob_sensor_list *sensor_list, ob_error **error);
+
+#define ob_sensor_list_get_sensor_count ob_sensor_list_get_count
 
 #ifdef __cplusplus
 }

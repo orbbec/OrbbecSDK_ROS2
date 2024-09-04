@@ -6,37 +6,78 @@
  */
 #pragma once
 
+#include "libobsensor/h/Context.h"
 #include "Types.hpp"
+#include "Error.hpp"
 
 #include <functional>
 #include <memory>
 
-struct ContextImpl;
-
 namespace ob {
+
+// forward declarations
 class Device;
 class DeviceInfo;
 class DeviceList;
 
-class OB_EXTENSION_API Context {
+class Context {
+public:
+    /**
+     * @brief Type definition for the device changed callback function.
+     *
+     * @param removedList The list of removed devices.
+     * @param addedList The list of added devices.
+     */
+    typedef std::function<void(std::shared_ptr<DeviceList> removedList, std::shared_ptr<DeviceList> addedList)> DeviceChangedCallback;
+
+    /**
+     * @brief Type definition for the log output callback function.
+     *
+     * @param severity The current callback log level.
+     * @param logMsg The log message.
+     */
+    typedef std::function<void(OBLogSeverity severity, const char *logMsg)> LogCallback;
+
 private:
-    std::unique_ptr<ContextImpl> impl_;
+    ob_context           *impl_ = nullptr;
+    DeviceChangedCallback deviceChangedCallback_;
+    static LogCallback    logCallback_;
 
 public:
     /**
+     * @brief Context constructor.
      * @brief The Context class is a management class that describes the runtime of the SDK. It is responsible for applying and releasing resources for the SDK.
      * The context has the ability to manage multiple devices, enumerate devices, monitor device callbacks, and enable functions such as multi-device
      * synchronization.
+     *
+     * @param[in] configPath The path to the configuration file. If the path is empty, the default configuration will be used.
      */
-    Context(const char *configPath = "");
-    virtual ~Context() noexcept;
+    explicit Context(const char *configPath = "") {
+        ob_error *error = nullptr;
+        impl_           = ob_create_context_with_config(configPath, &error);
+        Error::handle(&error);
+    }
+
+    /**
+     * @brief Context destructor.
+     */
+    ~Context() noexcept {
+        ob_error *error = nullptr;
+        ob_delete_context(impl_, &error);
+        Error::handle(&error, false);
+    }
 
     /**
      * @brief Queries the enumerated device list.
      *
      * @return std::shared_ptr<DeviceList> A pointer to the device list class.
      */
-    std::shared_ptr<DeviceList> queryDeviceList();
+    std::shared_ptr<DeviceList> queryDeviceList() const {
+        ob_error *error = nullptr;
+        auto      list  = ob_query_device_list(impl_, &error);
+        Error::handle(&error);
+        return std::make_shared<DeviceList>(list);
+    }
 
     /**
      * @brief enable or disable net device enumeration.
@@ -45,55 +86,71 @@ public:
      *
      * @attention Net device enumeration by gvcp protocol, if the device is not in the same subnet as the host, it will be discovered but cannot be connected.
      *
-     * @param[out] enable true to enable, false to disable
+     * @param[in] enable true to enable, false to disable
      */
-    void enableNetDeviceEnumeration(bool enable);
+    void enableNetDeviceEnumeration(bool enable) const {
+        ob_error *error = nullptr;
+        ob_enable_net_device_enumeration(impl_, enable, &error);
+        Error::handle(&error);
+    }
 
     /**
-     * @brief Creates a network device object.
+     * @brief Creates a network device with the specified IP address and port.
      *
-     * @param address The IP address.
-     * @param port The port.
+     * @param[in] address The IP address, ipv4 only. such as "192.168.1.10"
+     * @param[in] port The port number.
      * @return std::shared_ptr<Device> The created device object.
      */
-    std::shared_ptr<Device> createNetDevice(const char *address, uint16_t port);
-
-    /**
-     * @brief Changes the IP configuration of a network device.
-     *
-     * @param deviceUid The device unique ID, which is the network device MAC address. It can be obtained through the @ref DeviceList::uid() function.
-     * @param config The new IP configuration.
-     */
-    void changeNetDeviceIpConfig(const char *deviceUid, const OBNetIpConfig &config);
-
-    using DeviceChangedCallback = std::function<void(std::shared_ptr<DeviceList> removedList, std::shared_ptr<DeviceList> addedList)>;
+    std::shared_ptr<Device> createNetDevice(const char *address, uint16_t port) const {
+        ob_error *error  = nullptr;
+        auto      device = ob_create_net_device(impl_, address, port, &error);
+        Error::handle(&error);
+        return std::make_shared<Device>(device);
+    }
 
     /**
      * @brief Set the device plug-in callback function.
      *
      * @param callback The function triggered when the device is plugged and unplugged.
      */
-    void setDeviceChangedCallback(DeviceChangedCallback callback);
+    void setDeviceChangedCallback(DeviceChangedCallback callback) {
+        deviceChangedCallback_ = callback;
+        ob_error *error        = nullptr;
+        ob_set_device_changed_callback(impl_, &Context::deviceChangedCallback, this, &error);
+        Error::handle(&error);
+    }
 
     /**
      * @brief Activates device clock synchronization to synchronize the clock of the host and all created devices (if supported).
      *
      * @param repeatInterval The interval for auto-repeated synchronization, in milliseconds. If the value is 0, synchronization is performed only once.
      */
-    void enableDeviceClockSync(uint64_t repeatInterval);
-#define enableMultiDeviceSync enableDeviceClockSync
+    void enableDeviceClockSync(uint64_t repeatInterval) const {
+        ob_error *error = nullptr;
+        ob_enable_device_clock_sync(impl_, repeatInterval, &error);
+        Error::handle(&error);
+    }
 
     /**
      * @brief Frees idle memory from the internal frame memory pool.
+     * @brief The SDK includes an internal frame memory pool that caches memory allocated for frames received from devices.
      */
-    void freeIdleMemory();
+    void freeIdleMemory() const {
+        ob_error *error = nullptr;
+        ob_free_idle_memory(impl_, &error);
+        Error::handle(&error);
+    }
 
     /**
-     * @brief Set the level of the global log, which affects both the log level output to the terminal and output to the file.
+     * @brief Set the level of the global log, which affects both the log level output to the console, output to the file and output the user defined callback.
      *
      * @param severity The log output level.
      */
-    static void setLoggerSeverity(OBLogSeverity severity);
+    static void setLoggerSeverity(OBLogSeverity severity) {
+        ob_error *error = nullptr;
+        ob_set_logger_severity(severity, &error);
+        Error::handle(&error);
+    }
 
     /**
      * @brief Set log output to a file.
@@ -102,22 +159,22 @@ public:
      * @param directory The log file output path. If the path is empty, the existing settings will continue to be used (if the existing configuration is also
      * empty, the log will not be output to the file).
      */
-    static void setLoggerToFile(OBLogSeverity severity, const char *directory);
+    static void setLoggerToFile(OBLogSeverity severity, const char *directory) {
+        ob_error *error = nullptr;
+        ob_set_logger_to_file(severity, directory, &error);
+        Error::handle(&error);
+    }
 
     /**
-     * @brief Set log output to the terminal.
+     * @brief Set log output to the console.
      *
-     * @param severity The log level output to the terminal.
+     * @param severity The log level output to the console.
      */
-    static void setLoggerToConsole(OBLogSeverity severity);
-
-    /**
-     * @brief Log output callback function.
-     *
-     * @param severity The current callback log level.
-     * @param logMsg The log message.
-     */
-    using LogCallback = std::function<void(OBLogSeverity severity, const char *logMsg)>;
+    static void setLoggerToConsole(OBLogSeverity severity) {
+        ob_error *error = nullptr;
+        ob_set_logger_to_console(severity, &error);
+        Error::handle(&error);
+    }
 
     /**
      * @brief Set the logger to callback.
@@ -125,23 +182,31 @@ public:
      * @param severity The callback log level.
      * @param callback The callback function.
      */
-    static void setLoggerToCallback(OBLogSeverity severity, LogCallback callback);
+    static void setLoggerToCallback(OBLogSeverity severity, LogCallback callback) {
+        ob_error *error       = nullptr;
+        Context::logCallback_ = callback;
+        ob_set_logger_to_callback(severity, &Context::logCallback, &Context::logCallback_, &error);
+        Error::handle(&error);
+    }
 
-    /**
-     * @brief Loads a license file.
-     *
-     * @param filePath The license file path.
-     * @param key The decryption key.
-     */
-    static void loadLicense(const char *filePath, const char *key = OB_DEFAULT_DECRYPT_KEY);
+private:
+    static void deviceChangedCallback(ob_device_list *removedList, ob_device_list *addedList, void *userData) {
+        auto ctx = static_cast<Context *>(userData);
+        if(ctx && ctx->deviceChangedCallback_) {
+            auto removed = std::make_shared<DeviceList>(removedList);
+            auto added   = std::make_shared<DeviceList>(addedList);
+            ctx->deviceChangedCallback_(removed, added);
+        }
+    }
 
-    /**
-     * @brief Loads a license from data.
-     *
-     * @param data The license data.
-     * @param dataLen The license data length.
-     * @param key The decryption key.
-     */
-    static void loadLicenseFromData(const char *data, uint32_t dataLen, const char *key = OB_DEFAULT_DECRYPT_KEY);
+    static void logCallback(OBLogSeverity severity, const char *logMsg, void *userData) {
+        auto cb = static_cast<LogCallback *>(userData);
+        if(cb) {
+            (*cb)(severity, logMsg);
+        }
+    }
+
+// for backward compatibility
+#define enableMultiDeviceSync enableDeviceClockSync
 };
 }  // namespace ob

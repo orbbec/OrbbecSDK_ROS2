@@ -58,7 +58,7 @@ sensor_msgs::msg::CameraInfo convertToCameraInfo(OBCameraIntrinsic intrinsic,
 }
 
 void saveRGBPointsToPly(const std::shared_ptr<ob::Frame> &frame, const std::string &fileName) {
-  size_t point_size = frame->dataSize() / sizeof(OBColorPoint);
+  size_t point_size = frame->getDataSize() / sizeof(OBColorPoint);
   FILE *fp = fopen(fileName.c_str(), "wb+");
   std::shared_ptr<int> fp_guard(nullptr, [&fp](int *) {
     fflush(fp);
@@ -75,7 +75,7 @@ void saveRGBPointsToPly(const std::shared_ptr<ob::Frame> &frame, const std::stri
   fprintf(fp, "property uchar blue\n");
   fprintf(fp, "end_header\n");
 
-  const auto *points = (OBColorPoint *)frame->data();
+  const auto *points = (OBColorPoint *)frame->getData();
   CHECK_NOTNULL(points);
   for (size_t i = 0; i < point_size; i++) {
     fprintf(fp, "%.3f %.3f %.3f %d %d %d\n", points[i].x, points[i].y, points[i].z,
@@ -172,7 +172,7 @@ void saveDepthPointsToPly(const sensor_msgs::msg::PointCloud2::UniquePtr &msg,
 }
 
 void savePointsToPly(const std::shared_ptr<ob::Frame> &frame, const std::string &fileName) {
-  size_t point_size = frame->dataSize() / sizeof(OBPoint);
+  size_t point_size = frame->getDataSize() / sizeof(OBPoint);
   FILE *fp = fopen(fileName.c_str(), "wb+");
   std::shared_ptr<int> fp_guard(nullptr, [&fp](int *) {
     fflush(fp);
@@ -188,7 +188,7 @@ void savePointsToPly(const std::shared_ptr<ob::Frame> &frame, const std::string 
   fprintf(fp, "property float z\n");
   fprintf(fp, "end_header\n");
 
-  const auto *points = (OBPoint *)frame->data();
+  const auto *points = (OBPoint *)frame->getData();
   CHECK_NOTNULL(points);
   for (size_t i = 0; i < point_size; i++) {
     fprintf(fp, "%.3f %.3f %.3f\n", points[i].x, points[i].y, points[i].z);
@@ -338,9 +338,11 @@ OBFormat OBFormatFromString(const std::string &format) {
     return OB_FORMAT_BYR2;
   } else if (fixed_format == "RW16") {
     return OB_FORMAT_RW16;
-  } else if (fixed_format == "DISP16") {
-    return OB_FORMAT_DISP16;
-  } else {
+  }
+//   else if (fixed_format == "DISP16") {
+//     return OB_FORMAT_DISP16;
+//   }
+  else {
     return OB_FORMAT_UNKNOWN;
   }
 }
@@ -413,8 +415,8 @@ std::string OBFormatToString(const OBFormat &format) {
       return "BYR2";
     case OB_FORMAT_RW16:
       return "RW16";
-    case OB_FORMAT_DISP16:
-      return "DISP16";
+    // case OB_FORMAT_DISP16:
+    //   return "DISP16";
     default:
       return "UNKNOWN";
   }
@@ -433,6 +435,9 @@ std::string ObDeviceTypeToString(const OBDeviceType &type) {
       return "structured light monocular camera";
     case OBDeviceType::OB_TOF_CAMERA:
       return "tof camera";
+    default:
+        // 处理其他未预见的情况
+        break;
   }
   return "unknown technology camera";
 }
@@ -715,11 +720,11 @@ std::string parseUsbPort(const std::string &line) {
 }
 
 bool isValidJPEG(const std::shared_ptr<ob::ColorFrame> &frame) {
-  if (frame->dataSize() < 2) {  // Checking both start and end markers, so minimal size is 4
+  if (frame->getDataSize() < 2) {  // Checking both start and end markers, so minimal size is 4
     return false;
   }
 
-  const auto *data = static_cast<const uint8_t *>(frame->data());
+  const auto *data = static_cast<const uint8_t *>(frame->getData());
 
   // Check for JPEG start marker
   if (data[0] != 0xFF || data[1] != 0xD8) {

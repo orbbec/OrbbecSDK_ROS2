@@ -4,42 +4,55 @@
  */
 #pragma once
 
+#include "libobsensor/h/Version.h"
+
 namespace ob {
-class OB_EXTENSION_API Version {
+class Version {
 public:
+    /**
+     * @brief Get the full version number of the SDK.
+     * @brief The full version number equals to: major * 10000 + minor * 100 + patch
+     *
+     * @return int The full version number of the SDK.
+     */
+    static int getVersion() {
+        return ob_get_version();
+    }
     /**
      * @brief Get the major version number of the SDK.
      *
      * @return int The major version number of the SDK.
      */
-    static int getMajor();
+    static int getMajor() {
+        return ob_get_major_version();
+    }
 
     /**
      * @brief Get the minor version number of the SDK.
      *
      * @return int The minor version number of the SDK.
      */
-    static int getMinor();
+    static int getMinor() {
+        return ob_get_minor_version();
+    }
 
     /**
      * @brief Get the patch version number of the SDK.
      *
      * @return int The patch version number of the SDK.
      */
-    static int getPatch();
-
-    /**
-     * @brief Get the full version number of the SDK.
-     *
-     * @return int The full version number of the SDK.
-     */
-    static int getVersion();
+    static int getPatch() {
+        return ob_get_patch_version();
+    }
 
     /**
      * @brief Get the stage version of the SDK.
+     * @brief The stage version string is a vendor defined string for some special releases.
      *
      * @return char* The stage version string of the SDK.
      */
-    static char *getStageVersion();
+    static const char *getStageVersion() {
+        return ob_get_stage_version();
+    }
 };
 }  // namespace ob

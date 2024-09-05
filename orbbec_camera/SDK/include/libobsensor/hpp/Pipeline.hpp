@@ -451,7 +451,6 @@ class Pipeline {
     ob_error *error = nullptr;
     OBCalibrationParam calibrationParam =
         ob_pipeline_get_calibration_param(impl_, config->getImpl(), &error);
-        std::cout << "over" << std::endl;
 
     Error::handle(&error);
     return calibrationParam;

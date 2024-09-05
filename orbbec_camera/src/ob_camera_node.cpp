@@ -1128,7 +1128,6 @@ void OBCameraNode::setupPipelineConfig() {
       !isGemini335PID(pid)) {
     OBAlignMode align_mode = align_mode_ == "HW" ? ALIGN_D2C_HW_MODE : ALIGN_D2C_SW_MODE;
     RCLCPP_INFO_STREAM(logger_, "set align mode to " << magic_enum::enum_name(align_mode));
-    RCLCPP_INFO_STREAM(logger_, "jjjjj " << pipeline_config_);
     calibration_param_ = pipeline_->getCalibrationParam(pipeline_config_);
     pipeline_config_->setAlignMode(align_mode);
     RCLCPP_INFO_STREAM(logger_, "enable depth scale " << (enable_depth_scale_ ? "ON" : "OFF"));
@@ -1402,11 +1401,10 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
                  depth_height, color_width, color_height);
     return;
   }
-        RCLCPP_INFO_STREAM(logger_, "zzzzzzz" << pipeline_config_->getImpl());
+
   if (!xy_tables_.has_value()) {
 
     calibration_param_ = pipeline_->getCalibrationParam(pipeline_config_);
-                               RCLCPP_INFO_STREAM(logger_, "jjjjjjjjjjjj" );
 
     uint32_t table_size =
         color_width * color_height * 2;  // one for x-coordinate and one for y-coordinate LUT

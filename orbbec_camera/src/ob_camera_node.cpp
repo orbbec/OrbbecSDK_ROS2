@@ -1026,7 +1026,7 @@ void OBCameraNode::getParameters() {
   if (!depth_precision_str_.empty()) {
     depth_precision_ = depthPrecisionLevelFromString(depth_precision_str_);
   }
-  if (enable_colored_point_cloud_) {
+  if (enable_colored_point_cloud_ || enable_d2c_viewer_) {
     depth_registration_ = true;
   }
   if (!enable_stream_[COLOR]) {
@@ -1899,7 +1899,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
                                                       : camera_params.depthIntrinsic;
     distortion = stream_index.first == OB_STREAM_COLOR ? camera_params.rgbDistortion
                                                        : camera_params.depthDistortion;
-    if(pid == DABAI_MAX_PID){
+    if (pid == DABAI_MAX_PID) {
       // use color param
       intrinsic = camera_params.rgbIntrinsic;
       distortion = camera_params.rgbDistortion;

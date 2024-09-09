@@ -128,5 +128,6 @@ const int32_t GEMINI_335LG_PID = 0x080B;  // Gemini 336Lg
 const int32_t GEMINI_336LG_PID = 0x080D;
 const int32_t GEMINI_335LE_PID = 0x080E;  // Gemini 335Le
 const int32_t GEMINI_336LE_PID = 0x0810;  // Gemini 335Le
+const int32_t DABAI_MAX_PID = 0x069a;     // dabai max
 
 }  // namespace orbbec_camera

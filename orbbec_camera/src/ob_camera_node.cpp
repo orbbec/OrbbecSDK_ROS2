@@ -1366,7 +1366,10 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
   }
   CHECK_NOTNULL(pipeline_);
   auto camera_params = pipeline_->getCameraParam();
-  if (depth_registration_) {
+  auto device_info = device_->getDeviceInfo();
+  CHECK_NOTNULL(device_info.get());
+  auto pid = device_info->pid();
+  if (depth_registration_ || pid == DABAI_MAX_PID) {
     camera_params.depthIntrinsic = camera_params.rgbIntrinsic;
   }
   depth_point_cloud_filter_.setCameraParam(camera_params);

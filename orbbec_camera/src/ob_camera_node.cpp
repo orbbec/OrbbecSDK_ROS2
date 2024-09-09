@@ -1899,6 +1899,11 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
                                                       : camera_params.depthIntrinsic;
     distortion = stream_index.first == OB_STREAM_COLOR ? camera_params.rgbDistortion
                                                        : camera_params.depthDistortion;
+    if(pid == DABAI_MAX_PID){
+      // use color param
+      intrinsic = camera_params.rgbIntrinsic;
+      distortion = camera_params.rgbDistortion;
+    }
   }
   std::string frame_id = optical_frame_id_[stream_index];
   if (depth_registration_ && stream_index == DEPTH) {

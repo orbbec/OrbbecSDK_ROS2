@@ -565,5 +565,6 @@ class OBCameraNode {
   bool enable_heartbeat_ = false;
   bool enable_color_undistortion_ = false;
   image_transport::Publisher color_undistortion_publisher_;
+  std::vector<std::shared_ptr<ob::Filter>> filter_list_;
 };
 }  // namespace orbbec_camera

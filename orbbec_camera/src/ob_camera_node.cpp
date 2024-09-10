@@ -425,13 +425,13 @@ void OBCameraNode::setupDevices() {
 void OBCameraNode::setupDepthPostProcessFilter() {
   auto depth_sensor = device_->getSensor(OB_SENSOR_DEPTH);
   // set depth sensor to filter
-  auto filter_list = depth_sensor->getRecommendedFilters();
-  if (!filter_list.empty()) {
+  filter_list_ = depth_sensor->getRecommendedFilters();
+  if (!filter_list_.empty()) {
     RCLCPP_ERROR(logger_, "Failed to get depth sensor filter list");
     return;
   }
-  for (size_t i = 0; i < filter_list.size(); i++) {
-    auto filter = filter_list[i];
+  for (size_t i = 0; i < filter_list_.size(); i++) {
+    auto filter = filter_list_[i];
     std::map<std::string, bool> filter_params = {
         {"DecimationFilter", enable_decimation_filter_},
         {"HDRMerge", enable_hdr_merge_},
@@ -1513,11 +1513,8 @@ std::shared_ptr<ob::Frame> OBCameraNode::processDepthFrameFilter(
   if (frame == nullptr || frame->getType() != OB_FRAME_DEPTH) {
     return nullptr;
   }
-  auto sensor = device_->getSensor(OB_SENSOR_DEPTH);
-  CHECK_NOTNULL(sensor.get());
-  auto filter_list = sensor->getRecommendedFilters();
-  for (size_t i = 0; i < filter_list.size(); i++) {
-    auto filter = filter_list[i];
+  for (size_t i = 0; i < filter_list_.size(); i++) {
+    auto filter = filter_list_[i];
     CHECK_NOTNULL(filter.get());
     if (filter->isEnabled() && frame != nullptr) {
       frame = filter->process(frame);

@@ -23,6 +23,49 @@
 #include <csignal>
 #include <sys/mman.h>
 #include <unistd.h>
+#include <filesystem>
+
+#include <fstream>
+#include <iomanip>  // For std::put_time
+
+std::string g_camera_name = "orbbec_camera";  // Assuming this is declared elsewhere
+
+void signalHandler(int sig) {
+  std::cout << "Received signal: " << sig << std::endl;
+
+  std::string log_dir = "Log/";
+
+  // get current time
+  std::time_t now = std::time(nullptr);
+  std::tm *local_time = std::localtime(&now);
+
+  // format date and time to string, format as "2024_05_20_12_34_56"
+  std::ostringstream time_stream;
+  time_stream << std::put_time(local_time, "%Y_%m_%d_%H_%M_%S");
+
+  // generate log file name
+  std::string log_file_name = g_camera_name + "_crash_stack_trace_" + time_stream.str() + ".log";
+  std::string log_file_path = log_dir + log_file_name;
+
+  if (!std::filesystem::exists(log_dir)) {
+    std::filesystem::create_directories(log_dir);
+  }
+
+  std::cout << "Log crash stack trace to " << log_file_path << std::endl;
+  std::ofstream log_file(log_file_path, std::ios::app);
+
+  if (log_file.is_open()) {
+    log_file << "Received signal: " << sig << std::endl;
+
+    backward::StackTrace st;
+    st.load_here(32);  // Capture stack
+    backward::Printer p;
+    p.print(st, log_file);  // Print stack to log file
+  }
+
+  log_file.close();
+  exit(sig);  // Exit program
+}
 
 namespace orbbec_camera {
 OBCameraNodeDriver::OBCameraNodeDriver(const rclcpp::NodeOptions &node_options)
@@ -57,10 +100,15 @@ OBCameraNodeDriver::~OBCameraNodeDriver() {
 }
 
 void OBCameraNodeDriver::init() {
+  signal(SIGSEGV, signalHandler);  // segment fault
+  signal(SIGABRT, signalHandler);  // abort
+  signal(SIGFPE, signalHandler);   // float point exception
+  signal(SIGILL, signalHandler);   // illegal instruction
   auto log_level_str = declare_parameter<std::string>("log_level", "none");
   auto log_level = obLogSeverityFromString(log_level_str);
   connection_delay_ = static_cast<int>(declare_parameter<int>("connection_delay", 100));
   enable_sync_host_time_ = declare_parameter<bool>("enable_sync_host_time", true);
+  g_camera_name = declare_parameter<std::string>("camera_name", g_camera_name);
   ob::Context::setLoggerToConsole(log_level);
   orb_device_lock_shm_fd_ = shm_open(ORB_DEFAULT_LOCK_NAME.c_str(), O_CREAT | O_RDWR, 0666);
   if (orb_device_lock_shm_fd_ < 0) {
@@ -260,8 +308,8 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceBySerialNumber(
         auto device = list->getDevice(i);
         auto device_info = device->getDeviceInfo();
         if (device_info->getSerialNumber() == serial_number) {
-          RCLCPP_INFO_STREAM(logger_,
-                             "Device serial number " << device_info->getSerialNumber() << " matched");
+          RCLCPP_INFO_STREAM(
+              logger_, "Device serial number " << device_info->getSerialNumber() << " matched");
           return device;
         }
       } else {
@@ -319,13 +367,16 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   serial_number_ = device_info_->getSerialNumber();
   CHECK_NOTNULL(device_info_.get());
   device_unique_id_ = device_info_->getUid();
-  if (enable_sync_host_time_ && !isOpenNIDevice(device_info_->getPid())) {
-    device_->timerSyncWithHost();
-    sync_host_time_timer_ = this->create_wall_timer(std::chrono::milliseconds(30000), [this]() {
-      if (device_) {
-        device_->timerSyncWithHost();
-      }
-    });
+  try {
+    if (enable_sync_host_time_ && !isOpenNIDevice(device_info_->getPid())) {
+      device_->timerSyncWithHost();
+      sync_host_time_timer_ = this->create_wall_timer(std::chrono::milliseconds(30000), [this]() {
+        if (device_) {
+          device_->timerSyncWithHost();
+        }
+      });
+    }
+  } catch (...) {
   }
   RCLCPP_INFO_STREAM(logger_, "Device " << device_info_->getName() << " connected");
   RCLCPP_INFO_STREAM(logger_, "Serial number: " << device_info_->getSerialNumber());

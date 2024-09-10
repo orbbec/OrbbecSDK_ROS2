@@ -700,23 +700,39 @@ std::ostream &operator<<(std::ostream &os, const OBAccelFullScaleRange &rhs) {
 }
 
 std::string parseUsbPort(const std::string &line) {
-  std::string port_id;
-  std::regex self_regex("(?:[^ ]+/usb[0-9]+[0-9./-]*/){0,1}([0-9.-]+)(:){0,1}[^ ]*",
+ std::string port_id;
+  std::regex usb_regex("(?:[^ ]+/usb[0-9]+[0-9./-]*/){0,1}([0-9.-]+)(:){0,1}[^ ]*",
                         std::regex_constants::ECMAScript);
   std::smatch base_match;
-  bool found = std::regex_match(line, base_match, self_regex);
-  if (found) {
+  bool found_usb = std::regex_match(line, base_match, usb_regex);
+
+  if (found_usb) {
     port_id = base_match[1].str();
-    if (base_match[2].str().empty())  // This is libuvc string. Remove counter is exists.
-    {
-      std::regex end_regex = std::regex(".+(-[0-9]+$)", std::regex_constants::ECMAScript);
+    std::cout << "USB port_id: " << port_id << std::endl;
+
+    if (base_match[2].str().empty()) {
+      std::regex end_regex(".+(-[0-9]+$)", std::regex_constants::ECMAScript);
       bool found_end = std::regex_match(port_id, base_match, end_regex);
+
       if (found_end) {
         port_id = port_id.substr(0, port_id.size() - base_match[1].str().size());
+        std::cout << "Modified USB port_id: " << port_id << std::endl;
       }
     }
+
+    return port_id;
   }
-  return port_id;
+
+  std::regex gmsl_regex("(gmsl[0-9]+)(?:-[0-9]+)*(-[0-9]+)$", std::regex_constants::ECMAScript);
+  bool found_gmsl = std::regex_match(line, base_match, gmsl_regex);
+
+  if (found_gmsl) {
+    port_id = base_match[1].str() + base_match[2].str();
+    std::cout << "Parsed GMSL Port ID: " << port_id << std::endl;
+    return port_id;
+  }
+
+  return "";
 }
 
 bool isValidJPEG(const std::shared_ptr<ob::ColorFrame> &frame) {

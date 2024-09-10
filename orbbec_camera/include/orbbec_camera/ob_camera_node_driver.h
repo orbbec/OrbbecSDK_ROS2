@@ -26,6 +26,7 @@
 #include "libobsensor/ObSensor.hpp"
 #include <pthread.h>
 #include <std_srvs/srv/empty.hpp>
+#include <backward_ros/backward.hpp>
 
 namespace orbbec_camera {
 

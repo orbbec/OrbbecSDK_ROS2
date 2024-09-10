@@ -367,17 +367,15 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   serial_number_ = device_info_->getSerialNumber();
   CHECK_NOTNULL(device_info_.get());
   device_unique_id_ = device_info_->getUid();
-  try {
-    if (enable_sync_host_time_ && !isOpenNIDevice(device_info_->getPid())) {
-      device_->timerSyncWithHost();
-      sync_host_time_timer_ = this->create_wall_timer(std::chrono::milliseconds(30000), [this]() {
-        if (device_) {
-          device_->timerSyncWithHost();
-        }
-      });
-    }
-  } catch (...) {
+  if (enable_sync_host_time_ && !isOpenNIDevice(device_info_->pid())) {
+    TRY_EXECUTE_BLOCK(device_->timerSyncWithHost());
+    sync_host_time_timer_ = this->create_wall_timer(std::chrono::milliseconds(30000), [this]() {
+      if (device_) {
+        TRY_EXECUTE_BLOCK(device_->timerSyncWithHost());
+      }
+    });
   }
+
   RCLCPP_INFO_STREAM(logger_, "Device " << device_info_->getName() << " connected");
   RCLCPP_INFO_STREAM(logger_, "Serial number: " << device_info_->getSerialNumber());
   RCLCPP_INFO_STREAM(logger_, "Firmware version: " << device_info_->getFirmwareVersion());
@@ -388,7 +386,7 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   auto time_cost = std::chrono::duration_cast<std::chrono::milliseconds>(
       std::chrono::high_resolution_clock::now() - start_time_);
   RCLCPP_INFO_STREAM(logger_, "Start device cost " << time_cost.count() << " ms");
-}
+}  // namespace orbbec_camera
 
 void OBCameraNodeDriver::connectNetDevice(const std::string &net_device_ip, int net_device_port) {
   if (net_device_ip.empty() || net_device_port == 0) {

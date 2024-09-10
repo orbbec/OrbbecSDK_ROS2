@@ -11,6 +11,7 @@
   <depend>ament_lint_auto</depend>
   <depend>ament_lint_common</depend>
   <depend>ament_index_cpp</depend>
+  <depend>backward_ros</depend>
   <depend>image_transport</depend>
   <depend>image_publisher</depend>
   <depend>rclcpp_components</depend>

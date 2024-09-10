@@ -26,6 +26,7 @@ endif ()
 set(dependencies
   ament_cmake
   ament_index_cpp
+  backward_ros
   Eigen3
   builtin_interfaces
   cv_bridge
@@ -119,6 +120,7 @@ set(COMMON_LIBRARIES
   -L${ORBBEC_LIBS_DIR}
   Threads::Threads
   -lrt
+  -ldw
 )
 if (USE_RK_HW_DECODER)
   list(APPEND COMMON_LIBRARIES

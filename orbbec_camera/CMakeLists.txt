@@ -146,8 +146,6 @@ set(SOURCE_FILES
   src/synced_imu_publisher.cpp
   src/utils.cpp
   src/jpeg_decoder.cpp
-#   tools/list_camera_profile.cpp
-#   tools/list_devices_node.cpp
 )
 
 if (USE_RK_HW_DECODER)
@@ -211,7 +209,7 @@ rclcpp_components_register_node(${PROJECT_NAME}
   EXECUTABLE orbbec_camera_node
 )
 # Add nodes using the macro
-# add_orbbec_executable(list_devices_node tools/list_devices_node.cpp)
+add_orbbec_executable(list_devices_node tools/list_devices_node.cpp)
 # add_orbbec_executable(list_depth_work_mode_node tools/list_depth_work_mode.cpp)
 # add_orbbec_executable(list_camera_profile_mode_node tools/list_camera_profile.cpp)
 
@@ -238,7 +236,7 @@ if (DEFINED ENV{BUILDING_PACKAGE})
 endif ()
 
 install(TARGETS
-#     list_devices_node
+  list_devices_node
 #   list_depth_work_mode_node
 #   list_camera_profile_mode_node
   topic_statistics_node

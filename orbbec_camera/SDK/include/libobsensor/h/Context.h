@@ -157,6 +157,25 @@ void ob_load_license(const char *filePath, const char *key, ob_error **error);
  */
 void ob_load_license_from_data(const char *data, uint32_t dataLen, const char *key, ob_error **error);
 
+/**
+ * @brief Set the UVC backend for the specified context
+ * This function configures the Universal Video Class (UVC) backend for the given context, allowing the selection of a specific backend for
+ * video capture operations.
+ *
+ * @attention This function is only supported on Linux (ARM) platforms.
+ * Some devices, like the Dabai series, do not support V4L2. Therefore, the default backend is LIBUVC. Ensure that the device
+ * supports V4L2 before setting it as the backend.
+ *
+ * @param[in] context Pointer to the context object
+ * @param[in] uvc_backend Specifies the UVC backend to use:
+ *                       - `UVC_BACKEND_AUTO`: Automatically selects between
+ *                         V4L2 or libuvc based on metadata support.
+ *                       - `UVC_BACKEND_LIBUVC`: Forces the use of libuvc.
+ *                       - `UVC_BACKEND_V4L2`: Forces the use of V4L2.
+ * @param[out] error Pointer to an error object that will be populated if an error occurs.
+ */
+void ob_set_uvc_backend(ob_context *context, ob_uvc_backend uvc_backend, ob_error **error);
+
 #ifdef __cplusplus
 }
 #endif

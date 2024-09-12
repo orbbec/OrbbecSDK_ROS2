@@ -143,5 +143,22 @@ public:
      * @param key The decryption key.
      */
     static void loadLicenseFromData(const char *data, uint32_t dataLen, const char *key = OB_DEFAULT_DECRYPT_KEY);
+
+    /**
+     * @brief Set the UVC backend for the specified context
+     * This function configures the Universal Video Class (UVC) backend for the given context, allowing the selection of a specific backend for
+     * video capture operations.
+     *
+     * @attention This function is only supported on Linux (ARM) platforms.
+     * Some devices, like the Dabai series, do not support V4L2. Therefore, the default backend is LIBUVC. Ensure that the device
+     * supports V4L2 before setting it as the backend.
+     *
+     * @param[in] uvcBackend Specifies the UVC backend to use:
+     *                       - `UVC_BACKEND_AUTO`: Automatically selects between
+     *                         V4L2 or libuvc based on metadata support.
+     *                       - `UVC_BACKEND_LIBUVC`: Forces the use of libuvc.
+     *                       - `UVC_BACKEND_V4L2`: Forces the use of V4L2.
+     */
+    void setUVCBackend(OBUvcBackend uvcBackend);
 };
 }  // namespace ob

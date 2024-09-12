@@ -345,8 +345,9 @@ public:
         return getIndex();
     }
 
-    virtual uint8_t *data() const {
-        return getData();
+    virtual void *data() const {
+        auto data = getData();
+        return reinterpret_cast<void *>(data);
     }
 
     virtual uint32_t dataSize() const {

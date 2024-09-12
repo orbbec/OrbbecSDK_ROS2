@@ -69,10 +69,7 @@ OB_EXPORT ob_exception_type ob_error_get_exception_type(const ob_error *error);
  */
 OB_EXPORT void ob_delete_error(ob_error *error);
 
-/**
- * In order to be compatible with the closed source version of orbbecsdk's interface.
- * We recommend using the latest interface names for a better experience.
-*/
+// The following interfaces are deprecated and are retained here for compatibility purposes.
 #define ob_error_status ob_error_get_status
 #define ob_error_message ob_error_get_message
 #define ob_error_function ob_error_get_function

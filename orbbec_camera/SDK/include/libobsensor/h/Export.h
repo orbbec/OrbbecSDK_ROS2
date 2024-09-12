@@ -7,7 +7,7 @@
 #  define OB_NO_EXPORT
 #else
 #  ifndef OB_EXPORT
-#    ifdef openobsdk_EXPORTS
+#    ifdef OrbbecSDK_EXPORTS
         /* We are building this library */
 #      define OB_EXPORT __attribute__((visibility("default")))
 #    else

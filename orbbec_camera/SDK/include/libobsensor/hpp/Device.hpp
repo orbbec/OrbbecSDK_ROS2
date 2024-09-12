@@ -1112,9 +1112,10 @@ public:
 
     /**
      * @brief Get the specified device object from the device list by uid
-     * @brief On Linux platform, the uid of the device is composed of bus-port-dev, for example 1-1.2-1. But the SDK will remove the dev number and only keep
-     * the bus-port as the uid to create the device, for example 1-1.2, so that we can create a device connected to the specified USB port. Similarly, users can
-     * also directly pass in bus-port as uid to create device.
+     * @brief On Linux platform, for usb device, the uid of the device is composed of bus-port-dev, for example 1-1.2-1. But the SDK will remove the dev number
+     * and only keep the bus-port as the uid to create the device, for example 1-1.2, so that we can create a device connected to the specified USB port.
+     * Similarly, users can also directly pass in bus-port as uid to create device.
+     * @brief For GMSL device，the uid is GMSL port with “gmsl2-” prefix, for example gmsl2-1.
      *
      * @attention If the device has been acquired and created elsewhere, repeated acquisition will throw an exception
      *

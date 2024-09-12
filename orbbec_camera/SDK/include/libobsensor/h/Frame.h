@@ -600,10 +600,7 @@ OB_EXPORT ob_frame *ob_frameset_get_frame_by_index(const ob_frame *frameset, uin
  */
 OB_EXPORT void ob_frameset_push_frame(ob_frame *frameset, const ob_frame *frame, ob_error **error);
 
-/**
- * In order to be compatible with the closed source version of orbbecsdk's interface.
- * We recommend using the latest interface names for a better experience.
- */
+// The following interfaces are deprecated and are retained here for compatibility purposes.
 #define ob_frame_index ob_frame_get_index
 #define ob_frame_format ob_frame_get_format
 #define ob_frame_time_stamp_us ob_frame_get_timestamp_us

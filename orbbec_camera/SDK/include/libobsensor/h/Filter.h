@@ -75,11 +75,21 @@ OB_EXPORT const char *ob_filter_get_config_schema(const ob_filter *filter, ob_er
  * @brief Get the filter config schema list of the filter
  * @brief The returned string is a list of ob_config_schema_item representing the configuration schema of the filter.
  *
+ * @attention The returned list should be deleted by calling @ref ob_delete_filter_config_schema_list when it is no longer needed.
+ *
  * @param filter The filter object to get the configuration schema for
  * @param error Pointer to an error object that will be set if an error occurs
  * @return ob_filter_config_schema_list* Return the filter config schema list of the filter
  */
 OB_EXPORT ob_filter_config_schema_list *ob_filter_get_config_schema_list(const ob_filter *filter, ob_error **error);
+
+/**
+ * @brief Delete a list of filter config schema items.
+ *
+ * @param config_schema_list The list of filter config schema items to delete.
+ * @param error Pointer to an error object that will be set if an error occurs.
+ */
+OB_EXPORT void ob_delete_filter_config_schema_list(ob_filter_config_schema_list *config_schema_list, ob_error **error);
 
 /**
  * @brief Update config of the filter
@@ -231,10 +241,8 @@ OB_EXPORT uint32_t ob_filter_config_schema_list_get_count(const ob_filter_config
  */
 OB_EXPORT ob_filter_config_schema_item ob_filter_config_schema_list_get_item(const ob_filter_config_schema_list *config_schema_list, uint32_t index,
                                                                              ob_error **error);
-/**
- * In order to be compatible with the closed source version of orbbecsdk's interface.
- * We recommend using the latest interface names for a better experience.
-*/
+
+// The following interfaces are deprecated and are retained here for compatibility purposes.
 #define ob_get_filter ob_filter_list_get_filter
 #define ob_get_filter_name ob_filter_get_name
 

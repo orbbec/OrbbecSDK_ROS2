@@ -65,14 +65,14 @@ OB_EXPORT void ob_sensor_switch_profile(ob_sensor *sensor, ob_stream_profile *pr
 OB_EXPORT void ob_delete_sensor(ob_sensor *sensor, ob_error **error);
 
 /**
- * @brief Request the list of recommended filter list.
+ * @brief  Create a list of recommended filters for the specified sensor.
  *
  * @param[in] sensor The ob_sensor object.
  * @param[out] error Pointer to an error object that will be set if an error occurs.
  *
  * @return ob_filter_list
  */
-OB_EXPORT ob_filter_list *ob_sensor_get_recommended_filter_list(const ob_sensor *sensor, ob_error **error);
+OB_EXPORT ob_filter_list *ob_sensor_create_recommended_filter_list(const ob_sensor *sensor, ob_error **error);
 
 /**
  * @brief Get the number of sensors in the sensor list.
@@ -122,6 +122,7 @@ OB_EXPORT ob_sensor *ob_sensor_list_get_sensor(const ob_sensor_list *sensor_list
 OB_EXPORT void ob_delete_sensor_list(ob_sensor_list *sensor_list, ob_error **error);
 
 #define ob_sensor_list_get_sensor_count ob_sensor_list_get_count
+#define ob_sensor_get_recommended_filter_list ob_sensor_create_recommended_filter_list
 
 #ifdef __cplusplus
 }

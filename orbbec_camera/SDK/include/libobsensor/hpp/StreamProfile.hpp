@@ -120,15 +120,13 @@ public:
         return std::static_pointer_cast<const T>(shared_from_this());
     }
 
-    /**
-     * In order to be compatible with the closed source version of orbbecsdk's interface.
-     * We recommend using the latest interface names for a better experience.
-     */
-    OB_DEPRECATED OBFormat format() const {
+public:
+    // The following interfaces are deprecated and are retained here for compatibility purposes.
+    OBFormat format() const {
         return getFormat();
     }
 
-    OB_DEPRECATED OBStreamType type() const {
+    OBStreamType type() const {
         return getType();
     }
 };
@@ -203,19 +201,17 @@ public:
         return distortion;
     }
 
-    /**
-     * In order to be compatible with the closed source version of orbbecsdk's interface.
-     * We recommend using the latest interface names for a better experience.
-     */
-    OB_DEPRECATED uint32_t fps() const {
+public:
+    // The following interfaces are deprecated and are retained here for compatibility purposes.
+    uint32_t fps() const {
         return getFps();
     }
 
-    OB_DEPRECATED uint32_t width() const {
+    uint32_t width() const {
         return getWidth();
     }
 
-    OB_DEPRECATED uint32_t height() const {
+    uint32_t height() const {
         return getHeight();
     }
 };
@@ -265,11 +261,13 @@ public:
         return intrinsic;
     }
 
-    OB_DEPRECATED OBAccelFullScaleRange fullScaleRange() const{
+public:
+    // The following interfaces are deprecated and are retained here for compatibility purposes.
+    OBAccelFullScaleRange fullScaleRange() const {
         return getFullScaleRange();
     }
 
-    OB_DEPRECATED OBAccelSampleRate sampleRate() const{
+    OBAccelSampleRate sampleRate() const {
         return getSampleRate();
     }
 };
@@ -319,11 +317,13 @@ public:
         return intrinsic;
     }
 
-    OB_DEPRECATED OBGyroFullScaleRange fullScaleRange() const{
+public:
+    // The following interfaces are deprecated and are retained here for compatibility purposes.
+    OBGyroFullScaleRange fullScaleRange() const {
         return getFullScaleRange();
     }
 
-    OB_DEPRECATED OBGyroSampleRate sampleRate() const{
+    OBGyroSampleRate sampleRate() const {
         return getSampleRate();
     }
 };
@@ -431,11 +431,9 @@ public:
         return std::make_shared<GyroStreamProfile>(profile);
     }
 
-    /**
-     * In order to be compatible with the closed source version of orbbecsdk's interface.
-     * We recommend using the latest interface names for a better experience.
-     */
-    OB_DEPRECATED uint32_t count() const {
+public:
+    // The following interfaces are deprecated and are retained here for compatibility purposes.
+    uint32_t count() const {
         return getCount();
     }
 };

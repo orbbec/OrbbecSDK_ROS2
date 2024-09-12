@@ -387,10 +387,7 @@ OB_EXPORT ob_stream_profile *ob_stream_profile_list_get_gyro_stream_profile(cons
  */
 OB_EXPORT void ob_delete_stream_profile_list(const ob_stream_profile_list *profile_list, ob_error **error);
 
-/**
- * In order to be compatible with the closed source version of orbbecsdk's interface.
- * We recommend using the latest interface names for a better experience.
- */
+// The following interfaces are deprecated and are retained here for compatibility purposes.
 #define ob_stream_profile_format ob_stream_profile_get_format
 #define ob_stream_profile_type ob_stream_profile_get_type
 #define ob_video_stream_profile_fps ob_video_stream_profile_get_fps

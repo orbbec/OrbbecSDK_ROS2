@@ -75,14 +75,14 @@ OB_EXPORT ob_frame *transformation_depth_frame_to_color_camera(ob_device *device
                                                      uint32_t target_color_camera_height, ob_error **error);
 
 // \deprecated This function is deprecated and will be removed in a future version.  
-bool transformation_init_xy_tables(const ob_calibration_param calibration_param, const ob_sensor_type sensor_type, float *data, uint32_t *data_size,
+OB_EXPORT bool transformation_init_xy_tables(const ob_calibration_param calibration_param, const ob_sensor_type sensor_type, float *data, uint32_t *data_size,
                                    ob_xy_tables *xy_tables, ob_error **error);
 
 // \deprecated This function is deprecated and will be removed in a future version.  
-void transformation_depth_to_pointcloud(ob_xy_tables *xy_tables, const void *depth_image_data, void *pointcloud_data, ob_error **error);
+OB_EXPORT void transformation_depth_to_pointcloud(ob_xy_tables *xy_tables, const void *depth_image_data, void *pointcloud_data, ob_error **error);
 
 // \deprecated This function is deprecated and will be removed in a future version.  
-void transformation_depth_to_rgbd_pointcloud(ob_xy_tables *xy_tables, const void *depth_image_data, const void *color_image_data, void *pointcloud_data,
+OB_EXPORT void transformation_depth_to_rgbd_pointcloud(ob_xy_tables *xy_tables, const void *depth_image_data, const void *color_image_data, void *pointcloud_data,
                                              ob_error **error);
 
 // \deprecated This function is deprecated and will be removed in a future version.  

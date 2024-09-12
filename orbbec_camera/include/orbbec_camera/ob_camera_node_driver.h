@@ -104,5 +104,6 @@ class OBCameraNodeDriver : public rclcpp::Node {
   bool enable_sync_host_time_ = true;
   rclcpp::Service<std_srvs::srv::Empty>::SharedPtr reboot_device_srv_ = nullptr;
   std::chrono::time_point<std::chrono::system_clock> start_time_;
+  std::string extension_path_;
 };
 }  // namespace orbbec_camera

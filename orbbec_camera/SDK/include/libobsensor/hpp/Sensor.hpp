@@ -28,7 +28,7 @@ public:
     typedef std::function<void(std::shared_ptr<Frame> frame)> FrameCallback;
 
 protected:
-    ob_sensor_t * impl_;
+    ob_sensor_t  *impl_;
     FrameCallback callback_;
 
 public:
@@ -49,7 +49,7 @@ public:
         return *this;
     }
 
-    Sensor(const Sensor &sensor) = delete;
+    Sensor(const Sensor &sensor)            = delete;
     Sensor &operator=(const Sensor &sensor) = delete;
 
     virtual ~Sensor() noexcept {
@@ -83,12 +83,13 @@ public:
     }
 
     /**
-     * @brief Request recommended filters
+     * @brief Create a list of recommended filters for the sensor.
+     *
      * @return OBFilterList list of frame processing block
      */
-    std::vector<std::shared_ptr<Filter>> getRecommendedFilters() const {
+    std::vector<std::shared_ptr<Filter>> createRecommendedFilters() const {
         ob_error *error = nullptr;
-        auto      list  = ob_sensor_get_recommended_filter_list(impl_, &error);
+        auto      list  = ob_sensor_create_recommended_filter_list(impl_, &error);
         Error::handle(&error);
         auto filter_count = ob_filter_list_get_count(list, &error);
 
@@ -98,6 +99,8 @@ public:
             Error::handle(&error);
             filters.push_back(std::make_shared<Filter>(filterImpl));
         }
+        ob_delete_filter_list(list, &error);
+        Error::handle(&error, false);
         return filters;
     }
 
@@ -140,12 +143,14 @@ private:
         sensor->callback_(std::make_shared<Frame>(frame));
     }
 
-    /**
-     * In order to be compatible with the closed source version of orbbecsdk's interface.
-     * We recommend using the latest interface names for a better experience.
-     */
-    OB_DEPRECATED OBSensorType type() const {
+public:
+    // The following interfaces are deprecated and are retained here for compatibility purposes.
+    OBSensorType type() const {
         return getType();
+    }
+
+    std::vector<std::shared_ptr<Filter>> getRecommendedFilters() const {
+        return createRecommendedFilters();
     }
 };
 
@@ -213,15 +218,13 @@ public:
         return std::make_shared<Sensor>(sensor);
     }
 
-    /**
-     * In order to be compatible with the closed source version of orbbecsdk's interface.
-     * We recommend using the latest interface names for a better experience.
-     */
-    OB_DEPRECATED uint32_t count() const {
+public:
+    // The following interfaces are deprecated and are retained here for compatibility purposes.
+    uint32_t count() const {
         return getCount();
     }
 
-    OB_DEPRECATED OBSensorType type(uint32_t index) const {
+    OBSensorType type(uint32_t index) const {
         return getSensorType(index);
     }
 };

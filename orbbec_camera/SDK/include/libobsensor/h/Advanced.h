@@ -19,7 +19,7 @@ OB_EXPORT ob_depth_work_mode ob_device_get_current_depth_work_mode(const ob_devi
  * @brief According the current preset name to return current depth mode name
  * @return const char* return the current depth mode name.
  */
-OB_EXPORT const char * ob_device_get_current_depth_work_mode_name(const ob_device *device, ob_error **error);
+OB_EXPORT const char *ob_device_get_current_depth_work_mode_name(const ob_device *device, ob_error **error);
 
 /**
  * @brief Switch the depth work mode by ob_depth_work_mode.
@@ -151,7 +151,8 @@ OB_EXPORT void ob_device_export_current_settings_as_preset_json_file(ob_device *
  * @param[out] data return the preset json data.
  * @param[out] dataSize return the size of the preset json data.
  */
-OB_EXPORT void ob_device_export_current_settings_as_preset_json_data(ob_device *device, const char *presetName, const uint8_t **data, uint32_t *dataSize, ob_error **error);
+OB_EXPORT void ob_device_export_current_settings_as_preset_json_data(ob_device *device, const char *presetName, const uint8_t **data, uint32_t *dataSize,
+                                                                     ob_error **error);
 
 /**
  * @brief Get the available preset list.
@@ -199,10 +200,7 @@ OB_EXPORT const char *ob_device_preset_list_get_name(const ob_device_preset_list
  */
 OB_EXPORT bool ob_device_preset_list_has_preset(const ob_device_preset_list *preset_list, const char *preset_name, ob_error **error);
 
-/**
- * In order to be compatible with the closed source version of orbbecsdk's interface.
- * We recommend using the latest interface names for a better experience.
-*/
+// The following interfaces are deprecated and are retained here for compatibility purposes.
 #define ob_depth_work_mode_list_count ob_depth_work_mode_list_get_count
 #define ob_device_preset_list_count ob_device_preset_list_get_count
 

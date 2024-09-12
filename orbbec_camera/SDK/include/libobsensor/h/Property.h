@@ -441,6 +441,13 @@ typedef enum {
     OB_PROP_DISP_SEARCH_RANGE_MODE_INT = 191,
 
     /**
+     * @brief Repower device (cut off power and power on again)
+     *
+     * @brief Currently using for GMSL device, cut off power and power on again by GMSL host driver.
+     */
+    OB_PROP_DEVICE_REPOWER_BOOL = 202,
+
+    /**
      * @brief Baseline calibration parameters
      */
     OB_STRUCT_BASELINE_CALIBRATION_PARAM = 1002,

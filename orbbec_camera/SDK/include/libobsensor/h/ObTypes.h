@@ -1241,7 +1241,7 @@ typedef struct {
     /**
      * @brief The sync mode of the device.
      */
-    ob_multi_device_sync_mode syncMode;
+    OBMultiDeviceSyncMode syncMode;
 
     /**
      * @brief The delay time of the depth image capture after receiving the capture command or trigger signal in microseconds.

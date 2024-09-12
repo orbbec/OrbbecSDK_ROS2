@@ -101,13 +101,9 @@ public:
         return impl_->message;
     }
 
-    /**
-     * @brief (Deprecated) Returns the name of the function where the exception occurred.
-     * @brief Use the getFunction() function instead.
-     *
-     * @return const char* The function name.
-     */
-    OB_DEPRECATED const char *getName() const noexcept {
+public:
+    // The following interfaces are deprecated and are retained here for compatibility purposes.
+    const char *getName() const noexcept {
         return impl_->function;
     }
 };

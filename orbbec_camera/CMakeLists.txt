@@ -11,9 +11,6 @@ set(CMAKE_BUILD_TYPE "Release")
 option(USE_RK_HW_DECODER "Use Rockchip hardware decoder" OFF)
 option(USE_NV_HW_DECODER "Use Nvidia hardware decoder" OFF)
 
-
-
-
 if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Werror -Wno-pedantic -Wno-array-bounds)
 endif ()
@@ -81,6 +78,7 @@ message(STATUS "ORRBEC Machine Bits : ${MACHINES_BIT}")
 if ((${MACHINES} MATCHES "x86_64") AND (${MACHINES_BIT} MATCHES "64"))
   set(HOST_PLATFORM "x64")
 elseif (${MACHINES} MATCHES "arm" OR (${MACHINES} MATCHES "aarch64" AND ${MACHINES_BIT} MATCHES "32"))
+  message(FATAL_ERROR "ORBBEC SDK does not support arm32")
   set(HOST_PLATFORM "arm32")
 elseif ((${MACHINES} MATCHES "aarch64") AND (${MACHINES_BIT} MATCHES "64"))
   set(HOST_PLATFORM "arm64")

@@ -12,6 +12,8 @@ option(USE_RK_HW_DECODER "Use Rockchip hardware decoder" OFF)
 option(USE_NV_HW_DECODER "Use Nvidia hardware decoder" OFF)
 
 
+
+
 if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Werror -Wno-pedantic -Wno-array-bounds)
 endif ()
@@ -26,10 +28,10 @@ endif ()
 set(dependencies
   ament_cmake
   ament_index_cpp
-  backward_ros
   Eigen3
   builtin_interfaces
   cv_bridge
+  backward_ros
   camera_info_manager
   image_transport
   image_publisher
@@ -210,10 +212,11 @@ rclcpp_components_register_node(${PROJECT_NAME}
 )
 # Add nodes using the macro
 add_orbbec_executable(list_devices_node tools/list_devices_node.cpp)
-# add_orbbec_executable(list_depth_work_mode_node tools/list_depth_work_mode.cpp)
-# add_orbbec_executable(list_camera_profile_mode_node tools/list_camera_profile.cpp)
+add_orbbec_executable(list_depth_work_mode_node tools/list_depth_work_mode.cpp)
+add_orbbec_executable(list_camera_profile_mode_node tools/list_camera_profile.cpp)
 
 add_orbbec_executable(topic_statistics_node tools/topic_statistics.cpp)
+add_orbbec_executable(multi_save_rgbir_node tools/multi_save_rgbir_node.cpp)
 
 # Install rules
 install(TARGETS ${PROJECT_NAME}
@@ -235,11 +238,11 @@ if (DEFINED ENV{BUILDING_PACKAGE})
   )
 endif ()
 
-install(TARGETS
-  list_devices_node
-#   list_depth_work_mode_node
-#   list_camera_profile_mode_node
+install(TARGETS list_devices_node
+  list_depth_work_mode_node
+  list_camera_profile_mode_node
   topic_statistics_node
+  multi_save_rgbir_node
   DESTINATION lib/${PROJECT_NAME}/)
 
 if (BUILD_TESTING)

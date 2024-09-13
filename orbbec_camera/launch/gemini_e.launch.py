@@ -32,6 +32,7 @@ def generate_launch_description():
         DeclareLaunchArgument('color_qos', default_value='default'),
         DeclareLaunchArgument('color_camera_info_qos', default_value='default'),
         DeclareLaunchArgument('enable_color_auto_exposure', default_value='true'),
+        DeclareLaunchArgument('cloud_frame_id', default_value=''),
         DeclareLaunchArgument('color_exposure', default_value='-1'),
         DeclareLaunchArgument('color_gain', default_value='-1'),
         DeclareLaunchArgument('enable_color_auto_white_balance', default_value='true'),

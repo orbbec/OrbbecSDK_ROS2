@@ -1023,6 +1023,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter(trigger_out_delay_us_, "trigger_out_delay_us", 0);
   setAndGetNodeParameter(trigger_out_enabled_, "trigger_out_enabled", false);
   setAndGetNodeParameter<std::string>(depth_precision_str_, "depth_precision", "");
+  setAndGetNodeParameter<std::string>(cloud_frame_id_, "cloud_frame_id", "");
   if (!depth_precision_str_.empty()) {
     depth_precision_ = depthPrecisionLevelFromString(depth_precision_str_);
   }
@@ -1424,6 +1425,9 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
   auto frame_timestamp = getFrameTimestampUs(depth_frame);
   auto timestamp = fromUsToROSTime(frame_timestamp);
   std::string frame_id = depth_registration_ ? optical_frame_id_[COLOR] : optical_frame_id_[DEPTH];
+  if (!cloud_frame_id_.empty()) {
+    frame_id = cloud_frame_id_;
+  }
   point_cloud_msg->header.stamp = timestamp;
   point_cloud_msg->header.frame_id = frame_id;
   if (save_point_cloud_) {
@@ -1550,9 +1554,13 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
     modifier.resize(valid_count);
   }
   auto frame_timestamp = getFrameTimestampUs(depth_frame);
+  std::string frame_id = optical_frame_id_[COLOR];
+  if (!cloud_frame_id_.empty()) {
+    frame_id = cloud_frame_id_;
+  }
   auto timestamp = fromUsToROSTime(frame_timestamp);
   point_cloud_msg->header.stamp = timestamp;
-  point_cloud_msg->header.frame_id = optical_frame_id_[COLOR];
+  point_cloud_msg->header.frame_id = frame_id;
   if (save_colored_point_cloud_) {
     save_colored_point_cloud_ = false;
     auto now = std::time(nullptr);

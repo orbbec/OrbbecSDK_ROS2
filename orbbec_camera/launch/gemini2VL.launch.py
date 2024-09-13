@@ -20,6 +20,7 @@ def generate_launch_description():
         DeclareLaunchArgument('vendor_id', default_value='0x2bc5'),
         DeclareLaunchArgument('product_id', default_value=''),
         DeclareLaunchArgument('point_cloud_qos', default_value='default'),
+        DeclareLaunchArgument('cloud_frame_id', default_value=''),
         DeclareLaunchArgument('connection_delay', default_value='100'),
         DeclareLaunchArgument('color_width', default_value='1280'),
         DeclareLaunchArgument('color_height', default_value='800'),

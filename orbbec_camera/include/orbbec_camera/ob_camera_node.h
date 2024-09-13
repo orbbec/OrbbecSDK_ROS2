@@ -568,5 +568,6 @@ class OBCameraNode {
   std::shared_ptr<image_publisher> color_undistortion_publisher_;
   bool has_first_color_frame_ = false;
   bool use_intra_process_ = false;
+  std::string cloud_frame_id_;
 };
 }  // namespace orbbec_camera

@@ -214,7 +214,6 @@ add_orbbec_executable(list_depth_work_mode_node tools/list_depth_work_mode.cpp)
 add_orbbec_executable(list_camera_profile_mode_node tools/list_camera_profile.cpp)
 
 add_orbbec_executable(topic_statistics_node tools/topic_statistics.cpp)
-add_orbbec_executable(multi_save_rgbir_node tools/multi_save_rgbir_node.cpp)
 
 # Install rules
 install(TARGETS ${PROJECT_NAME}
@@ -240,7 +239,6 @@ install(TARGETS list_devices_node
   list_depth_work_mode_node
   list_camera_profile_mode_node
   topic_statistics_node
-  multi_save_rgbir_node
   DESTINATION lib/${PROJECT_NAME}/)
 
 if (BUILD_TESTING)

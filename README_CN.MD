@@ -1,7 +1,5 @@
 # orbbec_camera
 
-## [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-1.5.2-green)
-
 **请注意：本文档为机器翻译，仅供参考。翻译可能存在遗漏或错误，且不会及时更新。请以英文原文为准。**
 
 OrbbecSDK ROS 2 是一个用于 Orbbec 3D 相机的 ROS 2 环境无缝集成的包装器。它支持 ROS 2 Foxy、Galactic 和 Humble 版本。
@@ -357,6 +355,27 @@ IR 的帧率和分辨率必须与深度一致。不同模式与分辨率的对�
 ros2 run orbbec_camera list_camera_profile_mode_node
 ```
 
+## 使用FFmpeg解码H264/265的工具
+
+对于Femto Mega这种能够输出H264/H265编码格式的，能够使用mega_h26x_decode_node节点来实现H264/H265解码功能。
+mega_h26x_decode_node节点的解码功能是通过FFmpeg来实现的。
+
+* 首先启动Femto Mega相机并将color的编码格式设置为H264或者H265：
+
+  ```bash
+  ros2 launch orbbec_camera femto_mega.launch.py color_format:=H264
+  ```
+* 启动解码节点：
+
+  ```bash
+  ros2 run orbbec_camera mega_h26x_decode_node
+  ```
+
+mega_h26x_decode_node节点可用的话题：
+
+* /camera/color/h26x_encoded_data ：Femto Mega输出原始color的H264/H265编码数据
+* /camera/color/h26x_decoder/image_raw ：经过mega_h26x_decode_node节点解码后的RGB图像数据
+
 ## 构建 Debian 包
 
 ### 准备环境
@@ -403,63 +422,63 @@ bash .make_deb.sh
 
 ## 启动文件
 
-| 产品系列          | 启动文件                    |
-| ----------------- | --------------------------- |
-| astra+            | astra_adv.launch.py         |
+| 产品系列                              | 启动文件                    |
+| ------------------------------------- | --------------------------- |
+| astra+                                | astra_adv.launch.py         |
 | astra mini /astra mini pro /astra pro | astra.launch.py             |
-| astra mini pro s  | astra.launch.py             |
-| astra2            | astra2.launch.py            |
-| astra stereo s    | stereo_s_u3.launch.py       |
-| astra pro2        | astra_pro2.launch.py        |
-| dabai             | dabai.launch.py             |
-| dabai d1          | dabai_d1.launch.py          |
-| dabai dcw         | dabai_dcw.launch.py         |
-| dabai dw          | dabai_dw.launch.py          |
-| dabai pro         | dabai_pro.launch.py         |
-| deeya             | deeya.launch.py             |
-| femto /femto w    | femto.launch.py             |
-| femto mega        | femto_mega.launch.py        |
-| femto bolt        | femto_bolt.launch.py        |
-| gemini            | gemini.launch.py            |
-| gemini            | gemini.launch.py            |
-| gemini2 / dabai DCL | gemini2.launch.py           |
-| gemini2L          | gemini2L.launch.py          |
-| gemini e          | gemini_e.launch.py          |
-| gemini e lite     | gemini_e_lite.launch.py     |
-| dabai max         | dabai_max.launch.py         |
-| dabai max pro     | dabai_max_pro.launch.py     |
-| gemini uw         | gemini_uw.launch.py         |
-| dabai dcw2        | dabai_dcw2.launch.py        |
-| dabai dw2         | dabai_dw2.launch.py         |
-| gemini ew         | gemini_ew.launch.py         |
-| gemini ew lite    | gemini_ew_lite.launch.py    |
-| gemini 330 系列   | gemini_330_series.launch.py |
+| astra mini pro s                      | astra.launch.py             |
+| astra2                                | astra2.launch.py            |
+| astra stereo s                        | stereo_s_u3.launch.py       |
+| astra pro2                            | astra_pro2.launch.py        |
+| dabai                                 | dabai.launch.py             |
+| dabai d1                              | dabai_d1.launch.py          |
+| dabai dcw                             | dabai_dcw.launch.py         |
+| dabai dw                              | dabai_dw.launch.py          |
+| dabai pro                             | dabai_pro.launch.py         |
+| deeya                                 | deeya.launch.py             |
+| femto /femto w                        | femto.launch.py             |
+| femto mega                            | femto_mega.launch.py        |
+| femto bolt                            | femto_bolt.launch.py        |
+| gemini                                | gemini.launch.py            |
+| gemini                                | gemini.launch.py            |
+| gemini2 / dabai DCL                   | gemini2.launch.py           |
+| gemini2L                              | gemini2L.launch.py          |
+| gemini e                              | gemini_e.launch.py          |
+| gemini e lite                         | gemini_e_lite.launch.py     |
+| dabai max                             | dabai_max.launch.py         |
+| dabai max pro                         | dabai_max_pro.launch.py     |
+| gemini uw                             | gemini_uw.launch.py         |
+| dabai dcw2                            | dabai_dcw2.launch.py        |
+| dabai dw2                             | dabai_dw2.launch.py         |
+| gemini ew                             | gemini_ew.launch.py         |
+| gemini ew lite                        | gemini_ew_lite.launch.py    |
+| gemini 330 系列                       | gemini_330_series.launch.py |
 
 **所有启动文件本质上都是相似的，主要区别在于为同一系列中不同型号设置的参数的默认值。USB 标准的差异，例如 USB 2.0 与 USB 3.0，可能需要调整这些参数。如果遇到启动失败，请仔细查看规格手册。特别注意启动文件中的分辨率设置以及其他参数，以确保兼容性和最佳性能。**
 
 ## 产品支持
 
-| **产品列表** | **固件版本**               |
-| ------------ | -------------------------- |
-| Gemini 335   | 1.2.20                     |
-| Gemini 335L  | 1.2.20                     |
-| Femto Bolt   | 1.0.6/1.0.9                |
-| Femto Mega   | 1.1.7/1.2.7                |
-| Gemini 2 XL  | Obox：V1.2.5 VL：1.4.54   |
-| Astra 2      | 2.8.20                     |
-| Gemini 2 L   | 1.4.32                     |
-| Gemini 2     | 1.4.60 /1.4.76             |
-| Astra+       | 1.0.22/1.0.21/1.0.20/1.0.19 |
-| Femto        | 1.6.7                      |
-| Femto W      | 1.1.8                      |
-| DaBai        | 2436                       |
-| DaBai DCW    | 2460                       |
-| DaBai DW     | 2606                       |
-| Astra Mini Pro | 1007                     |
-| Gemini E     | 3460                       |
-| Gemini E Lite | 3606                      |
-| Gemini       | 3.0.18                     |
-| Astra Mini S Pro | 1.0.05                 |
+| **产品列表** | **固件版本**          |
+| ------------------ | --------------------------- |
+| Gemini 335         | 1.2.20                      |
+| Gemini 335L        | 1.2.20                      |
+| Femto Bolt         | 1.0.6/1.0.9                 |
+| Femto Mega         | 1.1.7/1.2.7                 |
+| Gemini 2 XL        | Obox：V1.2.5 VL：1.4.54     |
+| Astra 2            | 2.8.20                      |
+| Gemini 2 L         | 1.4.32                      |
+| Gemini 2           | 1.4.60 /1.4.76              |
+| Astra+             | 1.0.22/1.0.21/1.0.20/1.0.19 |
+| Femto              | 1.6.7                       |
+| Femto W            | 1.1.8                       |
+| DaBai              | 2436                        |
+| DaBai DCW          | 2460                        |
+| DaBai DW           | 2606                        |
+| Astra Mini Pro     | 1007                        |
+| Gemini E           | 3460                        |
+| Gemini E Lite      | 3606                        |
+| Gemini             | 3.0.18                      |
+| Astra Mini S Pro   | 1.0.05                      |
 
 ## DDS 调优
 
@@ -524,7 +543,6 @@ net.core.rmem_default=2147483647
 多个相机无图像
 
 - 可能是电源供应不足。为避免这种情况，请不要将所有相机连接到同一个集线器，并使用带电源的集线器。
-
 - 也可能是分辨率太高。要解决此问题，请尝试降低分辨率。
 
 为什么这里有那么多启动文件

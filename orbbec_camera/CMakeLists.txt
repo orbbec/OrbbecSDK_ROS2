@@ -56,7 +56,7 @@ foreach (dep IN LISTS dependencies)
 endforeach ()
 
 find_package(PkgConfig REQUIRED)
-
+pkg_check_modules(FFMPEG REQUIRED libavcodec libavformat libavutil libswscale)
 
 if (USE_RK_HW_DECODER)
   pkg_search_module(RK_MPP REQUIRED rockchip_mpp)
@@ -110,12 +110,14 @@ set(COMMON_INCLUDE_DIRS
   $<INSTALL_INTERFACE:include>
   ${ORBBEC_INCLUDE_DIR}
   ${OpenCV_INCLUDED_DIRS}
+  ${FFMPEG_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/tools
 )
 
 set(COMMON_LIBRARIES
   ${ORBBEC_SDK_LIBRARIES}
   ${OpenCV_LIBS}
+  ${FFMPEG_LIBRARIES}
   Eigen3::Eigen
   -lOrbbecSDK
   -L${ORBBEC_LIBS_DIR}
@@ -216,6 +218,7 @@ add_orbbec_executable(list_depth_work_mode_node tools/list_depth_work_mode.cpp)
 add_orbbec_executable(list_camera_profile_mode_node tools/list_camera_profile.cpp)
 
 add_orbbec_executable(topic_statistics_node tools/topic_statistics.cpp)
+add_orbbec_executable(mega_h26x_decode_node tools/mega_h26x_decode_node.cpp)
 
 
 add_library(frame_latency SHARED tools/frame_latency.cpp)
@@ -250,6 +253,7 @@ install(TARGETS list_devices_node
   list_depth_work_mode_node
   list_camera_profile_mode_node
   topic_statistics_node
+  mega_h26x_decode_node
   DESTINATION lib/${PROJECT_NAME}/)
 
 if (BUILD_TESTING)

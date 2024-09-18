@@ -388,8 +388,8 @@ void OBCameraNode::setupDevices() {
     RCLCPP_INFO_STREAM(logger_, "Setting color brightness to " << color_brightness_);
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_BRIGHTNESS_INT, color_brightness_);
   }
- // ir ae max
- if (device_->isPropertySupported(OB_PROP_IR_AE_MAX_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
+  // ir ae max
+  if (device_->isPropertySupported(OB_PROP_IR_AE_MAX_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting IR AE max exposure to " << ir_ae_max_exposure_);
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_AE_MAX_EXPOSURE_INT, ir_ae_max_exposure_);
   }
@@ -546,14 +546,14 @@ void OBCameraNode::setupDepthPostProcessFilter() {
     } else if (filter_name == "NoiseRemovalFilter" && enable_noise_removal_filter_) {
       auto noise_removal_filter = filter->as<ob::NoiseRemovalFilter>();
       OBNoiseRemovalFilterParams params = noise_removal_filter->getFilterParams();
-      RCLCPP_INFO_STREAM(logger_, "Default noise removal filter params: "
-                                      << "disp_diff: " << params.disp_diff
-                                      << ", max_size: " << params.max_size);
+      RCLCPP_INFO_STREAM(
+          logger_, "Default noise removal filter params: " << "disp_diff: " << params.disp_diff
+                                                           << ", max_size: " << params.max_size);
       params.disp_diff = noise_removal_filter_min_diff_;
       params.max_size = noise_removal_filter_max_size_;
-      RCLCPP_INFO_STREAM(logger_, "Set noise removal filter params: "
-                                      << "disp_diff: " << params.disp_diff
-                                      << ", max_size: " << params.max_size);
+      RCLCPP_INFO_STREAM(logger_,
+                         "Set noise removal filter params: " << "disp_diff: " << params.disp_diff
+                                                             << ", max_size: " << params.max_size);
       if (noise_removal_filter_min_diff_ != -1 && noise_removal_filter_max_size_ != -1) {
         noise_removal_filter->setFilterParams(params);
       }
@@ -562,11 +562,11 @@ void OBCameraNode::setupDepthPostProcessFilter() {
           hdr_merge_gain_2_ != -1) {
         auto hdr_merge_filter = filter->as<ob::HdrMerge>();
         hdr_merge_filter->enable(true);
-        RCLCPP_INFO_STREAM(logger_, "Set HDR merge filter params: "
-                                        << "exposure_1: " << hdr_merge_exposure_1_
-                                        << ", gain_1: " << hdr_merge_gain_1_
-                                        << ", exposure_2: " << hdr_merge_exposure_2_
-                                        << ", gain_2: " << hdr_merge_gain_2_);
+        RCLCPP_INFO_STREAM(
+            logger_, "Set HDR merge filter params: " << "exposure_1: " << hdr_merge_exposure_1_
+                                                     << ", gain_1: " << hdr_merge_gain_1_
+                                                     << ", exposure_2: " << hdr_merge_exposure_2_
+                                                     << ", gain_2: " << hdr_merge_gain_2_);
         auto config = OBHdrConfig();
         config.enable = true;
         config.exposure_1 = hdr_merge_exposure_1_;
@@ -649,10 +649,10 @@ void OBCameraNode::setupProfiles() {
           throw std::runtime_error("Failed cast profile to VideoStreamProfile");
         }
         RCLCPP_DEBUG_STREAM(
-            logger_, "Sensor profile: "
-                         << "stream_type: " << magic_enum::enum_name(profile->type())
-                         << "Format: " << profile->format() << ", Width: " << profile->width()
-                         << ", Height: " << profile->height() << ", FPS: " << profile->fps());
+            logger_,
+            "Sensor profile: " << "stream_type: " << magic_enum::enum_name(profile->type())
+                               << "Format: " << profile->format() << ", Width: " << profile->width()
+                               << ", Height: " << profile->height() << ", FPS: " << profile->fps());
         supported_profiles_[elem].emplace_back(profile);
       }
       std::shared_ptr<ob::VideoStreamProfile> selected_profile;
@@ -1263,6 +1263,13 @@ void OBCameraNode::setupPublishers() {
     camera_info_publishers_[stream_index] = node_->create_publisher<CameraInfo>(
         topic, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(camera_info_qos_profile),
                            camera_info_qos_profile));
+
+    auto image_h264_qos_profile = getRMWQosProfileFromString(image_qos);
+    camera_h26x_publishers_[stream_index] =
+        node_->create_publisher<sensor_msgs::msg::CompressedImage>(
+            "/camera/color/h26x_encoded_data",
+            rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(image_h264_qos_profile),
+                        image_h264_qos_profile));
     if (isGemini335PID(pid)) {
       metadata_publishers_[stream_index] =
           node_->create_publisher<orbbec_camera_msgs::msg::Metadata>(
@@ -1383,7 +1390,7 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
     return;
   }
   std::lock_guard<decltype(point_cloud_mutex_)> point_cloud_msg_lock(point_cloud_mutex_);
-  if(!depth_frame_) {
+  if (!depth_frame_) {
     RCLCPP_ERROR_STREAM(logger_, "depth frame is null");
     return;
   }
@@ -1802,6 +1809,7 @@ bool OBCameraNode::decodeColorFrameToBuffer(const std::shared_ptr<ob::Frame> &fr
   }
   CHECK_NOTNULL(image_publishers_[COLOR]);
   bool has_subscriber = image_publishers_[COLOR]->get_subscription_count() > 0;
+  has_subscriber = has_subscriber || camera_h26x_publishers_[COLOR]->get_subscription_count() > 0;
   if (enable_colored_point_cloud_ && depth_registration_cloud_pub_->get_subscription_count() > 0) {
     has_subscriber = true;
   }
@@ -1838,7 +1846,7 @@ bool OBCameraNode::decodeColorFrameToBuffer(const std::shared_ptr<ob::Frame> &fr
     }
   }
 #endif
-  if (!is_decoded) {
+  if (!is_decoded && !(frame->format() == OB_FORMAT_H264 || frame->format() == OB_FORMAT_H265)) {
     auto video_frame = softwareDecodeColorFrame(frame);
     if (!video_frame) {
       RCLCPP_ERROR_STREAM(logger_, "Failed to convert frame to video frame");
@@ -1897,6 +1905,8 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   has_subscriber =
       has_subscriber || (metadata_publishers_.count(stream_index) &&
                          metadata_publishers_[stream_index]->get_subscription_count() > 0);
+  has_subscriber =
+      has_subscriber || camera_h26x_publishers_[stream_index]->get_subscription_count() > 0;
   if (!has_subscriber) {
     return;
   }
@@ -1975,7 +1985,8 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
     publishMetadata(frame, stream_index, camera_info.header);
   }
   CHECK_NOTNULL(image_publishers_[stream_index]);
-  if (image_publishers_[stream_index]->get_subscription_count() == 0) {
+  if (image_publishers_[stream_index]->get_subscription_count() == 0 &&
+      camera_h26x_publishers_[stream_index]->get_subscription_count() == 0) {
     return;
   }
   auto &image = images_[stream_index];
@@ -1995,18 +2006,32 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
     auto depth_scale = video_frame->as<ob::DepthFrame>()->getValueScale();
     image = image * depth_scale;
   }
-  sensor_msgs::msg::Image::UniquePtr image_msg(new sensor_msgs::msg::Image());
+  if (frame->type() == OB_FRAME_COLOR &&
+      (frame->format() == OB_FORMAT_H264 || frame->format() == OB_FORMAT_H265)) {
+    sensor_msgs::msg::CompressedImage h264_image_msg;
+    h264_image_msg.header.stamp = timestamp;
+    if (frame->format() == OB_FORMAT_H264) {
+      h264_image_msg.format = "h264";
+    } else {
+      h264_image_msg.format = "h265";
+    }
+    h264_image_msg.data.resize(video_frame->dataSize());
+    memcpy(h264_image_msg.data.data(), video_frame->data(), video_frame->dataSize());
+    camera_h26x_publishers_[stream_index]->publish(std::move(h264_image_msg));
+  } else {
+    sensor_msgs::msg::Image::UniquePtr image_msg(new sensor_msgs::msg::Image());
 
-  cv_bridge::CvImage(std_msgs::msg::Header(), encoding_[stream_index], image)
-      .toImageMsg(*image_msg);
-  CHECK_NOTNULL(image_msg.get());
-  image_msg->header.stamp = timestamp;
-  image_msg->is_bigendian = false;
-  image_msg->step = width * unit_step_size_[stream_index];
-  image_msg->header.frame_id = frame_id;
-  CHECK(image_publishers_.count(stream_index) > 0);
-  saveImageToFile(stream_index, image, *image_msg);
-  image_publishers_[stream_index]->publish(std::move(image_msg));
+    cv_bridge::CvImage(std_msgs::msg::Header(), encoding_[stream_index], image)
+        .toImageMsg(*image_msg);
+    CHECK_NOTNULL(image_msg.get());
+    image_msg->header.stamp = timestamp;
+    image_msg->is_bigendian = false;
+    image_msg->step = width * unit_step_size_[stream_index];
+    image_msg->header.frame_id = frame_id;
+    CHECK(image_publishers_.count(stream_index) > 0);
+    saveImageToFile(stream_index, image, *image_msg);
+    image_publishers_[stream_index]->publish(std::move(image_msg));
+  }
   if (stream_index == COLOR && enable_color_undistortion_ &&
       color_undistortion_publisher_->get_subscription_count() > 0) {
     auto undistorted_image = undistortImage(image, intrinsic, distortion);

@@ -1383,6 +1383,10 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
     return;
   }
   std::lock_guard<decltype(point_cloud_mutex_)> point_cloud_msg_lock(point_cloud_mutex_);
+  if(!depth_frame_) {
+    RCLCPP_ERROR_STREAM(logger_, "depth frame is null");
+    return;
+  }
   auto depth_frame = depth_frame_->as<ob::DepthFrame>();
   if (!depth_frame) {
     RCLCPP_ERROR_STREAM(logger_, "depth frame is null");
@@ -1482,6 +1486,10 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
 
   CHECK_NOTNULL(depth_frame_.get());
   std::lock_guard<decltype(point_cloud_mutex_)> point_cloud_msg_lock(point_cloud_mutex_);
+  if (!depth_frame_) {
+    RCLCPP_ERROR_STREAM(logger_, "depth frame is null");
+    return;
+  }
   auto depth_frame = depth_frame_->as<ob::DepthFrame>();
   auto color_frame = frame_set->colorFrame();
   if (!depth_frame || !color_frame) {

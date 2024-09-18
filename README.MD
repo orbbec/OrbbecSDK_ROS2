@@ -281,6 +281,7 @@ The following are the launch parameters available:
 - `enable_laser`: Enables the laser. The default value is `true`.
 - `laser_on_off_mode`: Laser on/off alternate mode, 0: off, 1: on-off alternate, 2: off-on alternate. The default value
   is `0`.
+- `laser_energy_level`: Laser energy level.
 - `device_preset`: The default value is `Default`. Only the G330 series is supported. For more information, refer to
   the [G330 documentation](https://www.orbbec.com/docs/g330-use-depth-presets/). Please refer to the table below to set
   the `device_preset` value based on your use case. The value should be one of the preset names
@@ -321,6 +322,10 @@ the default parameters from the launch file will be used. If you want to use a c
 the firmware, and if hardware logging is desired, it should also be set to `true`.
 - `log_level` : SDK log level, the default value is `info`, the optional values are `debug`, `info`, `warn`, `error`, `fatal`.
 - `enable_color_undistortion`: Enables color undistortion, the default value is `false`. Note that our color cameras exhibit minimal distortion, and typically, undistortion is not necessary.
+- `color_brightness`: Color brightness.
+- `ir_brightness`: IR brightness.
+- `color_ae_max_exposure`: Color auto exposure maximum exposure.
+- `ir_ae_max_exposure`: IR auto exposure maximum exposure.
 
 **IMPORTANT**: *Please carefully read the instructions regarding software filtering settings
 at [this link](https://www.orbbec.com/docs/g330-use-depth-post-processing-blocks/). If you are uncertain, do not modify

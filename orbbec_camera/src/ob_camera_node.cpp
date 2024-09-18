@@ -380,6 +380,25 @@ void OBCameraNode::setupDevices() {
     }
   }
 
+  if (device_->isPropertySupported(OB_PROP_COLOR_AE_MAX_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting color AE max exposure to " << color_ae_max_exposure_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_AE_MAX_EXPOSURE_INT, color_ae_max_exposure_);
+  }
+  if (device_->isPropertySupported(OB_PROP_COLOR_BRIGHTNESS_INT, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting color brightness to " << color_brightness_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_BRIGHTNESS_INT, color_brightness_);
+  }
+ // ir ae max
+ if (device_->isPropertySupported(OB_PROP_IR_AE_MAX_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting IR AE max exposure to " << ir_ae_max_exposure_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_AE_MAX_EXPOSURE_INT, ir_ae_max_exposure_);
+  }
+  // ir brightness
+  if (device_->isPropertySupported(OB_PROP_IR_BRIGHTNESS_INT, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting IR brightness to " << ir_brightness_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_BRIGHTNESS_INT, ir_brightness_);
+  }
+  // ir auto exposure
   if (device_->isPropertySupported(OB_PROP_IR_AUTO_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
     RCLCPP_INFO_STREAM(logger_,
                        "Setting IR auto exposure to " << (enable_ir_auto_exposure_ ? "ON" : "OFF"));
@@ -1011,9 +1030,13 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(color_exposure_, "color_exposure", -1);
   setAndGetNodeParameter<int>(color_gain_, "color_gain", -1);
   setAndGetNodeParameter<int>(color_white_balance_, "color_white_balance", -1);
+  setAndGetNodeParameter<int>(color_ae_max_exposure_, "color_ae_max_exposure", -1);
+  setAndGetNodeParameter<int>(color_brightness_, "color_brightness", -1);
   setAndGetNodeParameter(enable_ir_auto_exposure_, "enable_ir_auto_exposure", true);
   setAndGetNodeParameter<int>(ir_exposure_, "ir_exposure", -1);
   setAndGetNodeParameter<int>(ir_gain_, "ir_gain", -1);
+  setAndGetNodeParameter<int>(ir_ae_max_exposure_, "ir_ae_max_exposure", -1);
+  setAndGetNodeParameter<int>(ir_brightness_, "ir_brightness", -1);
   setAndGetNodeParameter(enable_ir_long_exposure_, "enable_ir_long_exposure", true);
   setAndGetNodeParameter<std::string>(depth_work_mode_, "depth_work_mode", "");
   setAndGetNodeParameter<std::string>(sync_mode_str_, "sync_mode", "");

@@ -115,7 +115,7 @@ const stream_index_pair INFRA2{OB_STREAM_IR_RIGHT, 0};
 const stream_index_pair GYRO{OB_STREAM_GYRO, 0};
 const stream_index_pair ACCEL{OB_STREAM_ACCEL, 0};
 
-const std::vector<stream_index_pair> IMAGE_STREAMS = {COLOR,DEPTH, INFRA0, INFRA1, INFRA2};
+const std::vector<stream_index_pair> IMAGE_STREAMS = {COLOR, DEPTH, INFRA0, INFRA1, INFRA2};
 
 const std::vector<stream_index_pair> HID_STREAMS = {GYRO, ACCEL};
 
@@ -463,8 +463,12 @@ class OBCameraNode {
   int color_exposure_ = -1;
   int color_gain_ = -1;
   int color_white_balance_ = -1;
+  int color_ae_max_exposure_ = -1;
+  int color_brightness_ = -1;
   int ir_exposure_ = -1;
   int ir_gain_ = -1;
+  int ir_ae_max_exposure_ = -1;
+  int ir_brightness_ = -1;
   int soft_filter_max_diff_ = -1;
   int soft_filter_speckle_size_ = -1;
   bool enable_frame_sync_ = false;

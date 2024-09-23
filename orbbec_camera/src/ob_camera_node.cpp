@@ -379,21 +379,25 @@ void OBCameraNode::setupDevices() {
     }
   }
 
-  if (device_->isPropertySupported(OB_PROP_COLOR_AE_MAX_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
+  if (color_ae_max_exposure_ != -1 &&
+      device_->isPropertySupported(OB_PROP_COLOR_AE_MAX_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting color AE max exposure to " << color_ae_max_exposure_);
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_AE_MAX_EXPOSURE_INT, color_ae_max_exposure_);
   }
-  if (device_->isPropertySupported(OB_PROP_COLOR_BRIGHTNESS_INT, OB_PERMISSION_WRITE)) {
+  if (color_brightness_ != -1 &&
+      device_->isPropertySupported(OB_PROP_COLOR_BRIGHTNESS_INT, OB_PERMISSION_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting color brightness to " << color_brightness_);
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_BRIGHTNESS_INT, color_brightness_);
   }
   // ir ae max
-  if (device_->isPropertySupported(OB_PROP_IR_AE_MAX_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
+  if (ir_ae_max_exposure_ != -1 &&
+      device_->isPropertySupported(OB_PROP_IR_AE_MAX_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting IR AE max exposure to " << ir_ae_max_exposure_);
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_AE_MAX_EXPOSURE_INT, ir_ae_max_exposure_);
   }
   // ir brightness
-  if (device_->isPropertySupported(OB_PROP_IR_BRIGHTNESS_INT, OB_PERMISSION_WRITE)) {
+  if (ir_brightness_ != -1 &&
+      device_->isPropertySupported(OB_PROP_IR_BRIGHTNESS_INT, OB_PERMISSION_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting IR brightness to " << ir_brightness_);
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_BRIGHTNESS_INT, ir_brightness_);
   }
@@ -2060,9 +2064,14 @@ void OBCameraNode::publishMetadata(const std::shared_ptr<ob::Frame> &frame,
 void OBCameraNode::saveImageToFile(const stream_index_pair &stream_index, const cv::Mat &image,
                                    const sensor_msgs::msg::Image &image_msg) {
   if (save_images_[stream_index]) {
-    auto now = time(nullptr);
+    auto now = std::chrono::system_clock::now();
+    auto in_time_t = std::chrono::system_clock::to_time_t(now);
+    auto us =
+        std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()) % 1000000;
+
     std::stringstream ss;
-    ss << std::put_time(localtime(&now), "%Y%m%d_%H%M%S");
+    ss << std::put_time(std::localtime(&in_time_t), "%Y%m%d_%H%M%S");
+    ss << "_" << std::setw(6) << std::setfill('0') << us.count();
     auto current_path = std::filesystem::current_path().string();
     auto fps = fps_[stream_index];
     int index = save_images_count_[stream_index];

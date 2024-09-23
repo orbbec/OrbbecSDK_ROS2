@@ -15,6 +15,7 @@
  *******************************************************************************/
 
 #include "orbbec_camera/ob_camera_node_driver.h"
+#include "orbbec_camera/utils.h"
 #include <fcntl.h>
 #include <semaphore.h>
 #include <sys/shm.h>
@@ -38,7 +39,7 @@ void signalHandler(int sig) {
 
   // get current time
   std::time_t now = std::time(nullptr);
-  std::tm* local_time = std::localtime(&now);
+  std::tm *local_time = std::localtime(&now);
 
   // format date and time to string, format as "2024_05_20_12_34_56"
   std::ostringstream time_stream;
@@ -69,24 +70,27 @@ void signalHandler(int sig) {
 }
 
 namespace orbbec_camera {
-OBCameraNodeDriver::OBCameraNodeDriver(const rclcpp::NodeOptions& node_options)
+backward::SignalHandling OBCameraNodeDriver::sh;
+OBCameraNodeDriver::OBCameraNodeDriver(const rclcpp::NodeOptions &node_options)
     : Node("orbbec_camera_node", "/", node_options),
+      node_options_(node_options),
       config_path_(ament_index_cpp::get_package_share_directory("orbbec_camera") +
                    "/config/OrbbecSDKConfig_v1.0.xml"),
+      ctx_(std::make_unique<ob::Context>(config_path_.c_str())),
       logger_(this->get_logger()),
-      extension_path_(ament_index_cpp::get_package_prefix("orbbec_camera") +
-                      "/lib/extensions") {
+      extension_path_(ament_index_cpp::get_package_prefix("orbbec_camera") + "/lib/extensions") {
   init();
 }
 
-OBCameraNodeDriver::OBCameraNodeDriver(const std::string& node_name, const std::string& ns,
-                                       const rclcpp::NodeOptions& node_options)
+OBCameraNodeDriver::OBCameraNodeDriver(const std::string &node_name, const std::string &ns,
+                                       const rclcpp::NodeOptions &node_options)
     : Node(node_name, ns, node_options),
+      node_options_(node_options),
       config_path_(ament_index_cpp::get_package_share_directory("orbbec_camera") +
                    "/config/OrbbecSDKConfig_v1.0.xml"),
+      ctx_(std::make_unique<ob::Context>()),
       logger_(this->get_logger()),
-      extension_path_(ament_index_cpp::get_package_prefix("orbbec_camera") +
-                      "/lib/extensions") {
+      extension_path_(ament_index_cpp::get_package_prefix("orbbec_camera") + "/lib/extensions") {
   init();
 }
 
@@ -128,8 +132,8 @@ void OBCameraNodeDriver::init() {
     return;
   }
   orb_device_lock_shm_addr_ =
-      static_cast<uint8_t*>(mmap(NULL, sizeof(pthread_mutex_t), PROT_READ | PROT_WRITE, MAP_SHARED,
-                                 orb_device_lock_shm_fd_, 0));
+      static_cast<uint8_t *>(mmap(NULL, sizeof(pthread_mutex_t), PROT_READ | PROT_WRITE, MAP_SHARED,
+                                  orb_device_lock_shm_fd_, 0));
   if (orb_device_lock_shm_addr_ == MAP_FAILED) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to map shared memory " << ORB_DEFAULT_LOCK_NAME);
     return;
@@ -139,7 +143,7 @@ void OBCameraNodeDriver::init() {
                                  std::placeholders::_1, std::placeholders::_2));
   pthread_mutexattr_init(&orb_device_lock_attr_);
   pthread_mutexattr_setpshared(&orb_device_lock_attr_, PTHREAD_PROCESS_SHARED);
-  orb_device_lock_ = (pthread_mutex_t*)orb_device_lock_shm_addr_;
+  orb_device_lock_ = (pthread_mutex_t *)orb_device_lock_shm_addr_;
   pthread_mutex_init(orb_device_lock_, &orb_device_lock_attr_);
   is_alive_.store(true);
   parameters_ = std::make_shared<Parameters>(this);
@@ -150,8 +154,8 @@ void OBCameraNodeDriver::init() {
   net_device_port_ = static_cast<int>(declare_parameter<int>("net_device_port", 0));
   enumerate_net_device_ = declare_parameter<bool>("enumerate_net_device", false);
   ctx_->enableNetDeviceEnumeration(enumerate_net_device_);
-  ctx_->setDeviceChangedCallback([this](const std::shared_ptr<ob::DeviceList>& removed_list,
-                                        const std::shared_ptr<ob::DeviceList>& added_list) {
+  ctx_->setDeviceChangedCallback([this](const std::shared_ptr<ob::DeviceList> &removed_list,
+                                        const std::shared_ptr<ob::DeviceList> &added_list) {
     onDeviceConnected(added_list);
     onDeviceDisconnected(removed_list);
   });
@@ -162,7 +166,7 @@ void OBCameraNodeDriver::init() {
   reset_device_thread_ = std::make_shared<std::thread>([this]() { resetDevice(); });
 }
 
-void OBCameraNodeDriver::onDeviceConnected(const std::shared_ptr<ob::DeviceList>& device_list) {
+void OBCameraNodeDriver::onDeviceConnected(const std::shared_ptr<ob::DeviceList> &device_list) {
   CHECK_NOTNULL(device_list);
   if (device_list->getCount() == 0) {
     return;
@@ -172,7 +176,7 @@ void OBCameraNodeDriver::onDeviceConnected(const std::shared_ptr<ob::DeviceList>
   }
 }
 
-void OBCameraNodeDriver::onDeviceDisconnected(const std::shared_ptr<ob::DeviceList>& device_list) {
+void OBCameraNodeDriver::onDeviceDisconnected(const std::shared_ptr<ob::DeviceList> &device_list) {
   CHECK_NOTNULL(device_list);
   if (device_list->getCount() == 0) {
     return;
@@ -194,7 +198,7 @@ void OBCameraNodeDriver::onDeviceDisconnected(const std::shared_ptr<ob::DeviceLi
   }
 }
 
-OBLogSeverity OBCameraNodeDriver::obLogSeverityFromString(const std::string_view& log_level) {
+OBLogSeverity OBCameraNodeDriver::obLogSeverityFromString(const std::string_view &log_level) {
   if (log_level == "debug") {
     return OBLogSeverity::OB_LOG_SEVERITY_DEBUG;
   } else if (log_level == "info") {
@@ -276,7 +280,7 @@ void OBCameraNodeDriver::rebootDeviceCallback(
 }
 
 std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDevice(
-    const std::shared_ptr<ob::DeviceList>& list) {
+    const std::shared_ptr<ob::DeviceList> &list) {
   if (device_num_ == 1) {
     RCLCPP_INFO_STREAM(logger_, "Connecting to the default device");
     return list->getDevice(0);
@@ -300,7 +304,7 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDevice(
 }
 
 std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceBySerialNumber(
-    const std::shared_ptr<ob::DeviceList>& list, const std::string& serial_number) {
+    const std::shared_ptr<ob::DeviceList> &list, const std::string &serial_number) {
   std::string lower_sn;
   std::transform(serial_number.begin(), serial_number.end(), std::back_inserter(lower_sn),
                  [](auto ch) { return isalpha(ch) ? tolower(ch) : static_cast<int>(ch); });
@@ -327,10 +331,10 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceBySerialNumber(
           return list->getDevice(i);
         }
       }
-    } catch (ob::Error& e) {
+    } catch (ob::Error &e) {
       RCLCPP_ERROR_STREAM_THROTTLE(logger_, *get_clock(), 1000,
                                    "Failed to get device info " << e.getMessage());
-    } catch (std::exception& e) {
+    } catch (std::exception &e) {
       RCLCPP_ERROR_STREAM(logger_, "Failed to get device info " << e.what());
     } catch (...) {
       RCLCPP_ERROR_STREAM(logger_, "Failed to get device info");
@@ -340,17 +344,24 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceBySerialNumber(
 }
 
 std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByUSBPort(
-    const std::shared_ptr<ob::DeviceList>& list, const std::string& usb_port) {
+    const std::shared_ptr<ob::DeviceList> &list, const std::string &usb_port) {
   try {
     RCLCPP_INFO_STREAM(logger_, "Before lock: Select device usb port: " << usb_port);
     std::lock_guard<decltype(device_lock_)> lock(device_lock_);
     RCLCPP_INFO_STREAM(logger_, "After lock: Select device usb port: " << usb_port);
     auto device = list->getDeviceByUid(usb_port.c_str());
-    RCLCPP_INFO_STREAM(logger_, "Device usb port " << usb_port << " done");
+    if (device) {
+      RCLCPP_INFO_STREAM(logger_, "getDeviceByUid device usb port " << usb_port << " done");
+    } else {
+      RCLCPP_ERROR_STREAM(logger_, "getDeviceByUid device usb port " << usb_port << " failed");
+      RCLCPP_ERROR_STREAM(logger_,
+                          "Please use script to get usb port: "
+                          "ros2 run orbbec_camera list_devices_node");
+    }
     return device;
-  } catch (ob::Error& e) {
+  } catch (ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to get device info " << e.getMessage());
-  } catch (std::exception& e) {
+  } catch (std::exception &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to get device info " << e.what());
   } catch (...) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to get device info");
@@ -359,14 +370,46 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByUSBPort(
   return nullptr;
 }
 
-void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device>& device) {
+void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &device) {
   device_ = device;
   CHECK_NOTNULL(device_);
   CHECK_NOTNULL(device_.get());
   if (ob_camera_node_) {
     ob_camera_node_.reset();
   }
-  ob_camera_node_ = std::make_unique<OBCameraNode>(this, device_, parameters_);
+  int retry_count = 0;
+  constexpr int max_retries = 3;
+  bool initialized = false;
+  device_info_ = device_->getDeviceInfo();
+  RCLCPP_INFO_STREAM(logger_, "Try to connect device via " << device_info_->connectionType());
+
+  while (retry_count < max_retries && !initialized) {
+    try {
+      ob_camera_node_ = std::make_unique<OBCameraNode>(this, device_, parameters_,
+                                                       node_options_.use_intra_process_comms());
+      initialized = true;
+    } catch (const ob::Error &e) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to initialize device (Attempt "
+                                       << retry_count + 1 << " of " << max_retries
+                                       << "): " << e.getMessage());
+    } catch (const std::exception &e) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to initialize device (Attempt " << retry_count + 1
+                                                                           << " of " << max_retries
+                                                                           << "): " << e.what());
+    } catch (...) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to initialize device (Attempt "
+                                       << retry_count + 1 << " of " << max_retries << ")");
+    }
+    retry_count++;
+  }
+
+  if (!initialized) {
+    RCLCPP_ERROR_STREAM(logger_,
+                        "Device initialization failed after " << max_retries << " attempts.");
+    throw std::runtime_error("Device initialization failed after " + std::to_string(max_retries) +
+                             " attempts.");
+  }
+
   ob_camera_node_->startIMU();
   ob_camera_node_->startStreams();
   device_connected_ = true;
@@ -397,7 +440,7 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device>& dev
   RCLCPP_INFO_STREAM(logger_, "Start device cost " << time_cost.count() << " ms");
 }  // namespace orbbec_camera
 
-void OBCameraNodeDriver::connectNetDevice(const std::string& net_device_ip, int net_device_port) {
+void OBCameraNodeDriver::connectNetDevice(const std::string &net_device_ip, int net_device_port) {
   if (net_device_ip.empty() || net_device_port == 0) {
     RCLCPP_ERROR_STREAM(logger_, "Invalid net device ip or port");
     return;
@@ -411,7 +454,7 @@ void OBCameraNodeDriver::connectNetDevice(const std::string& net_device_ip, int 
   initializeDevice(device);
 }
 
-void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList>& list) {
+void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list) {
   if (device_connected_) {
     return;
   }
@@ -426,7 +469,7 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList>& list
   std::this_thread::sleep_for(std::chrono::milliseconds(connection_delay_));
   pthread_mutex_lock(orb_device_lock_);
   std::shared_ptr<int> lock_holder(nullptr,
-                                   [this](int*) { pthread_mutex_unlock(orb_device_lock_); });
+                                   [this](int *) { pthread_mutex_unlock(orb_device_lock_); });
   bool start_device_failed = false;
   try {
     auto start_time = std::chrono::high_resolution_clock::now();
@@ -445,10 +488,10 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList>& list
     end_time = std::chrono::high_resolution_clock::now();
     time_cost = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
     RCLCPP_INFO_STREAM(logger_, "Initialize device cost " << time_cost.count() << " ms");
-  } catch (ob::Error& e) {
+  } catch (ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to initialize device " << e.getMessage());
     start_device_failed = true;
-  } catch (std::exception& e) {
+  } catch (std::exception &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to initialize device " << e.what());
     start_device_failed = true;
   } catch (...) {

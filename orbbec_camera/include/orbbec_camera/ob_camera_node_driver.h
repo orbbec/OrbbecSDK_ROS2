@@ -70,6 +70,7 @@ class OBCameraNodeDriver : public rclcpp::Node {
                             std::shared_ptr<std_srvs::srv::Empty::Response> response);
 
  private:
+  const rclcpp::NodeOptions node_options_;
   std::string config_path_;
   std::unique_ptr<ob::Context> ctx_ = nullptr;
   rclcpp::Logger logger_;
@@ -105,5 +106,6 @@ class OBCameraNodeDriver : public rclcpp::Node {
   rclcpp::Service<std_srvs::srv::Empty>::SharedPtr reboot_device_srv_ = nullptr;
   std::chrono::time_point<std::chrono::system_clock> start_time_;
   std::string extension_path_;
+  static backward::SignalHandling sh;  // for stack trace
 };
 }  // namespace orbbec_camera

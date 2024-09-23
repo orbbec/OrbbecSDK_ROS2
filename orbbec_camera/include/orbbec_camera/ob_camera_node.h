@@ -60,6 +60,7 @@
 #include "orbbec_camera/dynamic_params.h"
 #include "orbbec_camera/d2c_viewer.h"
 #include "magic_enum/magic_enum.hpp"
+#include "orbbec_camera/image_publisher.h"
 #include "jpeg_decoder.h"
 #include <std_msgs/msg/string.hpp>
 
@@ -114,7 +115,7 @@ const stream_index_pair INFRA2{OB_STREAM_IR_RIGHT, 0};
 const stream_index_pair GYRO{OB_STREAM_GYRO, 0};
 const stream_index_pair ACCEL{OB_STREAM_ACCEL, 0};
 
-const std::vector<stream_index_pair> IMAGE_STREAMS = {DEPTH, INFRA0, COLOR, INFRA1, INFRA2};
+const std::vector<stream_index_pair> IMAGE_STREAMS = {COLOR, DEPTH, INFRA0, INFRA1, INFRA2};
 
 const std::vector<stream_index_pair> HID_STREAMS = {GYRO, ACCEL};
 
@@ -131,7 +132,7 @@ const std::map<OBStreamType, OBFrameType> STREAM_TYPE_TO_FRAME_TYPE = {
 class OBCameraNode {
  public:
   OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> device,
-               std::shared_ptr<Parameters> parameters);
+               std::shared_ptr<Parameters> parameters, bool use_intra_process = false);
 
   template <class T>
   void setAndGetNodeParameter(
@@ -315,7 +316,7 @@ class OBCameraNode {
   void onNewColorFrameCallback();
 
   void saveImageToFile(const stream_index_pair& stream_index, const cv::Mat& image,
-                       const sensor_msgs::msg::Image::SharedPtr& image_msg);
+                       const sensor_msgs::msg::Image& image_msg);
 
   void onNewIMUFrameSyncOutputCallback(const std::shared_ptr<ob::Frame>& accelframe,
                                        const std::shared_ptr<ob::Frame>& gryoframe);
@@ -391,7 +392,7 @@ class OBCameraNode {
   std::map<stream_index_pair, bool> enable_stream_;
   std::map<stream_index_pair, bool> flip_stream_;
   std::map<stream_index_pair, std::string> stream_name_;
-  std::map<stream_index_pair, image_transport::Publisher> image_publishers_;
+  std::map<stream_index_pair, std::shared_ptr<image_publisher>> image_publishers_;
   std::map<stream_index_pair, rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr>
       camera_info_publishers_;
 
@@ -462,8 +463,12 @@ class OBCameraNode {
   int color_exposure_ = -1;
   int color_gain_ = -1;
   int color_white_balance_ = -1;
+  int color_ae_max_exposure_ = -1;
+  int color_brightness_ = -1;
   int ir_exposure_ = -1;
   int ir_gain_ = -1;
+  int ir_ae_max_exposure_ = -1;
+  int ir_brightness_ = -1;
   int soft_filter_max_diff_ = -1;
   int soft_filter_speckle_size_ = -1;
   bool enable_frame_sync_ = false;
@@ -564,7 +569,10 @@ class OBCameraNode {
   std::chrono::milliseconds software_trigger_period_{33};
   bool enable_heartbeat_ = false;
   bool enable_color_undistortion_ = false;
-  image_transport::Publisher color_undistortion_publisher_;
+  std::shared_ptr<image_publisher> color_undistortion_publisher_;
+  bool has_first_color_frame_ = false;
+  bool use_intra_process_ = false;
+  std::string cloud_frame_id_;
   std::vector<std::shared_ptr<ob::Filter>> filter_list_;
 };
 }  // namespace orbbec_camera

@@ -20,6 +20,7 @@ def generate_launch_description():
         DeclareLaunchArgument('vendor_id', default_value='0x2bc5'),
         DeclareLaunchArgument('product_id', default_value=''),
         DeclareLaunchArgument('enable_point_cloud', default_value='true'),
+        DeclareLaunchArgument('cloud_frame_id', default_value=''),
         DeclareLaunchArgument('enable_colored_point_cloud', default_value='true'),
         DeclareLaunchArgument('point_cloud_qos', default_value='default'),
         DeclareLaunchArgument('connection_delay', default_value='100'),
@@ -71,6 +72,7 @@ def generate_launch_description():
         DeclareLaunchArgument('log_level', default_value='none'),
         DeclareLaunchArgument('enable_publish_extrinsic', default_value='false'),
         DeclareLaunchArgument('enable_d2c_viewer', default_value='false'),
+        DeclareLaunchArgument("enable_hardware_d2d", default_value="true"),
         DeclareLaunchArgument('enable_ldp', default_value='true'),
         # Configure the path for depth filter file, for example: /config/depthfilter/Gemini2_v1.7.json
         DeclareLaunchArgument('depth_filter_config', default_value=''),

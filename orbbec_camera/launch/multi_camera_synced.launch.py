@@ -61,43 +61,14 @@ def generate_launch_description():
             "config_file_path": config_file_path,
         }.items(),
     )
-    test_node = (
-        Node(
-            package="orbbec_camera",
-            executable="multi_save_rgbir_node",
-            name="multi_save_rgbir_node",
-            parameters=[
-                {
-                    "ir_topics": [
-                        "/front_camera/left_ir/image_raw",
-                        "/right_camera/left_ir/image_raw",
-                        "/rear_camera/left_ir/image_raw",
-                    ],
-                    "color_topics": [
-                        "/front_camera/color/image_raw",
-                        "/right_camera/color/image_raw",
-                        "/rear_camera/color/image_raw",
-                    ],
-                }
-            ],
-        )
-    )
-
-    # If you need more cameras, just add more launch_include here, and change the usb_port and device_num
 
     # Launch description
     ld = LaunchDescription(
         [
-            GroupAction([test_node]),
-            TimerAction(
-                period=3.0,
-                actions=[
-                    GroupAction([rear_camera]),
-                    # GroupAction([left_camera]),
-                    GroupAction([right_camera]),
-                    TimerAction(period=3.0, actions=[GroupAction([front_camera])]),
-                ],
-            ),
+            GroupAction([rear_camera]),
+            GroupAction([left_camera]),
+            GroupAction([right_camera]),
+            TimerAction(period=3.0, actions=[GroupAction([front_camera])]),
             # The primary camera should be launched at last
         ]
     )

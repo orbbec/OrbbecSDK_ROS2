@@ -1248,17 +1248,18 @@ void OBCameraNode::setupPublishers() {
     }
     std::string name = stream_name_[stream_index];
     std::string topic = name + "/image_raw";
-    auto image_qos_profile = image_qos_[stream_index];
-    // if (use_intra_process_) {
-    //   image_qos_profile = rmw_qos_profile_default;
-    // }
-    // if (use_intra_process_) {
-    //   image_publishers_[stream_index] =
-    //       std::make_shared<image_rcl_publisher>(*node_, topic, image_qos_profile);
-    // } else {
-    //   image_publishers_[stream_index] =
-    //       std::make_shared<image_transport_publisher>(*node_, topic, image_qos_profile);
-    // }
+    auto image_qos = image_qos_[stream_index];
+    auto image_qos_profile = getRMWQosProfileFromString(image_qos);
+    if (use_intra_process_) {
+      image_qos_profile = rmw_qos_profile_default;
+    }
+    if (use_intra_process_) {
+      image_publishers_[stream_index] =
+          std::make_shared<image_rcl_publisher>(*node_, topic, image_qos_profile);
+    } else {
+      image_publishers_[stream_index] =
+          std::make_shared<image_transport_publisher>(*node_, topic, image_qos_profile);
+    }
 
     topic = name + "/camera_info";
     auto camera_info_qos = camera_info_qos_[stream_index];
@@ -1276,15 +1277,15 @@ void OBCameraNode::setupPublishers() {
               rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(camera_info_qos_profile),
                           camera_info_qos_profile));
     }
-    // if (stream_index == COLOR && enable_color_undistortion_) {
-    //   if (use_intra_process_) {
-    //     color_undistortion_publisher_ = std::make_shared<image_rcl_publisher>(
-    //         *node_, "color/image_undistorted", image_qos_profile);
-    //   } else {
-    //     color_undistortion_publisher_ = std::make_shared<image_transport_publisher>(
-    //         *node_, "color/image_undistorted", image_qos_profile);
-    //   }
-    // }
+    if (stream_index == COLOR && enable_color_undistortion_) {
+      if (use_intra_process_) {
+        color_undistortion_publisher_ = std::make_shared<image_rcl_publisher>(
+            *node_, "color/image_undistorted", image_qos_profile);
+      } else {
+        color_undistortion_publisher_ = std::make_shared<image_transport_publisher>(
+            *node_, "color/image_undistorted", image_qos_profile);
+      }
+    }
   }
 
   if (enable_sync_output_accel_gyro_) {

@@ -271,6 +271,34 @@ void OBCameraNode::setupDevices() {
     }
   }
 
+  if (color_ae_roi_left_ != -1 && color_ae_roi_top_ != -1 && color_ae_roi_right_ != -1 &&
+      color_ae_roi_bottom_ != -1 &&
+      device_->isPropertySupported(OB_STRUCT_COLOR_AE_ROI, OB_PERMISSION_READ_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting color AE ROI to "
+                                    << color_ae_roi_left_ << ", " << color_ae_roi_top_ << ", "
+                                    << color_ae_roi_right_ << ", " << color_ae_roi_bottom_);
+    AE_ROI roi;
+    roi.x0_left = color_ae_roi_left_;
+    roi.y0_top = color_ae_roi_top_;
+    roi.x1_right = color_ae_roi_right_;
+    roi.y1_bottom = color_ae_roi_bottom_;
+    device_->setStructuredData(OB_STRUCT_COLOR_AE_ROI, &roi, sizeof(AE_ROI));
+  }
+  // depth ae roi
+  if (depth_ae_roi_left_ != -1 && depth_ae_roi_top_ != -1 && depth_ae_roi_right_ != -1 &&
+      depth_ae_roi_bottom_ != -1 &&
+      device_->isPropertySupported(OB_STRUCT_DEPTH_AE_ROI, OB_PERMISSION_READ_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting depth AE ROI to "
+                                    << depth_ae_roi_left_ << ", " << depth_ae_roi_top_ << ", "
+                                    << depth_ae_roi_right_ << ", " << depth_ae_roi_bottom_);
+    AE_ROI roi;
+    roi.x0_left = depth_ae_roi_left_;
+    roi.y0_top = depth_ae_roi_top_;
+    roi.x1_right = depth_ae_roi_right_;
+    roi.y1_bottom = depth_ae_roi_bottom_;
+    device_->setStructuredData(OB_STRUCT_DEPTH_AE_ROI, &roi, sizeof(AE_ROI));
+  }
+
   if (device_->isPropertySupported(OB_PROP_DEPTH_PRECISION_LEVEL_INT, OB_PERMISSION_READ_WRITE) &&
       !depth_precision_str_.empty()) {
     auto default_precision_level = device_->getIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT);
@@ -550,14 +578,14 @@ void OBCameraNode::setupDepthPostProcessFilter() {
     } else if (filter_name == "NoiseRemovalFilter" && enable_noise_removal_filter_) {
       auto noise_removal_filter = filter->as<ob::NoiseRemovalFilter>();
       OBNoiseRemovalFilterParams params = noise_removal_filter->getFilterParams();
-      RCLCPP_INFO_STREAM(
-          logger_, "Default noise removal filter params: " << "disp_diff: " << params.disp_diff
-                                                           << ", max_size: " << params.max_size);
+      RCLCPP_INFO_STREAM(logger_, "Default noise removal filter params: "
+                                      << "disp_diff: " << params.disp_diff
+                                      << ", max_size: " << params.max_size);
       params.disp_diff = noise_removal_filter_min_diff_;
       params.max_size = noise_removal_filter_max_size_;
-      RCLCPP_INFO_STREAM(logger_,
-                         "Set noise removal filter params: " << "disp_diff: " << params.disp_diff
-                                                             << ", max_size: " << params.max_size);
+      RCLCPP_INFO_STREAM(logger_, "Set noise removal filter params: "
+                                      << "disp_diff: " << params.disp_diff
+                                      << ", max_size: " << params.max_size);
       if (noise_removal_filter_min_diff_ != -1 && noise_removal_filter_max_size_ != -1) {
         noise_removal_filter->setFilterParams(params);
       }
@@ -566,11 +594,11 @@ void OBCameraNode::setupDepthPostProcessFilter() {
           hdr_merge_gain_2_ != -1) {
         auto hdr_merge_filter = filter->as<ob::HdrMerge>();
         hdr_merge_filter->enable(true);
-        RCLCPP_INFO_STREAM(
-            logger_, "Set HDR merge filter params: " << "exposure_1: " << hdr_merge_exposure_1_
-                                                     << ", gain_1: " << hdr_merge_gain_1_
-                                                     << ", exposure_2: " << hdr_merge_exposure_2_
-                                                     << ", gain_2: " << hdr_merge_gain_2_);
+        RCLCPP_INFO_STREAM(logger_, "Set HDR merge filter params: "
+                                        << "exposure_1: " << hdr_merge_exposure_1_
+                                        << ", gain_1: " << hdr_merge_gain_1_
+                                        << ", exposure_2: " << hdr_merge_exposure_2_
+                                        << ", gain_2: " << hdr_merge_gain_2_);
         auto config = OBHdrConfig();
         config.enable = true;
         config.exposure_1 = hdr_merge_exposure_1_;
@@ -653,10 +681,10 @@ void OBCameraNode::setupProfiles() {
           throw std::runtime_error("Failed cast profile to VideoStreamProfile");
         }
         RCLCPP_DEBUG_STREAM(
-            logger_,
-            "Sensor profile: " << "stream_type: " << magic_enum::enum_name(profile->type())
-                               << "Format: " << profile->format() << ", Width: " << profile->width()
-                               << ", Height: " << profile->height() << ", FPS: " << profile->fps());
+            logger_, "Sensor profile: "
+                         << "stream_type: " << magic_enum::enum_name(profile->type())
+                         << "Format: " << profile->format() << ", Width: " << profile->width()
+                         << ", Height: " << profile->height() << ", FPS: " << profile->fps());
         supported_profiles_[elem].emplace_back(profile);
       }
       std::shared_ptr<ob::VideoStreamProfile> selected_profile;
@@ -1112,6 +1140,14 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(max_depth_limit_, "max_depth_limit", 0);
   setAndGetNodeParameter<bool>(enable_heartbeat_, "enable_heartbeat", false);
   setAndGetNodeParameter<bool>(enable_color_undistortion_, "enable_color_undistortion", false);
+  setAndGetNodeParameter<int>(color_ae_roi_left_, "color_ae_roi_left", -1);
+  setAndGetNodeParameter<int>(color_ae_roi_top_, "color_ae_roi_top", -1);
+  setAndGetNodeParameter<int>(color_ae_roi_right_, "color_ae_roi_right", -1);
+  setAndGetNodeParameter<int>(color_ae_roi_bottom_, "color_ae_roi_bottom", -1);
+  setAndGetNodeParameter<int>(depth_ae_roi_left_, "depth_ae_roi_left", -1);
+  setAndGetNodeParameter<int>(depth_ae_roi_top_, "depth_ae_roi_top", -1);
+  setAndGetNodeParameter<int>(depth_ae_roi_right_, "depth_ae_roi_right", -1);
+  setAndGetNodeParameter<int>(depth_ae_roi_bottom_, "depth_ae_roi_bottom", -1);
   if (enable_3d_reconstruction_mode_) {
     laser_on_off_mode_ = 1;  // 0 off, 1 on-off, 1 off-on
   }

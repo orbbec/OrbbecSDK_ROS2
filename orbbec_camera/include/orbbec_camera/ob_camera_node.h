@@ -573,5 +573,15 @@ class OBCameraNode {
   bool has_first_color_frame_ = false;
   bool use_intra_process_ = false;
   std::string cloud_frame_id_;
+  // color ae roi
+  int color_ae_roi_left_ = -1;
+  int color_ae_roi_top_ = -1;
+  int color_ae_roi_right_ = -1;
+  int color_ae_roi_bottom_ = -1;
+  // depth ae roi
+  int depth_ae_roi_left_ = -1;
+  int depth_ae_roi_top_ = -1;
+  int depth_ae_roi_right_ = -1;
+  int depth_ae_roi_bottom_ = -1;
 };
 }  // namespace orbbec_camera

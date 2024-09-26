@@ -435,6 +435,8 @@ void OBCameraNodeDriver::connectNetDevice(const std::string &net_device_ip, int 
     RCLCPP_ERROR_STREAM(logger_, "Invalid net device ip or port");
     return;
   }
+  RCLCPP_INFO_STREAM(logger_, "Connecting to net device ip: " << net_device_ip
+                             << " port: " << net_device_port);
   std::this_thread::sleep_for(std::chrono::milliseconds(connection_delay_));
   auto device = ctx_->createNetDevice(net_device_ip.c_str(), net_device_port);
   if (device == nullptr) {

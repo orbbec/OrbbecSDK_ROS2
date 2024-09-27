@@ -2228,7 +2228,7 @@ void OBCameraNode::setDefaultIMUMessage(sensor_msgs::msg::Imu &imu_msg) {
   imu_msg.orientation.x = 0.0;
   imu_msg.orientation.y = 0.0;
   imu_msg.orientation.z = 0.0;
-  imu_msg.orientation.w = 0.0;
+  imu_msg.orientation.w = 1.0;
 
   imu_msg.orientation_covariance = {-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   imu_msg.linear_acceleration_covariance = {

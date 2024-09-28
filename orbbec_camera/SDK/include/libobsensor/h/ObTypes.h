@@ -685,7 +685,7 @@ typedef enum {
     OB_PRECISION_UNKNOWN,
     OB_PRECISION_COUNT,
 } OBDepthPrecisionLevel,
-    ob_depth_precision_level, OB_DEPTH_PRECISION_LEVEL;
+    ob_depth_precision_level, OB_DEPTH_PRECISION_LEVEL, OBDepthUnit, ob_depth_unit;
 
 /**
  * @brief disparity parameters for disparity based camera
@@ -1388,6 +1388,13 @@ typedef struct {
     double                  def;   ///< Default value casted to double
     const char             *desc;  ///< Description of the configuration item
 } OBFilterConfigSchemaItem, ob_filter_config_schema_item;
+
+/**
+ * @brief struct of serial number
+ */
+typedef struct {
+    char numberStr[16];
+} OBDeviceSerialNumber, ob_device_serial_number, OBSerialNumber, ob_serial_number;
 
 /**
  * @brief Frame metadata types

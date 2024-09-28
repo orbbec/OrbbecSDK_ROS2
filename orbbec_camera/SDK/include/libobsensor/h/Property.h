@@ -692,6 +692,12 @@ typedef enum {
     OB_PROP_COLOR_FOCUS_INT = 2038,
 
     /**
+     * @brief Depth camera priority
+     *
+     */
+    OB_PROP_DEPTH_AUTO_EXPOSURE_PRIORITY_INT = 2052,
+
+    /**
      * @brief Software disparity to depth
      */
     OB_PROP_SDK_DISPARITY_TO_DEPTH_BOOL = 3004,
@@ -739,6 +745,7 @@ typedef enum {
 #define OB_PROP_LASER_ENERGY_LEVEL_INT OB_PROP_LASER_POWER_LEVEL_CONTROL_INT
 #define OB_PROP_LASER_HW_ENERGY_LEVEL_INT OB_PROP_LASER_POWER_ACTUAL_LEVEL_INT
 #define OB_PROP_DEVICE_USB3_REPEAT_IDENTIFY_BOOL OB_PROP_DEVICE_USB2_REPEAT_IDENTIFY_BOOL
+#define OB_PROP_DEPTH_NOISE_REMOVAL_FILTER_BOOL OB_PROP_DEPTH_SOFT_FILTER_BOOL
 
 /**
  * @brief The data type used to describe all property settings

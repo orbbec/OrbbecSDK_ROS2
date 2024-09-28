@@ -796,7 +796,7 @@ public:
         init(impl);
     }
 
-     ~NoiseRemovalFilter() noexcept = default;
+    ~NoiseRemovalFilter() noexcept = default;
 
     /**
      * @brief Set the noise removal filter params.
@@ -923,15 +923,75 @@ public:
 };
 
 /**
+ * @brief Depth to disparity or disparity to depth
+ */
+class DisparityTransform : public Filter {
+public:
+    DisparityTransform(const std::string &activationKey = "") {
+        ob_error *error = nullptr;
+        auto      impl  = ob_create_private_filter("DisparityTransform", activationKey.c_str(), &error);
+        Error::handle(&error);
+        init(impl);
+    }
+
+    ~DisparityTransform() noexcept = default;
+};
+
+class OBFilterList {
+private:
+    ob_filter_list_t* impl_;
+
+public:
+    explicit OBFilterList(ob_filter_list_t *impl) : impl_(impl) {}
+
+    ~OBFilterList() noexcept {
+        ob_error *error = nullptr;
+        ob_delete_filter_list(impl_, &error);
+        Error::handle(&error, false);
+    }
+
+    /**
+     * @brief Get the number of filters
+     *
+     * @return uint32_t The number of filters
+     */
+    uint32_t getCount() const {
+        ob_error *error = nullptr;
+        auto      count = ob_filter_list_get_count(impl_, &error);
+        Error::handle(&error);
+        return count;
+    }
+
+    /**
+     * @brief Get the Filter object at the specified index
+     *
+     * @param index The filter index. The range is [0, count-1]. If the index exceeds the range, an exception will be thrown.
+     * @return std::shared_ptr<Filter> The filter object.
+     */
+    std::shared_ptr<Filter> getFilter(uint32_t index) {
+        ob_error *error  = nullptr;
+        auto      filter = ob_filter_list_get_filter(impl_, index, &error);
+        Error::handle(&error);
+        return std::make_shared<Filter>(filter);
+    }
+
+public:
+    // The following interfaces are deprecated and are retained here for compatibility purposes.
+    uint32_t count() const {
+        return getCount();
+    }
+};
+
+/**
  * @brief Define the Filter type map
  */
-static const std::unordered_map<std::string, std::type_index> typeMap = {
+static const std::unordered_map<std::string, std::type_index> obFilterTypeMap = {
     { "PointCloudFilter", typeid(PointCloudFilter) },   { "Align", typeid(Align) },
     { "FormatConverter", typeid(FormatConvertFilter) }, { "HDRMerge", typeid(HdrMerge) },
     { "SequenceIdFilter", typeid(SequenceIdFilter) },   { "DecimationFilter", typeid(DecimationFilter) },
     { "ThresholdFilter", typeid(ThresholdFilter) },     { "SpatialAdvancedFilter", typeid(SpatialAdvancedFilter) },
     { "HoleFillingFilter", typeid(HoleFillingFilter) }, { "NoiseRemovalFilter", typeid(NoiseRemovalFilter) },
-    { "TemporalFilter", typeid(TemporalFilter) }
+    { "TemporalFilter", typeid(TemporalFilter) },       { "DisparityTransform", typeid(DisparityTransform) }
 };
 
 /**
@@ -939,8 +999,8 @@ static const std::unordered_map<std::string, std::type_index> typeMap = {
  */
 template <typename T> bool Filter::is() {
     std::string name = type();
-    auto        it   = typeMap.find(name);
-    if(it != typeMap.end()) {
+    auto        it   = obFilterTypeMap.find(name);
+    if(it != obFilterTypeMap.end()) {
         return std::type_index(typeid(T)) == it->second;
     }
     return false;

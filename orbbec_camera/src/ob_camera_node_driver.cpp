@@ -76,7 +76,6 @@ OBCameraNodeDriver::OBCameraNodeDriver(const rclcpp::NodeOptions &node_options)
       node_options_(node_options),
       config_path_(ament_index_cpp::get_package_share_directory("orbbec_camera") +
                    "/config/OrbbecSDKConfig_v1.0.xml"),
-      ctx_(std::make_unique<ob::Context>(config_path_.c_str())),
       logger_(this->get_logger()),
       extension_path_(ament_index_cpp::get_package_prefix("orbbec_camera") + "/lib/extensions") {
   init();
@@ -88,7 +87,6 @@ OBCameraNodeDriver::OBCameraNodeDriver(const std::string &node_name, const std::
       node_options_(node_options),
       config_path_(ament_index_cpp::get_package_share_directory("orbbec_camera") +
                    "/config/OrbbecSDKConfig_v1.0.xml"),
-      ctx_(std::make_unique<ob::Context>()),
       logger_(this->get_logger()),
       extension_path_(ament_index_cpp::get_package_prefix("orbbec_camera") + "/lib/extensions") {
   init();
@@ -114,7 +112,12 @@ void OBCameraNodeDriver::init() {
   signal(SIGFPE, signalHandler);   // float point exception
   signal(SIGILL, signalHandler);   // illegal instruction
   ob::Context::setExtensionsDirectory(extension_path_.c_str());
-  ctx_ = std::make_unique<ob::Context>(config_path_.c_str());
+  if (config_path_.empty()) {
+    ctx_ = std::make_unique<ob::Context>();
+  } else {
+    ctx_ = std::make_unique<ob::Context>(config_path_.c_str());
+  }
+
   auto log_level_str = declare_parameter<std::string>("log_level", "none");
   auto log_level = obLogSeverityFromString(log_level_str);
   connection_delay_ = static_cast<int>(declare_parameter<int>("connection_delay", 100));

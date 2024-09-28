@@ -397,6 +397,16 @@ OB_EXPORT const char *ob_device_info_get_ip_address(const ob_device_info *info, 
 OB_EXPORT const char *ob_device_info_get_hardware_version(const ob_device_info *info, ob_error **error);
 
 /**
+ * @brief Check if the device extension information exists.
+ *
+ * @param device The device object.
+ * @param info_key The key of the device extension information.
+ * @param error Pointer to an error object that will be set if an error occurs.
+ * @return bool Whether the device extension information exists.
+ */
+OB_EXPORT bool ob_device_is_extension_info_exist(const ob_device *device, const char *info_key, ob_error **error);
+
+/**
  * @brief Get the device extension information.
  * @brief Extension information is a set of key-value pair of string, user cat get the information by the key.
  *

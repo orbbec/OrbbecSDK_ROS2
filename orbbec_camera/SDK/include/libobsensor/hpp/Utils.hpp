@@ -94,77 +94,6 @@ public:
         return result;
     }
 
-    /**
-     * @brief Transforms the depth frame into the geometry of the color camera.
-     *
-     * @param device Device handle
-     * @param depthFrame Input depth frame
-     * @param targetColorCameraWidth Target color camera width
-     * @param targetColorCameraHeight Target color camera height
-     *
-     * @return std::shared_ptr<ob::Frame> Transformed depth frame
-     */
-    static std::shared_ptr<ob::Frame> transformationDepthFrameToColorCamera(std::shared_ptr<ob::Device> device, std::shared_ptr<ob::Frame> depthFrame,
-                                                                            uint32_t targetColorCameraWidth, uint32_t targetColorCameraHeight) {
-        ob_error *error = NULL;
-
-        // unsafe operation, need to cast const to non-const
-        auto unConstImpl = const_cast<ob_frame *>(depthFrame->getImpl());
-
-        auto result = transformation_depth_frame_to_color_camera(device->getImpl() , unConstImpl, targetColorCameraWidth, targetColorCameraHeight, &error);
-        Error::handle(&error);
-        return std::make_shared<ob::Frame>(result);
-    }
-
-    /**
-     * @brief Init transformation tables
-     *
-     * @param calibrationParam Device calibration param,see pipeline::getCalibrationParam
-     * @param sensorType sensor type
-     * @param data input data,needs to be allocated externally.During initialization, the external allocation size is 'dataSize', for example, dataSize = 1920 *
-     * 1080 * 2*sizeof(float) (1920 * 1080 represents the image resolution, and 2 represents two LUTs, one for x-coordinate and one for y-coordinate).
-     * @param dataSize input data size
-     * @param xyTables output xy tables
-     *
-     * @return bool Transform result
-     */
-    static bool transformationInitXYTables(const OBCalibrationParam calibrationParam, const OBSensorType sensorType, float *data, uint32_t *dataSize,
-                                           OBXYTables *xyTables) {
-        ob_error *error = NULL;
-        bool result = transformation_init_xy_tables(calibrationParam, sensorType, data, dataSize, xyTables, &error);
-        Error::handle(&error);
-        return result;
-    }
-
-    /**
-     * @brief Transform depth image to point cloud data
-     *
-     * @param xyTables input xy tables,see CoordinateTransformHelper::transformationInitXYTables
-     * @param depthImageData input depth image data
-     * @param pointCloudData output point cloud data
-     *
-     */
-    static void transformationDepthToPointCloud(OBXYTables *xyTables, const void *depthImageData, void *pointCloudData) {
-        ob_error *error = NULL;
-        transformation_depth_to_pointcloud(xyTables, depthImageData, pointCloudData, &error);
-        Error::handle(&error, false);
-    }
-
-    /**
-     * @brief Transform depth image to RGBD point cloud data
-     *
-     * @param xyTables input xy tables,see CoordinateTransformHelper::transformationInitXYTables
-     * @param depthImageData input depth image data
-     * @param colorImageData input color image data (only RGB888 support)
-     * @param pointCloudData output RGBD point cloud data
-     *
-     */
-    static void transformationDepthToRGBDPointCloud(OBXYTables *xyTables, const void *depthImageData, const void *colorImageData, void *pointCloudData){
-        ob_error *error = NULL;
-        transformation_depth_to_rgbd_pointcloud(xyTables, depthImageData, colorImageData, pointCloudData, &error);
-        Error::handle(&error, false);
-    }
-
 public:
     // The following interfaces are deprecated and are retained here for compatibility purposes.
     static bool calibration3dTo3d(const OBCalibrationParam calibrationParam, const OBPoint3f sourcePoint3f, const OBSensorType sourceSensorType,
@@ -197,6 +126,38 @@ public:
         bool result = ob_calibration_2d_to_2d(calibrationParam, sourcePoint2f, sourceDepthPixelValue, sourceSensorType, targetSensorType, targetPoint2f, &error);
         Error::handle(&error);
         return result;
+    }
+
+    static std::shared_ptr<ob::Frame> transformationDepthFrameToColorCamera(std::shared_ptr<ob::Device> device, std::shared_ptr<ob::Frame> depthFrame,
+                                                                            uint32_t targetColorCameraWidth, uint32_t targetColorCameraHeight) {
+        ob_error *error = NULL;
+
+        // unsafe operation, need to cast const to non-const
+        auto unConstImpl = const_cast<ob_frame *>(depthFrame->getImpl());
+
+        auto result = transformation_depth_frame_to_color_camera(device->getImpl() , unConstImpl, targetColorCameraWidth, targetColorCameraHeight, &error);
+        Error::handle(&error);
+        return std::make_shared<ob::Frame>(result);
+    }
+
+    static bool transformationInitXYTables(const OBCalibrationParam calibrationParam, const OBSensorType sensorType, float *data, uint32_t *dataSize,
+                                           OBXYTables *xyTables) {
+        ob_error *error = NULL;
+        bool result = transformation_init_xy_tables(calibrationParam, sensorType, data, dataSize, xyTables, &error);
+        Error::handle(&error);
+        return result;
+    }
+
+    static void transformationDepthToPointCloud(OBXYTables *xyTables, const void *depthImageData, void *pointCloudData) {
+        ob_error *error = NULL;
+        transformation_depth_to_pointcloud(xyTables, depthImageData, pointCloudData, &error);
+        Error::handle(&error, false);
+    }
+
+    static void transformationDepthToRGBDPointCloud(OBXYTables *xyTables, const void *depthImageData, const void *colorImageData, void *pointCloudData){
+        ob_error *error = NULL;
+        transformation_depth_to_rgbd_pointcloud(xyTables, depthImageData, colorImageData, pointCloudData, &error);
+        Error::handle(&error, false);
     }
 };
 }  // namespace ob

@@ -98,13 +98,27 @@ public:
     }
 
     /**
+     * @brief Check if the extension information is exist
+     *
+     * @param infoKey The key of the extension information
+     * @return bool Whether the extension information exists
+     */
+    bool isExtensionInfoExist(const std::string &infoKey) const {
+        ob_error *error = nullptr;
+        auto      exist = ob_device_is_extension_info_exist(impl_, infoKey.c_str(), &error);
+        Error::handle(&error);
+        return exist;
+    }
+
+    /**
      * @brief Get information about extensions obtained from SDK supported by the device
      *
+     * @param infoKey The key of the extension information
      * @return const char* Returns extended information about the device
      */
-    const char *getExtensionInfo(const char *info_key) const {
+    const char *getExtensionInfo(const std::string &infoKey) const {
         ob_error   *error = nullptr;
-        const char *info  = ob_device_get_extension_info(impl_, info_key, &error);
+        const char *info  = ob_device_get_extension_info(impl_, infoKey.c_str(), &error);
         Error::handle(&error);
         return info;
     }
@@ -713,6 +727,24 @@ public:
         return state;
     }
 
+    /**
+     * @brief Send data to the device and receive data from the device.
+     * @brief This is a factory and debug function, which can be used to send and receive data from the device. The data format is secret and belongs to the
+     * device vendor.
+     *
+     * @attention The send and receive data buffer are managed by the caller, the receive data buffer should be allocated at 1024 bytes or larger.
+     *
+     * @param[in] sendData The data to be sent to the device.
+     * @param[in] sendDataSize The size of the data to be sent to the device.
+     * @param[out] receiveData The data received from the device.
+     * @param[in out] receiveDataSize The requeseted size of the data received from the device, and the actual size of the data received from the device.
+     */
+    void sendAndReceiveData(const uint8_t *sendData, uint32_t sendDataSize, uint8_t *receiveData, uint32_t *receiveDataSize) const {
+        ob_error *error = nullptr;
+        ob_device_send_and_receive_data(impl_, sendData, sendDataSize, receiveData, receiveDataSize, &error);
+        Error::handle(&error);
+    }
+
 private:
     static void firmwareUpdateCallback(ob_fw_update_state state, const char *message, uint8_t percent, void *userData) {
         auto device = static_cast<Device *>(userData);
@@ -834,8 +866,8 @@ public:
     /**
      * @brief Get the connection type of the device
      *
-     * @return const char* the connection type of the device，currently supports："USB", "USB1.0", "USB1.1", "USB2.0", "USB2.1", "USB3.0", "USB3.1", "USB3.2",
-     * "Ethernet"
+     * @return const char* the connection type of the device，currently supports："USB", "USB1.0", "USB1.1", "USB2.0", "USB2.1", "USB3.0", "USB3.1",
+     * "USB3.2", "Ethernet"
      */
     const char *getConnectionType() const {
         ob_error   *error = nullptr;

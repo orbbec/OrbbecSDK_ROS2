@@ -214,8 +214,10 @@ rclcpp_components_register_node(${PROJECT_NAME}
 add_orbbec_executable(list_devices_node tools/list_devices_node.cpp)
 add_orbbec_executable(list_depth_work_mode_node tools/list_depth_work_mode.cpp)
 add_orbbec_executable(list_camera_profile_mode_node tools/list_camera_profile.cpp)
-
 add_orbbec_executable(topic_statistics_node tools/topic_statistics.cpp)
+add_orbbec_executable(multi_save_rgbir_node tools/multi_save_rgbir_node.cpp)
+add_orbbec_executable(metadata_save_files_node tools/metadata_save_files.cpp)
+add_orbbec_executable(metadata_export_files_node tools/metadata_export_files.cpp)
 
 add_library(frame_latency SHARED tools/frame_latency.cpp)
 target_include_directories(frame_latency PUBLIC ${COMMON_INCLUDE_DIRS})
@@ -251,6 +253,9 @@ install(TARGETS list_devices_node
   list_depth_work_mode_node
   list_camera_profile_mode_node
   topic_statistics_node
+  multi_save_rgbir_node
+  metadata_save_files_node
+  metadata_export_files_node
   DESTINATION lib/${PROJECT_NAME}/)
 
 if (BUILD_TESTING)

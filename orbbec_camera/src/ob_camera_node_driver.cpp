@@ -114,6 +114,7 @@ void OBCameraNodeDriver::init() {
   connection_delay_ = static_cast<int>(declare_parameter<int>("connection_delay", 100));
   enable_sync_host_time_ = declare_parameter<bool>("enable_sync_host_time", true);
   g_camera_name = declare_parameter<std::string>("camera_name", g_camera_name);
+  enable_hardware_reset_ = declare_parameter<bool>("enable_hardware_reset", false);
   ob::Context::setLoggerToConsole(log_level);
   orb_device_lock_shm_fd_ = shm_open(ORB_DEFAULT_LOCK_NAME.c_str(), O_CREAT | O_RDWR, 0666);
   if (orb_device_lock_shm_fd_ < 0) {
@@ -365,6 +366,18 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByUSBPort(
 }
 
 void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &device) {
+  if (device_) {
+    RCLCPP_INFO_STREAM(logger_, "Device is not nullptr, reset device");
+    device_.reset();
+  }
+  if (enable_hardware_reset_ && !hardware_reset_done_) {
+    RCLCPP_INFO_STREAM(logger_, "Enable hardware reset, reboot device");
+    device->reboot();
+    RCLCPP_INFO_STREAM(logger_, "Reboot device done");
+    hardware_reset_done_ = true;
+    device_connected_ = false;
+    return;
+  }
   device_ = device;
   CHECK_NOTNULL(device_);
   CHECK_NOTNULL(device_.get());
@@ -435,8 +448,8 @@ void OBCameraNodeDriver::connectNetDevice(const std::string &net_device_ip, int 
     RCLCPP_ERROR_STREAM(logger_, "Invalid net device ip or port");
     return;
   }
-  RCLCPP_INFO_STREAM(logger_, "Connecting to net device ip: " << net_device_ip
-                             << " port: " << net_device_port);
+  RCLCPP_INFO_STREAM(
+      logger_, "Connecting to net device ip: " << net_device_ip << " port: " << net_device_port);
   std::this_thread::sleep_for(std::chrono::milliseconds(connection_delay_));
   auto device = ctx_->createNetDevice(net_device_ip.c_str(), net_device_port);
   if (device == nullptr) {

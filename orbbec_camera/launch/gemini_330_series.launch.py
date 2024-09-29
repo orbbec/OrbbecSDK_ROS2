@@ -180,6 +180,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_color_undistortion', default_value='false'),
         DeclareLaunchArgument('config_file_path', default_value=''),
         DeclareLaunchArgument('enable_heartbeat', default_value='false'),
+        DeclareLaunchArgument('enable_hardware_reset', default_value='false'),
     ]
 
     def get_params(context, args):

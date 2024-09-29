@@ -107,5 +107,7 @@ class OBCameraNodeDriver : public rclcpp::Node {
   rclcpp::Service<std_srvs::srv::Empty>::SharedPtr reboot_device_srv_ = nullptr;
   std::chrono::time_point<std::chrono::system_clock> start_time_;
   static backward::SignalHandling sh;  // for stack trace
+  bool enable_hardware_reset_ = false;
+  bool hardware_reset_done_ = false;
 };
 }  // namespace orbbec_camera

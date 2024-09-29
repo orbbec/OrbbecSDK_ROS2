@@ -326,6 +326,8 @@ the firmware, and if hardware logging is desired, it should also be set to `true
 - `ir_brightness`: IR brightness.
 - `color_ae_max_exposure`: Color auto exposure maximum exposure.
 - `ir_ae_max_exposure`: IR auto exposure maximum exposure.
+- `enable_hardware_reset`: This option enables the hardware reset function. By default, it is set to `false`. 
+If set to `true`, the camera will reboot upon its first connection.
 
 **IMPORTANT**: *Please carefully read the instructions regarding software filtering settings
 at [this link](https://www.orbbec.com/docs/g330-use-depth-post-processing-blocks/). If you are uncertain, do not modify

@@ -420,7 +420,7 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   serial_number_ = device_info_->getSerialNumber();
   CHECK_NOTNULL(device_info_.get());
   device_unique_id_ = device_info_->getUid();
-#if 0
+
   if (enable_sync_host_time_ && !isOpenNIDevice(device_info_->pid())) {
     TRY_EXECUTE_BLOCK(device_->timerSyncWithHost());
     sync_host_time_timer_ = this->create_wall_timer(std::chrono::milliseconds(30000), [this]() {
@@ -429,7 +429,6 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
       }
     });
   }
-#endif
 
   RCLCPP_INFO_STREAM(logger_, "Device " << device_info_->getName() << " connected");
   RCLCPP_INFO_STREAM(logger_, "Serial number: " << device_info_->getSerialNumber());

@@ -62,7 +62,7 @@ class MetadataExportFiles : public rclcpp::Node {
   }
 
   void load_parameters() {
-    std::ifstream file("src/OrbbecSDK_ROS2/orbbec_camera/config/metadataexport/metadata_export_params.json");
+    std::ifstream file("install/orbbec_camera/share/orbbec_camera/config/metadataexport/metadata_export_params.json");
     if (!file.is_open()) {
       RCLCPP_ERROR(this->get_logger(), "Failed to open JSON file.");
       return;

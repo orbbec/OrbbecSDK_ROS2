@@ -90,7 +90,6 @@
         <!-- Frame metadata parsing path; optinal values: PayloadHeader, ExtensionHeader-->
         <FrameMetadataParsingPath>ExtensionHeader</FrameMetadataParsingPath>
         
-
         <!-- The device corresponding to Astra adv is astra+ -->
         <AstraAdv>
             <Depth>

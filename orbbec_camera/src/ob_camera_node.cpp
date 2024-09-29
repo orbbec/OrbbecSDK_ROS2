@@ -1444,7 +1444,7 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
     bool valid_point = points[i].z >= min_depth && points[i].z <= max_depth;
     if (valid_point || ordered_pc_) {
       *iter_x = static_cast<float>(points[i].x / 1000.0);
-      *iter_y = static_cast<float>(points[i].y / 1000.0);
+      *iter_y = -static_cast<float>(points[i].y / 1000.0);
       *iter_z = static_cast<float>(points[i].z / 1000.0);
       ++iter_x, ++iter_y, ++iter_z;
       valid_count++;

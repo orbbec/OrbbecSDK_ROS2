@@ -1402,74 +1402,33 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
     RCLCPP_ERROR_STREAM(logger_, "depth frame is null");
     return;
   }
-  auto depth_width = depth_frame->getWidth();
-  auto depth_height = depth_frame->getHeight();
   CHECK_NOTNULL(pipeline_);
+  auto camera_params = pipeline_->getCameraParam();
   auto device_info = device_->getDeviceInfo();
   CHECK_NOTNULL(device_info.get());
-  auto pid = device_info->getPid();
-
-  if (!depth_xy_tables_.has_value()) {
-    RCLCPP_INFO(logger_, "Update depth xy tables");
-    try {
-      calibration_param_ = pipeline_->getCalibrationParam(pipeline_config_);
-    } catch (const ob::Error &e) {
-      RCLCPP_ERROR_STREAM(logger_, "Failed to get calibration param: " << e.getMessage());
-      throw;
-    }
-
-    uint32_t table_size =
-        depth_width * depth_height * 2;  // one for x-coordinate and one for y-coordinate LUT
-    if (depth_xy_table_data_size_ != table_size) {
-      RCLCPP_INFO_STREAM(logger_, "Update depth xy tables with size " << table_size);
-      depth_xy_table_data_size_ = table_size;
-      delete[] depth_xy_table_data_;
-      depth_xy_table_data_ = new float[table_size];
-    }
-
-    depth_xy_tables_ = OBXYTables();
-    CHECK_NOTNULL(depth_xy_table_data_);
-    auto align_sensor = depth_registration_ ? OB_SENSOR_COLOR : OB_SENSOR_DEPTH;
-    if (pid == DABAI_MAX_PID) {
-      align_sensor = OB_SENSOR_COLOR;
-    }
-    if (!ob::CoordinateTransformHelper::transformationInitXYTables(
-            *calibration_param_, align_sensor, depth_xy_table_data_, &table_size,
-            &(*depth_xy_tables_))) {
-      RCLCPP_ERROR_STREAM(logger_, "Failed to init depth xy tables");
-      return;
-    }
+  auto pid = device_info->pid();
+  if (depth_registration_ || pid == DABAI_MAX_PID) {
+    camera_params.depthIntrinsic = camera_params.rgbIntrinsic;
   }
-  const auto *depth_data = depth_frame->getData();
-  if (depth_data == nullptr) {
-    RCLCPP_ERROR_STREAM(logger_, "depth data is empty");
+  depth_point_cloud_filter_.setCameraParam(camera_params);
+  float depth_scale = depth_frame->getValueScale();
+  depth_point_cloud_filter_.setPositionDataScaled(depth_scale);
+  depth_point_cloud_filter_.setCreatePointFormat(OB_FORMAT_POINT);
+  auto result_frame = depth_point_cloud_filter_.process(depth_frame);
+  if (!result_frame) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to process depth frame");
     return;
   }
-
-  uint32_t point_cloud_buffer_size = depth_width * depth_height * sizeof(OBPoint);
-  if (point_cloud_buffer_size > depth_point_cloud_buffer_size_) {
-    RCLCPP_INFO(logger_, "Update depth point cloud buffer size to %d", point_cloud_buffer_size);
-    delete[] depth_point_cloud_buffer_;
-
-    depth_point_cloud_buffer_ = new uint8_t[point_cloud_buffer_size];
-    depth_point_cloud_buffer_size_ = point_cloud_buffer_size;
-  }
-  memset(depth_point_cloud_buffer_, 0, depth_point_cloud_buffer_size_);
-  auto *point_cloud = reinterpret_cast<OBPoint *>(depth_point_cloud_buffer_);
-  ob::CoordinateTransformHelper::transformationDepthToPointCloud(&(*depth_xy_tables_), depth_data,
-                                                                 point_cloud);
-  auto point_size = depth_point_cloud_buffer_size_ / sizeof(OBPoint);
-
-  auto *points = reinterpret_cast<OBPoint *>(depth_point_cloud_buffer_);
-  auto width = depth_frame->getWidth();
-  auto height = depth_frame->getHeight();
-  auto depth_scale = depth_frame->getValueScale();
+  auto point_size = result_frame->dataSize() / sizeof(OBPoint);
+  auto *points = static_cast<OBPoint *>(result_frame->data());
+  auto width = depth_frame->width();
+  auto height = depth_frame->height();
   auto point_cloud_msg = std::make_unique<sensor_msgs::msg::PointCloud2>();
   sensor_msgs::PointCloud2Modifier modifier(*point_cloud_msg);
   modifier.setPointCloud2FieldsByString(1, "xyz");
   modifier.resize(width * height);
-  point_cloud_msg->width = depth_frame->getWidth();
-  point_cloud_msg->height = depth_frame->getHeight();
+  point_cloud_msg->width = depth_frame->width();
+  point_cloud_msg->height = depth_frame->height();
   point_cloud_msg->row_step = point_cloud_msg->width * point_cloud_msg->point_step;
   point_cloud_msg->data.resize(point_cloud_msg->height * point_cloud_msg->row_step);
   sensor_msgs::PointCloud2Iterator<float> iter_x(*point_cloud_msg, "x");
@@ -1481,7 +1440,6 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
   const static float max_depth = MAX_DISTANCE / depth_scale;
   size_t valid_count = 0;
   for (size_t i = 0; i < point_size; i++) {
-    // RCLCPP_INFO_STREAM(logger_, "points[i].z" << points[i].z);
     bool valid_point = points[i].z >= min_depth && points[i].z <= max_depth;
     if (valid_point || ordered_pc_) {
       *iter_x = static_cast<float>(points[i].x / 1000.0);
@@ -1527,6 +1485,7 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
     }
   }
   depth_cloud_pub_->publish(std::move(point_cloud_msg));
+
 }
 
 void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> &frame_set) {

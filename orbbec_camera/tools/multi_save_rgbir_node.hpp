@@ -11,25 +11,33 @@
 class MultiCameraSubscriber : public rclcpp::Node {
  public:
   MultiCameraSubscriber() : Node("multi_camera_subscriber") {
-    auto context = std::make_unique<ob::Context>();
-    context->setLoggerSeverity(OBLogSeverity::OB_LOG_SEVERITY_NONE);
-    auto list = context->queryDeviceList();
-    for (size_t i = 0; i < list->deviceCount(); i++) {
-      auto device = list->getDevice(i);
-      auto device_info = device->getDeviceInfo();
-      std::string serial = device_info->serialNumber();
-      std::string uid = device_info->uid();
-      auto usb_port = orbbec_camera::parseUsbPort(uid);
-      int vid = device_info->vid();
-      int pid = device_info->pid();
-      serial_numbers_[usb_port] = serial;
-      RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), ":vid: " << std::hex << vid);
-      RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), ":pid: " << std::hex << pid);
-      RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), ":serial: " << serial);
-      RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), ":usb_port: " << usb_port);
-      color_frame_counters_[count] = 0;
-      ir_frame_counters_[count] = 0;
-      count++;
+    try {
+      auto context = std::make_unique<ob::Context>();
+      context->setLoggerSeverity(OBLogSeverity::OB_LOG_SEVERITY_NONE);
+      auto list = context->queryDeviceList();
+      for (size_t i = 0; i < list->deviceCount(); i++) {
+        auto device = list->getDevice(i);
+        auto device_info = device->getDeviceInfo();
+        std::string serial = device_info->serialNumber();
+        std::string uid = device_info->uid();
+        auto usb_port = orbbec_camera::parseUsbPort(uid);
+        int vid = device_info->vid();
+        int pid = device_info->pid();
+        serial_numbers_[usb_port] = serial;
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), ":vid: " << std::hex << vid);
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), ":pid: " << std::hex << pid);
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), ":serial: " << serial);
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), ":usb_port: " << usb_port);
+        color_frame_counters_[count] = 0;
+        ir_frame_counters_[count] = 0;
+        count++;
+      }
+    } catch (ob::Error &e) {
+      RCLCPP_ERROR_STREAM(get_logger(), e.getMessage());
+    } catch (const std::exception &e) {
+      RCLCPP_ERROR_STREAM(get_logger(), e.what());
+    } catch (...) {
+      RCLCPP_ERROR_STREAM(get_logger(), "unknown error");
     }
 
     this->declare_parameter<std::vector<std::string>>("ir_topics", std::vector<std::string>());

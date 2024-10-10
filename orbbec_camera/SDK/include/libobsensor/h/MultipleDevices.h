@@ -1,4 +1,7 @@
-﻿/**
+// Copyright (c) Orbbec Inc. All Rights Reserved.
+// Licensed under the MIT License.
+
+/**
  * @file MultipleDevices.h
  * @brief This file contains the multiple devices related API witch is used to control the synchronization between multiple devices and the synchronization
  * between different sensor within single device.
@@ -122,3 +125,4 @@ OB_EXPORT void ob_device_timer_sync_with_host(ob_device *device, ob_error **erro
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+

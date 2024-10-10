@@ -1,5 +1,5 @@
-﻿// License: Apache 2.0. See LICENSE file in root directory.
-// Copyright(c) 2020 Orbbec  Corporation. All Rights Reserved.
+// Copyright (c) Orbbec Inc. All Rights Reserved.
+// Licensed under the MIT License.
 
 /**
  * @file Property.h
@@ -771,3 +771,4 @@ typedef struct OBPropertyItem {
 #ifdef __cplusplus
 }
 #endif
+

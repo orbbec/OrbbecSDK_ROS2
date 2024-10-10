@@ -1,4 +1,7 @@
-﻿/**
+// Copyright (c) Orbbec Inc. All Rights Reserved.
+// Licensed under the MIT License.
+
+/**
  * @file StreamProfile.h
  * @brief The stream profile related type is used to get information such as the width, height, frame rate, and format of the stream.
  *

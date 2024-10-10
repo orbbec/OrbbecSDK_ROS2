@@ -1,4 +1,7 @@
-﻿/**
+// Copyright (c) Orbbec Inc. All Rights Reserved.
+// Licensed under the MIT License.
+
+/**
  * @file Device.hpp
  * @brief Device related types, including operations such as getting and creating a device, setting and obtaining device attributes, and obtaining sensors
  *
@@ -1358,3 +1361,4 @@ public:
 };
 
 }  // namespace ob
+

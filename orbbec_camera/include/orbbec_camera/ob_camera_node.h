@@ -554,6 +554,7 @@ class OBCameraNode {
   std::atomic_bool is_camera_node_initialized_{false};
   int laser_energy_level_ = -1;
   ob::PointCloudFilter depth_point_cloud_filter_;
+  ob::PointCloudFilter color_point_cloud_filter_;
   std::optional<OBCalibrationParam> calibration_param_;
   std::optional<OBXYTables> xy_tables_;
   float* xy_table_data_ = nullptr;

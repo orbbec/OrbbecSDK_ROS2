@@ -1,4 +1,7 @@
-﻿/**
+// Copyright (c) Orbbec Inc. All Rights Reserved.
+// Licensed under the MIT License.
+
+/**
  * @file Device.h
  * @brief Device-related functions, including operations such as obtaining and creating a device, setting and obtaining device property, and obtaining sensors
  */
@@ -641,3 +644,4 @@ OB_EXPORT void ob_delete_camera_param_list(ob_camera_param_list *param_list, ob_
 #ifdef __cplusplus
 }
 #endif
+

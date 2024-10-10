@@ -1,4 +1,7 @@
-﻿/**
+// Copyright (c) Orbbec Inc. All Rights Reserved.
+// Licensed under the MIT License.
+
+/**
  * @file Frame.h
  * @brief Frame related function is mainly used to obtain frame data and frame information
  *
@@ -634,3 +637,4 @@ OB_EXPORT void ob_frameset_push_frame(ob_frame *frameset, const ob_frame *frame,
 #ifdef __cplusplus
 }
 #endif
+

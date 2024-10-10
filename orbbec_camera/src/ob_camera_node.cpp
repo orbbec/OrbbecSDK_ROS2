@@ -552,14 +552,14 @@ void OBCameraNode::setupDepthPostProcessFilter() {
     } else if (filter_name == "NoiseRemovalFilter" && enable_noise_removal_filter_) {
       auto noise_removal_filter = filter->as<ob::NoiseRemovalFilter>();
       OBNoiseRemovalFilterParams params = noise_removal_filter->getFilterParams();
-      RCLCPP_INFO_STREAM(logger_, "Default noise removal filter params: "
-                                      << "disp_diff: " << params.disp_diff
-                                      << ", max_size: " << params.max_size);
+      RCLCPP_INFO_STREAM(
+          logger_, "Default noise removal filter params: " << "disp_diff: " << params.disp_diff
+                                                           << ", max_size: " << params.max_size);
       params.disp_diff = noise_removal_filter_min_diff_;
       params.max_size = noise_removal_filter_max_size_;
-      RCLCPP_INFO_STREAM(logger_, "Set noise removal filter params: "
-                                      << "disp_diff: " << params.disp_diff
-                                      << ", max_size: " << params.max_size);
+      RCLCPP_INFO_STREAM(logger_,
+                         "Set noise removal filter params: " << "disp_diff: " << params.disp_diff
+                                                             << ", max_size: " << params.max_size);
       if (noise_removal_filter_min_diff_ != -1 && noise_removal_filter_max_size_ != -1) {
         noise_removal_filter->setFilterParams(params);
       }
@@ -568,11 +568,11 @@ void OBCameraNode::setupDepthPostProcessFilter() {
           hdr_merge_gain_2_ != -1) {
         auto hdr_merge_filter = filter->as<ob::HdrMerge>();
         hdr_merge_filter->enable(true);
-        RCLCPP_INFO_STREAM(logger_, "Set HDR merge filter params: "
-                                        << "exposure_1: " << hdr_merge_exposure_1_
-                                        << ", gain_1: " << hdr_merge_gain_1_
-                                        << ", exposure_2: " << hdr_merge_exposure_2_
-                                        << ", gain_2: " << hdr_merge_gain_2_);
+        RCLCPP_INFO_STREAM(
+            logger_, "Set HDR merge filter params: " << "exposure_1: " << hdr_merge_exposure_1_
+                                                     << ", gain_1: " << hdr_merge_gain_1_
+                                                     << ", exposure_2: " << hdr_merge_exposure_2_
+                                                     << ", gain_2: " << hdr_merge_gain_2_);
         auto config = OBHdrConfig();
         config.enable = true;
         config.exposure_1 = hdr_merge_exposure_1_;
@@ -1485,7 +1485,6 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
     }
   }
   depth_cloud_pub_->publish(std::move(point_cloud_msg));
-
 }
 
 void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> &frame_set) {
@@ -1517,39 +1516,28 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
     return;
   }
 
-  if (!xy_tables_.has_value()) {
-    calibration_param_ = pipeline_->getCalibrationParam(pipeline_config_);
-
-    uint32_t table_size =
-        color_width * color_height * 2;  // one for x-coordinate and one for y-coordinate LUT
-    if (xy_table_data_size_ != table_size) {
-      RCLCPP_INFO_STREAM(logger_, "Init xy tables with size " << table_size);
-      xy_table_data_size_ = table_size;
-      delete[] xy_table_data_;
-      xy_table_data_ = new float[table_size];
-    }
-
-    xy_tables_ = OBXYTables();
-    CHECK_NOTNULL(xy_table_data_);
-    if (!ob::CoordinateTransformHelper::transformationInitXYTables(
-            *calibration_param_, OB_SENSOR_COLOR, xy_table_data_, &table_size, &(*xy_tables_))) {
-      RCLCPP_ERROR_STREAM(logger_, "Failed to init xy tables");
-      return;
-    }
+  CHECK_NOTNULL(pipeline_);
+  auto camera_params = pipeline_->getCameraParam();
+  auto device_info = device_->getDeviceInfo();
+  CHECK_NOTNULL(device_info.get());
+  auto pid = device_info->pid();
+  if (depth_registration_ || pid == DABAI_MAX_PID) {
+    camera_params.depthIntrinsic = camera_params.rgbIntrinsic;
   }
-  const auto *depth_data = (uint8_t *)depth_frame->getData();
-  const auto *color_data = (uint8_t *)(rgb_buffer_);
-  CHECK_NOTNULL(rgb_point_cloud_buffer_);
-  uint32_t point_cloud_buffer_size = color_width * color_height * sizeof(OBColorPoint);
-  if (point_cloud_buffer_size > rgb_point_cloud_buffer_size_) {
-    delete[] rgb_point_cloud_buffer_;
-    rgb_point_cloud_buffer_ = new uint8_t[point_cloud_buffer_size];
-    rgb_point_cloud_buffer_size_ = point_cloud_buffer_size;
+
+  color_point_cloud_filter_.setCameraParam(camera_params);
+  double depth_scale = depth_frame->getValueScale();
+  color_point_cloud_filter_.setPositionDataScaled(depth_scale);
+  auto alignedFrameset = align_filter_->process(frame_set);
+  color_point_cloud_filter_.setCreatePointFormat(OB_FORMAT_RGB_POINT);
+  auto result_frame = color_point_cloud_filter_.process(alignedFrameset);
+  if (!result_frame) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to process depth frame");
+    return;
   }
-  memset(rgb_point_cloud_buffer_, 0, rgb_point_cloud_buffer_size_);
-  auto *point_cloud = (OBColorPoint *)rgb_point_cloud_buffer_;
-  ob::CoordinateTransformHelper::transformationDepthToRGBDPointCloud(&(*xy_tables_), depth_data,
-                                                                     color_data, point_cloud);
+  auto point_size = result_frame->dataSize() / sizeof(OBColorPoint);
+  auto *point_cloud = static_cast<OBColorPoint *>(result_frame->data());
+
   auto point_cloud_msg = std::make_unique<sensor_msgs::msg::PointCloud2>();
   sensor_msgs::PointCloud2Modifier modifier(*point_cloud_msg);
   modifier.setPointCloud2FieldsByString(1, "xyz");
@@ -1570,10 +1558,9 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
   size_t valid_count = 0;
   static const float MIN_DISTANCE = 20.0;
   static const float MAX_DISTANCE = 10000.0;
-  double depth_scale = depth_frame->getValueScale();
   static float min_depth = MIN_DISTANCE / depth_scale;
   static float max_depth = MAX_DISTANCE / depth_scale;
-  for (size_t i = 0; i < color_width * color_height; i++) {
+  for (size_t i = 0; i < point_size; i++) {
     bool valid_point = point_cloud[i].z >= min_depth && point_cloud[i].z <= max_depth;
     if (valid_point || ordered_pc_) {
       *iter_x = static_cast<float>(point_cloud[i].x / 1000.0);
@@ -1586,6 +1573,7 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
       ++valid_count;
     }
   }
+
   if (valid_count == 0) {
     RCLCPP_WARN(logger_, "No valid points in point cloud");
     return;
@@ -1623,6 +1611,7 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
       RCLCPP_ERROR(logger_, "Failed to save point cloud");
     }
   }
+
   depth_registration_cloud_pub_->publish(std::move(point_cloud_msg));
 }
 

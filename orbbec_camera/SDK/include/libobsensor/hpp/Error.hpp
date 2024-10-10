@@ -1,4 +1,7 @@
-﻿/**
+// Copyright (c) Orbbec Inc. All Rights Reserved.
+// Licensed under the MIT License.
+
+/**
  * @file  Error.hpp
  * @brief This file defines the Error class, which describes abnormal errors within the SDK.
  *        Detailed information about the exception can be obtained through this class.
@@ -108,3 +111,4 @@ public:
     }
 };
 }  // namespace ob
+

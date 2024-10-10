@@ -1,4 +1,7 @@
-﻿/**
+// Copyright (c) Orbbec Inc. All Rights Reserved.
+// Licensed under the MIT License.
+
+/**
  * @file  Filter.hpp
  * @brief This file contains the Filter class, which is the processing unit of the SDK that can perform point cloud generation, format conversion, and other
  * functions.
@@ -1007,3 +1010,4 @@ template <typename T> bool Filter::is() {
 }
 
 }  // namespace ob
+

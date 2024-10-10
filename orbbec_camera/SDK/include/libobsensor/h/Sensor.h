@@ -1,4 +1,7 @@
-﻿/**
+// Copyright (c) Orbbec Inc. All Rights Reserved.
+// Licensed under the MIT License.
+
+/**
  * @file Sensor.h
  * @brief Defines types related to sensors, used for obtaining stream configurations, opening and closing streams, and setting and getting sensor properties.
  */

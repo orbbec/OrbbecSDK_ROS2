@@ -1,4 +1,7 @@
-﻿/**
+// Copyright (c) Orbbec Inc. All Rights Reserved.
+// Licensed under the MIT License.
+
+/**
  * @file Version.hpp
  * @brief Provides functions to retrieve version information of the SDK.
  */
@@ -56,3 +59,4 @@ public:
     }
 };
 }  // namespace ob
+

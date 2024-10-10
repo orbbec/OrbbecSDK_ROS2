@@ -1,4 +1,7 @@
-﻿/**
+// Copyright (c) Orbbec Inc. All Rights Reserved.
+// Licensed under the MIT License.
+
+/**
  * @file Pipeline.h
  * @brief The SDK's advanced API can quickly implement functions such as switching streaming, frame synchronization, software filtering, etc., suitable for
  * applications, and the algorithm focuses on rgbd data stream scenarios. If you are on real-time or need to handle synchronization separately, align the scene.
@@ -329,3 +332,4 @@ OB_EXPORT ob_calibration_param ob_pipeline_get_calibration_param(ob_pipeline *pi
 #ifdef __cplusplus
 }
 #endif
+

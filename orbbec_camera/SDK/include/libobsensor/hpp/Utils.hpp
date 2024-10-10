@@ -1,3 +1,6 @@
+// Copyright (c) Orbbec Inc. All Rights Reserved.
+// Licensed under the MIT License.
+
 /**
  * @file Utils.hpp
  * @brief The SDK utils class
@@ -161,3 +164,4 @@ public:
     }
 };
 }  // namespace ob
+

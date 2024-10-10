@@ -1,4 +1,7 @@
-﻿// License: Apache 2.0. See LICENSE file in root directory.
+// Copyright (c) Orbbec Inc. All Rights Reserved.
+// Licensed under the MIT License.
+
+// License: Apache 2.0. See LICENSE file in root directory.
 // Copyright(c) 2020 Orbbec  Corporation. All Rights Reserved.
 
 /**
@@ -968,7 +971,7 @@ typedef struct {
 } OBEdgeNoiseRemovalFilterParams, ob_edge_noise_removal_filter_params;
 
 /**
- * @brief 去噪方式
+ * @brief Denoising method
  */
 typedef enum OB_DDO_NOISE_REMOVAL_TYPE {
     OB_NR_LUT     = 0,  // SPLIT
@@ -1750,3 +1753,4 @@ typedef void(ob_log_callback)(ob_log_severity severity, const char *message, voi
 #endif
 
 #pragma pack(pop)
+

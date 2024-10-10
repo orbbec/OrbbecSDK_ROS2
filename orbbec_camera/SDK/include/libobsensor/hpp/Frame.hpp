@@ -1,4 +1,7 @@
-﻿/**
+// Copyright (c) Orbbec Inc. All Rights Reserved.
+// Licensed under the MIT License.
+
+/**
  * @file Frame.hpp
  * @brief Frame related type, which is mainly used to obtain frame data and frame information.
  *

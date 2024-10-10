@@ -1,4 +1,7 @@
-﻿/**
+// Copyright (c) Orbbec Inc. All Rights Reserved.
+// Licensed under the MIT License.
+
+/**
  * @file Pipeline.hpp
  * @brief The SDK's advanced API type can quickly implement switching streaming and frame synchronization
  * operations.
@@ -446,3 +449,4 @@ public:
 };
 
 }  // namespace ob
+

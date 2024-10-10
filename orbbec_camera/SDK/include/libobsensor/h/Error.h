@@ -1,4 +1,7 @@
-﻿/**
+// Copyright (c) Orbbec Inc. All Rights Reserved.
+// Licensed under the MIT License.
+
+/**
  * @file Error.h
  * @brief Functions for handling errors, mainly used for obtaining error messages.
  */

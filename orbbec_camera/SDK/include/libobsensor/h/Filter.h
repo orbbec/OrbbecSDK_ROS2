@@ -1,4 +1,7 @@
-﻿/**
+// Copyright (c) Orbbec Inc. All Rights Reserved.
+// Licensed under the MIT License.
+
+/**
  * @file Filter.h
  * @brief The processing unit of the SDK can perform point cloud generation, format conversion and other functions.
  */
@@ -249,3 +252,4 @@ OB_EXPORT ob_filter_config_schema_item ob_filter_config_schema_list_get_item(con
 #ifdef __cplusplus
 }
 #endif
+

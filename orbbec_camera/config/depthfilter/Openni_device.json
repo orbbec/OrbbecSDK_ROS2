@@ -26,17 +26,12 @@
 				]
 			},
 			"EdgeNoiseRemovalFilter": {
-				"enable": true,
+				"enable": false,
 				"type": "MGC_FILTER",
-				"x1_th": 3,
-				"x2_th": 3,
-				"y1_th": 0,
-				"y2_th": 0,
-				"limit_x": 60,
-				"limit_y": 60,
-				"R": 320,
-				"width1": 40,
-				"width2": 40
+				"margin_left_th": 3,
+				"margin_right_th": 3,
+				"margin_top_th": 0,
+				"margin_bottom_th": 0
 			},
 			"SpatialFastFilter": {
 				"enable": false,
@@ -62,8 +57,8 @@
 			},
 			"TemporalFilter": {
 				"enable": false,
-				"fill": false,
-				"scale": 0.05,
+				"type": "TF_FILL_DISABLED",
+				"scale": 0.1,
 				"weight": 0.4
 			}
 		}

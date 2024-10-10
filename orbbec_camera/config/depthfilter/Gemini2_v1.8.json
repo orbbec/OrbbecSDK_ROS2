@@ -1,9 +1,9 @@
 {
 	"device": "Orbbec Gemini 2",
 	"structVersion": "0.0.c",
-	"dataVersion": "1.7.0",
+	"dataVersion": "1.8.0",
 	"description": "Gemini2 depth filter params",
-	"configDate": "20231212",
+	"configDate": "20240305",
 	"vid": "0x2bc5",
 	"pid": "0x0670",
 	"depthFilters": [
@@ -62,7 +62,7 @@
 			},
 			"TemporalFilter": {
 				"enable": false,
-				"fill": false,
+				"type": "TF_FILL_DISABLED",
 				"scale": 0.05,
 				"weight": 0.4
 			}
@@ -122,7 +122,7 @@
 			},
 			"TemporalFilter": {
 				"enable": false,
-				"fill": false,
+				"type": false,
 				"scale": 0.05,
 				"weight": 0.4
 			}
@@ -242,7 +242,7 @@
 			},
 			"TemporalFilter": {
 				"enable": false,
-				"fill": false,
+				"type": false,
 				"scale": 0.05,
 				"weight": 0.4
 			}

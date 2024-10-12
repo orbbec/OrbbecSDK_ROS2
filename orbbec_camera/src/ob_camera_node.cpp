@@ -552,14 +552,14 @@ void OBCameraNode::setupDepthPostProcessFilter() {
     } else if (filter_name == "NoiseRemovalFilter" && enable_noise_removal_filter_) {
       auto noise_removal_filter = filter->as<ob::NoiseRemovalFilter>();
       OBNoiseRemovalFilterParams params = noise_removal_filter->getFilterParams();
-      RCLCPP_INFO_STREAM(
-          logger_, "Default noise removal filter params: " << "disp_diff: " << params.disp_diff
-                                                           << ", max_size: " << params.max_size);
+      RCLCPP_INFO_STREAM(logger_, "Default noise removal filter params: "
+                                      << "disp_diff: " << params.disp_diff
+                                      << ", max_size: " << params.max_size);
       params.disp_diff = noise_removal_filter_min_diff_;
       params.max_size = noise_removal_filter_max_size_;
-      RCLCPP_INFO_STREAM(logger_,
-                         "Set noise removal filter params: " << "disp_diff: " << params.disp_diff
-                                                             << ", max_size: " << params.max_size);
+      RCLCPP_INFO_STREAM(logger_, "Set noise removal filter params: "
+                                      << "disp_diff: " << params.disp_diff
+                                      << ", max_size: " << params.max_size);
       if (noise_removal_filter_min_diff_ != -1 && noise_removal_filter_max_size_ != -1) {
         noise_removal_filter->setFilterParams(params);
       }
@@ -568,11 +568,11 @@ void OBCameraNode::setupDepthPostProcessFilter() {
           hdr_merge_gain_2_ != -1) {
         auto hdr_merge_filter = filter->as<ob::HdrMerge>();
         hdr_merge_filter->enable(true);
-        RCLCPP_INFO_STREAM(
-            logger_, "Set HDR merge filter params: " << "exposure_1: " << hdr_merge_exposure_1_
-                                                     << ", gain_1: " << hdr_merge_gain_1_
-                                                     << ", exposure_2: " << hdr_merge_exposure_2_
-                                                     << ", gain_2: " << hdr_merge_gain_2_);
+        RCLCPP_INFO_STREAM(logger_, "Set HDR merge filter params: "
+                                        << "exposure_1: " << hdr_merge_exposure_1_
+                                        << ", gain_1: " << hdr_merge_gain_1_
+                                        << ", exposure_2: " << hdr_merge_exposure_2_
+                                        << ", gain_2: " << hdr_merge_gain_2_);
         auto config = OBHdrConfig();
         config.enable = true;
         config.exposure_1 = hdr_merge_exposure_1_;
@@ -1389,15 +1389,11 @@ void OBCameraNode::publishPointCloud(const std::shared_ptr<ob::FrameSet> &frame_
 void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &frame_set) {
   (void)frame_set;
   if (!depth_cloud_pub_ || depth_cloud_pub_->get_subscription_count() == 0 ||
-      !enable_point_cloud_ || !depth_frame_) {
+      !enable_point_cloud_) {
     return;
   }
   std::lock_guard<decltype(point_cloud_mutex_)> point_cloud_msg_lock(point_cloud_mutex_);
-  if (!depth_frame_) {
-    RCLCPP_ERROR_STREAM(logger_, "depth frame is null");
-    return;
-  }
-  auto depth_frame = depth_frame_->as<ob::DepthFrame>();
+  auto depth_frame = frame_set->depthFrame();
   if (!depth_frame) {
     RCLCPP_ERROR_STREAM(logger_, "depth frame is null");
     return;
@@ -1490,16 +1486,12 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
 void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> &frame_set) {
   if (!depth_registration_cloud_pub_ ||
       depth_registration_cloud_pub_->get_subscription_count() == 0 ||
-      !enable_colored_point_cloud_ || !depth_frame_) {
+      !enable_colored_point_cloud_ || !frame_set) {
     return;
   }
-  CHECK_NOTNULL(depth_frame_.get());
   std::lock_guard<decltype(point_cloud_mutex_)> point_cloud_msg_lock(point_cloud_mutex_);
-  if (!depth_frame_) {
-    RCLCPP_ERROR_STREAM(logger_, "depth frame is null");
-    return;
-  }
-  auto depth_frame = depth_frame_->as<ob::DepthFrame>();
+
+  auto depth_frame = frame_set->depthFrame();
   auto color_frame = frame_set->colorFrame();
 
   if (!depth_frame || !color_frame) {
@@ -1526,11 +1518,10 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
   }
 
   color_point_cloud_filter_.setCameraParam(camera_params);
-  double depth_scale = depth_frame->getValueScale();
+  auto depth_scale = depth_frame->getValueScale();
   color_point_cloud_filter_.setPositionDataScaled(depth_scale);
-  auto alignedFrameset = align_filter_->process(frame_set);
   color_point_cloud_filter_.setCreatePointFormat(OB_FORMAT_RGB_POINT);
-  auto result_frame = color_point_cloud_filter_.process(alignedFrameset);
+  auto result_frame = color_point_cloud_filter_.process(frame_set);
   if (!result_frame) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to process depth frame");
     return;
@@ -1665,25 +1656,27 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
       publishStaticTransforms();
       tf_published_ = true;
     }
-    depth_frame_ = frame_set->getFrame(OB_FRAME_DEPTH);
+    auto depth_frame = frame_set->getFrame(OB_FRAME_DEPTH);
     bool depth_laser_status = false;
-    if (depth_frame_ && depth_frame_->hasMetadata(OB_FRAME_METADATA_TYPE_LASER_STATUS)) {
-      depth_laser_status = depth_frame_->getMetadataValue(OB_FRAME_METADATA_TYPE_LASER_STATUS) == 1;
+    if (depth_frame && depth_frame->hasMetadata(OB_FRAME_METADATA_TYPE_LASER_STATUS)) {
+      depth_laser_status = depth_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_LASER_STATUS) == 1;
     }
 
     auto device_info = device_->getDeviceInfo();
     CHECK_NOTNULL(device_info.get());
     auto pid = device_info->getPid();
     auto color_frame = frame_set->getFrame(OB_FRAME_COLOR);
-    // has_first_color_frame_ = has_first_color_frame_ || color_frame;
     if (isGemini335PID(pid)) {
-      depth_frame_ = processDepthFrameFilter(depth_frame_);
-      if (depth_registration_ && align_filter_ && depth_frame_ && color_frame) {
-        auto new_frame = align_filter_->process(frame_set);
-        if (new_frame) {
+      bool depth_aligned = false;
+      depth_frame = processDepthFrameFilter(depth_frame);
+      if(depth_frame)
+     { frame_set->pushFrame(depth_frame);}
+      if (depth_registration_ && align_filter_ && depth_frame && color_frame) {
+        if (auto new_frame = align_filter_->process(frame_set)) {
           auto new_frame_set = new_frame->as<ob::FrameSet>();
           CHECK_NOTNULL(new_frame_set.get());
-          depth_frame_ = new_frame_set->getFrame(OB_FRAME_DEPTH);
+          frame_set = new_frame_set;
+          depth_aligned = true;
         } else {
           RCLCPP_ERROR(logger_, "Failed to align depth frame to color frame");
           return;
@@ -1693,7 +1686,7 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
                      "Depth registration is disabled or align filter is null or depth frame is "
                      "null or color frame is null");
       }
-      if (depth_registration_ && align_filter_ && depth_frame_ && !color_frame) {
+      if (depth_registration_ && align_filter_ && !depth_aligned) {
         return;
       }
     }
@@ -1719,7 +1712,7 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
           continue;
         }
         if (stream_index == DEPTH) {
-          frame = (enable_3d_reconstruction_mode_ && !depth_laser_status) ? nullptr : depth_frame_;
+          frame = (enable_3d_reconstruction_mode_ && !depth_laser_status) ? nullptr : frame;
         }
         auto is_ir_frame = frame_type == OB_FRAME_IR_LEFT || frame_type == OB_FRAME_IR_RIGHT ||
                            frame_type == OB_FRAME_IR;

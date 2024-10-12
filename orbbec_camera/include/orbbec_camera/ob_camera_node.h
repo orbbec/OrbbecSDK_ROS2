@@ -511,7 +511,6 @@ class OBCameraNode {
 
   bool ordered_pc_ = false;
   bool enable_depth_scale_ = true;
-  std::shared_ptr<ob::Frame> depth_frame_ = nullptr;
   std::string device_preset_ = "Default";
   // filter switch
   bool enable_decimation_filter_ = false;

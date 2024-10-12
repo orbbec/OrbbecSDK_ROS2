@@ -73,6 +73,8 @@ Get source code
 ```bash
 cd ~/ros2_ws/src
 git clone https://github.com/orbbec/OrbbecSDK_ROS2.git
+cd OrbbecSDK_ROS2
+git checkout OrbbecSDK_V2.X
 ```
 
 Install deb dependencies

@@ -11,7 +11,11 @@
 #include <filesystem>
 
 #include <opencv2/opencv.hpp>
+#if defined(ROS_JAZZY) || defined(ROS_IRON)
+#include <cv_bridge/cv_bridge.hpp>
+#else
 #include <cv_bridge/cv_bridge.h>
+#endif
 #include <message_filters/subscriber.h>
 #include <message_filters/sync_policies/approximate_time.h>
 #include <message_filters/synchronizer.h>

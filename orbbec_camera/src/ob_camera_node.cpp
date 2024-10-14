@@ -1265,11 +1265,13 @@ void OBCameraNode::setupPublishers() {
                            camera_info_qos_profile));
 
     auto image_h264_qos_profile = getRMWQosProfileFromString(image_qos);
-    camera_h26x_publishers_[stream_index] =
-        node_->create_publisher<sensor_msgs::msg::CompressedImage>(
-            "/camera/color/h26x_encoded_data",
-            rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(image_h264_qos_profile),
-                        image_h264_qos_profile));
+    if (format_str_[stream_index] == "H264" || format_str_[stream_index] == "H265") {
+      camera_h26x_publishers_[stream_index] =
+          node_->create_publisher<sensor_msgs::msg::CompressedImage>(
+              "/camera/color/h26x_encoded_data",
+              rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(image_h264_qos_profile),
+                          image_h264_qos_profile));
+    }
     if (isGemini335PID(pid)) {
       metadata_publishers_[stream_index] =
           node_->create_publisher<orbbec_camera_msgs::msg::Metadata>(
@@ -1809,7 +1811,10 @@ bool OBCameraNode::decodeColorFrameToBuffer(const std::shared_ptr<ob::Frame> &fr
   }
   CHECK_NOTNULL(image_publishers_[COLOR]);
   bool has_subscriber = image_publishers_[COLOR]->get_subscription_count() > 0;
-  has_subscriber = has_subscriber || camera_h26x_publishers_[COLOR]->get_subscription_count() > 0;
+  if (camera_h26x_publishers_[COLOR] &&
+      camera_h26x_publishers_[COLOR]->get_subscription_count() > 0) {
+    has_subscriber = true;
+  }
   if (enable_colored_point_cloud_ && depth_registration_cloud_pub_->get_subscription_count() > 0) {
     has_subscriber = true;
   }
@@ -1905,8 +1910,8 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   has_subscriber =
       has_subscriber || (metadata_publishers_.count(stream_index) &&
                          metadata_publishers_[stream_index]->get_subscription_count() > 0);
-  has_subscriber =
-      has_subscriber || camera_h26x_publishers_[stream_index]->get_subscription_count() > 0;
+  has_subscriber = has_subscriber || (camera_h26x_publishers_[COLOR] &&
+                                      camera_h26x_publishers_[COLOR]->get_subscription_count() > 0);
   if (!has_subscriber) {
     return;
   }
@@ -1986,7 +1991,8 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   }
   CHECK_NOTNULL(image_publishers_[stream_index]);
   if (image_publishers_[stream_index]->get_subscription_count() == 0 &&
-      camera_h26x_publishers_[stream_index]->get_subscription_count() == 0) {
+      (!camera_h26x_publishers_[COLOR] &&
+       camera_h26x_publishers_[COLOR]->get_subscription_count() == 0)) {
     return;
   }
   auto &image = images_[stream_index];

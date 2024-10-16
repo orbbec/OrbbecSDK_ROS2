@@ -1,33 +1,33 @@
 # common params
-depth_registration: false
+depth_registration: true
 enable_point_cloud: false
 enable_colored_point_cloud: false
 device_preset: "High Accuracy"
-laser_on_off_mode: 1 # 0: off, 1: on-off, 1: off-on
+laser_on_off_mode: 0 # 0: off, 1: on-off, 1: off-on
 time_domain: "global" # global, device, system
 enable_sync_host_time: false
-frames_per_trigger: 2
+frames_per_trigger: 1
 
 # When 3D reconstruction mode is enabled:
 # - The laser will switch to on-off mode
 # - IR images without the laser will be used for SLAM localization
 # - Depth images with the laser will be used because they provide better depth quality
-enable_3d_reconstruction_mode: true
+enable_3d_reconstruction_mode: false
 
 # color params
 enable_color: true
 color_width: 640
 color_height: 480
-color_fps: 90
+color_fps: 30
 color_format: "YUYV"
-enable_color_auto_exposure: false
+enable_color_auto_exposure: true
 color_exposure: 50 # 5ms
 color_gain: -1 # -1 default
 
 # depth params
 depth_width: 640
 depth_height: 480
-depth_fps: 90
+depth_fps: 30
 depth_format: "Y16"
 
 # ir exposure
@@ -39,12 +39,12 @@ ir_gain: 40
 enable_left_ir: true
 left_ir_width: 640
 left_ir_height: 480
-left_ir_fps: 90
+left_ir_fps: 30
 left_ir_format: "Y8"
 
 #right ir params
 enable_right_ir: true
 right_ir_width: 640
 right_ir_height: 480
-right_ir_fps: 90
+right_ir_fps: 30
 right_ir_format: "Y8"

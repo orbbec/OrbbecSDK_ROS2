@@ -924,6 +924,69 @@ void OBCameraNode::stopIMU() {
   }
 }
 
+// cs_param_t rd_par = {0, 0}, param = {1, 3000}; //30
+int OBCameraNode::openSocSyncPwmTrigger(uint16_t fps) {
+    const char *devicePath           = DEVICE_PATH;
+    const int   TRIGGER_MODE_ENABLE  = 1;
+    const int   TRIGGER_MODE_DISABLE = 0;
+
+    int        ret    = -1;
+    cs_param_t param  = { TRIGGER_MODE_ENABLE, fps };
+    cs_param_t rd_par = { TRIGGER_MODE_DISABLE, 0 };
+
+    if(access(devicePath, F_OK) != 0) {
+        std::cerr << "Device node " << devicePath << " does not exist." << std::endl;
+        return ret;
+    }
+    gmsl_trigger_fd_ = open(DEVICE_PATH, O_RDWR);
+    if(gmsl_trigger_fd_ < 0) {
+        perror("open device failed\n");
+        return gmsl_trigger_fd_;
+    }
+
+    std::cout << "Written param mode=" << param.mode << ", fps=" << param.fps << std::endl;
+    ret = write(gmsl_trigger_fd_, &param, sizeof(param));
+    if(ret < 0) {
+        perror("write device failed\n");
+        close(gmsl_trigger_fd_);
+        return ret;
+    }
+
+    ret = read(gmsl_trigger_fd_, &rd_par, sizeof(rd_par));
+    if(ret < 0) {
+        perror("read device failed\n");
+        close(gmsl_trigger_fd_);
+        return ret;
+    }
+    std::cout << "Read param mode=" << rd_par.mode << ", fps=" << rd_par.fps << std::endl;
+
+    std::cout << "Start hardware triggering..." << std::endl;
+
+    return 0;
+}
+int OBCameraNode::closeSocSyncPwmTrigger() {
+    if(gmsl_trigger_fd_ >= 0) {
+        close(gmsl_trigger_fd_);
+        gmsl_trigger_fd_ = -1;  // Reset file descriptors
+        std::cout << "close camSync success" << std::endl;
+        return 0;
+    }
+    return -1;
+}
+
+void OBCameraNode::startGmslTrigger() {
+  if(gmsl_trigger_fps_ > 0 && enable_gmsl_trigger_) {
+    RCLCPP_WARN_STREAM(logger_, "Start HardwareTrigger by soc-trigger-source. gmsl_trigger_fps_: " << gmsl_trigger_fps_);
+    openSocSyncPwmTrigger(gmsl_trigger_fps_);
+  }
+  else {
+    RCLCPP_WARN_STREAM(logger_, "Start HardwareTrigger by soc-trigger-source. gmsl_trigger_fps_ illegal: " << gmsl_trigger_fps_);
+  }
+}
+void OBCameraNode::stopGmslTrigger() {
+  closeSocSyncPwmTrigger();
+}
+
 void OBCameraNode::setupDefaultImageFormat() {
   format_[DEPTH] = OB_FORMAT_Y16;
   format_str_[DEPTH] = "Y16";
@@ -1131,6 +1194,8 @@ void OBCameraNode::getParameters() {
   long software_trigger_period = 33;
   setAndGetNodeParameter<long>(software_trigger_period, "software_trigger_period", 33);
   software_trigger_period_ = std::chrono::milliseconds(software_trigger_period);
+  setAndGetNodeParameter<int>(gmsl_trigger_fps_, "gmsl_trigger_fps", 3000);
+  setAndGetNodeParameter<bool>(enable_gmsl_trigger_, "enable_gmsl_trigger", false);
 }
 
 void OBCameraNode::setupTopics() {

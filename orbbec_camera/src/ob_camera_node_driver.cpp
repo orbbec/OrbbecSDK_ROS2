@@ -104,6 +104,7 @@ OBCameraNodeDriver::~OBCameraNodeDriver() {
     reset_device_cond_.notify_all();
     reset_device_thread_->join();
   }
+  ob_camera_node_->stopGmslTrigger();
 }
 
 void OBCameraNodeDriver::init() {
@@ -415,6 +416,7 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
 
   ob_camera_node_->startIMU();
   ob_camera_node_->startStreams();
+
   device_connected_ = true;
   device_info_ = device_->getDeviceInfo();
   serial_number_ = device_info_->getSerialNumber();
@@ -490,6 +492,11 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
     end_time = std::chrono::high_resolution_clock::now();
     time_cost = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
     RCLCPP_INFO_STREAM(logger_, "Initialize device cost " << time_cost.count() << " ms");
+
+    auto pid = device->getDeviceInfo()->getPid();
+    if (GEMINI_335LG_PID == pid) {
+      ob_camera_node_->startGmslTrigger();
+    }
   } catch (ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to initialize device " << e.getMessage());
     start_device_failed = true;

@@ -552,14 +552,14 @@ void OBCameraNode::setupDepthPostProcessFilter() {
     } else if (filter_name == "NoiseRemovalFilter" && enable_noise_removal_filter_) {
       auto noise_removal_filter = filter->as<ob::NoiseRemovalFilter>();
       OBNoiseRemovalFilterParams params = noise_removal_filter->getFilterParams();
-      RCLCPP_INFO_STREAM(logger_, "Default noise removal filter params: "
-                                      << "disp_diff: " << params.disp_diff
-                                      << ", max_size: " << params.max_size);
+      RCLCPP_INFO_STREAM(
+          logger_, "Default noise removal filter params: " << "disp_diff: " << params.disp_diff
+                                                           << ", max_size: " << params.max_size);
       params.disp_diff = noise_removal_filter_min_diff_;
       params.max_size = noise_removal_filter_max_size_;
-      RCLCPP_INFO_STREAM(logger_, "Set noise removal filter params: "
-                                      << "disp_diff: " << params.disp_diff
-                                      << ", max_size: " << params.max_size);
+      RCLCPP_INFO_STREAM(logger_,
+                         "Set noise removal filter params: " << "disp_diff: " << params.disp_diff
+                                                             << ", max_size: " << params.max_size);
       if (noise_removal_filter_min_diff_ != -1 && noise_removal_filter_max_size_ != -1) {
         noise_removal_filter->setFilterParams(params);
       }
@@ -568,11 +568,11 @@ void OBCameraNode::setupDepthPostProcessFilter() {
           hdr_merge_gain_2_ != -1) {
         auto hdr_merge_filter = filter->as<ob::HdrMerge>();
         hdr_merge_filter->enable(true);
-        RCLCPP_INFO_STREAM(logger_, "Set HDR merge filter params: "
-                                        << "exposure_1: " << hdr_merge_exposure_1_
-                                        << ", gain_1: " << hdr_merge_gain_1_
-                                        << ", exposure_2: " << hdr_merge_exposure_2_
-                                        << ", gain_2: " << hdr_merge_gain_2_);
+        RCLCPP_INFO_STREAM(
+            logger_, "Set HDR merge filter params: " << "exposure_1: " << hdr_merge_exposure_1_
+                                                     << ", gain_1: " << hdr_merge_gain_1_
+                                                     << ", exposure_2: " << hdr_merge_exposure_2_
+                                                     << ", gain_2: " << hdr_merge_gain_2_);
         auto config = OBHdrConfig();
         config.enable = true;
         config.exposure_1 = hdr_merge_exposure_1_;
@@ -784,6 +784,7 @@ void OBCameraNode::startStreams() {
     pipeline_.reset();
   }
   pipeline_ = std::make_unique<ob::Pipeline>(device_);
+
   try {
     setupPipelineConfig();
     pipeline_->start(pipeline_config_, [this](const std::shared_ptr<ob::FrameSet> &frame_set) {
@@ -926,66 +927,66 @@ void OBCameraNode::stopIMU() {
 
 // cs_param_t rd_par = {0, 0}, param = {1, 3000}; //30
 int OBCameraNode::openSocSyncPwmTrigger(uint16_t fps) {
-    const char *devicePath           = DEVICE_PATH;
-    const int   TRIGGER_MODE_ENABLE  = 1;
-    const int   TRIGGER_MODE_DISABLE = 0;
+  const char *devicePath = DEVICE_PATH;
+  const int TRIGGER_MODE_ENABLE = 1;
+  const int TRIGGER_MODE_DISABLE = 0;
 
-    int        ret    = -1;
-    cs_param_t param  = { TRIGGER_MODE_ENABLE, fps };
-    cs_param_t rd_par = { TRIGGER_MODE_DISABLE, 0 };
+  int ret = -1;
+  cs_param_t param = {TRIGGER_MODE_ENABLE, fps};
+  cs_param_t rd_par = {TRIGGER_MODE_DISABLE, 0};
 
-    if(access(devicePath, F_OK) != 0) {
-        std::cerr << "Device node " << devicePath << " does not exist." << std::endl;
-        return ret;
-    }
-    gmsl_trigger_fd_ = open(DEVICE_PATH, O_RDWR);
-    if(gmsl_trigger_fd_ < 0) {
-        perror("open device failed\n");
-        return gmsl_trigger_fd_;
-    }
+  if (access(devicePath, F_OK) != 0) {
+    std::cerr << "Device node " << devicePath << " does not exist." << std::endl;
+    return ret;
+  }
+  gmsl_trigger_fd_ = open(DEVICE_PATH, O_RDWR);
+  if (gmsl_trigger_fd_ < 0) {
+    perror("open device failed\n");
+    return gmsl_trigger_fd_;
+  }
 
-    std::cout << "Written param mode=" << param.mode << ", fps=" << param.fps << std::endl;
-    ret = write(gmsl_trigger_fd_, &param, sizeof(param));
-    if(ret < 0) {
-        perror("write device failed\n");
-        close(gmsl_trigger_fd_);
-        return ret;
-    }
+  std::cout << "Written param mode=" << param.mode << ", fps=" << param.fps << std::endl;
+  ret = write(gmsl_trigger_fd_, &param, sizeof(param));
+  if (ret < 0) {
+    perror("write device failed\n");
+    close(gmsl_trigger_fd_);
+    return ret;
+  }
 
-    ret = read(gmsl_trigger_fd_, &rd_par, sizeof(rd_par));
-    if(ret < 0) {
-        perror("read device failed\n");
-        close(gmsl_trigger_fd_);
-        return ret;
-    }
-    std::cout << "Read param mode=" << rd_par.mode << ", fps=" << rd_par.fps << std::endl;
+  ret = read(gmsl_trigger_fd_, &rd_par, sizeof(rd_par));
+  if (ret < 0) {
+    perror("read device failed\n");
+    close(gmsl_trigger_fd_);
+    return ret;
+  }
+  std::cout << "Read param mode=" << rd_par.mode << ", fps=" << rd_par.fps << std::endl;
 
-    std::cout << "Start hardware triggering..." << std::endl;
+  std::cout << "Start hardware triggering..." << std::endl;
 
-    return 0;
+  return 0;
 }
 int OBCameraNode::closeSocSyncPwmTrigger() {
-    if(gmsl_trigger_fd_ >= 0) {
-        close(gmsl_trigger_fd_);
-        gmsl_trigger_fd_ = -1;  // Reset file descriptors
-        std::cout << "close camSync success" << std::endl;
-        return 0;
-    }
-    return -1;
+  if (gmsl_trigger_fd_ >= 0) {
+    close(gmsl_trigger_fd_);
+    gmsl_trigger_fd_ = -1;  // Reset file descriptors
+    std::cout << "close camSync success" << std::endl;
+    return 0;
+  }
+  return -1;
 }
 
 void OBCameraNode::startGmslTrigger() {
-  if(gmsl_trigger_fps_ > 0 && enable_gmsl_trigger_) {
-    RCLCPP_WARN_STREAM(logger_, "Start HardwareTrigger by soc-trigger-source. gmsl_trigger_fps_: " << gmsl_trigger_fps_);
+  if (gmsl_trigger_fps_ > 0 && enable_gmsl_trigger_) {
+    RCLCPP_WARN_STREAM(logger_, "Start HardwareTrigger by soc-trigger-source. gmsl_trigger_fps_: "
+                                    << gmsl_trigger_fps_);
     openSocSyncPwmTrigger(gmsl_trigger_fps_);
-  }
-  else {
-    RCLCPP_WARN_STREAM(logger_, "Start HardwareTrigger by soc-trigger-source. gmsl_trigger_fps_ illegal: " << gmsl_trigger_fps_);
+  } else {
+    RCLCPP_WARN_STREAM(logger_,
+                       "Start HardwareTrigger by soc-trigger-source. gmsl_trigger_fps_ illegal: "
+                           << gmsl_trigger_fps_);
   }
 }
-void OBCameraNode::stopGmslTrigger() {
-  closeSocSyncPwmTrigger();
-}
+void OBCameraNode::stopGmslTrigger() { closeSocSyncPwmTrigger(); }
 
 void OBCameraNode::setupDefaultImageFormat() {
   format_[DEPTH] = OB_FORMAT_Y16;
@@ -1732,77 +1733,77 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
     auto pid = device_info->getPid();
     auto color_frame = frame_set->getFrame(OB_FRAME_COLOR);
     if (isGemini335PID(pid)) {
-      bool depth_aligned = false;
       depth_frame = processDepthFrameFilter(depth_frame);
-      if(depth_frame)
-     { frame_set->pushFrame(depth_frame);}
+      if (depth_frame) {
+        frame_set->pushFrame(depth_frame);
+      }
       if (depth_registration_ && align_filter_ && depth_frame && color_frame) {
         if (auto new_frame = align_filter_->process(frame_set)) {
           auto new_frame_set = new_frame->as<ob::FrameSet>();
           CHECK_NOTNULL(new_frame_set.get());
           frame_set = new_frame_set;
-          depth_aligned = true;
-        } else {
-          RCLCPP_ERROR(logger_, "Failed to align depth frame to color frame");
-          return;
         }
       } else {
-        RCLCPP_DEBUG(logger_,
-                     "Depth registration is disabled or align filter is null or depth frame is "
-                     "null or color frame is null");
-      }
-      if (depth_registration_ && align_filter_ && !depth_aligned) {
+        RCLCPP_ERROR(logger_, "Failed to align depth frame to color frame");
         return;
       }
-    }
-
-    if (enable_stream_[COLOR] && color_frame) {
-      std::unique_lock<std::mutex> lock(color_frame_queue_lock_);
-      if (!enable_3d_reconstruction_mode_ || depth_laser_status) {
-        color_frame_queue_.push(frame_set);
-        color_frame_queue_cv_.notify_all();
-      }
     } else {
-      publishPointCloud(frame_set);
+      RCLCPP_DEBUG(logger_,
+                   "Depth registration is disabled or align filter is null or depth frame is "
+                   "null or color frame is null");
     }
-    for (const auto &stream_index : IMAGE_STREAMS) {
-      if (enable_stream_[stream_index]) {
-        auto frame_type = STREAM_TYPE_TO_FRAME_TYPE.at(stream_index.first);
-        if (frame_type == OB_FRAME_COLOR) {
-          continue;
-        }
+  }
 
-        auto frame = frame_set->getFrame(frame_type);
-        if (frame == nullptr) {
-          continue;
+  if (enable_stream_[COLOR] && color_frame) {
+    std::unique_lock<std::mutex> lock(color_frame_queue_lock_);
+    if (!enable_3d_reconstruction_mode_ || depth_laser_status) {
+      color_frame_queue_.push(frame_set);
+      color_frame_queue_cv_.notify_all();
+    }
+  } else {
+    publishPointCloud(frame_set);
+  }
+  for (const auto &stream_index : IMAGE_STREAMS) {
+    if (enable_stream_[stream_index]) {
+      auto frame_type = STREAM_TYPE_TO_FRAME_TYPE.at(stream_index.first);
+      if (frame_type == OB_FRAME_COLOR) {
+        continue;
+      }
+
+      auto frame = frame_set->getFrame(frame_type);
+      if (frame == nullptr) {
+        continue;
+      }
+      if (stream_index == DEPTH) {
+        frame = (enable_3d_reconstruction_mode_ && !depth_laser_status) ? nullptr : frame;
+      }
+      auto is_ir_frame = frame_type == OB_FRAME_IR_LEFT || frame_type == OB_FRAME_IR_RIGHT ||
+                         frame_type == OB_FRAME_IR;
+      if (is_ir_frame) {
+        std::shared_ptr<ob::Frame> ir_frame =
+            frame->getFormat() == OB_FORMAT_MJPG ? decodeIRMJPGFrame(frame) : frame;
+        bool ir_laser_status = false;
+        if (ir_frame && ir_frame->hasMetadata(OB_FRAME_METADATA_TYPE_LASER_STATUS)) {
+          ir_laser_status = ir_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_LASER_STATUS) == 1;
         }
-        if (stream_index == DEPTH) {
-          frame = (enable_3d_reconstruction_mode_ && !depth_laser_status) ? nullptr : frame;
+        if (ir_frame && (!enable_3d_reconstruction_mode_ || !ir_laser_status)) {
+          onNewFrameCallback(ir_frame, stream_index);
         }
-        auto is_ir_frame = frame_type == OB_FRAME_IR_LEFT || frame_type == OB_FRAME_IR_RIGHT ||
-                           frame_type == OB_FRAME_IR;
-        if (is_ir_frame) {
-          std::shared_ptr<ob::Frame> ir_frame =
-              frame->getFormat() == OB_FORMAT_MJPG ? decodeIRMJPGFrame(frame) : frame;
-          bool ir_laser_status = false;
-          if (ir_frame && ir_frame->hasMetadata(OB_FRAME_METADATA_TYPE_LASER_STATUS)) {
-            ir_laser_status = ir_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_LASER_STATUS) == 1;
-          }
-          if (ir_frame && (!enable_3d_reconstruction_mode_ || !ir_laser_status)) {
-            onNewFrameCallback(ir_frame, stream_index);
-          }
-        } else if (frame_type == OB_FRAME_DEPTH) {
-          onNewFrameCallback(frame, stream_index);
-        }
+      } else if (frame_type == OB_FRAME_DEPTH) {
+        onNewFrameCallback(frame, stream_index);
       }
     }
-  } catch (const ob::Error &e) {
-    RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: " << e.getMessage());
-  } catch (const std::exception &e) {
-    RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: " << e.what());
-  } catch (...) {
-    RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: unknown error");
   }
+}
+catch (const ob::Error &e) {
+  RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: " << e.getMessage());
+}
+catch (const std::exception &e) {
+  RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: " << e.what());
+}
+catch (...) {
+  RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: unknown error");
+}
 }
 
 void OBCameraNode::onNewColorFrameCallback() {
@@ -2051,6 +2052,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   } else {
     memcpy(image.data, video_frame->getData(), video_frame->getDataSize());
   }
+
   if (stream_index == DEPTH) {
     auto depth_scale = video_frame->as<ob::DepthFrame>()->getValueScale();
     image = image * depth_scale;

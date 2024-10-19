@@ -472,7 +472,7 @@ void OBCameraNode::setupDepthPostProcessFilter() {
   // set depth sensor to filter
   filter_list_ = depth_sensor->getRecommendedFilters();
   if (!filter_list_.empty()) {
-    RCLCPP_ERROR(logger_, "Failed to get depth sensor filter list");
+    // RCLCPP_ERROR(logger_, "Failed to get depth sensor filter list");
     return;
   }
   for (size_t i = 0; i < filter_list_.size(); i++) {
@@ -1742,68 +1742,64 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
           auto new_frame_set = new_frame->as<ob::FrameSet>();
           CHECK_NOTNULL(new_frame_set.get());
           frame_set = new_frame_set;
+        } else {
+          RCLCPP_ERROR(logger_, "Failed to align depth frame to color frame");
+          return;
         }
       } else {
-        RCLCPP_ERROR(logger_, "Failed to align depth frame to color frame");
-        return;
+        RCLCPP_DEBUG(logger_,
+                     "Depth registration is disabled or align filter is null or depth frame is "
+                     "null or color frame is null");
+      }
+    }
+
+    if (enable_stream_[COLOR] && color_frame) {
+      std::unique_lock<std::mutex> lock(color_frame_queue_lock_);
+      if (!enable_3d_reconstruction_mode_ || depth_laser_status) {
+        color_frame_queue_.push(frame_set);
+        color_frame_queue_cv_.notify_all();
       }
     } else {
-      RCLCPP_DEBUG(logger_,
-                   "Depth registration is disabled or align filter is null or depth frame is "
-                   "null or color frame is null");
+      publishPointCloud(frame_set);
     }
-  }
-
-  if (enable_stream_[COLOR] && color_frame) {
-    std::unique_lock<std::mutex> lock(color_frame_queue_lock_);
-    if (!enable_3d_reconstruction_mode_ || depth_laser_status) {
-      color_frame_queue_.push(frame_set);
-      color_frame_queue_cv_.notify_all();
-    }
-  } else {
-    publishPointCloud(frame_set);
-  }
-  for (const auto &stream_index : IMAGE_STREAMS) {
-    if (enable_stream_[stream_index]) {
-      auto frame_type = STREAM_TYPE_TO_FRAME_TYPE.at(stream_index.first);
-      if (frame_type == OB_FRAME_COLOR) {
-        continue;
-      }
-
-      auto frame = frame_set->getFrame(frame_type);
-      if (frame == nullptr) {
-        continue;
-      }
-      if (stream_index == DEPTH) {
-        frame = (enable_3d_reconstruction_mode_ && !depth_laser_status) ? nullptr : frame;
-      }
-      auto is_ir_frame = frame_type == OB_FRAME_IR_LEFT || frame_type == OB_FRAME_IR_RIGHT ||
-                         frame_type == OB_FRAME_IR;
-      if (is_ir_frame) {
-        std::shared_ptr<ob::Frame> ir_frame =
-            frame->getFormat() == OB_FORMAT_MJPG ? decodeIRMJPGFrame(frame) : frame;
-        bool ir_laser_status = false;
-        if (ir_frame && ir_frame->hasMetadata(OB_FRAME_METADATA_TYPE_LASER_STATUS)) {
-          ir_laser_status = ir_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_LASER_STATUS) == 1;
+    for (const auto &stream_index : IMAGE_STREAMS) {
+      if (enable_stream_[stream_index]) {
+        auto frame_type = STREAM_TYPE_TO_FRAME_TYPE.at(stream_index.first);
+        if (frame_type == OB_FRAME_COLOR) {
+          continue;
         }
-        if (ir_frame && (!enable_3d_reconstruction_mode_ || !ir_laser_status)) {
-          onNewFrameCallback(ir_frame, stream_index);
+
+        auto frame = frame_set->getFrame(frame_type);
+        if (frame == nullptr) {
+          continue;
         }
-      } else if (frame_type == OB_FRAME_DEPTH) {
-        onNewFrameCallback(frame, stream_index);
+        if (stream_index == DEPTH) {
+          frame = (enable_3d_reconstruction_mode_ && !depth_laser_status) ? nullptr : frame;
+        }
+        auto is_ir_frame = frame_type == OB_FRAME_IR_LEFT || frame_type == OB_FRAME_IR_RIGHT ||
+                           frame_type == OB_FRAME_IR;
+        if (is_ir_frame) {
+          std::shared_ptr<ob::Frame> ir_frame =
+              frame->getFormat() == OB_FORMAT_MJPG ? decodeIRMJPGFrame(frame) : frame;
+          bool ir_laser_status = false;
+          if (ir_frame && ir_frame->hasMetadata(OB_FRAME_METADATA_TYPE_LASER_STATUS)) {
+            ir_laser_status = ir_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_LASER_STATUS) == 1;
+          }
+          if (ir_frame && (!enable_3d_reconstruction_mode_ || !ir_laser_status)) {
+            onNewFrameCallback(ir_frame, stream_index);
+          }
+        } else if (frame_type == OB_FRAME_DEPTH) {
+          onNewFrameCallback(frame, stream_index);
+        }
       }
     }
+  } catch (const ob::Error &e) {
+    RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: " << e.getMessage());
+  } catch (const std::exception &e) {
+    RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: " << e.what());
+  } catch (...) {
+    RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: unknown error");
   }
-}
-catch (const ob::Error &e) {
-  RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: " << e.getMessage());
-}
-catch (const std::exception &e) {
-  RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: " << e.what());
-}
-catch (...) {
-  RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: unknown error");
-}
 }
 
 void OBCameraNode::onNewColorFrameCallback() {

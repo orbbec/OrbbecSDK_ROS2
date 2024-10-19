@@ -459,9 +459,9 @@ void OBCameraNode::setLaserEnableCallback(
     std::shared_ptr<std_srvs::srv::SetBool::Response>& response) {
   (void)request_header;
   (void)response;
-  bool laser_enable = request->data;
+  int laser_enable = request->data? 1 : 0;
   try {
-    device_->setBoolProperty(OB_PROP_LASER_BOOL, laser_enable);
+    device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, laser_enable);
     response->success = true;
   } catch (const ob::Error& e) {
     response->message = e.getMessage();

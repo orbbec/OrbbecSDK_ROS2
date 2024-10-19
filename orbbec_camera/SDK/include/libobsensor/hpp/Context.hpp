@@ -101,7 +101,7 @@ public:
      * @brief Creates a network device with the specified IP address and port.
      *
      * @param[in] address The IP address, ipv4 only. such as "192.168.1.10"
-     * @param[in] port The port number.
+     * @param[in] port The port number， currently only support 8090
      * @return std::shared_ptr<Device> The created device object.
      */
     std::shared_ptr<Device> createNetDevice(const char *address, uint16_t port) const {

@@ -43,17 +43,19 @@ class MultiCameraSubscriber : public rclcpp::Node {
     this->declare_parameter<std::vector<std::string>>("ir_topics", std::vector<std::string>());
     this->declare_parameter<std::vector<std::string>>("color_topics", std::vector<std::string>());
     this->declare_parameter<std::vector<std::string>>("usb_ports", std::vector<std::string>());
+    this->declare_parameter<std::string>("image_number", "100");
 
     std::vector<std::string> ir_topics_ = this->get_parameter("ir_topics").as_string_array();
     std::vector<std::string> color_topics_ = this->get_parameter("color_topics").as_string_array();
     std::vector<std::string> usb_params_ = this->get_parameter("usb_ports").as_string_array();
+    image_number_ = this->get_parameter("image_number").as_string();
 
     auto custom_qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));
     for (size_t i = 0; i < usb_params_.size(); i++) {
       usb_numbers_[i] = usb_params_[i];
       usb_index_map_[usb_params_[i]] = i;
     }
-
+    reentrant_callback_group_ = this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
     for (const auto &pair : serial_numbers_) {
       RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_camera_subscriber"),
                          "usb_port: " << pair.first << ", serial: " << pair.second);
@@ -69,37 +71,48 @@ class MultiCameraSubscriber : public rclcpp::Node {
       RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_camera_subscriber"),
                          "color_topic: " << color_topics_[i]);
 
-      auto ir_sub = std::make_shared<message_filters::Subscriber<sensor_msgs::msg::Image>>(
-          this, ir_topics_[i], custom_qos.get_rmw_qos_profile());
-      auto color_sub = std::make_shared<message_filters::Subscriber<sensor_msgs::msg::Image>>(
-          this, color_topics_[i], custom_qos.get_rmw_qos_profile());
+      rclcpp::SubscriptionOptions ir_sub_options;
+      ir_sub_options.callback_group = reentrant_callback_group_;
 
-      ir_sub->registerCallback([this, i](const sensor_msgs::msg::Image::ConstSharedPtr &msg) {
-        this->irCallback(msg, i);
-      });
+      rclcpp::SubscriptionOptions color_sub_options;
+      color_sub_options.callback_group = reentrant_callback_group_;
 
-      color_sub->registerCallback([this, i](const sensor_msgs::msg::Image::ConstSharedPtr &msg) {
-        this->colorCallback(msg, i);
-      });
+      auto ir_sub = this->create_subscription<sensor_msgs::msg::Image>(
+          ir_topics_[i], custom_qos,
+          [this, i](const sensor_msgs::msg::Image::ConstSharedPtr &msg) {
+            this->irCallback(msg, i);
+          },
+          ir_sub_options);
+
+      auto color_sub = this->create_subscription<sensor_msgs::msg::Image>(
+          color_topics_[i], custom_qos,
+          [this, i](const sensor_msgs::msg::Image::ConstSharedPtr &msg) {
+            this->colorCallback(msg, i);
+          },
+          color_sub_options);
 
       ir_subscribers_.push_back(ir_sub);
       color_subscribers_.push_back(color_sub);
+
+      ir_image_buffers_.emplace_back();
+      color_image_buffers_.emplace_back();
+      ir_current_timestamp_buffers_.emplace_back();
+      color_current_timestamp_buffers_.emplace_back();
+      ir_timestamp_buffers_.emplace_back();
+      color_timestamp_buffers_.emplace_back();
     }
   }
 
  private:
-  std::string generateFolderName(const sensor_msgs::msg::Image::ConstSharedPtr &color_msg,
-                                 const std::string &serial_number, size_t serial_index) {
-    std::string color_resolution =
-        std::to_string(color_msg->width) + "x" + std::to_string(color_msg->height);
-    std::string color_encoding = color_msg->encoding;
+  std::string generateFolderName(const std::string &serial_number, size_t serial_index) {
     std::string frame_rate = "30fps";
-    std::string folder_name = "Star-AE-OFF-ir-" + color_resolution + "-" + "y8" + "-rgb-" +
+    std::string folder_name = "Star-AE-OFF-ir-" + ir_resolution + "-" + "y8" + "-rgb-" +
                               color_resolution + "-" + "mjpg" + "-" + frame_rate;
 
     std::string path = std::string("multicamera_sync/output/") + folder_name + "/" +
                        "TotalModeFrames/" + "/" + "SN" + serial_number + "_Index" +
                        std::to_string(serial_index);
+
     std::filesystem::create_directories(path);
     return path;
   }
@@ -121,44 +134,87 @@ class MultiCameraSubscriber : public rclcpp::Node {
 
     return timestamp.str();
   }
-  void irCallback(const sensor_msgs::msg::Image::ConstSharedPtr &image, size_t index) {
+
+  void saveAlignedImages(size_t index) {
+    images_saved_ = true;
+    auto &ir_images = ir_image_buffers_[index];
+    auto &ir_current_timestamps = ir_current_timestamp_buffers_[index];
+    auto &ir_timestamps = ir_timestamp_buffers_[index];
+    auto &color_images = color_image_buffers_[index];
+    auto &color_current_timestamps = color_current_timestamp_buffers_[index];
+    auto &color_timestamps = color_timestamp_buffers_[index];
+
+    if (ir_images.size() < static_cast<size_t>(std::stoi(image_number_)) ||
+        color_images.size() < static_cast<size_t>(std::stoi(image_number_))) {
+      return;
+    }
+
     auto usb_iter = usb_index_map_.find(usb_numbers_[index]);
     auto serial_iter = serial_numbers_.find(usb_numbers_[index]);
     int usb_index = usb_iter->second;
     std::string serial_index = serial_iter->second;
+
+    for (size_t i = 0; i < static_cast<size_t>(std::stoi(image_number_)); ++i) {
+      std::string folder = generateFolderName(serial_index, usb_index);
+      std::string ir_filename = folder + "/ir#left_SN" + serial_index + "_Index" +
+                                std::to_string(usb_index) + "_d" + ir_current_timestamps[i] + "_f" +
+                                std::to_string(i) + "_s" + ir_timestamps[i] + "_.jpg";
+
+      cv::imwrite(ir_filename, ir_images[i]);
+      RCLCPP_INFO(this->get_logger(), "Saved IR image to: %s", ir_filename.c_str());
+
+      std::string color_filename = folder + "/color_SN" + serial_index + "_Index" +
+                                   std::to_string(usb_index) + "_d" + color_current_timestamps[i] +
+                                   "_f" + std::to_string(i) + "_s" + color_timestamps[i] + "_.jpg";
+      cv::imwrite(color_filename, color_images[i]);
+      RCLCPP_INFO(this->get_logger(), "Saved Color image to: %s", color_filename.c_str());
+    }
+
+    ir_images.clear();
+    color_images.clear();
+    ir_current_timestamps.clear();
+    color_current_timestamps.clear();
+    ir_timestamps.clear();
+    color_timestamps.clear();
+    rclcpp::shutdown();
+  }
+
+  void irCallback(const sensor_msgs::msg::Image::ConstSharedPtr &image, size_t index) {
     cv::Mat ir_mat = cv_bridge::toCvCopy(image, image->encoding)->image;
-    std::string timestamp_ir = getCurrentTimestamp(image);
-    size_t frame_index = ir_frame_counters_[index]++;
-    std::string folder = generateFolderName(image, serial_index, usb_index);
-    std::string filename = folder + "/ir#left_SN" + serial_index + "_Index" +
-                           std::to_string(usb_index) + "_d" + timestamp_ir + "_f" +
-                           std::to_string(frame_index) + "_s" + getTimestamp() + "_.jpg";
-    cv::imwrite(filename, ir_mat);
-    RCLCPP_INFO(this->get_logger(), "Saved IR image for camera to: %s", filename.c_str());
+    std::string current_timestamp_ir = getCurrentTimestamp(image);
+    std::string timestamp_ir = getTimestamp();
+    ir_image_buffers_[index].push_back(ir_mat);
+    ir_current_timestamp_buffers_[index].push_back(current_timestamp_ir);
+    ir_timestamp_buffers_[index].push_back(timestamp_ir);
+    ir_resolution = std::to_string(image->width) + "x" + std::to_string(image->height);
+    if (!images_saved_ &&
+        ir_image_buffers_[index].size() >= static_cast<size_t>(std::stoi(image_number_)) &&
+        color_image_buffers_[index].size() >= static_cast<size_t>(std::stoi(image_number_))) {
+      saveAlignedImages(index);
+    }
   }
 
   void colorCallback(const sensor_msgs::msg::Image::ConstSharedPtr &image, size_t index) {
-    auto usb_iter = usb_index_map_.find(usb_numbers_[index]);
-    auto serial_iter = serial_numbers_.find(usb_numbers_[index]);
-    int usb_index = usb_iter->second;
-    std::string serial_index = serial_iter->second;
     cv::Mat color_mat = cv_bridge::toCvCopy(image, image->encoding)->image;
     cv::Mat corrected_image;
     cv::cvtColor(color_mat, corrected_image, cv::COLOR_RGB2BGR);
-    std::string timestamp_color = getCurrentTimestamp(image);
-    size_t frame_index = color_frame_counters_[index]++;
-    std::string folder = generateFolderName(image, serial_index, usb_index);
-    std::string filename = folder + "/color_SN" + serial_index + "_Index" +
-                           std::to_string(usb_index) + "_d" + timestamp_color + "_f" +
-                           std::to_string(frame_index) + "_s" + getTimestamp() + "_.jpg";
-    cv::imwrite(filename, corrected_image);
-    RCLCPP_INFO(this->get_logger(), "Saved Color image for camera to: %s", filename.c_str());
+    std::string current_timestamp_color = getCurrentTimestamp(image);
+    std::string timestamp_color = getTimestamp();
+
+    color_image_buffers_[index].push_back(corrected_image);
+    color_current_timestamp_buffers_[index].push_back(current_timestamp_color);
+    color_timestamp_buffers_[index].push_back(timestamp_color);
+    color_resolution = std::to_string(image->width) + "x" + std::to_string(image->height);
+    if (!images_saved_ &&
+        ir_image_buffers_[index].size() >= static_cast<size_t>(std::stoi(image_number_)) &&
+        color_image_buffers_[index].size() >= static_cast<size_t>(std::stoi(image_number_))) {
+      saveAlignedImages(index);
+    }
   }
 
-  std::vector<std::shared_ptr<message_filters::Subscriber<sensor_msgs::msg::Image>>>
-      ir_subscribers_;
-  std::vector<std::shared_ptr<message_filters::Subscriber<sensor_msgs::msg::Image>>>
-      color_subscribers_;
+  rclcpp::CallbackGroup::SharedPtr reentrant_callback_group_;
+  std::vector<rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr> ir_subscribers_;
+  std::vector<rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr> color_subscribers_;
 
   std::map<std::string, int> usb_index_map_;
   std::map<std::string, std::string> serial_numbers_;
@@ -170,4 +226,17 @@ class MultiCameraSubscriber : public rclcpp::Node {
   std::vector<std::string> usb_params_;
   std::vector<std::string> ir_topics_;
   std::vector<std::string> color_topics_;
+  std::string image_number_;
+
+  std::vector<std::vector<cv::Mat>> ir_image_buffers_;
+  std::vector<std::vector<cv::Mat>> color_image_buffers_;
+  std::vector<std::vector<std::string>> ir_current_timestamp_buffers_;
+  std::vector<std::vector<std::string>> color_current_timestamp_buffers_;
+  std::vector<std::vector<std::string>> ir_timestamp_buffers_;
+  std::vector<std::vector<std::string>> color_timestamp_buffers_;
+
+  std::string color_resolution;
+  std::string ir_resolution;
+
+  bool images_saved_;
 };

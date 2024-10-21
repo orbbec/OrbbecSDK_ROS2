@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by
-Stephen Brawner (brawner@gmail.com) 
+Stephen Brawner (brawner@gmail.com)
      Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
      For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="gemini_335_336">
@@ -15,7 +15,7 @@ Stephen Brawner (brawner@gmail.com)
                 iyy="1.70686808598814E-06" iyz="-7.18717290327325E-09" izz="1.31766831843134E-05" />
         </inertial>
         <visual>
-            <origin xyz="0 0 0" rpy="0 0 0" />
+            <origin xyz="-25 0 0" rpy="0 0 0" />
             <geometry>
                 <mesh filename="${mesh_path}camera_link.STL" />
             </geometry>
@@ -63,7 +63,7 @@ Stephen Brawner (brawner@gmail.com)
         <axis xyz="0 0 0" />
     </joint>
 
-    <link name="camera_infra_1_frame">
+    <link name="camera_left_ir_frame">
         <inertial>
             <origin xyz="-0.00158020887627678 -1.52683853303637E-08 -1.4860800305164E-07"
                 rpy="0 0 0" />
@@ -73,9 +73,9 @@ Stephen Brawner (brawner@gmail.com)
                 iyy="4.84012226840139E-09" iyz="1.92888940614786E-14" izz="4.84044260907388E-09" />
         </inertial>
         <visual>
-            <origin xyz="0 0 0" rpy="0 0 0" />
+            <origin xyz="-25 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="${mesh_path}camera_infra_1_frame.STL" />
+                <mesh filename="${mesh_path}camera_left_ir_frame.STL" />
             </geometry>
             <material name="">
                 <color rgba="0.501960784313725 0.250980392156863 0.250980392156863 1" />
@@ -84,19 +84,19 @@ Stephen Brawner (brawner@gmail.com)
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="${mesh_path}camera_infra_1_frame.STL" />
+                <mesh filename="${mesh_path}camera_left_ir_frame.STL" />
             </geometry>
         </collision>
     </link>
 
-    <joint name="camera_infra_1_joint" type="fixed">
+    <joint name="camera_left_ir_joint" type="fixed">
         <origin xyz="0.01587 -0.025 0.0125" rpy="0 0 0" />
         <parent link="camera_bottom_screw_frame" />
-        <child link="camera_infra_1_frame" />
+        <child link="camera_left_ir_frame" />
         <axis xyz="0 0 0" />
     </joint>
 
-    <link name="camera_infra_1_optical_frame">
+    <link name="camera_left_ir_optical_frame">
         <inertial>
             <origin xyz="1.52683853338331E-08 1.48608003051636E-07 -0.00158020887627678" rpy="0 0 0" />
             <mass value="0.000453168790516429" />
@@ -107,7 +107,7 @@ Stephen Brawner (brawner@gmail.com)
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="${mesh_path}camera_infra_1_optical_frame.STL" />
+                <mesh filename="${mesh_path}camera_left_ir_optical_frame.STL" />
             </geometry>
             <material name="">
                 <color rgba="0.501960784313725 0.250980392156863 0.250980392156863 1" />
@@ -116,19 +116,19 @@ Stephen Brawner (brawner@gmail.com)
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="${mesh_path}camera_infra_1_optical_frame.STL" />
+                <mesh filename="${mesh_path}camera_left_ir_optical_frame.STL" />
             </geometry>
         </collision>
     </link>
 
-    <joint name="camera_infra_1_optical_joint" type="fixed">
+    <joint name="camera_left_ir_optical_joint" type="fixed">
         <origin xyz="0.01587 -0.025 0.0125" rpy="-1.5707963267949 0 -1.5707963267949" />
         <parent link="camera_bottom_screw_frame" />
-        <child link="camera_infra_1_optical_frame" />
+        <child link="camera_left_ir_optical_frame" />
         <axis xyz="0 0 0" />
     </joint>
 
-    <link name="camera_infra2_frame">
+    <link name="camera_right_ir_frame">
         <inertial>
             <origin xyz="-0.00158020887627678 -1.52683853303637E-08 -1.48608003050581E-07"
                 rpy="0 0 0" />
@@ -140,7 +140,7 @@ Stephen Brawner (brawner@gmail.com)
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="${mesh_path}camera_infra2_frame.STL" />
+                <mesh filename="${mesh_path}camera_right_ir_frame.STL" />
             </geometry>
             <material name="">
                 <color rgba="0.501960784313725 0.250980392156863 0.250980392156863 1" />
@@ -149,19 +149,19 @@ Stephen Brawner (brawner@gmail.com)
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="${mesh_path}camera_infra2_frame.STL" />
+                <mesh filename="${mesh_path}camera_right_ir_frame.STL" />
             </geometry>
         </collision>
     </link>
 
-    <joint name="camera_infra2_joint" type="fixed">
+    <joint name="camera_right_ir_joint" type="fixed">
         <origin xyz="0.01587 0.025 0.0125" rpy="0 0 0" />
         <parent link="camera_bottom_screw_frame" />
-        <child link="camera_infra2_frame" />
+        <child link="camera_right_ir_frame" />
         <axis xyz="0 0 0" />
     </joint>
 
-    <link name="camera_infra2_optical_frame">
+    <link name="camera_right_ir_optical_frame">
         <inertial>
             <origin xyz="1.52683853268942E-08 1.4860800305058E-07 -0.00158020887627678" rpy="0 0 0" />
             <mass value="0.000453168790516429" />
@@ -172,7 +172,7 @@ Stephen Brawner (brawner@gmail.com)
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="${mesh_path}camera_infra2_optical_frame.STL" />
+                <mesh filename="${mesh_path}camera_right_ir_optical_frame.STL" />
             </geometry>
             <material name="">
                 <color rgba="0.501960784313725 0.250980392156863 0.250980392156863 1" />
@@ -181,15 +181,15 @@ Stephen Brawner (brawner@gmail.com)
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="${mesh_path}camera_infra2_optical_frame.STL" />
+                <mesh filename="${mesh_path}camera_right_ir_optical_frame.STL" />
             </geometry>
         </collision>
     </link>
 
-    <joint name="camera_infra2_optical_joint" type="fixed">
+    <joint name="camera_right_ir_optical_joint" type="fixed">
         <origin xyz="0.01587 0.025 0.0125" rpy="-1.5707963267949 0 -1.5707963267949" />
         <parent link="camera_bottom_screw_frame" />
-        <child link="camera_infra2_optical_frame" />
+        <child link="camera_right_ir_optical_frame" />
         <axis xyz="0 0 0" />
     </joint>
 

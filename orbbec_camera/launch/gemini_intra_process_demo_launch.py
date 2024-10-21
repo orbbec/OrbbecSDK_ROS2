@@ -172,6 +172,8 @@ def generate_launch_description():
         DeclareLaunchArgument('topic_type', default_value='points'),
         DeclareLaunchArgument('topic_name', default_value='/camera/depth_registered/points'),
         DeclareLaunchArgument('use_intra_process_comms', default_value='true'),
+        DeclareLaunchArgument('gmsl_trigger_fps', default_value='3000'),
+        DeclareLaunchArgument('enable_gmsl_trigger', default_value='false'),
     ]
 
     def get_params(context, args):

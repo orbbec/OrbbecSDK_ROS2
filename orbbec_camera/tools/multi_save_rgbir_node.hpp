@@ -24,10 +24,10 @@ class MultiCameraSubscriber : public rclcpp::Node {
         int vid = device_info->vid();
         int pid = device_info->pid();
         serial_numbers_[usb_port] = serial;
-        RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), ":vid: " << std::hex << vid);
-        RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), ":pid: " << std::hex << pid);
-        RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), ":serial: " << serial);
-        RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), ":usb_port: " << usb_port);
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_save_rgbir_node"), ":vid: " << std::hex << vid);
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_save_rgbir_node"), ":pid: " << std::hex << pid);
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_save_rgbir_node"), ":serial: " << serial);
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_save_rgbir_node"), ":usb_port: " << usb_port);
         color_frame_counters_[count] = 0;
         ir_frame_counters_[count] = 0;
         count++;

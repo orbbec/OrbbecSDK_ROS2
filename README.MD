@@ -1,4 +1,5 @@
 # Orbbec ROS2 SDK
+
  [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-1.5.11-green)
 
 Orbbec SDK ROS 2 is a wrapper for the Orbbec 3D camera that provides seamless integration with the ROS 2 environment. It
@@ -7,6 +8,7 @@ supports ROS 2 Foxy, Humble, and Jazzy distributions.
 ## Table of Contents
 
 <!-- TOC -->
+
 * [Orbbec ROS2 SDK](#orbbec-ros2-sdk)
   * [Table of Contents](#table-of-contents)
   * [Installation Instructions](#installation-instructions)
@@ -44,6 +46,7 @@ supports ROS 2 Foxy, Humble, and Jazzy distributions.
     * [Why Are There So Many Launch Files?](#why-are-there-so-many-launch-files)
   * [Other useful links](#other-useful-links)
   * [License](#license)
+
 <!-- TOC -->
 
 ## Installation Instructions
@@ -195,7 +198,7 @@ ros2 service call /camera/save_point_cloud std_srvs/srv/Empty "{}"
 ```
 
 ## Efficient intra-process communication:
-  
+
 Our ROS2 Wrapper node supports zero-copy communications if loaded in the same process as a subscriber node. This can reduce copy times on image/pointcloud topics, especially with big frame resolutions and high FPS.
 
 You will need to launch a component container and launch our node as a component together with other component nodes. Further details on "Composing multiple nodes in a single process" can be found [here](https://docs.ros.org/en/rolling/Tutorials/Composition.html).
@@ -203,16 +206,20 @@ You will need to launch a component container and launch our node as a component
 Further details on efficient intra-process communication can be found [here](https://docs.ros.org/en/humble/Tutorials/Intra-Process-Communication.html#efficient-intra-process-communication).
 
 ### Example
+
 #### Manually loading multiple components into the same process
+
 * Start the component:
+
   ```bash
   ros2 run rclcpp_components component_container
   ```
-
 * Add the wrapper:
+
   ```bash
   ros2 component load /ComponentManager orbbec_camera orbbec_camera::OBCameraNodeDriver -e use_intra_process_comms:=true
   ```
+
   Load other component nodes (consumers of the wrapper topics) in the same way.
 
 #### Using a launch file
@@ -227,6 +234,7 @@ ros2 launch orbbec_camera gemini_intra_process_demo_launch.py
 * Compressed images using `image_transport` will be disabled as this isn't supported with intra-process communication
 
 ## Use V4L2 backend
+
 To enable the V4L2 backend for the Gemini2 series cameras, follow these steps:
 
 1. The Gemini2 series cameras support the V4L2 backend.
@@ -308,19 +316,18 @@ The following are the launch parameters available:
   attempt to reset the camera up to three times. This setting aims to prevent USB 3.0 devices from being incorrectly
   recognized as USB 2.0. It is recommended to set this parameter to `false` when using a USB 2.0 connection to avoid
   unnecessary resets.
-
-- `enable_3d_reconstruction_mode`: Enables 3D reconstruction mode. Default is `false`. When set to `true`, the camera 
-laser operates in on-off mode, capturing IR images (laser off) for VSLAM localization and depth images (laser on) for point cloud computation.
+- `enable_3d_reconstruction_mode`: Enables 3D reconstruction mode. Default is `false`. When set to `true`, the camera
+  laser operates in on-off mode, capturing IR images (laser off) for VSLAM localization and depth images (laser on) for point cloud computation.
 - `tf_publish_rate`: The rate at which the camera publishes dynamic transforms. The default value is `0.0`, which means static transforms are published.
 - `time_domain`: The frame time domain, string type, can be `device`, `global`, or `system`. `device` means using the hardware timestamp from the camera,
-`system` means using the timestamp when the PC received the first packet of data or frame, and `global` is used for synchronized time across multiple
-devices, aligning data from different sources to a common time base.
+  `system` means using the timestamp when the PC received the first packet of data or frame, and `global` is used for synchronized time across multiple
+  devices, aligning data from different sources to a common time base.
 - `enable_sync_host_time`: Enables synchronization of the host time with the camera time. The default value is `true`, if
-use global time, set to `false`. Some old devices may not support this feature.
+  use global time, set to `false`. Some old devices may not support this feature.
 - `config_file_path`: The path to the YAML configuration file. The default value is `""`. If the configuration file is not specified,
-the default parameters from the launch file will be used. If you want to use a custom configuration file, please refer to `gemini_330_series.launch.py`.
-  `enable_heartbeat` enables the heartbeat function, which is set to `false` by default. If set to `true`, the camera node will send heartbeat signals to 
-the firmware, and if hardware logging is desired, it should also be set to `true`.
+  the default parameters from the launch file will be used. If you want to use a custom configuration file, please refer to `gemini_330_series.launch.py`.
+  `enable_heartbeat` enables the heartbeat function, which is set to `false` by default. If set to `true`, the camera node will send heartbeat signals to
+  the firmware, and if hardware logging is desired, it should also be set to `true`.
 - `log_level` : SDK log level, the default value is `info`, the optional values are `debug`, `info`, `warn`, `error`, `fatal`.
 - `enable_color_undistortion`: Enables color undistortion, the default value is `false`. Note that our color cameras exhibit minimal distortion, and typically, undistortion is not necessary.
 
@@ -328,16 +335,51 @@ the firmware, and if hardware logging is desired, it should also be set to `true
 at [this link](https://www.orbbec.com/docs/g330-use-depth-post-processing-blocks/). If you are uncertain, do not modify
 these settings.*
 
+## ROS2(Robot) vs Optical(Camera) Coordination Systems
+
+* Point Of View:
+  * Imagine we are standing behind of the camera, and looking forward.
+  * Always use this point of view when talking about coordinates, left vs right IRs, position of sensor, etc..
+
+![ROS2 and Camera Coordinate System](docs/images/image7.png)
+
+* ROS2 Coordinate System: (X: Forward, Y:Left, Z: Up)
+* Camera Optical Coordinate System: (X: Right, Y: Down, Z: Forward)
+* All data published in our wrapper topics is optical data taken directly from our camera sensors.
+* static and dynamic TF topics publish optical CS and ROS CS to give the user the ability to move from one CS to other CS.
+
+## Camera sensor structure
+
+![module in rviz2](docs/images/image9.png)
+
+![module in rviz2](docs/images/image10.png)
+
+## TF from coordinate A to coordinate B:
+
+In Orbbec cameras, the origin point (0,0,0) is taken from the camera_link position
+
+Our wrapper provide static TFs between each sensor coordinate to the camera base (camera_link)
+
+Also, it provides TFs from each sensor ROS coordinates to its corrosponding optical coordinates.
+
+Example of static TFs of RGB sensor and right infra sensor of Gemini335 module as it shown in rviz2:
+
+```bash
+ros2 launch orbbec_description view_model.launch.py model:=gemini_335_336.urdf.xacro
+```
+
+![module in rviz2](docs/images/image8.png)
+
 ## Predefined presets
 
-| Preset         | Features                                                                                                                                                                                                      | Recommended use cases                                                                                                                                         |
-|----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Default        | - Best visual perception<br/>- Overall good performance in accuracy, fill rate, tiny objects, etc.                                                                                                            | - Generic<br>- Robotics                                                                                                                                       |
-| Hand           | - Clear hand and finger edges                                                                                                                                                                                 | - Gesture recognition                                                                                                                                         |
-| High Accuracy  | - Depth of high confidence<br>- Barely noise depth values<br>- Lower fill rate                                                                                                                                | - Collision avoidance<br>- Object scanning                                                                                                                    |
-| High Density   | - Higher fill rate<br>- More tiny objects<br>- May suffer from noise depth values                                                                                                                             | - Object recognition<br>- Pick & place<br>- Foreground & background animation                                                                                 |
-| Medium Density | - Balanced performance in fill rate and accuracy<br>- In comparison to Default: lower fill rate, better edge quality                                                                                          | - Generic and alternative to Default                                                                                                                          |
-| Custom         | - User defined Preset<br>- Derived from Presets above, with customized modifications, e.g. a new configuration for the post-processing pipeline, modified mean intensity set point of depth AE function, etc. | - Better depth performance achieved using customized configurations in comparison to using predefined presets<br>- For well-established custom configurations |
+| Preset         | Features                                                                                                                                                                                                           | Recommended use cases                                                                                                                                              |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Default        | - Best visual perception``- Overall good performance in accuracy, fill rate, tiny objects, etc.                                                                                                                    | - Generic `<br>`- Robotics                                                                                                                                       |
+| Hand           | - Clear hand and finger edges                                                                                                                                                                                      | - Gesture recognition                                                                                                                                              |
+| High Accuracy  | - Depth of high confidence `<br>`- Barely noise depth values `<br>`- Lower fill rate                                                                                                                           | - Collision avoidance `<br>`- Object scanning                                                                                                                    |
+| High Density   | - Higher fill rate `<br>`- More tiny objects `<br>`- May suffer from noise depth values                                                                                                                        | - Object recognition `<br>`- Pick & place `<br>`- Foreground & background animation                                                                            |
+| Medium Density | - Balanced performance in fill rate and accuracy `<br>`- In comparison to Default: lower fill rate, better edge quality                                                                                          | - Generic and alternative to Default                                                                                                                               |
+| Custom         | - User defined Preset `<br>`- Derived from Presets above, with customized modifications, e.g. a new configuration for the post-processing pipeline, modified mean intensity set point of depth AE function, etc. | - Better depth performance achieved using customized configurations in comparison to using predefined presets `<br>`- For well-established custom configurations |
 
 Choose the appropriate preset name based on your specific use case and set it as the value for the `device_preset`
 parameter.
@@ -432,7 +474,7 @@ to `true` in the stream that corresponds to the argument of the launch file.
 - `/camera/ir/camera_info`: The IR camera info.
 - `/camera/ir/image_raw`: The IR stream image
 - `/camera/accel/sample`: Acceleration data stream `enable_sync_output_accel_gyro`turned off，`enable_accel`turned on
-- `/camera/gyro/sample`: Gyroscope data stream，enable_sync_output_accel_gyro`turned off，`enable_gyro`turned on
+- `/camera/gyro/sample`: Gyroscope data stream，enable_sync_output_accel_gyro `turned off，`enable_gyro`turned on
 - `camera/gyro_accel/sample`: Synchronized data stream of acceleration and gyroscope，`enable_sync_output_accel_gyro`
   turned on
 - `/diagnostics`: The diagnostic information of the camera, Currently, the diagnostic information only includes the
@@ -519,9 +561,11 @@ ros2 launch orbbec_camera multi_camera.launch.py
 ```
 
 ## Compressed Image
+
 You can use `image_transport` to compress the image using `jpeg`. Below is an example of how to use it:
 
 To access the compressed color image, you can use the following command:
+
 ```bash
 ros2 topic echo /camera/color/image_raw/compressed --no-arr
 ```
@@ -595,37 +639,18 @@ bash .make_deb.sh
 
 ## Launch files
 
-| product serials                       | launch file                 |
-|---------------------------------------|-----------------------------|
-| astra+                                | astra_adv.launch.py         |
-| astra mini /astra mini pro /astra pro | astra.launch.py             |
-| astra mini pro s                      | astra.launch.py             |
-| astra2                                | astra2.launch.py            |
-| astra stereo s                        | stereo_s_u3.launch.py       |
-| astra pro2                            | astra_pro2.launch.py        |
-| dabai                                 | dabai.launch.py             |
-| dabai d1                              | dabai_d1.launch.py          |
-| dabai dcw                             | dabai_dcw.launch.py         |
-| dabai dw                              | dabai_dw.launch.py          |
-| dabai pro                             | dabai_pro.launch.py         |
-| deeya                                 | deeya.launch.py             |
-| femto /femto w                        | femto.launch.py             |
-| femto mega                            | femto_mega.launch.py        |
-| femto bolt                            | femto_bolt.launch.py        |
-| gemini                                | gemini.launch.py            |
-| gemini                                | gemini.launch.py            |
-| gemini2 / dabai DCL                   | gemini2.launch.py           |
-| gemini2L                              | gemini2L.launch.py          |
-| gemini e                              | gemini_e.launch.py          |
-| gemini e lite                         | gemini_e_lite.launch.py     |
-| dabai max                             | dabai_max.launch.py         |
-| dabai max pro                         | dabai_max_pro.launch.py     |
-| gemini uw                             | gemini_uw.launch.py         |
-| dabai dcw2                            | dabai_dcw2.launch.py        |
-| dabai dw2                             | dabai_dw2.launch.py         |
-| gemini ew                             | gemini_ew.launch.py         |
-| gemini ew lite                        | gemini_ew_lite.launch.py    |
-| gemini 330 series                     | gemini_330_series.launch.py |
+| product serials | Firmware Version | **Firmware Version** |
+| :-------------: | :--------------: | :-------------------------: |
+|     Astra2     |      2.8.20      |      astra2.launch.py      |
+|   Femto mega   |   1.1.7/1.2.7   |    femto_mega.launch.py    |
+|   Femto bolt   |   1.0.6/1.0.9   |    femto_bolt.launch.py    |
+|     Gemini2     |  1.4.60 /1.4.76  |      gemini2.launch.py      |
+|    Gemini2L    |      1.4.32      |     gemini2L.launch.py     |
+|   Gemini 335   |      1.2.20      | gemini_330_series.launch.py |
+|   Gemini 335L   |      1.2.20      | gemini_330_series.launch.py |
+|  Gemini 335Lg  |      1.3.46      | gemini_330_series.launch.py |
+|   Gemini 336   |      1.2.20      | gemini_330_series.launch.py |
+|   Gemini 336L   |      1.2.20      | gemini_330_series.launch.py |
 
 **All launch files are essentially similar, with the primary difference being the default values of the parameters set
 for different models
@@ -703,7 +728,6 @@ net.core.rmem_default=2147483647
 
 If you use Fast DDS, you can refer to the [Fast DDS Configuration](./docs/fastdds_tuning.md) file.
 
-
 ## Frequently Asked Questions
 
 ### Unexpected Crash
@@ -714,24 +738,29 @@ Please send this log to the support team or submit it to a GitHub issue for furt
 ### No Data Stream from Multiple Cameras
 
 **Insufficient Power Supply**:
+
 - Ensure that each camera is connected to a separate hub.
 - Use a powered hub to provide sufficient power to each camera.
 
 **High Resolution**:
+
 - Try lowering the resolution to resolve data stream issues.
 
 **Increase usbfs_memory_mb Value**:
-- Increase the `usbfs_memory_mb` value to 128MB (this is a reference value and can be adjusted based on your system’s needs) 
-by running the following command:
+
+- Increase the `usbfs_memory_mb` value to 128MB (this is a reference value and can be adjusted based on your system’s needs)
+  by running the following command:
+
 ```bash
     echo 128 | sudo tee /sys/module/usbcore/parameters/usbfs_memory_mb
 ```
+
 - To make this change permanent, check [this link](https://github.com/OpenKinect/libfreenect2/issues/807).
 
 ### Additional Troubleshooting
 
-- If you encounter other issues, set the `log_level` parameter to `debug`. This will generate an SDK log file in the running directory: `Log/OrbbecSDK.log.txt`. 
-Please provide this file to the support team for further assistance.
+- If you encounter other issues, set the `log_level` parameter to `debug`. This will generate an SDK log file in the running directory: `Log/OrbbecSDK.log.txt`.
+  Please provide this file to the support team for further assistance.
 - If firmware logs are required, set `enable_heartbeat` to `true` to activate this feature.
 
 ### Why Are There So Many Launch Files?

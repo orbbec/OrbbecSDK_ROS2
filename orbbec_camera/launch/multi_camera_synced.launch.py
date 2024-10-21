@@ -18,58 +18,62 @@ def generate_launch_description():
         ),
         launch_arguments={
             "camera_name": "front_camera",
-            "usb_port": "2-6",
-            "device_num": "3",
-            "sync_mode": "software_triggering",
+            "usb_port": "gmsl2-1",
+            "device_num": "2",
+            "sync_mode": "hardware_triggering",
             "config_file_path": config_file_path,
+            "enable_gmsl_trigger": "true",
         }.items(),
     )
 
-    left_camera = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "gemini_330_series.launch.py")
-        ),
-        launch_arguments={
-            "camera_name": "left_camera",
-            "usb_port": "2-1.2.1",
-            "device_num": "3",
-            "sync_mode": "hardware_triggering",
-            "config_file_path": config_file_path,
-        }.items(),
-    )
-    rear_camera = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "gemini_330_series.launch.py")
-        ),
-        launch_arguments={
-            "camera_name": "rear_camera",
-            "usb_port": "2-3",
-            "device_num": "3",
-            "sync_mode": "hardware_triggering",
-            "config_file_path": config_file_path,
-        }.items(),
-    )
+    # left_camera = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         os.path.join(launch_file_dir, "gemini_330_series.launch.py")
+    #     ),
+    #     launch_arguments={
+    #         "camera_name": "left_camera",
+    #         "usb_port": "gmsl2-2",
+    #         "device_num": "3",
+    #         "sync_mode": "secondary",
+    #         "config_file_path": config_file_path,
+    #         "enable_gmsl_trigger": "false",
+    #     }.items(),
+    # )
     right_camera = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(launch_file_dir, "gemini_330_series.launch.py")
         ),
         launch_arguments={
             "camera_name": "right_camera",
-            "usb_port": "2-7",
-            "device_num": "3",
+            "usb_port": "gmsl2-3",
+            "device_num": "2",
             "sync_mode": "hardware_triggering",
             "config_file_path": config_file_path,
+            "enable_gmsl_trigger": "false",
         }.items(),
     )
+    # rear_camera = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         os.path.join(launch_file_dir, "gemini_330_series.launch.py")
+    #     ),
+    #     launch_arguments={
+    #         "camera_name": "rear_camera",
+    #         "usb_port": "gmsl2-4",
+    #         "device_num": "3",
+    #         "sync_mode": "secondary",
+    #         "config_file_path": config_file_path,
+    #         "enable_gmsl_trigger": "false",
+    #     }.items(),
+    # )
 
     # Launch description
     ld = LaunchDescription(
         [
-            GroupAction([rear_camera]),
-            GroupAction([left_camera]),
-            GroupAction([right_camera]),
-            TimerAction(period=3.0, actions=[GroupAction([front_camera])]),
-            # The primary camera should be launched at last
+          # TimerAction(period=0.5, actions=[GroupAction([rear_camera])]),
+          TimerAction(period=0.5, actions=[GroupAction([right_camera])]),
+          # TimerAction(period=0.5, actions=[GroupAction([left_camera])]),
+          TimerAction(period=0.5, actions=[GroupAction([front_camera])]),
+          # The primary camera should be launched at last
         ]
     )
 

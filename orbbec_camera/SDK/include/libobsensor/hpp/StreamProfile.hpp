@@ -9,6 +9,7 @@
 
 #include "Types.hpp"
 #include "libobsensor/h/StreamProfile.h"
+#include "libobsensor/h/Error.h"
 #include <iostream>
 #include <memory>
 
@@ -19,9 +20,7 @@ protected:
     const ob_stream_profile_t *impl_ = nullptr;
 
 public:
-    explicit StreamProfile(const ob_stream_profile_t *impl) : impl_(impl) {}
-
-    StreamProfile(StreamProfile &streamProfile) = delete;
+    StreamProfile(StreamProfile &streamProfile)            = delete;
     StreamProfile &operator=(StreamProfile &streamProfile) = delete;
 
     StreamProfile(StreamProfile &&streamProfile) noexcept : impl_(streamProfile.impl_) {
@@ -106,7 +105,7 @@ public:
             throw std::runtime_error("Unsupported operation. Object's type is not the required type.");
         }
 
-        return std::static_pointer_cast<T>(shared_from_this());
+        return std::dynamic_pointer_cast<T>(shared_from_this());
     }
 
     /**
@@ -123,7 +122,6 @@ public:
         return std::static_pointer_cast<const T>(shared_from_this());
     }
 
-public:
     // The following interfaces are deprecated and are retained here for compatibility purposes.
     OBFormat format() const {
         return getFormat();
@@ -132,6 +130,9 @@ public:
     OBStreamType type() const {
         return getType();
     }
+
+protected:
+    explicit StreamProfile(const ob_stream_profile_t *impl) : impl_(impl) {}
 };
 
 /**
@@ -351,6 +352,33 @@ template <typename T> bool StreamProfile::is() const {
     return false;
 }
 
+class StreamProfileFactory {
+public:
+    static std::shared_ptr<StreamProfile> create(const ob_stream_profile_t *impl) {
+        ob_error  *error = nullptr;
+        const auto type  = ob_stream_profile_get_type(impl, &error);
+        Error::handle(&error);
+        switch(type) {
+        case OB_STREAM_IR:
+        case OB_STREAM_IR_LEFT:
+        case OB_STREAM_IR_RIGHT:
+        case OB_STREAM_DEPTH:
+        case OB_STREAM_COLOR:
+        case OB_STREAM_VIDEO:
+            return std::make_shared<VideoStreamProfile>(impl);
+        case OB_STREAM_ACCEL:
+            return std::make_shared<AccelStreamProfile>(impl);
+        case OB_STREAM_GYRO:
+            return std::make_shared<GyroStreamProfile>(impl);
+        default: {
+            ob_error *err = ob_create_error(OB_STATUS_ERROR, "Unsupported stream type.", "StreamProfileFactory::create", "", OB_EXCEPTION_TYPE_INVALID_VALUE);
+            Error::handle(&err);
+            return nullptr;
+        }
+        }
+    }
+};
+
 class StreamProfileList {
 protected:
     const ob_stream_profile_list_t *impl_;
@@ -385,7 +413,7 @@ public:
         ob_error *error   = nullptr;
         auto      profile = ob_stream_profile_list_get_profile(impl_, index, &error);
         Error::handle(&error);
-        return std::make_shared<StreamProfile>(profile);
+        return StreamProfileFactory::create(profile);
     }
 
     /**
@@ -403,7 +431,8 @@ public:
         ob_error *error   = nullptr;
         auto      profile = ob_stream_profile_list_get_video_stream_profile(impl_, width, height, format, fps, &error);
         Error::handle(&error);
-        return std::make_shared<VideoStreamProfile>(profile);
+        auto vsp = StreamProfileFactory::create(profile);
+        return vsp->as<VideoStreamProfile>();
     }
 
     /**
@@ -417,7 +446,8 @@ public:
         ob_error *error   = nullptr;
         auto      profile = ob_stream_profile_list_get_accel_stream_profile(impl_, fullScaleRange, sampleRate, &error);
         Error::handle(&error);
-        return std::make_shared<AccelStreamProfile>(profile);
+        auto asp = StreamProfileFactory::create(profile);
+        return asp->as<AccelStreamProfile>();
     }
 
     /**
@@ -431,7 +461,8 @@ public:
         ob_error *error   = nullptr;
         auto      profile = ob_stream_profile_list_get_gyro_stream_profile(impl_, fullScaleRange, sampleRate, &error);
         Error::handle(&error);
-        return std::make_shared<GyroStreamProfile>(profile);
+        auto gsp = StreamProfileFactory::create(profile);
+        return gsp->as<GyroStreamProfile>();
     }
 
 public:
@@ -442,4 +473,3 @@ public:
 };
 
 }  // namespace ob
-

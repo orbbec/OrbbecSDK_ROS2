@@ -63,6 +63,7 @@
 #include "orbbec_camera/image_publisher.h"
 #include "jpeg_decoder.h"
 #include <std_msgs/msg/string.hpp>
+#include <fcntl.h>
 
 #if defined(ROS_JAZZY) || defined(ROS_IRON)
 #include <cv_bridge/cv_bridge.hpp>
@@ -93,6 +94,8 @@
 #define ODOM_FRAME_ID()                                                                           \
   (static_cast<std::ostringstream&&>(std::ostringstream() << getNamespaceStr() << "_odom_frame")) \
       .str()
+
+#define DEVICE_PATH "/dev/camsync"
 
 namespace orbbec_camera {
 using GetDeviceInfo = orbbec_camera_msgs::srv::GetDeviceInfo;
@@ -129,6 +132,11 @@ const std::map<OBStreamType, OBFrameType> STREAM_TYPE_TO_FRAME_TYPE = {
     {OB_STREAM_ACCEL, OB_FRAME_ACCEL},
 };
 
+typedef struct {
+    uint8_t  mode;
+    uint16_t fps;
+} cs_param_t;
+
 class OBCameraNode {
  public:
   OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> device,
@@ -151,6 +159,11 @@ class OBCameraNode {
   void startIMUSyncStream();
 
   void startIMU();
+
+  int openSocSyncPwmTrigger(uint16_t fps);
+  int closeSocSyncPwmTrigger();
+  void startGmslTrigger();
+  void stopGmslTrigger();
 
  private:
   struct IMUData {
@@ -539,6 +552,9 @@ class OBCameraNode {
   int hdr_merge_gain_1_ = -1;
   int hdr_merge_exposure_2_ = -1;
   int hdr_merge_gain_2_ = -1;
+  int gmsl_trigger_fd_ = -1;
+  int gmsl_trigger_fps_ = -1;
+  bool enable_gmsl_trigger_ = false;
 
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr filter_status_pub_;
   nlohmann::json filter_status_;

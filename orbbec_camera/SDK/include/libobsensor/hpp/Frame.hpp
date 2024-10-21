@@ -261,7 +261,7 @@ public:
         ob_error *error   = nullptr;
         auto      profile = ob_frame_get_stream_profile(impl_, &error);
         Error::handle(&error);
-        return std::make_shared<StreamProfile>(profile);
+        return StreamProfileFactory::create(profile);
     }
 
     /**

@@ -17,9 +17,9 @@ def generate_launch_description():
         ),
         launch_arguments={
             "camera_name": "front_camera",
-            "usb_port": "2-2",
-            "device_num": "1",
-            "sync_mode": "secondary",
+            "usb_port": "2-7",
+            "device_num": "2",
+            "sync_mode": "software_triggering",
             "enable_left_ir":"true",
         }.items(),
     )
@@ -42,11 +42,10 @@ def generate_launch_description():
         ),
         launch_arguments={
             "camera_name": "right_camera",
-            "usb_port": "gmsl2-3",
+            "usb_port": "2-6",
             "device_num": "2",
-            "sync_mode": "secondary",
-            "config_file_path": config_file_path,
-            "enable_gmsl_trigger": "false",
+            "sync_mode": "hardware_triggering",
+            "enable_left_ir":"true",
         }.items(),
     )
     # rear_camera = IncludeLaunchDescription(
@@ -71,18 +70,18 @@ def generate_launch_description():
         {
             # The port number should be filled in according to the order of the port numbers above.
             # "usb_ports": ["gmsl2-1","gmsl2-2","gmsl2-3"],
-            "image_number": "100",
-            "usb_ports": ["2-2"],
+            "image_number": "20",
+            "usb_ports": ["2-7","2-6"],
             "ir_topics": [
                 "/front_camera/left_ir/image_raw",
                 # "/left_camera/left_ir/image_raw",
-                # "/right_camera/left_ir/image_raw",
+                "/right_camera/left_ir/image_raw",
                 # "/rear_camera/left_ir/image_raw",
             ],
             "color_topics": [
                 "/front_camera/color/image_raw",
                 # "/left_camera/color/image_raw",
-                # "/right_camera/color/image_raw",
+                "/right_camera/color/image_raw",
                 # "/rear_camera/color/image_raw",
             ],
           }
@@ -97,9 +96,9 @@ def generate_launch_description():
             period=0.5,
             actions=[
               # TimerAction(period=0.5, actions=[GroupAction([rear_camera])]),
-            #   TimerAction(period=0.5, actions=[GroupAction([right_camera])]),
+              TimerAction(period=0.5, actions=[GroupAction([right_camera])]),
               # TimerAction(period=0.5, actions=[GroupAction([left_camera])]),
-              TimerAction(period=0.5, actions=[GroupAction([front_camera])]),
+              TimerAction(period=1.0, actions=[GroupAction([front_camera])]),
               # The primary camera should be launched at last
             ],
           ),

@@ -20,7 +20,7 @@ supports ROS 2 Foxy, Humble, and Jazzy distributions.
     * [Limitations](#limitations)
   * [Use V4L2 backend](#use-v4l2-backend)
   * [Launch parameters](#launch-parameters)
-  * [ROS2(Robot) vs Optical(Camera) Coordination Systems](#ros2(robot)-vs-optical(camera)-coordination-systems)
+  * [ROS2-vs-Optical Coordination Systems](#ros2robot-vs-opticalcamera-coordination-systems)
   * [Camera sensor structure](#camera-sensor-structure)
   * [TF from coordinate A to coordinate B:](#tf-from-coordinate-a-to-coordinate-b)
   * [Predefined presets](#predefined-presets)

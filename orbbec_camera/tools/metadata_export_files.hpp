@@ -108,7 +108,7 @@ class MetadataExportFiles : public rclcpp::Node {
 
     left_ir_sync_ = std::make_shared<message_filters::Synchronizer<MySyncPolicy>>(
         MySyncPolicy(10), *left_ir_image_sub_, *left_ir_metadata_sub_);
-    left_ir_sync_->setMaxIntervalDuration(rclcpp::Duration(100000000LL));  // 100 ms
+    left_ir_sync_->setMaxIntervalDuration(rclcpp::Duration(0, 100 * 1000000));  // 100 ms
 
     left_ir_sync_->registerCallback(
         std::bind(&MetadataExportFiles::left_ir_metadata_sync_callback, this, _1, _2));
@@ -121,7 +121,7 @@ class MetadataExportFiles : public rclcpp::Node {
 
     right_ir_sync_ = std::make_shared<message_filters::Synchronizer<MySyncPolicy>>(
         MySyncPolicy(10), *right_ir_image_sub_, *right_ir_metadata_sub_);
-    right_ir_sync_->setMaxIntervalDuration(rclcpp::Duration(100000000LL));  // 100 ms
+    right_ir_sync_->setMaxIntervalDuration(rclcpp::Duration(0, 100 * 1000000));  // 100 ms
 
     right_ir_sync_->registerCallback(
         std::bind(&MetadataExportFiles::right_ir_metadata_sync_callback, this, _1, _2));
@@ -134,7 +134,7 @@ class MetadataExportFiles : public rclcpp::Node {
 
     depth_sync_ = std::make_shared<message_filters::Synchronizer<MySyncPolicy>>(
         MySyncPolicy(10), *depth_image_sub_, *depth_metadata_sub_);
-    depth_sync_->setMaxIntervalDuration(rclcpp::Duration(100000000LL));  // 100 ms
+    depth_sync_->setMaxIntervalDuration(rclcpp::Duration(0, 100 * 1000000));  // 100 ms
 
     depth_sync_->registerCallback(
         std::bind(&MetadataExportFiles::depth_metadata_sync_callback, this, _1, _2));
@@ -147,7 +147,7 @@ class MetadataExportFiles : public rclcpp::Node {
 
     color_sync_ = std::make_shared<message_filters::Synchronizer<MySyncPolicy>>(
         MySyncPolicy(10), *color_image_sub_, *color_metadata_sub_);
-    color_sync_->setMaxIntervalDuration(rclcpp::Duration(100000000LL));  // 100 ms
+    color_sync_->setMaxIntervalDuration(rclcpp::Duration(0, 100 * 1000000));  // 100 ms
 
     color_sync_->registerCallback(
         std::bind(&MetadataExportFiles::color_metadata_sync_callback, this, _1, _2));
@@ -380,9 +380,10 @@ class MetadataExportFiles : public rclcpp::Node {
     }
 
     std::ostringstream ss;
-    ss << serial_path << "/" << std::to_string(frame_index) << "_" << "0000" << "_"
-       << camera_timestamp_us << "_" << timestamp_us.str() << "_" << prefix << "_" << resolution
-       << ".png";
+    ss << serial_path << "/" << std::to_string(frame_index) << "_"
+       << "0000"
+       << "_" << camera_timestamp_us << "_" << timestamp_us.str() << "_" << prefix << "_"
+       << resolution << ".png";
     cv::imwrite(ss.str(), cv_ptr->image);
   }
   void save_metadata_to_file(const ImageMetadata &metadata, const std::string &prefix) {

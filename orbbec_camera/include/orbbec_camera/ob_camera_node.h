@@ -64,6 +64,7 @@
 #include "jpeg_decoder.h"
 #include <std_msgs/msg/string.hpp>
 #include <fcntl.h>
+#include <unistd.h>
 
 #if defined(ROS_JAZZY) || defined(ROS_IRON)
 #include <cv_bridge/cv_bridge.hpp>
@@ -133,8 +134,8 @@ const std::map<OBStreamType, OBFrameType> STREAM_TYPE_TO_FRAME_TYPE = {
 };
 
 typedef struct {
-    uint8_t  mode;
-    uint16_t fps;
+  uint8_t mode;
+  uint16_t fps;
 } cs_param_t;
 
 class OBCameraNode {

@@ -133,8 +133,7 @@ class MetadataSaveFiles : public rclcpp::Node {
 
     left_ir_sync_ = std::make_shared<message_filters::Synchronizer<MySyncPolicy>>(
         MySyncPolicy(10), *left_ir_image_sub_, *left_ir_metadata_sub_);
-    left_ir_sync_->setMaxIntervalDuration(
-        rclcpp::Duration::from_nanoseconds(100000000LL));  // 100 ms
+    left_ir_sync_->setMaxIntervalDuration(rclcpp::Duration(100000000LL));  // 100 ms
 
     left_ir_sync_->registerCallback(
         std::bind(&MetadataSaveFiles::left_ir_metadata_sync_callback, this, _1, _2));
@@ -147,8 +146,7 @@ class MetadataSaveFiles : public rclcpp::Node {
 
     right_ir_sync_ = std::make_shared<message_filters::Synchronizer<MySyncPolicy>>(
         MySyncPolicy(10), *right_ir_image_sub_, *right_ir_metadata_sub_);
-    right_ir_sync_->setMaxIntervalDuration(
-        rclcpp::Duration::from_nanoseconds(100000000LL));  // 100 ms
+    right_ir_sync_->setMaxIntervalDuration(rclcpp::Duration(100000000LL));  // 100 ms
 
     right_ir_sync_->registerCallback(
         std::bind(&MetadataSaveFiles::right_ir_metadata_sync_callback, this, _1, _2));
@@ -161,7 +159,7 @@ class MetadataSaveFiles : public rclcpp::Node {
 
     depth_sync_ = std::make_shared<message_filters::Synchronizer<MySyncPolicy>>(
         MySyncPolicy(10), *depth_image_sub_, *depth_metadata_sub_);
-    depth_sync_->setMaxIntervalDuration(rclcpp::Duration::from_nanoseconds(100000000LL));  // 100 ms
+    depth_sync_->setMaxIntervalDuration(rclcpp::Duration(100000000LL));  // 100 ms
 
     depth_sync_->registerCallback(
         std::bind(&MetadataSaveFiles::depth_metadata_sync_callback, this, _1, _2));

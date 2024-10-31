@@ -2077,7 +2077,6 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
       .toImageMsg(*image_msg);
   CHECK_NOTNULL(image_msg.get());
   image_msg->header.stamp = timestamp;
-  RCLCPP_INFO_STREAM(logger_, "timestamp " << frame_timestamp);
   image_msg->is_bigendian = false;
   image_msg->step = width * unit_step_size_[stream_index];
   image_msg->header.frame_id = frame_id;

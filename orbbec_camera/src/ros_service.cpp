@@ -169,6 +169,16 @@ void OBCameraNode::setupCameraCtrlServices() {
                                          std::shared_ptr<GetInt32::Response> response) {
         getLdpMeasureDistanceCallback(request, response);
       });
+  set_sync_immediately_srv_ = node_->create_service<SetBool>(
+      "set_sync_immediately", [this](const std::shared_ptr<SetBool::Request> request,
+                                     std::shared_ptr<SetBool::Response> response) {
+        setSYNCImmediatelyCallback(request, response);
+      });
+  set_reset_timestamp_srv_ = node_->create_service<SetBool>(
+      "set_reset_timestamp", [this](const std::shared_ptr<SetBool::Request> request,
+                                    std::shared_ptr<SetBool::Response> response) {
+        setRESETTimestampCallback(request, response);
+      });
 }
 
 void OBCameraNode::setExposureCallback(const std::shared_ptr<SetInt32::Request>& request,
@@ -767,4 +777,43 @@ void OBCameraNode::setIRLongExposureCallback(
     response->success = false;
   }
 }
+
+void OBCameraNode::setSYNCImmediatelyCallback(
+    const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
+    std::shared_ptr<std_srvs::srv::SetBool::Response>& response) {
+  (void)request;
+  try {
+    TRY_EXECUTE_BLOCK(device_->timerSyncWithHost());
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->message = e.getMessage();
+    response->success = false;
+  } catch (const std::exception& e) {
+    response->message = e.what();
+    response->success = false;
+  } catch (...) {
+    response->message = "unknown error";
+    response->success = false;
+  }
+}
+
+void OBCameraNode::setRESETTimestampCallback(
+    const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
+    std::shared_ptr<std_srvs::srv::SetBool::Response>& response) {
+  (void)request;
+  try {
+    device_->setBoolProperty(OB_PROP_TIMER_RESET_SIGNAL_BOOL, true);
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->message = e.getMessage();
+    response->success = false;
+  } catch (const std::exception& e) {
+    response->message = e.what();
+    response->success = false;
+  } catch (...) {
+    response->message = "unknown error";
+    response->success = false;
+  }
+}
+
 }  // namespace orbbec_camera

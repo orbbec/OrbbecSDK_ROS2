@@ -2,7 +2,7 @@
 
  [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-2.0.7-green)
 
-Orbbec SDK ROS 2 is a wrapper for the Orbbec 3D camera that provides seamless integration with the ROS 2 environment. It
+OrbbecSDK_ROS2 is a wrapper for the Orbbec 3D camera that provides seamless integration with the ROS 2 environment. It
 supports ROS 2 Foxy, Humble, and Jazzy distributions.
 
 With the major update of the new branch [v2-main](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main?tab=readme-ov-file) in October 2024, OrbbecSDK_ROS2 is connected to the open source version of [OrbbecSDK v2](https://github.com/orbbec/OrbbecSDK_v2/releases), which will make OrbbecSDK_ROS2 more flexible and extensible. This update in v2-main ensures compatibility with all new Orbbec USB products that comply with the UVC standard. However, OrbbecSDK_ROS2 v2 no longer supports Orbbec's traditional OpenNI protocol devices. We encourage you to check whether your device is supported by OrbbecSDK_ROS2 v2 and use the new version if supported.

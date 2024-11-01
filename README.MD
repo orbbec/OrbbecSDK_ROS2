@@ -1,17 +1,17 @@
-# OrbbecSDK ROS2
+# Orbbec ROS2 SDK
 
  [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-1.5.11-green)
 
 OrbbecSDK_ROS 2 is a wrapper for the Orbbec 3D camera that provides seamless integration with the ROS 2 environment. It
 supports ROS 2 Foxy, Humble, and Jazzy distributions.
 
-With the major update of the new branch [v2-main](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main?tab=readme-ov-file) in October 2024, OrbbecSDK_ROS2 is connected to the open source version of [OrbbecSDK v2](https://github.com/orbbec/OrbbecSDK_v2/releases), which will make OrbbecSDK_ROS2 more flexible and extensible. This update in v2-main ensures compatibility with all new Orbbec USB products that comply with the UVC standard. However, OrbbecSDK_ROS2 v2 no longer supports Orbbec's traditional OpenNI protocol devices. We encourage you to check whether your device is supported by OrbbecSDK_ROS2 v2 and use the new version if supported.
+With the major update of the new branch [v2-main](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main?tab=readme-ov-file) in October 2024, OrbbecSDK_ROS2 is connected to the open source version of Orbbec SDK, which will make OrbbecSDK_ROS2 more flexible and extensible. This update in v2-main ensures compatibility with all new Orbbec USB products that comply with the UVC standard. However, OrbbecSDK_ROS2 v2 no longer supports Orbbec's traditional OpenNI protocol devices. We encourage you to check whether your device is supported by OrbbecSDK_ROS2 v2 and use the new version if supported.
 
 ## Table of Contents
 
 <!-- TOC -->
 
-* [OrbbecSDK ROS2](#orbbec-ros2-sdk)
+* [Orbbec ROS2 SDK](#orbbec-ros2-sdk)
   * [Table of Contents](#table-of-contents)
   * [Installation Instructions](#installation-instructions)
   * [Getting start](#getting-start)
@@ -344,13 +344,13 @@ these settings.*
 
 ## Predefined presets
 
-| Preset         | Features                                                                                                                                                                                                          | Recommended use cases                                                                                                                                             |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Default        | - Best visual perception``- Overall good performance in accuracy, fill rate, tiny objects, etc.                                                                                                            | - Generic`<br>`- Robotics                                                                                                                                       |
-| Hand           | - Clear hand and finger edges                                                                                                                                                                                     | - Gesture recognition                                                                                                                                             |
-| High Accuracy  | - Depth of high confidence`<br>`- Barely noise depth values`<br>`- Lower fill rate                                                                                                                            | - Collision avoidance`<br>`- Object scanning                                                                                                                    |
-| High Density   | - Higher fill rate`<br>`- More tiny objects`<br>`- May suffer from noise depth values                                                                                                                         | - Object recognition`<br>`- Pick & place`<br>`- Foreground & background animation                                                                             |
-| Medium Density | - Balanced performance in fill rate and accuracy`<br>`- In comparison to Default: lower fill rate, better edge quality                                                                                          | - Generic and alternative to Default                                                                                                                              |
+| Preset         | Features                                                                                                                                                                                                        | Recommended use cases                                                                                                                                           |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Default        | - Best visual perception``- Overall good performance in accuracy, fill rate, tiny objects, etc.                                                                                                                 | - Generic`<br>`- Robotics                                                                                                                                       |
+| Hand           | - Clear hand and finger edges                                                                                                                                                                                   | - Gesture recognition                                                                                                                                           |
+| High Accuracy  | - Depth of high confidence`<br>`- Barely noise depth values`<br>`- Lower fill rate                                                                                                                              | - Collision avoidance`<br>`- Object scanning                                                                                                                    |
+| High Density   | - Higher fill rate`<br>`- More tiny objects`<br>`- May suffer from noise depth values                                                                                                                           | - Object recognition`<br>`- Pick & place`<br>`- Foreground & background animation                                                                               |
+| Medium Density | - Balanced performance in fill rate and accuracy`<br>`- In comparison to Default: lower fill rate, better edge quality                                                                                          | - Generic and alternative to Default                                                                                                                            |
 | Custom         | - User defined Preset`<br>`- Derived from Presets above, with customized modifications, e.g. a new configuration for the post-processing pipeline, modified mean intensity set point of depth AE function, etc. | - Better depth performance achieved using customized configurations in comparison to using predefined presets`<br>`- For well-established custom configurations |
 
 Choose the appropriate preset name based on your specific use case and set it as the value for the `device_preset`

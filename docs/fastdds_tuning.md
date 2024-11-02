@@ -1,8 +1,3 @@
-Here's a professional, English version of the document you provided for your client regarding tuning Fast DDS for Orbbec
-camera usage with ROS2:
-
----
-
 # Fast DDS Optimization for Orbbec Camera with ROS2
 
 When operating with the default configuration, Fast DDS exhibits suboptimal transmission efficiency, resulting in

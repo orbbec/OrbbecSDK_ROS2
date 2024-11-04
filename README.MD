@@ -1,24 +1,22 @@
-<<<<<<< HEAD
 # OrbbecSDK ROS2
 
- [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-1.5.11-green)
-=======
-# Orbbec ROS2 SDK
-
 [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-1.5.11-green)
->>>>>>> add mega I launch file
 
 OrbbecSDK_ROS2 is a wrapper for the Orbbec 3D camera that provides seamless integration with the ROS 2 environment. It
 supports ROS 2 Foxy, Humble, and Jazzy distributions.
 
-With the major update of the new branch [v2-main](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main?tab=readme-ov-file) in October 2024, OrbbecSDK_ROS2 is connected to the open source version of [OrbbecSDK v2](https://github.com/orbbec/OrbbecSDK_v2/releases), which will make OrbbecSDK_ROS2 more flexible and extensible. This update in v2-main ensures compatibility with all new Orbbec USB products that comply with the UVC standard. However, OrbbecSDK_ROS2 v2 no longer supports Orbbec's traditional OpenNI protocol devices. We encourage you to check whether your device is supported by OrbbecSDK_ROS2 v2 and use the new version if supported.
+With the major update of the new
+branch [v2-main](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main?tab=readme-ov-file) in October 2024,
+OrbbecSDK_ROS2 is connected to the open source version
+of [OrbbecSDK v2](https://github.com/orbbec/OrbbecSDK_v2/releases), which will make OrbbecSDK_ROS2 more flexible and
+extensible. This update in v2-main ensures compatibility with all new Orbbec USB products that comply with the UVC
+standard. However, OrbbecSDK_ROS2 v2 no longer supports Orbbec's traditional OpenNI protocol devices. We encourage you
+to check whether your device is supported by OrbbecSDK_ROS2 v2 and use the new version if supported.
 
 ## Table of Contents
 
 <!-- TOC -->
-
-<<<<<<< HEAD
-* [OrbbecSDK ROS2](#orbbec-ros2-sdk)
+* [OrbbecSDK ROS2](#orbbecsdk-ros2)
   * [Table of Contents](#table-of-contents)
   * [Installation Instructions](#installation-instructions)
   * [Getting start](#getting-start)
@@ -55,46 +53,6 @@ With the major update of the new branch [v2-main](https://github.com/orbbec/Orbb
     * [Why Are There So Many Launch Files?](#why-are-there-so-many-launch-files)
   * [Other useful links](#other-useful-links)
   * [License](#license)
-=======
-* [Orbbec ROS2 SDK](#orbbec-ros2-sdk)
-    * [Table of Contents](#table-of-contents)
-    * [Installation Instructions](#installation-instructions)
-    * [Getting start](#getting-start)
-    * [Efficient intra-process communication:](#efficient-intra-process-communication)
-        * [Example](#example)
-            * [Manually loading multiple components into the same process](#manually-loading-multiple-components-into-the-same-process)
-            * [Using a launch file](#using-a-launch-file)
-        * [Limitations](#limitations)
-    * [Use V4L2 backend](#use-v4l2-backend)
-    * [Launch parameters](#launch-parameters)
-    * [Predefined presets](#predefined-presets)
-    * [Depth work mode switch](#depth-work-mode-switch)
-    * [Configuration of depth NFOV and WFOV modes](#configuration-of-depth-nfov-and-wfov-modes)
-    * [All available service for camera control](#all-available-service-for-camera-control)
-    * [All available topics](#all-available-topics)
-    * [Network device enumeration](#network-device-enumeration)
-    * [Multi-Camera](#multi-camera)
-    * [Compressed Image](#compressed-image)
-    * [Use hardware decoder to decode JPEG](#use-hardware-decoder-to-decode-jpeg)
-        * [rockchip and Amlogic](#rockchip-and-amlogic)
-        * [Nvidia Jetson](#nvidia-jetson)
-    * [Check which profiles the camera supports](#check-which-profiles-the-camera-supports)
-    * [Building a Debian Package](#building-a-debian-package)
-        * [Preparing the Environment](#preparing-the-environment)
-        * [Configuring ROS Dependencies](#configuring-ros-dependencies)
-        * [Building the Package](#building-the-package)
-    * [Launch files](#launch-files)
-    * [Product support](#product-support)
-    * [DDS Tuning](#dds-tuning)
-    * [Frequently Asked Questions](#frequently-asked-questions)
-        * [Unexpected Crash](#unexpected-crash)
-        * [No Data Stream from Multiple Cameras](#no-data-stream-from-multiple-cameras)
-        * [Additional Troubleshooting](#additional-troubleshooting)
-        * [Why Are There So Many Launch Files?](#why-are-there-so-many-launch-files)
-    * [Other useful links](#other-useful-links)
-    * [License](#license)
->>>>>>> add mega I launch file
-
 <!-- TOC -->
 
 ## Installation Instructions
@@ -244,11 +202,6 @@ ros2 service call /camera/save_point_cloud std_srvs/srv/Empty "{}"
 ```
 
 ## Efficient intra-process communication:
-<<<<<<< HEAD
-
-Our ROS2 Wrapper node supports zero-copy communications if loaded in the same process as a subscriber node. This can reduce copy times on image/pointcloud topics, especially with big frame resolutions and high FPS.
-=======
->>>>>>> add mega I launch file
 
 Our ROS2 Wrapper node supports zero-copy communications if loaded in the same process as a subscriber node. This can
 reduce copy times on image/pointcloud topics, especially with big frame resolutions and high FPS.
@@ -375,23 +328,6 @@ The following are the launch parameters available:
   attempt to reset the camera up to three times. This setting aims to prevent USB 3.0 devices from being incorrectly
   recognized as USB 2.0. It is recommended to set this parameter to `false` when using a USB 2.0 connection to avoid
   unnecessary resets.
-<<<<<<< HEAD
-- `enable_3d_reconstruction_mode`: Enables 3D reconstruction mode. Default is `false`. When set to `true`, the camera
-  laser operates in on-off mode, capturing IR images (laser off) for VSLAM localization and depth images (laser on) for point cloud computation.
-- `tf_publish_rate`: The rate at which the camera publishes dynamic transforms. The default value is `0.0`, which means static transforms are published.
-- `time_domain`: The frame time domain, string type, can be `device`, `global`, or `system`. `device` means using the hardware timestamp from the camera,
-  `system` means using the timestamp when the PC received the first packet of data or frame, and `global` is used for synchronized time across multiple
-  devices, aligning data from different sources to a common time base.
-- `enable_sync_host_time`: Enables synchronization of the host time with the camera time. The default value is `true`, if
-  use global time, set to `false`. Some old devices may not support this feature.
-- `config_file_path`: The path to the YAML configuration file. The default value is `""`. If the configuration file is not specified,
-  the default parameters from the launch file will be used. If you want to use a custom configuration file, please refer to `gemini_330_series.launch.py`.
-  `enable_heartbeat` enables the heartbeat function, which is set to `false` by default. If set to `true`, the camera node will send heartbeat signals to
-  the firmware, and if hardware logging is desired, it should also be set to `true`.
-- `log_level` : SDK log level, the default value is `info`, the optional values are `debug`, `info`, `warn`, `error`, `fatal`.
-- `enable_color_undistortion`: Enables color undistortion, the default value is `false`. Note that our color cameras exhibit minimal distortion, and typically, undistortion is not necessary.
-=======
-
 - `enable_3d_reconstruction_mode`: Enables 3D reconstruction mode. Default is `false`. When set to `true`, the camera
   laser operates in on-off mode, capturing IR images (laser off) for VSLAM localization and depth images (laser on) for
   point cloud computation.
@@ -416,7 +352,6 @@ The following are the launch parameters available:
   `fatal`.
 - `enable_color_undistortion`: Enables color undistortion, the default value is `false`. Note that our color cameras
   exhibit minimal distortion, and typically, undistortion is not necessary.
->>>>>>> add mega I launch file
 - `color_brightness`: Color brightness.
 - `ir_brightness`: IR brightness.
 - `color_ae_max_exposure`: Color auto exposure maximum exposure.
@@ -430,13 +365,13 @@ these settings.*
 
 ## Predefined presets
 
-| Preset         | Features                                                                                                                                                                                                           | Recommended use cases                                                                                                                                              |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Default        | - Best visual perception``- Overall good performance in accuracy, fill rate, tiny objects, etc.                                                                                                                    | - Generic `<br>`- Robotics                                                                                                                                       |
-| Hand           | - Clear hand and finger edges                                                                                                                                                                                      | - Gesture recognition                                                                                                                                              |
-| High Accuracy  | - Depth of high confidence `<br>`- Barely noise depth values `<br>`- Lower fill rate                                                                                                                           | - Collision avoidance `<br>`- Object scanning                                                                                                                    |
-| High Density   | - Higher fill rate `<br>`- More tiny objects `<br>`- May suffer from noise depth values                                                                                                                        | - Object recognition `<br>`- Pick & place `<br>`- Foreground & background animation                                                                            |
-| Medium Density | - Balanced performance in fill rate and accuracy `<br>`- In comparison to Default: lower fill rate, better edge quality                                                                                          | - Generic and alternative to Default                                                                                                                               |
+| Preset         | Features                                                                                                                                                                                                         | Recommended use cases                                                                                                                                            |
+|----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Default        | - Best visual perception``- Overall good performance in accuracy, fill rate, tiny objects, etc.                                                                                                                  | - Generic `<br>`- Robotics                                                                                                                                       |
+| Hand           | - Clear hand and finger edges                                                                                                                                                                                    | - Gesture recognition                                                                                                                                            |
+| High Accuracy  | - Depth of high confidence `<br>`- Barely noise depth values `<br>`- Lower fill rate                                                                                                                             | - Collision avoidance `<br>`- Object scanning                                                                                                                    |
+| High Density   | - Higher fill rate `<br>`- More tiny objects `<br>`- May suffer from noise depth values                                                                                                                          | - Object recognition `<br>`- Pick & place `<br>`- Foreground & background animation                                                                              |
+| Medium Density | - Balanced performance in fill rate and accuracy `<br>`- In comparison to Default: lower fill rate, better edge quality                                                                                          | - Generic and alternative to Default                                                                                                                             |
 | Custom         | - User defined Preset `<br>`- Derived from Presets above, with customized modifications, e.g. a new configuration for the post-processing pipeline, modified mean intensity set point of depth AE function, etc. | - Better depth performance achieved using customized configurations in comparison to using predefined presets `<br>`- For well-established custom configurations |
 
 Choose the appropriate preset name based on your specific use case and set it as the value for the `device_preset`
@@ -698,7 +633,7 @@ bash .make_deb.sh
 ## Launch files
 
 | product serials                       | launch file                 |
-| ------------------------------------- | --------------------------- |
+|---------------------------------------|-----------------------------|
 | astra+                                | astra_adv.launch.py         |
 | astra mini /astra mini pro /astra pro | astra.launch.py             |
 | astra mini pro s                      | astra.launch.py             |
@@ -728,7 +663,7 @@ bash .make_deb.sh
 | gemini ew                             | gemini_ew.launch.py         |
 | gemini ew lite                        | gemini_ew_lite.launch.py    |
 | gemini 330 series                     | gemini_330_series.launch.py |
-| femto mega network /femto mega I      | femto_net_camera.launch.py  |
+| femto mega I                          | femto_net_camera.launch.py  |
 
 **All launch files are essentially similar, with the primary difference being the default values of the parameters set
 for different models
@@ -827,12 +762,8 @@ Please send this log to the support team or submit it to a GitHub issue for furt
 
 **Increase usbfs_memory_mb Value**:
 
-<<<<<<< HEAD
-- Increase the `usbfs_memory_mb` value to 128MB (this is a reference value and can be adjusted based on your system’s needs)
-=======
 - Increase the `usbfs_memory_mb` value to 128MB (this is a reference value and can be adjusted based on your system’s
   needs)
->>>>>>> add mega I launch file
   by running the following command:
 
 ```bash
@@ -843,12 +774,8 @@ Please send this log to the support team or submit it to a GitHub issue for furt
 
 ### Additional Troubleshooting
 
-<<<<<<< HEAD
-- If you encounter other issues, set the `log_level` parameter to `debug`. This will generate an SDK log file in the running directory: `Log/OrbbecSDK.log.txt`.
-=======
 - If you encounter other issues, set the `log_level` parameter to `debug`. This will generate an SDK log file in the
   running directory: `Log/OrbbecSDK.log.txt`.
->>>>>>> add mega I launch file
   Please provide this file to the support team for further assistance.
 - If firmware logs are required, set `enable_heartbeat` to `true` to activate this feature.
 

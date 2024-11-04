@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 # OrbbecSDK ROS2
 
  [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-1.5.11-green)
+=======
+# Orbbec ROS2 SDK
+
+[![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-1.5.11-green)
+>>>>>>> add mega I launch file
 
 OrbbecSDK_ROS2 is a wrapper for the Orbbec 3D camera that provides seamless integration with the ROS 2 environment. It
 supports ROS 2 Foxy, Humble, and Jazzy distributions.
@@ -11,6 +17,7 @@ With the major update of the new branch [v2-main](https://github.com/orbbec/Orbb
 
 <!-- TOC -->
 
+<<<<<<< HEAD
 * [OrbbecSDK ROS2](#orbbec-ros2-sdk)
   * [Table of Contents](#table-of-contents)
   * [Installation Instructions](#installation-instructions)
@@ -48,6 +55,45 @@ With the major update of the new branch [v2-main](https://github.com/orbbec/Orbb
     * [Why Are There So Many Launch Files?](#why-are-there-so-many-launch-files)
   * [Other useful links](#other-useful-links)
   * [License](#license)
+=======
+* [Orbbec ROS2 SDK](#orbbec-ros2-sdk)
+    * [Table of Contents](#table-of-contents)
+    * [Installation Instructions](#installation-instructions)
+    * [Getting start](#getting-start)
+    * [Efficient intra-process communication:](#efficient-intra-process-communication)
+        * [Example](#example)
+            * [Manually loading multiple components into the same process](#manually-loading-multiple-components-into-the-same-process)
+            * [Using a launch file](#using-a-launch-file)
+        * [Limitations](#limitations)
+    * [Use V4L2 backend](#use-v4l2-backend)
+    * [Launch parameters](#launch-parameters)
+    * [Predefined presets](#predefined-presets)
+    * [Depth work mode switch](#depth-work-mode-switch)
+    * [Configuration of depth NFOV and WFOV modes](#configuration-of-depth-nfov-and-wfov-modes)
+    * [All available service for camera control](#all-available-service-for-camera-control)
+    * [All available topics](#all-available-topics)
+    * [Network device enumeration](#network-device-enumeration)
+    * [Multi-Camera](#multi-camera)
+    * [Compressed Image](#compressed-image)
+    * [Use hardware decoder to decode JPEG](#use-hardware-decoder-to-decode-jpeg)
+        * [rockchip and Amlogic](#rockchip-and-amlogic)
+        * [Nvidia Jetson](#nvidia-jetson)
+    * [Check which profiles the camera supports](#check-which-profiles-the-camera-supports)
+    * [Building a Debian Package](#building-a-debian-package)
+        * [Preparing the Environment](#preparing-the-environment)
+        * [Configuring ROS Dependencies](#configuring-ros-dependencies)
+        * [Building the Package](#building-the-package)
+    * [Launch files](#launch-files)
+    * [Product support](#product-support)
+    * [DDS Tuning](#dds-tuning)
+    * [Frequently Asked Questions](#frequently-asked-questions)
+        * [Unexpected Crash](#unexpected-crash)
+        * [No Data Stream from Multiple Cameras](#no-data-stream-from-multiple-cameras)
+        * [Additional Troubleshooting](#additional-troubleshooting)
+        * [Why Are There So Many Launch Files?](#why-are-there-so-many-launch-files)
+    * [Other useful links](#other-useful-links)
+    * [License](#license)
+>>>>>>> add mega I launch file
 
 <!-- TOC -->
 
@@ -198,12 +244,21 @@ ros2 service call /camera/save_point_cloud std_srvs/srv/Empty "{}"
 ```
 
 ## Efficient intra-process communication:
+<<<<<<< HEAD
 
 Our ROS2 Wrapper node supports zero-copy communications if loaded in the same process as a subscriber node. This can reduce copy times on image/pointcloud topics, especially with big frame resolutions and high FPS.
+=======
+>>>>>>> add mega I launch file
 
-You will need to launch a component container and launch our node as a component together with other component nodes. Further details on "Composing multiple nodes in a single process" can be found [here](https://docs.ros.org/en/rolling/Tutorials/Composition.html).
+Our ROS2 Wrapper node supports zero-copy communications if loaded in the same process as a subscriber node. This can
+reduce copy times on image/pointcloud topics, especially with big frame resolutions and high FPS.
 
-Further details on efficient intra-process communication can be found [here](https://docs.ros.org/en/humble/Tutorials/Intra-Process-Communication.html#efficient-intra-process-communication).
+You will need to launch a component container and launch our node as a component together with other component nodes.
+Further details on "Composing multiple nodes in a single process" can be
+found [here](https://docs.ros.org/en/rolling/Tutorials/Composition.html).
+
+Further details on efficient intra-process communication can be
+found [here](https://docs.ros.org/en/humble/Tutorials/Intra-Process-Communication.html#efficient-intra-process-communication).
 
 ### Example
 
@@ -256,7 +311,8 @@ The following are the launch parameters available:
   settings. The possible values
   are `SYSTEM_DEFAULT`, `DEFAULT`, `PARAMETER_EVENTS`, `SERVICES_DEFAULT`, `PARAMETERS`, `SENSOR_DATA` and are
   case-insensitive. These correspond
-  to `rmw_qos_profile_system_default`, `rmw_qos_profile_default`, `rmw_qos_profile_parameter_events`, `rmw_qos_profile_services_default`, `rmw_qos_profile_parameters`,
+  to `rmw_qos_profile_system_default`, `rmw_qos_profile_default`, `rmw_qos_profile_parameter_events`,
+  `rmw_qos_profile_services_default`, `rmw_qos_profile_parameters`,
   and `SENSOR_DATA`, respectively.
 - `enable_d2c_viewer`: Publishes the D2C overlay image (for testing only).
 - `device_num`: The number of devices. This must be filled in if multiple cameras are required.
@@ -271,13 +327,15 @@ The following are the launch parameters available:
 - `usb_port`: The USB port of the camera. This is required when multiple cameras are used.
 - `enable_accel`: Enables the accelerometer.
 - `accel_rate`: The frequency of the accelerometer, the optional values
-  are `1.5625hz`, `3.125hz`, `6.25hz`, `12.5hz`, `25hz`, `50hz`, `100hz`, `200hz`, `500hz`, `1khz`, `2khz`, `4khz`, `8khz`, `16khz`, `32khz`.
+  are `1.5625hz`, `3.125hz`, `6.25hz`, `12.5hz`, `25hz`, `50hz`, `100hz`, `200hz`, `500hz`, `1khz`, `2khz`, `4khz`,
+  `8khz`, `16khz`, `32khz`.
   The specific value depends on the current camera.
 - `accel_range`: The range of the accelerometer, the optional values are `2g`, `4g`, `8g`, `16g`. The specific value
   depends on the current camera.
 - `enable_gyro`: Enables the gyroscope.
 - `gyro_rate`: The frequency of the gyroscope, the optional values
-  are `1.5625hz`, `3.125hz`, `6.25hz`, `12.5hz`, `25hz`, `50hz`, `100hz`, `200hz`, `500hz`, `1khz`, `2khz`, `4khz`, `8khz`, `16khz`, `32khz`.
+  are `1.5625hz`, `3.125hz`, `6.25hz`, `12.5hz`, `25hz`, `50hz`, `100hz`, `200hz`, `500hz`, `1khz`, `2khz`, `4khz`,
+  `8khz`, `16khz`, `32khz`.
   The specific value depends on the current camera.
 - `gyro_range`: The range of the gyroscope, the optional values
   are `16dps`, `31dps`, `62dps`, `125dps`, `250dps`, `500dps`, `1000dps`, `2000dps`. The specific value depends on the
@@ -317,6 +375,7 @@ The following are the launch parameters available:
   attempt to reset the camera up to three times. This setting aims to prevent USB 3.0 devices from being incorrectly
   recognized as USB 2.0. It is recommended to set this parameter to `false` when using a USB 2.0 connection to avoid
   unnecessary resets.
+<<<<<<< HEAD
 - `enable_3d_reconstruction_mode`: Enables 3D reconstruction mode. Default is `false`. When set to `true`, the camera
   laser operates in on-off mode, capturing IR images (laser off) for VSLAM localization and depth images (laser on) for point cloud computation.
 - `tf_publish_rate`: The rate at which the camera publishes dynamic transforms. The default value is `0.0`, which means static transforms are published.
@@ -331,6 +390,33 @@ The following are the launch parameters available:
   the firmware, and if hardware logging is desired, it should also be set to `true`.
 - `log_level` : SDK log level, the default value is `info`, the optional values are `debug`, `info`, `warn`, `error`, `fatal`.
 - `enable_color_undistortion`: Enables color undistortion, the default value is `false`. Note that our color cameras exhibit minimal distortion, and typically, undistortion is not necessary.
+=======
+
+- `enable_3d_reconstruction_mode`: Enables 3D reconstruction mode. Default is `false`. When set to `true`, the camera
+  laser operates in on-off mode, capturing IR images (laser off) for VSLAM localization and depth images (laser on) for
+  point cloud computation.
+- `tf_publish_rate`: The rate at which the camera publishes dynamic transforms. The default value is `0.0`, which means
+  static transforms are published.
+- `time_domain`: The frame time domain, string type, can be `device`, `global`, or `system`. `device` means using the
+  hardware timestamp from the camera,
+  `system` means using the timestamp when the PC received the first packet of data or frame, and `global` is used for
+  synchronized time across multiple
+  devices, aligning data from different sources to a common time base.
+- `enable_sync_host_time`: Enables synchronization of the host time with the camera time. The default value is `true`,
+  if
+  use global time, set to `false`. Some old devices may not support this feature.
+- `config_file_path`: The path to the YAML configuration file. The default value is `""`. If the configuration file is
+  not specified,
+  the default parameters from the launch file will be used. If you want to use a custom configuration file, please refer
+  to `gemini_330_series.launch.py`.
+  `enable_heartbeat` enables the heartbeat function, which is set to `false` by default. If set to `true`, the camera
+  node will send heartbeat signals to
+  the firmware, and if hardware logging is desired, it should also be set to `true`.
+- `log_level` : SDK log level, the default value is `info`, the optional values are `debug`, `info`, `warn`, `error`,
+  `fatal`.
+- `enable_color_undistortion`: Enables color undistortion, the default value is `false`. Note that our color cameras
+  exhibit minimal distortion, and typically, undistortion is not necessary.
+>>>>>>> add mega I launch file
 - `color_brightness`: Color brightness.
 - `ir_brightness`: IR brightness.
 - `color_ae_max_exposure`: Color auto exposure maximum exposure.
@@ -642,6 +728,7 @@ bash .make_deb.sh
 | gemini ew                             | gemini_ew.launch.py         |
 | gemini ew lite                        | gemini_ew_lite.launch.py    |
 | gemini 330 series                     | gemini_330_series.launch.py |
+| femto mega network /femto mega I      | femto_net_camera.launch.py  |
 
 **All launch files are essentially similar, with the primary difference being the default values of the parameters set
 for different models
@@ -723,7 +810,8 @@ If you use Fast DDS, you can refer to the [Fast DDS Configuration](./docs/fastdd
 
 ### Unexpected Crash
 
-If the camera node crashes unexpectedly, it will generate a crash log in the current running directory: `Log/camera_crash_stack_trace_xx.log`.
+If the camera node crashes unexpectedly, it will generate a crash log in the current running directory:
+`Log/camera_crash_stack_trace_xx.log`.
 Please send this log to the support team or submit it to a GitHub issue for further assistance.
 
 ### No Data Stream from Multiple Cameras
@@ -739,7 +827,12 @@ Please send this log to the support team or submit it to a GitHub issue for furt
 
 **Increase usbfs_memory_mb Value**:
 
+<<<<<<< HEAD
 - Increase the `usbfs_memory_mb` value to 128MB (this is a reference value and can be adjusted based on your system’s needs)
+=======
+- Increase the `usbfs_memory_mb` value to 128MB (this is a reference value and can be adjusted based on your system’s
+  needs)
+>>>>>>> add mega I launch file
   by running the following command:
 
 ```bash
@@ -750,7 +843,12 @@ Please send this log to the support team or submit it to a GitHub issue for furt
 
 ### Additional Troubleshooting
 
+<<<<<<< HEAD
 - If you encounter other issues, set the `log_level` parameter to `debug`. This will generate an SDK log file in the running directory: `Log/OrbbecSDK.log.txt`.
+=======
+- If you encounter other issues, set the `log_level` parameter to `debug`. This will generate an SDK log file in the
+  running directory: `Log/OrbbecSDK.log.txt`.
+>>>>>>> add mega I launch file
   Please provide this file to the support team for further assistance.
 - If firmware logs are required, set `enable_heartbeat` to `true` to activate this feature.
 

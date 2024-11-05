@@ -418,6 +418,32 @@ void OBCameraNode::setupDevices() {
     RCLCPP_INFO_STREAM(logger_, "Setting color brightness to " << color_brightness_);
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_BRIGHTNESS_INT, color_brightness_);
   }
+  if (color_sharpness_ != -1 &&
+      device_->isPropertySupported(OB_PROP_COLOR_SHARPNESS_INT, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting color sharpness to " << color_sharpness_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_SHARPNESS_INT, color_sharpness_);
+  }
+  if (color_saturation_ != -1 &&
+      device_->isPropertySupported(OB_PROP_COLOR_SATURATION_INT, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting color saturation to " << color_saturation_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_SATURATION_INT, color_saturation_);
+  }
+  if (color_contrast_ != -1 &&
+      device_->isPropertySupported(OB_PROP_COLOR_CONTRAST_INT, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting color contrast to " << color_contrast_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_CONTRAST_INT, color_contrast_);
+  }
+  if (color_gamma_ != -1 &&
+      device_->isPropertySupported(OB_PROP_COLOR_GAMMA_INT, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting color gamma to " << color_gamma_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_GAMMA_INT, color_gamma_);
+  }
+  if (color_hue_ != -1 &&
+      device_->isPropertySupported(OB_PROP_COLOR_HUE_INT, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting color hue to " << color_hue_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_HUE_INT, color_hue_);
+  }
+
   // ir ae max
   if (ir_ae_max_exposure_ != -1 &&
       device_->isPropertySupported(OB_PROP_IR_AE_MAX_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
@@ -1064,6 +1090,11 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(color_white_balance_, "color_white_balance", -1);
   setAndGetNodeParameter<int>(color_ae_max_exposure_, "color_ae_max_exposure", -1);
   setAndGetNodeParameter<int>(color_brightness_, "color_brightness", -1);
+  setAndGetNodeParameter<int>(color_sharpness_, "color_sharpness", -1);
+  setAndGetNodeParameter<int>(color_saturation_, "color_saturation", -1);
+  setAndGetNodeParameter<int>(color_contrast_, "color_contrast", -1);
+  setAndGetNodeParameter<int>(color_gamma_, "color_gamma", -1);
+  setAndGetNodeParameter<int>(color_hue_, "color_hue", -1);
   setAndGetNodeParameter(enable_ir_auto_exposure_, "enable_ir_auto_exposure", true);
   setAndGetNodeParameter<int>(ir_exposure_, "ir_exposure", -1);
   setAndGetNodeParameter<int>(ir_gain_, "ir_gain", -1);

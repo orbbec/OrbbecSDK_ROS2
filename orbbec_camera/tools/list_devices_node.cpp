@@ -31,6 +31,7 @@ int main() {
       auto usb_port = orbbec_camera::parseUsbPort(uid);
       RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), "serial: " << serial);
       RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), "usb port: " << usb_port);
+      RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), "usb connect type: " << device_info->getConnectionType());
     }
   }  catch (ob::Error &e) {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger("list_device_node"), e.getMessage());

@@ -105,6 +105,11 @@ OBCameraNodeDriver::~OBCameraNodeDriver() {
     reset_device_thread_->join();
   }
   ob_camera_node_->stopGmslTrigger();
+  if (orb_device_lock_shm_fd_ != -1) {
+    close(orb_device_lock_shm_fd_);
+    orb_device_lock_shm_fd_ = -1;
+  }
+  shm_unlink(ORB_DEFAULT_LOCK_NAME.c_str());
 }
 
 void OBCameraNodeDriver::init() {
@@ -292,8 +297,7 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDevice(
   } else if (!usb_port_.empty()) {
     RCLCPP_INFO_STREAM(logger_, "Connecting to device with usb port: " << usb_port_);
     device = selectDeviceByUSBPort(list, usb_port_);
-  }
-    else if (device_num_ == 1) {
+  } else if (device_num_ == 1) {
     RCLCPP_INFO_STREAM(logger_, "Connecting to the default device");
     return list->getDevice(0);
   }

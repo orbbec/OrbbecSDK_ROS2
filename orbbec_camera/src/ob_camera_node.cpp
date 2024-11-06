@@ -1688,9 +1688,6 @@ std::shared_ptr<ob::Frame> OBCameraNode::processDepthFrameFilter(
   if (frame == nullptr || frame->getType() != OB_FRAME_DEPTH) {
     return nullptr;
   }
-  auto sensor = device_->getSensor(OB_SENSOR_DEPTH);
-  CHECK_NOTNULL(sensor.get());
-  auto filter_list = sensor->getRecommendedFilters();
   for (size_t i = 0; i < filter_list_.size(); i++) {
     auto filter = filter_list_[i];
     CHECK_NOTNULL(filter.get());

@@ -12,68 +12,97 @@ def generate_launch_description():
     launch_file_dir = os.path.join(package_dir, "launch")
     config_file_dir = os.path.join(package_dir, "config")
     config_file_path = os.path.join(config_file_dir, "camera_params.yaml")
-    front_camera = IncludeLaunchDescription(
+
+    G0_4J = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(launch_file_dir, "gemini_330_series.launch.py")
         ),
         launch_arguments={
-            "camera_name": "front_camera",
-            "usb_port": "gmsl2-1",
-            "device_num": "2",
-            "sync_mode": "hardware_triggering",
+            "camera_name": "G0_4J",
+            "usb_port": "2-7",
+            "device_num": "5",
+            "sync_mode": "standalone",
+            "enable_left_ir":"true",
             "config_file_path": config_file_path,
-            "enable_gmsl_trigger": "true",
         }.items(),
     )
 
-    # left_camera = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         os.path.join(launch_file_dir, "gemini_330_series.launch.py")
-    #     ),
-    #     launch_arguments={
-    #         "camera_name": "left_camera",
-    #         "usb_port": "gmsl2-2",
-    #         "device_num": "3",
-    #         "sync_mode": "secondary",
-    #         "config_file_path": config_file_path,
-    #         "enable_gmsl_trigger": "false",
-    #     }.items(),
-    # )
-    right_camera = IncludeLaunchDescription(
+    G1_F0 = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(launch_file_dir, "gemini_330_series.launch.py")
         ),
         launch_arguments={
-            "camera_name": "right_camera",
-            "usb_port": "gmsl2-3",
-            "device_num": "2",
-            "sync_mode": "hardware_triggering",
+            "camera_name": "G1_F0",
+            "usb_port": "2-2",
+            "device_num": "5",
+            "sync_mode": "standalone",
+            "enable_left_ir":"true",
             "config_file_path": config_file_path,
-            "enable_gmsl_trigger": "false",
         }.items(),
     )
-    # rear_camera = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         os.path.join(launch_file_dir, "gemini_330_series.launch.py")
-    #     ),
-    #     launch_arguments={
-    #         "camera_name": "rear_camera",
-    #         "usb_port": "gmsl2-4",
-    #         "device_num": "3",
-    #         "sync_mode": "secondary",
-    #         "config_file_path": config_file_path,
-    #         "enable_gmsl_trigger": "false",
-    #     }.items(),
-    # )
+    G2_15 = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(launch_file_dir, "gemini_330_series.launch.py")
+        ),
+        launch_arguments={
+            "camera_name": "G2_15",
+            "usb_port": "2-1",
+            "device_num": "5",
+            "sync_mode": "standalone",
+            "enable_left_ir":"true",
+            "config_file_path": config_file_path,
+        }.items(),
+    )
+    G3_1M = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(launch_file_dir, "gemini_330_series.launch.py")
+        ),
+        launch_arguments={
+            "camera_name": "G3_1M",
+            "usb_port": "2-1.4.3",
+            "device_num": "5",
+            "sync_mode": "secondary_synced",
+            "enable_left_ir":"true",
+            "config_file_path": config_file_path,
+        }.items(),
+    )
+    G4_74 = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(launch_file_dir, "gemini_330_series.launch.py")
+        ),
+        launch_arguments={
+            "camera_name": "G4_74",
+            "usb_port": "2-1.4.4.1",
+            "device_num": "5",
+            "sync_mode": "secondary_synced",
+            "enable_left_ir":"true",
+            "config_file_path": config_file_path,
+        }.items(),
+    )
+
+    multi_save_rgbir_node = Node(
+        package="orbbec_camera",
+        executable="multi_save_rgbir_node",
+        name="multi_save_rgbir_node",
+    )
+
+    # If you need more cameras, just add more launch_include here, and change the usb_port and device_num
 
     # Launch description
     ld = LaunchDescription(
         [
-          # TimerAction(period=0.5, actions=[GroupAction([rear_camera])]),
-          TimerAction(period=0.5, actions=[GroupAction([right_camera])]),
-          # TimerAction(period=0.5, actions=[GroupAction([left_camera])]),
-          TimerAction(period=0.5, actions=[GroupAction([front_camera])]),
-          # The primary camera should be launched at last
+            GroupAction([multi_save_rgbir_node]),
+            TimerAction(
+                period=2.0,
+                actions=[
+                    TimerAction(period=0.2, actions=[GroupAction([G1_F0])]),
+                    TimerAction(period=0.2, actions=[GroupAction([G2_15])]),
+                    # TimerAction(period=0.2, actions=[GroupAction([G3_1M])]),
+                    # TimerAction(period=0.2, actions=[GroupAction([G4_74])]),
+                    TimerAction(period=0.2, actions=[GroupAction([G0_4J])]),
+                ],
+            ),
+            # The primary camera should be launched at last
         ]
     )
 

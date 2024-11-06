@@ -103,24 +103,47 @@ using std::placeholders::_2;
 class MetadataSaveFiles : public rclcpp::Node {
  public:
   MetadataSaveFiles() : Node("metadata_save_files") {
-    this->declare_parameter("left_ir_image_topic", "/camera/left_ir/image_raw");
-    this->declare_parameter("right_ir_image_topic", "/camera/right_ir/image_raw");
-    this->declare_parameter("depth_image_topic", "/camera/depth/image_raw");
-    this->declare_parameter("left_ir_metadata_topic", "/camera/left_ir/metadata");
-    this->declare_parameter("right_ir_metadata_topic", "/camera/right_ir/metadata");
-    this->declare_parameter("depth_metadata_topic", "/camera/depth/metadata");
-
-    left_ir_image_topic_ = this->get_parameter("left_ir_image_topic").as_string();
-    right_ir_image_topic_ = this->get_parameter("right_ir_image_topic").as_string();
-    depth_image_topic_ = this->get_parameter("depth_image_topic").as_string();
-    left_ir_metadata_topic_ = this->get_parameter("left_ir_metadata_topic").as_string();
-    right_ir_metadata_topic_ = this->get_parameter("right_ir_metadata_topic").as_string();
-    depth_metadata_topic_ = this->get_parameter("depth_metadata_topic").as_string();
-
+    initialize_params();
     initialize_directories();
     initialize_pub_sub();
   }
+  void initialize_params() {
+    std::ifstream file(
+        "install/orbbec_camera/share/orbbec_camera/config/tools/metadatasave/"
+        "metadata_save_params.json");
+    if (!file.is_open()) {
+      RCLCPP_ERROR(this->get_logger(), "Failed to open JSON file.");
+      return;
+    }
+    nlohmann::json json_data;
+    file >> json_data;
+    left_ir_image_topic_ =
+        json_data["metadata_save_params"]["left_ir_image_topic"].get<std::string>();
+    right_ir_image_topic_ =
+        json_data["metadata_save_params"]["right_ir_image_topic"].get<std::string>();
+    depth_image_topic_ = json_data["metadata_save_params"]["depth_image_topic"].get<std::string>();
 
+    left_ir_metadata_topic_ =
+        json_data["metadata_save_params"]["left_ir_metadata_topic"].get<std::string>();
+    right_ir_metadata_topic_ =
+        json_data["metadata_save_params"]["right_ir_metadata_topic"].get<std::string>();
+    depth_metadata_topic_ =
+        json_data["metadata_save_params"]["depth_metadata_topic"].get<std::string>();
+    RCLCPP_INFO(this->get_logger(), "Parameter 2: %s", depth_image_topic_.c_str());
+    // this->declare_parameter("left_ir_image_topic", "/camera/left_ir/image_raw");
+    // this->declare_parameter("right_ir_image_topic", "/camera/right_ir/image_raw");
+    // this->declare_parameter("depth_image_topic", "/camera/depth/image_raw");
+    // this->declare_parameter("left_ir_metadata_topic", "/camera/left_ir/metadata");
+    // this->declare_parameter("right_ir_metadata_topic", "/camera/right_ir/metadata");
+    // this->declare_parameter("depth_metadata_topic", "/camera/depth/metadata");
+
+    // left_ir_image_topic_ = this->get_parameter("left_ir_image_topic").as_string();
+    // right_ir_image_topic_ = this->get_parameter("right_ir_image_topic").as_string();
+    // depth_image_topic_ = this->get_parameter("depth_image_topic").as_string();
+    // left_ir_metadata_topic_ = this->get_parameter("left_ir_metadata_topic").as_string();
+    // right_ir_metadata_topic_ = this->get_parameter("right_ir_metadata_topic").as_string();
+    // depth_metadata_topic_ = this->get_parameter("depth_metadata_topic").as_string();
+  }
   void initialize_pub_sub() {
     auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));
     const rmw_qos_profile_t qos_filters = qos.get_rmw_qos_profile();

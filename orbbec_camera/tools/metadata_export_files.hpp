@@ -68,7 +68,7 @@ class MetadataExportFiles : public rclcpp::Node {
 
   void load_parameters() {
     std::ifstream file(
-        "install/orbbec_camera/share/orbbec_camera/config/metadataexport/"
+        "install/orbbec_camera/share/orbbec_camera/config/tools/metadataexport/"
         "metadata_export_params.json");
     if (!file.is_open()) {
       RCLCPP_ERROR(this->get_logger(), "Failed to open JSON file.");
@@ -78,23 +78,25 @@ class MetadataExportFiles : public rclcpp::Node {
     nlohmann::json json_data;
     file >> json_data;
 
-    sn_ = json_data["camera_params"]["sn"].get<std::string>();
+    sn_ = json_data["metadata_export_params"]["sn"].get<std::string>();
 
-    left_ir_image_topic_ = json_data["camera_params"]["left_ir_image_topic"].get<std::string>();
-    right_ir_image_topic_ = json_data["camera_params"]["right_ir_image_topic"].get<std::string>();
-    depth_image_topic_ = json_data["camera_params"]["depth_image_topic"].get<std::string>();
-    color_image_topic_ = json_data["camera_params"]["color_image_topic"].get<std::string>();
+    left_ir_image_topic_ =
+        json_data["metadata_export_params"]["left_ir_image_topic"].get<std::string>();
+    right_ir_image_topic_ =
+        json_data["metadata_export_params"]["right_ir_image_topic"].get<std::string>();
+    depth_image_topic_ =
+        json_data["metadata_export_params"]["depth_image_topic"].get<std::string>();
+    color_image_topic_ =
+        json_data["metadata_export_params"]["color_image_topic"].get<std::string>();
 
     left_ir_metadata_topic_ =
-        json_data["camera_params"]["left_ir_metadata_topic"].get<std::string>();
+        json_data["metadata_export_params"]["left_ir_metadata_topic"].get<std::string>();
     right_ir_metadata_topic_ =
-        json_data["camera_params"]["right_ir_metadata_topic"].get<std::string>();
-    depth_metadata_topic_ = json_data["camera_params"]["depth_metadata_topic"].get<std::string>();
-    color_metadata_topic_ = json_data["camera_params"]["color_metadata_topic"].get<std::string>();
-
-    RCLCPP_INFO(this->get_logger(), "Parameter 1: %s", sn_.c_str());
-    RCLCPP_INFO(this->get_logger(), "Parameter 2: %s", depth_image_topic_.c_str());
-    RCLCPP_INFO(this->get_logger(), "Parameter 3: %s", color_image_topic_.c_str());
+        json_data["metadata_export_params"]["right_ir_metadata_topic"].get<std::string>();
+    depth_metadata_topic_ =
+        json_data["metadata_export_params"]["depth_metadata_topic"].get<std::string>();
+    color_metadata_topic_ =
+        json_data["metadata_export_params"]["color_metadata_topic"].get<std::string>();
   }
   void initialize_pub_sub() {
     auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));

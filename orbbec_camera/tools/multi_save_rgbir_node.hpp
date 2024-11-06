@@ -13,8 +13,7 @@ class MultiCameraSubscriber : public rclcpp::Node {
  public:
   MultiCameraSubscriber() : Node("multi_camera_subscriber") {
     device_init();
-    currenttimes_=getCurrentTimes();
-
+    currenttimes_ = getCurrentTimes();
   }
   void device_init() {
     try {
@@ -28,7 +27,8 @@ class MultiCameraSubscriber : public rclcpp::Node {
         std::string uid = device_info->uid();
         auto usb_port = orbbec_camera::parseUsbPort(uid);
         serial_numbers_[usb_port] = serial;
-        // RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), ":list->deviceCount(): " << list->deviceCount());
+        // RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), ":list->deviceCount(): " <<
+        // list->deviceCount());
         color_frame_counters_[count] = 0;
         ir_frame_counters_[count] = 0;
         count++;
@@ -40,27 +40,12 @@ class MultiCameraSubscriber : public rclcpp::Node {
     } catch (...) {
       RCLCPP_ERROR_STREAM(get_logger(), "unknown error");
     }
-
-    this->declare_parameter<std::vector<std::string>>("ir_topics", std::vector<std::string>());
-    this->declare_parameter<std::vector<std::string>>("color_topics", std::vector<std::string>());
-    this->declare_parameter<std::vector<std::string>>("usb_ports", std::vector<std::string>());
-    this->declare_parameter<std::string>("image_number", "100");
-
-    ir_topics_ = this->get_parameter("ir_topics").as_string_array();
-    color_topics_ = this->get_parameter("color_topics").as_string_array();
-    usb_params_ = this->get_parameter("usb_ports").as_string_array();
-    image_number_ = this->get_parameter("image_number").as_string();
-
-    auto custom_qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));
-    capture_control_sub_ = this->create_subscription<std_msgs::msg::Bool>(
-        "start_capture", custom_qos,
-        std::bind(&MultiCameraSubscriber::controlCaptureCallback, this, std::placeholders::_1));
+    params_init();
     for (size_t i = 0; i < usb_params_.size(); i++) {
       usb_numbers_[i] = usb_params_[i];
       usb_index_map_[usb_params_[i]] = i;
     }
-    reentrant_callback_group_ =
-        this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
+    reentrant_callback_group_ = this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
     for (const auto &pair : serial_numbers_) {
       RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_camera_subscriber"),
                          "usb_port: " << pair.first << ", serial: " << pair.second);
@@ -69,10 +54,29 @@ class MultiCameraSubscriber : public rclcpp::Node {
       RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_camera_subscriber"),
                          "usb_port: " << pair.first << ", index: " << pair.second);
     }
+    auto custom_qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));
+    capture_control_sub_ = this->create_subscription<std_msgs::msg::Bool>(
+        "start_capture", custom_qos,
+        std::bind(&MultiCameraSubscriber::controlCaptureCallback, this, std::placeholders::_1));
   }
 
  private:
   std::mutex buffer_mutex_;
+  void params_init() {
+    std::ifstream file(
+        "install/orbbec_camera/share/orbbec_camera/config/tools/multisavergbir/"
+        "multi_save_rgbir_params.json");
+    if (!file.is_open()) {
+      RCLCPP_ERROR(this->get_logger(), "Failed to open JSON file.");
+      return;
+    }
+    nlohmann::json json_data;
+    file >> json_data;
+    image_number_ = json_data["save_rgbir_params"]["image_number"].get<std::string>();
+    usb_params_ = json_data["save_rgbir_params"]["usb_ports"].get<std::vector<std::string>>();
+    ir_topics_ = json_data["save_rgbir_params"]["ir_topics"].get<std::vector<std::string>>();
+    color_topics_ = json_data["save_rgbir_params"]["color_topics"].get<std::vector<std::string>>();
+  }
   void topic_init() {
     auto custom_qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
     RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_camera_subscriber"),
@@ -115,7 +119,7 @@ class MultiCameraSubscriber : public rclcpp::Node {
       callback_called_ = std::vector<bool>(ir_topics_.size(), false);
     }
   }
-  std::string getCurrentTimes(){
+  std::string getCurrentTimes() {
     auto now = std::chrono::system_clock::now();
     auto now_time_t = std::chrono::system_clock::to_time_t(now);
     std::tm tm = *std::localtime(&now_time_t);
@@ -126,7 +130,6 @@ class MultiCameraSubscriber : public rclcpp::Node {
     return date_str;
   }
   std::string generateFolderName(const std::string &serial_number, size_t serial_index) {
-
     std::string path = std::string("multicamera_sync/output/") + currenttimes_ + "/" +
                        "TotalModeFrames/" + "/" + "SN" + serial_number + "_Index" +
                        std::to_string(serial_index);
@@ -165,11 +168,12 @@ class MultiCameraSubscriber : public rclcpp::Node {
         color_images.size() < static_cast<size_t>(std::stoi(image_number_))) {
       return;
     }
-
+    RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), "jjjjj1");
     auto usb_iter = usb_index_map_.find(usb_numbers_[index]);
     auto serial_iter = serial_numbers_.find(usb_numbers_[index]);
     int usb_index = usb_iter->second;
     if (serial_iter == serial_numbers_.end()) {
+      RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), "jjjjj2");
       return;
     }
     std::string serial_index = serial_iter->second;
@@ -186,7 +190,7 @@ class MultiCameraSubscriber : public rclcpp::Node {
       }
 
       cv::imwrite(ir_filename, ir_images[i]);
-      // RCLCPP_INFO(this->get_logger(), "Saved IR image to: %s", ir_filename.c_str());
+      //   RCLCPP_INFO(this->get_logger(), "Saved IR image to: %s", ir_filename.c_str());
 
       std::string color_filename = folder + "/color_SN" + serial_index + "_Index" +
                                    std::to_string(usb_index) + "_d" + color_current_timestamps[i] +
@@ -242,8 +246,8 @@ class MultiCameraSubscriber : public rclcpp::Node {
       ir_current_timestamp_buffers_[index].push_back(current_timestamp_ir);
       ir_timestamp_buffers_[index].push_back(timestamp_ir);
       ir_resolution_ = std::to_string(image->width) + "x" + std::to_string(image->height);
-    //   RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), ":ir: " << index <<":"<<
-    //   ir_image_buffers_[index].size());
+      RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"),
+                         ":ir: " << index << ":" << ir_image_buffers_[index].size());
       if (ir_image_buffers_[index].size() >= static_cast<size_t>(std::stoi(image_number_)) &&
           color_image_buffers_[index].size() >= static_cast<size_t>(std::stoi(image_number_))) {
         saveAlignedImages(index);
@@ -263,8 +267,8 @@ class MultiCameraSubscriber : public rclcpp::Node {
       color_current_timestamp_buffers_[index].push_back(current_timestamp_color);
       color_timestamp_buffers_[index].push_back(timestamp_color);
       color_resolution_ = std::to_string(image->width) + "x" + std::to_string(image->height);
-    //   RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), ":color: " << index <<":"<<
-    //   color_image_buffers_[index].size());
+      RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"),
+                         ":color: " << index << ":" << color_image_buffers_[index].size());
       if (ir_image_buffers_[index].size() >= static_cast<size_t>(std::stoi(image_number_)) &&
           color_image_buffers_[index].size() >= static_cast<size_t>(std::stoi(image_number_))) {
         saveAlignedImages(index);
@@ -300,7 +304,7 @@ class MultiCameraSubscriber : public rclcpp::Node {
 
   std::string color_resolution_;
   std::string ir_resolution_;
- std::string currenttimes_;
+  std::string currenttimes_;
 
   bool is_saving_images_ = false;
 };

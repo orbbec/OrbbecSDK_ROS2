@@ -1,0 +1,13 @@
+{
+    "metadata_export_params": {
+        "sn": "CP1L44P00085",
+        "left_ir_image_topic": "/camera/left_ir/image_raw",
+        "right_ir_image_topic": "/camera/right_ir/image_raw",
+        "depth_image_topic": "/camera/depth/image_raw",
+        "color_image_topic": "/camera/color/image_raw",
+        "left_ir_metadata_topic": "/camera/left_ir/metadata",
+        "right_ir_metadata_topic": "/camera/right_ir/metadata",
+        "depth_metadata_topic": "/camera/depth/metadata",
+        "color_metadata_topic": "/camera/color/metadata"
+    }
+}

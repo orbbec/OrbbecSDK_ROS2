@@ -80,6 +80,8 @@ def generate_launch_description():
         DeclareLaunchArgument('color_contrast', default_value='-1'),
         DeclareLaunchArgument('color_gamma', default_value='-1'),
         DeclareLaunchArgument('color_hue', default_value='-1'),
+        DeclareLaunchArgument('color_info_url', default_value=''),
+        DeclareLaunchArgument('ir_info_url', default_value=''),
         DeclareLaunchArgument('color_ae_roi_left', default_value='-1'),
         DeclareLaunchArgument('color_ae_roi_top', default_value='-1'),
         DeclareLaunchArgument('color_ae_roi_right', default_value='-1'),

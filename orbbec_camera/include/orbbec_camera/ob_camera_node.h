@@ -193,6 +193,8 @@ class OBCameraNode {
 
   void setupPublishers();
 
+  void setupCameraInfo();
+
   void publishStaticTF(const rclcpp::Time& t, const tf2::Vector3& trans, const tf2::Quaternion& q,
                        const std::string& from, const std::string& to);
 

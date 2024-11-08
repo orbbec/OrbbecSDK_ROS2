@@ -602,5 +602,12 @@ class OBCameraNode {
   bool use_intra_process_ = false;
   std::string cloud_frame_id_;
   std::vector<std::shared_ptr<ob::Filter>> filter_list_;
+
+  // interleave AE
+  std::string interleave_ae_mode_ = "hdr";  // hdr or laser
+  bool enable_depth_interleave_frame_ = false;
+
+  int init_interleave_hdr_param();
+  int init_interleave_laser_param();
 };
 }  // namespace orbbec_camera

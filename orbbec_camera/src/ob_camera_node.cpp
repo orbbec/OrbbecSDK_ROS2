@@ -545,14 +545,14 @@ void OBCameraNode::setupDepthPostProcessFilter() {
     } else if (filter_name == "NoiseRemovalFilter" && enable_noise_removal_filter_) {
       auto noise_removal_filter = filter->as<ob::NoiseRemovalFilter>();
       OBNoiseRemovalFilterParams params = noise_removal_filter->getFilterParams();
-      RCLCPP_INFO_STREAM(
-          logger_, "Default noise removal filter params: " << "disp_diff: " << params.disp_diff
-                                                           << ", max_size: " << params.max_size);
+      RCLCPP_INFO_STREAM(logger_, "Default noise removal filter params: "
+                                      << "disp_diff: " << params.disp_diff
+                                      << ", max_size: " << params.max_size);
       params.disp_diff = noise_removal_filter_min_diff_;
       params.max_size = noise_removal_filter_max_size_;
-      RCLCPP_INFO_STREAM(logger_,
-                         "Set noise removal filter params: " << "disp_diff: " << params.disp_diff
-                                                             << ", max_size: " << params.max_size);
+      RCLCPP_INFO_STREAM(logger_, "Set noise removal filter params: "
+                                      << "disp_diff: " << params.disp_diff
+                                      << ", max_size: " << params.max_size);
       if (noise_removal_filter_min_diff_ != -1 && noise_removal_filter_max_size_ != -1) {
         noise_removal_filter->setFilterParams(params);
       }
@@ -561,11 +561,11 @@ void OBCameraNode::setupDepthPostProcessFilter() {
           hdr_merge_gain_2_ != -1) {
         auto hdr_merge_filter = filter->as<ob::HdrMerge>();
         hdr_merge_filter->enable(true);
-        RCLCPP_INFO_STREAM(
-            logger_, "Set HDR merge filter params: " << "exposure_1: " << hdr_merge_exposure_1_
-                                                     << ", gain_1: " << hdr_merge_gain_1_
-                                                     << ", exposure_2: " << hdr_merge_exposure_2_
-                                                     << ", gain_2: " << hdr_merge_gain_2_);
+        RCLCPP_INFO_STREAM(logger_, "Set HDR merge filter params: "
+                                        << "exposure_1: " << hdr_merge_exposure_1_
+                                        << ", gain_1: " << hdr_merge_gain_1_
+                                        << ", exposure_2: " << hdr_merge_exposure_2_
+                                        << ", gain_2: " << hdr_merge_gain_2_);
         auto config = OBHdrConfig();
         config.enable = true;
         config.exposure_1 = hdr_merge_exposure_1_;
@@ -782,6 +782,42 @@ void OBCameraNode::updateImageConfig(const stream_index_pair &stream_index) {
   }
 }
 
+int OBCameraNode::init_interleave_hdr_param() {
+  // set interleaveae
+  device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_CONFIG_INDEX_INT, 0);
+  device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, 1);
+  device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, 7500);
+  device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, 16);
+  device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, 60);
+  device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, 10000);
+
+  device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_CONFIG_INDEX_INT, 1);
+  device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, 1);
+  device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, 1);
+  device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, 16);
+  device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, 20);
+  device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, 2000);
+  return 0;
+}
+
+int OBCameraNode::init_interleave_laser_param() {
+  // set interleaveae
+  device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_CONFIG_INDEX_INT, 0);
+  device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, 1);
+  device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, 3000);
+  device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, 16);
+  device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, 60);
+  device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, 30000);
+
+  device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_CONFIG_INDEX_INT, 1);
+  device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, 0);
+  device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, 3000);
+  device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, 16);
+  device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, 60);
+  device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, 30000);
+  return 0;
+}
+
 void OBCameraNode::startStreams() {
   if (pipeline_ != nullptr) {
     pipeline_.reset();
@@ -790,6 +826,20 @@ void OBCameraNode::startStreams() {
 
   try {
     setupPipelineConfig();
+
+    // set interleave mode
+    if (interleave_ae_mode_ == "hdr") {
+      RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to hdr");
+      device_->loadFrameInterleave("hdr interleave");
+      init_interleave_hdr_param();
+    } else if (interleave_ae_mode_ == "laser") {
+      RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to laser");
+      device_->loadFrameInterleave("laser interleave");
+      init_interleave_laser_param();
+    } else {
+      RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to nothing");
+    }
+
     pipeline_->start(pipeline_config_, [this](const std::shared_ptr<ob::FrameSet> &frame_set) {
       onNewFrameSetCallback(frame_set);
     });
@@ -808,6 +858,18 @@ void OBCameraNode::startStreams() {
   if (enable_stream_[COLOR] && !colorFrameThread_) {
     colorFrameThread_ = std::make_shared<std::thread>([this]() { onNewColorFrameCallback(); });
   }
+
+  // enable interleave frame
+  if ((interleave_ae_mode_ == "hdr") || (interleave_ae_mode_ == "laser")) {
+    RCLCPP_INFO_STREAM(logger_, "current interleave_ae_mode_: " << interleave_ae_mode_);
+    if (device_->isPropertySupported(OB_PROP_FRAME_INTERLEAVE_ENABLE_BOOL, OB_PERMISSION_WRITE)) {
+      RCLCPP_INFO_STREAM(logger_, "Enable enable_interleave_depth_frame to "
+                                      << (enable_depth_interleave_frame_ ? "true" : "false"));
+      TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_FRAME_INTERLEAVE_ENABLE_BOOL,
+                          enable_depth_interleave_frame_);
+    }
+  }
+
   if (enable_frame_sync_) {
     RCLCPP_INFO_STREAM(logger_, "Enable frame sync");
     TRY_EXECUTE_BLOCK(pipeline_->enableFrameSync());
@@ -891,6 +953,19 @@ void OBCameraNode::stopStreams() {
   }
   try {
     pipeline_->stop();
+
+    // disable interleave frame
+    if ((interleave_ae_mode_ == "hdr") || (interleave_ae_mode_ == "laser")) {
+      RCLCPP_INFO_STREAM(logger_, "current interleave_ae_mode_: " << interleave_ae_mode_);
+      if (device_->isPropertySupported(OB_PROP_FRAME_INTERLEAVE_ENABLE_BOOL, OB_PERMISSION_WRITE)) {
+        enable_depth_interleave_frame_ = false;
+        RCLCPP_INFO_STREAM(logger_, "Enable enable_interleave_depth_frame to "
+                                        << (enable_depth_interleave_frame_ ? "true" : "false"));
+        TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_FRAME_INTERLEAVE_ENABLE_BOOL,
+                            enable_depth_interleave_frame_);
+      }
+    }
+
   } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to stop pipeline: " << e.getMessage());
   } catch (...) {

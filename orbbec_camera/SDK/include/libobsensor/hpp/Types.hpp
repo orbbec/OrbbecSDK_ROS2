@@ -2,4 +2,4 @@
 // Licensed under the MIT License.
 
 #pragma once
-// empty file, leave here for backwards compatibility
+#include <libobsensor/h/ObTypes.h>

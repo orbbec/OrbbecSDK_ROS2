@@ -1,4 +1,4 @@
-// Copyright (c) Orbbec Inc. All Rights Reserved.
+﻿// Copyright (c) Orbbec Inc. All Rights Reserved.
 // Licensed under the MIT License.
 
 /**
@@ -448,6 +448,20 @@ typedef enum {
     OB_PROP_DEVICE_REPOWER_BOOL = 202,
 
     /**
+     * @brief frame interleave config index
+     */
+    OB_PROP_FRAME_INTERLEAVE_CONFIG_INDEX_INT = 204,
+
+    /**
+     * @brief frame interleave enable (true:enable,false:disable)
+     */
+    OB_PROP_FRAME_INTERLEAVE_ENABLE_BOOL = 205,
+    /**
+     * @brief laser pattern sync with delay(us)
+     */
+    OB_PROP_FRAME_INTERLEAVE_LASER_PATTERN_SYNC_DELAY_INT = 206,
+
+    /**
      * @brief Baseline calibration parameters
      */
     OB_STRUCT_BASELINE_CALIBRATION_PARAM = 1002,
@@ -771,4 +785,3 @@ typedef struct OBPropertyItem {
 #ifdef __cplusplus
 }
 #endif
-

@@ -426,6 +426,20 @@ public:
     OBStreamType getAlignToStreamType() {
         return static_cast<OBStreamType>(static_cast<int>(getConfigValue("AlignType")));
     }
+
+    /**
+     * @brief Sets whether the output frame resolution should match the target resolution.
+     *        When enabled, the output frame resolution will be adjusted to match (same as) the target resolution.
+     *        When disabled, the output frame resolution will match the original resolution while maintaining
+     *        the aspect ratio of the target resolution.
+     *
+     *
+     * @param state If true, output frame resolution will match the target resolution; otherwise, it will
+     *              maintain the original resolution with the target's aspect ratio.
+     */
+    void setMatchTargetResolution(bool state) {
+        setConfigValue("MatchTargetRes", state);
+    }
 };
 
 /**
@@ -942,7 +956,7 @@ public:
 
 class OBFilterList {
 private:
-    ob_filter_list_t* impl_;
+    ob_filter_list_t *impl_;
 
 public:
     explicit OBFilterList(ob_filter_list_t *impl) : impl_(impl) {}
@@ -1010,4 +1024,3 @@ template <typename T> bool Filter::is() {
 }
 
 }  // namespace ob
-

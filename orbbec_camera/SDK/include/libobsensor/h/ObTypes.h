@@ -22,23 +22,24 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
-typedef struct ob_context_t                   ob_context;
-typedef struct ob_device_t                    ob_device;
-typedef struct ob_device_info_t               ob_device_info;
-typedef struct ob_device_list_t               ob_device_list;
-typedef struct ob_camera_param_list_t         ob_camera_param_list;
-typedef struct ob_sensor_t                    ob_sensor;
-typedef struct ob_sensor_list_t               ob_sensor_list;
-typedef struct ob_stream_profile_t            ob_stream_profile;
-typedef struct ob_stream_profile_list_t       ob_stream_profile_list;
-typedef struct ob_frame_t                     ob_frame;
-typedef struct ob_filter_t                    ob_filter;
-typedef struct ob_filter_list_t               ob_filter_list;
-typedef struct ob_pipeline_t                  ob_pipeline;
-typedef struct ob_config_t                    ob_config;
-typedef struct ob_depth_work_mode_list_t      ob_depth_work_mode_list;
-typedef struct ob_device_preset_list_t        ob_device_preset_list;
-typedef struct ob_filter_config_schema_list_t ob_filter_config_schema_list;
+typedef struct ob_context_t                      ob_context;
+typedef struct ob_device_t                       ob_device;
+typedef struct ob_device_info_t                  ob_device_info;
+typedef struct ob_device_list_t                  ob_device_list;
+typedef struct ob_camera_param_list_t            ob_camera_param_list;
+typedef struct ob_sensor_t                       ob_sensor;
+typedef struct ob_sensor_list_t                  ob_sensor_list;
+typedef struct ob_stream_profile_t               ob_stream_profile;
+typedef struct ob_stream_profile_list_t          ob_stream_profile_list;
+typedef struct ob_frame_t                        ob_frame;
+typedef struct ob_filter_t                       ob_filter;
+typedef struct ob_filter_list_t                  ob_filter_list;
+typedef struct ob_pipeline_t                     ob_pipeline;
+typedef struct ob_config_t                       ob_config;
+typedef struct ob_depth_work_mode_list_t         ob_depth_work_mode_list;
+typedef struct ob_device_preset_list_t           ob_device_preset_list;
+typedef struct ob_filter_config_schema_list_t    ob_filter_config_schema_list;
+typedef struct ob_device_frame_interleave_list_t ob_device_frame_interleave_list;
 
 #define OB_WIDTH_ANY 0
 #define OB_HEIGHT_ANY 0
@@ -543,21 +544,23 @@ typedef enum {
  */
 typedef enum {
     OB_SAMPLE_RATE_UNKNOWN   = 0,
-    OB_SAMPLE_RATE_1_5625_HZ = 1, /**< 1.5625Hz */
-    OB_SAMPLE_RATE_3_125_HZ,      /**< 3.125Hz */
-    OB_SAMPLE_RATE_6_25_HZ,       /**< 6.25Hz */
-    OB_SAMPLE_RATE_12_5_HZ,       /**< 12.5Hz */
-    OB_SAMPLE_RATE_25_HZ,         /**< 25Hz */
-    OB_SAMPLE_RATE_50_HZ,         /**< 50Hz */
-    OB_SAMPLE_RATE_100_HZ,        /**< 100Hz */
-    OB_SAMPLE_RATE_200_HZ,        /**< 200Hz */
-    OB_SAMPLE_RATE_500_HZ,        /**< 500Hz */
-    OB_SAMPLE_RATE_1_KHZ,         /**< 1KHz */
-    OB_SAMPLE_RATE_2_KHZ,         /**< 2KHz */
-    OB_SAMPLE_RATE_4_KHZ,         /**< 4KHz */
-    OB_SAMPLE_RATE_8_KHZ,         /**< 8KHz */
-    OB_SAMPLE_RATE_16_KHZ,        /**< 16KHz */
-    OB_SAMPLE_RATE_32_KHZ,        /**< 32Hz */
+    OB_SAMPLE_RATE_1_5625_HZ = 1,  /**< 1.5625Hz */
+    OB_SAMPLE_RATE_3_125_HZ  = 2,  /**< 3.125Hz */
+    OB_SAMPLE_RATE_6_25_HZ   = 3,  /**< 6.25Hz */
+    OB_SAMPLE_RATE_12_5_HZ   = 4,  /**< 12.5Hz */
+    OB_SAMPLE_RATE_25_HZ     = 5,  /**< 25Hz */
+    OB_SAMPLE_RATE_50_HZ     = 6,  /**< 50Hz */
+    OB_SAMPLE_RATE_100_HZ    = 7,  /**< 100Hz */
+    OB_SAMPLE_RATE_200_HZ    = 8,  /**< 200Hz */
+    OB_SAMPLE_RATE_500_HZ    = 9,  /**< 500Hz */
+    OB_SAMPLE_RATE_1_KHZ     = 10, /**< 1KHz */
+    OB_SAMPLE_RATE_2_KHZ     = 11, /**< 2KHz */
+    OB_SAMPLE_RATE_4_KHZ     = 12, /**< 4KHz */
+    OB_SAMPLE_RATE_8_KHZ     = 13, /**< 8KHz */
+    OB_SAMPLE_RATE_16_KHZ    = 14, /**< 16KHz */
+    OB_SAMPLE_RATE_32_KHZ    = 15, /**< 32Hz */
+    OB_SAMPLE_RATE_400_HZ    = 16, /**< 400Hz*/
+    OB_SAMPLE_RATE_800_HZ    = 17, /**< 800Hz*/
 } OBIMUSampleRate,
     OBGyroSampleRate, ob_gyro_sample_rate, OBAccelSampleRate, ob_accel_sample_rate, OB_SAMPLE_RATE;
 
@@ -566,14 +569,16 @@ typedef enum {
  */
 typedef enum {
     OB_GYRO_FS_UNKNOWN = -1,
-    OB_GYRO_FS_16dps   = 1, /**< 16 degrees per second */
-    OB_GYRO_FS_31dps,       /**< 31 degrees per second */
-    OB_GYRO_FS_62dps,       /**< 62 degrees per second */
-    OB_GYRO_FS_125dps,      /**< 125 degrees per second */
-    OB_GYRO_FS_250dps,      /**< 250 degrees per second */
-    OB_GYRO_FS_500dps,      /**< 500 degrees per second */
-    OB_GYRO_FS_1000dps,     /**< 1000 degrees per second */
-    OB_GYRO_FS_2000dps,     /**< 2000 degrees per second */
+    OB_GYRO_FS_16dps   = 1,  /**< 16 degrees per second */
+    OB_GYRO_FS_31dps   = 2,  /**< 31 degrees per second */
+    OB_GYRO_FS_62dps   = 3,  /**< 62 degrees per second */
+    OB_GYRO_FS_125dps  = 4,  /**< 125 degrees per second */
+    OB_GYRO_FS_250dps  = 5,  /**< 250 degrees per second */
+    OB_GYRO_FS_500dps  = 6,  /**< 500 degrees per second */
+    OB_GYRO_FS_1000dps = 7,  /**< 1000 degrees per second */
+    OB_GYRO_FS_2000dps = 8,  /**< 2000 degrees per second */
+    OB_GYRO_FS_400dps  = 9,  /**< 400 degrees per second */
+    OB_GYRO_FS_800dps  = 10, /**< 800 degrees per second */
 } OBGyroFullScaleRange,
     ob_gyro_full_scale_range, OB_GYRO_FULL_SCALE_RANGE;
 
@@ -583,9 +588,13 @@ typedef enum {
 typedef enum {
     OB_ACCEL_FS_UNKNOWN = -1,
     OB_ACCEL_FS_2g      = 1, /**< 1x the acceleration of gravity */
-    OB_ACCEL_FS_4g,          /**< 4x the acceleration of gravity */
-    OB_ACCEL_FS_8g,          /**< 8x the acceleration of gravity */
-    OB_ACCEL_FS_16g,         /**< 16x the acceleration of gravity */
+    OB_ACCEL_FS_4g      = 2, /**< 4x the acceleration of gravity */
+    OB_ACCEL_FS_8g      = 3, /**< 8x the acceleration of gravity */
+    OB_ACCEL_FS_16g     = 4, /**< 16x the acceleration of gravity */
+    OB_ACCEL_FS_3g      = 5, /**< 3x the acceleration of gravity */
+    OB_ACCEL_FS_6g      = 6, /**< 6x the acceleration of gravity */
+    OB_ACCEL_FS_12g     = 7, /**< 12x the acceleration of gravity */
+    OB_ACCEL_FS_24g     = 8, /**< 24x the acceleration of gravity */
 } OBAccelFullScaleRange,
     ob_accel_full_scale_range, OB_ACCEL_FULL_SCALE_RANGE;
 
@@ -1590,6 +1599,31 @@ typedef enum {
 } ob_frame_metadata_type,
     OBFrameMetadataType;
 
+/**
+ * @brief For Linux, there are two ways to access the UVC device, libuvc and v4l2. The backend type is used to select the backend to access the device.
+ *
+ */
+typedef enum {
+    /**
+     * @brief Auto detect system capabilities and device hint to select backend
+     *
+     */
+    OB_UVC_BACKEND_TYPE_AUTO,
+
+    /**
+     * @brief Use libuvc backend to access the UVC device
+     *
+     */
+    OB_UVC_BACKEND_TYPE_LIBUVC,
+
+    /**
+     * @brief Use v4l2 backend to access the UVC device
+     *
+     */
+    OB_UVC_BACKEND_TYPE_V4L2,
+} ob_uvc_backend_type,
+    OBUvcBackendType;
+
 // For compatibility
 #define OB_FRAME_METADATA_TYPE_LASER_POWER_MODE OB_FRAME_METADATA_TYPE_LASER_POWER_LEVEL
 #define OB_FRAME_METADATA_TYPE_EMITTER_MODE OB_FRAME_METADATA_TYPE_LASER_STATUS
@@ -1753,4 +1787,3 @@ typedef void(ob_log_callback)(ob_log_severity severity, const char *message, voi
 #endif
 
 #pragma pack(pop)
-

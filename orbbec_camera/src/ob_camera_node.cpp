@@ -321,15 +321,8 @@ void OBCameraNode::setupDevices() {
     }
   }
 
-  if (!depth_filter_config_.empty() && enable_depth_filter_) {
-    RCLCPP_INFO_STREAM(logger_, "Load depth filter config: " << depth_filter_config_);
-    TRY_EXECUTE_BLOCK(device_->loadDepthFilterConfig(depth_filter_config_.c_str()));
-  } else {
-    if (device_->isPropertySupported(OB_PROP_DEPTH_SOFT_FILTER_BOOL, OB_PERMISSION_READ_WRITE)) {
-      RCLCPP_INFO_STREAM(logger_,
-                         "Setting depth soft filter to " << (enable_soft_filter_ ? "ON" : "OFF"));
-      TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_DEPTH_SOFT_FILTER_BOOL, enable_soft_filter_);
-    }
+  if (device_->isPropertySupported(OB_PROP_DEPTH_SOFT_FILTER_BOOL, OB_PERMISSION_READ_WRITE)) {
+    device_->setBoolProperty(OB_PROP_DEPTH_SOFT_FILTER_BOOL, enable_noise_removal_filter_);
   }
 
   if (device_->isPropertySupported(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {

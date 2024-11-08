@@ -724,8 +724,7 @@ void OBCameraNode::setupProfiles() {
         images_[elem] = cv::Mat(height_[elem], width_[elem], CV_8UC4, cv::Scalar(0, 0, 0, 0));
         encoding_[elem] = sensor_msgs::image_encodings::RGBA8;
         unit_step_size_[COLOR] = 4 * sizeof(uint8_t);
-      }
-      else {
+      } else {
         images_[elem] =
             cv::Mat(height_[elem], width_[elem], image_format_[elem], cv::Scalar(0, 0, 0));
       }
@@ -1735,35 +1734,29 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
     if (depth_frame && depth_frame->hasMetadata(OB_FRAME_METADATA_TYPE_LASER_STATUS)) {
       depth_laser_status = depth_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_LASER_STATUS) == 1;
     }
-
-    auto device_info = device_->getDeviceInfo();
-    CHECK_NOTNULL(device_info.get());
-    auto pid = device_info->getPid();
     auto color_frame = frame_set->getFrame(OB_FRAME_COLOR);
-    if (isGemini335PID(pid)) {
-      depth_frame = processDepthFrameFilter(depth_frame);
-      bool depth_aligned = false;
-      if (depth_frame) {
-        frame_set->pushFrame(depth_frame);
-      }
-      if (depth_registration_ && align_filter_ && depth_frame && color_frame) {
-        if (auto new_frame = align_filter_->process(frame_set)) {
-          auto new_frame_set = new_frame->as<ob::FrameSet>();
-          CHECK_NOTNULL(new_frame_set.get());
-          frame_set = new_frame_set;
-          depth_aligned = true;
-        } else {
-          RCLCPP_ERROR(logger_, "Failed to align depth frame to color frame");
-          return;
-        }
+    depth_frame = processDepthFrameFilter(depth_frame);
+    bool depth_aligned = false;
+    if (depth_frame) {
+      frame_set->pushFrame(depth_frame);
+    }
+    if (depth_registration_ && align_filter_ && depth_frame && color_frame) {
+      if (auto new_frame = align_filter_->process(frame_set)) {
+        auto new_frame_set = new_frame->as<ob::FrameSet>();
+        CHECK_NOTNULL(new_frame_set.get());
+        frame_set = new_frame_set;
+        depth_aligned = true;
       } else {
-        RCLCPP_DEBUG(logger_,
-                     "Depth registration is disabled or align filter is null or depth frame is "
-                     "null or color frame is null");
-      }
-      if (depth_registration_ && align_filter_ && !depth_aligned) {
+        RCLCPP_ERROR(logger_, "Failed to align depth frame to color frame");
         return;
       }
+    } else {
+      RCLCPP_DEBUG(logger_,
+                   "Depth registration is disabled or align filter is null or depth frame is "
+                   "null or color frame is null");
+    }
+    if (depth_registration_ && align_filter_ && !depth_aligned) {
+      return;
     }
 
     if (enable_stream_[COLOR] && color_frame) {

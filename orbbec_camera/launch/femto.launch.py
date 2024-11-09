@@ -78,10 +78,10 @@ def generate_launch_description():
         DeclareLaunchArgument('soft_filter_speckle_size', default_value='-1'),
         DeclareLaunchArgument('enable_frame_sync', default_value='false'),
         DeclareLaunchArgument('ordered_pc', default_value='false'),
-        DeclareLaunchArgument('use_hardware_time', default_value='false'),
         DeclareLaunchArgument('align_mode', default_value='HW'),
         DeclareLaunchArgument('laser_energy_level', default_value='-1'),
         DeclareLaunchArgument('enable_heartbeat', default_value='false'),
+        DeclareLaunchArgument('time_domain', default_value='device'),
     ]
 
     # Node configuration

@@ -570,7 +570,12 @@ The decoding function of the mega_h26x_decode_node node is implemented through F
 ros2 launch orbbec_camera femto_mega.launch.py color_format:=H264
 ```
 
-*
+* Configure decoding node parameters
+
+Configuration file directory:[mega_h26x_decode_params.json](https://github.com/orbbec/OrbbecSDK_ROS2/blob/femto_mega_h26x_decode/orbbec_camera/config/tools/megah26xdecode/mega_h26x_decode_params.json)
+
+* encode_topics : Input image encoding data topics name
+* decode_topics : Output image decoding data topics name
 * Start the decoding node:
 
 ```bash

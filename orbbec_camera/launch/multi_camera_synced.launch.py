@@ -15,7 +15,7 @@ def generate_launch_description():
 
     G0_4J = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "gemini_330_series.launch.py")
+            os.path.join(launch_file_dir, "gemini_330_series_interleave_laser_g335L.launch.py")
         ),
         launch_arguments={
             "camera_name": "G0_4J",
@@ -29,7 +29,7 @@ def generate_launch_description():
 
     G1_F0 = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "gemini_330_series.launch.py")
+            os.path.join(launch_file_dir, "gemini_330_series_interleave_laser_g335L.launch.py")
         ),
         launch_arguments={
             "camera_name": "G1_F0",
@@ -42,7 +42,7 @@ def generate_launch_description():
     )
     G2_15 = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "gemini_330_series.launch.py")
+            os.path.join(launch_file_dir, "gemini_330_series_interleave_laser_g335L.launch.py")
         ),
         launch_arguments={
             "camera_name": "G2_15",
@@ -55,7 +55,7 @@ def generate_launch_description():
     )
     G3_1M = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "gemini_330_series.launch.py")
+            os.path.join(launch_file_dir, "gemini_330_series_interleave_laser_g335L.launch.py")
         ),
         launch_arguments={
             "camera_name": "G3_1M",
@@ -68,7 +68,7 @@ def generate_launch_description():
     )
     G4_74 = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "gemini_330_series.launch.py")
+            os.path.join(launch_file_dir, "gemini_330_series_interleave_laser_g335L.launch.py")
         ),
         launch_arguments={
             "camera_name": "G4_74",

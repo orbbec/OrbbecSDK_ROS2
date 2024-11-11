@@ -762,18 +762,6 @@ public:
     }
 
     /**
-     * @brief Get current frame interleave name
-     * @return const char* return the current frame interleave  name, it should be one of the frame interleave names returned by @ref
-     * getAvailableFrameInterleaveList.
-     */
-    const char *getCurrentFrameInterleaveName() const {
-        ob_error   *error = nullptr;
-        const char *name  = ob_device_get_current_frame_interleave_name(impl_, &error);
-        Error::handle(&error);
-        return name;
-    }
-
-    /**
      * @brief load the frame interleave according to frame interleave name.
      * @param frameInterleaveName The frame interleave name to set. The name should be one of the frame interleave names returned by @ref
      * getAvailableFrameInterleaveList.

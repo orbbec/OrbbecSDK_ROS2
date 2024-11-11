@@ -359,6 +359,10 @@ class OBCameraNode {
 
   void setupDepthPostProcessFilter();
 
+  // interleave AE
+  int init_interleave_hdr_param();
+  int init_interleave_laser_param();
+
  private:
   rclcpp::Node* node_ = nullptr;
   std::shared_ptr<ob::Device> device_ = nullptr;
@@ -606,8 +610,5 @@ class OBCameraNode {
   // interleave AE
   std::string interleave_ae_mode_ = "hdr";  // hdr or laser
   bool enable_depth_interleave_frame_ = false;
-
-  int init_interleave_hdr_param();
-  int init_interleave_laser_param();
 };
 }  // namespace orbbec_camera

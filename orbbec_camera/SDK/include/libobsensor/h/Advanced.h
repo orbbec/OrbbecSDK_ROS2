@@ -230,14 +230,6 @@ OB_EXPORT void ob_device_load_frame_interleave(ob_device *device, const char *fr
  */
 OB_EXPORT ob_device_frame_interleave_list *ob_device_get_available_frame_interleave_list(ob_device *device, ob_error **error);
 
-/**
- * @breif Get the current frame interleave name.
- *
- * @param device The device object.
- * @param error  Pointer to an error object that will be set if an error occurs.
- * @return  The current frame interleave name, it should be one of the frame interleave names returned by @ref ob_device_get_available_frame_interleave_list.
- */
-OB_EXPORT const char *ob_device_get_current_frame_interleave_name(const ob_device *device, ob_error **error);
 
 /**
  * @brief Delete the available frame interleave list.

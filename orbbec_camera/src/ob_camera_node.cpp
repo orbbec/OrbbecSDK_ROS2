@@ -1263,14 +1263,13 @@ void OBCameraNode::setupPublishers() {
     camera_info_publishers_[stream_index] = node_->create_publisher<CameraInfo>(
         topic, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(camera_info_qos_profile),
                            camera_info_qos_profile));
-
+    topic = name + "/h26x_encoded_data";
     auto image_h264_qos_profile = getRMWQosProfileFromString(image_qos);
     if (format_str_[stream_index] == "H264" || format_str_[stream_index] == "H265") {
       camera_h26x_publishers_[stream_index] =
           node_->create_publisher<sensor_msgs::msg::CompressedImage>(
-              "/camera/color/h26x_encoded_data",
-              rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(image_h264_qos_profile),
-                          image_h264_qos_profile));
+              topic, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(image_h264_qos_profile),
+                                 image_h264_qos_profile));
     }
     if (isGemini335PID(pid)) {
       metadata_publishers_[stream_index] =

@@ -1,0 +1,12 @@
+{
+    "h26x_decode_params": {
+        "encode_topics": [
+            "/camera_01/color/h26x_encoded_data",
+            "/camera_02/color/h26x_encoded_data"
+        ],
+        "decode_topics": [
+            "/camera_01/color/h26x/image_raw",
+            "/camera_02/color/h26x/image_raw"
+        ]
+    }
+}

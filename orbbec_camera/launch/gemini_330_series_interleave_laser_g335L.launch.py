@@ -182,7 +182,9 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_heartbeat', default_value='false'),
         DeclareLaunchArgument('enable_hardware_reset', default_value='false'),
         DeclareLaunchArgument('interleave_ae_mode', default_value='laser'), # 'hdr' or 'laser'
-        DeclareLaunchArgument('enable_depth_interleave_frame', default_value='true'),
+        DeclareLaunchArgument('interleave_frame_enable', default_value='true'),
+        DeclareLaunchArgument('interleave_skip_enable', default_value='false'),
+        DeclareLaunchArgument('interleave_skip_index', default_value='1'), # 0:partern ir  1:flood ir
     ]
 
     def get_params(context, args):

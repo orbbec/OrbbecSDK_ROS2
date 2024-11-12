@@ -609,6 +609,8 @@ class OBCameraNode {
 
   // interleave AE
   std::string interleave_ae_mode_ = "hdr";  // hdr or laser
-  bool enable_depth_interleave_frame_ = false;
+  bool interleave_frame_enable_ = false;
+  bool interleave_skip_enable_ = false;
+  int interleave_skip_index_ = 1;
 };
 }  // namespace orbbec_camera

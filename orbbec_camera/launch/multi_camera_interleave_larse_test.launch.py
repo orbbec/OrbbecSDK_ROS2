@@ -12,13 +12,13 @@ def generate_launch_description():
     launch_file_dir = os.path.join(package_dir, 'launch')
     launch1_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, 'gemini_330_series_interleave_laser_g335Lg.launch.py')
+            os.path.join(launch_file_dir, 'gemini_330_series_interleave_laser_g335.launch.py')
         ),
         launch_arguments={
             'camera_name': 'camera_01',
             'usb_port': '2-1-2',
             'device_num': '2',
-            'sync_mode': 'primary'
+            'sync_mode': 'PRIMARY'
         }.items()
     )
 
@@ -30,7 +30,7 @@ def generate_launch_description():
             'camera_name': 'camera_02',
             'usb_port': '2-2-3',
             'device_num': '2',
-            'sync_mode': 'hardware_triggering'
+            'sync_mode': 'SECONDARY_SYNCED'
         }.items()
     )
 

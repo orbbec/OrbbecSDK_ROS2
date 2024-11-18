@@ -802,7 +802,7 @@ void OBCameraNode::setRESETTimestampCallback(
     std::shared_ptr<std_srvs::srv::SetBool::Response>& response) {
   (void)request;
   try {
-    device_->setBoolProperty(OB_PROP_TIMER_RESET_SIGNAL_BOOL, true);
+    device_->setBoolProperty(OB_PROP_TIMER_RESET_TRIGGER_OUT_ENABLE_BOOL, true);
     response->success = true;
   } catch (const ob::Error& e) {
     response->message = e.getMessage();

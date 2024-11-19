@@ -1193,6 +1193,9 @@ void OBCameraNode::getParameters() {
   if (isOpenNIDevice(pid)) {
     time_domain_ = "system";
   }
+  if (time_domain_ == "global") {
+    device_->enableGlobalTimestamp(true);
+  }
   RCLCPP_INFO_STREAM(logger_, "current time domain: " << time_domain_);
   setAndGetNodeParameter<int>(frames_per_trigger_, "frames_per_trigger", 2);
   long software_trigger_period = 33;

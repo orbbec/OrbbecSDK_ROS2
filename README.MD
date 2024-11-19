@@ -243,7 +243,7 @@ ros2 launch orbbec_camera gemini_intra_process_demo_launch.py
 To enable the V4L2 backend for the Gemini2 series cameras, follow these steps:
 
 1. The Gemini2 series cameras support the V4L2 backend.
-2. Open the `config/OrbbecSDKConfig_v1.0.xml` file.
+2. Open the `config/OrbbecSDKConfig_v2.0.xml` file.
 3. Set the navigation option to `LinuxUVCBackend`.
 4. Change the backend setting to `V4L2`.
 

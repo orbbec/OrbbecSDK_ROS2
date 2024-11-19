@@ -14,7 +14,7 @@
         "color_topics": [
             "/G0_4J/color/image_raw",
             "/G1_F0/color/image_raw",
-            "/G2_15/left_ir/image_raw"
+            "/G2_15/color/image_raw"
         ]
     }
 }

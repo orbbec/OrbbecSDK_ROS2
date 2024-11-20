@@ -2,19 +2,22 @@
     "save_rgbir_params": {
         "image_number": "100",
         "usb_ports": [
-            "2-7",
             "2-2",
+            "2-3.3",
+            "2-3.1",
             "2-1"
         ],
         "ir_topics": [
-            "/G0_4J/left_ir/image_raw",
-            "/G1_F0/left_ir/image_raw",
-            "/G2_15/left_ir/image_raw"
+            "/G0_51/left_ir/image_raw",
+            "/G1_54/left_ir/image_raw",
+            "/G2_5Y/left_ir/image_raw",
+            "/G3_47/left_ir/image_raw"
         ],
         "color_topics": [
-            "/G0_4J/color/image_raw",
-            "/G1_F0/color/image_raw",
-            "/G2_15/color/image_raw"
+            "/G0_51/color/image_raw",
+            "/G1_54/color/image_raw",
+            "/G2_5Y/color/image_raw",
+            "/G3_47/color/image_raw"
         ]
     }
 }

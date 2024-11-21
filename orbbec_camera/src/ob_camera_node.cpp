@@ -783,6 +783,13 @@ void OBCameraNode::updateImageConfig(const stream_index_pair &stream_index) {
 }
 
 int OBCameraNode::init_interleave_hdr_param() {
+  device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_CONFIG_INDEX_INT, 1);
+  device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, 1);
+  device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, 1);
+  device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, 16);
+  device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, 20);
+  device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, 2000);
+
   // set interleaveae
   device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_CONFIG_INDEX_INT, 0);
   device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, 1);
@@ -790,25 +797,10 @@ int OBCameraNode::init_interleave_hdr_param() {
   device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, 16);
   device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, 60);
   device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, 10000);
-
-  device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_CONFIG_INDEX_INT, 1);
-  device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, 1);
-  device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, 1);
-  device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, 16);
-  device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, 20);
-  device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, 2000);
   return 0;
 }
 
 int OBCameraNode::init_interleave_laser_param() {
-  // set interleaveae
-  device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_CONFIG_INDEX_INT, 0);
-  device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, 1);
-  device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, 3000);
-  device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, 16);
-  device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, 60);
-  device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, 30000);
-
   device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_CONFIG_INDEX_INT, 1);
   device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, 0);
   device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, 3000);
@@ -816,6 +808,14 @@ int OBCameraNode::init_interleave_laser_param() {
   device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, 60);
   // device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, 30000);
   device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, 17000);
+
+  // set interleaveae
+  device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_CONFIG_INDEX_INT, 0);
+  device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, 1);
+  device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, 3000);
+  device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, 16);
+  device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, 60);
+  device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, 30000);
   return 0;
 }
 

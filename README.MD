@@ -7,6 +7,21 @@ supports ROS 2 Foxy, Humble, and Jazzy distributions.
 
 With the major update of the new branch [v2-main](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main?tab=readme-ov-file) in October 2024, OrbbecSDK_ROS2 is connected to the open source version of [OrbbecSDK v2](https://github.com/orbbec/OrbbecSDK_v2/releases), which will make OrbbecSDK_ROS2 more flexible and extensible. This update in v2-main ensures compatibility with all new Orbbec USB products that comply with the UVC standard. However, OrbbecSDK_ROS2 v2 no longer supports Orbbec's traditional OpenNI protocol devices. We encourage you to check whether your device is supported by OrbbecSDK_ROS2 v2 and use the new version if supported.
 
+| product serials | Firmware Version | **Firmware Version** |
+| :-------------: | :--------------: | :-------------------------: |
+|     Astra2     |      2.8.20      |      astra2.launch.py      |
+|   Femto mega   |   1.1.7/1.2.7   |    femto_mega.launch.py    |
+|   Femto bolt   |   1.0.6/1.0.9   |    femto_bolt.launch.py    |
+|     Gemini2     |  1.4.60 /1.4.76  |      gemini2.launch.py      |
+|    Gemini2L    |      1.4.32      |     gemini2L.launch.py     |
+|   Gemini 335   |      1.2.20      | gemini_330_series.launch.py |
+|   Gemini 335L   |      1.2.20      | gemini_330_series.launch.py |
+|  Gemini 335Lg  |      1.3.46      | gemini_330_series.launch.py |
+|   Gemini 336   |      1.2.20      | gemini_330_series.launch.py |
+|   Gemini 336L   |      1.2.20      | gemini_330_series.launch.py |
+
+If the camera you are using is not in this supported list, you can use the repository under the [main branch](https://github.com/orbbec/OrbbecSDK_ROS2/tree/main) to use your camera
+
 ## Table of Contents
 
 <!-- TOC -->

@@ -774,7 +774,9 @@ The following devices are supported by the OrbbecSDK ROS2 Wrapper.
 | Gemini EW Lite                        | gemini_ew_lite.launch.py    |
 | Gemini 335/335L/336/336L              | gemini_330_series.launch.py |
 
-> [!IMPORTANT]  We recommend using the [OrbbecSDK ROS2 Wrapper v2](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main) to get better flexibility and extensibility for the following devices: Astra 2, Femto Mega, Femto Bolt, Gemini 2, Gemini 2 L, Gemini 335, Gemini 335L, Gemini 336, Gemini 336L, Gemini 335Lg(only supported in v2-main branch).
+> [!IMPORTANT]
+>
+> We recommend using the [OrbbecSDK ROS2 Wrapper v2](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main) to get better flexibility and extensibility for the following devices: Astra 2, Femto Mega, Femto Bolt, Gemini 2, Gemini 2 L, Gemini 335, Gemini 335L, Gemini 336, Gemini 336L, Gemini 335Lg(only supported in v2-main branch).
 
 All launch files are essentially similar, with the primary difference being the default values of the parameters set
 for different models within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution settings in the launch file, as well as other parameters, to ensure compatibility and optimal performance.

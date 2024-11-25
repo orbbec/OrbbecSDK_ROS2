@@ -4,7 +4,7 @@
 
 > [!IMPORTANT]
 >
-> Welcome to the OrbbecSDK ROS2 Wrapper. Before you begin using this version of ROS2 wrapper, it's crucial to check the following device support list to verify the compatibility.
+> Welcome to the OrbbecSDK ROS2 Wrapper v2. Before you begin using this version of ROS2 wrapper, it's crucial to check the following device support list to verify the compatibility.
 
 OrbbecSDK ROS2 Wrapper provides seamless integration of Orbbec cameras with ROS 2 environment. It supports ROS2 Foxy, Humble, and Jazzy distributions.
 

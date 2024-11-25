@@ -4,21 +4,21 @@
 
 > [!IMPORTANT]
 >
-> Welcome to the OrbbecSDK ROS2 Wrapper v2. Before you begin using this version of ROS2 Wrapper, it's crucial to check the [device support list] (#product-support) to verify that your device is supported to ensure compatibility.
+> Welcome to the OrbbecSDK ROS2 Wrapper. Before you begin using this version of ROS2 wrapper, it's crucial to check the following device support list to verify the compatibility.
 
 OrbbecSDK ROS2 Wrapper provides seamless integration of Orbbec cameras with ROS 2 environment. It supports ROS2 Foxy, Humble, and Jazzy distributions.
 
-With a major update in October 2024, OrbbecSDK ROS2 Wrapper v2 is connected to the Open Source [OrbbecSDK v2](https://github.com/orbbec/OrbbecSDK_v2/releases) with enhanced flexibility and extensibility. This update ensures compatibility with all Orbbec USB products adhering to UVC standard. However, it no longer supports Orbbec's traditional OpenNI protocol devices.
+With a major update in October 2024, we release the [OrbbecSDK ROS2 Wrapper v2](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main) connected to the open source [OrbbecSDK v2](https://github.com/orbbec/OrbbecSDK_v2/releases) with enhanced flexibility and extensibility. This update ensures compatibility with all Orbbec USB products adhering to UVC standard. However, it no longer supports Orbbec's traditional OpenNI protocol devices. We strongly encourage you to use the v2-main branch if your device is supported.
 
-Below is the list of supported devices.
+Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
 
 <table border="1" style="border-collapse: collapse; text-align: left; width: 100%;">
   <thead>
     <tr style="background-color: #1f4e78; color: white; text-align: center;">
       <th>Product Series</th>
       <th>Product</th>
-      <th>Branch main</th>
-      <th>Branch v2-main</th>
+      <th><a href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/main" style="color: black; text-decoration: none;">Branch main</a></th>
+      <th><a href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main" style="color: black; text-decoration: none;">Branch v2-main</a></th>
     </tr>
   </thead>
   <tbody>
@@ -112,6 +112,7 @@ Below is the list of supported devices.
 </table>
 
 **Note**: If you do not find your device, please contact our FAE or sales representative for help.
+
 **Definition**:
 
 1. recommended for new designs: we will provide full supports with new features,  bug fix and performance optimization;
@@ -773,8 +774,8 @@ For optimal performance, we strongly recommend updating to the latest firmware v
 |   Gemini 336   |      1.2.20      | gemini_330_series.launch.py |
 |   Gemini 336L   |      1.2.20      | gemini_330_series.launch.py |
 
-**All launch files are essentially similar, with the primary difference being the default values of the parameters set
-for different models within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution settings in the launch file, as well as other parameters, to ensure compatibility and optimal performance.**
+All launch files are essentially similar, with the primary difference being the default values of the parameters set
+for different models within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution settings in the launch file, as well as other parameters, to ensure compatibility and optimal performance.
 
 ## DDS Tuning
 

@@ -1,59 +1,167 @@
-# OrbbecSDK ROS2
+# OrbbecSDK ROS2 Wrapper
 
 [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-1.5.11-green)
 
-OrbbecSDK_ROS2 is a wrapper for the Orbbec 3D camera that provides seamless integration with the ROS 2 environment. It
-supports ROS 2 Foxy, Humble, and Jazzy distributions.
+> [!IMPORTANT]
+>
+> Welcome to the OrbbecSDK ROS2 Wrapper. Before you begin using this version of ROS2 Wrapper, it's crucial to check the [device support list] (#product-support) to verify that your device is supported to ensure compatibility.
 
-With the major update of the new
-branch [v2-main](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main?tab=readme-ov-file) in October 2024,
-OrbbecSDK_ROS2 is connected to the open source version
-of [OrbbecSDK v2](https://github.com/orbbec/OrbbecSDK_v2/releases), which will make OrbbecSDK_ROS2 more flexible and
-extensible. This update in v2-main ensures compatibility with all new Orbbec USB products that comply with the UVC
-standard. However, OrbbecSDK_ROS2 v2 no longer supports Orbbec's traditional OpenNI protocol devices. We encourage you
-to check whether your device is supported by OrbbecSDK_ROS2 v2 and use the new version if supported.
+OrbbecSDK ROS2 Wrapper provides seamless integration of Orbbec cameras with ROS 2 environment. It supports ROS2 Foxy, Humble, and Jazzy distributions.
+
+With a major update in October 2024, we release the [OrbbecSDK ROS2 Wrapper v2](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main) connected to the Open Source [OrbbecSDK v2](https://github.com/orbbec/OrbbecSDK_v2/releases) with enhanced flexibility and extensibility. This update ensures compatibility with all Orbbec USB products adhering to UVC standard. However, it no longer supports Orbbec's traditional OpenNI protocol devices.  We strongly encourage you to use the latest [Orgiastic ROS2 Wrapper v2](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main) if your device is supported in its [device support list](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main?tab=readme-ov-file#product-support).
+
+Below is the list of supported devices.
+
+<table border="1" style="border-collapse: collapse; text-align: left; width: 100%;">
+  <thead>
+    <tr style="background-color: #1f4e78; color: white; text-align: center;">
+      <th>Product Series</th>
+      <th>Product</th>
+      <th>Branch main</th>
+      <th>Branch v2-main</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="7" style="text-align: center; font-weight: bold;">Gemini 330</td>
+      <td>Gemini 335</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 336</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 330</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 335L</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 336L</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 330L</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 335Lg</td>
+      <td>not supported</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td rowspan="3" style="text-align: center; font-weight: bold;">Gemini 2</td>
+      <td>Gemini 2</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 2 L</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 2 XL</td>
+      <td>recommended for new designs</td>
+      <td>to be supported</td>
+    </tr>
+    <tr>
+      <td rowspan="3" style="text-align: center; font-weight: bold;">Femto</td>
+      <td>Femto Bolt</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+    <tr>
+      <td>Femto Mega I</td>
+      <td>full maintenance</td>
+      <td>to be supported</td>
+    </tr>
+    <tr>
+      <td rowspan="3" style="text-align: center; font-weight: bold;">Astra</td>
+      <td>Astra 2</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Astra+</td>
+      <td>limited maintenance</td>
+      <td>not supported</td>
+    </tr>
+    <tr>
+      <td>Astra Pro Plus</td>
+      <td>limited maintenance</td>
+      <td>not supported</td>
+    </tr>
+    <tr>
+      <td style="text-align: center; font-weight: bold;">Astra Mini</td>
+      <td>Astra Mini Pro</td>
+      <td>full maintenance</td>
+      <td>not supported</td>
+    </tr>
+  </tbody>
+</table>
+
+**Note**: If you do not find your device, please contact our FAE or sales representative for help.
+**Definition**:
+
+1. recommended for new designs: we will provide full supports with new features,  bug fix and performance optimization;
+
+2. full maintenance: we will provide bug fix support;
+
+3. limited maintenance: we will provide critical bug fix support;
+
+4. not supported: we will not support specific device in this version;
+
+5. to be supported: we will add support in the near future.
 
 ## Table of Contents
 
-<!-- TOC -->
-* [OrbbecSDK ROS2](#orbbecsdk-ros2)
-  * [Table of Contents](#table-of-contents)
-  * [Installation Instructions](#installation-instructions)
-  * [Getting start](#getting-start)
-  * [Efficient intra-process communication:](#efficient-intra-process-communication)
-    * [Example](#example)
-      * [Manually loading multiple components into the same process](#manually-loading-multiple-components-into-the-same-process)
-      * [Using a launch file](#using-a-launch-file)
-    * [Limitations](#limitations)
-  * [Use V4L2 backend](#use-v4l2-backend)
-  * [Launch parameters](#launch-parameters)
-  * [Predefined presets](#predefined-presets)
-  * [Depth work mode switch](#depth-work-mode-switch)
-  * [Configuration of depth NFOV and WFOV modes](#configuration-of-depth-nfov-and-wfov-modes)
-  * [All available service for camera control](#all-available-service-for-camera-control)
-  * [All available topics](#all-available-topics)
-  * [Network device enumeration](#network-device-enumeration)
-  * [Multi-Camera](#multi-camera)
-  * [Compressed Image](#compressed-image)
-  * [Use hardware decoder to decode JPEG](#use-hardware-decoder-to-decode-jpeg)
-    * [rockchip and Amlogic](#rockchip-and-amlogic)
-    * [Nvidia Jetson](#nvidia-jetson)
-  * [Check which profiles the camera supports](#check-which-profiles-the-camera-supports)
-  * [Building a Debian Package](#building-a-debian-package)
-    * [Preparing the Environment](#preparing-the-environment)
-    * [Configuring ROS Dependencies](#configuring-ros-dependencies)
-    * [Building the Package](#building-the-package)
-  * [Launch files](#launch-files)
-  * [Product support](#product-support)
-  * [DDS Tuning](#dds-tuning)
-  * [Frequently Asked Questions](#frequently-asked-questions)
-    * [Unexpected Crash](#unexpected-crash)
-    * [No Data Stream from Multiple Cameras](#no-data-stream-from-multiple-cameras)
-    * [Additional Troubleshooting](#additional-troubleshooting)
-    * [Why Are There So Many Launch Files?](#why-are-there-so-many-launch-files)
-  * [Other useful links](#other-useful-links)
-  * [License](#license)
-<!-- TOC -->
+- [OrbbecSDK ROS2 Wrapper](#orbbecsdk-ros2-wrapper)
+  - [Table of Contents](#table-of-contents)
+  - [Installation Instructions](#installation-instructions)
+  - [Getting start](#getting-start)
+  - [Efficient intra-process communication:](#efficient-intra-process-communication)
+    - [Example](#example)
+      - [Manually loading multiple components into the same process](#manually-loading-multiple-components-into-the-same-process)
+      - [Using a launch file](#using-a-launch-file)
+    - [Limitations](#limitations)
+  - [Use V4L2 backend](#use-v4l2-backend)
+  - [Launch parameters](#launch-parameters)
+  - [Predefined presets](#predefined-presets)
+  - [Depth work mode switch](#depth-work-mode-switch)
+  - [Configuration of depth NFOV and WFOV modes](#configuration-of-depth-nfov-and-wfov-modes)
+  - [All available service for camera control](#all-available-service-for-camera-control)
+  - [All available topics](#all-available-topics)
+  - [Network device enumeration](#network-device-enumeration)
+  - [Multi-Camera](#multi-camera)
+  - [Compressed Image](#compressed-image)
+  - [Use hardware decoder to decode JPEG](#use-hardware-decoder-to-decode-jpeg)
+    - [rockchip and Amlogic](#rockchip-and-amlogic)
+    - [Nvidia Jetson](#nvidia-jetson)
+  - [Check which profiles the camera supports](#check-which-profiles-the-camera-supports)
+  - [Building a Debian Package](#building-a-debian-package)
+    - [Preparing the Environment](#preparing-the-environment)
+    - [Configuring ROS Dependencies](#configuring-ros-dependencies)
+    - [Building the Package](#building-the-package)
+  - [Supported Devices](#supported-devices)
+  - [DDS Tuning](#dds-tuning)
+  - [Frequently Asked Questions](#frequently-asked-questions)
+    - [Unexpected Crash](#unexpected-crash)
+    - [No Data Stream from Multiple Cameras](#no-data-stream-from-multiple-cameras)
+    - [Additional Troubleshooting](#additional-troubleshooting)
+    - [Why Are There So Many Launch Files?](#why-are-there-so-many-launch-files)
+  - [Other useful links](#other-useful-links)
+  - [License](#license)
 
 ## Installation Instructions
 
@@ -365,13 +473,13 @@ these settings.*
 
 ## Predefined presets
 
-| Preset         | Features                                                                                                                                                                                                         | Recommended use cases                                                                                                                                            |
+| Preset         | Features                                                                                                                                                                                                           | Recommended use cases                                                                                                                                              |
 |----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Default        | - Best visual perception``- Overall good performance in accuracy, fill rate, tiny objects, etc.                                                                                                                  | - Generic `<br>`- Robotics                                                                                                                                       |
-| Hand           | - Clear hand and finger edges                                                                                                                                                                                    | - Gesture recognition                                                                                                                                            |
-| High Accuracy  | - Depth of high confidence `<br>`- Barely noise depth values `<br>`- Lower fill rate                                                                                                                             | - Collision avoidance `<br>`- Object scanning                                                                                                                    |
-| High Density   | - Higher fill rate `<br>`- More tiny objects `<br>`- May suffer from noise depth values                                                                                                                          | - Object recognition `<br>`- Pick & place `<br>`- Foreground & background animation                                                                              |
-| Medium Density | - Balanced performance in fill rate and accuracy `<br>`- In comparison to Default: lower fill rate, better edge quality                                                                                          | - Generic and alternative to Default                                                                                                                             |
+| Default        | - Best visual perception``- Overall good performance in accuracy, fill rate, tiny objects, etc.                                                                                                                    | - Generic `<br>`- Robotics                                                                                                                                       |
+| Hand           | - Clear hand and finger edges                                                                                                                                                                                      | - Gesture recognition                                                                                                                                              |
+| High Accuracy  | - Depth of high confidence `<br>`- Barely noise depth values `<br>`- Lower fill rate                                                                                                                           | - Collision avoidance `<br>`- Object scanning                                                                                                                    |
+| High Density   | - Higher fill rate `<br>`- More tiny objects `<br>`- May suffer from noise depth values                                                                                                                        | - Object recognition `<br>`- Pick & place `<br>`- Foreground & background animation                                                                            |
+| Medium Density | - Balanced performance in fill rate and accuracy `<br>`- In comparison to Default: lower fill rate, better edge quality                                                                                          | - Generic and alternative to Default                                                                                                                               |
 | Custom         | - User defined Preset `<br>`- Derived from Presets above, with customized modifications, e.g. a new configuration for the post-processing pipeline, modified mean intensity set point of depth AE function, etc. | - Better depth performance achieved using customized configurations in comparison to using predefined presets `<br>`- For well-established custom configurations |
 
 Choose the appropriate preset name based on your specific use case and set it as the value for the `device_preset`
@@ -630,53 +738,46 @@ cd src/OrbbecSDK_ROS2/
 bash .make_deb.sh
 ```
 
-## Launch files
+## Supported Devices
 
-| product serials                       | launch file                 |
-|---------------------------------------|-----------------------------|
-| astra+                                | astra_adv.launch.py         |
-| astra mini /astra mini pro /astra pro | astra.launch.py             |
-| astra mini pro s                      | astra.launch.py             |
-| astra2                                | astra2.launch.py            |
-| astra stereo s                        | stereo_s_u3.launch.py       |
-| astra pro2                            | astra_pro2.launch.py        |
-| dabai                                 | dabai.launch.py             |
-| dabai d1                              | dabai_d1.launch.py          |
-| dabai dcw                             | dabai_dcw.launch.py         |
-| dabai dw                              | dabai_dw.launch.py          |
-| dabai pro                             | dabai_pro.launch.py         |
-| deeya                                 | deeya.launch.py             |
-| femto /femto w                        | femto.launch.py             |
-| femto mega                            | femto_mega.launch.py        |
-| femto bolt                            | femto_bolt.launch.py        |
-| gemini                                | gemini.launch.py            |
-| gemini                                | gemini.launch.py            |
-| gemini2 / dabai DCL                   | gemini2.launch.py           |
-| gemini2L                              | gemini2L.launch.py          |
-| gemini e                              | gemini_e.launch.py          |
-| gemini e lite                         | gemini_e_lite.launch.py     |
-| dabai max                             | dabai_max.launch.py         |
-| dabai max pro                         | dabai_max_pro.launch.py     |
-| gemini uw                             | gemini_uw.launch.py         |
-| dabai dcw2                            | dabai_dcw2.launch.py        |
-| dabai dw2                             | dabai_dw2.launch.py         |
-| gemini ew                             | gemini_ew.launch.py         |
-| gemini ew lite                        | gemini_ew_lite.launch.py    |
-| gemini 330 series                     | gemini_330_series.launch.py |
-| femto mega I                          | femto_net_camera.launch.py  |
+The following devices are supported by the OrbbecSDK ROS2 Wrapper.
 
-**All launch files are essentially similar, with the primary difference being the default values of the parameters set
-for different models
-within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these
-parameters. If you
-encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution
-settings in the launch
-file, as well as other parameters, to ensure compatibility and optimal performance.**
+| Product                               | launch file                 |
+| ------------------------------------- | --------------------------- |
+| Astra+                                | astra_adv.launch.py         |
+| Astra Mini /Astra Mini Pro /Astra Pro | astra.launch.py             |
+| Astra Mini Pro S                      | astra.launch.py             |
+| Astra 2                               | astra2.launch.py            |
+| Astra Stereo S                        | stereo_s_u3.launch.py       |
+| Astra Pro 2                           | astra_pro2.launch.py        |
+| Dabai                                 | dabai.launch.py             |
+| Dabai D1                              | dabai_d1.launch.py          |
+| Dabai DW                              | dabai_dw.launch.py          |
+| Dabai DCW                             | dabai_dcw.launch.py         |
+| Dabai Pro                             | dabai_pro.launch.py         |
+| Dabai Max                             | dabai_max.launch.py         |
+| Dabai Max Pro                         | dabai_max_pro.launch.py     |
+| Dabai DW 2                            | dabai_dw2.launch.py         |
+| Dabai DCW 2                           | dabai_dcw2.launch.py        |
+| Deeya                                 | deeya.launch.py             |
+| Femto/Femto W                         | femto.launch.py             |
+| Femto Mega                            | femto_mega.launch.py        |
+| Femto Bolt                            | femto_bolt.launch.py        |
+| Femto Mega I                          | femto_net_camera.launch.py  |
+| Gemini                                | gemini.launch.py            |
+| Gemini 2 / Dabai DCL                  | gemini2.launch.py           |
+| Gemini 2 L                            | gemini2L.launch.py          |
+| Gemini E                              | gemini_e.launch.py          |
+| Gemini E Lite                         | gemini_e_lite.launch.py     |
+| Gemini UW                             | gemini_uw.launch.py         |
+| Gemini EW                             | gemini_ew.launch.py         |
+| Gemini EW Lite                        | gemini_ew_lite.launch.py    |
+| Gemini 335/335L/336/336L              | gemini_330_series.launch.py |
 
-## Product support
+> [!IMPORTANT]  We recommend using the [OrbbecSDK ROS2 Wrapper v2](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main) to get better flexibility and extensibility for the following devices: Astra 2, Femto Mega, Femto Bolt, Gemini 2, Gemini 2 L, Gemini 335, Gemini 335L, Gemini 336, Gemini 336L, Gemini 335Lg(only supported in v2-main branch).
 
-Please refer to the OrbbecSDK supported
-products: [Product Support](https://github.com/orbbec/OrbbecSDK?tab=readme-ov-file#product-support)
+All launch files are essentially similar, with the primary difference being the default values of the parameters set
+for different models within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution settings in the launch file, as well as other parameters, to ensure compatibility and optimal performance.
 
 ## DDS Tuning
 

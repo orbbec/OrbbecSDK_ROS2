@@ -1,73 +1,170 @@
-# OrbbecSDK ROS2
+# OrbbecSDK ROS2 Wrapper v2
 
  [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-2.0.7-green)
 
-OrbbecSDK_ROS2 is a wrapper for the Orbbec 3D camera that provides seamless integration with the ROS 2 environment. It
-supports ROS 2 Foxy, Humble, and Jazzy distributions.
+> [!IMPORTANT]
+>
+> Welcome to the OrbbecSDK ROS2 Wrapper v2. Before you begin using this version of ROS2 Wrapper, it's crucial to check the [device support list] (#product-support) to verify that your device is supported to ensure compatibility.
 
-With the major update of the new branch [v2-main](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main?tab=readme-ov-file) in October 2024, OrbbecSDK_ROS2 is connected to the open source version of [OrbbecSDK v2](https://github.com/orbbec/OrbbecSDK_v2/releases), which will make OrbbecSDK_ROS2 more flexible and extensible. This update in v2-main ensures compatibility with all new Orbbec USB products that comply with the UVC standard. However, OrbbecSDK_ROS2 v2 no longer supports Orbbec's traditional OpenNI protocol devices. We encourage you to check whether your device is supported by OrbbecSDK_ROS2 v2 and use the new version if supported.
+OrbbecSDK ROS2 Wrapper provides seamless integration of Orbbec cameras with ROS 2 environment. It supports ROS2 Foxy, Humble, and Jazzy distributions.
 
-| product serials | Firmware Version | **Firmware Version** |
-| :-------------: | :--------------: | :-------------------------: |
-|     Astra2     |      2.8.20      |      astra2.launch.py      |
-|   Femto mega   |   1.1.7/1.2.7   |    femto_mega.launch.py    |
-|   Femto bolt   |   1.0.6/1.0.9   |    femto_bolt.launch.py    |
-|     Gemini2     |  1.4.60 /1.4.76  |      gemini2.launch.py      |
-|    Gemini2L    |      1.4.32      |     gemini2L.launch.py     |
-|   Gemini 335   |      1.2.20      | gemini_330_series.launch.py |
-|   Gemini 335L   |      1.2.20      | gemini_330_series.launch.py |
-|  Gemini 335Lg  |      1.3.46      | gemini_330_series.launch.py |
-|   Gemini 336   |      1.2.20      | gemini_330_series.launch.py |
-|   Gemini 336L   |      1.2.20      | gemini_330_series.launch.py |
+With a major update in October 2024, OrbbecSDK ROS2 Wrapper v2 is connected to the Open Source [OrbbecSDK v2](https://github.com/orbbec/OrbbecSDK_v2/releases) with enhanced flexibility and extensibility. This update ensures compatibility with all Orbbec USB products adhering to UVC standard. However, it no longer supports Orbbec's traditional OpenNI protocol devices.
 
-If the camera you are using is not in this supported list, you can use the repository under the [main branch](https://github.com/orbbec/OrbbecSDK_ROS2/tree/main) to use your camera
+Below is the list of supported devices.
+
+<table border="1" style="border-collapse: collapse; text-align: left; width: 100%;">
+  <thead>
+    <tr style="background-color: #1f4e78; color: white; text-align: center;">
+      <th>Product Series</th>
+      <th>Product</th>
+      <th>Branch main</th>
+      <th>Branch v2-main</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="7" style="text-align: center; font-weight: bold;">Gemini 330</td>
+      <td>Gemini 335</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 336</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 330</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 335L</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 336L</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 330L</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 335Lg</td>
+      <td>not supported</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td rowspan="3" style="text-align: center; font-weight: bold;">Gemini 2</td>
+      <td>Gemini 2</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 2 L</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 2 XL</td>
+      <td>recommended for new designs</td>
+      <td>to be supported</td>
+    </tr>
+    <tr>
+      <td rowspan="3" style="text-align: center; font-weight: bold;">Femto</td>
+      <td>Femto Bolt</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+    <tr>
+      <td>Femto Mega I</td>
+      <td>full maintenance</td>
+      <td>to be supported</td>
+    </tr>
+    <tr>
+      <td rowspan="3" style="text-align: center; font-weight: bold;">Astra</td>
+      <td>Astra 2</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Astra+</td>
+      <td>limited maintenance</td>
+      <td>not supported</td>
+    </tr>
+    <tr>
+      <td>Astra Pro Plus</td>
+      <td>limited maintenance</td>
+      <td>not supported</td>
+    </tr>
+    <tr>
+      <td style="text-align: center; font-weight: bold;">Astra Mini</td>
+      <td>Astra Mini Pro</td>
+      <td>full maintenance</td>
+      <td>not supported</td>
+    </tr>
+  </tbody>
+</table>
+
+**Note**: If you do not find your device, please contact our FAE or sales representative for help.
+**Definition**:
+
+1. recommended for new designs: we will provide full supports with new features,  bug fix and performance optimization;
+
+2. full maintenance: we will provide bug fix support;
+
+3. limited maintenance: we will provide critical bug fix support;
+
+4. not supported: we will not support specific device in this version;
+
+5. to be supported: we will add support in the near future.
 
 ## Table of Contents
 
-<!-- TOC -->
-
-* [OrbbecSDK ROS2](#orbbec-ros2-sdk)
-  * [Table of Contents](#table-of-contents)
-  * [Installation Instructions](#installation-instructions)
-  * [Getting start](#getting-start)
-  * [Efficient intra-process communication:](#efficient-intra-process-communication)
-    * [Example](#example)
-      * [Manually loading multiple components into the same process](#manually-loading-multiple-components-into-the-same-process)
-      * [Using a launch file](#using-a-launch-file)
-    * [Limitations](#limitations)
-  * [Use V4L2 backend](#use-v4l2-backend)
-  * [Launch parameters](#launch-parameters)
-  * [ROS2-vs-Optical Coordination Systems](#ros2robot-vs-opticalcamera-coordination-systems)
-  * [Camera sensor structure](#camera-sensor-structure)
-  * [TF from coordinate A to coordinate B:](#tf-from-coordinate-a-to-coordinate-b)
-  * [Predefined presets](#predefined-presets)
-  * [Depth work mode switch](#depth-work-mode-switch)
-  * [Configuration of depth NFOV and WFOV modes](#configuration-of-depth-nfov-and-wfov-modes)
-  * [All available service for camera control](#all-available-service-for-camera-control)
-  * [All available topics](#all-available-topics)
-  * [Network device enumeration](#network-device-enumeration)
-  * [Multi-Camera](#multi-camera)
-  * [Compressed Image](#compressed-image)
-  * [Use hardware decoder to decode JPEG](#use-hardware-decoder-to-decode-jpeg)
-    * [rockchip and Amlogic](#rockchip-and-amlogic)
-    * [Nvidia Jetson](#nvidia-jetson)
-  * [Check which profiles the camera supports](#check-which-profiles-the-camera-supports)
-  * [Building a Debian Package](#building-a-debian-package)
-    * [Preparing the Environment](#preparing-the-environment)
-    * [Configuring ROS Dependencies](#configuring-ros-dependencies)
-    * [Building the Package](#building-the-package)
-  * [Launch files](#launch-files)
-  * [Product support](#product-support)
-  * [DDS Tuning](#dds-tuning)
-  * [Frequently Asked Questions](#frequently-asked-questions)
-    * [Unexpected Crash](#unexpected-crash)
-    * [No Data Stream from Multiple Cameras](#no-data-stream-from-multiple-cameras)
-    * [Additional Troubleshooting](#additional-troubleshooting)
-    * [Why Are There So Many Launch Files?](#why-are-there-so-many-launch-files)
-  * [Other useful links](#other-useful-links)
-  * [License](#license)
-
-<!-- TOC -->
+- [OrbbecSDK ROS2 Wrapper v2](#orbbecsdk-ros2-wrapper-v2)
+  - [Table of Contents](#table-of-contents)
+  - [Installation Instructions](#installation-instructions)
+  - [Getting start](#getting-start)
+  - [Efficient intra-process communication:](#efficient-intra-process-communication)
+    - [Example](#example)
+      - [Manually loading multiple components into the same process](#manually-loading-multiple-components-into-the-same-process)
+      - [Using a launch file](#using-a-launch-file)
+    - [Limitations](#limitations)
+  - [Use V4L2 backend](#use-v4l2-backend)
+  - [Launch parameters](#launch-parameters)
+  - [ROS2(Robot) vs Optical(Camera) Coordination Systems](#ros2robot-vs-opticalcamera-coordination-systems)
+  - [Camera sensor structure](#camera-sensor-structure)
+  - [TF from coordinate A to coordinate B:](#tf-from-coordinate-a-to-coordinate-b)
+  - [Predefined presets](#predefined-presets)
+  - [Depth work mode switch](#depth-work-mode-switch)
+  - [Configuration of depth NFOV and WFOV modes](#configuration-of-depth-nfov-and-wfov-modes)
+  - [All available service for camera control](#all-available-service-for-camera-control)
+  - [All available topics](#all-available-topics)
+  - [Network device enumeration](#network-device-enumeration)
+  - [Multi-Camera](#multi-camera)
+  - [Compressed Image](#compressed-image)
+  - [Use hardware decoder to decode JPEG](#use-hardware-decoder-to-decode-jpeg)
+    - [rockchip and Amlogic](#rockchip-and-amlogic)
+    - [Nvidia Jetson](#nvidia-jetson)
+  - [Check which profiles the camera supports](#check-which-profiles-the-camera-supports)
+  - [Building a Debian Package](#building-a-debian-package)
+    - [Preparing the Environment](#preparing-the-environment)
+    - [Configuring ROS Dependencies](#configuring-ros-dependencies)
+    - [Building the Package](#building-the-package)
+  - [Supported Devices](#supported-devices)
+  - [DDS Tuning](#dds-tuning)
+  - [Frequently Asked Questions](#frequently-asked-questions)
+    - [Unexpected Crash](#unexpected-crash)
+    - [No Data Stream from Multiple Cameras](#no-data-stream-from-multiple-cameras)
+    - [Additional Troubleshooting](#additional-troubleshooting)
+    - [Why Are There So Many Launch Files?](#why-are-there-so-many-launch-files)
+  - [Other useful links](#other-useful-links)
+  - [License](#license)
 
 ## Installation Instructions
 
@@ -97,7 +194,7 @@ Get source code
 cd ~/ros2_ws/src
 git clone https://github.com/orbbec/OrbbecSDK_ROS2.git
 cd OrbbecSDK_ROS2
-git checkout OrbbecSDK_V2.X
+git checkout v2-main
 ```
 
 Install deb dependencies
@@ -657,15 +754,19 @@ cd src/OrbbecSDK_ROS2/
 bash .make_deb.sh
 ```
 
-## Launch files
+## Supported Devices
 
-| product serials | Firmware Version | **Firmware Version** |
-| :-------------: | :--------------: | :-------------------------: |
+Currently, the following devices are supported by the OrbbecSDK ROS2 Wrapper v2-main branch.  More devices support will be added in the near future. If you can not find your device in the table below, try the [main](https://github.com/orbbec/OrbbecSDK_ROS2)  branch.
+
+For optimal performance, we strongly recommend updating to the latest firmware version. This ensures that you benefit from the most recent enhancements and bug fixes.
+
+| Product List | Minimal Firmware Version | **Launch File** |
+| :-------------- | :--------------- | :-------------------------- |
 |     Astra2     |      2.8.20      |      astra2.launch.py      |
-|   Femto mega   |   1.1.7/1.2.7   |    femto_mega.launch.py    |
-|   Femto bolt   |   1.0.6/1.0.9   |    femto_bolt.launch.py    |
-|     Gemini2     |  1.4.60 /1.4.76  |      gemini2.launch.py      |
-|    Gemini2L    |      1.4.32      |     gemini2L.launch.py     |
+|   Femto Mega   |   1.1.7/1.2.7   |    femto_mega.launch.py    |
+|   Femto Bolt   |   1.0.6/1.0.9   |    femto_bolt.launch.py    |
+|     Gemini 2     |  1.4.60 /1.4.76  |      gemini2.launch.py      |
+|    Gemini 2 L    |      1.4.32      |     gemini2L.launch.py     |
 |   Gemini 335   |      1.2.20      | gemini_330_series.launch.py |
 |   Gemini 335L   |      1.2.20      | gemini_330_series.launch.py |
 |  Gemini 335Lg  |      1.3.46      | gemini_330_series.launch.py |
@@ -673,17 +774,7 @@ bash .make_deb.sh
 |   Gemini 336L   |      1.2.20      | gemini_330_series.launch.py |
 
 **All launch files are essentially similar, with the primary difference being the default values of the parameters set
-for different models
-within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these
-parameters. If you
-encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution
-settings in the launch
-file, as well as other parameters, to ensure compatibility and optimal performance.**
-
-## Product support
-
-Please refer to the OrbbecSDK supported
-products: [Product Support](https://github.com/orbbec/OrbbecSDK?tab=readme-ov-file#product-support)
+for different models within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution settings in the launch file, as well as other parameters, to ensure compatibility and optimal performance.**
 
 ## DDS Tuning
 

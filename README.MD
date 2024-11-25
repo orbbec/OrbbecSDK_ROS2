@@ -4,21 +4,21 @@
 
 > [!IMPORTANT]
 >
-> Welcome to the OrbbecSDK ROS2 Wrapper. Before you begin using this version of ROS2 Wrapper, it's crucial to check the [device support list] (#product-support) to verify that your device is supported to ensure compatibility.
+> Welcome to the OrbbecSDK ROS2 Wrapper. Before you begin using this version of ROS2 wrapper, it's crucial to check the following device support list to verify the compatibility.
 
 OrbbecSDK ROS2 Wrapper provides seamless integration of Orbbec cameras with ROS 2 environment. It supports ROS2 Foxy, Humble, and Jazzy distributions.
 
-With a major update in October 2024, we release the [OrbbecSDK ROS2 Wrapper v2](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main) connected to the Open Source [OrbbecSDK v2](https://github.com/orbbec/OrbbecSDK_v2/releases) with enhanced flexibility and extensibility. This update ensures compatibility with all Orbbec USB products adhering to UVC standard. However, it no longer supports Orbbec's traditional OpenNI protocol devices.  We strongly encourage you to use the latest [Orgiastic ROS2 Wrapper v2](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main) if your device is supported in its [device support list](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main?tab=readme-ov-file#product-support).
+With a major update in October 2024, we release the [OrbbecSDK ROS2 Wrapper v2](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main) connected to the open source [OrbbecSDK v2](https://github.com/orbbec/OrbbecSDK_v2/releases) with enhanced flexibility and extensibility. This update ensures compatibility with all Orbbec USB products adhering to UVC standard. However, it no longer supports Orbbec's traditional OpenNI protocol devices. We strongly encourage you to use the v2-main branch if your device is supported.
 
-Below is the list of supported devices.
+Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
 
 <table border="1" style="border-collapse: collapse; text-align: left; width: 100%;">
   <thead>
     <tr style="background-color: #1f4e78; color: white; text-align: center;">
       <th>Product Series</th>
       <th>Product</th>
-      <th>Branch main</th>
-      <th>Branch v2-main</th>
+      <th><a href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/main" style="color: black; text-decoration: none;">Branch main</a></th>
+      <th><a href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main" style="color: black; text-decoration: none;">Branch v2-main</a></th>
     </tr>
   </thead>
   <tbody>
@@ -112,16 +112,13 @@ Below is the list of supported devices.
 </table>
 
 **Note**: If you do not find your device, please contact our FAE or sales representative for help.
+
 **Definition**:
 
 1. recommended for new designs: we will provide full supports with new features,  bug fix and performance optimization;
-
 2. full maintenance: we will provide bug fix support;
-
 3. limited maintenance: we will provide critical bug fix support;
-
 4. not supported: we will not support specific device in this version;
-
 5. to be supported: we will add support in the near future.
 
 ## Table of Contents
@@ -474,7 +471,7 @@ these settings.*
 ## Predefined presets
 
 | Preset         | Features                                                                                                                                                                                                           | Recommended use cases                                                                                                                                              |
-|----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Default        | - Best visual perception``- Overall good performance in accuracy, fill rate, tiny objects, etc.                                                                                                                    | - Generic `<br>`- Robotics                                                                                                                                       |
 | Hand           | - Clear hand and finger edges                                                                                                                                                                                      | - Gesture recognition                                                                                                                                              |
 | High Accuracy  | - Depth of high confidence `<br>`- Barely noise depth values `<br>`- Lower fill rate                                                                                                                           | - Collision avoidance `<br>`- Object scanning                                                                                                                    |

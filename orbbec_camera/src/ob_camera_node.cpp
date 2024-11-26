@@ -219,7 +219,11 @@ void OBCameraNode::setupDevices() {
   }
   if (device_->isPropertySupported(OB_PROP_LASER_CONTROL_INT, OB_PERMISSION_READ_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting laser control to " << enable_laser_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_CONTROL_INT, enable_laser_);
+    if (isGemini335PID(pid)) {
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_CONTROL_INT, enable_laser_);
+    } else {
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_BOOL, enable_laser_);
+    }
   }
   if (device_->isPropertySupported(OB_PROP_LASER_ON_OFF_MODE_INT, OB_PERMISSION_READ_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting laser on off mode to " << laser_on_off_mode_);
@@ -436,25 +440,29 @@ void OBCameraNode::setupDevices() {
   if (device_->isPropertySupported(OB_PROP_DEPTH_MAX_DIFF_INT, OB_PERMISSION_WRITE)) {
     auto default_noise_removal_filter_min_diff =
         device_->getIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT);
-    RCLCPP_INFO_STREAM(logger_,"default_noise_removal_filter_min_diff: " << default_noise_removal_filter_min_diff);
+    RCLCPP_INFO_STREAM(logger_, "default_noise_removal_filter_min_diff: "
+                                    << default_noise_removal_filter_min_diff);
     if (noise_removal_filter_min_diff_ != -1 &&
         default_noise_removal_filter_min_diff != noise_removal_filter_min_diff_) {
       device_->setIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT, noise_removal_filter_min_diff_);
       auto new_noise_removal_filter_min_diff = device_->getIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT);
-      RCLCPP_INFO_STREAM(logger_,"after set noise_removal_filter_min_diff: " << new_noise_removal_filter_min_diff);
+      RCLCPP_INFO_STREAM(logger_, "after set noise_removal_filter_min_diff: "
+                                      << new_noise_removal_filter_min_diff);
     }
   }
 
   if (device_->isPropertySupported(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT, OB_PERMISSION_WRITE)) {
     auto default_noise_removal_filter_max_size =
         device_->getIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT);
-    RCLCPP_INFO_STREAM(logger_,"default_noise_removal_filter_max_size: " << default_noise_removal_filter_max_size);
+    RCLCPP_INFO_STREAM(logger_, "default_noise_removal_filter_max_size: "
+                                    << default_noise_removal_filter_max_size);
     if (noise_removal_filter_max_size_ != -1 &&
         default_noise_removal_filter_max_size != noise_removal_filter_max_size_) {
       device_->setIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT, noise_removal_filter_max_size_);
       auto new_noise_removal_filter_max_size =
           device_->getIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT);
-      RCLCPP_INFO_STREAM(logger_,"after set noise_removal_filter_max_size: " << new_noise_removal_filter_max_size);
+      RCLCPP_INFO_STREAM(logger_, "after set noise_removal_filter_max_size: "
+                                      << new_noise_removal_filter_max_size);
     }
   }
 }

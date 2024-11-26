@@ -184,9 +184,9 @@ void OBCameraNode::setupCameraCtrlServices() {
                                           std::shared_ptr<SetInt32::Response> response) {
         setSYNCInterleaveLaserCallback(request, response);
       });
-    set_sync_host_time_srv_ = node_->create_service<SetBool>(
+  set_sync_host_time_srv_ = node_->create_service<SetBool>(
       "set_sync_hosttime", [this](const std::shared_ptr<SetBool::Request> request,
-                                    std::shared_ptr<SetBool::Response> response) {
+                                  std::shared_ptr<SetBool::Response> response) {
         setSYNCHostimeCallback(request, response);
       });
 }
@@ -479,13 +479,11 @@ void OBCameraNode::setLaserEnableCallback(
     std::shared_ptr<std_srvs::srv::SetBool::Response>& response) {
   (void)request_header;
   (void)response;
-  auto device_info = device_->getDeviceInfo();
-  auto pid = device_info->getPid();
   int laser_enable = request->data ? 1 : 0;
   try {
-    if (isGemini335PID(pid)) {
+    if (device_->isPropertySupported(OB_PROP_LASER_CONTROL_INT, OB_PERMISSION_READ_WRITE)) {
       device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, laser_enable);
-    } else {
+    } else if (device_->isPropertySupported(OB_PROP_LASER_BOOL, OB_PERMISSION_READ_WRITE)) {
       device_->setIntProperty(OB_PROP_LASER_BOOL, laser_enable);
     }
     response->success = true;

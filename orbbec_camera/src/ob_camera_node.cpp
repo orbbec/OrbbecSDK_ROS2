@@ -218,14 +218,12 @@ void OBCameraNode::setupDevices() {
     TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_LDP_BOOL, enable_ldp_);
   }
   if (device_->isPropertySupported(OB_PROP_LASER_CONTROL_INT, OB_PERMISSION_READ_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting G300 laser control to " << enable_laser_);
+TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_CONTROL_INT, enable_laser_);
+  }
+    if (device_->isPropertySupported(OB_PROP_LASER_BOOL, OB_PERMISSION_READ_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting laser control to " << enable_laser_);
-    auto device_info = device_->getDeviceInfo();
-    auto pid = device_info->getPid();
-    if (isGemini335PID(pid)) {
-      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_CONTROL_INT, enable_laser_);
-    } else {
-      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_BOOL, enable_laser_);
-    }
+TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_BOOL, enable_laser_);
   }
   if (device_->isPropertySupported(OB_PROP_LASER_ON_OFF_MODE_INT, OB_PERMISSION_READ_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting laser on off mode to " << laser_on_off_mode_);

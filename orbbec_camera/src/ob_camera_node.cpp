@@ -219,6 +219,8 @@ void OBCameraNode::setupDevices() {
   }
   if (device_->isPropertySupported(OB_PROP_LASER_CONTROL_INT, OB_PERMISSION_READ_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting laser control to " << enable_laser_);
+    auto device_info = device_->getDeviceInfo();
+    auto pid = device_info->getPid();
     if (isGemini335PID(pid)) {
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_CONTROL_INT, enable_laser_);
     } else {

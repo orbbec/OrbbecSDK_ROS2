@@ -138,6 +138,13 @@ typedef struct {
   uint16_t fps;
 } cs_param_t;
 
+struct VideoStreamInfo {
+  OBFrameType frame_type;
+  std::chrono::steady_clock::time_point last_frame_time;
+  int frame_count_ = 0;
+  double frame_rate_ = 0.0;
+};
+
 class OBCameraNode {
  public:
   OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> device,
@@ -326,6 +333,8 @@ class OBCameraNode {
   bool decodeColorFrameToBuffer(const std::shared_ptr<ob::Frame>& frame, uint8_t* buffer);
 
   std::shared_ptr<ob::Frame> decodeIRMJPGFrame(const std::shared_ptr<ob::Frame>& frame);
+
+  void updateStreamInfo(VideoStreamInfo& stream_info);
 
   void onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
                           const stream_index_pair& stream_index);
@@ -615,5 +624,11 @@ class OBCameraNode {
   bool interleave_frame_enable_ = false;
   bool interleave_skip_enable_ = false;
   int interleave_skip_index_ = 1;
+  int interleave_skip_depth_index_ = 1;
+
+  VideoStreamInfo color_stream_info_ = {OB_FRAME_COLOR, std::chrono::steady_clock::now()};
+  VideoStreamInfo depth_stream_info_ = {OB_FRAME_DEPTH, std::chrono::steady_clock::now()};
+  VideoStreamInfo left_ir_stream_info_ = {OB_FRAME_IR_LEFT, std::chrono::steady_clock::now()};
+  VideoStreamInfo right_ir_stream_info_ = {OB_FRAME_IR_RIGHT, std::chrono::steady_clock::now()};
 };
 }  // namespace orbbec_camera

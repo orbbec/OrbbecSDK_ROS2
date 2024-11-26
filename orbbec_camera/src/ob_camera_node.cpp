@@ -2028,6 +2028,61 @@ std::shared_ptr<ob::Frame> OBCameraNode::decodeIRMJPGFrame(
   return frame;
 }
 
+void OBCameraNode::updateStreamInfo(VideoStreamInfo& stream_info) {
+    auto now = std::chrono::steady_clock::now();
+    auto duration = std::chrono::duration<double, std::micro>(now - stream_info.last_frame_time).count();
+    double dst_duration = duration;
+    int dst_fps = 0;
+    stream_index_pair dst_frame_type;
+
+    switch (stream_info.frame_type) {
+      case OB_FRAME_COLOR:
+        dst_frame_type = stream_index_pair{OB_STREAM_COLOR, 0};
+        break;
+      case OB_FRAME_DEPTH:
+        dst_frame_type = stream_index_pair{OB_STREAM_DEPTH, 0};
+        break;
+      case OB_FRAME_IR_LEFT:
+        dst_frame_type = stream_index_pair{OB_STREAM_IR_LEFT, 0};
+        break;
+      case OB_FRAME_IR_RIGHT:
+        dst_frame_type = stream_index_pair{OB_STREAM_IR_RIGHT, 0};
+        break;
+      default:
+        RCLCPP_INFO_STREAM(logger_, "[WARNING] Unknown frame_type "
+          << stream_info.frame_type << "\n");
+        return;
+    }
+
+    if (interleave_skip_enable_) {
+      dst_duration = (1000000.0 / fps_[dst_frame_type]) * 2;
+      dst_fps = fps_[dst_frame_type] / 2;
+    } else {
+      dst_duration = 1000000.0 / fps_[dst_frame_type];
+      dst_fps = fps_[dst_frame_type];
+    }
+
+    if (duration > dst_duration) {
+        RCLCPP_INFO_STREAM(logger_, "[WARNING] Frame interval for frame_type "
+                  << stream_info.frame_type << " exceeded " << dst_duration / 1000.0 << " ms. Interval: "
+                  << duration / 1000.0 << " ms\n");
+    }
+
+    stream_info.frame_count_++;
+
+    if (stream_info.frame_count_ % dst_fps == 0) {
+        double elapsed_seconds = std::chrono::duration<double>(now - stream_info.last_frame_time).count();
+        if (elapsed_seconds > 0) {
+            stream_info.frame_rate_ = dst_fps / elapsed_seconds;
+            RCLCPP_INFO_STREAM(logger_, "[INFO] Frame rate for frame_type " << stream_info.frame_type
+                      << ": " << stream_info.frame_rate_ << " FPS\n");
+        }
+    }
+
+    stream_info.last_frame_time = now;
+}
+
+
 void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
                                       const stream_index_pair &stream_index) {
   if (frame == nullptr) {
@@ -2045,8 +2100,20 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   }
   std::shared_ptr<ob::VideoFrame> video_frame;
   if (frame->getType() == OB_FRAME_COLOR) {
+    updateStreamInfo(color_stream_info_);
     video_frame = frame->as<ob::ColorFrame>();
   } else if (frame->getType() == OB_FRAME_DEPTH) {
+    // interleave filter depth
+    if (interleave_skip_enable_) {
+      interleave_skip_depth_index_++;
+      RCLCPP_DEBUG(logger_, "interleave filter skip interleave_skip_index_: %d",
+                   interleave_skip_depth_index_);
+      if (interleave_skip_depth_index_ % 2 == 0 ) {
+        RCLCPP_DEBUG(logger_, "interleave filter skip frame type: %d", frame->getType());
+        return;
+      }
+      updateStreamInfo(depth_stream_info_);
+    }
     video_frame = frame->as<ob::DepthFrame>();
   } else if (frame->getType() == OB_FRAME_IR || frame->getType() == OB_FRAME_IR_LEFT ||
              frame->getType() == OB_FRAME_IR_RIGHT) {
@@ -2060,6 +2127,12 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
           interleave_skip_index_) {
         RCLCPP_DEBUG(logger_, "interleave filter skip frame type: %d", frame->getType());
         return;
+      }
+      if (frame->getType() == OB_FRAME_IR_LEFT){
+        updateStreamInfo(left_ir_stream_info_);
+      }
+       if (frame->getType() == OB_FRAME_IR_RIGHT){
+        updateStreamInfo(right_ir_stream_info_);
       }
     }
 

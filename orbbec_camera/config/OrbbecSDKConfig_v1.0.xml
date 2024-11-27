@@ -10,7 +10,7 @@
         <!-- File log output level -->
         <FileLogLevel>0</FileLogLevel>
         <!-- Console log output level -->
-        <ConsoleLogLevel>3</ConsoleLogLevel>
+        <ConsoleLogLevel>4</ConsoleLogLevel>
         <!-- Default log output file path, string type. If this item is not configured, the default
         path will be used: Win/Linux: "./Log"; Android: "/sdcard/orbbec/Log" -->
         <!-- <OutputDir>./log</OutputDir> -->

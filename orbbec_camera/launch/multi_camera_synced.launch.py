@@ -7,6 +7,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.actions import DeclareLaunchArgument
 from launch.conditions import UnlessCondition, IfCondition
 from launch.substitutions import LaunchConfiguration
+from launch.substitutions import TextSubstitution
 
 def generate_launch_description():
     # Include launch files
@@ -15,21 +16,28 @@ def generate_launch_description():
     config_file_dir = os.path.join(package_dir, "config")
     config_file_path = os.path.join(config_file_dir, "camera_params.yaml")
 
-    use_intra_process_comms_arg = DeclareLaunchArgument(
+    use_intra_process_comms_declare = DeclareLaunchArgument(
         'use_intra_process_comms', default_value='true',
     )
-    attach_to_shared_component_container_arg = DeclareLaunchArgument(
-        'attach_to_shared_component_container', default_value='true',
+    attach_to_shared_component_container_declare = DeclareLaunchArgument(
+        'attach_to_shared_component_container', default_value='false',
+    )
+    component_container_name_declare = DeclareLaunchArgument(
+      'component_container_name', default_value='shared_orbbec_container'
     )
 
-    shared_container_name = "shared_orbbec_container"
-    shared_container = Node(
-        name=shared_container_name,
+    attach_to_shared_component_container_arg = LaunchConfiguration('attach_to_shared_component_container', default=False)
+    component_container_name_arg = LaunchConfiguration('component_container_name', default='shared_orbbec_container')
+
+    shared_orbbec_container = Node(
+        name=component_container_name_arg,
         package='rclcpp_components',
         executable='component_container_mt',
         output='screen',
-        condition=IfCondition(LaunchConfiguration('attach_to_shared_component_container'))
+        condition=UnlessCondition(attach_to_shared_component_container_arg)
     )
+
+    attach_to_shared_component_container_arg = TextSubstitution(text='true')
 
     front_camera = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -42,11 +50,10 @@ def generate_launch_description():
             "sync_mode": "primary",
             "config_file_path": config_file_path,
             'use_intra_process_comms': LaunchConfiguration("use_intra_process_comms"),
-            'attach_to_shared_component_container': LaunchConfiguration("attach_to_shared_component_container"),
-            'component_container_name': shared_container_name,
+            'attach_to_shared_component_container': attach_to_shared_component_container_arg,
+            'component_container_name': component_container_name_arg,
         }.items(),
     )
-
     left_camera = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(launch_file_dir, "gemini_330_series_interleave_laser_g335L.launch.py")
@@ -58,8 +65,8 @@ def generate_launch_description():
             "sync_mode": "secondary_synced",
             "config_file_path": config_file_path,
             'use_intra_process_comms': LaunchConfiguration("use_intra_process_comms"),
-            'attach_to_shared_component_container': LaunchConfiguration("attach_to_shared_component_container"),
-            'component_container_name': shared_container_name,
+            'attach_to_shared_component_container': attach_to_shared_component_container_arg,
+            'component_container_name': component_container_name_arg,
         }.items(),
     )
     right_camera = IncludeLaunchDescription(
@@ -73,8 +80,8 @@ def generate_launch_description():
             "sync_mode": "secondary_synced",
             "config_file_path": config_file_path,
             'use_intra_process_comms': LaunchConfiguration("use_intra_process_comms"),
-            'attach_to_shared_component_container': LaunchConfiguration("attach_to_shared_component_container"),
-            'component_container_name': shared_container_name,
+            'attach_to_shared_component_container': attach_to_shared_component_container_arg,
+            'component_container_name': component_container_name_arg,
         }.items(),
     )
     rear_camera = IncludeLaunchDescription(
@@ -88,20 +95,11 @@ def generate_launch_description():
             "sync_mode": "secondary_synced",
             "config_file_path": config_file_path,
             'use_intra_process_comms': LaunchConfiguration("use_intra_process_comms"),
-            'attach_to_shared_component_container': LaunchConfiguration("attach_to_shared_component_container"),
-            'component_container_name': shared_container_name,
+            'attach_to_shared_component_container': attach_to_shared_component_container_arg,
+            'component_container_name': component_container_name_arg,
         }.items(),
     )
 
-    # Launch description
-    # ld = LaunchDescription(
-    #   [
-    #       TimerAction(period=0.5, actions=[GroupAction([left_camera])]),
-    #       TimerAction(period=0.5, actions=[GroupAction([right_camera])]),
-    #       TimerAction(period=0.5, actions=[GroupAction([rear_camera])]),
-    #       TimerAction(period=0.5, actions=[GroupAction([front_camera])]),
-    #   ]
-    # )
     delayed_left_camera = TimerAction(
         period=0.5,
         actions=[left_camera],
@@ -120,9 +118,10 @@ def generate_launch_description():
     )
     ld = LaunchDescription(
       [
-        use_intra_process_comms_arg,
-        attach_to_shared_component_container_arg,
-        shared_container,
+        use_intra_process_comms_declare,
+        attach_to_shared_component_container_declare,
+        component_container_name_declare,
+        shared_orbbec_container,
         delayed_left_camera,
         delayed_right_camera,
         delayed_rear_camera,

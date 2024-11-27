@@ -188,7 +188,7 @@ def generate_launch_description():
         DeclareLaunchArgument('interleave_skip_index', default_value='0'), # 0:skip pattern ir  1: skip flood ir
         DeclareLaunchArgument('use_intra_process_comms', default_value='false'),
         DeclareLaunchArgument('attach_to_shared_component_container', default_value='false'),
-        DeclareLaunchArgument('component_container_name', default_value='orbbec_container'),
+        DeclareLaunchArgument('component_container_name', default_value='shared_orbbec_container'),
         DeclareLaunchArgument('delta_duration', default_value='5000.0'),
         DeclareLaunchArgument('delta_fps', default_value='2'),
     ]
@@ -212,9 +212,9 @@ def generate_launch_description():
             ]
         else:
             attach_to_shared_component_container_arg = LaunchConfiguration('attach_to_shared_component_container', default=False)
-            component_container_name_arg = LaunchConfiguration('component_container_name', default='orbbec_container')
+            component_container_name_arg = LaunchConfiguration('component_container_name', default='shared_orbbec_container')
 
-            orbbec_container = Node(
+            shared_orbbec_container = Node(
                 name=component_container_name_arg,
                 package='rclcpp_components',
                 executable='component_container_mt',
@@ -222,7 +222,7 @@ def generate_launch_description():
                 condition=UnlessCondition(attach_to_shared_component_container_arg)
             )
             return [
-                orbbec_container,
+                shared_orbbec_container,
                 LoadComposableNodes(
                   target_container=component_container_name_arg,
                   composable_node_descriptions=[

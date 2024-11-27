@@ -23,12 +23,14 @@ color_format: "YUYV"
 enable_color_auto_exposure: false
 color_exposure: 50 # 5ms
 color_gain: -1 # -1 default
+color_qos: "sensor_data"
 
 # depth params
 depth_width: 640
 depth_height: 480
 depth_fps: 60
 depth_format: "Y16"
+depth_qos: "sensor_data"
 
 # ir exposure
 enable_ir_auto_exposure: true
@@ -41,6 +43,7 @@ left_ir_width: 640
 left_ir_height: 480
 left_ir_fps: 60
 left_ir_format: "Y8"
+left_ir_qos: "sensor_data"
 
 #right ir params
 enable_right_ir: true
@@ -48,3 +51,4 @@ right_ir_width: 640
 right_ir_height: 480
 right_ir_fps: 60
 right_ir_format: "Y8"
+right_ir_qos: "sensor_data"

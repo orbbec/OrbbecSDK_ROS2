@@ -140,16 +140,16 @@ typedef struct {
 
 struct VideoStreamInfo {
   OBFrameType frame_type;
-  std::chrono::steady_clock::time_point last_frame_time;
+  uint64_t last_frame_time;
   int frame_count = 0;
   double frame_rate = 0.0;
-  std::chrono::steady_clock::time_point last_fps_calculation_time;
+  uint64_t last_fps_calculation_time;
   int last_fps_frame_count = 0;
   VideoStreamInfo()
     : frame_type(OB_FRAME_COLOR),
-      last_frame_time(std::chrono::steady_clock::now()),
-      last_fps_calculation_time(std::chrono::steady_clock::now()) {}
-  VideoStreamInfo(OBFrameType type, std::chrono::steady_clock::time_point time)
+      last_frame_time(0),
+      last_fps_calculation_time(0) {}
+  VideoStreamInfo(OBFrameType type, uint64_t time)
     : frame_type(type),
       last_frame_time(time),
       last_fps_calculation_time(time) {}
@@ -344,7 +344,7 @@ class OBCameraNode {
 
   std::shared_ptr<ob::Frame> decodeIRMJPGFrame(const std::shared_ptr<ob::Frame>& frame);
 
-  void updateStreamInfo(VideoStreamInfo& stream_info);
+  void updateStreamInfo(const std::shared_ptr<ob::Frame> &frame, VideoStreamInfo& stream_info);
 
   void onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
                           const stream_index_pair& stream_index);
@@ -638,9 +638,9 @@ class OBCameraNode {
 
   double delta_duration_ = 5000.0;
   int delta_fps_ = 2;
-  VideoStreamInfo color_stream_info_ = {OB_FRAME_COLOR, std::chrono::steady_clock::now()};
-  VideoStreamInfo depth_stream_info_ = {OB_FRAME_DEPTH, std::chrono::steady_clock::now()};
-  VideoStreamInfo left_ir_stream_info_ = {OB_FRAME_IR_LEFT, std::chrono::steady_clock::now()};
-  VideoStreamInfo right_ir_stream_info_ = {OB_FRAME_IR_RIGHT, std::chrono::steady_clock::now()};
+  VideoStreamInfo color_stream_info_ = {OB_FRAME_COLOR, 0};
+  VideoStreamInfo depth_stream_info_ = {OB_FRAME_DEPTH, 0};
+  VideoStreamInfo left_ir_stream_info_ = {OB_FRAME_IR_LEFT, 0};
+  VideoStreamInfo right_ir_stream_info_ = {OB_FRAME_IR_RIGHT, 0};
 };
 }  // namespace orbbec_camera

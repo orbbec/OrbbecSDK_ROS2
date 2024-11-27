@@ -1287,6 +1287,9 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<bool>(interleave_frame_enable_, "interleave_frame_enable", false);
   setAndGetNodeParameter<bool>(interleave_skip_enable_, "interleave_skip_enable", false);
   setAndGetNodeParameter<int>(interleave_skip_index_, "interleave_skip_index", 1);
+
+  setAndGetNodeParameter<double>(delta_duration_, "delta_duration", 5000.0);
+  setAndGetNodeParameter<int>(delta_fps_, "delta_fps", 2);
 }
 
 void OBCameraNode::setupTopics() {
@@ -2034,8 +2037,8 @@ void OBCameraNode::updateStreamInfo(VideoStreamInfo& stream_info) {
     double dst_duration = duration;
     int dst_fps = 0;
     stream_index_pair dst_frame_type;
-    double delta_duration = 2000.0;
-    int delta_fps = 2;
+    double delta_duration = delta_duration_;
+    int delta_fps = delta_fps_;
 
     switch (stream_info.frame_type) {
       case OB_FRAME_COLOR:

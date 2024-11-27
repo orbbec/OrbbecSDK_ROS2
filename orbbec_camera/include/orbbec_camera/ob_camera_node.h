@@ -636,6 +636,8 @@ class OBCameraNode {
   int interleave_skip_index_ = 1;
   int interleave_skip_depth_index_ = 1;
 
+  double delta_duration_ = 5000.0;
+  int delta_fps_ = 2;
   VideoStreamInfo color_stream_info_ = {OB_FRAME_COLOR, std::chrono::steady_clock::now()};
   VideoStreamInfo depth_stream_info_ = {OB_FRAME_DEPTH, std::chrono::steady_clock::now()};
   VideoStreamInfo left_ir_stream_info_ = {OB_FRAME_IR_LEFT, std::chrono::steady_clock::now()};

@@ -2034,6 +2034,8 @@ void OBCameraNode::updateStreamInfo(VideoStreamInfo& stream_info) {
     double dst_duration = duration;
     int dst_fps = 0;
     stream_index_pair dst_frame_type;
+    double delta_duration = 2000.0;
+    int delta_fps = 2;
 
     switch (stream_info.frame_type) {
       case OB_FRAME_COLOR:
@@ -2055,7 +2057,7 @@ void OBCameraNode::updateStreamInfo(VideoStreamInfo& stream_info) {
     }
 
     if (interleave_skip_enable_) {
-      dst_duration = (1000000.0 / fps_[dst_frame_type]) * 2;
+      dst_duration = (1000000.0 / fps_[dst_frame_type]) * 2 + delta_duration;
       dst_fps = fps_[dst_frame_type] / 2;
     } else {
       dst_duration = 1000000.0 / fps_[dst_frame_type];
@@ -2063,25 +2065,33 @@ void OBCameraNode::updateStreamInfo(VideoStreamInfo& stream_info) {
     }
 
     if (duration > dst_duration) {
-        RCLCPP_INFO_STREAM(logger_, "[WARNING] Frame interval for frame_type "
-                  << stream_info.frame_type << " exceeded " << dst_duration / 1000.0 << " ms. Interval: "
-                  << duration / 1000.0 << " ms\n");
+      RCLCPP_INFO_STREAM(logger_, "[WARNING] Frame interval for frame_type "
+        << stream_info.frame_type << " exceeded " << dst_duration / 1000.0 << " ms. Interval: "
+        << duration / 1000.0 << " ms\n");
     }
 
-    stream_info.frame_count_++;
+    stream_info.frame_count++;
 
-    if (stream_info.frame_count_ % dst_fps == 0) {
-        double elapsed_seconds = std::chrono::duration<double>(now - stream_info.last_frame_time).count();
-        if (elapsed_seconds > 0) {
-            stream_info.frame_rate_ = dst_fps / elapsed_seconds;
-            RCLCPP_INFO_STREAM(logger_, "[INFO] Frame rate for frame_type " << stream_info.frame_type
-                      << ": " << stream_info.frame_rate_ << " FPS\n");
+    if (stream_info.frame_count % dst_fps == 0) {
+      auto now = std::chrono::steady_clock::now();
+      double elapsed_seconds = std::chrono::duration<double>(now - stream_info.last_fps_calculation_time).count();
+
+      if (elapsed_seconds > 0) {
+        int frames_in_interval = stream_info.frame_count - stream_info.last_fps_frame_count;
+        stream_info.frame_rate = frames_in_interval / elapsed_seconds;
+
+        if (stream_info.frame_rate < (dst_fps - delta_fps)) {
+          RCLCPP_INFO_STREAM(logger_, "[INFO] Frame rate for frame_type " << stream_info.frame_type
+            << ": " << stream_info.frame_rate << " FPS\n");
         }
-    }
+
+        stream_info.last_fps_calculation_time = now;
+        stream_info.last_fps_frame_count = stream_info.frame_count;
+      }
+  }
 
     stream_info.last_frame_time = now;
 }
-
 
 void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
                                       const stream_index_pair &stream_index) {

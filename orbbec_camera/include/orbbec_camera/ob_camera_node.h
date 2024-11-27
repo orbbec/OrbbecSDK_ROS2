@@ -141,8 +141,18 @@ typedef struct {
 struct VideoStreamInfo {
   OBFrameType frame_type;
   std::chrono::steady_clock::time_point last_frame_time;
-  int frame_count_ = 0;
-  double frame_rate_ = 0.0;
+  int frame_count = 0;
+  double frame_rate = 0.0;
+  std::chrono::steady_clock::time_point last_fps_calculation_time;
+  int last_fps_frame_count = 0;
+  VideoStreamInfo()
+    : frame_type(OB_FRAME_COLOR),
+      last_frame_time(std::chrono::steady_clock::now()),
+      last_fps_calculation_time(std::chrono::steady_clock::now()) {}
+  VideoStreamInfo(OBFrameType type, std::chrono::steady_clock::time_point time)
+    : frame_type(type),
+      last_frame_time(time),
+      last_fps_calculation_time(time) {}
 };
 
 class OBCameraNode {

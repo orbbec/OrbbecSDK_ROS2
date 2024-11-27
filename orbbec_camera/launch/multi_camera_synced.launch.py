@@ -17,7 +17,7 @@ def generate_launch_description():
     config_file_path = os.path.join(config_file_dir, "camera_params.yaml")
 
     use_intra_process_comms_declare = DeclareLaunchArgument(
-        'use_intra_process_comms', default_value='true',
+        'use_intra_process_comms', default_value='false',
     )
     attach_to_shared_component_container_declare = DeclareLaunchArgument(
         'attach_to_shared_component_container', default_value='false',

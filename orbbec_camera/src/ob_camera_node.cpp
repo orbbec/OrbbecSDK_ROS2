@@ -861,6 +861,10 @@ void OBCameraNode::startStreams() {
     RCLCPP_INFO_STREAM(logger_, "Disable frame sync");
     TRY_EXECUTE_BLOCK(pipeline_->disableFrameSync());
   }
+  if (device_->isPropertySupported(OB_PROP_LDP_BOOL, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting LDP to " << (enable_ldp_ ? "ON" : "OFF"));
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_LDP_BOOL, enable_ldp_);
+  }
   pipeline_started_.store(true);
 }
 

@@ -211,7 +211,7 @@ void OBCameraNode::setupDevices() {
     std::string d2d_mode = is_hardware_d2d ? "HW D2D" : "SW D2D";
     RCLCPP_INFO_STREAM(logger_, "Depth process is " << d2d_mode);
   }
-  if (device_->isPropertySupported(OB_PROP_LDP_BOOL, OB_PERMISSION_READ_WRITE)) {
+  if (device_->isPropertySupported(OB_PROP_LDP_BOOL, OB_PERMISSION_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting LDP to " << (enable_ldp_ ? "ON" : "OFF"));
     TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_LDP_BOOL, enable_ldp_);
   }

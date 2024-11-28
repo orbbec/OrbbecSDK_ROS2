@@ -440,6 +440,18 @@ public:
     void setMatchTargetResolution(bool state) {
         setConfigValue("MatchTargetRes", state);
     }
+
+    /**
+     * @brief Set the Align To Stream Profile
+     * @brief  It is useful when the align target stream dose not started (without any frame to get intrinsics and extrinsics).
+     *
+     * @param profile The Align To Stream Profile.
+     */
+    void setAlignToStreamProfile(std::shared_ptr<const StreamProfile> profile) {
+        ob_error *error = nullptr;
+        ob_align_filter_set_align_to_stream_profile(impl_, profile->getImpl(), &error);
+        Error::handle(&error);
+    }
 };
 
 /**

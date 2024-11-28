@@ -830,7 +830,7 @@ void OBCameraNode::setSYNCInterleaveLaserCallback(
     std::shared_ptr<SetInt32 ::Response>& response) {
   (void)request;
   try {
-    device_->setIntProperty(OB_PROP_TIMER_RESET_TRIGGER_OUT_ENABLE_BOOL, request->data);
+    device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_LASER_PATTERN_SYNC_DELAY_INT, request->data);
     response->success = true;
   } catch (const ob::Error& e) {
     response->message = e.getMessage();

@@ -81,6 +81,10 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
       <td>recommended for new designs</td>
     </tr>
     <tr>
+      <td>Femto Mega</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
     <tr>
       <td>Femto Mega I</td>
       <td>full maintenance</td>
@@ -110,6 +114,8 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
     </tr>
   </tbody>
 </table>
+
+
 
 **Note**: If you do not find your device, please contact our FAE or sales representative for help.
 

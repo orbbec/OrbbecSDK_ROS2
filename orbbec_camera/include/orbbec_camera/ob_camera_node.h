@@ -312,6 +312,8 @@ class OBCameraNode {
                                  std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
   void setSYNCInterleaveLaserCallback(const std::shared_ptr<SetInt32 ::Request>& request,
                                       std::shared_ptr<SetInt32 ::Response>& response);
+  void setSYNCHostimeCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
+                                 std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
   bool toggleSensor(const stream_index_pair& stream_index, bool enabled, std::string& msg);
 
   void saveImageCallback(const std::shared_ptr<std_srvs::srv::Empty::Request>& request,
@@ -465,6 +467,7 @@ class OBCameraNode {
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_sync_immediately_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_reset_timestamp_srv_;
   rclcpp::Service<SetInt32>::SharedPtr set_interleaver_laser_sync_srv_;
+  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_sync_host_time_srv_;
 
   bool enable_sync_output_accel_gyro_ = false;
   bool publish_tf_ = false;

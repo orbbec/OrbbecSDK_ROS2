@@ -184,6 +184,11 @@ void OBCameraNode::setupCameraCtrlServices() {
                                           std::shared_ptr<SetInt32::Response> response) {
         setSYNCInterleaveLaserCallback(request, response);
       });
+    set_sync_host_time_srv_ = node_->create_service<SetBool>(
+      "set_sync_hosttime", [this](const std::shared_ptr<SetBool::Request> request,
+                                    std::shared_ptr<SetBool::Response> response) {
+        setSYNCHostimeCallback(request, response);
+      });
 }
 
 void OBCameraNode::setExposureCallback(const std::shared_ptr<SetInt32::Request>& request,
@@ -825,7 +830,25 @@ void OBCameraNode::setSYNCInterleaveLaserCallback(
     std::shared_ptr<SetInt32 ::Response>& response) {
   (void)request;
   try {
-    device_->setIntProperty(OB_PROP_TIMER_RESET_TRIGGER_OUT_ENABLE_BOOL, request->data);
+    device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_LASER_PATTERN_SYNC_DELAY_INT, request->data);
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->message = e.getMessage();
+    response->success = false;
+  } catch (const std::exception& e) {
+    response->message = e.what();
+    response->success = false;
+  } catch (...) {
+    response->message = "unknown error";
+    response->success = false;
+  }
+}
+void OBCameraNode::setSYNCHostimeCallback(
+    const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
+    std::shared_ptr<std_srvs::srv::SetBool::Response>& response) {
+  (void)request;
+  try {
+    device_->timerSyncWithHost();
     response->success = true;
   } catch (const ob::Error& e) {
     response->message = e.getMessage();

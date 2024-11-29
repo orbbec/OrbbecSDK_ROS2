@@ -60,7 +60,7 @@ def generate_launch_description():
         ),
         launch_arguments={
             "camera_name": "left_camera",
-            "usb_port": "2-3.2",
+            "usb_port": "2-3.1",
             "device_num": "4",
             "sync_mode": "secondary_synced",
             "config_file_path": config_file_path,
@@ -75,7 +75,7 @@ def generate_launch_description():
         ),
         launch_arguments={
             "camera_name": "right_camera",
-            "usb_port": "2-3.4",
+            "usb_port": "2-3.3",
             "device_num": "4",
             "sync_mode": "secondary_synced",
             "config_file_path": config_file_path,

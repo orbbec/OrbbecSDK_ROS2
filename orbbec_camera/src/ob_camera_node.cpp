@@ -245,8 +245,7 @@ void OBCameraNode::setupDevices() {
     RCLCPP_INFO_STREAM(logger_, "Set depth work mode: " << depth_work_mode_);
     TRY_EXECUTE_BLOCK(device_->switchDepthWorkMode(depth_work_mode_.c_str()));
   }
-  if (!sync_mode_str_.empty() && device_->isPropertySupported(OB_PROP_SYNC_SIGNAL_TRIGGER_OUT_BOOL,
-                                                              OB_PERMISSION_READ_WRITE)) {
+  if (!sync_mode_str_.empty()) {
     auto sync_config = device_->getMultiDeviceSyncConfig();
     RCLCPP_INFO_STREAM(logger_,
                        "Current sync mode: " << magic_enum::enum_name(sync_config.syncMode));
@@ -604,14 +603,14 @@ void OBCameraNode::setupDepthPostProcessFilter() {
     } else if (filter_name == "NoiseRemovalFilter" && enable_noise_removal_filter_) {
       auto noise_removal_filter = filter->as<ob::NoiseRemovalFilter>();
       OBNoiseRemovalFilterParams params = noise_removal_filter->getFilterParams();
-      RCLCPP_INFO_STREAM(logger_, "Default noise removal filter params: "
-                                      << "disp_diff: " << params.disp_diff
-                                      << ", max_size: " << params.max_size);
+      RCLCPP_INFO_STREAM(
+          logger_, "Default noise removal filter params: " << "disp_diff: " << params.disp_diff
+                                                           << ", max_size: " << params.max_size);
       params.disp_diff = noise_removal_filter_min_diff_;
       params.max_size = noise_removal_filter_max_size_;
-      RCLCPP_INFO_STREAM(logger_, "Set noise removal filter params: "
-                                      << "disp_diff: " << params.disp_diff
-                                      << ", max_size: " << params.max_size);
+      RCLCPP_INFO_STREAM(logger_,
+                         "Set noise removal filter params: " << "disp_diff: " << params.disp_diff
+                                                             << ", max_size: " << params.max_size);
       if (noise_removal_filter_min_diff_ != -1 && noise_removal_filter_max_size_ != -1) {
         noise_removal_filter->setFilterParams(params);
       }
@@ -620,11 +619,11 @@ void OBCameraNode::setupDepthPostProcessFilter() {
           hdr_merge_gain_2_ != -1) {
         auto hdr_merge_filter = filter->as<ob::HdrMerge>();
         hdr_merge_filter->enable(true);
-        RCLCPP_INFO_STREAM(logger_, "Set HDR merge filter params: "
-                                        << "exposure_1: " << hdr_merge_exposure_1_
-                                        << ", gain_1: " << hdr_merge_gain_1_
-                                        << ", exposure_2: " << hdr_merge_exposure_2_
-                                        << ", gain_2: " << hdr_merge_gain_2_);
+        RCLCPP_INFO_STREAM(
+            logger_, "Set HDR merge filter params: " << "exposure_1: " << hdr_merge_exposure_1_
+                                                     << ", gain_1: " << hdr_merge_gain_1_
+                                                     << ", exposure_2: " << hdr_merge_exposure_2_
+                                                     << ", gain_2: " << hdr_merge_gain_2_);
         auto config = OBHdrConfig();
         config.enable = true;
         config.exposure_1 = hdr_merge_exposure_1_;
@@ -707,10 +706,10 @@ void OBCameraNode::setupProfiles() {
           throw std::runtime_error("Failed cast profile to VideoStreamProfile");
         }
         RCLCPP_DEBUG_STREAM(
-            logger_, "Sensor profile: "
-                         << "stream_type: " << magic_enum::enum_name(profile->type())
-                         << "Format: " << profile->format() << ", Width: " << profile->width()
-                         << ", Height: " << profile->height() << ", FPS: " << profile->fps());
+            logger_,
+            "Sensor profile: " << "stream_type: " << magic_enum::enum_name(profile->type())
+                               << "Format: " << profile->format() << ", Width: " << profile->width()
+                               << ", Height: " << profile->height() << ", FPS: " << profile->fps());
         supported_profiles_[elem].emplace_back(profile);
       }
       std::shared_ptr<ob::VideoStreamProfile> selected_profile;

@@ -125,6 +125,7 @@ void OBCameraNodeDriver::init() {
   }
 
   auto log_level_str = declare_parameter<std::string>("log_level", "none");
+  std::cout << "=========log_level_str " << log_level_str << std::endl;
   auto log_level = obLogSeverityFromString(log_level_str);
   connection_delay_ = static_cast<int>(declare_parameter<int>("connection_delay", 100));
   enable_sync_host_time_ = declare_parameter<bool>("enable_sync_host_time", true);

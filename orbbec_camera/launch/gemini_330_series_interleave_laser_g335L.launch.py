@@ -189,8 +189,8 @@ def generate_launch_description():
         DeclareLaunchArgument('use_intra_process_comms', default_value='false'),
         DeclareLaunchArgument('attach_to_shared_component_container', default_value='false'),
         DeclareLaunchArgument('component_container_name', default_value='shared_orbbec_container'),
-        DeclareLaunchArgument('delta_duration', default_value='1000.0'),
-        DeclareLaunchArgument('delta_fps', default_value='1'),
+        DeclareLaunchArgument('delta_duration_us', default_value='1000.0'),
+        DeclareLaunchArgument('delta_fps', default_value='2'),
         DeclareLaunchArgument('gmsl_trigger_fps', default_value='3000'),
         DeclareLaunchArgument('enable_gmsl_trigger', default_value='false'),
     ]

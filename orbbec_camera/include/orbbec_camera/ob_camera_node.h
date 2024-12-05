@@ -146,13 +146,9 @@ struct VideoStreamInfo {
   uint64_t last_fps_calculation_time;
   int last_fps_frame_count = 0;
   VideoStreamInfo()
-    : frame_type(OB_FRAME_COLOR),
-      last_frame_time(0),
-      last_fps_calculation_time(0) {}
+      : frame_type(OB_FRAME_COLOR), last_frame_time(0), last_fps_calculation_time(0) {}
   VideoStreamInfo(OBFrameType type, uint64_t time)
-    : frame_type(type),
-      last_frame_time(time),
-      last_fps_calculation_time(time) {}
+      : frame_type(type), last_frame_time(time), last_fps_calculation_time(time) {}
 };
 
 class OBCameraNode {
@@ -313,7 +309,7 @@ class OBCameraNode {
   void setSYNCInterleaveLaserCallback(const std::shared_ptr<SetInt32 ::Request>& request,
                                       std::shared_ptr<SetInt32 ::Response>& response);
   void setSYNCHostimeCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
-                                 std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
+                              std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
   bool toggleSensor(const stream_index_pair& stream_index, bool enabled, std::string& msg);
 
   void saveImageCallback(const std::shared_ptr<std_srvs::srv::Empty::Request>& request,
@@ -346,7 +342,7 @@ class OBCameraNode {
 
   std::shared_ptr<ob::Frame> decodeIRMJPGFrame(const std::shared_ptr<ob::Frame>& frame);
 
-  void updateStreamInfo(const std::shared_ptr<ob::Frame> &frame, VideoStreamInfo& stream_info);
+  void updateStreamInfo(const std::shared_ptr<ob::Frame>& frame, VideoStreamInfo& stream_info);
 
   void onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
                           const stream_index_pair& stream_index);
@@ -640,7 +636,7 @@ class OBCameraNode {
   int interleave_skip_color_index_ = 1;
   int interleave_skip_depth_index_ = 1;
 
-  double delta_duration_ = 5000.0;
+  double delta_duration_us_ = 1000.0;
   int delta_fps_ = 2;
   VideoStreamInfo color_stream_info_ = {OB_FRAME_COLOR, 0};
   VideoStreamInfo depth_stream_info_ = {OB_FRAME_DEPTH, 0};

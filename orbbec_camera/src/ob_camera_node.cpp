@@ -218,8 +218,12 @@ void OBCameraNode::setupDevices() {
     TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_LDP_BOOL, enable_ldp_);
   }
   if (device_->isPropertySupported(OB_PROP_LASER_CONTROL_INT, OB_PERMISSION_READ_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting laser control to " << enable_laser_);
+    RCLCPP_INFO_STREAM(logger_, "Setting G300 laser control to " << enable_laser_);
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_CONTROL_INT, enable_laser_);
+  }
+  if (device_->isPropertySupported(OB_PROP_LASER_BOOL, OB_PERMISSION_READ_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting laser control to " << enable_laser_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_BOOL, enable_laser_);
   }
   if (device_->isPropertySupported(OB_PROP_LASER_ON_OFF_MODE_INT, OB_PERMISSION_READ_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting laser on off mode to " << laser_on_off_mode_);
@@ -407,6 +411,8 @@ void OBCameraNode::setupDevices() {
       device_->isPropertySupported(OB_PROP_IR_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
     TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_IR_AUTO_EXPOSURE_BOOL, false);
     auto range = device_->getIntPropertyRange(OB_PROP_IR_EXPOSURE_INT);
+    RCLCPP_ERROR(logger_, "ir exposure value is out of range[%d,%d], please check the value",
+                 range.min, range.max);
     if (ir_exposure_ < range.min || ir_exposure_ > range.max) {
       RCLCPP_ERROR(logger_, "ir exposure value is out of range[%d,%d], please check the value",
                    range.min, range.max);
@@ -418,6 +424,8 @@ void OBCameraNode::setupDevices() {
   if (ir_gain_ != -1 && device_->isPropertySupported(OB_PROP_IR_GAIN_INT, OB_PERMISSION_WRITE)) {
     TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_IR_AUTO_EXPOSURE_BOOL, false);
     auto range = device_->getIntPropertyRange(OB_PROP_IR_GAIN_INT);
+    RCLCPP_ERROR(logger_, "ir gain value is out of range[%d,%d], please check the value", range.min,
+                 range.max);
     if (ir_gain_ < range.min || ir_gain_ > range.max) {
       RCLCPP_ERROR(logger_, "ir gain value is out of range[%d,%d], please check the value",
                    range.min, range.max);
@@ -828,22 +836,33 @@ void OBCameraNode::startStreams() {
   try {
     setupPipelineConfig();
 
-    // set interleave mode
-    if (interleave_ae_mode_ == "hdr") {
-      RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to hdr");
-      device_->loadFrameInterleave("hdr interleave");
-      init_interleave_hdr_param();
-    } else if (interleave_ae_mode_ == "laser") {
-      RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to laser");
-      device_->loadFrameInterleave("laser interleave");
-      init_interleave_laser_param();
-    } else {
-      RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to nothing");
+    if (interleave_frame_enable_) {
+      // set interleave mode
+      if (interleave_ae_mode_ == "hdr") {
+        RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to hdr");
+        device_->loadFrameInterleave("hdr interleave");
+        init_interleave_hdr_param();
+      } else if (interleave_ae_mode_ == "laser") {
+        RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to laser");
+        device_->loadFrameInterleave("laser interleave");
+        init_interleave_laser_param();
+      } else {
+        RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to nothing");
+      }
     }
 
     pipeline_->start(pipeline_config_, [this](const std::shared_ptr<ob::FrameSet> &frame_set) {
       onNewFrameSetCallback(frame_set);
     });
+
+    // if (device_->isPropertySupported(OB_PROP_LASER_CONTROL_INT, OB_PERMISSION_READ_WRITE)) {
+    //   RCLCPP_INFO_STREAM(logger_, "Setting G300 laser control to " << enable_laser_);
+    //   TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_CONTROL_INT, enable_laser_);
+    // }
+    // if (device_->isPropertySupported(OB_PROP_LASER_BOOL, OB_PERMISSION_READ_WRITE)) {
+    //   RCLCPP_INFO_STREAM(logger_, "Setting laser control to " << enable_laser_);
+    //   TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_BOOL, enable_laser_);
+    // }
   } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to start pipeline: " << e.getMessage());
     RCLCPP_INFO_STREAM(logger_, "try to disable ir stream and try again");
@@ -2065,7 +2084,7 @@ void OBCameraNode::updateStreamInfo(const std::shared_ptr<ob::Frame> &frame,
       return;
   }
 
-  if (interleave_skip_enable_) {
+  if (interleave_frame_enable_ && interleave_skip_enable_) {
     dst_fps = fps_[dst_frame_type] / 2;
   } else {
     dst_fps = fps_[dst_frame_type];
@@ -2130,7 +2149,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   std::shared_ptr<ob::VideoFrame> video_frame;
   if (frame->getType() == OB_FRAME_COLOR) {
     // updateStreamInfo(frame, color_stream_info_);
-    if (interleave_skip_enable_) {
+    if (interleave_frame_enable_ && interleave_skip_enable_) {
       interleave_skip_color_index_++;
       RCLCPP_DEBUG(logger_, "interleave filter skip interleave_skip_color_index_: %d",
                    interleave_skip_color_index_);
@@ -2143,7 +2162,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
     video_frame = frame->as<ob::ColorFrame>();
   } else if (frame->getType() == OB_FRAME_DEPTH) {
     // updateStreamInfo(frame, depth_stream_info_);
-    if (interleave_skip_enable_) {
+    if (interleave_frame_enable_ && interleave_skip_enable_) {
       interleave_skip_depth_index_++;
       RCLCPP_DEBUG(logger_, "interleave filter skip interleave_skip_index_: %d",
                    interleave_skip_depth_index_);
@@ -2159,7 +2178,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
     video_frame = frame->as<ob::IRFrame>();
 
     // interleave filter speckle or flood ir
-    if (interleave_skip_enable_) {
+    if (interleave_frame_enable_ && interleave_skip_enable_) {
       RCLCPP_DEBUG(logger_, "interleave filter skip interleave_skip_index_: %d",
                    interleave_skip_index_);
       if (video_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_INDEX) ==

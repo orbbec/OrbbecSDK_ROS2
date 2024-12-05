@@ -182,9 +182,9 @@ def generate_launch_description():
         DeclareLaunchArgument('config_file_path', default_value=''),
         DeclareLaunchArgument('enable_heartbeat', default_value='false'),
         DeclareLaunchArgument('enable_hardware_reset', default_value='false'),
-        DeclareLaunchArgument('interleave_ae_mode', default_value='laser'), # 'hdr' or 'laser'
-        DeclareLaunchArgument('interleave_frame_enable', default_value='true'),
-        DeclareLaunchArgument('interleave_skip_enable', default_value='true'),
+        DeclareLaunchArgument('interleave_ae_mode', default_value='hdr'), # 'hdr' or 'laser'
+        DeclareLaunchArgument('interleave_frame_enable', default_value='false'),
+        DeclareLaunchArgument('interleave_skip_enable', default_value='false'),
         DeclareLaunchArgument('interleave_skip_index', default_value='0'), # 0:skip pattern ir  1: skip flood ir
         DeclareLaunchArgument('use_intra_process_comms', default_value='false'),
         DeclareLaunchArgument('attach_to_shared_component_container', default_value='false'),

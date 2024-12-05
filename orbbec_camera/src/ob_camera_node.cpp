@@ -814,8 +814,7 @@ int OBCameraNode::init_interleave_laser_param() {
   device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, 3000);
   device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, 16);
   device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, 60);
-  // device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, 30000);
-  device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, 17000);
+  device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, 7000);
 
   // set interleaveae
   device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_CONFIG_INDEX_INT, 0);
@@ -823,7 +822,7 @@ int OBCameraNode::init_interleave_laser_param() {
   device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, 3000);
   device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, 16);
   device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, 60);
-  device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, 30000);
+  device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, 17000);
   return 0;
 }
 
@@ -854,15 +853,6 @@ void OBCameraNode::startStreams() {
     pipeline_->start(pipeline_config_, [this](const std::shared_ptr<ob::FrameSet> &frame_set) {
       onNewFrameSetCallback(frame_set);
     });
-
-    // if (device_->isPropertySupported(OB_PROP_LASER_CONTROL_INT, OB_PERMISSION_READ_WRITE)) {
-    //   RCLCPP_INFO_STREAM(logger_, "Setting G300 laser control to " << enable_laser_);
-    //   TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_CONTROL_INT, enable_laser_);
-    // }
-    // if (device_->isPropertySupported(OB_PROP_LASER_BOOL, OB_PERMISSION_READ_WRITE)) {
-    //   RCLCPP_INFO_STREAM(logger_, "Setting laser control to " << enable_laser_);
-    //   TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_BOOL, enable_laser_);
-    // }
   } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to start pipeline: " << e.getMessage());
     RCLCPP_INFO_STREAM(logger_, "try to disable ir stream and try again");

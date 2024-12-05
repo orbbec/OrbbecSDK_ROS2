@@ -45,13 +45,17 @@ def generate_launch_description():
         ),
         launch_arguments={
             "camera_name": "front_camera",
-            "usb_port": "2-1",
+            # "usb_port": "2-1",
+            "usb_port": "gmsl2-4",
             "device_num": "4",
-            "sync_mode": "primary",
+            # "sync_mode": "primary",
+            "sync_mode": "secondary_synced",
             "config_file_path": config_file_path,
             'use_intra_process_comms': LaunchConfiguration("use_intra_process_comms"),
             'attach_to_shared_component_container': attach_to_shared_component_container_arg,
             'component_container_name': component_container_name_arg,
+            'gmsl_trigger_fps': "5990",
+            'enable_gmsl_trigger': "true",
         }.items(),
     )
     left_camera = IncludeLaunchDescription(
@@ -60,7 +64,8 @@ def generate_launch_description():
         ),
         launch_arguments={
             "camera_name": "left_camera",
-            "usb_port": "2-3.1",
+            # "usb_port": "2-3.1",
+            "usb_port": "gmsl2-3",
             "device_num": "4",
             "sync_mode": "secondary_synced",
             "config_file_path": config_file_path,
@@ -75,7 +80,8 @@ def generate_launch_description():
         ),
         launch_arguments={
             "camera_name": "right_camera",
-            "usb_port": "2-3.3",
+            # "usb_port": "2-3.3",
+            "usb_port": "gmsl2-1",
             "device_num": "4",
             "sync_mode": "secondary_synced",
             "config_file_path": config_file_path,
@@ -90,7 +96,8 @@ def generate_launch_description():
         ),
         launch_arguments={
             "camera_name": "rear_camera",
-            "usb_port": "2-2",
+            # "usb_port": "2-2",
+            "usb_port": "gmsl2-7",
             "device_num": "4",
             "sync_mode": "secondary_synced",
             "config_file_path": config_file_path,

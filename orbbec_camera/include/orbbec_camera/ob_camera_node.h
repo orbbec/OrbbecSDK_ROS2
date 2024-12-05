@@ -637,6 +637,7 @@ class OBCameraNode {
   bool interleave_frame_enable_ = false;
   bool interleave_skip_enable_ = false;
   int interleave_skip_index_ = 1;
+  int interleave_skip_color_index_ = 1;
   int interleave_skip_depth_index_ = 1;
 
   double delta_duration_ = 5000.0;

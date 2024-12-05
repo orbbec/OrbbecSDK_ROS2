@@ -2,9 +2,9 @@
 depth_registration: false
 enable_point_cloud: false
 enable_colored_point_cloud: false
-device_preset: "High Accuracy"
+device_preset: "Default"
 laser_on_off_mode: 0 # 0: off, 1: on-off, 1: off-on
-time_domain: "global" # global, device, system
+time_domain: "device" # global, device, system
 enable_sync_host_time: true
 frames_per_trigger: 1
 log_level: "warning"

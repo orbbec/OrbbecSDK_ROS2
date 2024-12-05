@@ -2039,9 +2039,8 @@ void OBCameraNode::updateStreamInfo(const std::shared_ptr<ob::Frame> &frame,
   double dst_duration = 0.0;
   int dst_fps = 0;
   stream_index_pair dst_frame_type;
-  double delta_duration = delta_duration_;
-  int delta_fps = delta_fps_;
-  if (current_timestamp <= stream_info.last_frame_time) {
+
+  if (current_timestamp < stream_info.last_frame_time) {
     RCLCPP_INFO_STREAM(logger_, "[WARNING] current_timestamp "
                                     << current_timestamp << " stream_info.last_frame_time "
                                     << stream_info.last_frame_time << "\n");
@@ -2123,10 +2122,20 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   }
   std::shared_ptr<ob::VideoFrame> video_frame;
   if (frame->getType() == OB_FRAME_COLOR) {
-    updateStreamInfo(frame, color_stream_info_);
+    // updateStreamInfo(frame, color_stream_info_);
+    if (interleave_skip_enable_) {
+      interleave_skip_color_index_++;
+      RCLCPP_DEBUG(logger_, "interleave filter skip interleave_skip_color_index_: %d",
+                   interleave_skip_color_index_);
+      if (interleave_skip_color_index_ % 2 == 0) {
+        RCLCPP_DEBUG(logger_, "interleave filter skip frame type: %d", frame->getType());
+        return;
+      }
+      updateStreamInfo(frame, color_stream_info_);
+    }
     video_frame = frame->as<ob::ColorFrame>();
   } else if (frame->getType() == OB_FRAME_DEPTH) {
-    // interleave filter depth
+    // updateStreamInfo(frame, depth_stream_info_);
     if (interleave_skip_enable_) {
       interleave_skip_depth_index_++;
       RCLCPP_DEBUG(logger_, "interleave filter skip interleave_skip_index_: %d",

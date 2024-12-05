@@ -65,7 +65,7 @@ def generate_launch_description():
         DeclareLaunchArgument('color_width', default_value='0'),
         DeclareLaunchArgument('color_height', default_value='0'),
         DeclareLaunchArgument('color_fps', default_value='30'),
-        DeclareLaunchArgument('color_format', default_value='MJPG'),
+        DeclareLaunchArgument('color_format', default_value='YUYV'),
         DeclareLaunchArgument('enable_color', default_value='true'),
         DeclareLaunchArgument('color_qos', default_value='default'),
         DeclareLaunchArgument('color_camera_info_qos', default_value='default'),
@@ -191,6 +191,8 @@ def generate_launch_description():
         DeclareLaunchArgument('component_container_name', default_value='shared_orbbec_container'),
         DeclareLaunchArgument('delta_duration', default_value='1000.0'),
         DeclareLaunchArgument('delta_fps', default_value='1'),
+        DeclareLaunchArgument('gmsl_trigger_fps', default_value='3000'),
+        DeclareLaunchArgument('enable_gmsl_trigger', default_value='false'),
     ]
 
     def get_params(context, args):

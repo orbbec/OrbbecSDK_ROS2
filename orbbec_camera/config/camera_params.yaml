@@ -8,7 +8,6 @@ time_domain: "global" # global, device, system
 enable_sync_host_time: true
 frames_per_trigger: 1
 log_level: "warning"
-enable_laser: true
 
 # When 3D reconstruction mode is enabled:
 # - The laser will switch to on-off mode

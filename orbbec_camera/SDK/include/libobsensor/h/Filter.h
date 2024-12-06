@@ -245,6 +245,16 @@ OB_EXPORT uint32_t ob_filter_config_schema_list_get_count(const ob_filter_config
 OB_EXPORT ob_filter_config_schema_item ob_filter_config_schema_list_get_item(const ob_filter_config_schema_list *config_schema_list, uint32_t index,
                                                                              ob_error **error);
 
+/**
+ * @brief Set the align to stream profile for the align filter.
+ * @breif It is useful when the align target stream dose not started (without any frame to get intrinsics and extrinsics).
+ *
+ * @param filter A filter object.
+ * @param align_to_stream_profile The align target stream profile.
+ * @param error Pointer to an error object that will be set if an error occurs.
+ */
+OB_EXPORT void ob_align_filter_set_align_to_stream_profile(ob_filter *filter, const ob_stream_profile *align_to_stream_profile, ob_error **error);
+
 // The following interfaces are deprecated and are retained here for compatibility purposes.
 #define ob_get_filter ob_filter_list_get_filter
 #define ob_get_filter_name ob_filter_get_name

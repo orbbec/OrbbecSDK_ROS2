@@ -357,12 +357,6 @@ void OBCameraNode::setupDevices() {
     }
   }
 
-  if (device_->isPropertySupported(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(
-        logger_, "Setting color auto exposure to " << (enable_color_auto_exposure_ ? "ON" : "OFF"));
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_COLOR_AUTO_EXPOSURE_BOOL,
-                        enable_color_auto_exposure_);
-  }
   if (device_->isPropertySupported(OB_PROP_COLOR_AUTO_WHITE_BALANCE_BOOL, OB_PERMISSION_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting color auto white balance to "
                                     << (enable_color_auto_white_balance_ ? "ON" : "OFF"));
@@ -371,7 +365,6 @@ void OBCameraNode::setupDevices() {
   }
   if (color_exposure_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, false);
     auto range = device_->getIntPropertyRange(OB_PROP_COLOR_EXPOSURE_INT);
     if (color_exposure_ < range.min || color_exposure_ > range.max) {
       RCLCPP_ERROR(logger_, "color exposure value is out of range[%d,%d], please check the value",
@@ -383,7 +376,6 @@ void OBCameraNode::setupDevices() {
   }
   if (color_gain_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_GAIN_INT, OB_PERMISSION_WRITE)) {
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, false);
     auto range = device_->getIntPropertyRange(OB_PROP_COLOR_GAIN_INT);
     if (color_gain_ < range.min || color_gain_ > range.max) {
       RCLCPP_ERROR(logger_, "color gain value is out of range[%d,%d], please check the value",
@@ -406,7 +398,12 @@ void OBCameraNode::setupDevices() {
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_WHITE_BALANCE_INT, color_white_balance_);
     }
   }
-
+  if (device_->isPropertySupported(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(
+        logger_, "Setting color auto exposure to " << (enable_color_auto_exposure_ ? "ON" : "OFF"));
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_COLOR_AUTO_EXPOSURE_BOOL,
+                        enable_color_auto_exposure_);
+  }
   if (color_ae_max_exposure_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_AE_MAX_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting color AE max exposure to " << color_ae_max_exposure_);
@@ -455,15 +452,8 @@ void OBCameraNode::setupDevices() {
     RCLCPP_INFO_STREAM(logger_, "Setting IR brightness to " << ir_brightness_);
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_BRIGHTNESS_INT, ir_brightness_);
   }
-  // ir auto exposure
-  if (device_->isPropertySupported(OB_PROP_IR_AUTO_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_,
-                       "Setting IR auto exposure to " << (enable_ir_auto_exposure_ ? "ON" : "OFF"));
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_IR_AUTO_EXPOSURE_BOOL, enable_ir_auto_exposure_);
-  }
   if (ir_exposure_ != -1 &&
       device_->isPropertySupported(OB_PROP_IR_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_IR_AUTO_EXPOSURE_BOOL, false);
     auto range = device_->getIntPropertyRange(OB_PROP_IR_EXPOSURE_INT);
     if (ir_exposure_ < range.min || ir_exposure_ > range.max) {
       RCLCPP_ERROR(logger_, "ir exposure value is out of range[%d,%d], please check the value",
@@ -474,7 +464,6 @@ void OBCameraNode::setupDevices() {
     }
   }
   if (ir_gain_ != -1 && device_->isPropertySupported(OB_PROP_IR_GAIN_INT, OB_PERMISSION_WRITE)) {
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_IR_AUTO_EXPOSURE_BOOL, false);
     auto range = device_->getIntPropertyRange(OB_PROP_IR_GAIN_INT);
     if (ir_gain_ < range.min || ir_gain_ > range.max) {
       RCLCPP_ERROR(logger_, "ir gain value is out of range[%d,%d], please check the value",
@@ -484,7 +473,12 @@ void OBCameraNode::setupDevices() {
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_GAIN_INT, ir_gain_);
     }
   }
-
+  // ir auto exposure
+  if (device_->isPropertySupported(OB_PROP_IR_AUTO_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_,
+                       "Setting IR auto exposure to " << (enable_ir_auto_exposure_ ? "ON" : "OFF"));
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_IR_AUTO_EXPOSURE_BOOL, enable_ir_auto_exposure_);
+  }
   if (device_->isPropertySupported(OB_PROP_IR_LONG_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
     RCLCPP_INFO_STREAM(logger_,
                        "Setting IR long exposure to " << (enable_ir_long_exposure_ ? "ON" : "OFF"));

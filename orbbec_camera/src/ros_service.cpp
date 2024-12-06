@@ -811,6 +811,7 @@ void OBCameraNode::setRESETTimestampCallback(
   (void)request;
   try {
     device_->setBoolProperty(OB_PROP_TIMER_RESET_TRIGGER_OUT_ENABLE_BOOL, true);
+    device_->setBoolProperty(OB_PROP_TIMER_RESET_SIGNAL_BOOL, true);
     response->success = true;
   } catch (const ob::Error& e) {
     response->message = e.getMessage();

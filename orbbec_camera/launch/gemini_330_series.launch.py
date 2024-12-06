@@ -174,6 +174,10 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_heartbeat', default_value='false'),
         DeclareLaunchArgument('gmsl_trigger_fps', default_value='3000'),
         DeclareLaunchArgument('enable_gmsl_trigger', default_value='false'),
+        DeclareLaunchArgument('interleave_ae_mode', default_value='laser'), # 'hdr' or 'laser'
+        DeclareLaunchArgument('interleave_frame_enable', default_value='true'),
+        DeclareLaunchArgument('interleave_skip_enable', default_value='false'),
+        DeclareLaunchArgument('interleave_skip_index', default_value='1'), # 0:skip pattern ir  1: skip flood ir
     ]
 
     def get_params(context, args):

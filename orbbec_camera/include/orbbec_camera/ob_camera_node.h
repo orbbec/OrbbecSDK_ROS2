@@ -296,7 +296,7 @@ class OBCameraNode {
   void setSYNCInterleaveLaserCallback(const std::shared_ptr<SetInt32 ::Request>& request,
                                       std::shared_ptr<SetInt32 ::Response>& response);
   void setSYNCHostimeCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
-                                 std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
+                              std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
   bool toggleSensor(const stream_index_pair& stream_index, bool enabled, std::string& msg);
 
   void saveImageCallback(const std::shared_ptr<std_srvs::srv::Empty::Request>& request,
@@ -618,5 +618,28 @@ class OBCameraNode {
   bool interleave_frame_enable_ = false;
   bool interleave_skip_enable_ = false;
   int interleave_skip_index_ = 1;
+
+  // hdr and laser interleave params
+  int hdr_index1_laser_control_ = 1;
+  int hdr_index1_depth_exposure_ = 1;
+  int hdr_index1_depth_gain_ = 16;
+  int hdr_index1_ir_brightness_ = 20;
+  int hdr_index1_ir_ae_max_exposure_ = 2000;
+  int hdr_index0_laser_control_ = 1;
+  int hdr_index0_depth_exposure_ = 7500;
+  int hdr_index0_depth_gain_ = 16;
+  int hdr_index0_ir_brightness_ = 60;
+  int hdr_index0_ir_ae_max_exposure_ = 10000;
+
+  int laser_index1_laser_control_ = 0;
+  int laser_index1_depth_exposure_ = 3000;
+  int laser_index1_depth_gain_ = 16;
+  int laser_index1_ir_brightness_ = 60;
+  int laser_index1_ir_ae_max_exposure_ = 7000;
+  int laser_index0_laser_control_ = 1;
+  int laser_index0_depth_exposure_ = 3000;
+  int laser_index0_depth_gain_ = 16;
+  int laser_index0_ir_brightness_ = 60;
+  int laser_index0_ir_ae_max_exposure_ = 17000;
 };
 }  // namespace orbbec_camera

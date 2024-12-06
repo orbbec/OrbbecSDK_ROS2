@@ -633,6 +633,30 @@ class OBCameraNode {
   bool interleave_frame_enable_ = false;
   bool interleave_skip_enable_ = false;
   int interleave_skip_index_ = 1;
+
+  // hdr and laser interleave params
+  int hdr_index1_laser_control_ = 1;
+  int hdr_index1_depth_exposure_ = 1;
+  int hdr_index1_depth_gain_ = 16;
+  int hdr_index1_ir_brightness_ = 20;
+  int hdr_index1_ir_ae_max_exposure_ = 2000;
+  int hdr_index0_laser_control_ = 1;
+  int hdr_index0_depth_exposure_ = 7500;
+  int hdr_index0_depth_gain_ = 16;
+  int hdr_index0_ir_brightness_ = 60;
+  int hdr_index0_ir_ae_max_exposure_ = 10000;
+
+  int laser_index1_laser_control_ = 0;
+  int laser_index1_depth_exposure_ = 3000;
+  int laser_index1_depth_gain_ = 16;
+  int laser_index1_ir_brightness_ = 60;
+  int laser_index1_ir_ae_max_exposure_ = 7000;
+  int laser_index0_laser_control_ = 1;
+  int laser_index0_depth_exposure_ = 3000;
+  int laser_index0_depth_gain_ = 16;
+  int laser_index0_ir_brightness_ = 60;
+  int laser_index0_ir_ae_max_exposure_ = 17000;
+
   int interleave_skip_color_index_ = 1;
   int interleave_skip_depth_index_ = 1;
 

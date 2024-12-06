@@ -792,37 +792,37 @@ void OBCameraNode::updateImageConfig(const stream_index_pair &stream_index) {
 
 int OBCameraNode::init_interleave_hdr_param() {
   device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_CONFIG_INDEX_INT, 1);
-  device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, 1);
-  device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, 1);
-  device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, 16);
-  device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, 20);
-  device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, 2000);
+  device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, hdr_index1_laser_control_);
+  device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, hdr_index1_depth_exposure_);
+  device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, hdr_index1_depth_gain_);
+  device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, hdr_index1_ir_brightness_);
+  device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, hdr_index1_ir_ae_max_exposure_);
 
   // set interleaveae
   device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_CONFIG_INDEX_INT, 0);
-  device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, 1);
-  device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, 7500);
-  device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, 16);
-  device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, 60);
-  device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, 10000);
+  device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, hdr_index0_laser_control_);
+  device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, hdr_index0_depth_exposure_);
+  device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, hdr_index0_depth_gain_);
+  device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, hdr_index0_ir_brightness_);
+  device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, hdr_index0_ir_ae_max_exposure_);
   return 0;
 }
 
 int OBCameraNode::init_interleave_laser_param() {
   device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_CONFIG_INDEX_INT, 1);
-  device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, 0);
-  device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, 3000);
-  device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, 16);
-  device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, 60);
-  device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, 7000);
+  device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, laser_index1_laser_control_);
+  device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, laser_index1_depth_exposure_);
+  device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, laser_index1_depth_gain_);
+  device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, laser_index1_ir_brightness_);
+  device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, laser_index1_ir_ae_max_exposure_);
 
   // set interleaveae
   device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_CONFIG_INDEX_INT, 0);
-  device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, 1);
-  device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, 3000);
-  device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, 16);
-  device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, 60);
-  device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, 17000);
+  device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, laser_index0_laser_control_);
+  device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, laser_index0_depth_exposure_);
+  device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, laser_index0_depth_gain_);
+  device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, laser_index0_ir_brightness_);
+  device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, laser_index0_ir_ae_max_exposure_);
   return 0;
 }
 
@@ -1297,6 +1297,61 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<bool>(interleave_frame_enable_, "interleave_frame_enable", false);
   setAndGetNodeParameter<bool>(interleave_skip_enable_, "interleave_skip_enable", false);
   setAndGetNodeParameter<int>(interleave_skip_index_, "interleave_skip_index", 1);
+
+  // hdr and laser interleave params
+  setAndGetNodeParameter<int>(hdr_index1_laser_control_, "hdr_index1_laser_control", 1);
+  setAndGetNodeParameter<int>(hdr_index1_depth_exposure_, "hdr_index1_depth_exposure", 1);
+  setAndGetNodeParameter<int>(hdr_index1_depth_gain_, "hdr_index1_depth_gain", 16);
+  setAndGetNodeParameter<int>(hdr_index1_ir_brightness_, "hdr_index1_ir_brightness", 20);
+  setAndGetNodeParameter<int>(hdr_index1_ir_ae_max_exposure_, "hdr_index1_ir_ae_max_exposure",
+                              2000);
+  setAndGetNodeParameter<int>(hdr_index0_laser_control_, "hdr_index0_laser_control", 1);
+  setAndGetNodeParameter<int>(hdr_index0_depth_exposure_, "hdr_index0_depth_exposure", 7500);
+  setAndGetNodeParameter<int>(hdr_index0_depth_gain_, "hdr_index0_depth_gain", 16);
+  setAndGetNodeParameter<int>(hdr_index0_ir_brightness_, "hdr_index0_ir_brightness", 60);
+  setAndGetNodeParameter<int>(hdr_index0_ir_ae_max_exposure_, "hdr_index0_ir_ae_max_exposure",
+                              10000);
+
+  RCLCPP_INFO_STREAM(logger_, "hdr_index1_laser_control_ "
+                                  << hdr_index1_laser_control_ << " hdr_index1_depth_exposure_ "
+                                  << hdr_index1_depth_exposure_ << " hdr_index1_depth_gain_ "
+                                  << hdr_index1_depth_gain_ << " hdr_index1_ir_brightness_ "
+                                  << hdr_index1_ir_brightness_ << " hdr_index1_ir_ae_max_exposure_ "
+                                  << hdr_index1_ir_ae_max_exposure_ << "\n");
+  RCLCPP_INFO_STREAM(logger_, "hdr_index0_laser_control_ "
+                                  << hdr_index0_laser_control_ << " hdr_index0_depth_exposure_ "
+                                  << hdr_index0_depth_exposure_ << " hdr_index0_depth_gain_ "
+                                  << hdr_index0_depth_gain_ << " hdr_index0_ir_brightness_ "
+                                  << hdr_index0_ir_brightness_ << " hdr_index0_ir_ae_max_exposure_ "
+                                  << hdr_index0_ir_ae_max_exposure_ << "\n");
+
+  setAndGetNodeParameter<int>(laser_index1_laser_control_, "laser_index1_laser_control", 0);
+  setAndGetNodeParameter<int>(laser_index1_depth_exposure_, "laser_index1_depth_exposure", 3000);
+  setAndGetNodeParameter<int>(laser_index1_depth_gain_, "laser_index1_depth_gain", 16);
+  setAndGetNodeParameter<int>(laser_index1_ir_brightness_, "laser_index1_ir_brightness", 60);
+  setAndGetNodeParameter<int>(laser_index1_ir_ae_max_exposure_, "laser_index1_ir_ae_max_exposure",
+                              7000);
+  setAndGetNodeParameter<int>(laser_index0_laser_control_, "laser_index0_laser_control", 1);
+  setAndGetNodeParameter<int>(laser_index0_depth_exposure_, "laser_index0_depth_exposure", 3000);
+  setAndGetNodeParameter<int>(laser_index0_depth_gain_, "laser_index0_depth_gain", 16);
+  setAndGetNodeParameter<int>(laser_index0_ir_brightness_, "laser_index0_ir_brightness", 60);
+  setAndGetNodeParameter<int>(laser_index0_ir_ae_max_exposure_, "laser_index0_ir_ae_max_exposure",
+                              17000);
+
+  RCLCPP_INFO_STREAM(logger_, "laser_index1_laser_control_ "
+                                  << laser_index1_laser_control_ << " laser_index1_depth_exposure_ "
+                                  << laser_index1_depth_exposure_ << " laser_index1_depth_gain_ "
+                                  << laser_index1_depth_gain_ << " laser_index1_ir_brightness_ "
+                                  << laser_index1_ir_brightness_
+                                  << " laser_index1_ir_ae_max_exposure_ "
+                                  << laser_index1_ir_ae_max_exposure_ << "\n");
+  RCLCPP_INFO_STREAM(logger_, "laser_index0_laser_control_ "
+                                  << laser_index0_laser_control_ << " laser_index0_depth_exposure_ "
+                                  << laser_index0_depth_exposure_ << " laser_index0_depth_gain_ "
+                                  << laser_index0_depth_gain_ << " laser_index0_ir_brightness_ "
+                                  << laser_index0_ir_brightness_
+                                  << " laser_index0_ir_ae_max_exposure_ "
+                                  << laser_index0_ir_ae_max_exposure_ << "\n");
 
   setAndGetNodeParameter<double>(delta_duration_us_, "delta_duration_us", 5000.0);
   setAndGetNodeParameter<int>(delta_fps_, "delta_fps", 2);

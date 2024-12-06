@@ -19,7 +19,7 @@ def generate_launch_description():
         ),
         launch_arguments={
             "camera_name": "G330_0",
-            "usb_port": "2-3.4",
+            "usb_port": "2-7",
             "device_num": "2",
             "sync_mode": "primary",
             "config_file_path": config_file_path,
@@ -32,7 +32,7 @@ def generate_launch_description():
         ),
         launch_arguments={
             "camera_name": "G330_1",
-            "usb_port": "2-3.3",
+            "usb_port": "2-1",
             "device_num": "2",
             "sync_mode": "secondary_synced",
             "config_file_path": config_file_path,
@@ -46,9 +46,8 @@ def generate_launch_description():
     ld = LaunchDescription(
         [
 
-            TimerAction(period=0.2, actions=[GroupAction([G330_1])]),
-            TimerAction(period=0.2, actions=[GroupAction([G330_0])]),
-
+            G330_1,
+            TimerAction(period=2.0, actions=[GroupAction([G330_0])]),
             # The primary camera should be launched at last
         ]
     )

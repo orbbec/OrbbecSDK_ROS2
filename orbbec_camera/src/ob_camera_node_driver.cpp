@@ -75,7 +75,7 @@ OBCameraNodeDriver::OBCameraNodeDriver(const rclcpp::NodeOptions &node_options)
     : Node("orbbec_camera_node", "/", node_options),
       node_options_(node_options),
       config_path_(ament_index_cpp::get_package_share_directory("orbbec_camera") +
-                   "/config/OrbbecSDKConfig_v1.0.xml"),
+                   "/config/OrbbecSDKConfig_v2.0.xml"),
       logger_(this->get_logger()),
       extension_path_(ament_index_cpp::get_package_prefix("orbbec_camera") + "/lib/extensions") {
   init();
@@ -86,7 +86,7 @@ OBCameraNodeDriver::OBCameraNodeDriver(const std::string &node_name, const std::
     : Node(node_name, ns, node_options),
       node_options_(node_options),
       config_path_(ament_index_cpp::get_package_share_directory("orbbec_camera") +
-                   "/config/OrbbecSDKConfig_v1.0.xml"),
+                   "/config/OrbbecSDKConfig_v2.0.xml"),
       logger_(this->get_logger()),
       extension_path_(ament_index_cpp::get_package_prefix("orbbec_camera") + "/lib/extensions") {
   init();

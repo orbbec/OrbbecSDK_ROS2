@@ -251,8 +251,7 @@ void OBCameraNode::setupDevices() {
     RCLCPP_INFO_STREAM(logger_, "Set depth work mode: " << depth_work_mode_);
     TRY_EXECUTE_BLOCK(device_->switchDepthWorkMode(depth_work_mode_.c_str()));
   }
-  if (!sync_mode_str_.empty() && device_->isPropertySupported(OB_PROP_SYNC_SIGNAL_TRIGGER_OUT_BOOL,
-                                                              OB_PERMISSION_READ_WRITE)) {
+  if (!sync_mode_str_.empty()) {
     auto sync_config = device_->getMultiDeviceSyncConfig();
     RCLCPP_INFO_STREAM(logger_,
                        "Current sync mode: " << magic_enum::enum_name(sync_config.syncMode));
@@ -329,12 +328,6 @@ void OBCameraNode::setupDevices() {
     device_->setBoolProperty(OB_PROP_DEPTH_SOFT_FILTER_BOOL, enable_noise_removal_filter_);
   }
 
-  if (device_->isPropertySupported(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(
-        logger_, "Setting color auto exposure to " << (enable_color_auto_exposure_ ? "ON" : "OFF"));
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_COLOR_AUTO_EXPOSURE_BOOL,
-                        enable_color_auto_exposure_);
-  }
   if (device_->isPropertySupported(OB_PROP_COLOR_AUTO_WHITE_BALANCE_BOOL, OB_PERMISSION_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting color auto white balance to "
                                     << (enable_color_auto_white_balance_ ? "ON" : "OFF"));
@@ -343,7 +336,6 @@ void OBCameraNode::setupDevices() {
   }
   if (color_exposure_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, false);
     auto range = device_->getIntPropertyRange(OB_PROP_COLOR_EXPOSURE_INT);
     if (color_exposure_ < range.min || color_exposure_ > range.max) {
       RCLCPP_ERROR(logger_, "color exposure value is out of range[%d,%d], please check the value",
@@ -355,7 +347,6 @@ void OBCameraNode::setupDevices() {
   }
   if (color_gain_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_GAIN_INT, OB_PERMISSION_WRITE)) {
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, false);
     auto range = device_->getIntPropertyRange(OB_PROP_COLOR_GAIN_INT);
     if (color_gain_ < range.min || color_gain_ > range.max) {
       RCLCPP_ERROR(logger_, "color gain value is out of range[%d,%d], please check the value",
@@ -364,6 +355,12 @@ void OBCameraNode::setupDevices() {
       RCLCPP_INFO_STREAM(logger_, "Setting color gain to " << color_gain_);
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_GAIN_INT, color_gain_);
     }
+  }
+  if (device_->isPropertySupported(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(
+        logger_, "Setting color auto exposure to " << (enable_color_auto_exposure_ ? "ON" : "OFF"));
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_COLOR_AUTO_EXPOSURE_BOOL,
+                        enable_color_auto_exposure_);
   }
   if (color_white_balance_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_WHITE_BALANCE_INT, OB_PERMISSION_WRITE)) {
@@ -402,14 +399,8 @@ void OBCameraNode::setupDevices() {
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_BRIGHTNESS_INT, ir_brightness_);
   }
 
-  if (device_->isPropertySupported(OB_PROP_IR_AUTO_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_,
-                       "Setting IR auto exposure to " << (enable_ir_auto_exposure_ ? "ON" : "OFF"));
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_IR_AUTO_EXPOSURE_BOOL, enable_ir_auto_exposure_);
-  }
   if (ir_exposure_ != -1 &&
       device_->isPropertySupported(OB_PROP_IR_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_IR_AUTO_EXPOSURE_BOOL, false);
     auto range = device_->getIntPropertyRange(OB_PROP_IR_EXPOSURE_INT);
     RCLCPP_ERROR(logger_, "ir exposure value is out of range[%d,%d], please check the value",
                  range.min, range.max);
@@ -422,7 +413,6 @@ void OBCameraNode::setupDevices() {
     }
   }
   if (ir_gain_ != -1 && device_->isPropertySupported(OB_PROP_IR_GAIN_INT, OB_PERMISSION_WRITE)) {
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_IR_AUTO_EXPOSURE_BOOL, false);
     auto range = device_->getIntPropertyRange(OB_PROP_IR_GAIN_INT);
     RCLCPP_ERROR(logger_, "ir gain value is out of range[%d,%d], please check the value", range.min,
                  range.max);
@@ -434,7 +424,11 @@ void OBCameraNode::setupDevices() {
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_GAIN_INT, ir_gain_);
     }
   }
-
+  if (device_->isPropertySupported(OB_PROP_IR_AUTO_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_,
+                       "Setting IR auto exposure to " << (enable_ir_auto_exposure_ ? "ON" : "OFF"));
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_IR_AUTO_EXPOSURE_BOOL, enable_ir_auto_exposure_);
+  }
   if (device_->isPropertySupported(OB_PROP_IR_LONG_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
     RCLCPP_INFO_STREAM(logger_,
                        "Setting IR long exposure to " << (enable_ir_long_exposure_ ? "ON" : "OFF"));
@@ -442,28 +436,31 @@ void OBCameraNode::setupDevices() {
   }
 
   if (device_->isPropertySupported(OB_PROP_DEPTH_MAX_DIFF_INT, OB_PERMISSION_WRITE)) {
-    auto default_soft_filter_max_diff = device_->getIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT);
-    RCLCPP_INFO_STREAM(logger_, "default_soft_filter_max_diff: " << default_soft_filter_max_diff);
-    if (soft_filter_max_diff_ != -1 && default_soft_filter_max_diff != soft_filter_max_diff_) {
-      device_->setIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT, soft_filter_max_diff_);
-      auto new_soft_filter_max_diff = device_->getIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT);
-      RCLCPP_INFO_STREAM(logger_, "after set soft_filter_max_diff: " << new_soft_filter_max_diff);
+    auto default_noise_removal_filter_min_diff =
+        device_->getIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT);
+    RCLCPP_INFO_STREAM(logger_, "default_noise_removal_filter_min_diff: "
+                                    << default_noise_removal_filter_min_diff);
+    if (noise_removal_filter_min_diff_ != -1 &&
+        default_noise_removal_filter_min_diff != noise_removal_filter_min_diff_) {
+      device_->setIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT, noise_removal_filter_min_diff_);
+      auto new_noise_removal_filter_min_diff = device_->getIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT);
+      RCLCPP_INFO_STREAM(logger_, "after set noise_removal_filter_min_diff: "
+                                      << new_noise_removal_filter_min_diff);
     }
   }
 
   if (device_->isPropertySupported(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT, OB_PERMISSION_WRITE)) {
-    auto default_soft_filter_speckle_size =
+    auto default_noise_removal_filter_max_size =
         device_->getIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT);
-    RCLCPP_INFO_STREAM(logger_,
-                       "default_soft_filter_speckle_size: " << default_soft_filter_speckle_size);
-    if (soft_filter_speckle_size_ != -1 &&
-        default_soft_filter_speckle_size != soft_filter_speckle_size_) {
-      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT,
-                          soft_filter_speckle_size_);
-      auto new_soft_filter_speckle_size =
+    RCLCPP_INFO_STREAM(logger_, "default_noise_removal_filter_max_size: "
+                                    << default_noise_removal_filter_max_size);
+    if (noise_removal_filter_max_size_ != -1 &&
+        default_noise_removal_filter_max_size != noise_removal_filter_max_size_) {
+      device_->setIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT, noise_removal_filter_max_size_);
+      auto new_noise_removal_filter_max_size =
           device_->getIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT);
-      RCLCPP_INFO_STREAM(logger_,
-                         "after set soft_filter_speckle_size: " << new_soft_filter_speckle_size);
+      RCLCPP_INFO_STREAM(logger_, "after set noise_removal_filter_max_size: "
+                                      << new_noise_removal_filter_max_size);
     }
   }
 }
@@ -789,7 +786,6 @@ void OBCameraNode::updateImageConfig(const stream_index_pair &stream_index) {
     unit_step_size_[stream_index] = sizeof(uint16_t);
   }
 }
-
 int OBCameraNode::init_interleave_hdr_param() {
   device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_CONFIG_INDEX_INT, 1);
   device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, hdr_index1_laser_control_);
@@ -825,7 +821,6 @@ int OBCameraNode::init_interleave_laser_param() {
   device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, laser_index0_ir_ae_max_exposure_);
   return 0;
 }
-
 void OBCameraNode::startStreams() {
   if (pipeline_ != nullptr) {
     pipeline_.reset();
@@ -834,20 +829,17 @@ void OBCameraNode::startStreams() {
 
   try {
     setupPipelineConfig();
-
-    if (interleave_frame_enable_) {
-      // set interleave mode
-      if (interleave_ae_mode_ == "hdr") {
-        RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to hdr");
-        device_->loadFrameInterleave("hdr interleave");
-        init_interleave_hdr_param();
-      } else if (interleave_ae_mode_ == "laser") {
-        RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to laser");
-        device_->loadFrameInterleave("laser interleave");
-        init_interleave_laser_param();
-      } else {
-        RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to nothing");
-      }
+    // set interleave mode
+    if (interleave_ae_mode_ == "hdr" && interleave_frame_enable_) {
+      RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to hdr");
+      device_->loadFrameInterleave("hdr interleave");
+      init_interleave_hdr_param();
+    } else if (interleave_ae_mode_ == "laser" && interleave_frame_enable_) {
+      RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to laser");
+      device_->loadFrameInterleave("laser interleave");
+      init_interleave_laser_param();
+    } else {
+      RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to nothing");
     }
 
     pipeline_->start(pipeline_config_, [this](const std::shared_ptr<ob::FrameSet> &frame_set) {
@@ -971,7 +963,6 @@ void OBCameraNode::stopStreams() {
   }
   try {
     pipeline_->stop();
-
     // disable interleave frame
     if ((interleave_ae_mode_ == "hdr") || (interleave_ae_mode_ == "laser")) {
       RCLCPP_INFO_STREAM(logger_, "current interleave_ae_mode_: " << interleave_ae_mode_);
@@ -983,7 +974,6 @@ void OBCameraNode::stopStreams() {
                             interleave_frame_enable_);
       }
     }
-
   } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to stop pipeline: " << e.getMessage());
   } catch (...) {
@@ -1285,6 +1275,9 @@ void OBCameraNode::getParameters() {
   auto pid = device_info->getPid();
   if (isOpenNIDevice(pid)) {
     time_domain_ = "system";
+  }
+  if (time_domain_ == "global") {
+    device_->enableGlobalTimestamp(true);
   }
   RCLCPP_INFO_STREAM(logger_, "current time domain: " << time_domain_);
   setAndGetNodeParameter<int>(frames_per_trigger_, "frames_per_trigger", 2);

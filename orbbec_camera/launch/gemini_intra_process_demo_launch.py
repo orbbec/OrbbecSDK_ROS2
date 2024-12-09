@@ -128,7 +128,6 @@ def generate_launch_description():
         DeclareLaunchArgument('software_trigger_period', default_value='33'),  # ms
         DeclareLaunchArgument('enable_frame_sync', default_value='true'),
         DeclareLaunchArgument('ordered_pc', default_value='false'),
-        DeclareLaunchArgument('use_hardware_time', default_value='true'),
         DeclareLaunchArgument('enable_depth_scale', default_value='true'),
         DeclareLaunchArgument('enable_decimation_filter', default_value='false'),
         DeclareLaunchArgument('enable_hdr_merge', default_value='false'),

@@ -479,7 +479,6 @@ void OBCameraNode::setLaserEnableCallback(
     std::shared_ptr<std_srvs::srv::SetBool::Response>& response) {
   (void)request_header;
   (void)response;
-  auto device_info = device_->getDeviceInfo();
   int laser_enable = request->data ? 1 : 0;
   try {
     if (device_->isPropertySupported(OB_PROP_LASER_CONTROL_INT, OB_PERMISSION_READ_WRITE)) {
@@ -812,6 +811,7 @@ void OBCameraNode::setRESETTimestampCallback(
   (void)request;
   try {
     device_->setBoolProperty(OB_PROP_TIMER_RESET_TRIGGER_OUT_ENABLE_BOOL, true);
+    device_->setBoolProperty(OB_PROP_TIMER_RESET_SIGNAL_BOOL, true);
     response->success = true;
   } catch (const ob::Error& e) {
     response->message = e.getMessage();

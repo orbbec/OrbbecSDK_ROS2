@@ -1,6 +1,6 @@
 # common params
 depth_registration: false
-enable_point_cloud: false
+enable_point_cloud: true
 enable_colored_point_cloud: false
 device_preset: "Default"
 laser_on_off_mode: 0 # 0: off, 1: on-off, 1: off-on

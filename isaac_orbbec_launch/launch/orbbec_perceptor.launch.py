@@ -63,8 +63,8 @@ def generate_launch_description():
         from_bag_arg,
         bag_path_arg,
         shared_orbbec_container,
-        perceptor_launch,
         orbbec_launch,
+        perceptor_launch,
         bag_play,
       ]
     )

@@ -17,7 +17,7 @@
 
 int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
-  auto node = std::make_shared<MultiCameraSubscriber>();
+  auto node = std::make_shared<orbbec_camera::tools::MultiCameraSubscriber>();
   rclcpp::executors::MultiThreadedExecutor executor(rclcpp::ExecutorOptions(), 20);
   executor.add_node(node);
   executor.spin();

@@ -258,7 +258,7 @@ public:
 };
 
 /**
- * @brief Spatial advanced filte smooths the image by calculating frame with alpha and delta settings
+ * @brief Spatial advanced filter smooths the image by calculating frame with alpha and delta settings
  * alpha defines the weight of the current pixel for smoothing,
  * delta defines the depth gradient below which the smoothing will occur as number of depth levels.
  */
@@ -276,21 +276,21 @@ public:
     /**
      * @brief Get the spatial advanced filter dispdiff range.
      *
-     * @return OBFloatPropertyRange the dispdiff value of property range.
+     * @return OBUint16PropertyRange the dispdiff value of property range.
      */
     OBUint16PropertyRange getDispDiffRange();
 
     /**
      * @brief Get the spatial advanced filter radius range.
      *
-     * @return OBFloatPropertyRange the radius value of property range.
+     * @return OBUint16PropertyRange the radius value of property range.
      */
     OBUint16PropertyRange getRadiusRange();
 
     /**
      * @brief Get the spatial advanced filter magnitude range.
      *
-     * @return OBFloatPropertyRange the magnitude value of property range.
+     * @return OBIntPropertyRange the magnitude value of property range.
      */
     OBIntPropertyRange getMagnitudeRange();
 
@@ -310,6 +310,73 @@ public:
 };
 
 /**
+ * @brief Spatial fast filter smooths the image by calculating frame with filter window size settings
+ */
+class OB_EXTENSION_API SpatialFastFilter : public Filter {
+public:
+    SpatialFastFilter();
+    /**
+     * @brief Get the spatial fast filter window size range
+     *
+     * @return OBUint8PropertyRange the windows size value of property range.
+     */
+    OBUint8PropertyRange getSizeRange();
+
+     /**
+     * @brief Get the spatial fast filter params.
+     *
+     * @return OBSpatialFastFilterParams
+     */
+    OBSpatialFastFilterParams getFilterParams();
+    /**
+     * @brief Set the spatial fast filter params.
+     *
+     * @param params OBSpatialFastFilterParams.
+     */
+    void setFilterParams(OBSpatialFastFilterParams params);
+};
+
+/**
+ * @brief Spatial moderate filter smooths the image by calculating frame with filter window size,magnitude and disp diff settings
+ */
+class OB_EXTENSION_API SpatialModerateFilter : public Filter {
+public:
+    SpatialModerateFilter();
+    /**
+     * @brief Get the spatial moderate filter window size range
+     *
+     * @return OBUint8PropertyRange the windows size value of property range.
+     */
+    OBUint8PropertyRange          getSizeRange();
+
+    /**
+     * @brief Get the spatial moderate filter magnitude range.
+     *
+     * @return OBUint8PropertyRange the magnitude value of property range.
+     */
+    OBUint8PropertyRange getMagnitudeRange();
+    /**
+     * @brief Get the spatial moderate filter dispdiff range.
+     *
+     * @return OBUint16PropertyRange the dispdiff value of property range.
+     */
+    OBUint16PropertyRange getDispDiffRange();
+
+     /**
+     * @brief Get the spatial moderate filter params.
+     *
+     * @return OBSpatialModerateFilterParams
+     */
+    OBSpatialModerateFilterParams getFilterParams();
+    /**
+     * @brief Set the spatial moderate filter params.
+     *
+     * @param params OBSpatialModerateFilterParams.
+     */
+    void setFilterParams(OBSpatialModerateFilterParams params);
+};
+
+    /**
  * @brief Depth to disparity or disparity to depth
  */
 class OB_EXTENSION_API DisparityTransform : public Filter {
@@ -542,6 +609,15 @@ template <typename T> bool Filter::is() {
     if(name == "SpatialAdvancedFilter") {
         return typeid(T) == typeid(SpatialAdvancedFilter);
     }
+
+    if(name == "SpatialFastFilter") {
+        return typeid(T) == typeid(SpatialFastFilter);
+    }
+
+    if(name == "SpatialModerateFilter") {
+        return typeid(T) == typeid(SpatialModerateFilter);
+    }
+
     if(name == "TemporalFilter") {
         return typeid(T) == typeid(TemporalFilter);
     }

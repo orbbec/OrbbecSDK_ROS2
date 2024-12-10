@@ -974,6 +974,18 @@ typedef struct {
     uint16_t radius;     // hole_fill
 } OBSpatialAdvancedFilterParams, ob_spatial_advanced_filter_params;
 
+
+typedef struct {
+    uint8_t  size;  //median filter window size
+} OBSpatialFastFilterParams, ob_spatial_fast_filter_params;
+
+
+typedef struct  {
+    uint8_t  size ;
+    uint8_t  magnitude ; // magnitude
+    uint16_t disp_diff ;
+} OBSpatialModerateFilterParams, ob_spatial_moderate_filter_params;
+
 typedef enum OB_EDGE_NOISE_REMOVAL_TYPE {
     OB_MG_FILTER  = 0,
     OB_MGH_FILTER = 1,  // horizontal MG

@@ -248,11 +248,92 @@ ob_spatial_advanced_filter_params ob_spatial_advanced_filter_get_filter_params(o
 /**
  * @brief Set the spatial advanced filter params.
  *
- * @param[in] filter A temporal_filter object.
+ * @param[in] filter A spatial advanced filter object.
  * @param[in] params ob_spatial_advanced_filter_params.
  * @param[out] error Log error messages.
  */
 void ob_spatial_advanced_filter_set_filter_params(ob_filter *filter, ob_spatial_advanced_filter_params params, ob_error **error);
+
+/**
+ * @brief Create a spatial fast filter.
+ * @param[out] error Log error messages.
+ * @return A depth_filter object.
+ */
+ob_filter *ob_create_spatial_fast_filter(ob_error **error);
+
+/**
+ * @brief Get the spatial fast filter window size range.
+ *
+ * @param[in] filter A spatial fast filter object.
+ * @param[out] error Log error messages.
+ * @return ob_uint8_property_range the filter window size value of property range.
+ */
+ob_uint8_property_range ob_spatial_fast_filter_get_size_range(ob_filter *filter, ob_error **error);
+
+/**
+ * @brief Set the spatial fast filter params.
+ *
+ * @param[in] filter A spatial fast filter object.
+ * @param[in] params ob_spatial_fast_filter_params.
+ * @param[out] error Log error messages.
+ */
+void ob_spatial_fast_filter_set_filter_params(ob_filter *filter, ob_spatial_fast_filter_params params, ob_error **error);
+
+/**
+ * @brief Get the spatial fast filter params.
+ *
+ * @param[in] filter A spatial fast filter object.
+ * @param[out] error Log error messages.
+ * @return ob_spatial_fast_filter_params.
+ */
+ob_spatial_fast_filter_params ob_spatial_fast_filter_get_filter_params(ob_filter *filter, ob_error **error);
+
+/**
+ * @brief Create a spatial moderate filter.
+ * @param[out] error Log error messages.
+ * @return A depth_filter object.
+ */
+ob_filter *ob_create_spatial_moderate_filter(ob_error **error);
+/**
+ * @brief Get the spatial moderate filter disp diff range.
+ *
+ * @param[in] filter A spatial moderate filter object.
+ * @param[out] error Log error messages.
+ * @return ob_uint16_property_range the dispdiff value of property range.
+ */
+ob_uint16_property_range ob_spatial_moderate_filter_get_disp_diff_range(ob_filter *filter, ob_error **error);
+/**
+ * @brief Get the spatial moderate filter magnitude range.
+ *
+ * @param[in] filter A spatial moderate filter object.
+ * @param[out] error Log error messages.
+ * @return ob_uint8_property_range the magnitude value of property range.
+ */
+ob_uint8_property_range ob_spatial_moderate_filter_get_magnitude_range(ob_filter *filter, ob_error **error);
+/**
+ * @brief Get the spatial moderate filter window size range.
+ *
+ * @param[in] filter A spatial moderate filter object.
+ * @param[out] error Log error messages.
+ * @return ob_uint8_property_range the filter window size value of property range.
+ */
+ob_uint8_property_range ob_spatial_moderate_filter_get_size_range(ob_filter *filter, ob_error **error);
+/**
+ * @brief Get the spatial moderate filter params.
+ *
+ * @param[in] filter A spatial moderate filter object.
+ * @param[out] error Log error messages.
+ * @return ob_spatial_moderate_filter_params.
+ */
+ob_spatial_moderate_filter_params ob_spatial_moderate_filter_get_filter_params(ob_filter *filter, ob_error **error);
+/**
+ * @brief Set the spatial moderate filter params.
+ *
+ * @param[in] filter A spatial moderate filter object.
+ * @param[in] params ob_spatial_moderate_filter_params.
+ * @param[out] error Log error messages.
+ */
+void ob_spatial_moderate_filter_set_filter_params(ob_filter *filter, ob_spatial_moderate_filter_params params, ob_error **error);
 
 /**
  * @brief Create a noise removal filter.

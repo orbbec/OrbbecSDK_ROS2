@@ -322,30 +322,6 @@ void OBCameraNode::setupDevices() {
     }
   }
 
-  for (const auto &stream_index : IMAGE_STREAMS) {
-    if (enable_stream_[stream_index]) {
-      OBPropertyID mirrorPropertyID = OB_PROP_DEPTH_MIRROR_BOOL;
-      if (stream_index == COLOR) {
-        mirrorPropertyID = OB_PROP_COLOR_MIRROR_BOOL;
-      } else if (stream_index == DEPTH) {
-        mirrorPropertyID = OB_PROP_DEPTH_MIRROR_BOOL;
-      } else if (stream_index == INFRA0) {
-        mirrorPropertyID = OB_PROP_IR_MIRROR_BOOL;
-
-      } else if (stream_index == INFRA1) {
-        mirrorPropertyID = OB_PROP_IR_MIRROR_BOOL;
-      } else if (stream_index == INFRA2) {
-        mirrorPropertyID = OB_PROP_IR_RIGHT_MIRROR_BOOL;
-      }
-
-      if (device_->isPropertySupported(mirrorPropertyID, OB_PERMISSION_WRITE)) {
-        RCLCPP_INFO_STREAM(logger_, "Setting " << stream_name_[stream_index] << " mirror to "
-                                               << (flip_stream_[stream_index] ? "ON" : "OFF"));
-        TRY_TO_SET_PROPERTY(setBoolProperty, mirrorPropertyID, flip_stream_[stream_index]);
-      }
-    }
-  }
-
   if (!depth_filter_config_.empty() && enable_depth_filter_) {
     RCLCPP_INFO_STREAM(logger_, "Load depth filter config: " << depth_filter_config_);
     TRY_EXECUTE_BLOCK(device_->loadDepthFilterConfig(depth_filter_config_.c_str()));
@@ -1779,7 +1755,7 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
     if (enable_stream_[COLOR] && color_frame) {
       std::unique_lock<std::mutex> lock(color_frame_queue_lock_);
       if (!enable_3d_reconstruction_mode_ || depth_laser_status) {
-        if(color_frame_queue_.size() > 2) {
+        if (color_frame_queue_.size() > 2) {
           color_frame_queue_.pop();
         }
         color_frame_queue_.push(frame_set);
@@ -2072,6 +2048,39 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
     camera_info.p.at(7) = -fy * ex.trans[1] / 1000.0 + 0.0;
   }
   CHECK(camera_info_publishers_.count(stream_index) > 0);
+  if (flip_stream_[stream_index]) {
+    // We are performing a horizontal flip (left-right mirror) of the image.
+    //
+    // After flipping the image, the camera's principal point (cx) in the
+    // camera_info must be adjusted so that it still refers to the correct point
+    // in the flipped image.
+
+    // Intrinsic matrix K:
+    // K = [ fx  0  cx
+    //       0   fy cy
+    //       0   0   1 ]
+    double &cx = camera_info.k[2];  // K[0,2]
+
+    // Store the original principal point cx
+    double old_cx = cx;
+
+    // For a horizontal flip, the new cx = (width - 1) - old_cx
+    // This effectively mirrors the cx value about the center of the image.
+    cx = (width - 1) - old_cx;
+
+    // Update the projection matrix P:
+    // P = [ fx  0   cx  Tx
+    //       0   fy  cy  Ty
+    //       0   0   1   0 ]
+    double &p_cx = camera_info.p[2];
+
+    double old_p_cx = p_cx;
+    p_cx = (width - 1) - old_p_cx;
+
+    // fx, fy, cy remain the same for a simple horizontal flip.
+    // The only changes are cx and p_cx.
+  }
+
   camera_info_publishers_[stream_index]->publish(camera_info);
   if (isGemini335PID(pid)) {
     publishMetadata(frame, stream_index, camera_info.header);
@@ -2096,6 +2105,10 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   if (stream_index == DEPTH) {
     auto depth_scale = video_frame->as<ob::DepthFrame>()->getValueScale();
     image = image * depth_scale;
+  }
+  if (flip_stream_[stream_index]) {
+    // flip image
+    cv::flip(image, image, 1);
   }
   sensor_msgs::msg::Image::UniquePtr image_msg(new sensor_msgs::msg::Image());
 

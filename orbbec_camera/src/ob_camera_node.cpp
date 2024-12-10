@@ -1779,6 +1779,9 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
     if (enable_stream_[COLOR] && color_frame) {
       std::unique_lock<std::mutex> lock(color_frame_queue_lock_);
       if (!enable_3d_reconstruction_mode_ || depth_laser_status) {
+        if(color_frame_queue_.size() > 2) {
+          color_frame_queue_.pop();
+        }
         color_frame_queue_.push(frame_set);
         color_frame_queue_cv_.notify_all();
       }

@@ -115,20 +115,14 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
   </tbody>
 </table>
 
-
-
 **Note**: If you do not find your device, please contact our FAE or sales representative for help.
 
 **Definition**:
 
 1. recommended for new designs: we will provide full supports with new features,  bug fix and performance optimization;
-
 2. full maintenance: we will provide bug fix support;
-
 3. limited maintenance: we will provide critical bug fix support;
-
 4. not supported: we will not support specific device in this version;
-
 5. to be supported: we will add support in the near future.
 
 ## Table of Contents
@@ -454,6 +448,10 @@ The following are the launch parameters available:
   the firmware, and if hardware logging is desired, it should also be set to `true`.
 - `log_level` : SDK log level, the default value is `info`, the optional values are `debug`, `info`, `warn`, `error`, `fatal`.
 - `enable_color_undistortion`: Enables color undistortion, the default value is `false`. Note that our color cameras exhibit minimal distortion, and typically, undistortion is not necessary.
+- `interleave_ae_mode` : Set laser or hdr interleave.
+- `interleave_frame_enable` : Whether to enable interleave frame mode.
+- `interleave_skip_enable` : Whether to enable skip frames.
+- `interleave_skip_index` : Set skip pattern IR or flood IR.
 
 **IMPORTANT**: *Please carefully read the instructions regarding software filtering settings
 at [this link](https://www.orbbec.com/docs/g330-use-depth-post-processing-blocks/). If you are uncertain, do not modify
@@ -585,6 +583,9 @@ to `true` in the stream that corresponds to the argument of the launch file.
 - `/camera/toggle_color`
 - `/camera/toggle_depth`
 - `/camera/toggle_ir`
+- `/camera/set_reset_timestamp`
+- `/camera/set_sync_interleaverlaser`
+- `/camera/set_sync_hosttime`
 
 ## All available topics
 
@@ -767,18 +768,18 @@ Currently, the following devices are supported by the OrbbecSDK ROS2 Wrapper v2-
 
 For optimal performance, we strongly recommend updating to the latest firmware version. This ensures that you benefit from the most recent enhancements and bug fixes.
 
-| Product List | Minimal Firmware Version | **Launch File** |
-| :-------------- | :--------------- | :-------------------------- |
-|     Astra2     |      2.8.20      |      astra2.launch.py      |
-|   Femto Mega   |   1.1.7/1.2.7   |    femto_mega.launch.py    |
-|   Femto Bolt   |   1.0.6/1.0.9   |    femto_bolt.launch.py    |
-|     Gemini 2     |  1.4.60 /1.4.76  |      gemini2.launch.py      |
-|    Gemini 2 L    |      1.4.32      |     gemini2L.launch.py     |
-|   Gemini 335   |      1.2.20      | gemini_330_series.launch.py |
-|   Gemini 335L   |      1.2.20      | gemini_330_series.launch.py |
-|  Gemini 335Lg  |      1.3.46      | gemini_330_series.launch.py |
-|   Gemini 336   |      1.2.20      | gemini_330_series.launch.py |
-|   Gemini 336L   |      1.2.20      | gemini_330_series.launch.py |
+| Product List | Minimal Firmware Version | **Launch File**       |
+| :----------- | :----------------------- | :-------------------------- |
+| Astra2       | 2.8.20                   | astra2.launch.py            |
+| Femto Mega   | 1.1.7/1.2.7              | femto_mega.launch.py        |
+| Femto Bolt   | 1.0.6/1.0.9              | femto_bolt.launch.py        |
+| Gemini 2     | 1.4.60 /1.4.76           | gemini2.launch.py           |
+| Gemini 2 L   | 1.4.32                   | gemini2L.launch.py          |
+| Gemini 335   | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 335L  | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 335Lg | 1.3.46                   | gemini_330_series.launch.py |
+| Gemini 336   | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 336L  | 1.2.20                   | gemini_330_series.launch.py |
 
 All launch files are essentially similar, with the primary difference being the default values of the parameters set
 for different models within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution settings in the launch file, as well as other parameters, to ensure compatibility and optimal performance.

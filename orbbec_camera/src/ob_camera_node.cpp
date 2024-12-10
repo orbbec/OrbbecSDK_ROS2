@@ -2106,7 +2106,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
     video_frame = frame->as<ob::IRFrame>();
 
     // interleave filter speckle or flood ir
-    if (interleave_skip_enable_) {
+    if (interleave_frame_enable_ && interleave_skip_enable_) {
       RCLCPP_DEBUG(logger_, "interleave filter skip interleave_skip_index_: %d",
                    interleave_skip_index_);
       if (video_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_INDEX) ==

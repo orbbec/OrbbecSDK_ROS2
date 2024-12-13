@@ -1615,6 +1615,13 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
     RCLCPP_ERROR_STREAM(logger_, "depth frame is null");
     return;
   }
+
+  if (depth_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_INDEX) !=
+      interleave_skip_index_) {
+    RCLCPP_DEBUG(logger_, "interleave filter skip frame type: %d", depth_frame->getType());
+    return;
+  }
+
   CHECK_NOTNULL(pipeline_);
   auto camera_params = pipeline_->getCameraParam();
   auto device_info = device_->getDeviceInfo();

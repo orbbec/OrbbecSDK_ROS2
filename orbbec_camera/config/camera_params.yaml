@@ -2,7 +2,7 @@
 depth_registration: false
 enable_point_cloud: true
 enable_colored_point_cloud: false
-device_preset: "Default"
+device_preset: "High Accurary"
 laser_on_off_mode: 0 # 0: off, 1: on-off, 1: off-on
 time_domain: "global" # global, device, system
 enable_sync_host_time: true

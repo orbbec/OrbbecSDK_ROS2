@@ -2201,10 +2201,15 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   } else if (frame->getType() == OB_FRAME_DEPTH) {
     // updateStreamInfo(frame, depth_stream_info_);
     if (interleave_frame_enable_ && interleave_skip_enable_) {
-      interleave_skip_depth_index_++;
-      RCLCPP_DEBUG(logger_, "interleave filter skip interleave_skip_index_: %d",
-                   interleave_skip_depth_index_);
-      if (interleave_skip_depth_index_ % 2 == 0) {
+      // interleave_skip_depth_index_++;
+      // RCLCPP_DEBUG(logger_, "interleave filter skip interleave_skip_index_: %d",
+      //              interleave_skip_depth_index_);
+      // if (interleave_skip_depth_index_ % 2 == 0) {
+      //   RCLCPP_DEBUG(logger_, "interleave filter skip frame type: %d", frame->getType());
+      //   return;
+      // }
+      if (frame->getMetadataValue(OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_INDEX) !=
+          interleave_skip_index_) {
         RCLCPP_DEBUG(logger_, "interleave filter skip frame type: %d", frame->getType());
         return;
       }
@@ -2231,7 +2236,6 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
         updateStreamInfo(frame, right_ir_stream_info_);
       }
     }
-
   } else {
     RCLCPP_ERROR(logger_, "Unsupported frame type: %d", frame->getType());
     return;

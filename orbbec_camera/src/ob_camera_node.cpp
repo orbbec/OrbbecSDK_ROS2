@@ -2193,19 +2193,21 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   }
   std::shared_ptr<ob::VideoFrame> video_frame;
   if (frame->getType() == OB_FRAME_COLOR) {
-    // updateStreamInfo(frame, color_stream_info_);
-    if (interleave_frame_enable_ && interleave_skip_enable_) {
-      interleave_skip_color_index_++;
-      RCLCPP_DEBUG(logger_, "interleave filter skip interleave_skip_color_index_: %d",
-                   interleave_skip_color_index_);
-      if (interleave_skip_color_index_ % 2 == 0) {
-        RCLCPP_DEBUG(logger_, "interleave filter skip frame type: %d", frame->getType());
-        return;
-      }
-      updateStreamInfo(frame, color_stream_info_);
-    }
+    updateStreamInfo(frame, color_stream_info_);
+    // if (interleave_frame_enable_ && interleave_skip_enable_) {
+    //   interleave_skip_color_index_++;
+    //   RCLCPP_DEBUG(logger_, "interleave filter skip interleave_skip_color_index_: %d",
+    //                interleave_skip_color_index_);
+    //   if (interleave_skip_color_index_ % 2 == 0) {
+    //     RCLCPP_DEBUG(logger_, "interleave filter skip frame type: %d", frame->getType());
+    //     return;
+    //   }
+    //   updateStreamInfo(frame, color_stream_info_);
+    // }
     video_frame = frame->as<ob::ColorFrame>();
   } else if (frame->getType() == OB_FRAME_DEPTH) {
+    video_frame = frame->as<ob::DepthFrame>();
+
     // updateStreamInfo(frame, depth_stream_info_);
     if (interleave_frame_enable_ && interleave_skip_enable_) {
       // interleave_skip_depth_index_++;
@@ -2215,14 +2217,13 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
       //   RCLCPP_DEBUG(logger_, "interleave filter skip frame type: %d", frame->getType());
       //   return;
       // }
-      if (frame->getMetadataValue(OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_INDEX) !=
+      if (video_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_INDEX) !=
           interleave_skip_index_) {
         RCLCPP_DEBUG(logger_, "interleave filter skip frame type: %d", frame->getType());
         return;
       }
       updateStreamInfo(frame, depth_stream_info_);
     }
-    video_frame = frame->as<ob::DepthFrame>();
   } else if (frame->getType() == OB_FRAME_IR || frame->getType() == OB_FRAME_IR_LEFT ||
              frame->getType() == OB_FRAME_IR_RIGHT) {
     video_frame = frame->as<ob::IRFrame>();

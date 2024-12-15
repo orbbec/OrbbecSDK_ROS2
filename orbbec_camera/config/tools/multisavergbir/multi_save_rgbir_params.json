@@ -1,26 +1,13 @@
 {
     "save_rgbir_params": {
         "time_domain": "device",
-        "image_number": "100",
         "usb_ports": [
             "2-3",
             "2-1"
         ],
-        "ir_topics": [
-            "/G330_0/left_ir/image_raw",
-            "/G330_1/left_ir/image_raw"
-        ],
-        "left_ir_metadata_topic": [
-            "/G330_0/left_ir/metadata",
-            "/G330_1/left_ir/metadata"
-        ],
-        "color_topics": [
-            "/G330_0/color/image_raw",
-            "/G330_1/color/image_raw"
-        ],
-        "color_metadata_topic": [
-            "/G330_0/color/metadata",
-            "/G330_1/color/metadata"
+        "camera_name": [
+            "G330_0",
+            "G330_1"
         ]
     }
 }

@@ -977,8 +977,9 @@ void OBCameraNode::setupDefaultImageFormat() {
 }
 
 void OBCameraNode::getParameters() {
+  setAndGetNodeParameter<std::string>(prefix_, "prefix", "");
   setAndGetNodeParameter<std::string>(camera_name_, "camera_name", "camera");
-  camera_link_frame_id_ = camera_name_ + "_link";
+  camera_link_frame_id_ = prefix_ + camera_name_ + "_link";
   for (auto stream_index : IMAGE_STREAMS) {
     std::string param_name = stream_name_[stream_index] + "_width";
     setAndGetNodeParameter(width_[stream_index], param_name, 0);
@@ -995,10 +996,10 @@ void OBCameraNode::getParameters() {
     param_name = "flip_" + stream_name_[stream_index];
     setAndGetNodeParameter(flip_stream_[stream_index], param_name, false);
     param_name = camera_name_ + "_" + stream_name_[stream_index] + "_frame_id";
-    std::string default_frame_id = camera_name_ + "_" + stream_name_[stream_index] + "_frame";
+    std::string default_frame_id = prefix_ + camera_name_ + "_" + stream_name_[stream_index] + "_frame";
     setAndGetNodeParameter(frame_id_[stream_index], param_name, default_frame_id);
     std::string default_optical_frame_id =
-        camera_name_ + "_" + stream_name_[stream_index] + "_optical_frame";
+        prefix_ + camera_name_ + "_" + stream_name_[stream_index] + "_optical_frame";
     param_name = stream_name_[stream_index] + "_optical_frame_id";
     setAndGetNodeParameter(optical_frame_id_[stream_index], param_name, default_optical_frame_id);
     param_name = stream_name_[stream_index] + "_format";
@@ -1029,14 +1030,14 @@ void OBCameraNode::getParameters() {
     param_name = stream_name_[stream_index] + "_range";
     setAndGetNodeParameter<std::string>(imu_range_[stream_index], param_name, "");
     param_name = camera_name_ + "_" + stream_name_[stream_index] + "_frame_id";
-    std::string default_frame_id = camera_name_ + "_" + stream_name_[stream_index] + "_frame";
+    std::string default_frame_id = prefix_ + camera_name_ + "_" + stream_name_[stream_index] + "_frame";
     setAndGetNodeParameter(frame_id_[stream_index], param_name, default_frame_id);
     std::string default_optical_frame_id =
-        camera_name_ + "_" + stream_name_[stream_index] + "_optical_frame";
+        prefix_ + camera_name_ + "_" + stream_name_[stream_index] + "_optical_frame";
     param_name = stream_name_[stream_index] + "_optical_frame_id";
     setAndGetNodeParameter(optical_frame_id_[stream_index], param_name, default_optical_frame_id);
     depth_aligned_frame_id_[stream_index] =
-        camera_name_ + "_" + stream_name_[COLOR] + "_optical_frame";
+        prefix_ + camera_name_ + "_" + stream_name_[COLOR] + "_optical_frame";
   }
 
   setAndGetNodeParameter(publish_tf_, "publish_tf", true);
@@ -1083,6 +1084,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter(trigger_out_enabled_, "trigger_out_enabled", false);
   setAndGetNodeParameter<std::string>(depth_precision_str_, "depth_precision", "");
   setAndGetNodeParameter<std::string>(cloud_frame_id_, "cloud_frame_id", "");
+  cloud_frame_id_ = prefix_ + cloud_frame_id_;
   if (!depth_precision_str_.empty()) {
     depth_precision_ = depthPrecisionLevelFromString(depth_precision_str_);
   }
@@ -1380,32 +1382,32 @@ void OBCameraNode::setupPublishers() {
   if (enable_stream_[DEPTH] && enable_stream_[INFRA0]) {
     depth_to_other_extrinsics_publishers_[INFRA0] =
         node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
-            "/" + camera_name_ + "/depth_to_ir", extrinsics_qos);
+            "/" + prefix_ + camera_name_ + "/depth_to_ir", extrinsics_qos);
   }
   if (enable_stream_[DEPTH] && enable_stream_[COLOR]) {
     depth_to_other_extrinsics_publishers_[COLOR] =
         node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
-            "/" + camera_name_ + "/depth_to_color", extrinsics_qos);
+            "/" + prefix_ + camera_name_ + "/depth_to_color", extrinsics_qos);
   }
   if (enable_stream_[DEPTH] && enable_stream_[INFRA1]) {
     depth_to_other_extrinsics_publishers_[INFRA1] =
         node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
-            "/" + camera_name_ + "/depth_to_left_ir", extrinsics_qos);
+            "/" + prefix_ + camera_name_ + "/depth_to_left_ir", extrinsics_qos);
   }
   if (enable_stream_[DEPTH] && enable_stream_[INFRA2]) {
     depth_to_other_extrinsics_publishers_[INFRA2] =
         node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
-            "/" + camera_name_ + "/depth_to_right_ir", extrinsics_qos);
+            "/" + prefix_ + camera_name_ + "/depth_to_right_ir", extrinsics_qos);
   }
   if (enable_stream_[DEPTH] && enable_stream_[ACCEL]) {
     depth_to_other_extrinsics_publishers_[ACCEL] =
         node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
-            "/" + camera_name_ + "/depth_to_accel", extrinsics_qos);
+            "/" + prefix_ + camera_name_ + "/depth_to_accel", extrinsics_qos);
   }
   if (enable_stream_[DEPTH] && enable_stream_[GYRO]) {
     depth_to_other_extrinsics_publishers_[GYRO] =
         node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
-            "/" + camera_name_ + "/depth_to_gyro", extrinsics_qos);
+            "/" + prefix_ + camera_name_ + "/depth_to_gyro", extrinsics_qos);
   }
   filter_status_pub_ =
       node_->create_publisher<std_msgs::msg::String>("depth_filter_status", extrinsics_qos);
@@ -1510,7 +1512,8 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
   auto frame_timestamp = getFrameTimestampUs(depth_frame);
   auto timestamp = fromUsToROSTime(frame_timestamp);
   std::string frame_id = depth_registration_ ? optical_frame_id_[COLOR] : optical_frame_id_[DEPTH];
-  if (!cloud_frame_id_.empty()) {
+  std::string cloud_frame_id_no_prefix = cloud_frame_id_.substr(prefix_.length(), cloud_frame_id_.length());
+  if (!cloud_frame_id_no_prefix.empty()) {
     frame_id = cloud_frame_id_;
   }
   point_cloud_msg->header.stamp = timestamp;
@@ -2471,7 +2474,8 @@ void OBCameraNode::calcAndPublishStaticTransform() {
                     frame_id_[base_stream_]);
   }
   if (enable_stream_[DEPTH] && enable_stream_[COLOR]) {
-    static const char *frame_id = "depth_to_color_extrinsics";
+    std::string string_frame_id = prefix_ + camera_name_ + "_" + "depth_to_color_extrinsics";
+    static const char *frame_id = string_frame_id.c_str();
     OBExtrinsic ex;
     try {
       ex = base_stream_profile->getExtrinsicTo(stream_profile_[COLOR]);
@@ -2486,7 +2490,8 @@ void OBCameraNode::calcAndPublishStaticTransform() {
     depth_to_other_extrinsics_publishers_[COLOR]->publish(ex_msg);
   }
   if (enable_stream_[DEPTH] && enable_stream_[INFRA0]) {
-    static const char *frame_id = "depth_to_ir_extrinsics";
+    std::string string_frame_id = prefix_ + camera_name_ + "_" + "depth_to_ir_extrinsics";
+    static const char *frame_id = string_frame_id.c_str();
     OBExtrinsic ex;
     try {
       ex = base_stream_profile->getExtrinsicTo(stream_profile_[INFRA0]);
@@ -2501,7 +2506,8 @@ void OBCameraNode::calcAndPublishStaticTransform() {
     depth_to_other_extrinsics_publishers_[INFRA0]->publish(ex_msg);
   }
   if (enable_stream_[DEPTH] && enable_stream_[INFRA1]) {
-    static const char *frame_id = "depth_to_left_ir_extrinsics";
+    std::string string_frame_id = prefix_ + camera_name_ + "_" + "depth_to_left_ir_extrinsics";
+    static const char *frame_id = string_frame_id.c_str();
     OBExtrinsic ex;
     try {
       ex = base_stream_profile->getExtrinsicTo(stream_profile_[INFRA1]);
@@ -2516,7 +2522,8 @@ void OBCameraNode::calcAndPublishStaticTransform() {
     depth_to_other_extrinsics_publishers_[INFRA1]->publish(ex_msg);
   }
   if (enable_stream_[DEPTH] && enable_stream_[INFRA2]) {
-    static const char *frame_id = "depth_to_right_ir_extrinsics";
+    std::string string_frame_id = prefix_ + camera_name_ + "_" + "depth_to_right_ir_extrinsics";
+    static const char *frame_id = string_frame_id.c_str();
     OBExtrinsic ex;
     try {
       ex = base_stream_profile->getExtrinsicTo(stream_profile_[INFRA2]);
@@ -2532,7 +2539,8 @@ void OBCameraNode::calcAndPublishStaticTransform() {
     depth_to_other_extrinsics_publishers_[INFRA2]->publish(ex_msg);
   }
   if (enable_stream_[DEPTH] && enable_stream_[ACCEL]) {
-    static const char *frame_id = "depth_to_accel_extrinsics";
+    std::string string_frame_id = prefix_ + camera_name_ + "_" + "depth_to_accel_extrinsics";
+    static const char *frame_id = string_frame_id.c_str();
     OBExtrinsic ex;
     try {
       ex = base_stream_profile->getExtrinsicTo(stream_profile_[ACCEL]);
@@ -2547,7 +2555,8 @@ void OBCameraNode::calcAndPublishStaticTransform() {
     depth_to_other_extrinsics_publishers_[ACCEL]->publish(ex_msg);
   }
   if (enable_stream_[DEPTH] && enable_stream_[GYRO]) {
-    static const char *frame_id = "depth_to_gyro_extrinsics";
+    std::string string_frame_id = prefix_ + camera_name_ + "_" + "depth_to_gyro_extrinsics";
+    static const char *frame_id = string_frame_id.c_str();
     OBExtrinsic ex;
     try {
       ex = base_stream_profile->getExtrinsicTo(stream_profile_[GYRO]);

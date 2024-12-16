@@ -19,7 +19,7 @@ enable_3d_reconstruction_mode: false
 enable_color: true
 color_width: 640
 color_height: 480
-color_fps: 30
+color_fps: 60
 color_format: "MJPG"
 enable_color_auto_exposure: false
 color_exposure: 50 # 5ms

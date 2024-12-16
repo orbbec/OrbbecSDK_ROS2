@@ -2193,17 +2193,17 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   }
   std::shared_ptr<ob::VideoFrame> video_frame;
   if (frame->getType() == OB_FRAME_COLOR) {
-    updateStreamInfo(frame, color_stream_info_);
-    // if (interleave_frame_enable_ && interleave_skip_enable_) {
-    //   interleave_skip_color_index_++;
-    //   RCLCPP_DEBUG(logger_, "interleave filter skip interleave_skip_color_index_: %d",
-    //                interleave_skip_color_index_);
-    //   if (interleave_skip_color_index_ % 2 == 0) {
-    //     RCLCPP_DEBUG(logger_, "interleave filter skip frame type: %d", frame->getType());
-    //     return;
-    //   }
-    //   updateStreamInfo(frame, color_stream_info_);
-    // }
+    // updateStreamInfo(frame, color_stream_info_);
+    if (interleave_frame_enable_ && interleave_skip_enable_) {
+      interleave_skip_color_index_++;
+      RCLCPP_DEBUG(logger_, "interleave filter skip interleave_skip_color_index_: %d",
+                   interleave_skip_color_index_);
+      if (interleave_skip_color_index_ % 2 == 0) {
+        RCLCPP_DEBUG(logger_, "interleave filter skip frame type: %d", frame->getType());
+        return;
+      }
+      updateStreamInfo(frame, color_stream_info_);
+    }
     video_frame = frame->as<ob::ColorFrame>();
   } else if (frame->getType() == OB_FRAME_DEPTH) {
     video_frame = frame->as<ob::DepthFrame>();

@@ -94,6 +94,17 @@ class MultiCameraSubscriber : public rclcpp::Node {
     }
   }
   void topic_init() {
+    ir_image_buffers_.resize(left_ir_topics_.size());
+    color_image_buffers_.resize(left_ir_topics_.size());
+    ir_current_timestamp_buffers_.resize(left_ir_topics_.size());
+    color_current_timestamp_buffers_.resize(left_ir_topics_.size());
+    ir_timestamp_buffers_.resize(left_ir_topics_.size());
+    color_timestamp_buffers_.resize(left_ir_topics_.size());
+    left_ir_metadata_.exposure_buffs.resize(left_ir_topics_.size());
+    left_ir_metadata_.gain_buffs.resize(left_ir_topics_.size());
+    color_metadata_.exposure_buffs.resize(left_ir_topics_.size());
+    color_metadata_.gain_buffs.resize(left_ir_topics_.size());
+    callback_called_ = std::vector<bool>(left_ir_topics_.size(), false);
     auto custom_qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
     RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_camera_subscriber"),
                        "camera_name_.size(): " << camera_name_.size());
@@ -143,18 +154,6 @@ class MultiCameraSubscriber : public rclcpp::Node {
       ir_meta_subscribers_.push_back(ir_metadata_sub);
       color_subscribers_.push_back(color_sub);
       color_meta_subscribers_.push_back(color_metadata_sub);
-
-      ir_image_buffers_.resize(left_ir_topics_.size());
-      color_image_buffers_.resize(left_ir_topics_.size());
-      ir_current_timestamp_buffers_.resize(left_ir_topics_.size());
-      color_current_timestamp_buffers_.resize(left_ir_topics_.size());
-      ir_timestamp_buffers_.resize(left_ir_topics_.size());
-      color_timestamp_buffers_.resize(left_ir_topics_.size());
-      left_ir_metadata_.exposure_buffs.resize(left_ir_topics_.size());
-      left_ir_metadata_.gain_buffs.resize(left_ir_topics_.size());
-      color_metadata_.exposure_buffs.resize(left_ir_topics_.size());
-      color_metadata_.gain_buffs.resize(left_ir_topics_.size());
-      callback_called_ = std::vector<bool>(left_ir_topics_.size(), false);
     }
   }
   std::string getCurrentTimes() {

@@ -19,6 +19,18 @@ struct ImageMetadata {
 class MultiCameraSubscriber : public rclcpp::Node {
  public:
   MultiCameraSubscriber() : Node("multi_camera_subscriber") { device_init(); }
+  ~MultiCameraSubscriber() {
+    ir_image_buffers_.clear();
+    ir_current_timestamp_buffers_.clear();
+    ir_timestamp_buffers_.clear();
+    color_image_buffers_.clear();
+    color_current_timestamp_buffers_.clear();
+    color_timestamp_buffers_.clear();
+    left_ir_metadata_.exposure_buffs.clear();
+    left_ir_metadata_.gain_buffs.clear();
+    color_metadata_.exposure_buffs.clear();
+    color_metadata_.gain_buffs.clear();
+  }
   void device_init() {
     try {
       auto context = std::make_unique<ob::Context>();
@@ -33,9 +45,9 @@ class MultiCameraSubscriber : public rclcpp::Node {
         serial_numbers_[usb_port] = serial;
         // RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), ":list->deviceCount(): " <<
         // list->deviceCount());
-        color_frame_counters_[count] = 0;
-        ir_frame_counters_[count] = 0;
-        count++;
+        color_frame_counters_[count_] = 0;
+        ir_frame_counters_[count_] = 0;
+        count_++;
       }
     } catch (ob::Error &e) {
       RCLCPP_ERROR_STREAM(get_logger(), e.getMessage());
@@ -205,8 +217,8 @@ class MultiCameraSubscriber : public rclcpp::Node {
     auto &color_meta_exposure = color_metadata_.exposure_buffs[index];
     auto &color_meta_gain = color_metadata_.gain_buffs[index];
     callback_called_[index] = true;
-    if (ir_images.size() < static_cast<size_t>(is_saving_images_) ||
-        color_images.size() < static_cast<size_t>(is_saving_images_)) {
+    if (ir_images.size() < static_cast<size_t>(saving_images_number_) ||
+        color_images.size() < static_cast<size_t>(saving_images_number_)) {
       return;
     }
     RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_camera_subscriber"), "index:" << index);
@@ -219,7 +231,7 @@ class MultiCameraSubscriber : public rclcpp::Node {
     }
     std::string serial_index = serial_iter->second;
 
-    for (size_t i = 0; i < static_cast<size_t>(is_saving_images_); i++) {
+    for (size_t i = 0; i < static_cast<size_t>(saving_images_number_); i++) {
       std::string folder = generateFolderName(serial_index, usb_index);
       std::string ir_filename = folder + "/ir#left_SN" + serial_index + "_Index" +
                                 std::to_string(usb_index) + time_domain_ +
@@ -232,7 +244,6 @@ class MultiCameraSubscriber : public rclcpp::Node {
       }
 
       cv::imwrite(ir_filename, ir_images[i]);
-
       std::string color_filename =
           folder + "/color_SN" + serial_index + "_Index" + std::to_string(usb_index) +
           time_domain_ + color_current_timestamps[i] + "_f" + std::to_string(i) + "_s" +
@@ -243,6 +254,7 @@ class MultiCameraSubscriber : public rclcpp::Node {
       cv::imwrite(color_filename, color_images[i]);
       // RCLCPP_INFO(this->get_logger(), "Saved Color image to: %s", color_filename.c_str());
     }
+
     ir_image_buffers_[index].clear();
     ir_current_timestamp_buffers_[index].clear();
     ir_timestamp_buffers_[index].clear();
@@ -259,26 +271,25 @@ class MultiCameraSubscriber : public rclcpp::Node {
         std::all_of(callback_called_.begin(), callback_called_.end(), [](bool v) { return v; });
     if (all_true) {
       RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_camera_subscriber"), "over ");
-      is_saving_images_ = 0;
-      ir_image_buffers_.clear();
-      ir_current_timestamp_buffers_.clear();
-      ir_timestamp_buffers_.clear();
-      color_image_buffers_.clear();
-      color_current_timestamp_buffers_.clear();
-      color_timestamp_buffers_.clear();
-      //   rclcpp::shutdown();
+      saving_images_number_ = 0;
+      callback_called_.clear();
+      callback_called_ = std::vector<bool>(left_ir_topics_.size(), false);
     }
   }
 
   void controlCaptureCallback(const std_msgs::msg::Int32::SharedPtr msg) {
     currenttimes_ = getCurrentTimes();
-    is_saving_images_ = msg->data;
-    topic_init();
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_camera_subscriber"), "jjjj " << is_saving_images_);
+    saving_images_number_ = msg->data;
+    if (!topic_init_) {
+      topic_init();
+      topic_init_ = true;
+    }
+    RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_camera_subscriber"),
+                       "saving_images_number_: " << saving_images_number_);
   }
   void irCallback(std::shared_ptr<const sensor_msgs::msg::Image> image, size_t index) {
     std::lock_guard<std::mutex> lock(image_mutex_);
-    if (!callback_called_[index] && static_cast<size_t>(is_saving_images_)) {
+    if (!callback_called_[index] && static_cast<size_t>(saving_images_number_)) {
       cv::Mat ir_mat = cv_bridge::toCvCopy(image, image->encoding)->image;
       std::string current_timestamp_ir = getCurrentTimestamp(image);
       std::string timestamp_ir = getTimestamp();
@@ -288,15 +299,19 @@ class MultiCameraSubscriber : public rclcpp::Node {
       ir_resolution_ = std::to_string(image->width) + "x" + std::to_string(image->height);
       RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_camera_subscriber"),
                          ":ir: " << index << ":" << ir_image_buffers_[index].size());
-      if (ir_image_buffers_[index].size() >= static_cast<size_t>(is_saving_images_) &&
-          color_image_buffers_[index].size() >= static_cast<size_t>(is_saving_images_)) {
+      if (ir_image_buffers_[index].size() >= static_cast<size_t>(saving_images_number_) &&
+          color_image_buffers_[index].size() >= static_cast<size_t>(saving_images_number_) &&
+          color_metadata_.exposure_buffs[index].size() >=
+              static_cast<size_t>(saving_images_number_) &&
+          left_ir_metadata_.exposure_buffs[index].size() >=
+              static_cast<size_t>(saving_images_number_)) {
         saveAlignedImages(index);
       }
     }
   }
   void colorCallback(std::shared_ptr<const sensor_msgs::msg::Image> image, size_t index) {
     std::lock_guard<std::mutex> lock(image_mutex_);
-    if (!callback_called_[index] && static_cast<size_t>(is_saving_images_)) {
+    if (!callback_called_[index] && static_cast<size_t>(saving_images_number_)) {
       cv::Mat color_mat = cv_bridge::toCvCopy(image, image->encoding)->image;
       cv::Mat corrected_image;
       cv::cvtColor(color_mat, corrected_image, cv::COLOR_RGB2BGR);
@@ -308,8 +323,12 @@ class MultiCameraSubscriber : public rclcpp::Node {
       color_resolution_ = std::to_string(image->width) + "x" + std::to_string(image->height);
       RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_camera_subscriber"),
                          ":color: " << index << ":" << color_image_buffers_[index].size());
-      if (ir_image_buffers_[index].size() >= static_cast<size_t>(is_saving_images_) &&
-          color_image_buffers_[index].size() >= static_cast<size_t>(is_saving_images_)) {
+      if (ir_image_buffers_[index].size() >= static_cast<size_t>(saving_images_number_) &&
+          color_image_buffers_[index].size() >= static_cast<size_t>(saving_images_number_) &&
+          color_metadata_.exposure_buffs[index].size() >=
+              static_cast<size_t>(saving_images_number_) &&
+          left_ir_metadata_.exposure_buffs[index].size() >=
+              static_cast<size_t>(saving_images_number_)) {
         saveAlignedImages(index);
       }
     }
@@ -318,16 +337,20 @@ class MultiCameraSubscriber : public rclcpp::Node {
   void ir_meta_Callback(std::shared_ptr<const orbbec_camera_msgs::msg::Metadata> msg,
                         size_t index) {
     std::lock_guard<std::mutex> lock(meta_mutex_);
-    nlohmann::json json_data = nlohmann::json::parse(msg->json_data);
-    left_ir_metadata_.exposure_buffs[index].push_back(json_data["exposure"].dump());
-    left_ir_metadata_.gain_buffs[index].push_back(json_data["gain"].dump());
+    if (!callback_called_[index] && static_cast<size_t>(saving_images_number_)) {
+      nlohmann::json json_data = nlohmann::json::parse(msg->json_data);
+      left_ir_metadata_.exposure_buffs[index].push_back(json_data["exposure"].dump());
+      left_ir_metadata_.gain_buffs[index].push_back(json_data["gain"].dump());
+    }
   }
   void color_meta_Callback(std::shared_ptr<const orbbec_camera_msgs::msg::Metadata> msg,
                            size_t index) {
     std::lock_guard<std::mutex> lock(meta_mutex_);
-    nlohmann::json json_data = nlohmann::json::parse(msg->json_data);
-    color_metadata_.exposure_buffs[index].push_back(json_data["exposure"].dump());
-    color_metadata_.gain_buffs[index].push_back(json_data["gain"].dump());
+    if (!callback_called_[index] && static_cast<size_t>(saving_images_number_)) {
+      nlohmann::json json_data = nlohmann::json::parse(msg->json_data);
+      color_metadata_.exposure_buffs[index].push_back(json_data["exposure"].dump());
+      color_metadata_.gain_buffs[index].push_back(json_data["gain"].dump());
+    }
   }
 
   rclcpp::CallbackGroup::SharedPtr reentrant_callback_group_;
@@ -344,7 +367,6 @@ class MultiCameraSubscriber : public rclcpp::Node {
   std::array<std::string, 10> usb_numbers_;
   std::array<size_t, 10> color_frame_counters_;
   std::array<size_t, 10> ir_frame_counters_;
-  size_t count = 0;
 
   std::vector<std::string> usb_params_;
   std::vector<std::string> camera_name_;
@@ -367,7 +389,10 @@ class MultiCameraSubscriber : public rclcpp::Node {
   std::string ir_resolution_;
   std::string currenttimes_;
 
-  int is_saving_images_ = 0;
+  size_t count_ = 0;
+  int saving_images_number_ = 0;
+
+  bool topic_init_ = false;
 
   ImageMetadata left_ir_metadata_ = ImageMetadata();
   ImageMetadata color_metadata_ = ImageMetadata();

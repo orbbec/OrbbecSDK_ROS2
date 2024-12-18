@@ -1160,7 +1160,6 @@ void OBCameraNode::getParameters() {
     depth_aligned_frame_id_[stream_index] =
         camera_name_ + "_" + stream_name_[COLOR] + "_optical_frame";
   }
-
   setAndGetNodeParameter(publish_tf_, "publish_tf", true);
   setAndGetNodeParameter(tf_publish_rate_, "tf_publish_rate", 0.0);
   setAndGetNodeParameter(depth_registration_, "depth_registration", false);

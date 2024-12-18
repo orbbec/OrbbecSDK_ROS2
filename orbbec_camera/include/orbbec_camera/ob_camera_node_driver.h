@@ -83,6 +83,7 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::string device_unique_id_;
   std::string usb_port_;
   bool enumerate_net_device_ = false;  // default false
+  std::string uvc_backend_;
   std::shared_ptr<Parameters> parameters_ = nullptr;
   std::shared_ptr<std::thread> query_thread_ = nullptr;
   std::shared_ptr<std::thread> device_count_update_thread_ = nullptr;

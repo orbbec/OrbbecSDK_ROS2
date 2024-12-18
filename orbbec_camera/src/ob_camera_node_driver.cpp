@@ -162,6 +162,17 @@ void OBCameraNodeDriver::init() {
   net_device_ip_ = declare_parameter<std::string>("net_device_ip", "");
   net_device_port_ = static_cast<int>(declare_parameter<int>("net_device_port", 0));
   enumerate_net_device_ = declare_parameter<bool>("enumerate_net_device", false);
+  uvc_backend_ = declare_parameter<std::string>("uvc_backend", "libuvc");
+  if(uvc_backend_=="libuvc"){  
+      ctx_->setUvcBackendType(OB_UVC_BACKEND_TYPE_LIBUVC);
+       RCLCPP_INFO_STREAM(logger_, "setUvcBackendType:"<<uvc_backend_);
+  }else if(uvc_backend_=="v4l2"){
+      ctx_->setUvcBackendType(OB_UVC_BACKEND_TYPE_V4L2);
+      RCLCPP_INFO_STREAM(logger_, "setUvcBackendType:"<<uvc_backend_);
+  }else{
+    ctx_->setUvcBackendType(OB_UVC_BACKEND_TYPE_LIBUVC);
+    RCLCPP_INFO_STREAM(logger_, "setUvcBackendType:"<<uvc_backend_);
+  }
   ctx_->enableNetDeviceEnumeration(enumerate_net_device_);
   ctx_->setDeviceChangedCallback([this](const std::shared_ptr<ob::DeviceList> &removed_list,
                                         const std::shared_ptr<ob::DeviceList> &added_list) {

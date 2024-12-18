@@ -747,6 +747,11 @@ typedef enum {
     OB_PROP_SDK_IR_RIGHT_FRAME_UNPACK_BOOL = 3012,
 
     /**
+     * @brief Read the current network bandwidth type of the network device, whether it is Gigabit Ethernet or Fast Ethernet, such as G335LE.
+     */
+    OB_PROP_NETWORK_BANDWIDTH_TYPE_INT = 3027,
+
+    /**
      * @brief Calibration JSON file read from device (Femto Mega, read only)
      */
     OB_RAW_DATA_CAMERA_CALIB_JSON_FILE = 4029,

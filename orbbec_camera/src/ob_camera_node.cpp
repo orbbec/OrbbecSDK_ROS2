@@ -824,11 +824,11 @@ void OBCameraNode::startStreams() {
     // set interleave mode
     if (interleave_ae_mode_ == "hdr" && interleave_frame_enable_) {
       RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to hdr");
-      device_->loadFrameInterleave("hdr interleave");
+      device_->loadFrameInterleave("Depth From HDR");
       init_interleave_hdr_param();
     } else if (interleave_ae_mode_ == "laser" && interleave_frame_enable_) {
       RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to laser");
-      device_->loadFrameInterleave("laser interleave");
+      device_->loadFrameInterleave("Laser ON-Off");
       init_interleave_laser_param();
     } else {
       RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to nothing");

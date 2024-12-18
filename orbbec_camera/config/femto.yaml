@@ -1,0 +1,127 @@
+# config/*.yaml files are used to configure the camera parameters
+---
+orbbec_ros:
+    camera_parameters:
+        general:
+            # Camera model. upport product models by referencing config/*.yaml
+            camera_model: "femto"
+            # Path to the configuration file. If empty, default parameters will be used
+            config_file_path: "femto.yaml"
+
+        deivce:
+            # camera name, usually overwritten by launch file
+            camera_name: "camera"
+            # camera serial number, usually overwritten by launch file
+            serial_number: ""
+            # The USB port of the camera. This parameter is required when using multiple cameras.
+            usb_port: ""
+            # Number of devices. If multiple cameras are required, this parameter must be filled in launch file
+            device_num: 1
+            # The delay time for reopening the device, in milliseconds. Usually, there is no need to modify by default.
+            connection_delay: 100
+            # If true, the heartbeat will be enabled
+            enable_heartbeat: false
+            # If true, the LDP will be enabled
+            enable_ldp: true
+
+            network_device:
+                # Whether to enable the function of enumerating network devices. True means enabled and false means disabled. This function is only supported by Femto Mega and Gemini 2 XL devices. 
+                # When accessing these devices through the network, the IP address of the device needs to be preconfigured. The enable switch needs to be set to true.
+                enumerate_net_device: false
+                # Port number of the network device. If 0, a random port will be used
+                net_device_port: 0
+                # IP address of the network device.
+                net_device_ip: ""
+
+        color:
+            # If true, the color image will be enabled
+            enable_color: true
+            # Width of the color image. If 0, the default width will be used
+            color_width: 640
+            # Height of the color image. If 0, the default height will be used
+            color_height: 480
+            # If 0, the default FPS will be used
+            color_fps: 30
+            # Format of the color image.
+            color_format: "MJPG"
+
+        depth:
+            # If true, the depth image will be enabled
+            enable_depth: true
+            # Width of the depth image. If 0, the default width will be used
+            depth_width: 640
+            # Height of the depth image. If 0, the default height will be used
+            depth_height: 480
+            # fps of the depth image. If 0, the default FPS will be used
+            depth_fps: 30
+            # Format of the depth image.
+            depth_format: "Y16"
+            # Depth registration enable
+            depth_registration: false
+
+            # The alignment mode to be used. Options are "HW" for hardware alignment and "SW" for software alignment
+            align_mode: "HW"
+
+        ir:
+            # If false, the left IR image will not be enabled
+            enable_ir: true
+            # Width of the left IR image. If 0, the default width will be used
+            ir_width: 640
+            # Height of the left IR image. If 0, the default height will be used
+            ir_height: 480
+            # Fps of the left IR image. If 0, the default FPS will be used
+            ir_fps: 30
+            # Format of the left IR image. Supported formats are 'Y8'
+            ir_format: "Y16"
+
+        imu:
+            # If true, the IMU accelerometer data will be enabled
+            enable_accel: false
+            # Rate of the
+            accel_rate: "100hz"
+            # Range of the accelerometer.
+            accel_range: "4g"
+            # If true, the IMU gyroscope data will be enabled
+            enable_gyro: false
+            # Rate of the gyroscope.
+            gyro_rate: "100hz"
+            # Range of the gyroscope.
+            gyro_range: "1000dps"
+            # enable_sync_output_accel_gyro
+            enable_sync_output_accel_gyro: true
+
+        point_cloud:
+            # If true, the point cloud will be enabled
+            enable_point_cloud: true
+
+        advanced:
+            # If true, the extrinsics publish will be enabled
+            enable_publish_extrinsic: false
+            # If true, the frame synchronization will be enabled
+            enable_frame_sync: false
+            # If true, Overlay display of color image and depth image after D2C processing will be enabled
+            enable_d2c_viewer: false
+            # If false, the hardware time will not be used
+            use_hardware_time: false
+            # If false, the host time will not be synchronized with the device time
+            enable_sync_host_time: false
+
+            device_sync:
+                # Device synchronization mode. supports: {1.FREE_RUN 2.STANDALONE 3.PRIMARY 4.SECONDARY 5.SECONDARY_SYNCED 6.SOFTWARE_TRIGGERING 7.HARDWARE_TRIGGERING}.
+                # For details, Please refer to the OBMultiDeviceSyncMode-related comments in SDK/include/libobsensor/ObTypes.h for a detailed explanation of each mode.
+                sync_mode: "STANDALONE"
+                # The delay time of the depth image capture after receiving the capture command or trigger signal in microseconds.
+                # For details, Please refer to the OBMultiDeviceSyncConfig-related comments in SDK/include/libobsensor/ObTypes.h
+                depth_delay_us: 0
+                # The delay time of the color image capture after receiving the capture command or trigger signal in microseconds.
+                color_delay_us: 0
+                # The delay time of the image capture after receiving the capture command or trigger signal in microseconds.
+                trigger2image_delay_us: 0
+                # Trigger signal output enable flag.
+                trigger_out_enabled: true
+                # The delay time of the trigger signal output after receiving the capture command or trigger signal in microseconds.
+                trigger_out_delay_us: 0
+                # The frame number of each stream after each trigger in triggering mode.
+                frames_per_trigger: 2
+                # software trigger period in ms
+                software_trigger_period: 33

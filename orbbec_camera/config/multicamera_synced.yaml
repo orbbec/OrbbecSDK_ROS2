@@ -1,0 +1,40 @@
+# config/*.yaml files are used to configure the camera parameters
+---
+orbbec_ros:
+    multi_camera_parameters:
+
+        launch_device_camera1:
+            config_file_path: "multicamera_test/gemini330_series_sync_front_camera.yaml"
+            # default period 0.0; unit: second
+            period: 3.0
+            camera_name: "front_camera"
+            usb_port: "2-5"
+            device_num: "3"
+            sync_mode: "hardware_triggering"
+
+        launch_device_camera2:
+            config_file_path: "multicamera_test/gemini330_series_sync_left_camera.yaml"
+            # default period 0.0; unit: second
+            period: 0.0
+            camera_name: "left_camera"
+            usb_port: "2-1"
+            device_num: "3"
+            sync_mode: "hardware_triggering"
+
+        launch_device_camera3:
+            config_file_path: "multicamera_test/gemini330_series_sync_rear_camera.yaml"
+            # default period 0.0; unit: second
+            period: 0.0
+            camera_name: "rear_camera"
+            usb_port: "2-3"
+            device_num: "3"
+            sync_mode: "hardware_triggering"
+
+        launch_device_camera4:
+            config_file_path: "multicamera_test/gemini330_series_sync_right_camera.yaml"
+            # default period 0.0; unit: second
+            period: 0.0
+            camera_name: "right_camera"
+            usb_port: "2-7"
+            device_num: "3"
+            sync_mode: "hardware_triggering"

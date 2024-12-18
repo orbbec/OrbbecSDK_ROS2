@@ -1,0 +1,436 @@
+# config/*.yaml files are used to configure the camera parameters
+---
+orbbec_ros:
+    camera_parameters:
+        general:
+            # Camera model. upport product models by referencing config/*.yaml
+            camera_model: "gemini330_series"
+            # The configuration file for yaml params.
+            config_file_path: "gemini330_series.yaml" #Time domain.
+            time_domain: "device"
+            # Log level. Supported levels are 'debug', 'info', 'warning' and 'error'. Default is 'none'.
+            log_level: "none"
+
+        deivce:
+            # camera name, usually overwritten by launch file
+            camera_name: "camera"
+            # camera serial number, usually overwritten by launch file
+            serial_number: ""
+            # The USB port of the camera. This parameter is required when using multiple cameras.
+            usb_port: ""
+            # Number of devices. If multiple cameras are required, this parameter must be filled in launch file
+            device_num: 1
+            # Usually no need to change
+            vendor_id: "0x2bc5"
+            # Usually no need to change,will be read from the device
+            product_id: ""
+            # The delay time for reopening the device, in milliseconds. Usually, there is no need to modify by default.
+            connection_delay: 10
+            # If the camera is connected to a USB 2.0 port and is not detected, the system will attempt to reset the camera up to three times. This setting is designed to prevent USB 3.0 devices from being mistakenly identified as USB 2.0.
+            # It is recommended to set this parameter to false when using a USB 2.0 connection to avoid unnecessary resets
+            retry_on_usb3_detection_failure: false
+            # If true, the heartbeat will be enabled
+            enable_heartbeat: false
+            # If true, the camera will be reset
+            enable_hardware_reset: false
+            # If true, the LDP will be enabled
+            enable_ldp: true
+            # The preset of the device. #For details, Please refer to the comments in SDK/include/libobsensor/Advanced.h for a detailed explanation
+            # Predefined presets doc reference: docs/source/2_installation/package_description.md
+            # Deep working mode support is as follows:{"Default","Hand","High Accuracy","High Density","Medium Density","Custom"}
+            device_preset: "Default"
+
+            network_device:
+                # Whether to enable the function of enumerating network devices. True means enabled and false means disabled. This function is only supported by Femto Mega and Gemini 2 XL devices.
+                # When accessing these devices through the network, the IP address of the device needs to be preconfigured. The enable switch needs to be set to true.
+                enumerate_net_device: false
+                # Port number of the network device. If 0, a random port will be used
+                net_device_port: 0
+                # IP address of the network device.
+                net_device_ip: ""
+
+        color:
+            # If true, the color image will be enabled
+            enable_color: true
+            # Quality of Service for the color image topic and the color camera info topic
+            # [color|depth|ir]_qos, and [color|depth|ir]_camera_info_qos and [point_cloud_qos] are the Quality of Service (QoS) settings in ROS 2 messages.
+            # The possible values include SYSTEM_DEFAULT, DEFAULT, PARAMETER_EVENTS, SERVICES_DEFAULT, PARAMETERS, and SENSOR_DATA, and these values are not case-sensitive.
+            # They respectively correspond to rmw_qos_profile_system_default, rmw_qos_profile_default, rmw_qos_profile_parameter_events, rmw_qos_profile_services_default, rmw_qos_profile_parameters, and SENSOR_DATA.
+            color_qos: "default"
+            color_camera_info_qos: "default"
+            # Width of the color image. If 0, the default width will be used
+            color_width: 0
+            # Height of the color image. If 0, the default height will be used
+            color_height: 0
+            # Fps of the color image. If 0, the default FPS will be used
+            color_fps: 0
+            # default Format of the color image.
+            color_format: "MJPG"
+            # If true, the color image will be flipped horizontally
+            flip_color: false
+
+            # If true, the color image will be undistorted
+            enable_color_undistortion: false
+            # enable auto white balance for the color image
+            enable_color_auto_white_balance: true
+            # Manual set white balance value for the color image. If -1, note:enable_color_auto_white_balance: false
+            color_white_balance: -1
+
+            # Auto exposure enable & configuration
+            color_auto_ae:
+                # enable auto exposure for the color image
+                enable_color_auto_exposure: true
+                # left edge of the auto exposure region of interest. If -1, the default value will be used
+                color_ae_roi_left: -1
+                # top edge of the auto exposure region of interest. If -1, the default value will be used
+                color_ae_roi_top: -1
+                # right edge of the auto exposure region of interest. If -1, the default value will be used
+                color_ae_roi_right: -1
+                # bottom edge of the auto exposure region of interest. If -1, the default value will be used
+                color_ae_roi_bottom: -1
+
+            # Manual exposure must set enable_color_auto_exposure: false
+            color_manual_ae:
+                # exposure value for the color image. If -1, the default exposure will be used
+                color_exposure: -1
+                # maximum exposure value for the color image. If -1, the default value will be used
+                color_ae_max_exposure: -1
+                # gain value for the color image. If -1, the default gain will be used
+                color_gain: -1
+                # brightness value for the color image. If -1, the default brightness will be used
+                color_brightness: -1
+
+        depth:
+            # If true, the depth image will be enabled
+            enable_depth: true
+            # Quality of Service for the depth image topic and the depth camera info topic
+            # [color|depth|ir]_qos, and [color|depth|ir]_camera_info_qos and [point_cloud_qos] are the Quality of Service (QoS) settings in ROS 2 messages.
+            # The possible values include SYSTEM_DEFAULT, DEFAULT, PARAMETER_EVENTS, SERVICES_DEFAULT, PARAMETERS, and SENSOR_DATA, and these values are not case-sensitive.
+            # They respectively correspond to rmw_qos_profile_system_default, rmw_qos_profile_default, rmw_qos_profile_parameter_events, rmw_qos_profile_services_default, rmw_qos_profile_parameters, and SENSOR_DATA.
+            depth_qos: "default"
+            depth_camera_info_qos: "default"
+            # Width of the depth image. If 0, the default width will be used
+            depth_width: 0
+            # Height of the depth image. If 0, the default height will be used
+            depth_height: 0
+            # Fps of the depth image. If 0, the default FPS will be used
+            depth_fps: 0
+            # default Format of the depth image.
+            depth_format: "Y16"
+            # If true, the depth image will be flipped horizontally
+            flip_depth: false
+            # If false, the depth scale will not be enabled
+            enable_depth_scale: true
+            # Depth accuracy, the format should be 1mm. The default value is 1mm.
+            depth_precision: ""
+
+            # D2C Depth registration mode.
+            # Enables hardware that aligns depth frames to color frames. This field is required when setting enable_colored_point_cloud to true
+            depth_registration: true
+            # The alignment mode to be used. Options are "HW" for hardware alignment and "SW" for software alignment
+            align_mode: "SW"
+
+            # Gemini 2, Gemini 2 L, and Gemini 2 XL cameras support deep working mode switching
+            # Specific camera deep working mode support types can be found in the deep mode comments.
+            # Deep working mode support is as follows:{"Unbinned Dense Default","Unbinned Sparse Default","Binned Sparse Default","Obstacle Avoidance"}
+            # Depth work mode. #For details, Please refer to the comments in SDK/include/libobsensor/Advanced.h for a detailed explanation.
+            depth_work_mode: ""
+
+            # Configure the loading path of the deep filtering configuration file. By default, the deep filtering configuration file is located in the /config/depthfilter directory and is only supported by Gemini2.
+            depth_filter_config: ""
+
+            # Auto exposure region of interest left. If -1, the default value will be used
+            depth_ae_roi:
+                depth_ae_roi_left: -1
+                # Auto exposure region of interest top. If -1, the default value will be used
+                depth_ae_roi_top: -1
+                # Auto exposure region of interest right. If -1, the default value will be used
+                depth_ae_roi_right: -1
+                # Auto exposure region of interest bottom. If -1, the default value will be used
+                depth_ae_roi_bottom: -1
+
+            laser:
+                # Whether to enable the laser. Default value is true
+                enable_laser: false
+                # Laser Switch Alternate Mode, 0: Off, 1: On-Off Alternate, 2: Off-On Alternate. Default value is 0.
+                laser_on_off_mode: 0
+                # Laser energy level. If -1, the default energy level will be used
+                laser_energy_level: -1
+
+            filter:
+                # This filtering effectively reduces the complexity of the depth scene. The filtering operates with kernel sizes ranging from [2x2] to [8x8] pixels.
+                # The image size is proportionally reduced in both dimensions to maintain the aspect ratio.
+                decimation_filter:
+                    # If true, the decimation filter will be enabled
+                    enable_decimation_filter: false
+                    # Decimation filter scale. If -1, the default scale will be used
+                    decimation_filter_scale_: -1
+
+                # This filtering removes speckle noise in the form of clusters and produces a depth map with less filling.
+                noise_removal_filter:
+                    # If true, the noise removal filter will be enabled
+                    enable_noise_removal_filter: true
+                    # Noise removal filter min diff.
+                    noise_removal_filter_min_diff: 256
+                    # Noise removal filter max size
+                    noise_removal_filter_max_size: 80
+
+                # This filter retains depth values of interest and ignores depth values that are out of range.
+                threshold_filter:
+                    # If true, the threshold filter will be enabled
+                    enable_threshold_filter: false
+                    # Threshold filter max. If -1, the default max will be used
+                    threshold_filter_max: -1
+                    # Threshold filter min. If -1, the default min will be used
+                    threshold_filter_min: -1
+
+                # This filtering process, specified by multiple iterations according to the amplitude parameter, is used to enhance the smoothness of depth data.
+                # It can also fill small holes in the depth map.
+                spatial_filter:
+                    # -enable_spatial_filter
+                    enable_spatial_filter: false
+                    # Spatial filter alpha. If -1, the default alpha will be used
+                    spatial_filter_alpha: -1
+                    # Spatial filter diff threshold. If -1, the default threshold will be used
+                    spatial_filter_diff_threshold: -1
+                    # Spatial filter magnitude. If -1, the default magnitude will be used
+                    spatial_filter_magnitude: -1
+                    # Spatial filter radius. If -1, the default radius will be used
+                    spatial_filter_radius: -1
+
+                # This filtering aims to improve the persistence of depth data by manipulating per-pixel values based on previous frames. The filtering performs a single processing on the data,
+                # adjusting depth values while updating tracking history.
+                temporal_filter:
+                    # -enable_temporal_filter
+                    enable_temporal_filter: false
+                    # Temporal filter diff threshold. If -1, the default threshold will be used
+                    temporal_filter_diff_threshold: -1
+                    # Temporal filter weight. If -1, the default weight will be used
+                    temporal_filter_weight: -1
+
+                # This filter fills all holes in the depth map using the specified mode.
+                hole_filling_filter:
+                    # -enable_hole_filling_filter
+                    enable_hole_filling_filter: false
+                    # Hole filling filter mode. If empty, the default mode will be used
+                    hole_filling_filter_mode: ""
+
+                soft_filter:
+                    # If false, the soft filter will not be enabled
+                    enable_soft_filter: true
+                    # The maximum difference between the current and previous depth frame to be considered valid
+                    soft_filter_max_diff: -1
+                    # The size of the speckle to be filtered out
+                    soft_filter_speckle_size: -1
+
+                # This filtering is used in conjunction with the deep HDR function and only outputs sequences with the specified sequence ID.
+                sequence_filter:
+                    # If true, the sequence ID filter will be enabled
+                    enable_sequence_id_filter: false
+                    # Sequence ID filter ID. If -1, the default ID will be used
+                    sequence_id_filter_id: -1
+
+                # This filtering is used in conjunction with the deep HDR function. By merging consecutive depth images with alternating exposure values,
+                # we can simultaneously overcome the challenges of obtaining depth values for low-light and over-illuminated objects.
+                hdr_filter:
+                    # If true, the HDR merge filter will be enabled
+                    enable_hdr_merge: false
+                    # HDR merge exposure1, If -1, the default value will be used
+                    hdr_merge_exposure_1: -1
+                    # HDR merge gain1, If -1, the default value will be used
+                    hdr_merge_gain_1: -1
+                    # HDR merge exposure2, If -1, the default value will be used
+                    hdr_merge_exposure_2: -1
+                    # HDR merge gain2, If -1, the default value will be used
+                    hdr_merge_gain_2: -1
+
+        leftir:
+            # If false, the left IR image will not be enabled
+            enable_left_ir: false
+            # Quality of Service for the left IR image topic and the left IR camera info topic
+            # [color|depth|ir]_qos, and [color|depth|ir]_camera_info_qos and [point_cloud_qos] are the Quality of Service (QoS) settings in ROS 2 messages.
+            # The possible values include SYSTEM_DEFAULT, DEFAULT, PARAMETER_EVENTS, SERVICES_DEFAULT, PARAMETERS, and SENSOR_DATA, and these values are not case-sensitive.
+            # They respectively correspond to rmw_qos_profile_system_default, rmw_qos_profile_default, rmw_qos_profile_parameter_events, rmw_qos_profile_services_default, rmw_qos_profile_parameters, and SENSOR_DATA.
+            left_ir_qos: "default"
+            left_ir_camera_info_qos: "default"
+            # Width of the left IR image. If 0, the default width will be used
+            left_ir_width: 0
+            # Height of the left IR image. If 0, the default height will be used
+            left_ir_height: 0
+            # Fps of the left IR image. If 0, the default FPS will be used
+            left_ir_fps: 0
+            # Format of the left IR image. Supported formats are 'Y8'
+            left_ir_format: "Y8"
+
+        rightir:
+            # If false, the right IR image will not be enabled
+            enable_right_ir: false
+            # Quality of Service for the right IR image topic and the right IR camera info topic
+            # [color|depth|ir]_qos, and [color|depth|ir]_camera_info_qos and [point_cloud_qos] are the Quality of Service (QoS) settings in ROS 2 messages.
+            # The possible values include SYSTEM_DEFAULT, DEFAULT, PARAMETER_EVENTS, SERVICES_DEFAULT, PARAMETERS, and SENSOR_DATA, and these values are not case-sensitive.
+            # They respectively correspond to rmw_qos_profile_system_default, rmw_qos_profile_default, rmw_qos_profile_parameter_events, rmw_qos_profile_services_default, rmw_qos_profile_parameters, and SENSOR_DATA.
+            right_ir_qos: "default"
+            right_ir_camera_info_qos: "default"
+            # Width of the right IR image. If 0, the default width will be used
+            right_ir_width: 0
+            # Height of the right IR image. If 0, the default height will be used
+            right_ir_height: 0
+            # Fps of the right IR image. If 0, the default FPS will be used
+            right_ir_fps: 0
+            # Format of the right IR image. Supported formats are 'Y8'
+            right_ir_format: "Y8"
+
+        ir:
+            # If false, the left IR image will not be enabled
+            enable_ir: false
+            # Quality of Service for the IR image topic and the IR camera info topic
+            # [color|depth|ir]_qos, and [color|depth|ir]_camera_info_qos and [point_cloud_qos] are the Quality of Service (QoS) settings in ROS 2 messages.
+            # The possible values include SYSTEM_DEFAULT, DEFAULT, PARAMETER_EVENTS, SERVICES_DEFAULT, PARAMETERS, and SENSOR_DATA, and these values are not case-sensitive.
+            # They respectively correspond to rmw_qos_profile_system_default, rmw_qos_profile_default, rmw_qos_profile_parameter_events, rmw_qos_profile_services_default, rmw_qos_profile_parameters, and SENSOR_DATA.
+            ir_qos: "default"
+            ir_camera_info_qos: "default"
+            # Width of the IR image. If 0, the default width will be used
+            ir_width: 0
+            # Height of the IR image. If 0, the default height will be used
+            ir_height: 0
+            # Fps of the IR image. If 0, the default FPS will be used
+            ir_fps: 0
+            # Format of the IR image. Supported formats are 'Y8'
+            ir_format: "Y8"
+
+        ir_parameters:
+            # If false, the IR image auto exposure will not be enabled
+            enable_ir_auto_exposure: true
+            # Exposure time of the IR image. If -1, auto exposure will be used
+            ir_exposure: -1
+            # Gain of the IR image. If -1, auto gain will be used
+            ir_gain: -1
+            # Maximum exposure time of the IR image
+            ir_ae_max_exposure: 10000
+            # ir_brightness, if -1, auto brightness will be used
+            ir_brightness: -1
+            # If true, the left IR image will be flipped horizontally
+            flip_ir: false
+
+        imu:
+            # If true, the IMU accelerometer data will be enabled
+            enable_accel: false
+            # The frequency of the accelerometer can be selected as 1.5625Hz, 3.125Hz, 6.25Hz, 12.5Hz, 25Hz, 50Hz, 100Hz, 200Hz, 500Hz, 1kHz, 2kHz, 4kHz, 8kHz, 16kHz, 32kHz.
+            # The specific value depends on the current camera.
+            accel_rate: "200hz"
+            # The range of the accelerometer, the optional values are 2g, 4g, 8g, 16g. The specific value depends on the current camera.
+            accel_range: "4g"
+            # If true, the IMU gyroscope data will be enabled
+            enable_gyro: false
+            # The frequency of the gyroscope can be selected as 1.5625hz, 3.125hz, 6.25hz, 12.5hz, 25hz, 50hz, 100hz, 200hz, 500hz, 1kHz, 2kHz, 4kHz, 8kHz, 16kHz, 32kHz.
+            # The specific value depends on the current camera.
+            gyro_rate: "200hz"
+            # The range of the gyroscope, the optional values are 16dps, 31dps, 62dps, 125dps, 250dps, 500dps, 1000dps, 2000dps. The specific value depends on the current camera.
+            gyro_range: "1000dps"
+            # enable_sync_output_accel_gyro
+            enable_sync_output_accel_gyro: false
+            # Covariance of the linear acceleration
+            liner_accel_cov: 0.01
+            # Covariance of the angular velocity
+            angular_vel_cov: 0.01
+
+        point_cloud:
+            # enable point cloud. {fase:disable, true:enable}
+            enable_point_cloud: false
+            # enable RGBD point cloud. {fase:disable, true:enable}
+            enable_colored_point_cloud: false
+            # Quality of Service for the point cloud topic
+            point_cloud_qos: "default"
+            # Support modifying the frame_id name within the ros message, with the depth name used by default.
+            cloud_frame_id: ""
+            # If true, enable filtering of invalid point clouds, i.e., filtering point cloud data with Z=0
+            ordered_pc: false
+
+        tf:
+            # If true, the TF will be enabled
+            publish_tf: true
+            # Rate of the TF publication
+            tf_publish_rate: 0.0
+
+        advanced:
+            # If true, the extrinsics publish will be enabled
+            enable_publish_extrinsic: false
+            # If true, the frame synchronization will be enabled
+            enable_frame_sync: true
+            # Publish D2C superimposed image (only for testing).
+            enable_d2c_viewer: false
+            # If false, the hardware time will not be used, true:devicetime, false:systemtime
+            use_hardware_time: false
+            # If false, the host time will not be synchronized with the device time
+            enable_sync_host_time: false
+            # URL of the IR image info
+            ir_info_url: ""
+            # URL of the color image info
+            color_info_url: ""
+            # If true, the 3D reconstruction mode will be enabled
+            enable_3d_reconstruction_mode: false
+            # Diagnostic period in seconds
+            diagnostic_period: 1.0
+
+            device_sync:
+                # Device synchronization mode. supports: {1.FREE_RUN 2.STANDALONE 3.PRIMARY 4.SECONDARY 5.SECONDARY_SYNCED 6.SOFTWARE_TRIGGERING 7.HARDWARE_TRIGGERING}.
+                # For details, Please refer to the OBMultiDeviceSyncMode-related comments in SDK/include/libobsensor/ObTypes.h for a detailed explanation of each mode.
+                sync_mode: "STANDALONE"
+                # The delay time of the depth image capture after receiving the capture command or trigger signal in microseconds.
+                # For details, Please refer to the OBMultiDeviceSyncConfig-related comments in SDK/include/libobsensor/ObTypes.h
+                depth_delay_us: 0
+                # The delay time of the color image capture after receiving the capture command or trigger signal in microseconds.
+                color_delay_us: 0
+                # The delay time of the image capture after receiving the capture command or trigger signal in microseconds.
+                trigger2image_delay_us: 0
+                # Trigger signal output enable flag.
+                trigger_out_enabled: true
+                # The delay time of the trigger signal output after receiving the capture command or trigger signal in microseconds.
+                trigger_out_delay_us: 0
+                # The frame number of each stream after each trigger in triggering mode.
+                frames_per_trigger: 2
+                # software trigger period in ms
+                software_trigger_period: 33
+
+            gmsldevice_trigger:
+                enable_gmsl_trigger: false
+                gmsl_trigger_fps: 3000
+
+            # config for interleave mode。
+            # interleave_ae_mode is currently supported by the gemini330 series,
+            # and specific products can be checked for support of interleave_ae_mode by referring to the product manual.
+            interleave_ae_mode:
+                # 'hdr' or 'laser'
+                interleave_ae_mode: "laser"
+                #enable interleave frame
+                interleave_frame_enable: false
+
+                interleave_skip:
+                    #enable interleave skip
+                    interleave_skip_enable: false
+                    # 0:skip pattern ir  1: skip flood ir
+                    interleave_skip_index: 1
+
+                interleave_hdr_param:
+                    hdr_index1_laser_control: 1
+                    hdr_index1_depth_exposure: 1
+                    hdr_index1_depth_gain: 16
+                    hdr_index1_ir_brightness: 20
+                    hdr_index1_ir_ae_max_exposure: 2000
+                    hdr_index0_laser_control: 1
+                    hdr_index0_depth_exposure: 7500
+                    hdr_index0_depth_gain: 16
+                    hdr_index0_ir_brightness: 60
+                    hdr_index0_ir_ae_max_exposure: 10000
+
+                interleave_laser_param:
+                    laser_index1_laser_control: 0
+                    laser_index1_depth_exposure: 3000
+                    laser_index1_depth_gain: 16
+                    laser_index1_ir_brightness: 60
+                    laser_index1_ir_ae_max_exposure: 17000
+                    laser_index0_laser_control: 1
+                    laser_index0_depth_exposure: 3000
+                    laser_index0_depth_gain: 16
+                    laser_index0_ir_brightness: 60
+                    laser_index0_ir_ae_max_exposure: 30000

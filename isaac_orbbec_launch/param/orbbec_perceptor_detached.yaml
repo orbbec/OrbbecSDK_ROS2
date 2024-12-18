@@ -1,0 +1,101 @@
+nvblox_config:
+  container_name: 'nvblox_container'
+  attach_to_container: false
+  # container_name: 'shared_orbbec_container'
+  # attach_to_container: true
+  node_name: 'nvblox_node'
+  remappings:
+    - depth:
+        image: '/front_camera/depth/image_raw'
+        info: '/front_camera/depth/camera_info'
+      color:
+        image: '/front_camera/color/image_raw'
+        info: '/front_camera/color/camera_info'
+    - depth:
+        image: '/left_camera/depth/image_raw'
+        info: '/left_camera/depth/camera_info'
+      color:
+        image: '/left_camera/color/image_raw'
+        info: '/left_camera/color/camera_info'
+    - depth:
+        image: '/right_camera/depth/image_raw'
+        info: '/right_camera/depth/camera_info'
+      color:
+        image: '/right_camera/color/image_raw'
+        info: '/right_camera/color/camera_info'
+    - depth:
+        image: '/rear_camera/depth/image_raw'
+        info: '/rear_camera/depth/camera_info'
+      color:
+        image: '/rear_camera/color/image_raw'
+        info: '/rear_camera/color/camera_info'
+  config_files:
+    - package: 'isaac_ros_perceptor_bringup'
+      path: 'params/default_nvblox_config.yaml'
+  parameters:
+    - use_lidar: false
+    - input_qos: "SENSOR_DATA"
+    - map_clearing_frame_id: "camera_link"
+    - static_mapper:
+        esdf_slice_height: 0.0
+        esdf_slice_min_height: 0.09
+        esdf_slice_max_height: 0.65
+    - dynamic_mapper:
+        esdf_slice_height: 0.0
+        esdf_slice_min_height: 0.09
+        esdf_slice_max_height: 0.65
+
+cuvslam_config:
+  container_name: 'cuvslam_container'
+  attach_to_container: false
+  # container_name: 'shared_orbbec_container'
+  # attach_to_container: true
+  node_name: 'cuvslam_node'
+  remappings:
+    stereo_images:
+      - left:
+          image: '/front_camera/left_ir/image_raw'
+          info: '/front_camera/left_ir/camera_info'
+          optical_frame: 'front_camera_left_ir_optical_frame'
+        right:
+          image: '/front_camera/right_ir/image_raw'
+          info: '/front_camera/right_ir/camera_info'
+          optical_frame: 'front_camera_right_ir_optical_frame'
+      - left:
+          image: '/rear_camera/left_ir/image_raw'
+          info: '/rear_camera/left_ir/camera_info'
+          optical_frame: 'rear_camera_left_ir_optical_frame'
+        right:
+          image: '/rear_camera/right_ir/image_raw'
+          info: '/rear_camera/right_ir/camera_info'
+          optical_frame: 'rear_camera_right_ir_optical_frame'
+      - left:
+          image: '/left_camera/left_ir/image_raw'
+          info: '/left_camera/left_ir/camera_info'
+          optical_frame: 'left_camera_left_ir_optical_frame'
+        right:
+          image: '/left_camera/right_ir/image_raw'
+          info: '/left_camera/right_ir/camera_info'
+          optical_frame: 'left_camera_right_ir_optical_frame'
+      - left:
+          image: '/right_camera/left_ir/image_raw'
+          info: '/right_camera/left_ir/camera_info'
+          optical_frame: 'right_camera_left_ir_optical_frame'
+        right:
+          image: '/right_camera/right_ir/image_raw'
+          info: '/right_camera/right_ir/camera_info'
+          optical_frame: 'right_camera_right_ir_optical_frame'
+  config_files:
+    - package: 'isaac_ros_perceptor_bringup'
+      path: 'params/default_cuvslam_config.yaml'
+  parameters:
+    - image_jitter_threshold_ms: 67.0
+    - input_qos: "SENSOR_DATA"
+
+common_config:
+  map_frame: 'map'
+  odom_frame: 'odom'
+  robot_frame: 'base_link'
+
+extra_topics:
+  - '/tf_static'

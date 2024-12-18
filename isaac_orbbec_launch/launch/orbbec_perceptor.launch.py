@@ -15,7 +15,7 @@ def generate_launch_description():
     perceptor_bringup_dir = get_package_share_directory('isaac_ros_perceptor_bringup')
 
     perceptor_config_file = DeclareLaunchArgument(
-        'perceptor_config_file', default_value='params/orbbec_perceptor_detached.yaml',
+        'perceptor_config_file', default_value='param/orbbec_perceptor_detached.yaml',
         description="Perceptor configuration")
     from_bag_arg = DeclareLaunchArgument(
         'from_bag', default_value='False',

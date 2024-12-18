@@ -236,7 +236,7 @@ class MultiCameraSubscriber : public rclcpp::Node {
       std::string ir_filename = folder + "/ir#left_SN" + serial_index + "_Index" +
                                 std::to_string(usb_index) + time_domain_ +
                                 ir_current_timestamps[i] + "_f" + std::to_string(i) + "_s" +
-                                ir_timestamps[i] + "_e" + left_ir_meta_exposure[i] + "_g" +
+                                ir_timestamps[i] + "_e" + left_ir_meta_exposure[i] + "_d" +
                                 left_ir_meta_gain[i] + "_.jpg";
       if (ir_images[i].empty()) {
         RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_camera_subscriber"), "over ");
@@ -247,7 +247,7 @@ class MultiCameraSubscriber : public rclcpp::Node {
       std::string color_filename =
           folder + "/color_SN" + serial_index + "_Index" + std::to_string(usb_index) +
           time_domain_ + color_current_timestamps[i] + "_f" + std::to_string(i) + "_s" +
-          color_timestamps[i] + "_e" + color_meta_exposure[i] + "_g" + color_meta_gain[i] + "_.jpg";
+          color_timestamps[i] + "_e" + color_meta_exposure[i] + "_d" + color_meta_gain[i] + "_.jpg";
       if (color_images[i].empty()) {
         continue;
       }

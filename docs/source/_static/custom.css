@@ -1,0 +1,135 @@
+/* 让表格自动拉伸到满宽度 */
+table {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* 让表格中的每个 <th> 和 <td> 也自动拉伸 */
+th,
+td {
+    width: auto;
+}
+
+ul {
+    width: 100%;
+    /* 列表宽度占满整个容器 */
+    }
+
+
+/* 修改 Sphinx  Theme 项目标题的字体大小  Book和rtd 均OK */
+.wy-side-nav-search>a {
+    font-size: 16px;
+}
+
+/* 修改项目标题的字体大小 Book和rtd 均OK*/
+.wy-side-nav-search>div.version {
+    font-size: 16px;
+}
+
+
+.sidebar-logo {
+    width: 500px;
+    /* 或者使用百分比 */
+    height: auto;
+    max-width: 90%;
+        max-height: 90%;
+}
+
+
+.sidebar-content {
+    line-height: 1.0;
+    /* 行间距是字体大小的1.5倍 */
+}
+
+.sidebar {
+    padding: 20px;
+    /* 内边距 */
+    margin-bottom: 20px;
+    /* 外边距 */
+}
+
+.sidebar-text {
+    font-size: 30px;
+}
+/* 修改侧边栏的背景颜色 */
+.wy-nav-side {
+    background-color: #cecece !important;
+}
+
+/* 针对导航栏链接的选择器 */
+.wy-nav-side a {
+    color: #000000;
+    /* 修改为您需要的颜色 */
+}
+
+/* 鼠标悬停位置 hover 和 激活位置active 状态的样式 */
+/* .wy-nav-side a:hover {
+    background-color: #ebebeb !important;
+    } */
+
+/* .wy-nav-side .current li.toctree-l1 a:hover,
+.wy-nav-side .current li.toctree-l2 a:hover,
+.wy-nav-side .current li.toctree-l3 a:hover {
+    background-color: #ebebeb !important;
+    color: #108bf0 !important;
+        font-weight: bold !important;
+} */
+.wy-nav-side .current li[class^="toctree-l"] a:hover {
+    background-color: #ebebeb !important;
+    color: #108bf0 !important;
+        font-weight: bold !important;
+    }
+
+                /* .wy-nav-side .current li[class^="toctree-l"] a:active {
+        background-color: #ffffff !important;
+        color: #108bf0 !important;
+        font-weight: bold !important;
+}
+
+*/
+/* 当前活动项的颜色 */
+.wy-nav-side .current>a {
+    color: #108bf0 !important;
+    font-weight: bold !important;
+}
+
+
+h1.wy-banner-title {
+    color: #0267da !important;
+}
+
+/* 如果也需要修改小标题 */
+h2.wy-banner-subtitle {
+    color: #7b7b7b !important;
+}
+
+.wy-side-nav-search>a {
+    color: #ffffff !important;
+}
+
+/* 调整最大宽度  OK */
+.wy-nav-content {
+    max-width: 1100px;
+    }
+
+
+/* 设置选中标题的背景色 */
+.wy-menu-vertical li.current>a {
+    background-color: #e9e9e9 !important;
+    /* 你可以选择任何颜色 */
+    color: #ffffff;
+    /* 可选：设置选中标题的文本颜色 */
+}
+
+/* 设置选中标题下所有子标题（包括二级和三级）的背景色 */
+/* .wy-menu-vertical li.current ul li a,
+.wy-menu-vertical li.current li.current ul li a {
+    background-color: #ffffff !important;
+} */
+.wy-menu-vertical li.toctree-l1.current>ul li.toctree-l2>a,
+.wy-menu-vertical li.toctree-l2.current>ul li.toctree-l3>a,
+.wy-menu-vertical li.toctree-l3.current>ul li.toctree-l4>a {
+    background-color: #ffffff ;
+
+}

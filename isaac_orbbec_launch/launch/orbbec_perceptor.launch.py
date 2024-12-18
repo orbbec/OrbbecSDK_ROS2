@@ -12,11 +12,22 @@ from launch.actions import GroupAction
 
 def generate_launch_description():
     orbbec_camera_bringup_dir = get_package_share_directory('orbbec_camera')
+    isaac_orbbec_launch_dir = get_package_share_directory('isaac_orbbec_launch')
     perceptor_bringup_dir = get_package_share_directory('isaac_ros_perceptor_bringup')
 
-    perceptor_config_file = DeclareLaunchArgument(
-        'perceptor_config_file', default_value='param/orbbec_perceptor_detached.yaml',
+    default_perceptor_config_file = os.path.join(isaac_orbbec_launch_dir, 'param', 'orbbec_perceptor_detached.yaml')
+    perceptor_odom_rviz_file = os.path.join(isaac_orbbec_launch_dir, 'param', 'perceptor_odom.rviz')
+    default_dev_matrices_file = os.path.join(isaac_orbbec_launch_dir, 'config', 'matrices_SN1423724335594.yaml')
+
+    perceptor_config_file_arg = DeclareLaunchArgument(
+        'perceptor_config_file', default_value=default_perceptor_config_file,
         description="Perceptor configuration")
+    perceptor_odom_rviz_file_arg = DeclareLaunchArgument(
+        'perceptor_odom_rviz_file', default_value=perceptor_odom_rviz_file,
+        description="Perceptor configuration")
+    dev_matrices_arg = DeclareLaunchArgument(
+        'dev_matrices', default_value=default_dev_matrices_file,
+        description='default device extrinsics matrices')
     from_bag_arg = DeclareLaunchArgument(
         'from_bag', default_value='False',
         description='Whether to run from a bag or live realsense data')
@@ -39,6 +50,22 @@ def generate_launch_description():
             'component_container_name': component_container_name_arg}.items(),
         condition=UnlessCondition(LaunchConfiguration('from_bag')))
 
+    dev_matrices_arg = DeclareLaunchArgument(
+        'dev_matrices', default_value=default_dev_matrices_file,
+        description='default device extrinsics matrices')
+    base_static_transforms_publisher = ExecuteProcess(
+        cmd=[
+            'python3',
+            os.path.join(
+                get_package_share_directory('isaac_orbbec_launch'),  # Adjust this package name
+                'launch',
+                'base_static_transforms_publisher.py'
+            ),
+            '--dev_matrices', LaunchConfiguration('dev_matrices')
+        ],
+        output='screen'
+    )
+
     perceptor_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
             perceptor_bringup_dir, 'launch', 'rgbd_perceptor.launch.py')]),
@@ -58,13 +85,25 @@ def generate_launch_description():
         output='screen',
         condition=IfCondition(LaunchConfiguration('from_bag')))
 
+    rviz2_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='screen',
+        arguments=['-d', LaunchConfiguration('perceptor_odom_rviz_file')]
+    )
+
     return LaunchDescription([
-        perceptor_config_file,
+        perceptor_config_file_arg,
+        perceptor_odom_rviz_file_arg,
+        dev_matrices_arg,
         from_bag_arg,
         bag_path_arg,
         shared_orbbec_container,
         orbbec_launch,
+        base_static_transforms_publisher,
         perceptor_launch,
         bag_play,
+        rviz2_node,
       ]
     )

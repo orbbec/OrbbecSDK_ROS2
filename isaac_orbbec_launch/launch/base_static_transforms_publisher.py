@@ -7,6 +7,7 @@ import yaml
 from scipy.spatial.transform import Rotation as R
 import sys
 import os
+import argparse
 
 def rotation_matrix_to_quaternion(rotation_matrix):
     r = R.from_matrix(rotation_matrix)
@@ -87,7 +88,16 @@ def main():
         print("Usage: python static_transforms_publisher.py <path_to_yaml>")
         sys.exit(1)
 
-    yaml_path = sys.argv[1]
+    # yaml_path = sys.argv[1]
+    parser = argparse.ArgumentParser(description="Base Static Transforms Publisher")
+    parser.add_argument('--dev_matrices', type=str, required=True,
+                        help="Path to the device extrinsics matrices file")
+
+    args = parser.parse_args()
+    yaml_path = args.dev_matrices
+
+    # Use the dev_matrices argument
+    print(f"Using device matrices file: {args.dev_matrices}")
 
     rclpy.init()
     node = StaticTransformsPublisher(yaml_path)

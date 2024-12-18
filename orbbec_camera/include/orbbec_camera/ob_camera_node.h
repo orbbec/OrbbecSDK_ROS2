@@ -576,7 +576,6 @@ class OBCameraNode {
   std::unique_ptr<diagnostic_updater::Updater> diagnostic_updater_ = nullptr;
   double diagnostic_period_ = 1.0;
   bool enable_laser_ = false;
-  int laser_on_off_mode_ = 0;
   std::unique_ptr<ob::Align> align_filter_ = nullptr;
   OBStreamType align_target_stream_ = OB_STREAM_COLOR;
   bool retry_on_usb3_detection_failure_ = false;

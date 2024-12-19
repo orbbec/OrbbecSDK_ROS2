@@ -2007,8 +2007,8 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   if (image.empty() || image.cols != width || image.rows != height) {
     image.create(height, width, image_format_[stream_index]);
   }
-  if (frame->type() == OB_FRAME_COLOR && !is_color_frame_decoded_) {
-    RCLCPP_ERROR(logger_, "color frame is not decoded");
+  if (frame->type() == OB_FRAME_COLOR && !is_color_frame_decoded_ ) {
+    // RCLCPP_ERROR(logger_, "color frame is not decoded");
     return;
   }
   if (frame->type() == OB_FRAME_COLOR) {

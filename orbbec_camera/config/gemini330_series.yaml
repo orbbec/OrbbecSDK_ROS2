@@ -40,7 +40,7 @@ orbbec_ros:
             # Fps of the color image. If 0, the default FPS will be used
             color_fps: 0
             # default Format of the color image.
-            color_format: "MJPG"
+            color_format: "ANY"
             # enable auto exposure for the color image
             enable_color_auto_exposure: true
             # enable auto white balance for the color image
@@ -58,7 +58,7 @@ orbbec_ros:
             # Fps of the depth image. If 0, the default FPS will be used
             depth_fps: 0
             # default Format of the depth image.
-            depth_format: "Y16"
+            depth_format: "ANY"
             # If false, the depth scale will not be enabled
             enable_depth_scale: true
 
@@ -100,11 +100,11 @@ orbbec_ros:
 
         leftir:
             # the left IR image will not be enabled
-            enable_left_ir: true
+            enable_left_ir: false
 
         rightir:
             # the right IR image will not be enabled
-            enable_right_ir: true
+            enable_right_ir: false
 
         imu:
             # If true, the IMU accelerometer data will be enabled
@@ -126,17 +126,19 @@ orbbec_ros:
 
         point_cloud:
             # enable point cloud. {fase:disable, true:enable}
-            enable_point_cloud: false
+            enable_point_cloud: true
+            # enable color point cloud. {fase:disable, true:enable}
+            enable_colored_point_cloud: false
 
         advanced:
             # If true, the extrinsics publish will be enabled
             enable_publish_extrinsic: false
             # If true, the frame synchronization will be enabled
             enable_frame_sync: true
+            # global, device, system
+            time_domain: "device"
             # Publish D2C superimposed image (only for testing).
             enable_d2c_viewer: false
-            # If false, the hardware time will not be used, true:devicetime, false:systemtime
-            use_hardware_time: true
             # the host time will be synchronized with the device time
             enable_sync_host_time: true
 

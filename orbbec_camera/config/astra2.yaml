@@ -75,6 +75,8 @@ orbbec_ros:
         point_cloud:
             # If true, the point cloud will be enabled
             enable_point_cloud: true
+            # enable color point cloud. {fase:disable, true:enable}
+            enable_colored_point_cloud: false
 
         advanced:
             # If true, the extrinsics publish will be enabled

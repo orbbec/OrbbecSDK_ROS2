@@ -25,7 +25,7 @@ orbbec_ros:
             enable_ldp: true
 
             network_device:
-                # Whether to enable the function of enumerating network devices. True means enabled and false means disabled. This function is only supported by Femto Mega and Gemini 2 XL devices. 
+                # Whether to enable the function of enumerating network devices. True means enabled and false means disabled. This function is only supported by Femto Mega and Gemini 2 XL devices.
                 # When accessing these devices through the network, the IP address of the device needs to be preconfigured. The enable switch needs to be set to true.
                 enumerate_net_device: false
                 # Port number of the network device. If 0, a random port will be used
@@ -114,6 +114,8 @@ orbbec_ros:
         point_cloud:
             # If true, the depth point cloud will be enabled
             enable_point_cloud: true
+            # enable color point cloud. {fase:disable, true:enable}
+            enable_colored_point_cloud: false
 
         advanced:
             # If true, the extrinsics publish will be enabled

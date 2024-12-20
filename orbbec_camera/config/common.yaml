@@ -6,8 +6,7 @@ orbbec_ros:
             # Camera model. upport product models by referencing config/*.yaml
             camera_model: "gemini330_series"
             # The configuration file for yaml params.
-            config_file_path: "gemini330_series.yaml" #Time domain.
-            time_domain: "device"
+            config_file_path: "gemini330_series.yaml"
             # Log level. Supported levels are 'debug', 'info', 'warning' and 'error'. Default is 'none'.
             log_level: "none"
 
@@ -20,12 +19,16 @@ orbbec_ros:
             usb_port: ""
             # Number of devices. If multiple cameras are required, this parameter must be filled in launch file
             device_num: 1
+            # Optional values: v4l2, libuvc
+            uvc_backend: "libuvc"
             # Usually no need to change
             vendor_id: "0x2bc5"
             # Usually no need to change,will be read from the device
             product_id: ""
             # The delay time for reopening the device, in milliseconds. Usually, there is no need to modify by default.
             connection_delay: 10
+            # Select timestamp type: "device" 、 “global” and "system"
+            time_domain: "device"
             # If the camera is connected to a USB 2.0 port and is not detected, the system will attempt to reset the camera up to three times. This setting is designed to prevent USB 3.0 devices from being mistakenly identified as USB 2.0.
             # It is recommended to set this parameter to false when using a USB 2.0 connection to avoid unnecessary resets
             retry_on_usb3_detection_failure: false
@@ -65,7 +68,7 @@ orbbec_ros:
             # Fps of the color image. If 0, the default FPS will be used
             color_fps: 0
             # default Format of the color image.
-            color_format: "MJPG"
+            color_format: "ANY"
             # If true, the color image will be flipped horizontally
             flip_color: false
 
@@ -80,6 +83,8 @@ orbbec_ros:
             color_auto_ae:
                 # enable auto exposure for the color image
                 enable_color_auto_exposure: true
+                # maximum exposure value for the color image. If -1, the default value will be used
+                color_ae_max_exposure: -1
                 # left edge of the auto exposure region of interest. If -1, the default value will be used
                 color_ae_roi_left: -1
                 # top edge of the auto exposure region of interest. If -1, the default value will be used
@@ -93,8 +98,6 @@ orbbec_ros:
             color_manual_ae:
                 # exposure value for the color image. If -1, the default exposure will be used
                 color_exposure: -1
-                # maximum exposure value for the color image. If -1, the default value will be used
-                color_ae_max_exposure: -1
                 # gain value for the color image. If -1, the default gain will be used
                 color_gain: -1
                 # brightness value for the color image. If -1, the default brightness will be used
@@ -116,7 +119,7 @@ orbbec_ros:
             # Fps of the depth image. If 0, the default FPS will be used
             depth_fps: 0
             # default Format of the depth image.
-            depth_format: "Y16"
+            depth_format: "ANY"
             # If true, the depth image will be flipped horizontally
             flip_depth: false
             # If false, the depth scale will not be enabled
@@ -151,9 +154,7 @@ orbbec_ros:
 
             laser:
                 # Whether to enable the laser. Default value is true
-                enable_laser: false
-                # Laser Switch Alternate Mode, 0: Off, 1: On-Off Alternate, 2: Off-On Alternate. Default value is 0.
-                laser_on_off_mode: 0
+                enable_laser: true
                 # Laser energy level. If -1, the default energy level will be used
                 laser_energy_level: -1
 
@@ -190,7 +191,7 @@ orbbec_ros:
                     # -enable_spatial_filter
                     enable_spatial_filter: false
                     # Spatial filter alpha. If -1, the default alpha will be used
-                    spatial_filter_alpha: -1
+                    spatial_filter_alpha: -1.0
                     # Spatial filter diff threshold. If -1, the default threshold will be used
                     spatial_filter_diff_threshold: -1
                     # Spatial filter magnitude. If -1, the default magnitude will be used
@@ -204,9 +205,9 @@ orbbec_ros:
                     # -enable_temporal_filter
                     enable_temporal_filter: false
                     # Temporal filter diff threshold. If -1, the default threshold will be used
-                    temporal_filter_diff_threshold: -1
+                    temporal_filter_diff_threshold: -1.0
                     # Temporal filter weight. If -1, the default weight will be used
-                    temporal_filter_weight: -1
+                    temporal_filter_weight: -1.0
 
                 # This filter fills all holes in the depth map using the specified mode.
                 hole_filling_filter:
@@ -260,7 +261,7 @@ orbbec_ros:
             # Fps of the left IR image. If 0, the default FPS will be used
             left_ir_fps: 0
             # Format of the left IR image. Supported formats are 'Y8'
-            left_ir_format: "Y8"
+            left_ir_format: "ANY"
 
         rightir:
             # If false, the right IR image will not be enabled
@@ -278,7 +279,7 @@ orbbec_ros:
             # Fps of the right IR image. If 0, the default FPS will be used
             right_ir_fps: 0
             # Format of the right IR image. Supported formats are 'Y8'
-            right_ir_format: "Y8"
+            right_ir_format: "ANY"
 
         ir:
             # If false, the left IR image will not be enabled
@@ -301,12 +302,12 @@ orbbec_ros:
         ir_parameters:
             # If false, the IR image auto exposure will not be enabled
             enable_ir_auto_exposure: true
+            # Maximum exposure time of the IR image
+            ir_ae_max_exposure: -1
             # Exposure time of the IR image. If -1, auto exposure will be used
             ir_exposure: -1
             # Gain of the IR image. If -1, auto gain will be used
             ir_gain: -1
-            # Maximum exposure time of the IR image
-            ir_ae_max_exposure: 10000
             # ir_brightness, if -1, auto brightness will be used
             ir_brightness: -1
             # If true, the left IR image will be flipped horizontally
@@ -336,7 +337,7 @@ orbbec_ros:
 
         point_cloud:
             # enable point cloud. {fase:disable, true:enable}
-            enable_point_cloud: false
+            enable_point_cloud: true
             # enable RGBD point cloud. {fase:disable, true:enable}
             enable_colored_point_cloud: false
             # Quality of Service for the point cloud topic
@@ -359,10 +360,10 @@ orbbec_ros:
             enable_frame_sync: true
             # Publish D2C superimposed image (only for testing).
             enable_d2c_viewer: false
-            # If false, the hardware time will not be used, true:devicetime, false:systemtime
-            use_hardware_time: false
+            # false: switch to software disparity convert to depth, true: switch to hardware disparity convert to depth
+            enable_hardware_d2d: true
             # If false, the host time will not be synchronized with the device time
-            enable_sync_host_time: false
+            enable_sync_host_time: true
             # URL of the IR image info
             ir_info_url: ""
             # URL of the color image info
@@ -373,9 +374,9 @@ orbbec_ros:
             diagnostic_period: 1.0
 
             device_sync:
-                # Device synchronization mode. supports: {1.FREE_RUN 2.STANDALONE 3.PRIMARY 4.SECONDARY 5.SECONDARY_SYNCED 6.SOFTWARE_TRIGGERING 7.HARDWARE_TRIGGERING}.
+                # Device synchronization mode. supports: {1.free_run 2.standalone 3.primary 4.secondary 5.secondary_synced 6.software_triggering 7.hardware_triggering}.
                 # For details, Please refer to the OBMultiDeviceSyncMode-related comments in SDK/include/libobsensor/ObTypes.h for a detailed explanation of each mode.
-                sync_mode: "STANDALONE"
+                sync_mode: "standalone"
                 # The delay time of the depth image capture after receiving the capture command or trigger signal in microseconds.
                 # For details, Please refer to the OBMultiDeviceSyncConfig-related comments in SDK/include/libobsensor/ObTypes.h
                 depth_delay_us: 0

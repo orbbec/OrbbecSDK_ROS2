@@ -846,6 +846,7 @@ void OBCameraNode::startStreams() {
     RCLCPP_INFO_STREAM(logger_, "Disable frame sync");
     TRY_EXECUTE_BLOCK(pipeline_->disableFrameSync());
   }
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   // set interleave mode
   if (interleave_ae_mode_ == "hdr" && interleave_frame_enable_) {
     RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to hdr");
@@ -853,7 +854,7 @@ void OBCameraNode::startStreams() {
     init_interleave_hdr_param();
   } else if (interleave_ae_mode_ == "laser" && interleave_frame_enable_) {
     RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to laser");
-    device_->loadFrameInterleave("Laser ON-Off");
+    device_->loadFrameInterleave("Laser On-Off");
     init_interleave_laser_param();
   } else {
     RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to nothing");

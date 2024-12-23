@@ -165,7 +165,7 @@ orbbec_ros:
                     # If true, the decimation filter will be enabled
                     enable_decimation_filter: false
                     # Decimation filter scale. If -1, the default scale will be used
-                    decimation_filter_scale_: -1
+                    decimation_filter_scale: -1
 
                 # This filtering removes speckle noise in the form of clusters and produces a depth map with less filling.
                 noise_removal_filter:

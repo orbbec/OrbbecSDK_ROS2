@@ -1222,7 +1222,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<bool>(enable_spatial_filter_, "enable_spatial_filter", false);
   setAndGetNodeParameter<bool>(enable_temporal_filter_, "enable_temporal_filter", false);
   setAndGetNodeParameter<bool>(enable_hole_filling_filter_, "enable_hole_filling_filter", false);
-  setAndGetNodeParameter<int>(decimation_filter_scale_, "decimation_filter_scale_", -1);
+  setAndGetNodeParameter<int>(decimation_filter_scale_, "decimation_filter_scale", -1);
   setAndGetNodeParameter<int>(sequence_id_filter_id_, "sequence_id_filter_id", -1);
   setAndGetNodeParameter<int>(threshold_filter_max_, "threshold_filter_max", -1);
   setAndGetNodeParameter<int>(threshold_filter_min_, "threshold_filter_min", -1);

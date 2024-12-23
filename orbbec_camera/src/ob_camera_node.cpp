@@ -1418,9 +1418,11 @@ void OBCameraNode::setupPipelineConfig() {
 
       if (stream_index == COLOR && enable_stream_[COLOR] && align_filter_) {
         auto video_profile = profile;
-        std::cout << "color video_profile: " << video_profile->getWidth() << "x"
-                  << video_profile->getHeight() << " " << video_profile->getFps() << "fps "
-                  << magic_enum::enum_name(video_profile->getFormat()) << std::endl;
+        RCLCPP_INFO_STREAM(
+            logger_, "color video_profile: " << video_profile->getWidth() << "x"
+                                             << video_profile->getHeight() << " "
+                                             << video_profile->getFps() << "fps "
+                                             << magic_enum::enum_name(video_profile->getFormat()));
         align_filter_->setAlignToStreamProfile(video_profile);
       }
 

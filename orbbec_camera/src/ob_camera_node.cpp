@@ -1152,9 +1152,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(depth_ae_roi_top_, "depth_ae_roi_top", -1);
   setAndGetNodeParameter<int>(depth_ae_roi_right_, "depth_ae_roi_right", -1);
   setAndGetNodeParameter<int>(depth_ae_roi_bottom_, "depth_ae_roi_bottom", -1);
-  if (enable_3d_reconstruction_mode_) {
-    laser_on_off_mode_ = 1;  // 0 off, 1 on-off, 1 off-on
-  }
+
   setAndGetNodeParameter<std::string>(time_domain_, "time_domain", "device");
   auto device_info = device_->getDeviceInfo();
   CHECK_NOTNULL(device_info.get());
@@ -1770,21 +1768,7 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
         if (stream_index == DEPTH) {
           frame = depth_frame_;
         }
-        auto is_ir_frame = frame_type == OB_FRAME_IR_LEFT || frame_type == OB_FRAME_IR_RIGHT ||
-                           frame_type == OB_FRAME_IR;
-        if (is_ir_frame) {
-          std::shared_ptr<ob::Frame> ir_frame =
-              frame->format() == OB_FORMAT_MJPG ? decodeIRMJPGFrame(frame) : frame;
-          bool ir_laser_status = false;
-          if (ir_frame && ir_frame->hasMetadata(OB_FRAME_METADATA_TYPE_LASER_STATUS)) {
-            ir_laser_status = ir_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_LASER_STATUS) == 1;
-          }
-          if (ir_frame && (!enable_3d_reconstruction_mode_ || !ir_laser_status)) {
-            onNewFrameCallback(ir_frame, stream_index);
-          }
-        } else if (frame_type == OB_FRAME_DEPTH) {
-          onNewFrameCallback(frame, stream_index);
-        }
+        onNewFrameCallback(frame, stream_index);
       }
     }
 

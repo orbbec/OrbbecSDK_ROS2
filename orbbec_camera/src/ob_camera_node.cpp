@@ -573,14 +573,14 @@ void OBCameraNode::setupDepthPostProcessFilter() {
     } else if (filter_name == "NoiseRemovalFilter" && enable_noise_removal_filter_) {
       auto noise_removal_filter = filter->as<ob::NoiseRemovalFilter>();
       OBNoiseRemovalFilterParams params = noise_removal_filter->getFilterParams();
-      RCLCPP_INFO_STREAM(
-          logger_, "Default noise removal filter params: " << "disp_diff: " << params.disp_diff
-                                                           << ", max_size: " << params.max_size);
+      RCLCPP_INFO_STREAM(logger_, "Default noise removal filter params: "
+                                      << "disp_diff: " << params.disp_diff
+                                      << ", max_size: " << params.max_size);
       params.disp_diff = noise_removal_filter_min_diff_;
       params.max_size = noise_removal_filter_max_size_;
-      RCLCPP_INFO_STREAM(logger_,
-                         "Set noise removal filter params: " << "disp_diff: " << params.disp_diff
-                                                             << ", max_size: " << params.max_size);
+      RCLCPP_INFO_STREAM(logger_, "Set noise removal filter params: "
+                                      << "disp_diff: " << params.disp_diff
+                                      << ", max_size: " << params.max_size);
       if (noise_removal_filter_min_diff_ != -1 && noise_removal_filter_max_size_ != -1) {
         noise_removal_filter->setFilterParams(params);
       }
@@ -589,11 +589,11 @@ void OBCameraNode::setupDepthPostProcessFilter() {
           hdr_merge_gain_2_ != -1) {
         auto hdr_merge_filter = filter->as<ob::HdrMerge>();
         hdr_merge_filter->enable(true);
-        RCLCPP_INFO_STREAM(
-            logger_, "Set HDR merge filter params: " << "exposure_1: " << hdr_merge_exposure_1_
-                                                     << ", gain_1: " << hdr_merge_gain_1_
-                                                     << ", exposure_2: " << hdr_merge_exposure_2_
-                                                     << ", gain_2: " << hdr_merge_gain_2_);
+        RCLCPP_INFO_STREAM(logger_, "Set HDR merge filter params: "
+                                        << "exposure_1: " << hdr_merge_exposure_1_
+                                        << ", gain_1: " << hdr_merge_gain_1_
+                                        << ", exposure_2: " << hdr_merge_exposure_2_
+                                        << ", gain_2: " << hdr_merge_gain_2_);
         auto config = OBHdrConfig();
         config.enable = true;
         config.exposure_1 = hdr_merge_exposure_1_;
@@ -676,10 +676,10 @@ void OBCameraNode::setupProfiles() {
           throw std::runtime_error("Failed cast profile to VideoStreamProfile");
         }
         RCLCPP_DEBUG_STREAM(
-            logger_,
-            "Sensor profile: " << "stream_type: " << magic_enum::enum_name(profile->type())
-                               << "Format: " << profile->format() << ", Width: " << profile->width()
-                               << ", Height: " << profile->height() << ", FPS: " << profile->fps());
+            logger_, "Sensor profile: "
+                         << "stream_type: " << magic_enum::enum_name(profile->type())
+                         << "Format: " << profile->format() << ", Width: " << profile->width()
+                         << ", Height: " << profile->height() << ", FPS: " << profile->fps());
         supported_profiles_[elem].emplace_back(profile);
       }
       std::shared_ptr<ob::VideoStreamProfile> selected_profile;
@@ -1110,7 +1110,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<bool>(enable_spatial_filter_, "enable_spatial_filter", false);
   setAndGetNodeParameter<bool>(enable_temporal_filter_, "enable_temporal_filter", false);
   setAndGetNodeParameter<bool>(enable_hole_filling_filter_, "enable_hole_filling_filter", false);
-  setAndGetNodeParameter<int>(decimation_filter_scale_, "decimation_filter_scale_", -1);
+  setAndGetNodeParameter<int>(decimation_filter_scale_, "decimation_filter_scale", -1);
   setAndGetNodeParameter<int>(sequence_id_filter_id_, "sequence_id_filter_id", -1);
   setAndGetNodeParameter<int>(threshold_filter_max_, "threshold_filter_max", -1);
   setAndGetNodeParameter<int>(threshold_filter_min_, "threshold_filter_min", -1);
@@ -1723,16 +1723,12 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
       tf_published_ = true;
     }
     depth_frame_ = frame_set->getFrame(OB_FRAME_DEPTH);
-    bool depth_laser_status = false;
-    if (depth_frame_ && depth_frame_->hasMetadata(OB_FRAME_METADATA_TYPE_LASER_STATUS)) {
-      depth_laser_status = depth_frame_->getMetadataValue(OB_FRAME_METADATA_TYPE_LASER_STATUS) == 1;
-    }
     auto device_info = device_->getDeviceInfo();
     CHECK_NOTNULL(device_info.get());
     auto pid = device_info->pid();
     auto color_frame = frame_set->getFrame(OB_FRAME_COLOR);
     has_first_color_frame_ = has_first_color_frame_ || color_frame;
-    if (isGemini335PID(pid)) {
+    if (isGemini335PID(pid) && depth_frame_) {
       depth_frame_ = processDepthFrameFilter(depth_frame_);
       if (depth_registration_ && align_filter_ && depth_frame_ && has_first_color_frame_) {
         auto new_frame = align_filter_->process(frame_set);
@@ -1748,19 +1744,14 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
                      "Depth registration is disabled or align filter is null or depth frame is "
                      "null or color frame is null");
       }
-      if (depth_registration_ && align_filter_ && depth_frame_ && !has_first_color_frame_) {
-        return;
-      }
     }
     if (enable_stream_[COLOR] && color_frame) {
       std::unique_lock<std::mutex> lock(color_frame_queue_lock_);
-      if (!enable_3d_reconstruction_mode_ || depth_laser_status) {
-        if (color_frame_queue_.size() > 2) {
-          color_frame_queue_.pop();
-        }
-        color_frame_queue_.push(frame_set);
-        color_frame_queue_cv_.notify_all();
-      }
+      // if (color_frame_queue_.size() > 2) {
+      //   color_frame_queue_.pop();
+      // }
+      color_frame_queue_.push(frame_set);
+      color_frame_queue_cv_.notify_all();
     } else {
       publishPointCloud(frame_set);
     }
@@ -1777,7 +1768,7 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
           continue;
         }
         if (stream_index == DEPTH) {
-          frame = (enable_3d_reconstruction_mode_ && !depth_laser_status) ? nullptr : depth_frame_;
+          frame = depth_frame_;
         }
         auto is_ir_frame = frame_type == OB_FRAME_IR_LEFT || frame_type == OB_FRAME_IR_RIGHT ||
                            frame_type == OB_FRAME_IR;

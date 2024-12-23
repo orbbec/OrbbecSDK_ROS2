@@ -9,6 +9,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch.actions import TimerAction
 from launch.actions import GroupAction
+from launch.substitutions import PathJoinSubstitution
 
 def generate_launch_description():
     orbbec_camera_bringup_dir = get_package_share_directory('orbbec_camera')
@@ -50,9 +51,6 @@ def generate_launch_description():
             'component_container_name': component_container_name_arg}.items(),
         condition=UnlessCondition(LaunchConfiguration('from_bag')))
 
-    dev_matrices_arg = DeclareLaunchArgument(
-        'dev_matrices', default_value=default_dev_matrices_file,
-        description='default device extrinsics matrices')
     base_static_transforms_publisher = ExecuteProcess(
         cmd=[
             'python3',
@@ -61,7 +59,10 @@ def generate_launch_description():
                 'launch',
                 'base_static_transforms_publisher.py'
             ),
-            '--dev_matrices', LaunchConfiguration('dev_matrices')
+            '--dev_matrices', PathJoinSubstitution([
+                get_package_share_directory('isaac_orbbec_launch'),
+                LaunchConfiguration('dev_matrices')
+            ])
         ],
         output='screen'
     )
@@ -100,10 +101,10 @@ def generate_launch_description():
         from_bag_arg,
         bag_path_arg,
         shared_orbbec_container,
-        orbbec_launch,
+        # orbbec_launch,
         base_static_transforms_publisher,
-        perceptor_launch,
-        bag_play,
-        rviz2_node,
+        # perceptor_launch,
+        # bag_play,
+        # rviz2_node,
       ]
     )

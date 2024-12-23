@@ -1868,9 +1868,8 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
       depth_laser_status = depth_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_LASER_STATUS) == 1;
     }
     auto color_frame = frame_set->getFrame(OB_FRAME_COLOR);
-    depth_frame = processDepthFrameFilter(depth_frame);
-    bool depth_aligned = false;
     if (depth_frame) {
+      depth_frame = processDepthFrameFilter(depth_frame);
       frame_set->pushFrame(depth_frame);
     }
     if (depth_registration_ && align_filter_ && depth_frame) {
@@ -1878,7 +1877,6 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
         auto new_frame_set = new_frame->as<ob::FrameSet>();
         CHECK_NOTNULL(new_frame_set.get());
         frame_set = new_frame_set;
-        depth_aligned = true;
       } else {
         RCLCPP_ERROR(logger_, "Failed to align depth frame to color frame");
         return;
@@ -1887,9 +1885,6 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
       RCLCPP_DEBUG(logger_,
                    "Depth registration is disabled or align filter is null or depth frame is "
                    "null or color frame is null");
-    }
-    if (depth_registration_ && align_filter_ && !depth_aligned) {
-      return;
     }
 
     if (enable_stream_[COLOR] && color_frame) {

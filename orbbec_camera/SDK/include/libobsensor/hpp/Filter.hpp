@@ -503,7 +503,7 @@ private:
     std::map<float, std::string> sequenceIdList_{ { 0.f, "all" }, { 1.f, "1" } };
     OBSequenceIdItem            *outputSequenceIdList_ = nullptr;
 
-    void initSeqenceIdList() {
+    void initSequenceIdList() {
         outputSequenceIdList_ = new OBSequenceIdItem[sequenceIdList_.size()];
 
         int i = 0;
@@ -521,7 +521,7 @@ public:
         auto      impl  = ob_create_filter("SequenceIdFilter", &error);
         Error::handle(&error);
         init(impl);
-        initSeqenceIdList();
+        initSequenceIdList();
     }
 
     virtual ~SequenceIdFilter() noexcept {

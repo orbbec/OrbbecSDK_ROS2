@@ -46,7 +46,7 @@ def generate_launch_description():
     ld = LaunchDescription(
         [
 
-            G330_1,
+            TimerAction(period=0.0, actions=[GroupAction([G330_1])]),
             TimerAction(period=2.0, actions=[GroupAction([G330_0])]),
             # The primary camera should be launched at last
         ]

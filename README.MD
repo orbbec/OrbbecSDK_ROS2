@@ -1,10 +1,10 @@
 # OrbbecSDK ROS2 Wrapper v2
 
- [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-2.0.7-green)
+ [![stable](https://img.shields.io/badge/stability-stable-green)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-2.1.1-green)
 
 > [!IMPORTANT]
 >
-> Welcome to the OrbbecSDK ROS2 Wrapper v2. Before you begin using this version of ROS2 wrapper, it's crucial to check the following device support list to verify the compatibility.
+> Welcome to the OrbbecSDK ROS2 Wrapper v2. Before you begin using this version of ROS2 wrapper, it's crucial to check the following [device support list](#supported-devices) to verify the compatibility.
 
 OrbbecSDK ROS2 Wrapper provides seamless integration of Orbbec cameras with ROS 2 environment. It supports ROS2 Foxy, Humble, and Jazzy distributions.
 
@@ -124,6 +124,10 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
 3. limited maintenance: we will provide critical bug fix support;
 4. not supported: we will not support specific device in this version;
 5. to be supported: we will add support in the near future.
+
+**Documentation Note:**
+
+The following instructions are only applicable to traditional launch files. If you want to experience our latest launch file format, please refer to the following link:
 
 ## Table of Contents
 

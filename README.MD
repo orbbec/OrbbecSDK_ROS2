@@ -126,6 +126,7 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
 **Documentation Note:**
 
 The following instructions are only applicable to traditional launch files. If you want to experience our latest launch file format, please refer to the following link:
+[https://orbbec.github.io/OrbbecSDK_ROS2_Docs/](https://orbbec.github.io/OrbbecSDK_ROS2_Docs/)
 
 ## Table of Contents
 

@@ -18,6 +18,20 @@ Install xterm
 sudo apt install xterm
 ```
 
-Take gemini_330_series.launch.py as an example to use xterm terminal to open gdb
+Take orbbec_camera.launch.py as an example to use xterm terminal to open gdb
 
-![Multi_camera1](../image/gdb_1.png)
+```python
+    def create_composable_node(camera_name, params, use_intra_process):
+        common_arguments = [{'use_intra_process_comms': use_intra_process}]
+        composable_node = ComposableNode(
+                namespace=camera_name,
+                name=camera_name,
+                package=default_package_name,
+                plugin='orbbec_camera::OBCameraNodeDriver',
+                parameters=params,
+                #extra_arguments=[{'use_intra_process_comms': LaunchConfiguration("use_intra_process_comms")}],
+                extra_arguments=common_arguments,
+                prefix=['xterm -e gdb -ex run --args'],
+            )
+        return composable_node
+```

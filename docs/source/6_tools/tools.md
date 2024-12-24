@@ -52,10 +52,25 @@ This tool will save the color and left IR images of each camera and the timestam
 
 The configuration parameter file of this tool node is multi_save_rgbir_params.json
 
-![Multi_camera1](../image/multi_save_rgbir_node1.png)
+```json
+{
+    "save_rgbir_params": {
+        "time_domain": "device",
+        "usb_ports": [
+            "2-3",
+            "2-1"
+        ],
+        "camera_name": [
+            "G330_0",
+            "G330_1"
+        ]
+    }
+}
+```
 
-* The parameter order of usb_ports: "Host", "Slave 1", "Slave 2", "Slave 3". Fill in as many usb_ports as there are cameras.
-* ir_topics and color_topics are topic names. Fill in as many names as there are cameras.
+* time_domain: timestamp type
+* usb_ports parameter order: "host", "slave 1", "slave 2", "slave 3", fill in as many usb_ports as there are cameras
+* camera_name: the name set for the camera, for example: G330_0
 
 ## metadata_save_files_node
 
@@ -63,7 +78,18 @@ The metadata_save_files_node tool will save the depth, left and right IR, images
 
 The configuration parameter file of this tool node is metadata_save_params.json
 
-![Multi_camera1](../image/metadata_save_params.png)
+```json
+{
+    "metadata_save_params": {
+        "left_ir_image_topic": "/camera/left_ir/image_raw",
+        "right_ir_image_topic": "/camera/right_ir/image_raw",
+        "depth_image_topic": "/camera/depth/image_raw",
+        "left_ir_metadata_topic": "/camera/left_ir/metadata",
+        "right_ir_metadata_topic": "/camera/right_ir/metadata",
+        "depth_metadata_topic": "/camera/depth/metadata"
+    }
+}
+```
 
 ```bash
 ros2 run orbbec_camera metadata_save_files_node
@@ -75,7 +101,21 @@ The metadata_save_files_node tool will save depth, color, left and right IR imag
 
 The configuration parameter file of this tool node is metadata_save_params.json
 
-![Multi_camera1](https://file+.vscode-resource.vscode-cdn.net/home/jj/openSDK/opensdk_ros2/src/OrbbecSDK_ROS2/docs/source/image/metadata_save_params.png)
+```json
+{
+    "metadata_export_params": {
+        "sn": "CP1L44P00085",
+        "left_ir_image_topic": "/camera/left_ir/image_raw",
+        "right_ir_image_topic": "/camera/right_ir/image_raw",
+        "depth_image_topic": "/camera/depth/image_raw",
+        "color_image_topic": "/camera/color/image_raw",
+        "left_ir_metadata_topic": "/camera/left_ir/metadata",
+        "right_ir_metadata_topic": "/camera/right_ir/metadata",
+        "depth_metadata_topic": "/camera/depth/metadata",
+        "color_metadata_topic": "/camera/color/metadata"
+    }
+}
+```
 
 ```bash
 ros2 run orbbec_camera metadata_export_files_node

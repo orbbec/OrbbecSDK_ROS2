@@ -439,11 +439,6 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
 
   if (enable_sync_host_time_ && !isOpenNIDevice(device_info_->pid())) {
     TRY_EXECUTE_BLOCK(device_->timerSyncWithHost());
-    sync_host_time_timer_ = this->create_wall_timer(std::chrono::seconds(60 * 60 * 2), [this]() {
-      if (device_) {
-        TRY_EXECUTE_BLOCK(device_->timerSyncWithHost());
-      }
-    });
   }
 
   RCLCPP_INFO_STREAM(logger_, "Device " << device_info_->getName() << " connected");

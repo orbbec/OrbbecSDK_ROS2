@@ -8,7 +8,7 @@ This section provides a comprehensive guide to installing, compiling, and runnin
   - [Get source code of OrbbecSDK_ROS2](#get-source-code-of-orbbecsdk-ros2)
   - [Install environment](#install-environment)
   - [Build project](#build-project)
-  - [Performance Optimization Suggestions](#Performance Optimization Suggestions)
+  - [Performance Optimization Suggestions](#performance-ptimization-suggestions)
 
 ## Get source code of OrbbecSDK_ROS2
 

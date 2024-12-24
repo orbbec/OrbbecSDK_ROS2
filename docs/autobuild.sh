@@ -32,9 +32,11 @@ build_all()
     make clean
     rm -rf _html
     rm -rf _build
+    rm -rf docs
     make html
-	cp -R _build/html _html
+	  cp -R _build/html _html
     cp .nojekyll _html/
+    cp _html/ docs/ -af
     echo "create _html finished"
 }
 

@@ -375,7 +375,7 @@ class OBCameraNode {
   std::unique_ptr<ob::Pipeline> imuPipeline_ = nullptr;
   std::atomic_bool pipeline_started_{false};
   std::string camera_name_ = "camera";
-  const std::string imu_optical_frame_id_ = "camera_gyro_optical_frame";
+  std::string accel_gyro_frame_id_ = "camera_accel_gyro_optical_frame";
   const std::string imu_frame_id_ = "camera_gyro_frame";
   std::shared_ptr<ob::Config> pipeline_config_ = nullptr;
   std::map<stream_index_pair, std::shared_ptr<ob::Sensor>> sensors_;

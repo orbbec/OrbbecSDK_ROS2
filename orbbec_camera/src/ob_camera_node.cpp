@@ -1133,6 +1133,8 @@ void OBCameraNode::getParameters() {
     depth_aligned_frame_id_[stream_index] = optical_frame_id_[COLOR];
   }
 
+  accel_gyro_frame_id_ = camera_name_ + "_accel_gyro_optical_frame";
+
   setAndGetNodeParameter(enable_sync_output_accel_gyro_, "enable_sync_output_accel_gyro", false);
   for (const auto &stream_index : HID_STREAMS) {
     std::string param_name = stream_name_[stream_index] + "_qos";
@@ -2318,7 +2320,7 @@ void OBCameraNode::onNewIMUFrameSyncOutputCallback(const std::shared_ptr<ob::Fra
   accel_info.header = imu_msg.header;
   imu_info_publishers_[ACCEL]->publish(accel_info);
 
-  imu_msg.header.frame_id = imu_optical_frame_id_;
+  imu_msg.header.frame_id = accel_gyro_frame_id_;
 
   auto gyro_frame = gryoframe->as<ob::GyroFrame>();
   auto gyroData = gyro_frame->getValue();

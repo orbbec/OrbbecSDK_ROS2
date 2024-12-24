@@ -2205,26 +2205,35 @@ void OBCameraNode::onNewIMUFrameSyncOutputCallback(const std::shared_ptr<ob::Fra
   auto imu_msg = sensor_msgs::msg::Imu();
   setDefaultIMUMessage(imu_msg);
 
-  imu_msg.header.frame_id = imu_optical_frame_id_;
+  imu_msg.header.frame_id = optical_frame_id_[GYRO];
   auto frame_timestamp = getFrameTimestampUs(accelframe);
   auto timestamp = fromUsToROSTime(frame_timestamp);
-  imu_msg.header.stamp = timestamp;
-  auto gyro_frame = gryoframe->as<ob::GyroFrame>();
+  imu_msg.header.stamp = timestamp; 
+  
   auto gyro_info = createIMUInfo(GYRO);
   gyro_info.header = imu_msg.header;
-  gyro_info.header.frame_id = imu_optical_frame_id_;
   imu_info_publishers_[GYRO]->publish(gyro_info);
+  
+  auto accel_info = createIMUInfo(ACCEL);
+  imu_msg.header.frame_id = optical_frame_id_[ACCEL];
+  accel_info.header = imu_msg.header;
+  imu_info_publishers_[ACCEL]->publish(accel_info);
+  
+  imu_msg.header.frame_id = imu_optical_frame_id_;
+  
+  auto gyro_frame = gryoframe->as<ob::GyroFrame>();
   auto gyroData = gyro_frame->value();
   imu_msg.angular_velocity.x = gyroData.x - gyro_info.bias[0];
   imu_msg.angular_velocity.y = gyroData.y - gyro_info.bias[1];
   imu_msg.angular_velocity.z = gyroData.z - gyro_info.bias[2];
+  
   auto accel_frame = accelframe->as<ob::AccelFrame>();
   auto accelData = accel_frame->value();
-  auto accel_info = createIMUInfo(ACCEL);
+  
   imu_msg.linear_acceleration.x = accelData.x - accel_info.bias[0];
   imu_msg.linear_acceleration.y = accelData.y - accel_info.bias[1];
   imu_msg.linear_acceleration.z = accelData.z - accel_info.bias[2];
-  imu_info_publishers_[ACCEL]->publish(accel_info);
+  
   imu_gyro_accel_publisher_->publish(imu_msg);
 }
 
@@ -2246,14 +2255,15 @@ void OBCameraNode::onNewIMUFrameCallback(const std::shared_ptr<ob::Frame> &frame
   }
   auto imu_msg = sensor_msgs::msg::Imu();
   setDefaultIMUMessage(imu_msg);
+  
   imu_msg.header.frame_id = optical_frame_id_[stream_index];
   auto timestamp = fromUsToROSTime(frame->timeStampUs());
-
   imu_msg.header.stamp = timestamp;
+  
   auto imu_info = createIMUInfo(stream_index);
   imu_info.header = imu_msg.header;
-  imu_info.header.frame_id = imu_optical_frame_id_;
   imu_info_publishers_[stream_index]->publish(imu_info);
+  
   if (frame->type() == OB_FRAME_GYRO) {
     auto gyro_frame = frame->as<ob::GyroFrame>();
     auto data = gyro_frame->value();

@@ -1,10 +1,8 @@
 # OrbbecSDK ROS2 Wrapper v2
 
- [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-2.0.7-green)
-
 > [!IMPORTANT]
 >
-> Welcome to the OrbbecSDK ROS2 Wrapper v2. Before you begin using this version of ROS2 wrapper, it's crucial to check the following device support list to verify the compatibility.
+> Welcome to the OrbbecSDK ROS2 Wrapper v2. Before you begin using this version of ROS2 wrapper, it's crucial to check the following [device support list](#supported-devices) to verify the compatibility.
 
 OrbbecSDK ROS2 Wrapper provides seamless integration of Orbbec cameras with ROS 2 environment. It supports ROS2 Foxy, Humble, and Jazzy distributions.
 
@@ -125,6 +123,10 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
 4. not supported: we will not support specific device in this version;
 5. to be supported: we will add support in the near future.
 
+**Documentation Note:**
+
+The following instructions are only applicable to traditional launch files. If you want to experience our latest launch file format, please refer to the following link:
+
 ## Table of Contents
 
 - [OrbbecSDK ROS2 Wrapper v2](#orbbecsdk-ros2-wrapper-v2)
@@ -203,7 +205,8 @@ Install deb dependencies
 ```bash
 # assume you have sourced ROS environment, same blow
 sudo apt install libgflags-dev nlohmann-json3-dev  \
-ros-$ROS_DISTRO-image-transport ros-$ROS_DISTRO-image-publisher ros-$ROS_DISTRO-camera-info-manager \
+ros-$ROS_DISTRO-image-transport ros-${ROS_DISTRO}-image-transport-plugins ros-${ROS_DISTRO}-compressed-image-transport \
+ros-$ROS_DISTRO-image-publisher ros-$ROS_DISTRO-camera-info-manager \
 ros-$ROS_DISTRO-diagnostic-updater ros-$ROS_DISTRO-diagnostic-msgs ros-$ROS_DISTRO-statistics-msgs \
 ros-$ROS_DISTRO-backward-ros libdw-dev
 ```
@@ -353,12 +356,7 @@ ros2 launch orbbec_camera gemini_intra_process_demo_launch.py
 
 ## Use V4L2 backend
 
-To enable the V4L2 backend for the Gemini2 series cameras, follow these steps:
-
-1. The Gemini2 series cameras support the V4L2 backend.
-2. Open the `config/OrbbecSDKConfig_v2.0.xml` file.
-3. Set the navigation option to `LinuxUVCBackend`.
-4. Change the backend setting to `V4L2`.
+[Setting uvc_backend](#launch-parameters)
 
 Note: The V4L2 backend is not enabled by default.
 
@@ -370,6 +368,8 @@ The following are the launch parameters available:
   a longer time to initialize and reopening the device immediately can cause firmware crashes when hot plugging.
 - `enable_point_cloud`: Enables the point cloud.
 - `enable_colored_point_cloud`: Enables the RGB point cloud.
+- `cloud_frame_id`:Modifying the frame_id name within the ros message.
+- `ordered_pc`:Enable filtering of invalid point clouds.
 - `point_cloud_qos`, `[color|depth|ir]_qos`, `[color|depth|ir]_camera_info_qos`: ROS 2 Message Quality of Service (QoS)
   settings. The possible values
   are `SYSTEM_DEFAULT`, `DEFAULT`, `PARAMETER_EVENTS`, `SERVICES_DEFAULT`, `PARAMETERS`, `SENSOR_DATA` and are
@@ -378,6 +378,7 @@ The following are the launch parameters available:
   and `SENSOR_DATA`, respectively.
 - `enable_d2c_viewer`: Publishes the D2C overlay image (for testing only).
 - `device_num`: The number of devices. This must be filled in if multiple cameras are required.
+- `uvc_backend`:Optional values: v4l2, libuvc
 - `color_width`, `color_height`, `color_fps`: The resolution and frame rate of the color stream.
 - `ir_width`, `ir_height`, `ir_fps`: The resolution and frame rate of the IR stream.
 - `depth_width`, `depth_height`, `depth_fps`: The resolution and frame rate of the depth stream.
@@ -407,8 +408,6 @@ The following are the launch parameters available:
   filtering configuration file is located in the /config/depthfilter directory. Supported only on Gemini2.
 - `depth_precision`: The depth precision should be in the format `1mm`. The default value is `1mm`.
 - `enable_laser`: Enables the laser. The default value is `true`.
-- `laser_on_off_mode`: Laser on/off alternate mode, 0: off, 1: on-off alternate, 2: off-on alternate. The default value
-  is `0`.
 - `device_preset`: The default value is `Default`. Only the G330 series is supported. For more information, refer to
   the [G330 documentation](https://www.orbbec.com/docs/g330-use-depth-presets/). Please refer to the table below to set
   the `device_preset` value based on your use case. The value should be one of the preset names
@@ -452,6 +451,7 @@ The following are the launch parameters available:
 - `interleave_frame_enable` : Whether to enable interleave frame mode.
 - `interleave_skip_enable` : Whether to enable skip frames.
 - `interleave_skip_index` : Set skip pattern IR or flood IR.
+- `[hdr|laser]_index[0|1]_[laser_control|depth_exposure|depth_gain|ir_brightness|ae_max_exposure]`:In interleave frame mode, set the 0th and 1st frame parameters of hdr or laser interleaving frames
 
 **IMPORTANT**: *Please carefully read the instructions regarding software filtering settings
 at [this link](https://www.orbbec.com/docs/g330-use-depth-post-processing-blocks/). If you are uncertain, do not modify
@@ -463,7 +463,7 @@ these settings.*
   * Imagine we are standing behind of the camera, and looking forward.
   * Always use this point of view when talking about coordinates, left vs right IRs, position of sensor, etc..
 
-![ROS2 and Camera Coordinate System](docs/images/image7.png)
+![ROS2 and Camera Coordinate System](docs/source/image/image7.png)
 
 * ROS2 Coordinate System: (X: Forward, Y:Left, Z: Up)
 * Camera Optical Coordinate System: (X: Right, Y: Down, Z: Forward)
@@ -472,9 +472,9 @@ these settings.*
 
 ## Camera sensor structure
 
-![module in rviz2](docs/images/image9.png)
+![module in rviz2](docs/source/image/image9.png)
 
-![module in rviz2](docs/images/image10.png)
+![module in rviz2](docs/source/image/image10.png)
 
 ## TF from coordinate A to coordinate B:
 
@@ -490,7 +490,7 @@ Example of static TFs of RGB sensor and right infra sensor of Gemini335 module a
 ros2 launch orbbec_description view_model.launch.py model:=gemini_335_336.urdf.xacro
 ```
 
-![module in rviz2](docs/images/image8.png)
+![module in rviz2](docs/source/image/image8.png)
 
 ## Predefined presets
 

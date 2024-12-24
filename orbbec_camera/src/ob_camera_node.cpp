@@ -225,10 +225,6 @@ void OBCameraNode::setupDevices() {
     RCLCPP_INFO_STREAM(logger_, "Setting laser control to " << enable_laser_);
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_BOOL, enable_laser_);
   }
-  if (device_->isPropertySupported(OB_PROP_LASER_ON_OFF_MODE_INT, OB_PERMISSION_READ_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting laser on off mode to " << laser_on_off_mode_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_ON_OFF_MODE_INT, laser_on_off_mode_);
-  }
   if (!device_preset_.empty()) {
     try {
       RCLCPP_INFO_STREAM(logger_, "Available presets:");
@@ -402,8 +398,6 @@ void OBCameraNode::setupDevices() {
   if (ir_exposure_ != -1 &&
       device_->isPropertySupported(OB_PROP_IR_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
     auto range = device_->getIntPropertyRange(OB_PROP_IR_EXPOSURE_INT);
-    RCLCPP_ERROR(logger_, "ir exposure value is out of range[%d,%d], please check the value",
-                 range.min, range.max);
     if (ir_exposure_ < range.min || ir_exposure_ > range.max) {
       RCLCPP_ERROR(logger_, "ir exposure value is out of range[%d,%d], please check the value",
                    range.min, range.max);
@@ -414,8 +408,6 @@ void OBCameraNode::setupDevices() {
   }
   if (ir_gain_ != -1 && device_->isPropertySupported(OB_PROP_IR_GAIN_INT, OB_PERMISSION_WRITE)) {
     auto range = device_->getIntPropertyRange(OB_PROP_IR_GAIN_INT);
-    RCLCPP_ERROR(logger_, "ir gain value is out of range[%d,%d], please check the value", range.min,
-                 range.max);
     if (ir_gain_ < range.min || ir_gain_ > range.max) {
       RCLCPP_ERROR(logger_, "ir gain value is out of range[%d,%d], please check the value",
                    range.min, range.max);
@@ -469,8 +461,8 @@ void OBCameraNode::setupDepthPostProcessFilter() {
   auto depth_sensor = device_->getSensor(OB_SENSOR_DEPTH);
   // set depth sensor to filter
   filter_list_ = depth_sensor->createRecommendedFilters();
-  if (!filter_list_.empty()) {
-    // RCLCPP_ERROR(logger_, "Failed to get depth sensor filter list");
+  if (filter_list_.empty()) {
+    RCLCPP_ERROR(logger_, "Failed to get depth sensor filter list");
     return;
   }
   for (size_t i = 0; i < filter_list_.size(); i++) {
@@ -829,19 +821,6 @@ void OBCameraNode::startStreams() {
 
   try {
     setupPipelineConfig();
-    // set interleave mode
-    if (interleave_ae_mode_ == "hdr" && interleave_frame_enable_) {
-      RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to hdr");
-      device_->loadFrameInterleave("hdr interleave");
-      init_interleave_hdr_param();
-    } else if (interleave_ae_mode_ == "laser" && interleave_frame_enable_) {
-      RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to laser");
-      device_->loadFrameInterleave("laser interleave");
-      init_interleave_laser_param();
-    } else {
-      RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to nothing");
-    }
-
     pipeline_->start(pipeline_config_, [this](const std::shared_ptr<ob::FrameSet> &frame_set) {
       onNewFrameSetCallback(frame_set);
     });
@@ -860,13 +839,25 @@ void OBCameraNode::startStreams() {
   if (enable_stream_[COLOR] && !colorFrameThread_) {
     colorFrameThread_ = std::make_shared<std::thread>([this]() { onNewColorFrameCallback(); });
   }
-
   if (enable_frame_sync_) {
     RCLCPP_INFO_STREAM(logger_, "Enable frame sync");
     TRY_EXECUTE_BLOCK(pipeline_->enableFrameSync());
   } else {
     RCLCPP_INFO_STREAM(logger_, "Disable frame sync");
     TRY_EXECUTE_BLOCK(pipeline_->disableFrameSync());
+  }
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  // set interleave mode
+  if (interleave_ae_mode_ == "hdr" && interleave_frame_enable_) {
+    RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to hdr");
+    device_->loadFrameInterleave("Depth From HDR");
+    init_interleave_hdr_param();
+  } else if (interleave_ae_mode_ == "laser" && interleave_frame_enable_) {
+    RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to laser");
+    device_->loadFrameInterleave("Laser On-Off");
+    init_interleave_laser_param();
+  } else {
+    RCLCPP_INFO_STREAM(logger_, "Setting interleave mode to nothing");
   }
   // enable interleave frame
   if ((interleave_ae_mode_ == "hdr") || (interleave_ae_mode_ == "laser")) {
@@ -1232,7 +1223,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<bool>(enable_spatial_filter_, "enable_spatial_filter", false);
   setAndGetNodeParameter<bool>(enable_temporal_filter_, "enable_temporal_filter", false);
   setAndGetNodeParameter<bool>(enable_hole_filling_filter_, "enable_hole_filling_filter", false);
-  setAndGetNodeParameter<int>(decimation_filter_scale_, "decimation_filter_scale_", -1);
+  setAndGetNodeParameter<int>(decimation_filter_scale_, "decimation_filter_scale", -1);
   setAndGetNodeParameter<int>(sequence_id_filter_id_, "sequence_id_filter_id", -1);
   setAndGetNodeParameter<int>(threshold_filter_max_, "threshold_filter_max", -1);
   setAndGetNodeParameter<int>(threshold_filter_min_, "threshold_filter_min", -1);
@@ -1253,7 +1244,6 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<std::string>(align_mode_, "align_mode", "HW");
   setAndGetNodeParameter<double>(diagnostic_period_, "diagnostic_period", 1.0);
   setAndGetNodeParameter<bool>(enable_laser_, "enable_laser", true);
-  setAndGetNodeParameter<int>(laser_on_off_mode_, "laser_on_off_mode", 0);
   std::string align_target_stream_str_;
   setAndGetNodeParameter<std::string>(align_target_stream_str_, "align_target_stream", "COLOR");
   align_target_stream_ = obStreamTypeFromString(align_target_stream_str_);
@@ -1266,9 +1256,6 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(max_depth_limit_, "max_depth_limit", 0);
   setAndGetNodeParameter<bool>(enable_heartbeat_, "enable_heartbeat", false);
   setAndGetNodeParameter<bool>(enable_color_undistortion_, "enable_color_undistortion", false);
-  if (enable_3d_reconstruction_mode_) {
-    laser_on_off_mode_ = 1;  // 0 off, 1 on-off, 1 off-on
-  }
   setAndGetNodeParameter<std::string>(time_domain_, "time_domain", "device");
   auto device_info = device_->getDeviceInfo();
   CHECK_NOTNULL(device_info.get());
@@ -1432,6 +1419,17 @@ void OBCameraNode::setupPipelineConfig() {
     if (enable_stream_[stream_index]) {
       RCLCPP_INFO_STREAM(logger_, "Enable " << stream_name_[stream_index] << " stream");
       auto profile = stream_profile_[stream_index]->as<ob::VideoStreamProfile>();
+
+      if (stream_index == COLOR && enable_stream_[COLOR] && align_filter_) {
+        auto video_profile = profile;
+        RCLCPP_INFO_STREAM(
+            logger_, "color video_profile: " << video_profile->getWidth() << "x"
+                                             << video_profile->getHeight() << " "
+                                             << video_profile->getFps() << "fps "
+                                             << magic_enum::enum_name(video_profile->getFormat()));
+        align_filter_->setAlignToStreamProfile(video_profile);
+      }
+
       RCLCPP_INFO_STREAM(
           logger_, "Stream " << stream_name_[stream_index] << " width: " << profile->getWidth()
                              << " height: " << profile->getHeight() << " fps: " << profile->getFps()
@@ -1878,22 +1876,16 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
       tf_published_ = true;
     }
     auto depth_frame = frame_set->getFrame(OB_FRAME_DEPTH);
-    bool depth_laser_status = false;
-    if (depth_frame && depth_frame->hasMetadata(OB_FRAME_METADATA_TYPE_LASER_STATUS)) {
-      depth_laser_status = depth_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_LASER_STATUS) == 1;
-    }
     auto color_frame = frame_set->getFrame(OB_FRAME_COLOR);
-    depth_frame = processDepthFrameFilter(depth_frame);
-    bool depth_aligned = false;
     if (depth_frame) {
+      depth_frame = processDepthFrameFilter(depth_frame);
       frame_set->pushFrame(depth_frame);
     }
-    if (depth_registration_ && align_filter_ && depth_frame && color_frame) {
+    if (depth_registration_ && align_filter_ && depth_frame) {
       if (auto new_frame = align_filter_->process(frame_set)) {
         auto new_frame_set = new_frame->as<ob::FrameSet>();
         CHECK_NOTNULL(new_frame_set.get());
         frame_set = new_frame_set;
-        depth_aligned = true;
       } else {
         RCLCPP_ERROR(logger_, "Failed to align depth frame to color frame");
         return;
@@ -1903,16 +1895,11 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
                    "Depth registration is disabled or align filter is null or depth frame is "
                    "null or color frame is null");
     }
-    if (depth_registration_ && align_filter_ && !depth_aligned) {
-      return;
-    }
 
     if (enable_stream_[COLOR] && color_frame) {
       std::unique_lock<std::mutex> lock(color_frame_queue_lock_);
-      if (!enable_3d_reconstruction_mode_ || depth_laser_status) {
-        color_frame_queue_.push(frame_set);
-        color_frame_queue_cv_.notify_all();
-      }
+      color_frame_queue_.push(frame_set);
+      color_frame_queue_cv_.notify_all();
     } else {
       publishPointCloud(frame_set);
     }
@@ -1927,24 +1914,7 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
         if (frame == nullptr) {
           continue;
         }
-        if (stream_index == DEPTH) {
-          frame = (enable_3d_reconstruction_mode_ && !depth_laser_status) ? nullptr : frame;
-        }
-        auto is_ir_frame = frame_type == OB_FRAME_IR_LEFT || frame_type == OB_FRAME_IR_RIGHT ||
-                           frame_type == OB_FRAME_IR;
-        if (is_ir_frame) {
-          std::shared_ptr<ob::Frame> ir_frame =
-              frame->getFormat() == OB_FORMAT_MJPG ? decodeIRMJPGFrame(frame) : frame;
-          bool ir_laser_status = false;
-          if (ir_frame && ir_frame->hasMetadata(OB_FRAME_METADATA_TYPE_LASER_STATUS)) {
-            ir_laser_status = ir_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_LASER_STATUS) == 1;
-          }
-          if (ir_frame && (!enable_3d_reconstruction_mode_ || !ir_laser_status)) {
-            onNewFrameCallback(ir_frame, stream_index);
-          }
-        } else if (frame_type == OB_FRAME_DEPTH) {
-          onNewFrameCallback(frame, stream_index);
-        }
+        onNewFrameCallback(frame, stream_index);
       }
     }
   } catch (const ob::Error &e) {

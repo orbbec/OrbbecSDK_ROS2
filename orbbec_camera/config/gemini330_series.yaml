@@ -1,0 +1,100 @@
+# config/*.yaml files are used to configure the camera parameters
+---
+orbbec_ros:
+    camera_parameters:
+        general:
+            # Camera model. upport product models by referencing config/*.yaml
+            camera_model: "gemini330_series"
+            # Path to the configuration file. If empty, default parameters will be used
+            config_file_path: "gemini330_series.yaml"
+
+        deivce:
+            camera_name: "camera"
+            serial_number: ""
+            usb_port: ""
+            device_num: 1
+            uvc_backend: "libuvc"
+            vendor_id: "0x2bc5"
+            product_id: ""
+            connection_delay: 10
+            time_domain: "device"
+            retry_on_usb3_detection_failure: false
+            enable_heartbeat: false
+            enable_hardware_reset: false
+            enable_ldp: true
+            device_preset: "Default"
+
+        color:
+            enable_color: true
+            color_qos: "default"
+            color_camera_info_qos: "default"
+            color_width: 0
+            color_height: 0
+            color_fps: 0
+            color_format: "ANY"
+            enable_color_auto_white_balance: true
+            color_white_balance: -1
+            color_auto_ae:
+                enable_color_auto_exposure: true
+                color_ae_max_exposure: -1
+            color_manual_ae:
+                color_exposure: -1
+                color_gain: -1
+                color_brightness: -1
+
+        depth:
+            enable_depth: true
+            depth_qos: "default"
+            depth_camera_info_qos: "default"
+            depth_width: 0
+            depth_height: 0
+            depth_fps: 0
+            depth_format: "ANY"
+            depth_registration: true
+            align_mode: "SW"
+            laser:
+                enable_laser: true
+
+        leftir:
+            enable_left_ir: false
+            left_ir_qos: "default"
+            left_ir_camera_info_qos: "default"
+            left_ir_width: 0
+            left_ir_height: 0
+            left_ir_fps: 0
+            left_ir_format: "ANY"
+
+        rightir:
+            enable_right_ir: false
+            right_ir_camera_info_qos: "default"
+            right_ir_width: 0
+            right_ir_height: 0
+            right_ir_fps: 0
+            right_ir_format: "ANY"
+
+        ir_parameters:
+            enable_ir_auto_exposure: true
+            ir_ae_max_exposure: -1
+            ir_exposure: -1
+            ir_gain: -1
+            ir_brightness: -1
+
+        imu:
+            enable_accel: false
+            accel_rate: "200hz"
+            accel_range: "4g"
+            enable_gyro: false
+            gyro_rate: "200hz"
+            gyro_range: "1000dps"
+            enable_sync_output_accel_gyro: false
+            liner_accel_cov: 0.01
+            angular_vel_cov: 0.01
+
+        point_cloud:
+            enable_point_cloud: true
+            enable_colored_point_cloud: false
+
+        advanced:
+            enable_frame_sync: true
+            enable_d2c_viewer: false
+

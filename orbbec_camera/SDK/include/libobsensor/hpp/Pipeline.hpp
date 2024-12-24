@@ -387,7 +387,7 @@ public:
     /**
      * @brief Get the stream profile list of supported depth-to-color alignments
      *
-     * @param colorProfile The color stream profile, witch is the target stream profile for the depth-to-color alignment.
+     * @param colorProfile The color stream profile, which is the target stream profile for the depth-to-color alignment.
      * @param alignMode The alignment mode.
      *
      * @attention Currently, only ALIGN_D2C_HW_MODE supported. For other align modes, please using the AlignFilter interface.
@@ -449,4 +449,3 @@ public:
 };
 
 }  // namespace ob
-

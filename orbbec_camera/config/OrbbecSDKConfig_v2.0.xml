@@ -8,9 +8,9 @@
         <!-- Log output level, int type, optional values: 0-DEBUG, 1-INFO, 2-WARN, 3-ERROR, 4-FATAL,
         5-OFF -->
         <!-- File log output level -->
-        <FileLogLevel>0</FileLogLevel>
+        <FileLogLevel>5</FileLogLevel>
         <!-- Console log output level -->
-        <ConsoleLogLevel>0</ConsoleLogLevel>
+        <ConsoleLogLevel>3</ConsoleLogLevel>
         <!-- Default log output file path, string type. If this item is not configured, the default
         path will be used: Win/Linux: "./Log"; Android: "/sdcard/orbbec/Log" -->
         <!-- <OutputDir>./log</OutputDir> -->
@@ -35,15 +35,6 @@
         <!-- Frame buffer queue size in internal processing unit -->
         <FrameProcessingBlockQueueSize>10</FrameProcessingBlockQueueSize>
     </Memory>
-
-    <Misc>
-        <GlobalTimestampFitterEnable>false</GlobalTimestampFitterEnable>
-        <!-- Global timestamp fitter refresh interval, unit: milliseconds, default value: 1000,
-        minimum value: 100, it is recommended not to be greater than 1000 -->
-        <GlobalTimestampFitterInterval>1000</GlobalTimestampFitterInterval>
-        <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
-        <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
-    </Misc>
 
     <!-- Default working configuration of pipeline -->
     <Pipeline>
@@ -91,6 +82,15 @@
         <FemtoMega>
             <!-- For Femto-Mega devices, it must be set to V4L2, LibUVC is not supported -->
             <LinuxUVCDefaultBackend>V4L2</LinuxUVCDefaultBackend>
+
+            <Misc>
+                <GlobalTimestampFitterEnable>false</GlobalTimestampFitterEnable>
+                <!-- Global timestamp fitter refresh interval, unit: milliseconds, default value: 1000,
+                minimum value: 100, it is recommended not to be greater than 1000 -->
+                <GlobalTimestampFitterInterval>1000</GlobalTimestampFitterInterval>
+                <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
+                <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
+            </Misc>
 
             <Depth>
                 <!-- The width of the default resolution, int type -->
@@ -166,6 +166,15 @@
         </FemtoMega>
 
         <FemtoMegai>
+            <Misc>
+                <GlobalTimestampFitterEnable>false</GlobalTimestampFitterEnable>
+                <!-- Global timestamp fitter refresh interval, unit: milliseconds, default value: 1000,
+                minimum value: 100, it is recommended not to be greater than 1000 -->
+                <GlobalTimestampFitterInterval>1000</GlobalTimestampFitterInterval>
+                <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
+                <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
+            </Misc>
+
             <Depth>
                 <!-- The width of the default resolution, int type -->
                 <Width>640</Width>
@@ -243,6 +252,15 @@
             <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
             will determine the device's speciality. Optional values: V4L2, LibUVC -->
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
+
+            <Misc>
+                <GlobalTimestampFitterEnable>false</GlobalTimestampFitterEnable>
+                <!-- Global timestamp fitter refresh interval, unit: milliseconds, default value: 1000,
+                minimum value: 100, it is recommended not to be greater than 1000 -->
+                <GlobalTimestampFitterInterval>1000</GlobalTimestampFitterInterval>
+                <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
+                <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
+            </Misc>
 
             <Depth>
                 <!-- The width of the default resolution, int type -->
@@ -322,6 +340,15 @@
             <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
             will determine the device's speciality. Optional values: V4L2, LibUVC -->
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
+
+            <Misc>
+                <GlobalTimestampFitterEnable>false</GlobalTimestampFitterEnable>
+                <!-- Global timestamp fitter refresh interval, unit: milliseconds, default value: 1000,
+                minimum value: 100, it is recommended not to be greater than 1000 -->
+                <GlobalTimestampFitterInterval>1000</GlobalTimestampFitterInterval>
+                <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
+                <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
+            </Misc>
 
             <!-- Whether to enable heartbeat by default -->
             <DefaultHeartBeat>0</DefaultHeartBeat>
@@ -497,6 +524,15 @@
             will determine the device's speciality. Optional values: V4L2, LibUVC -->
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
 
+            <Misc>
+                <GlobalTimestampFitterEnable>false</GlobalTimestampFitterEnable>
+                <!-- Global timestamp fitter refresh interval, unit: milliseconds, default value: 1000,
+                minimum value: 100, it is recommended not to be greater than 1000 -->
+                <GlobalTimestampFitterInterval>1000</GlobalTimestampFitterInterval>
+                <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
+                <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
+            </Misc>
+
             <!-- Whether to enable heartbeat by default -->
             <DefaulHeartBeat>0</DefaulHeartBeat>
 
@@ -671,6 +707,15 @@
             will determine the device's speciality. Optional values: V4L2, LibUVC -->
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
 
+            <Misc>
+                <GlobalTimestampFitterEnable>false</GlobalTimestampFitterEnable>
+                <!-- Global timestamp fitter refresh interval, unit: milliseconds, default value: 1000,
+                minimum value: 100, it is recommended not to be greater than 1000 -->
+                <GlobalTimestampFitterInterval>1000</GlobalTimestampFitterInterval>
+                <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
+                <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
+            </Misc>
+
             <!-- Whether to enable heartbeat by default -->
             <DefaulHeartBeat>0</DefaulHeartBeat>
 
@@ -782,6 +827,15 @@
             <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
             will determine the device's speciality. Optional values: V4L2, LibUVC -->
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
+
+            <Misc>
+                <GlobalTimestampFitterEnable>false</GlobalTimestampFitterEnable>
+                <!-- Global timestamp fitter refresh interval, unit: milliseconds, default value: 1000,
+                minimum value: 100, it is recommended not to be greater than 1000 -->
+                <GlobalTimestampFitterInterval>1000</GlobalTimestampFitterInterval>
+                <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
+                <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
+            </Misc>
 
             <!-- Whether to enable heartbeat by default -->
             <DefaulHeartBeat>0</DefaulHeartBeat>
@@ -1059,6 +1113,15 @@
             this item will determine the device's speciality. Optional values: V4L2, LibUVC -->
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
 
+            <Misc>
+                <GlobalTimestampFitterEnable>true</GlobalTimestampFitterEnable>
+                <!-- Global timestamp fitter refresh interval, unit: milliseconds, default value: 1000,
+                minimum value: 100, it is recommended not to be greater than 1000 -->
+                <GlobalTimestampFitterInterval>1000</GlobalTimestampFitterInterval>
+                <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
+                <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
+            </Misc>
+
             <!-- Whether to enable heartbeat by default -->
             <DefaultHeartBeat>0</DefaultHeartBeat>
             <!-- Whether to enable firmware upgrade foolproof by default, only internal version
@@ -1132,6 +1195,15 @@
             <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
             will determine the device's speciality. Optional values: V4L2, LibUVC -->
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
+
+            <Misc>
+                <GlobalTimestampFitterEnable>true</GlobalTimestampFitterEnable>
+                <!-- Global timestamp fitter refresh interval, unit: milliseconds, default value: 1000,
+                minimum value: 100, it is recommended not to be greater than 1000 -->
+                <GlobalTimestampFitterInterval>1000</GlobalTimestampFitterInterval>
+                <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
+                <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
+            </Misc>
 
             <!-- Whether to enable heartbeat by default -->
             <DefaultHeartBeat>0</DefaultHeartBeat>
@@ -1207,6 +1279,15 @@
             will determine the device's speciality. Optional values: V4L2, LibUVC -->
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
 
+            <Misc>
+                <GlobalTimestampFitterEnable>true</GlobalTimestampFitterEnable>
+                <!-- Global timestamp fitter refresh interval, unit: milliseconds, default value: 1000,
+                minimum value: 100, it is recommended not to be greater than 1000 -->
+                <GlobalTimestampFitterInterval>1000</GlobalTimestampFitterInterval>
+                <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
+                <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
+            </Misc>
+
             <!-- Whether to enable heartbeat by default -->
             <DefaultHeartBeat>0</DefaultHeartBeat>
             <!-- Whether to enable firmware upgrade foolproof by default, only internal version
@@ -1275,6 +1356,15 @@
             <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
             will determine the device's speciality. Optional values: V4L2, LibUVC -->
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
+
+            <Misc>
+                <GlobalTimestampFitterEnable>true</GlobalTimestampFitterEnable>
+                <!-- Global timestamp fitter refresh interval, unit: milliseconds, default value: 1000,
+                minimum value: 100, it is recommended not to be greater than 1000 -->
+                <GlobalTimestampFitterInterval>1000</GlobalTimestampFitterInterval>
+                <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
+                <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
+            </Misc>
 
             <!-- Whether to enable heartbeat by default -->
             <DefaultHeartBeat>0</DefaultHeartBeat>
@@ -1350,6 +1440,15 @@
             will determine the device's speciality. Optional values: V4L2, LibUVC -->
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
 
+            <Misc>
+                <GlobalTimestampFitterEnable>true</GlobalTimestampFitterEnable>
+                <!-- Global timestamp fitter refresh interval, unit: milliseconds, default value: 1000,
+                minimum value: 100, it is recommended not to be greater than 1000 -->
+                <GlobalTimestampFitterInterval>1000</GlobalTimestampFitterInterval>
+                <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
+                <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
+            </Misc>
+
             <!-- Whether to enable heartbeat by default -->
             <DefaultHeartBeat>0</DefaultHeartBeat>
             <!-- Whether to enable firmware upgrade foolproof by default, only internal version
@@ -1424,6 +1523,15 @@
             <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
             will determine the device's speciality. Optional values: V4L2, LibUVC -->
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
+
+            <Misc>
+                <GlobalTimestampFitterEnable>true</GlobalTimestampFitterEnable>
+                <!-- Global timestamp fitter refresh interval, unit: milliseconds, default value: 1000,
+                minimum value: 100, it is recommended not to be greater than 1000 -->
+                <GlobalTimestampFitterInterval>1000</GlobalTimestampFitterInterval>
+                <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
+                <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
+            </Misc>
 
             <!--Whether
             to enable heartbeat by default-->
@@ -1517,6 +1625,15 @@
             will determine the device's speciality. Optional values: V4L2, LibUVC -->
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
 
+            <Misc>
+                <GlobalTimestampFitterEnable>true</GlobalTimestampFitterEnable>
+                <!-- Global timestamp fitter refresh interval, unit: milliseconds, default value: 1000,
+                minimum value: 100, it is recommended not to be greater than 1000 -->
+                <GlobalTimestampFitterInterval>1000</GlobalTimestampFitterInterval>
+                <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
+                <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
+            </Misc>
+
             <!--Whether
             to enable heartbeat by default-->
             <DefaultHeartBeat>0</DefaultHeartBeat>
@@ -1601,5 +1718,131 @@
                 <Format>Y8</Format>
             </IR_RIGHT>
         </DaBaiAL>
+		<!-- Gemini210 config -->
+        <Gemini210>
+            <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
+            will determine the device's speciality. Optional values: V4L2, LibUVC -->
+            <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
+
+            <Misc>
+                <GlobalTimestampFitterEnable>false</GlobalTimestampFitterEnable>
+                <!-- Global timestamp fitter refresh interval, unit: milliseconds, default value: 1000,
+                minimum value: 100, it is recommended not to be greater than 1000 -->
+                <GlobalTimestampFitterInterval>1000</GlobalTimestampFitterInterval>
+                <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
+                <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
+            </Misc>
+
+            <!-- Whether to enable heartbeat by default -->
+            <DefaulHeartBeat>0</DefaulHeartBeat>
+
+            <Depth>
+                <!-- Number of retries for open stream failures, 0 means no retries -->
+                <StreamFailedRetry>0</StreamFailedRetry>
+                <!-- Open flow waits for the timeout period of the first frame of data, after which
+                the open flow will fail -->
+                <MaxStartStreamDelayMs>5000</MaxStartStreamDelayMs>
+                <!-- The number of data stream restarts due to abnormal interruption, 0 means no
+                restart -->
+                <StreamInterruptedRestart>0</StreamInterruptedRestart>
+                <!-- The maximum frame interval time, if this value is exceeded, it will be judged
+                that the stream is interrupted -->
+                <MaxFrameIntervalMs>2000</MaxFrameIntervalMs>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>1280</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>800</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>15</FPS>
+                <Format>Y16</Format>
+            </Depth>
+            <Color>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>1280</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>720</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>15</FPS>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <Format>MJPG</Format>
+                <!-- Number of retries for open stream failures, 0 means no retries -->
+                <StreamFailedRetry>0</StreamFailedRetry>
+            </Color>
+            <IR>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>1280</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>800</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>15</FPS>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <Format>Y8</Format>
+                <!-- Number of retries for open stream failures, 0 means no retries -->
+                <StreamFailedRetry>0</StreamFailedRetry>
+            </IR>
+        </Gemini210>
+		<!-- Gemini215 config -->
+        <Gemini215>
+            <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
+            will determine the device's speciality. Optional values: V4L2, LibUVC -->
+            <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
+
+            <Misc>
+                <GlobalTimestampFitterEnable>false</GlobalTimestampFitterEnable>
+                <!-- Global timestamp fitter refresh interval, unit: milliseconds, default value: 1000,
+                minimum value: 100, it is recommended not to be greater than 1000 -->
+                <GlobalTimestampFitterInterval>1000</GlobalTimestampFitterInterval>
+                <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
+                <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
+            </Misc>
+
+            <!-- Whether to enable heartbeat by default -->
+            <DefaulHeartBeat>0</DefaulHeartBeat>
+
+            <Depth>
+                <!-- Number of retries for open stream failures, 0 means no retries -->
+                <StreamFailedRetry>0</StreamFailedRetry>
+                <!-- Open flow waits for the timeout period of the first frame of data, after which
+                the open flow will fail -->
+                <MaxStartStreamDelayMs>5000</MaxStartStreamDelayMs>
+                <!-- The number of data stream restarts due to abnormal interruption, 0 means no
+                restart -->
+                <StreamInterruptedRestart>0</StreamInterruptedRestart>
+                <!-- The maximum frame interval time, if this value is exceeded, it will be judged
+                that the stream is interrupted -->
+                <MaxFrameIntervalMs>2000</MaxFrameIntervalMs>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>1280</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>800</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>15</FPS>
+                <Format>Y16</Format>
+            </Depth>
+            <Color>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>1280</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>720</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>15</FPS>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <Format>MJPG</Format>
+                <!-- Number of retries for open stream failures, 0 means no retries -->
+                <StreamFailedRetry>0</StreamFailedRetry>
+            </Color>
+            <IR>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>1280</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>800</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>15</FPS>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <Format>Y8</Format>
+                <!-- Number of retries for open stream failures, 0 means no retries -->
+                <StreamFailedRetry>0</StreamFailedRetry>
+            </IR>
+        </Gemini215>
     </Device>
 </Config>

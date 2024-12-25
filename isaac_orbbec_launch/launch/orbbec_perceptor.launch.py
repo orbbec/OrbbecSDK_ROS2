@@ -69,7 +69,7 @@ def generate_launch_description():
 
     perceptor_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
-            perceptenable_point_cloudor_bringup_dir, 'launch', 'rgbd_perceptor.launch.py')]),
+            perceptor_bringup_dir, 'launch', 'rgbd_perceptor.launch.py')]),
         launch_arguments={'config_file': LaunchConfiguration("perceptor_config_file"),
                           'attach_to_shared_component_container': 'True',
                           'component_container_name': component_container_name_arg}.items())

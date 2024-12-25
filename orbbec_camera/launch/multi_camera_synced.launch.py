@@ -108,19 +108,19 @@ def generate_launch_description():
     )
 
     delayed_left_camera = TimerAction(
-        period=0.5,
+        period=0.0,
         actions=[left_camera],
     )
     delayed_right_camera = TimerAction(
-        period=1.0,
+        period=2.0,
         actions=[right_camera],
     )
     delayed_rear_camera = TimerAction(
-        period=1.5,
+        period=4.0,
         actions=[rear_camera],
     )
     delayed_front_camera = TimerAction(
-        period=2.0,
+        period=6.0,
         actions=[front_camera],
     )
     ld = LaunchDescription(

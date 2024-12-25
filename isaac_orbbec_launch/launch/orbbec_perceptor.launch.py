@@ -18,7 +18,7 @@ def generate_launch_description():
 
     default_perceptor_config_file = os.path.join(isaac_orbbec_launch_dir, 'param', 'orbbec_perceptor_detached.yaml')
     perceptor_odom_rviz_file = os.path.join(isaac_orbbec_launch_dir, 'param', 'perceptor_odom.rviz')
-    default_dev_matrices_file = os.path.join(isaac_orbbec_launch_dir, 'config', 'matrices_SN1423724335594.yaml')
+    default_dev_matrices_file = os.path.join(isaac_orbbec_launch_dir, 'config', 'dev_matrices_SN1423724335594.yaml')
 
     perceptor_config_file_arg = DeclareLaunchArgument(
         'perceptor_config_file', default_value=default_perceptor_config_file,
@@ -69,7 +69,7 @@ def generate_launch_description():
 
     perceptor_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
-            perceptor_bringup_dir, 'launch', 'rgbd_perceptor.launch.py')]),
+            perceptenable_point_cloudor_bringup_dir, 'launch', 'rgbd_perceptor.launch.py')]),
         launch_arguments={'config_file': LaunchConfiguration("perceptor_config_file"),
                           'attach_to_shared_component_container': 'True',
                           'component_container_name': component_container_name_arg}.items())
@@ -101,10 +101,10 @@ def generate_launch_description():
         from_bag_arg,
         bag_path_arg,
         shared_orbbec_container,
-        # orbbec_launch,
+        orbbec_launch,
         base_static_transforms_publisher,
-        # perceptor_launch,
-        # bag_play,
-        # rviz2_node,
+        perceptor_launch,
+        bag_play,
+        rviz2_node,
       ]
     )

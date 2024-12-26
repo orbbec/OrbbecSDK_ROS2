@@ -60,7 +60,7 @@ def generate_launch_description():
     )
     left_camera = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "gemini_330_series_interleave_laser_g335L.launch.py")
+            os.path.join(launch_file_dir, "gemini_330_series.launch.py")
         ),
         launch_arguments={
             "camera_name": "left_camera",
@@ -76,7 +76,7 @@ def generate_launch_description():
     )
     right_camera = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "gemini_330_series_interleave_laser_g335L.launch.py")
+            os.path.join(launch_file_dir, "gemini_330_series.launch.py")
         ),
         launch_arguments={
             "camera_name": "right_camera",
@@ -92,7 +92,7 @@ def generate_launch_description():
     )
     rear_camera = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "gemini_330_series_interleave_laser_g335L.launch.py")
+            os.path.join(launch_file_dir, "gemini_330_series.launch.py")
         ),
         launch_arguments={
             "camera_name": "rear_camera",

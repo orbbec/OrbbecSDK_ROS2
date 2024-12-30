@@ -168,7 +168,7 @@ def generate_launch_description():
         DeclareLaunchArgument('laser_energy_level', default_value='-1'),
         DeclareLaunchArgument('enable_3d_reconstruction_mode', default_value='false'),
         DeclareLaunchArgument('enable_sync_host_time', default_value='true'),
-        DeclareLaunchArgument('time_domain', default_value='global'),
+        DeclareLaunchArgument('time_domain', default_value='global'),# global, device, system
         DeclareLaunchArgument('enable_color_undistortion', default_value='false'),
         DeclareLaunchArgument('config_file_path', default_value=''),
         DeclareLaunchArgument('enable_heartbeat', default_value='false'),

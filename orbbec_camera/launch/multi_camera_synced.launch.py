@@ -36,6 +36,7 @@ def generate_launch_description():
             "device_num": "2",
             "sync_mode": "secondary_synced",
             "config_file_path": config_file_path,
+            "trigger_out_enabled": "false"
         }.items(),
     )
 

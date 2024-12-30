@@ -14,13 +14,11 @@ orbbec_ros:
             usb_port: ""
             device_num: 1
             uvc_backend: "libuvc"
-            vendor_id: "0x2bc5"
             product_id: ""
             connection_delay: 10
-            time_domain: "device"
+            time_domain: "global"
             retry_on_usb3_detection_failure: false
             enable_heartbeat: false
-            enable_hardware_reset: false
             enable_ldp: true
             device_preset: "Default"
 

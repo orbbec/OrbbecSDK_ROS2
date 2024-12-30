@@ -218,6 +218,7 @@ add_orbbec_executable(topic_statistics_node tools/topic_statistics.cpp)
 add_orbbec_executable(multi_save_rgbir_node tools/multi_save_rgbir_node.cpp)
 add_orbbec_executable(metadata_save_files_node tools/metadata_save_files.cpp)
 add_orbbec_executable(metadata_export_files_node tools/metadata_export_files.cpp)
+add_orbbec_executable(multi_save_cloud_node tools/multi_save_cloud_node.cpp)
 
 add_library(frame_latency SHARED tools/frame_latency.cpp)
 target_include_directories(frame_latency PUBLIC ${COMMON_INCLUDE_DIRS})
@@ -256,6 +257,7 @@ install(TARGETS list_devices_node
   multi_save_rgbir_node
   metadata_save_files_node
   metadata_export_files_node
+  multi_save_cloud_node
   DESTINATION lib/${PROJECT_NAME}/)
 
 if (BUILD_TESTING)

@@ -803,6 +803,20 @@ typedef struct {
 } OBTofExposureThresholdControl, ob_tof_exposure_threshold_control, TOF_EXPOSURE_THRESHOLD_CONTROL;
 
 /**
+ * @brief Device depth industry mode
+ */
+typedef enum {
+    OB_INDUSTRY_DEFAULT,
+    OB_INDUSTRY_MODE1,
+    OB_INDUSTRY_MODE2,
+    OB_INDUSTRY_MODE3,
+    OB_INDUSTRY_MODE4,
+    OB_INDUSTRY_MODE5,
+} OBDepthIndustryMode,
+    ob_depth_industry_mode;
+
+
+/**
  * @brief Sync mode
  * @deprecated This define is deprecated, please use @ref ob_multi_device_sync_mode instead
  */
@@ -1204,6 +1218,12 @@ typedef enum {
      * @attention In this mode, the user may return null when getting the specified type of data frame from the acquired FrameSet
      */
     OB_FRAME_AGGREGATE_OUTPUT_ANY_SITUATION,
+    /**
+     * @brief Disable Frame Aggreate
+     *
+     * @attention In this mode, All types of data frames will output independently.
+     */
+    OB_FRAME_AGGREGATE_OUTPUT_DISABLE,
 } OB_FRAME_AGGREGATE_OUTPUT_MODE,
     OBFrameAggregateOutputMode, ob_frame_aggregate_output_mode;
 

@@ -12,6 +12,7 @@ import os
 def generate_launch_description():
     # Declare arguments
     args = [
+        DeclareLaunchArgument('prefix', default_value=''),
         DeclareLaunchArgument('camera_name', default_value='camera'),
         DeclareLaunchArgument('depth_registration', default_value='false'),
         DeclareLaunchArgument('serial_number', default_value=''),
@@ -122,14 +123,14 @@ def generate_launch_description():
         compose_node = ComposableNode(
             package="orbbec_camera",
             plugin="orbbec_camera::OBCameraNodeDriver",
-            name=LaunchConfiguration("camera_name"),
-            namespace="",
+            name="orbbec_node_driver",
+            namespace=LaunchConfiguration("camera_name"),
             parameters=parameters,
         )
         # Define the ComposableNodeContainer
         container = ComposableNodeContainer(
-            name="camera_container",
-            namespace="",
+            name="container",
+            namespace=LaunchConfiguration("camera_name"),
             package="rclcpp_components",
             executable="component_container",
             composable_node_descriptions=[
@@ -142,7 +143,7 @@ def generate_launch_description():
             args
             + [
                 GroupAction(
-                    [PushRosNamespace(LaunchConfiguration("camera_name")), container]
+                    [PushRosNamespace(LaunchConfiguration("prefix")), container]
                 )
             ]
         )

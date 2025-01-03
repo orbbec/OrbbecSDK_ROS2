@@ -434,8 +434,6 @@ The following are the launch parameters available:
   attempt to reset the camera up to three times. This setting aims to prevent USB 3.0 devices from being incorrectly
   recognized as USB 2.0. It is recommended to set this parameter to `false` when using a USB 2.0 connection to avoid
   unnecessary resets.
-- `enable_3d_reconstruction_mode`: Enables 3D reconstruction mode. Default is `false`. When set to `true`, the camera
-  laser operates in on-off mode, capturing IR images (laser off) for VSLAM localization and depth images (laser on) for point cloud computation.
 - `tf_publish_rate`: The rate at which the camera publishes dynamic transforms. The default value is `0.0`, which means static transforms are published.
 - `time_domain`: The frame time domain, string type, can be `device`, `global`, or `system`. `device` means using the hardware timestamp from the camera,
   `system` means using the timestamp when the PC received the first packet of data or frame, and `global` is used for synchronized time across multiple

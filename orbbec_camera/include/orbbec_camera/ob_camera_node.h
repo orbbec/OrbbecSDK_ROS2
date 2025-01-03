@@ -594,7 +594,6 @@ class OBCameraNode {
   uint32_t depth_xy_table_data_size_ = 0;
   uint8_t* depth_point_cloud_buffer_ = nullptr;
   uint32_t depth_point_cloud_buffer_size_ = 0;
-  bool enable_3d_reconstruction_mode_ = false;
   int min_depth_limit_ = 0;
   int max_depth_limit_ = 0;
   std::string time_domain_ = "device";  // device, system, global

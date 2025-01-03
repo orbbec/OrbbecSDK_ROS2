@@ -1251,8 +1251,6 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<bool>(retry_on_usb3_detection_failure_, "retry_on_usb3_detection_failure",
                                false);
   setAndGetNodeParameter<int>(laser_energy_level_, "laser_energy_level", -1);
-  setAndGetNodeParameter<bool>(enable_3d_reconstruction_mode_, "enable_3d_reconstruction_mode",
-                               false);
   setAndGetNodeParameter<int>(min_depth_limit_, "min_depth_limit", 0);
   setAndGetNodeParameter<int>(max_depth_limit_, "max_depth_limit", 0);
   setAndGetNodeParameter<bool>(enable_heartbeat_, "enable_heartbeat", false);

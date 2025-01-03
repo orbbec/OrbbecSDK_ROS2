@@ -366,8 +366,6 @@ orbbec_ros:
             ir_info_url: ""
             # URL of the color image info
             color_info_url: ""
-            # If true, the 3D reconstruction mode will be enabled
-            enable_3d_reconstruction_mode: false
             # Diagnostic period in seconds
             diagnostic_period: 1.0
 

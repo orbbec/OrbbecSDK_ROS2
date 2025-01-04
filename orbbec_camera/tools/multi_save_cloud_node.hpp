@@ -103,6 +103,7 @@ void transform_cloud_Callback(std::shared_ptr<const sensor_msgs::msg::PointCloud
   fclose(fp);
 }
   rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr stand_cloud_sub_;
+  rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr transform_cloud_sub_;    
   std::string current_path;
 };
 }  // namespace tools

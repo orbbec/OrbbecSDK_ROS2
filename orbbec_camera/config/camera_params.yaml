@@ -9,6 +9,9 @@ frames_per_trigger: 1
 log_level: "warning"
 enable_laser: false
 
+interleave_frame_enable: true
+interleave_skip_enable: true
+
 # color params
 enable_color: true
 color_width: 640

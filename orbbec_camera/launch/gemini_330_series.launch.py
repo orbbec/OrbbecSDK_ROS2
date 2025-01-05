@@ -5,7 +5,8 @@ from launch.actions import DeclareLaunchArgument, OpaqueFunction, GroupAction
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import PushRosNamespace, ComposableNodeContainer, Node
 from launch_ros.descriptions import ComposableNode
-
+from launch.conditions import UnlessCondition
+from launch_ros.actions import LoadComposableNodes
 
 def load_yaml(file_path):
     with open(file_path, 'r') as f:
@@ -174,6 +175,10 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_heartbeat', default_value='false'),
         DeclareLaunchArgument('gmsl_trigger_fps', default_value='3000'),
         DeclareLaunchArgument('enable_gmsl_trigger', default_value='false'),
+        DeclareLaunchArgument('use_intra_process_comms', default_value='false'),
+        DeclareLaunchArgument('attach_component_container_enable', default_value='false'),
+        DeclareLaunchArgument('attach_component_container_name', default_value='orbbec_container'),
+
         DeclareLaunchArgument('interleave_ae_mode', default_value='laser'), # 'hdr' or 'laser'
         DeclareLaunchArgument('interleave_frame_enable', default_value='true'),
         DeclareLaunchArgument('interleave_skip_enable', default_value='true'),
@@ -221,25 +226,31 @@ def generate_launch_description():
                 )
             ]
         else:
+            attach_to_shared_component_container_arg = LaunchConfiguration('attach_to_shared_component_container', default=False)
+            component_container_name_arg = LaunchConfiguration('component_container_name', default='orbbec_container')
+
+            orbbec_container = Node(
+                name=component_container_name_arg,
+                package='rclcpp_components',
+                executable='component_container_mt',
+                output='screen',
+                condition=UnlessCondition(attach_to_shared_component_container_arg)
+            )
             return [
-                GroupAction([
-                    PushRosNamespace(LaunchConfiguration("camera_name")),
-                    ComposableNodeContainer(
-                        name="camera_container",
-                        namespace="",
-                        package="rclcpp_components",
-                        executable="component_container",
-                        composable_node_descriptions=[
-                            ComposableNode(
-                                package="orbbec_camera",
-                                plugin="orbbec_camera::OBCameraNodeDriver",
-                                name=LaunchConfiguration("camera_name"),
-                                parameters=params,
-                            ),
-                        ],
-                        output="screen",
+                orbbec_container,
+                LoadComposableNodes(
+                  target_container=component_container_name_arg,
+                  composable_node_descriptions=[
+                    ComposableNode(
+                      namespace=LaunchConfiguration("camera_name"),
+                      name=LaunchConfiguration("camera_name"),
+                      package='orbbec_camera',
+                      plugin='orbbec_camera::OBCameraNodeDriver',
+                      parameters=params,
+                      extra_arguments=[{'use_intra_process_comms': LaunchConfiguration("use_intra_process_comms")}],
                     )
-                ])
+                  ]
+                )
             ]
 
     return LaunchDescription(

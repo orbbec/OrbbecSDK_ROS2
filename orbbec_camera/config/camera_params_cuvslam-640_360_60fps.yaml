@@ -13,10 +13,10 @@ interleave_frame_enable: true
 interleave_skip_enable: true
 
 # color params
-enable_color: true
-color_width: 1280
-color_height: 800
-color_fps: 30
+enable_color: false
+color_width: 640
+color_height: 360
+color_fps: 60
 color_format: "MJPG"
 enable_color_auto_exposure: true
 color_exposure: 50 # 5ms
@@ -24,9 +24,10 @@ color_gain: -1 # -1 default
 color_qos: "sensor_data"
 
 # depth params
-depth_width: 1280
-depth_height: 800
-depth_fps: 30
+enable_depth: false
+depth_width: 640
+depth_height: 360
+depth_fps: 60
 depth_format: "Y16"
 depth_qos: "sensor_data"
 
@@ -37,16 +38,16 @@ ir_gain: 40
 
 #left ir params
 enable_left_ir: true
-left_ir_width: 1280
-left_ir_height: 800
-left_ir_fps: 30
+left_ir_width: 640
+left_ir_height: 360
+left_ir_fps: 60
 left_ir_format: "Y8"
 left_ir_qos: "sensor_data"
 
 #right ir params
 enable_right_ir: true
-right_ir_width: 1280
-right_ir_height: 800
-right_ir_fps: 30
+right_ir_width: 640
+right_ir_height: 360
+right_ir_fps: 60
 right_ir_format: "Y8"
 right_ir_qos: "sensor_data"

@@ -18,12 +18,13 @@ color_width: 640
 color_height: 360
 color_fps: 60
 color_format: "MJPG"
-enable_color_auto_exposure: false
+enable_color_auto_exposure: true
 color_exposure: 50 # 5ms
 color_gain: -1 # -1 default
 color_qos: "sensor_data"
 
 # depth params
+enable_depth: true
 depth_width: 640
 depth_height: 360
 depth_fps: 60

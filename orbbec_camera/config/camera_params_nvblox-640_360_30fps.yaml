@@ -24,6 +24,7 @@ color_gain: -1 # -1 default
 color_qos: "sensor_data"
 
 # depth params
+enable_depth: true
 depth_width: 640
 depth_height: 360
 depth_fps: 30

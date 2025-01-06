@@ -2164,57 +2164,25 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   }
   std::shared_ptr<ob::VideoFrame> video_frame;
   if (frame->getType() == OB_FRAME_COLOR) {
-    // updateStreamInfo(frame, color_stream_info_);
-    if (interleave_frame_enable_ && interleave_skip_enable_) {
-      interleave_skip_color_index_++;
-      RCLCPP_DEBUG(logger_, "interleave filter skip interleave_skip_color_index_: %d",
-                   interleave_skip_color_index_);
-      if (interleave_skip_color_index_ % 2 == 0) {
-        RCLCPP_DEBUG(logger_, "interleave filter skip frame type: %d", frame->getType());
-        return;
-      }
-      updateStreamInfo(frame, color_stream_info_);
-    }
     video_frame = frame->as<ob::ColorFrame>();
   } else if (frame->getType() == OB_FRAME_DEPTH) {
     video_frame = frame->as<ob::DepthFrame>();
-
-    // updateStreamInfo(frame, depth_stream_info_);
-    if (interleave_frame_enable_ && interleave_skip_enable_) {
-      // interleave_skip_depth_index_++;
-      // RCLCPP_DEBUG(logger_, "interleave filter skip interleave_skip_index_: %d",
-      //              interleave_skip_depth_index_);
-      // if (interleave_skip_depth_index_ % 2 == 0) {
-      //   RCLCPP_DEBUG(logger_, "interleave filter skip frame type: %d", frame->getType());
-      //   return;
-      // }
-      if (video_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_INDEX) !=
-          interleave_skip_index_) {
-        RCLCPP_DEBUG(logger_, "interleave filter skip frame type: %d", frame->getType());
-        return;
-      }
-      updateStreamInfo(frame, depth_stream_info_);
+    if (buffer_depth_ == nullptr) {
+      buffer_depth_ =
+          std::shared_ptr<char[]>(new char[video_frame->getWidth() * video_frame->getHeight() * 2]);
     }
   } else if (frame->getType() == OB_FRAME_IR || frame->getType() == OB_FRAME_IR_LEFT ||
              frame->getType() == OB_FRAME_IR_RIGHT) {
     video_frame = frame->as<ob::IRFrame>();
-
-    // interleave filter speckle or flood ir
-    if (interleave_frame_enable_ && interleave_skip_enable_) {
-      RCLCPP_DEBUG(logger_, "interleave filter skip interleave_skip_index_: %d",
-                   interleave_skip_index_);
-      if (video_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_INDEX) ==
-          interleave_skip_index_) {
-        RCLCPP_DEBUG(logger_, "interleave filter skip frame type: %d", frame->getType());
-        return;
-      }
-      if (frame->getType() == OB_FRAME_IR_LEFT) {
-        updateStreamInfo(frame, left_ir_stream_info_);
-      }
-      if (frame->getType() == OB_FRAME_IR_RIGHT) {
-        updateStreamInfo(frame, right_ir_stream_info_);
-      }
+    if (buffer_left_ir_ == nullptr) {
+      buffer_left_ir_ =
+          std::shared_ptr<char[]>(new char[video_frame->getWidth() * video_frame->getHeight()]);
     }
+    if (buffer_right_ir_ == nullptr) {
+      buffer_right_ir_ =
+          std::shared_ptr<char[]>(new char[video_frame->getWidth() * video_frame->getHeight()]);
+    }
+
   } else {
     RCLCPP_ERROR(logger_, "Unsupported frame type: %d", frame->getType());
     return;
@@ -2297,8 +2265,28 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
       frame->format() != OB_FORMAT_Y16 && frame->format() != OB_FORMAT_BGRA &&
       frame->format() != OB_FORMAT_RGBA && image_publishers_[COLOR]->get_subscription_count() > 0) {
     memcpy(image.data, rgb_buffer_, video_frame->getWidth() * video_frame->getHeight() * 3);
+  } else if (frame->getType() == OB_FRAME_DEPTH) {
+    if (video_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_INDEX) !=
+        interleave_skip_index_) {
+      memcpy(image.data, buffer_depth_.get(), video_frame->getDataSize());
+    } else {
+      memcpy(image.data, video_frame->getData(), video_frame->getDataSize());
+    }
   } else {
-    memcpy(image.data, video_frame->getData(), video_frame->getDataSize());
+    if (interleave_frame_enable_ && interleave_skip_enable_) {
+      if (video_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_INDEX) ==
+          interleave_skip_index_) {
+        if (frame->getType() == OB_FRAME_IR_LEFT) {
+          memcpy(image.data, buffer_left_ir_.get(), video_frame->getDataSize());
+        } else if (frame->getType() == OB_FRAME_IR_RIGHT) {
+          memcpy(image.data, buffer_right_ir_.get(), video_frame->getDataSize());
+        }
+      } else {
+        memcpy(image.data, video_frame->getData(), video_frame->getDataSize());
+      }
+    } else {
+      memcpy(image.data, video_frame->getData(), video_frame->getDataSize());
+    }
   }
   if (stream_index == DEPTH) {
     auto depth_scale = video_frame->as<ob::DepthFrame>()->getValueScale();
@@ -2316,6 +2304,26 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   CHECK(image_publishers_.count(stream_index) > 0);
   saveImageToFile(stream_index, image, *image_msg);
   image_publishers_[stream_index]->publish(std::move(image_msg));
+
+  if (frame->getType() == OB_FRAME_DEPTH) {
+    if (video_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_INDEX) ==
+        interleave_skip_index_) {
+      memcpy(buffer_depth_.get(), video_frame->getData(), video_frame->getDataSize());
+    }
+  } else if (frame->getType() == OB_FRAME_IR || frame->getType() == OB_FRAME_IR_LEFT ||
+             frame->getType() == OB_FRAME_IR_RIGHT) {
+    if (interleave_frame_enable_ && interleave_skip_enable_) {
+      if (video_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_HDR_SEQUENCE_INDEX) !=
+          interleave_skip_index_) {
+        if (frame->getType() == OB_FRAME_IR_LEFT) {
+          memcpy(buffer_left_ir_.get(), video_frame->getData(), video_frame->getDataSize());
+        } else if (frame->getType() == OB_FRAME_IR_RIGHT) {
+          memcpy(buffer_right_ir_.get(), video_frame->getData(), video_frame->getDataSize());
+        }
+      }
+    }
+  }
+
   if (stream_index == COLOR && enable_color_undistortion_ &&
       color_undistortion_publisher_->get_subscription_count() > 0) {
     auto undistorted_image = undistortImage(image, intrinsic, distortion);

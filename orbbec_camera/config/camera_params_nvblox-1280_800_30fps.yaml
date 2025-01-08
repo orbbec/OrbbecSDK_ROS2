@@ -1,16 +1,16 @@
 # common params
 depth_registration: false
-enable_point_cloud: true
+enable_point_cloud: false
 enable_colored_point_cloud: false
 device_preset: "High Accuracy"
 time_domain: "global" # global, device, system
 enable_sync_host_time: true
 frames_per_trigger: 1
 log_level: "warning"
-enable_laser: false
+enable_laser: true
 
-interleave_frame_enable: true
-interleave_skip_enable: true
+interleave_frame_enable: false
+interleave_skip_enable: false
 
 # color params
 enable_color: true

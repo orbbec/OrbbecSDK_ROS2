@@ -6,10 +6,10 @@ orbbec_ros:
         launch_device_camera1:
             config_file_path: "multicamera_test/gemini330_series_sync_front_camera.yaml"
             # default period 0.0; unit: second
-            period: 6.0
+            period: 2.0
             camera_name: "front_camera"
-            usb_port: "2-5"
-            device_num: "4"
+            usb_port: "4-3.3"
+            device_num: "2"
             sync_mode: "primary"
 
         launch_device_camera2:
@@ -17,27 +17,24 @@ orbbec_ros:
             # default period 0.0; unit: second
             period: 0.0
             camera_name: "left_camera"
-            usb_port: "2-1"
-            device_num: "4"
+            usb_port: "4-3.1"
+            device_num: "2"
             sync_mode: "secondary_synced"
-            trigger_out_enabled: false
 
-        launch_device_camera3:
-            config_file_path: "multicamera_test/gemini330_series_sync_rear_camera.yaml"
-            # default period 0.0; unit: second
-            period: 2.0
-            camera_name: "rear_camera"
-            usb_port: "2-3"
-            device_num: "4"
-            sync_mode: "secondary_synced"
-            trigger_out_enabled: false
+        # launch_device_camera3:
+        #     config_file_path: "multicamera_test/gemini330_series_sync_rear_camera.yaml"
+        #     # default period 0.0; unit: second
+        #     period: 2.0
+        #     camera_name: "rear_camera"
+        #     usb_port: "2-3"
+        #     device_num: "3"
+        #     sync_mode: "secondary_synced"
 
-        launch_device_camera4:
-            config_file_path: "multicamera_test/gemini330_series_sync_right_camera.yaml"
-            # default period 0.0; unit: second
-            period: 4.0
-            camera_name: "right_camera"
-            usb_port: "2-7"
-            device_num: "4"
-            sync_mode: "secondary_synced"
-            trigger_out_enabled: false
+        # launch_device_camera4:
+        #     config_file_path: "multicamera_test/gemini330_series_sync_right_camera.yaml"
+        #     # default period 0.0; unit: second
+        #     period: 4.0
+        #     camera_name: "right_camera"
+        #     usb_port: "2-7"
+        #     device_num: "4"
+        #     sync_mode: "secondary_synced"

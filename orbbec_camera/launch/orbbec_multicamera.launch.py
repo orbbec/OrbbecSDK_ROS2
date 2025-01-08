@@ -16,7 +16,7 @@ from utils_yaml import *
 
 default_package_name = 'orbbec_camera'
 default_launch_file = 'orbbec_camera.launch.py'
-default_multi_camera_config_file = 'multicamera.yaml' #'multi_camera_synced.ymal'
+default_multi_camera_config_file = 'multicamera.yaml' #'multicamera_synced.yaml'
 default_shared_container_name = 'shared_orbbec_container'
 
 

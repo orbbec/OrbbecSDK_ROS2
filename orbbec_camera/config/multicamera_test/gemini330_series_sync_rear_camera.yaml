@@ -101,7 +101,7 @@ orbbec_ros:
                 depth_delay_us: 0
                 color_delay_us: 0
                 trigger2image_delay_us: 0
-                trigger_out_enabled: false
+                trigger_out_enabled: true
                 trigger_out_delay_us: 0
                 frames_per_trigger: 2
                 software_trigger_period: 33

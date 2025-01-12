@@ -16,12 +16,12 @@ def generate_launch_description():
             os.path.join(launch_file_dir, 'orbbec_camera.launch.py')
         ),
         launch_arguments={
-            "camera_model": "gemini330_series",
-            "attach_component_container_enable": "true",
-            "camera_name": 'G330_0',
-            "usb_port": "2-1",
-            "device_num": "4",
-            "sync_mode": "primary",
+            'camera_model': 'gemini330_series',
+            'attach_component_container_enable': 'true',
+            'camera_name': 'G330_0',
+            'usb_port': '2-1',
+            'device_num': '4',
+            'sync_mode': 'primary',
         }.items()
     )
 
@@ -30,13 +30,13 @@ def generate_launch_description():
             os.path.join(launch_file_dir, 'orbbec_camera.launch.py')
         ),
         launch_arguments={
-            "camera_model": "gemini330_series",
-            "attach_component_container_enable": "false",
-            "camera_name": 'G330_1',
-            "usb_port": '2-4',
-            "device_num": '4',
-            "sync_mode": "secondary_synced",
-            "trigger_out_enabled": 'false',
+            'camera_model': 'gemini330_series',
+            'attach_component_container_enable': 'false',
+            'camera_name': 'G330_1',
+            'usb_port': '2-4',
+            'device_num': '4',
+            'sync_mode': 'secondary_synced',
+            'trigger_out_enabled': 'false',
         }.items()
     )
 
@@ -45,13 +45,13 @@ def generate_launch_description():
             os.path.join(launch_file_dir, 'orbbec_camera.launch.py')
         ),
         launch_arguments={
-            "camera_model": "gemini330_series",
-            "attach_component_container_enable": "true",
-            "camera_name": 'G330_2',
-            "usb_port": '2-7',
-            "device_num": '4',
-            "sync_mode": "secondary_synced",
-            "trigger_out_enabled": 'false',
+            'camera_model': 'gemini330_series',
+            'attach_component_container_enable': 'true',
+            'camera_name': 'G330_2',
+            'usb_port': '2-7',
+            'device_num': '4',
+            'sync_mode': 'secondary_synced',
+            'trigger_out_enabled': 'false',
         }.items()
     )
 
@@ -60,13 +60,13 @@ def generate_launch_description():
             os.path.join(launch_file_dir, 'orbbec_camera.launch.py')
         ),
         launch_arguments={
-            "camera_model": "gemini330_series",
-            "attach_component_container_enable": "true",
-            "camera_name": 'G330_3',
-            "usb_port": '2-3',
-            "device_num": '4',
-            "sync_mode": "secondary_synced",
-            "trigger_out_enabled": 'false',
+            'camera_model': 'gemini330_series',
+            'attach_component_container_enable': 'true',
+            'camera_name': 'G330_3',
+            'usb_port': '2-3',
+            'device_num': '4',
+            'sync_mode': 'secondary_synced',
+            'trigger_out_enabled': 'false',
         }.items()
     )
 

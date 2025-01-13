@@ -473,7 +473,7 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
   }
   std::this_thread::sleep_for(std::chrono::milliseconds(connection_delay_));
   int try_lock_count = 0;
-  int max_try_lock_count = 5;
+  int max_try_lock_count = 50;
 
   while (try_lock_count < max_try_lock_count) {
     int try_lock_result = pthread_mutex_trylock(orb_device_lock_);

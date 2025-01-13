@@ -1167,6 +1167,8 @@ void OBCameraNode::getParameters() {
   long software_trigger_period = 33;
   setAndGetNodeParameter<long>(software_trigger_period, "software_trigger_period", 33);
   software_trigger_period_ = std::chrono::milliseconds(software_trigger_period);
+
+  setAndGetNodeParameter<std::string>(frame_aggregate_mode_, "frame_aggregate_mode", "ANY");
 }
 
 void OBCameraNode::setupTopics() {
@@ -1256,6 +1258,16 @@ void OBCameraNode::setupPipelineConfig() {
                                    << " format: " << profile->format());
       pipeline_config_->enableStream(stream_profile_[stream_index]);
     }
+  }
+
+  if (frame_aggregate_mode_ == "full_frame") {
+    pipeline_config_->setFrameAggregateOutputMode(OB_FRAME_AGGREGATE_OUTPUT_FULL_FRAME_REQUIRE);
+  } else if (frame_aggregate_mode_ == "color_frame") {
+    pipeline_config_->setFrameAggregateOutputMode(OB_FRAME_AGGREGATE_OUTPUT_COLOR_FRAME_REQUIRE);
+  } else if (frame_aggregate_mode_ == "disable") {
+    pipeline_config_->setFrameAggregateOutputMode(OB_FRAME_AGGREGATE_OUTPUT_DISABLE);
+  } else {
+    pipeline_config_->setFrameAggregateOutputMode(OB_FRAME_AGGREGATE_OUTPUT_ANY_SITUATION);
   }
 }
 

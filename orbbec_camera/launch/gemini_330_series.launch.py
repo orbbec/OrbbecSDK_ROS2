@@ -188,6 +188,8 @@ def generate_launch_description():
         DeclareLaunchArgument('config_file_path', default_value=''),
         DeclareLaunchArgument('enable_heartbeat', default_value='false'),
         DeclareLaunchArgument('enable_hardware_reset', default_value='false'),
+
+        DeclareLaunchArgument('frame_aggregate_mode', default_value='ANY'), # full_frame、color_frame、ANY or disable
     ]
 
     def get_params(context, args):

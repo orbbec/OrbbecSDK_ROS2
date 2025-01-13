@@ -365,6 +365,8 @@ class OBCameraNode {
   int init_interleave_hdr_param();
   int init_interleave_laser_param();
 
+  void setDisparitySearchOffset();
+
  private:
   rclcpp::Node* node_ = nullptr;
   std::shared_ptr<ob::Device> device_ = nullptr;
@@ -636,5 +638,10 @@ class OBCameraNode {
   int laser_index0_depth_gain_ = 16;
   int laser_index0_ir_brightness_ = 60;
   int laser_index0_ir_ae_max_exposure_ = 17000;
+
+  int disparity_search_offset_ = 0;
+  bool disparity_offset_config_ = false;
+  int offset_index0_ = 0;
+  int offset_index1_ = 0;
 };
 }  // namespace orbbec_camera

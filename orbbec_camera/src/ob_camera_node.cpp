@@ -542,14 +542,14 @@ void OBCameraNode::setupDepthPostProcessFilter() {
     } else if (filter_name == "NoiseRemovalFilter" && enable_noise_removal_filter_) {
       auto noise_removal_filter = filter->as<ob::NoiseRemovalFilter>();
       OBNoiseRemovalFilterParams params = noise_removal_filter->getFilterParams();
-      RCLCPP_INFO_STREAM(logger_, "Default noise removal filter params: "
-                                      << "disp_diff: " << params.disp_diff
-                                      << ", max_size: " << params.max_size);
+      RCLCPP_INFO_STREAM(
+          logger_, "Default noise removal filter params: " << "disp_diff: " << params.disp_diff
+                                                           << ", max_size: " << params.max_size);
       params.disp_diff = noise_removal_filter_min_diff_;
       params.max_size = noise_removal_filter_max_size_;
-      RCLCPP_INFO_STREAM(logger_, "Set noise removal filter params: "
-                                      << "disp_diff: " << params.disp_diff
-                                      << ", max_size: " << params.max_size);
+      RCLCPP_INFO_STREAM(logger_,
+                         "Set noise removal filter params: " << "disp_diff: " << params.disp_diff
+                                                             << ", max_size: " << params.max_size);
       if (noise_removal_filter_min_diff_ != -1 && noise_removal_filter_max_size_ != -1) {
         noise_removal_filter->setFilterParams(params);
       }
@@ -558,11 +558,11 @@ void OBCameraNode::setupDepthPostProcessFilter() {
           hdr_merge_gain_2_ != -1) {
         auto hdr_merge_filter = filter->as<ob::HdrMerge>();
         hdr_merge_filter->enable(true);
-        RCLCPP_INFO_STREAM(logger_, "Set HDR merge filter params: "
-                                        << "exposure_1: " << hdr_merge_exposure_1_
-                                        << ", gain_1: " << hdr_merge_gain_1_
-                                        << ", exposure_2: " << hdr_merge_exposure_2_
-                                        << ", gain_2: " << hdr_merge_gain_2_);
+        RCLCPP_INFO_STREAM(
+            logger_, "Set HDR merge filter params: " << "exposure_1: " << hdr_merge_exposure_1_
+                                                     << ", gain_1: " << hdr_merge_gain_1_
+                                                     << ", exposure_2: " << hdr_merge_exposure_2_
+                                                     << ", gain_2: " << hdr_merge_gain_2_);
         auto config = OBHdrConfig();
         config.enable = true;
         config.exposure_1 = hdr_merge_exposure_1_;
@@ -1265,7 +1265,6 @@ void OBCameraNode::getParameters() {
   if (time_domain_ == "global") {
     device_->enableGlobalTimestamp(true);
   }
-  RCLCPP_INFO_STREAM(logger_, "current time domain: " << time_domain_);
   setAndGetNodeParameter<int>(frames_per_trigger_, "frames_per_trigger", 2);
   long software_trigger_period = 33;
   setAndGetNodeParameter<long>(software_trigger_period, "software_trigger_period", 33);
@@ -1291,19 +1290,6 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(hdr_index0_ir_ae_max_exposure_, "hdr_index0_ir_ae_max_exposure",
                               10000);
 
-  RCLCPP_INFO_STREAM(logger_, "hdr_index1_laser_control_ "
-                                  << hdr_index1_laser_control_ << " hdr_index1_depth_exposure_ "
-                                  << hdr_index1_depth_exposure_ << " hdr_index1_depth_gain_ "
-                                  << hdr_index1_depth_gain_ << " hdr_index1_ir_brightness_ "
-                                  << hdr_index1_ir_brightness_ << " hdr_index1_ir_ae_max_exposure_ "
-                                  << hdr_index1_ir_ae_max_exposure_ << "\n");
-  RCLCPP_INFO_STREAM(logger_, "hdr_index0_laser_control_ "
-                                  << hdr_index0_laser_control_ << " hdr_index0_depth_exposure_ "
-                                  << hdr_index0_depth_exposure_ << " hdr_index0_depth_gain_ "
-                                  << hdr_index0_depth_gain_ << " hdr_index0_ir_brightness_ "
-                                  << hdr_index0_ir_brightness_ << " hdr_index0_ir_ae_max_exposure_ "
-                                  << hdr_index0_ir_ae_max_exposure_ << "\n");
-
   setAndGetNodeParameter<int>(laser_index1_laser_control_, "laser_index1_laser_control", 0);
   setAndGetNodeParameter<int>(laser_index1_depth_exposure_, "laser_index1_depth_exposure", 3000);
   setAndGetNodeParameter<int>(laser_index1_depth_gain_, "laser_index1_depth_gain", 16);
@@ -1316,7 +1302,24 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(laser_index0_ir_brightness_, "laser_index0_ir_brightness", 60);
   setAndGetNodeParameter<int>(laser_index0_ir_ae_max_exposure_, "laser_index0_ir_ae_max_exposure",
                               17000);
+  setAndGetNodeParameter<int>(disparity_search_offset_, "disparity_search_offset", 0);
+  setAndGetNodeParameter<bool>(disparity_offset_config_, "disparity_offset_config", false);
+  setAndGetNodeParameter<int>(offset_index0_, "offset_index0", 0);
+  setAndGetNodeParameter<int>(offset_index1_, "offset_index1", 0);
 
+  RCLCPP_INFO_STREAM(logger_, "current time domain: " << time_domain_);
+  RCLCPP_INFO_STREAM(logger_, "hdr_index1_laser_control_ "
+                                  << hdr_index1_laser_control_ << " hdr_index1_depth_exposure_ "
+                                  << hdr_index1_depth_exposure_ << " hdr_index1_depth_gain_ "
+                                  << hdr_index1_depth_gain_ << " hdr_index1_ir_brightness_ "
+                                  << hdr_index1_ir_brightness_ << " hdr_index1_ir_ae_max_exposure_ "
+                                  << hdr_index1_ir_ae_max_exposure_ << "\n");
+  RCLCPP_INFO_STREAM(logger_, "hdr_index0_laser_control_ "
+                                  << hdr_index0_laser_control_ << " hdr_index0_depth_exposure_ "
+                                  << hdr_index0_depth_exposure_ << " hdr_index0_depth_gain_ "
+                                  << hdr_index0_depth_gain_ << " hdr_index0_ir_brightness_ "
+                                  << hdr_index0_ir_brightness_ << " hdr_index0_ir_ae_max_exposure_ "
+                                  << hdr_index0_ir_ae_max_exposure_ << "\n");
   RCLCPP_INFO_STREAM(logger_, "laser_index1_laser_control_ "
                                   << laser_index1_laser_control_ << " laser_index1_depth_exposure_ "
                                   << laser_index1_depth_exposure_ << " laser_index1_depth_gain_ "
@@ -1835,6 +1838,29 @@ std::shared_ptr<ob::Frame> OBCameraNode::processDepthFrameFilter(
   }
   return frame;
 }
+void OBCameraNode::setDisparitySearchOffset() {
+  static bool has_run = false;
+  if (has_run) {
+    return;
+  }
+  if (device_->isPropertySupported(OB_PROP_DISP_SEARCH_OFFSET_INT, OB_PERMISSION_WRITE)) {
+    device_->setIntProperty(OB_PROP_DISP_SEARCH_OFFSET_INT, disparity_search_offset_);
+    RCLCPP_INFO_STREAM(logger_, "disparity_search_offset_: " << disparity_search_offset_);
+    auto config = OBDispOffsetConfig();
+    if (disparity_offset_config_) {
+      config.enable = disparity_offset_config_;
+      config.offset0 = offset_index0_;
+      config.offset1 = offset_index1_;
+      config.reserved = 0;
+      device_->setStructuredData(OB_STRUCT_DISP_OFFSET_CONFIG,
+                                 reinterpret_cast<const uint8_t *>(&config), sizeof(config));
+      RCLCPP_INFO_STREAM(logger_, "disparity_offset_config_: "
+                                      << disparity_offset_config_ << "  offset_index0_:"
+                                      << offset_index0_ << "  offset_index1_:" << offset_index1_);
+    }
+  }
+  has_run = true;
+}
 
 uint64_t OBCameraNode::getFrameTimestampUs(const std::shared_ptr<ob::Frame> &frame) {
   if (frame == nullptr) {
@@ -1867,6 +1893,7 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
     auto depth_frame = frame_set->getFrame(OB_FRAME_DEPTH);
     auto color_frame = frame_set->getFrame(OB_FRAME_COLOR);
     if (depth_frame) {
+      setDisparitySearchOffset();
       depth_frame = processDepthFrameFilter(depth_frame);
       frame_set->pushFrame(depth_frame);
     }

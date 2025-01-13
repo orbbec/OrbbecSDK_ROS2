@@ -200,9 +200,9 @@ def generate_launch_description():
         DeclareLaunchArgument('laser_index0_ir_brightness', default_value='60'),
         DeclareLaunchArgument('laser_index0_ir_ae_max_exposure', default_value='30000'),
         DeclareLaunchArgument('disparity_search_offset', default_value='0'),
-        DeclareLaunchArgument('disparity_offset_config', default_value='true'),
+        DeclareLaunchArgument('disparity_offset_config', default_value='false'),
         DeclareLaunchArgument('offset_index0', default_value='0'),
-        DeclareLaunchArgument('offset_index1', default_value='125'),
+        DeclareLaunchArgument('offset_index1', default_value='0'),
 
     ]
 

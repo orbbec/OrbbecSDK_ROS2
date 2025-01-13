@@ -480,7 +480,30 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
     device_.reset();
   }
   std::this_thread::sleep_for(std::chrono::milliseconds(connection_delay_));
-  pthread_mutex_lock(orb_device_lock_);
+  int try_lock_count = 0;
+  int max_try_lock_count = 50;
+
+  while (try_lock_count < max_try_lock_count) {
+    int try_lock_result = pthread_mutex_trylock(orb_device_lock_);
+
+    if (try_lock_result == 0) {
+      // success get lock,break
+      break;
+    } else if (try_lock_result == EBUSY) {
+      RCLCPP_INFO_STREAM(logger_, "Device lock is held by another process, waiting 100ms");
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    } else {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to lock orb_device_lock_");
+      return;  // Not EBUSY, return
+    }
+
+    try_lock_count++;
+  }
+  if (try_lock_count >= max_try_lock_count) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to lock orb_device_lock_");
+    return;
+  }
+
   std::shared_ptr<int> lock_holder(nullptr,
                                    [this](int *) { pthread_mutex_unlock(orb_device_lock_); });
   bool start_device_failed = false;

@@ -1307,6 +1307,8 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(offset_index0_, "offset_index0", 0);
   setAndGetNodeParameter<int>(offset_index1_, "offset_index1", 0);
 
+  setAndGetNodeParameter<std::string>(frame_aggregate_mode_, "frame_aggregate_mode", "ANY");
+
   RCLCPP_INFO_STREAM(logger_, "current time domain: " << time_domain_);
   RCLCPP_INFO_STREAM(logger_, "hdr_index1_laser_control_ "
                                   << hdr_index1_laser_control_ << " hdr_index1_depth_exposure_ "
@@ -1435,6 +1437,16 @@ void OBCameraNode::setupPipelineConfig() {
                              << " format: " << profile->getFormat());
       pipeline_config_->enableStream(stream_profile_[stream_index]);
     }
+  }
+
+  if (frame_aggregate_mode_ == "full_frame") {
+    pipeline_config_->setFrameAggregateOutputMode(OB_FRAME_AGGREGATE_OUTPUT_FULL_FRAME_REQUIRE);
+  } else if (frame_aggregate_mode_ == "color_frame") {
+    pipeline_config_->setFrameAggregateOutputMode(OB_FRAME_AGGREGATE_OUTPUT_COLOR_FRAME_REQUIRE);
+  } else if (frame_aggregate_mode_ == "disable") {
+    pipeline_config_->setFrameAggregateOutputMode(OB_FRAME_AGGREGATE_OUTPUT_DISABLE);
+  } else {
+    pipeline_config_->setFrameAggregateOutputMode(OB_FRAME_AGGREGATE_OUTPUT_ANY_SITUATION);
   }
 }
 

@@ -204,6 +204,7 @@ def generate_launch_description():
         DeclareLaunchArgument('offset_index0', default_value='0'),
         DeclareLaunchArgument('offset_index1', default_value='0'),
 
+        DeclareLaunchArgument('frame_aggregate_mode', default_value='ANY'), # full_frame、color_frame、ANY or disable
     ]
 
     def get_params(context, args):

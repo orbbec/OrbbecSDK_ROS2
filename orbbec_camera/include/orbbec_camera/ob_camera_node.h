@@ -643,5 +643,7 @@ class OBCameraNode {
   bool disparity_offset_config_ = false;
   int offset_index0_ = 0;
   int offset_index1_ = 0;
+
+  std::string frame_aggregate_mode_ = "ANY";  // # full_frame、color_frame、ANY or disable
 };
 }  // namespace orbbec_camera

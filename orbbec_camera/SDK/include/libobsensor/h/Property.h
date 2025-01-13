@@ -441,6 +441,29 @@ typedef enum {
     OB_PROP_DISP_SEARCH_RANGE_MODE_INT = 191,
 
     /**
+     * @brief Laser high temperature protection
+     */
+    OB_PROP_LASER_HIGH_TEMPERATURE_PROTECT_BOOL = 193,
+
+    /**
+     * @brief low exposure laser control
+     *
+     * @brief Currently using for DabaiA device,if the exposure value is lower than a certain threshold, the laser is turned off;
+     * if it exceeds another threshold, the laser is turned on again.
+     */
+    OB_PROP_LOW_EXPOSURE_LASER_CONTROL_BOOL = 194,
+
+    /**
+     * @brief check pps sync in signal
+     */
+    OB_PROP_CHECK_PPS_SYNC_IN_SIGNAL_BOOL = 195,
+
+    /**
+     * @brief Disparity search range offset, range: [0, 127]
+     */
+    OB_PROP_DISP_SEARCH_OFFSET_INT = 196,
+
+    /**
      * @brief Repower device (cut off power and power on again)
      *
      * @brief Currently using for GMSL device, cut off power and power on again by GMSL host driver.
@@ -460,7 +483,14 @@ typedef enum {
      * @brief laser pattern sync with delay(us)
      */
     OB_PROP_FRAME_INTERLEAVE_LASER_PATTERN_SYNC_DELAY_INT = 206,
-
+    /**
+     * @brief hardware noise remove filter switch
+     */
+    OB_PROP_HW_NOISE_REMOVE_FILTER_ENABLE_BOOL = 211,
+    /**
+     * @brief hardware noise remove filter threshold ,range [0.0 - 1.0]
+     */
+    OB_PROP_HW_NOISE_REMOVE_FILTER_THRESHOLD_FLOAT = 212,
     /**
      * @brief Baseline calibration parameters
      */
@@ -544,6 +574,11 @@ typedef enum {
      * @brief ASIC serial number
      */
     OB_STRUCT_ASIC_SERIAL_NUMBER = 1063,
+    
+    /**
+     * @brief Disparity offset interleaving
+     */
+    OB_STRUCT_DISP_OFFSET_CONFIG  = 1064,
 
     /**
      * @brief Color camera auto exposure

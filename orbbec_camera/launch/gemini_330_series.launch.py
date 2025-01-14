@@ -173,6 +173,12 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_heartbeat', default_value='false'),
         DeclareLaunchArgument('gmsl_trigger_fps', default_value='3000'),
         DeclareLaunchArgument('enable_gmsl_trigger', default_value='false'),
+        DeclareLaunchArgument('disparity_range_mode', default_value='-1'),
+        DeclareLaunchArgument('disparity_search_offset', default_value='0'),
+        DeclareLaunchArgument('disparity_offset_config', default_value='false'),
+        DeclareLaunchArgument('offset_index0', default_value='0'),
+        DeclareLaunchArgument('offset_index1', default_value='0'),
+        DeclareLaunchArgument('frame_aggregate_mode', default_value='ANY'), # full_frame、color_frame、ANY or disable
         DeclareLaunchArgument('interleave_ae_mode', default_value='laser'), # 'hdr' or 'laser'
         DeclareLaunchArgument('interleave_frame_enable', default_value='false'),
         DeclareLaunchArgument('interleave_skip_enable', default_value='false'),
@@ -199,12 +205,6 @@ def generate_launch_description():
         DeclareLaunchArgument('laser_index0_depth_gain', default_value='16'),
         DeclareLaunchArgument('laser_index0_ir_brightness', default_value='60'),
         DeclareLaunchArgument('laser_index0_ir_ae_max_exposure', default_value='30000'),
-        DeclareLaunchArgument('disparity_search_offset', default_value='0'),
-        DeclareLaunchArgument('disparity_offset_config', default_value='false'),
-        DeclareLaunchArgument('offset_index0', default_value='0'),
-        DeclareLaunchArgument('offset_index1', default_value='0'),
-
-        DeclareLaunchArgument('frame_aggregate_mode', default_value='ANY'), # full_frame、color_frame、ANY or disable
     ]
 
     def get_params(context, args):

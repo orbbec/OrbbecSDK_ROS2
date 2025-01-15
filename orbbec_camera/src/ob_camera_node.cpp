@@ -1316,10 +1316,10 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(laser_index0_ir_ae_max_exposure_, "laser_index0_ir_ae_max_exposure",
                               17000);
   setAndGetNodeParameter<int>(disparity_range_mode_, "disparity_range_mode", -1);
-  setAndGetNodeParameter<int>(disparity_search_offset_, "disparity_search_offset", 0);
+  setAndGetNodeParameter<int>(disparity_search_offset_, "disparity_search_offset", -1);
   setAndGetNodeParameter<bool>(disparity_offset_config_, "disparity_offset_config", false);
-  setAndGetNodeParameter<int>(offset_index0_, "offset_index0", 0);
-  setAndGetNodeParameter<int>(offset_index1_, "offset_index1", 0);
+  setAndGetNodeParameter<int>(offset_index0_, "offset_index0", -1);
+  setAndGetNodeParameter<int>(offset_index1_, "offset_index1", -1);
 
   setAndGetNodeParameter<std::string>(frame_aggregate_mode_, "frame_aggregate_mode", "ANY");
 
@@ -1870,20 +1870,25 @@ void OBCameraNode::setDisparitySearchOffset() {
     return;
   }
   if (device_->isPropertySupported(OB_PROP_DISP_SEARCH_OFFSET_INT, OB_PERMISSION_WRITE)) {
-    device_->setIntProperty(OB_PROP_DISP_SEARCH_OFFSET_INT, disparity_search_offset_);
-    RCLCPP_INFO_STREAM(logger_, "disparity_search_offset: " << disparity_search_offset_);
-    auto config = OBDispOffsetConfig();
-    config.enable = disparity_offset_config_;
-    config.offset0 = offset_index0_;
-    config.offset1 = offset_index1_;
-    config.reserved = 0;
-    has_run = true;
-    device_->setStructuredData(OB_STRUCT_DISP_OFFSET_CONFIG,
-                               reinterpret_cast<const uint8_t *>(&config), sizeof(config));
-    RCLCPP_INFO_STREAM(logger_, "disparity_offset_config: "
-                                    << disparity_offset_config_ << "  offset_index0:"
-                                    << offset_index0_ << "  offset_index1:" << offset_index1_);
+    if (disparity_search_offset_ != -1) {
+      device_->setIntProperty(OB_PROP_DISP_SEARCH_OFFSET_INT, disparity_search_offset_);
+      RCLCPP_INFO_STREAM(logger_, "disparity_search_offset: " << disparity_search_offset_);
+    }
+    if (offset_index0_ != -1 && offset_index1_ != -1) {
+      auto config = OBDispOffsetConfig();
+      config.enable = disparity_offset_config_;
+      config.offset0 = offset_index0_;
+      config.offset1 = offset_index1_;
+      config.reserved = 0;
+
+      device_->setStructuredData(OB_STRUCT_DISP_OFFSET_CONFIG,
+                                 reinterpret_cast<const uint8_t *>(&config), sizeof(config));
+      RCLCPP_INFO_STREAM(logger_, "disparity_offset_config: "
+                                      << disparity_offset_config_ << "  offset_index0:"
+                                      << offset_index0_ << "  offset_index1:" << offset_index1_);
+    }
   }
+  has_run = true;
 }
 
 uint64_t OBCameraNode::getFrameTimestampUs(const std::shared_ptr<ob::Frame> &frame) {

@@ -174,10 +174,10 @@ def generate_launch_description():
         DeclareLaunchArgument('gmsl_trigger_fps', default_value='3000'),
         DeclareLaunchArgument('enable_gmsl_trigger', default_value='false'),
         DeclareLaunchArgument('disparity_range_mode', default_value='-1'),
-        DeclareLaunchArgument('disparity_search_offset', default_value='0'),
+        DeclareLaunchArgument('disparity_search_offset', default_value='-1'),
         DeclareLaunchArgument('disparity_offset_config', default_value='false'),
-        DeclareLaunchArgument('offset_index0', default_value='0'),
-        DeclareLaunchArgument('offset_index1', default_value='0'),
+        DeclareLaunchArgument('offset_index0', default_value='-1'),
+        DeclareLaunchArgument('offset_index1', default_value='-1'),
         DeclareLaunchArgument('frame_aggregate_mode', default_value='ANY'), # full_frame、color_frame、ANY or disable
         DeclareLaunchArgument('interleave_ae_mode', default_value='laser'), # 'hdr' or 'laser'
         DeclareLaunchArgument('interleave_frame_enable', default_value='false'),

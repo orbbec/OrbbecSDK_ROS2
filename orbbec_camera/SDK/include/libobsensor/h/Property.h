@@ -1,4 +1,4 @@
-﻿// Copyright (c) Orbbec Inc. All Rights Reserved.
+// Copyright (c) Orbbec Inc. All Rights Reserved.
 // Licensed under the MIT License.
 
 /**
@@ -483,6 +483,16 @@ typedef enum {
      * @brief laser pattern sync with delay(us)
      */
     OB_PROP_FRAME_INTERLEAVE_LASER_PATTERN_SYNC_DELAY_INT = 206,
+    /**
+     * @brief Get the health check result from device,range is [0.0f,1.5f]
+     */
+    OB_PROP_ON_CHIP_CALIBRATION_HEALTH_CHECK_FLOAT = 209,
+
+    /**
+     * @brief Enable or disable on-chip calibration
+     */
+    OB_PROP_ON_CHIP_CALIBRATION_ENABLE_BOOL = 210,
+
     /**
      * @brief hardware noise remove filter switch
      */

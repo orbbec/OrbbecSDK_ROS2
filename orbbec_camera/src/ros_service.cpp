@@ -214,6 +214,11 @@ void OBCameraNode::setupCameraCtrlServices() {
                                                std::shared_ptr<SetBool::Response> response) {
         setHoleFillingFilterEnableCallback(request, response);
       });
+  set_all_software_filter_enable_srv_ = node_->create_service<SetBool>(
+      "set_all_software_filter_enable", [this](const std::shared_ptr<SetBool::Request> request,
+                                               std::shared_ptr<SetBool::Response> response) {
+        setAllSoftwareFilterEnableCallback(request, response);
+      });
 }
 
 void OBCameraNode::setExposureCallback(const std::shared_ptr<SetInt32::Request>& request,
@@ -1053,6 +1058,69 @@ void OBCameraNode::setHoleFillingFilterEnableCallback(
     setupDepthPostProcessFilter();
     node_->set_parameter(
         rclcpp::Parameter("enable_hole_filling_filter", enable_hole_filling_filter_));
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->message = e.getMessage();
+    response->success = false;
+  } catch (const std::exception& e) {
+    response->message = e.what();
+    response->success = false;
+  } catch (...) {
+    response->message = "unknown error";
+    response->success = false;
+  }
+}
+void OBCameraNode::setAllSoftwareFilterEnableCallback(
+    const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
+    std::shared_ptr<std_srvs::srv::SetBool::Response>& response) {
+  try {
+    if (request->data) {
+      decimation_filter_scale_ = node_->get_parameter("decimation_filter_scale").as_int();
+      sequence_id_filter_id_ = node_->get_parameter("sequence_id_filter_id").as_int();
+      threshold_filter_max_ = node_->get_parameter("threshold_filter_max").as_int();
+      threshold_filter_min_ = node_->get_parameter("threshold_filter_min").as_int();
+      spatial_filter_alpha_ =
+          static_cast<float>(node_->get_parameter("spatial_filter_alpha").as_double());
+      spatial_filter_diff_threshold_ =
+          node_->get_parameter("spatial_filter_diff_threshold").as_int();
+      spatial_filter_magnitude_ = node_->get_parameter("spatial_filter_magnitude").as_int();
+      spatial_filter_radius_ = node_->get_parameter("spatial_filter_radius").as_int();
+      temporal_filter_diff_threshold_ =
+          static_cast<float>(node_->get_parameter("temporal_filter_diff_threshold").as_double());
+      temporal_filter_weight_ =
+          static_cast<float>(node_->get_parameter("temporal_filter_weight").as_double());
+      hole_filling_filter_mode_ = node_->get_parameter("hole_filling_filter_mode").as_string();
+      if (decimation_filter_scale_ == -1 || sequence_id_filter_id_ == -1 ||
+          threshold_filter_max_ == -1 || threshold_filter_min_ == -1 ||
+          spatial_filter_alpha_ == -1.0 || spatial_filter_diff_threshold_ == -1 ||
+          spatial_filter_magnitude_ == -1 || spatial_filter_radius_ == -1 ||
+          temporal_filter_diff_threshold_ == -1.0 || temporal_filter_weight_ == -1.0 ||
+          hole_filling_filter_mode_.empty()) {
+        return;
+      }
+    } else {
+      decimation_filter_scale_ = sequence_id_filter_id_ = threshold_filter_max_ =
+          threshold_filter_min_ = spatial_filter_diff_threshold_ = spatial_filter_magnitude_ =
+              spatial_filter_radius_ = -1;
+      spatial_filter_alpha_ = temporal_filter_diff_threshold_ = temporal_filter_weight_ = -1.0;
+      hole_filling_filter_mode_ = "";
+      node_->set_parameter(rclcpp::Parameter("decimation_filter_scale", decimation_filter_scale_));
+      node_->set_parameter(rclcpp::Parameter("sequence_id_filter_id", sequence_id_filter_id_));
+      node_->set_parameter(rclcpp::Parameter("threshold_filter_max", threshold_filter_max_));
+      node_->set_parameter(rclcpp::Parameter("threshold_filter_min", threshold_filter_min_));
+      node_->set_parameter(
+          rclcpp::Parameter("spatial_filter_diff_threshold", spatial_filter_diff_threshold_));
+      node_->set_parameter(
+          rclcpp::Parameter("spatial_filter_magnitude", spatial_filter_magnitude_));
+      node_->set_parameter(rclcpp::Parameter("spatial_filter_radius", spatial_filter_radius_));
+      node_->set_parameter(rclcpp::Parameter("spatial_filter_alpha", spatial_filter_alpha_));
+      node_->set_parameter(
+          rclcpp::Parameter("temporal_filter_diff_threshold", temporal_filter_diff_threshold_));
+      node_->set_parameter(rclcpp::Parameter("temporal_filter_weight", temporal_filter_weight_));
+      node_->set_parameter(
+          rclcpp::Parameter("hole_filling_filter_mode", hole_filling_filter_mode_));
+    }
+    setupDepthPostProcessFilter();
     response->success = true;
   } catch (const ob::Error& e) {
     response->message = e.getMessage();

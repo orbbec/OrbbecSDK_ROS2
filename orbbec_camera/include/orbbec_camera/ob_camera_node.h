@@ -302,6 +302,9 @@ class OBCameraNode {
   void setSequenceIdFilterEnableCallback(
       const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
       std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
+  void setThresholdFilterEnableCallback(
+      const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
+      std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
 
   bool toggleSensor(const stream_index_pair& stream_index, bool enabled, std::string& msg);
 
@@ -458,6 +461,7 @@ class OBCameraNode {
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_sync_host_time_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_decimation_filter_enable_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_sequence_id_filter_enable_srv_;
+  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_threshold_filter_enable_srv_;
 
   bool enable_sync_output_accel_gyro_ = false;
   bool publish_tf_ = false;

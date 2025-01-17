@@ -194,6 +194,11 @@ void OBCameraNode::setupCameraCtrlServices() {
                                               std::shared_ptr<SetBool::Response> response) {
         setSequenceIdFilterEnableCallback(request, response);
       });
+  set_threshold_filter_enable_srv_ = node_->create_service<SetBool>(
+      "set_threshold_filter_enable", [this](const std::shared_ptr<SetBool::Request> request,
+                                            std::shared_ptr<SetBool::Response> response) {
+        setThresholdFilterEnableCallback(request, response);
+      });
 }
 
 void OBCameraNode::setExposureCallback(const std::shared_ptr<SetInt32::Request>& request,
@@ -893,6 +898,40 @@ void OBCameraNode::setSequenceIdFilterEnableCallback(
     setupDepthPostProcessFilter();
     node_->set_parameter(
         rclcpp::Parameter("enable_sequence_id_filter", enable_sequence_id_filter_));
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->message = e.getMessage();
+    response->success = false;
+  } catch (const std::exception& e) {
+    response->message = e.what();
+    response->success = false;
+  } catch (...) {
+    response->message = "unknown error";
+    response->success = false;
+  }
+}
+void OBCameraNode::setThresholdFilterEnableCallback(
+    const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
+    std::shared_ptr<std_srvs::srv::SetBool::Response>& response) {
+  try {
+    enable_threshold_filter_ = request->data;
+    if (enable_threshold_filter_) {
+      threshold_filter_max_ = node_->get_parameter("threshold_filter_max").as_int();
+      threshold_filter_min_ = node_->get_parameter("threshold_filter_min").as_int();
+      if (threshold_filter_max_ == -1 || threshold_filter_min_ == -1) {
+        RCLCPP_WARN(
+            logger_,
+            "Please configure the parameter 'threshold_filter_max' and 'threshold_filter_min'");
+        return;
+      }
+    } else {
+      threshold_filter_max_ = -1;
+      threshold_filter_min_ = -1;
+      node_->set_parameter(rclcpp::Parameter("threshold_filter_max", threshold_filter_max_));
+      node_->set_parameter(rclcpp::Parameter("threshold_filter_min", threshold_filter_min_));
+    }
+    setupDepthPostProcessFilter();
+    node_->set_parameter(rclcpp::Parameter("enable_threshold_filter", enable_threshold_filter_));
     response->success = true;
   } catch (const ob::Error& e) {
     response->message = e.getMessage();

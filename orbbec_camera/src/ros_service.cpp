@@ -199,6 +199,21 @@ void OBCameraNode::setupCameraCtrlServices() {
                                             std::shared_ptr<SetBool::Response> response) {
         setThresholdFilterEnableCallback(request, response);
       });
+  set_spatial_filter_enable_srv_ = node_->create_service<SetBool>(
+      "set_spatial_filter_enable", [this](const std::shared_ptr<SetBool::Request> request,
+                                          std::shared_ptr<SetBool::Response> response) {
+        setSpatialFilterEnableCallback(request, response);
+      });
+  set_temporal_filter_enable_srv_ = node_->create_service<SetBool>(
+      "set_temporal_filter_enable", [this](const std::shared_ptr<SetBool::Request> request,
+                                           std::shared_ptr<SetBool::Response> response) {
+        setTemporalFilterEnableCallback(request, response);
+      });
+  set_hole_filling_filter_enable_srv_ = node_->create_service<SetBool>(
+      "set_hole_filling_filter_enable", [this](const std::shared_ptr<SetBool::Request> request,
+                                               std::shared_ptr<SetBool::Response> response) {
+        setHoleFillingFilterEnableCallback(request, response);
+      });
 }
 
 void OBCameraNode::setExposureCallback(const std::shared_ptr<SetInt32::Request>& request,
@@ -932,6 +947,112 @@ void OBCameraNode::setThresholdFilterEnableCallback(
     }
     setupDepthPostProcessFilter();
     node_->set_parameter(rclcpp::Parameter("enable_threshold_filter", enable_threshold_filter_));
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->message = e.getMessage();
+    response->success = false;
+  } catch (const std::exception& e) {
+    response->message = e.what();
+    response->success = false;
+  } catch (...) {
+    response->message = "unknown error";
+    response->success = false;
+  }
+}
+void OBCameraNode::setSpatialFilterEnableCallback(
+    const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
+    std::shared_ptr<std_srvs::srv::SetBool::Response>& response) {
+  try {
+    enable_spatial_filter_ = request->data;
+    if (enable_spatial_filter_) {
+      spatial_filter_alpha_ =
+          static_cast<float>(node_->get_parameter("spatial_filter_alpha").as_double());
+      spatial_filter_diff_threshold_ =
+          node_->get_parameter("spatial_filter_diff_threshold").as_int();
+      spatial_filter_magnitude_ = node_->get_parameter("spatial_filter_magnitude").as_int();
+      spatial_filter_radius_ = node_->get_parameter("spatial_filter_radius").as_int();
+      if (spatial_filter_alpha_ == -1.0 || spatial_filter_diff_threshold_ == -1 ||
+          spatial_filter_magnitude_ == -1 || spatial_filter_radius_ == -1) {
+        return;
+      }
+    } else {
+      spatial_filter_alpha_ = -1.0;
+      spatial_filter_diff_threshold_ = -1;
+      spatial_filter_magnitude_ = -1;
+      spatial_filter_radius_ = -1;
+      node_->set_parameter(rclcpp::Parameter("spatial_filter_alpha", spatial_filter_alpha_));
+      node_->set_parameter(
+          rclcpp::Parameter("spatial_filter_diff_threshold", spatial_filter_diff_threshold_));
+      node_->set_parameter(
+          rclcpp::Parameter("spatial_filter_magnitude", spatial_filter_magnitude_));
+      node_->set_parameter(rclcpp::Parameter("spatial_filter_radius", spatial_filter_radius_));
+    }
+    setupDepthPostProcessFilter();
+    node_->set_parameter(rclcpp::Parameter("enable_spatial_filter", enable_spatial_filter_));
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->message = e.getMessage();
+    response->success = false;
+  } catch (const std::exception& e) {
+    response->message = e.what();
+    response->success = false;
+  } catch (...) {
+    response->message = "unknown error";
+    response->success = false;
+  }
+}
+void OBCameraNode::setTemporalFilterEnableCallback(
+    const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
+    std::shared_ptr<std_srvs::srv::SetBool::Response>& response) {
+  try {
+    enable_temporal_filter_ = request->data;
+    if (enable_temporal_filter_) {
+      temporal_filter_diff_threshold_ =
+          static_cast<float>(node_->get_parameter("temporal_filter_diff_threshold").as_double());
+      temporal_filter_weight_ =
+          static_cast<float>(node_->get_parameter("temporal_filter_weight").as_double());
+      if (temporal_filter_diff_threshold_ == -1.0 || temporal_filter_weight_ == -1.0) {
+        return;
+      }
+    } else {
+      temporal_filter_diff_threshold_ = -1.0;
+      temporal_filter_weight_ = -1.0;
+      node_->set_parameter(
+          rclcpp::Parameter("temporal_filter_diff_threshold", temporal_filter_diff_threshold_));
+      node_->set_parameter(rclcpp::Parameter("temporal_filter_weight", temporal_filter_weight_));
+    }
+    setupDepthPostProcessFilter();
+    node_->set_parameter(rclcpp::Parameter("enable_temporal_filter", enable_temporal_filter_));
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->message = e.getMessage();
+    response->success = false;
+  } catch (const std::exception& e) {
+    response->message = e.what();
+    response->success = false;
+  } catch (...) {
+    response->message = "unknown error";
+    response->success = false;
+  }
+}
+void OBCameraNode::setHoleFillingFilterEnableCallback(
+    const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
+    std::shared_ptr<std_srvs::srv::SetBool::Response>& response) {
+  try {
+    enable_hole_filling_filter_ = request->data;
+    if (enable_hole_filling_filter_) {
+      hole_filling_filter_mode_ = node_->get_parameter("hole_filling_filter_mode").as_string();
+      if (hole_filling_filter_mode_.empty()) {
+        return;
+      }
+    } else {
+      hole_filling_filter_mode_ = "";
+      node_->set_parameter(
+          rclcpp::Parameter("hole_filling_filter_mode", hole_filling_filter_mode_));
+    }
+    setupDepthPostProcessFilter();
+    node_->set_parameter(
+        rclcpp::Parameter("enable_hole_filling_filter", enable_hole_filling_filter_));
     response->success = true;
   } catch (const ob::Error& e) {
     response->message = e.getMessage();

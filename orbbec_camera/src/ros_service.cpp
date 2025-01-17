@@ -184,6 +184,11 @@ void OBCameraNode::setupCameraCtrlServices() {
                                   std::shared_ptr<SetBool::Response> response) {
         setSYNCHostimeCallback(request, response);
       });
+  set_decimation_filter_enable_srv_ = node_->create_service<SetBool>(
+      "set_decimation_filter_enable", [this](const std::shared_ptr<SetBool::Request> request,
+                                             std::shared_ptr<SetBool::Response> response) {
+        setDecimationFilterEnableCallback(request, response);
+      });
 }
 
 void OBCameraNode::setExposureCallback(const std::shared_ptr<SetInt32::Request>& request,
@@ -824,6 +829,35 @@ void OBCameraNode::setSYNCHostimeCallback(
   (void)request;
   try {
     device_->timerSyncWithHost();
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->message = e.getMessage();
+    response->success = false;
+  } catch (const std::exception& e) {
+    response->message = e.what();
+    response->success = false;
+  } catch (...) {
+    response->message = "unknown error";
+    response->success = false;
+  }
+}
+void OBCameraNode::setDecimationFilterEnableCallback(
+    const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
+    std::shared_ptr<std_srvs::srv::SetBool::Response>& response) {
+  try {
+    enable_decimation_filter_ = request->data;
+    if (enable_decimation_filter_) {
+      decimation_filter_scale_ = node_->get_parameter("decimation_filter_scale").as_int();
+      if (decimation_filter_scale_ == -1) {
+        RCLCPP_WARN(logger_, "Please configure the parameter 'decimation_filter_scale'");
+        return;
+      }
+    } else {
+      decimation_filter_scale_ = -1;
+    }
+    setupDepthPostProcessFilter();
+    node_->set_parameter(rclcpp::Parameter("enable_decimation_filter", enable_decimation_filter_));
+    node_->set_parameter(rclcpp::Parameter("decimation_filter_scale", decimation_filter_scale_));
     response->success = true;
   } catch (const ob::Error& e) {
     response->message = e.getMessage();

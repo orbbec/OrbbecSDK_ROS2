@@ -314,6 +314,9 @@ class OBCameraNode {
   void setHoleFillingFilterEnableCallback(
       const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
       std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
+  void setNoiseRemovalFilterEnableCallback(
+      const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
+      std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
   void setAllSoftwareFilterEnableCallback(
       const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
       std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
@@ -477,6 +480,7 @@ class OBCameraNode {
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_spatial_filter_enable_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_temporal_filter_enable_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_hole_filling_filter_enable_srv_;
+  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_noise_removal_filter_enable_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_all_software_filter_enable_srv_;
 
   bool enable_sync_output_accel_gyro_ = false;

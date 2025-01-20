@@ -214,6 +214,11 @@ void OBCameraNode::setupCameraCtrlServices() {
                                                std::shared_ptr<SetBool::Response> response) {
         setHoleFillingFilterEnableCallback(request, response);
       });
+  set_noise_removal_filter_enable_srv_ = node_->create_service<SetBool>(
+      "set_noise_removal_filter_enable", [this](const std::shared_ptr<SetBool::Request> request,
+                                                std::shared_ptr<SetBool::Response> response) {
+        setNoiseRemovalFilterEnableCallback(request, response);
+      });
   set_all_software_filter_enable_srv_ = node_->create_service<SetBool>(
       "set_all_software_filter_enable", [this](const std::shared_ptr<SetBool::Request> request,
                                                std::shared_ptr<SetBool::Response> response) {
@@ -1070,6 +1075,42 @@ void OBCameraNode::setHoleFillingFilterEnableCallback(
     response->success = false;
   }
 }
+void OBCameraNode::setNoiseRemovalFilterEnableCallback(
+    const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
+    std::shared_ptr<std_srvs::srv::SetBool::Response>& response) {
+  try {
+    enable_noise_removal_filter_ = request->data;
+    if (enable_noise_removal_filter_) {
+      noise_removal_filter_min_diff_ =
+          node_->get_parameter("noise_removal_filter_min_diff").as_int();
+      noise_removal_filter_max_size_ =
+          node_->get_parameter("noise_removal_filter_max_size").as_int();
+      if (noise_removal_filter_min_diff_ == -1 || noise_removal_filter_max_size_ == -1) {
+        return;
+      }
+    } else {
+      noise_removal_filter_min_diff_ = -1;
+      noise_removal_filter_max_size_ = -1;
+      node_->set_parameter(
+          rclcpp::Parameter("noise_removal_filter_min_diff", noise_removal_filter_min_diff_));
+      node_->set_parameter(
+          rclcpp::Parameter("noise_removal_filter_max_size", noise_removal_filter_max_size_));
+    }
+    setupDepthPostProcessFilter();
+    node_->set_parameter(
+        rclcpp::Parameter("enable_noise_removal_filter", enable_noise_removal_filter_));
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->message = e.getMessage();
+    response->success = false;
+  } catch (const std::exception& e) {
+    response->message = e.what();
+    response->success = false;
+  } catch (...) {
+    response->message = "unknown error";
+    response->success = false;
+  }
+}
 void OBCameraNode::setAllSoftwareFilterEnableCallback(
     const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
     std::shared_ptr<std_srvs::srv::SetBool::Response>& response) {
@@ -1085,6 +1126,10 @@ void OBCameraNode::setAllSoftwareFilterEnableCallback(
           node_->get_parameter("spatial_filter_diff_threshold").as_int();
       spatial_filter_magnitude_ = node_->get_parameter("spatial_filter_magnitude").as_int();
       spatial_filter_radius_ = node_->get_parameter("spatial_filter_radius").as_int();
+      noise_removal_filter_min_diff_ =
+          node_->get_parameter("noise_removal_filter_min_diff").as_int();
+      noise_removal_filter_max_size_ =
+          node_->get_parameter("noise_removal_filter_max_size").as_int();
       temporal_filter_diff_threshold_ =
           static_cast<float>(node_->get_parameter("temporal_filter_diff_threshold").as_double());
       temporal_filter_weight_ =
@@ -1094,14 +1139,23 @@ void OBCameraNode::setAllSoftwareFilterEnableCallback(
           threshold_filter_max_ == -1 || threshold_filter_min_ == -1 ||
           spatial_filter_alpha_ == -1.0 || spatial_filter_diff_threshold_ == -1 ||
           spatial_filter_magnitude_ == -1 || spatial_filter_radius_ == -1 ||
+          noise_removal_filter_min_diff_ == -1 || noise_removal_filter_max_size_ == -1 ||
           temporal_filter_diff_threshold_ == -1.0 || temporal_filter_weight_ == -1.0 ||
           hole_filling_filter_mode_.empty()) {
         return;
+      } else {
+        enable_decimation_filter_ = enable_sequence_id_filter_ = enable_threshold_filter_ =
+            enable_noise_removal_filter_ = enable_spatial_filter_ = enable_temporal_filter_ =
+                enable_hole_filling_filter_ = true;
       }
     } else {
+      enable_decimation_filter_ = enable_sequence_id_filter_ = enable_threshold_filter_ =
+          enable_noise_removal_filter_ = enable_spatial_filter_ = enable_temporal_filter_ =
+              enable_hole_filling_filter_ = false;
       decimation_filter_scale_ = sequence_id_filter_id_ = threshold_filter_max_ =
           threshold_filter_min_ = spatial_filter_diff_threshold_ = spatial_filter_magnitude_ =
-              spatial_filter_radius_ = -1;
+              spatial_filter_radius_ = noise_removal_filter_min_diff_ =
+                  noise_removal_filter_max_size_ = -1;
       spatial_filter_alpha_ = temporal_filter_diff_threshold_ = temporal_filter_weight_ = -1.0;
       hole_filling_filter_mode_ = "";
       node_->set_parameter(rclcpp::Parameter("decimation_filter_scale", decimation_filter_scale_));
@@ -1115,12 +1169,26 @@ void OBCameraNode::setAllSoftwareFilterEnableCallback(
       node_->set_parameter(rclcpp::Parameter("spatial_filter_radius", spatial_filter_radius_));
       node_->set_parameter(rclcpp::Parameter("spatial_filter_alpha", spatial_filter_alpha_));
       node_->set_parameter(
+          rclcpp::Parameter("noise_removal_filter_min_diff", noise_removal_filter_min_diff_));
+      node_->set_parameter(
+          rclcpp::Parameter("noise_removal_filter_max_size", noise_removal_filter_max_size_));
+      node_->set_parameter(
           rclcpp::Parameter("temporal_filter_diff_threshold", temporal_filter_diff_threshold_));
       node_->set_parameter(rclcpp::Parameter("temporal_filter_weight", temporal_filter_weight_));
       node_->set_parameter(
           rclcpp::Parameter("hole_filling_filter_mode", hole_filling_filter_mode_));
     }
     setupDepthPostProcessFilter();
+    node_->set_parameter(rclcpp::Parameter("enable_decimation_filter", enable_decimation_filter_));
+    node_->set_parameter(
+        rclcpp::Parameter("enable_sequence_id_filter", enable_sequence_id_filter_));
+    node_->set_parameter(rclcpp::Parameter("enable_threshold_filter", enable_threshold_filter_));
+    node_->set_parameter(rclcpp::Parameter("enable_spatial_filter", enable_spatial_filter_));
+    node_->set_parameter(
+        rclcpp::Parameter("enable_noise_removal_filter", enable_noise_removal_filter_));
+    node_->set_parameter(rclcpp::Parameter("enable_temporal_filter", enable_temporal_filter_));
+    node_->set_parameter(
+        rclcpp::Parameter("enable_hole_filling_filter", enable_hole_filling_filter_));
     response->success = true;
   } catch (const ob::Error& e) {
     response->message = e.getMessage();

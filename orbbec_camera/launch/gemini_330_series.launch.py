@@ -138,6 +138,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_hdr_merge', default_value='false'),
         DeclareLaunchArgument('enable_sequence_id_filter', default_value='false'),
         DeclareLaunchArgument('enable_threshold_filter', default_value='false'),
+        DeclareLaunchArgument('enable_hardware_noise_removal_filter', default_value='true'),
         DeclareLaunchArgument('enable_noise_removal_filter', default_value='true'),
         DeclareLaunchArgument('enable_spatial_filter', default_value='false'),
         DeclareLaunchArgument('enable_temporal_filter', default_value='false'),

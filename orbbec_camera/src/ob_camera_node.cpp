@@ -322,6 +322,7 @@ void OBCameraNode::setupDevices() {
 
   if (device_->isPropertySupported(OB_PROP_DEPTH_SOFT_FILTER_BOOL, OB_PERMISSION_READ_WRITE)) {
     device_->setBoolProperty(OB_PROP_DEPTH_SOFT_FILTER_BOOL, enable_noise_removal_filter_);
+    RCLCPP_INFO_STREAM(logger_, "enable_noise_removal_filter:" << enable_noise_removal_filter_);
   }
 
   if (device_->isPropertySupported(OB_PROP_COLOR_AUTO_WHITE_BALANCE_BOOL, OB_PERMISSION_WRITE)) {
@@ -467,6 +468,13 @@ void OBCameraNode::setupDevices() {
     } else {
       RCLCPP_ERROR(logger_, "disparity_range_mode does not support this setting");
     }
+  }
+  if (device_->isPropertySupported(OB_PROP_HW_NOISE_REMOVE_FILTER_ENABLE_BOOL,
+                                   OB_PERMISSION_READ_WRITE)) {
+    device_->setBoolProperty(OB_PROP_HW_NOISE_REMOVE_FILTER_ENABLE_BOOL,
+                             enable_hardware_noise_removal_filter_);
+    RCLCPP_INFO_STREAM(
+        logger_, "Setting hardware_noise_removal_filter:" << enable_hardware_noise_removal_filter_);
   }
 }
 
@@ -1233,6 +1241,8 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<bool>(enable_hdr_merge_, "enable_hdr_merge", false);
   setAndGetNodeParameter<bool>(enable_sequence_id_filter_, "enable_sequence_id_filter", false);
   setAndGetNodeParameter<bool>(enable_threshold_filter_, "enable_threshold_filter", false);
+  setAndGetNodeParameter<bool>(enable_hardware_noise_removal_filter_,
+                               "enable_hardware_noise_removal_filter", true);
   setAndGetNodeParameter<bool>(enable_noise_removal_filter_, "enable_noise_removal_filter", true);
   setAndGetNodeParameter<bool>(enable_spatial_filter_, "enable_spatial_filter", false);
   setAndGetNodeParameter<bool>(enable_temporal_filter_, "enable_temporal_filter", false);

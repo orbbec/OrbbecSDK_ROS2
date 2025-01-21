@@ -21,7 +21,7 @@ def generate_launch_description():
             'camera_name': 'G330_0',
             'usb_port': '2-1',
             'device_num': '4',
-            'sync_mode': 'primary',
+            # 'sync_mode': 'primary',
         }.items()
     )
 
@@ -35,8 +35,8 @@ def generate_launch_description():
             'camera_name': 'G330_1',
             'usb_port': '2-4',
             'device_num': '4',
-            'sync_mode': 'secondary_synced',
-            'trigger_out_enabled': 'false',
+            # 'sync_mode': 'secondary_synced',
+            # 'trigger_out_enabled': 'false',
         }.items()
     )
 
@@ -50,8 +50,8 @@ def generate_launch_description():
             'camera_name': 'G330_2',
             'usb_port': '2-7',
             'device_num': '4',
-            'sync_mode': 'secondary_synced',
-            'trigger_out_enabled': 'false',
+            # 'sync_mode': 'secondary_synced',
+            # 'trigger_out_enabled': 'false',
         }.items()
     )
 
@@ -65,8 +65,8 @@ def generate_launch_description():
             'camera_name': 'G330_3',
             'usb_port': '2-3',
             'device_num': '4',
-            'sync_mode': 'secondary_synced',
-            'trigger_out_enabled': 'false',
+            # 'sync_mode': 'secondary_synced',
+            # 'trigger_out_enabled': 'false',
         }.items()
     )
 

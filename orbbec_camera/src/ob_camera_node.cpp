@@ -1880,11 +1880,13 @@ void OBCameraNode::setDisparitySearchOffset() {
     return;
   }
   if (device_->isPropertySupported(OB_PROP_DISP_SEARCH_OFFSET_INT, OB_PERMISSION_WRITE)) {
-    if (disparity_search_offset_ != -1) {
+    if (disparity_search_offset_ >= 0 && disparity_search_offset_ <= 127 &&
+        disparity_offset_config_ == false) {
       device_->setIntProperty(OB_PROP_DISP_SEARCH_OFFSET_INT, disparity_search_offset_);
       RCLCPP_INFO_STREAM(logger_, "disparity_search_offset: " << disparity_search_offset_);
     }
-    if (offset_index0_ != -1 && offset_index1_ != -1) {
+    if (disparity_offset_config_ == true && offset_index0_ >= 0 && offset_index0_ <= 127 &&
+        offset_index1_ >= 0 && offset_index1_ <= 127) {
       auto config = OBDispOffsetConfig();
       config.enable = disparity_offset_config_;
       config.offset0 = offset_index0_;

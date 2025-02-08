@@ -1,0 +1,213 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- Basic camera parameters -->
+    <arg name="camera_name" default="camera"/>
+    <!-- open device delay time 100m-->
+    <arg name="connection_delay" default="100"/>
+    <arg name="log_level" default="none"/>
+    <arg name="publish_tf" default="true"/>
+    <arg name="tf_publish_rate" default="10.0"/>
+    <arg name="enable_frame_sync" default="true"/>
+    <arg name="time_domain" default="global"/><!-- "device", "global", "system" -->
+    <arg name="uvc_backend" default="libuvc"/><!-- "libuvc" or "v4l2" -->
+    <arg name="enable_sync_host_time" default="true"/>
+    <!-- The default value of device_preset is `Default`. Only the G330 series is supported. For more information, refer to -->
+    <!-- https://www.orbbec.com/docs/g330-use-depth-presets/ -->
+    <arg name="device_preset" default="Default"/>
+    <arg name="diagnostics_frequency" default="1.0"/>
+    <arg name="enable_laser" default="true"/>
+    <arg name="sync_mode" default="standalone"/>
+    <arg name="enable_hardware_d2d" default="true"/>
+
+
+    <!-- Color camera parameters -->
+    <arg name="color_width" default="0"/>
+    <arg name="color_height" default="0"/>
+    <arg name="color_fps" default="0"/>
+    <arg name="enable_color" default="true"/>
+    <arg name="color_format" default="ANY"/>
+    <!-- color rotation degree : 0, 90, 180, 270 -->
+    <arg name="color_rotation" default="0"/>
+    <arg name="enable_color_auto_exposure" default="true"/>
+    <!-- -1 means not set, other value bigger than 0, the value is the exposure time in ms-->
+    <arg name="color_exposure" default="-1"/>
+
+    <!-- Depth camera parameters -->
+    <arg name="depth_width" default="0"/>
+    <arg name="depth_height" default="0"/>
+    <arg name="depth_fps" default="0"/>
+    <arg name="enable_depth" default="true"/>
+    <arg name="depth_format" default="ANY"/>
+    <arg name="depth_registration" default="true"/>
+    <!-- depth rotation degree : 0, 90, 180, 270 -->
+    <arg name="depth_rotation" default="0"/>
+
+    <!-- Left IR camera parameters -->
+    <arg name="left_ir_width" default="0"/>
+    <arg name="left_ir_height" default="0"/>
+    <arg name="left_ir_fps" default="0"/>
+    <arg name="enable_left_ir" default="false"/>
+    <arg name="left_ir_format" default="ANY"/>
+    <!-- left ir rotation degree : 0, 90, 180, 270 -->
+    <arg name="left_ir_rotation" default="0"/>
+
+    <!-- Right IR camera parameters -->
+    <arg name="right_ir_width" default="0"/>
+    <arg name="right_ir_height" default="0"/>
+    <arg name="right_ir_fps" default="0"/>
+    <arg name="enable_right_ir" default="false"/>
+    <arg name="right_ir_format" default="ANY"/>
+    <arg name="right_ir_rotation" default="0"/>
+
+    <!-- Common IR camera parameters -->
+    <arg name="enable_ir_auto_exposure" default="true"/>
+    <!-- Depth/IR/Left IR/Right IR exposure is same -->
+    <!-- -1 means not set, other value bigger than 0, the value is the exposure time in us-->
+    <arg name="ir_exposure" default="-1"/>
+    <arg name="enable_ir_long_exposure" default="false"/>
+
+    <!-- Point cloud parameters -->
+    <arg name="enable_point_cloud" default="true"/>
+    <arg name="enable_colored_point_cloud" default="false"/>
+    <arg name="ordered_pc" default="false"/>
+    <!-- Gemini 335/335L only support SW align mode, Please DO NOT change it -->
+    <arg name="align_mode" default="SW"/>
+
+    <!-- filter switch -->
+    <arg name="enable_decimation_filter" default="false"/>
+    <arg name="enable_hdr_merge" default="false"/>
+    <arg name="enable_sequenced_filter" default="false"/>
+    <arg name="enable_threshold_filter" default="false"/>
+    <arg name="enable_noise_removal_filter" default="true"/>
+    <arg name="enable_spatial_filter" default="false"/>
+    <arg name="enable_temporal_filter" default="false"/>
+    <arg name="enable_hole_filling_filter" default="false"/>
+    <arg name="sequence_id_filter_id" default="1"/>
+    <arg name="threshold_filter_max" default="-1"/>
+    <arg name="threshold_filter_min" default="-1"/>
+    <arg name="noise_removal_filter_min_diff" default="256"/>
+    <arg name="noise_removal_filter_max_size" default="80"/>
+    <arg name="spatial_filter_alpha" default="-1.0"/>
+    <arg name="spatial_filter_diff_threshold" default="-1"/>
+    <arg name="spatial_filter_magnitude" default="-1"/>
+    <arg name="spatial_filter_radius" default="-1"/>
+    <arg name="temporal_filter_diff_threshold" default="-1.0"/>
+    <arg name="temporal_filter_weight" default="-1.0"/>
+    <arg name="hole_filling_filter_mode" default=""/>
+    <arg name="hdr_merge_exposure_1" default="-1"/>
+    <arg name="hdr_merge_gain_1" default="-1"/>
+    <arg name="hdr_merge_exposure_2" default="-1"/>
+    <arg name="hdr_merge_gain_2" default="-1"/>
+
+    <!-- Misc parameters -->
+    <arg name="usb_port" default=""/>
+    <arg name="serial_number" default=""/>
+    <arg name="device_num" default="1"/>
+
+    <arg name="retry_on_usb3_detection_failure" default="false"/>
+    <arg name="enable_d2c_viewer" default="false"/>
+    <arg name="laser_energy_level" default="-1"/>
+    <arg name="enable_ldp" default="true"/>
+    <arg name="enable_heartbeat" default="false"/>
+    <arg name="enable_hardware_reset" default="false"/>
+
+    <group ns="$(arg camera_name)">
+        <node name="camera" pkg="orbbec_camera" type="orbbec_camera_node" output="screen">
+            <!-- Use the parameters defined above -->
+            <param name="camera_name" value="$(arg camera_name)"/>
+            <param name="connection_delay" value="$(arg connection_delay)"/>
+            <param name="log_level" value="$(arg log_level)"/>
+            <param name="publish_tf" value="$(arg publish_tf)"/>
+            <param name="tf_publish_rate" value="$(arg tf_publish_rate)"/>
+            <param name="enable_frame_sync" value="$(arg enable_frame_sync)"/>
+            <param name="time_domain" value="$(arg time_domain)"/>
+            <param name="uvc_backend" value="$(arg uvc_backend)"/>
+            <param name="enable_sync_host_time" value="$(arg enable_sync_host_time)"/>
+            <param name="device_preset" value="$(arg device_preset)"/>
+            <param name="diagnostics_frequency" value="$(arg diagnostics_frequency)"/>
+            <param name="align_mode" value="$(arg align_mode)"/>
+            <param name="enable_laser" value="$(arg enable_laser)"/>
+            <param name="sync_mode" value="$(arg sync_mode)"/>
+            <param name="enable_hardware_d2d" value="$(arg enable_hardware_d2d)"/>
+            <param name="ir_exposure" value="$(arg ir_exposure)"/>
+            <param name="enable_ir_long_exposure" value="$(arg enable_ir_long_exposure)"/>
+
+            <param name="color_width" value="$(arg color_width)"/>
+            <param name="color_height" value="$(arg color_height)"/>
+            <param name="color_fps" value="$(arg color_fps)"/>
+            <param name="enable_color" value="$(arg enable_color)"/>
+            <param name="color_format" value="$(arg color_format)"/>
+            <param name="enable_color_auto_exposure" value="$(arg enable_color_auto_exposure)"/>
+            <param name="color_exposure" value="$(arg color_exposure)"/>
+            <param name="color_rotation" value="$(arg color_rotation)"/>
+
+            <param name="depth_width" value="$(arg depth_width)"/>
+            <param name="depth_height" value="$(arg depth_height)"/>
+            <param name="depth_fps" value="$(arg depth_fps)"/>
+            <param name="enable_depth" value="$(arg enable_depth)"/>
+            <param name="depth_format" value="$(arg depth_format)"/>
+            <param name="depth_registration" value="$(arg depth_registration)"/>
+            <param name="depth_rotation" value="$(arg depth_rotation)"/>
+
+            <param name="left_ir_width" value="$(arg left_ir_width)"/>
+            <param name="left_ir_height" value="$(arg left_ir_height)"/>
+            <param name="left_ir_fps" value="$(arg left_ir_fps)"/>
+            <param name="enable_left_ir" value="$(arg enable_left_ir)"/>
+            <param name="left_ir_format" value="$(arg left_ir_format)"/>
+            <param name="left_ir_rotation" value="$(arg left_ir_rotation)"/>
+
+            <param name="right_ir_width" value="$(arg right_ir_width)"/>
+            <param name="right_ir_height" value="$(arg right_ir_height)"/>
+            <param name="right_ir_fps" value="$(arg right_ir_fps)"/>
+            <param name="enable_right_ir" value="$(arg enable_right_ir)"/>
+            <param name="right_ir_format" value="$(arg right_ir_format)"/>
+            <param name="right_ir_rotation" value="$(arg right_ir_rotation)"/>
+
+
+            <param name="enable_ir_auto_exposure" value="$(arg enable_ir_auto_exposure)"/>
+
+            <param name="enable_point_cloud" value="$(arg enable_point_cloud)"/>
+            <param name="enable_colored_point_cloud" value="$(arg enable_colored_point_cloud)"/>
+            <param name="ordered_pc" value="$(arg ordered_pc)"/>
+
+            <param name="enable_decimation_filter" value="$(arg enable_decimation_filter)"/>
+            <param name="enable_hdr_merge" value="$(arg enable_hdr_merge)"/>
+            <param name="enable_sequenced_filter" value="$(arg enable_sequenced_filter)"/>
+            <param name="enable_threshold_filter" value="$(arg enable_threshold_filter)"/>
+            <param name="enable_noise_removal_filter" value="$(arg enable_noise_removal_filter)"/>
+            <param name="enable_spatial_filter" value="$(arg enable_spatial_filter)"/>
+            <param name="enable_temporal_filter" value="$(arg enable_temporal_filter)"/>
+            <param name="enable_hole_filling_filter" value="$(arg enable_hole_filling_filter)"/>
+            <param name="sequence_id_filter_id" value="$(arg sequence_id_filter_id)"/>
+            <param name="threshold_filter_max" value="$(arg threshold_filter_max)"/>
+            <param name="threshold_filter_min" value="$(arg threshold_filter_min)"/>
+            <param name="noise_removal_filter_min_diff" value="$(arg noise_removal_filter_min_diff)"/>
+            <param name="noise_removal_filter_max_size" value="$(arg noise_removal_filter_max_size)"/>
+            <param name="spatial_filter_alpha" value="$(arg spatial_filter_alpha)"/>
+            <param name="spatial_filter_diff_threshold" value="$(arg spatial_filter_diff_threshold)"/>
+            <param name="spatial_filter_magnitude" value="$(arg spatial_filter_magnitude)"/>
+            <param name="spatial_filter_radius" value="$(arg spatial_filter_radius)"/>
+            <param name="temporal_filter_diff_threshold" value="$(arg temporal_filter_diff_threshold)"/>
+            <param name="temporal_filter_weight" value="$(arg temporal_filter_weight)"/>
+            <param name="hole_filling_filter_mode" value="$(arg hole_filling_filter_mode)"/>
+            <param name="hdr_merge_exposure_1" value="$(arg hdr_merge_exposure_1)"/>
+            <param name="hdr_merge_gain_1" value="$(arg hdr_merge_gain_1)"/>
+            <param name="hdr_merge_exposure_2" value="$(arg hdr_merge_exposure_2)"/>
+            <param name="hdr_merge_gain_2" value="$(arg hdr_merge_gain_2)"/>
+
+
+            <param name="usb_port" value="$(arg usb_port)"/>
+            <param name="serial_number" value="$(arg serial_number)"/>
+            <param name="device_num" value="$(arg device_num)"/>
+            <param name="retry_on_usb3_detection_failure" value="$(arg retry_on_usb3_detection_failure)"/>
+            <param name="enable_d2c_viewer" value="$(arg enable_d2c_viewer)"/>
+            <param name="laser_energy_level" value="$(arg laser_energy_level)"/>
+            <param name="enable_ldp" value="$(arg enable_ldp)"/>
+            <param name="enable_heartbeat" value="$(arg enable_heartbeat)"/>
+            <param name="enable_hardware_reset" value="$(arg enable_hardware_reset)"/>
+            
+            <!-- Remap the depth registered point cloud topic -->
+            <remap from="/$(arg camera_name)/depth/color/points" to="/$(arg camera_name)/depth_registered/points"/>
+        </node>
+    </group>
+</launch>

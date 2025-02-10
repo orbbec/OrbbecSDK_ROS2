@@ -1,0 +1,14 @@
+{
+    "start_benchmark_params": {
+        "camera_name": [
+            "camera_01",
+            "camera_02",
+            "camera_03",
+            "camera_04"
+        ],
+        "process_name": "component_conta",
+        "switch_cycle": 60,
+        "test_cycle": 1,
+        "skip_number": 30
+    }
+  }

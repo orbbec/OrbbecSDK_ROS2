@@ -633,7 +633,7 @@ class OBCameraNode {
   uint32_t depth_point_cloud_buffer_size_ = 0;
   int min_depth_limit_ = 0;
   int max_depth_limit_ = 0;
-  std::string time_domain_ = "device";  // device, system, global
+  std::string time_domain_ = "global";  // device, system, global
   // soft ware trigger
   rclcpp::TimerBase::SharedPtr software_trigger_timer_;
   std::chrono::milliseconds software_trigger_period_{33};

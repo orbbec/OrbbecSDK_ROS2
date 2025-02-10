@@ -1300,7 +1300,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(max_depth_limit_, "max_depth_limit", 0);
   setAndGetNodeParameter<bool>(enable_heartbeat_, "enable_heartbeat", false);
   setAndGetNodeParameter<bool>(enable_color_undistortion_, "enable_color_undistortion", false);
-  setAndGetNodeParameter<std::string>(time_domain_, "time_domain", "device");
+  setAndGetNodeParameter<std::string>(time_domain_, "time_domain", "global");
   auto device_info = device_->getDeviceInfo();
   CHECK_NOTNULL(device_info.get());
   auto pid = device_info->getPid();

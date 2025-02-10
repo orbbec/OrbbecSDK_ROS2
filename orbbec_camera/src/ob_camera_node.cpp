@@ -2217,14 +2217,12 @@ void OBCameraNode::onNewIMUFrameSyncOutputCallback(const std::shared_ptr<ob::Fra
   auto imu_msg = sensor_msgs::msg::Imu();
   setDefaultIMUMessage(imu_msg);
 
-  imu_msg.header.frame_id = imu_optical_frame_id_;
   auto frame_timestamp = getFrameTimestampUs(accelframe);
   auto timestamp = fromUsToROSTime(frame_timestamp);
   imu_msg.header.stamp = timestamp;
   auto gyro_frame = gryoframe->as<ob::GyroFrame>();
   auto gyro_info = createIMUInfo(GYRO);
   gyro_info.header = imu_msg.header;
-  gyro_info.header.frame_id = imu_optical_frame_id_;
   imu_info_publishers_[GYRO]->publish(gyro_info);
   auto gyroData = gyro_frame->value();
   imu_msg.angular_velocity.x = gyroData.x - gyro_info.bias[0];
@@ -2264,7 +2262,6 @@ void OBCameraNode::onNewIMUFrameCallback(const std::shared_ptr<ob::Frame> &frame
   imu_msg.header.stamp = timestamp;
   auto imu_info = createIMUInfo(stream_index);
   imu_info.header = imu_msg.header;
-  imu_info.header.frame_id = imu_optical_frame_id_;
   imu_info_publishers_[stream_index]->publish(imu_info);
   if (frame->type() == OB_FRAME_GYRO) {
     auto gyro_frame = frame->as<ob::GyroFrame>();
@@ -2286,7 +2283,7 @@ void OBCameraNode::onNewIMUFrameCallback(const std::shared_ptr<ob::Frame> &frame
 }
 
 void OBCameraNode::setDefaultIMUMessage(sensor_msgs::msg::Imu &imu_msg) {
-  imu_msg.header.frame_id = "imu_link";
+  imu_msg.header.frame_id = camera_name_ + imu_optical_frame_id_suffix_;
   imu_msg.orientation.x = 0.0;
   imu_msg.orientation.y = 0.0;
   imu_msg.orientation.z = 0.0;

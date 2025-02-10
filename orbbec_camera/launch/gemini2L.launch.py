@@ -78,8 +78,10 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_d2c_viewer', default_value='false'),
         DeclareLaunchArgument('enable_ldp', default_value='true'),
         DeclareLaunchArgument('enable_soft_filter', default_value='true'),
+        DeclareLaunchArgument('enable_decimation_filter', default_value='false'),
         DeclareLaunchArgument('soft_filter_max_diff', default_value='-1'),
         DeclareLaunchArgument('soft_filter_speckle_size', default_value='-1'),
+        DeclareLaunchArgument('decimation_filter_scale', default_value='-1'),
         # Depth work mode support is as follows:
         # Unbinned Dense Default
         # Unbinned Sparse Default

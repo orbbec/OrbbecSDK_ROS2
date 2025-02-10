@@ -597,6 +597,28 @@ void OBCameraNode::setupDepthPostProcessFilter() {
       RCLCPP_INFO_STREAM(logger_, "Skip setting filter: " << filter_name);
     }
   }
+  auto device_info = device_->getDeviceInfo();
+  CHECK_NOTNULL(device_info);
+  auto pid = device_info->getPid();
+  if (!isGemini335PID(pid)) {
+    if (enable_decimation_filter_) {
+      auto decimation_filter = std::make_shared<ob::DecimationFilter>();
+      decimation_filter->enable(true);
+      filter_list_.push_back(decimation_filter);
+      auto range = decimation_filter->getScaleRange();
+      if (decimation_filter_scale_ != -1 && decimation_filter_scale_ < range.max &&
+          decimation_filter_scale_ > range.min) {
+        RCLCPP_INFO_STREAM(logger_,
+                           "Set decimation filter scale value to " << decimation_filter_scale_);
+        decimation_filter->setScaleValue(decimation_filter_scale_);
+      }
+      if (decimation_filter_scale_ != -1 &&
+          (decimation_filter_scale_ < range.min || decimation_filter_scale_ > range.max)) {
+        RCLCPP_ERROR_STREAM(logger_, "Decimation filter scale value is out of range "
+                                         << range.min << " - " << range.max);
+      }
+    }
+  }
 }
 
 void OBCameraNode::selectBaseStream() {

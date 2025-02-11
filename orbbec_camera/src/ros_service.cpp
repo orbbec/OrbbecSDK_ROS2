@@ -502,7 +502,15 @@ void OBCameraNode::setLdpEnableCallback(
   (void)response;
   bool ldp_enable = request->data;
   try {
-    device_->setBoolProperty(OB_PROP_LDP_BOOL, ldp_enable);
+    if (device_->isPropertySupported(OB_PROP_LASER_CONTROL_INT, OB_PERMISSION_READ_WRITE)) {
+      auto laser_enable = device_->getIntProperty(OB_PROP_LASER_CONTROL_INT);
+      device_->setBoolProperty(OB_PROP_LDP_BOOL, ldp_enable);
+      device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, laser_enable);
+    } else if (device_->isPropertySupported(OB_PROP_LASER_BOOL, OB_PERMISSION_READ_WRITE)) {
+      auto laser_enable = device_->getIntProperty(OB_PROP_LASER_BOOL);
+      device_->setBoolProperty(OB_PROP_LDP_BOOL, ldp_enable);
+      device_->setIntProperty(OB_PROP_LASER_BOOL, laser_enable);
+    }
     response->success = true;
   } catch (const ob::Error& e) {
     response->success = false;

@@ -56,6 +56,7 @@
 #include "orbbec_camera_msgs/srv/set_int32.hpp"
 #include "orbbec_camera_msgs/srv/get_bool.hpp"
 #include "orbbec_camera_msgs/srv/set_string.hpp"
+#include "orbbec_camera_msgs/srv/set_filter.hpp"
 #include "orbbec_camera/constants.h"
 #include "orbbec_camera/dynamic_params.h"
 #include "orbbec_camera/d2c_viewer.h"
@@ -107,6 +108,7 @@ using GetString = orbbec_camera_msgs::srv::GetString;
 using SetString = orbbec_camera_msgs::srv::SetString;
 using SetBool = std_srvs::srv::SetBool;
 using GetBool = orbbec_camera_msgs::srv::GetBool;
+using SetFilter = orbbec_camera_msgs::srv::SetFilter;
 
 typedef std::pair<ob_stream_type, int> stream_index_pair;
 
@@ -293,33 +295,10 @@ class OBCameraNode {
                                  std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
   void setSYNCInterleaveLaserCallback(const std::shared_ptr<SetInt32 ::Request>& request,
                                       std::shared_ptr<SetInt32 ::Response>& response);
+  void setFilterCallback(const std::shared_ptr<SetFilter ::Request>& request,
+                         std::shared_ptr<SetFilter ::Response>& response);
   void setSYNCHostimeCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
                               std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
-
-  void setDecimationFilterEnableCallback(
-      const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
-      std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
-  void setSequenceIdFilterEnableCallback(
-      const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
-      std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
-  void setThresholdFilterEnableCallback(
-      const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
-      std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
-  void setSpatialFilterEnableCallback(
-      const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
-      std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
-  void setTemporalFilterEnableCallback(
-      const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
-      std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
-  void setHoleFillingFilterEnableCallback(
-      const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
-      std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
-  void setNoiseRemovalFilterEnableCallback(
-      const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
-      std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
-  void setAllSoftwareFilterEnableCallback(
-      const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
-      std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
 
   bool toggleSensor(const stream_index_pair& stream_index, bool enabled, std::string& msg);
 
@@ -474,14 +453,7 @@ class OBCameraNode {
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_reset_timestamp_srv_;
   rclcpp::Service<SetInt32>::SharedPtr set_interleaver_laser_sync_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_sync_host_time_srv_;
-  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_decimation_filter_enable_srv_;
-  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_sequence_id_filter_enable_srv_;
-  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_threshold_filter_enable_srv_;
-  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_spatial_filter_enable_srv_;
-  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_temporal_filter_enable_srv_;
-  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_hole_filling_filter_enable_srv_;
-  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_noise_removal_filter_enable_srv_;
-  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_all_software_filter_enable_srv_;
+  rclcpp::Service<SetFilter>::SharedPtr set_filter_srv_;
 
   bool enable_sync_output_accel_gyro_ = false;
   bool publish_tf_ = false;

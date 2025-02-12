@@ -383,6 +383,31 @@ void OBCameraNode::setupDevices() {
     RCLCPP_INFO_STREAM(logger_, "Setting color brightness to " << color_brightness_);
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_BRIGHTNESS_INT, color_brightness_);
   }
+  if (color_sharpness_ != -1 &&
+      device_->isPropertySupported(OB_PROP_COLOR_SHARPNESS_INT, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting color sharpness to " << color_sharpness_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_SHARPNESS_INT, color_sharpness_);
+  }
+  if (color_gamma_ != -1 &&
+      device_->isPropertySupported(OB_PROP_COLOR_GAMMA_INT, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting color gamm to " << color_gamma_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_GAMMA_INT, color_gamma_);
+  }
+  if (color_saturation_ != -1 &&
+      device_->isPropertySupported(OB_PROP_COLOR_SATURATION_INT, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting color saturation to " << color_saturation_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_SATURATION_INT, color_saturation_);
+  }
+  if (color_constrast_ != -1 &&
+      device_->isPropertySupported(OB_PROP_COLOR_CONTRAST_INT, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting color constrast to " << color_constrast_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_CONTRAST_INT, color_constrast_);
+  }
+  if (color_hue_ != -1 &&
+      device_->isPropertySupported(OB_PROP_COLOR_HUE_INT, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting color hue to " << color_hue_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_HUE_INT, color_hue_);
+  }
   // ir ae max
   if (ir_ae_max_exposure_ != -1 &&
       device_->isPropertySupported(OB_PROP_IR_AE_MAX_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
@@ -1230,6 +1255,11 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(color_white_balance_, "color_white_balance", -1);
   setAndGetNodeParameter<int>(color_ae_max_exposure_, "color_ae_max_exposure", -1);
   setAndGetNodeParameter<int>(color_brightness_, "color_brightness", -1);
+  setAndGetNodeParameter<int>(color_sharpness_, "color_sharpness", -1);
+  setAndGetNodeParameter<int>(color_gamma_, "color_gamma", -1);
+  setAndGetNodeParameter<int>(color_saturation_, "color_saturation", -1);
+  setAndGetNodeParameter<int>(color_constrast_, "color_constrast", -1);
+  setAndGetNodeParameter<int>(color_hue_, "color_hue", -1);
   setAndGetNodeParameter(enable_ir_auto_exposure_, "enable_ir_auto_exposure", true);
   setAndGetNodeParameter<int>(ir_exposure_, "ir_exposure", -1);
   setAndGetNodeParameter<int>(ir_gain_, "ir_gain", -1);
@@ -1911,9 +1941,6 @@ void OBCameraNode::setDisparitySearchOffset() {
     if (disparity_search_offset_ >= 0 && disparity_search_offset_ <= 127) {
       device_->setIntProperty(OB_PROP_DISP_SEARCH_OFFSET_INT, disparity_search_offset_);
       RCLCPP_INFO_STREAM(logger_, "disparity_search_offset: " << disparity_search_offset_);
-    } else {
-      device_->setIntProperty(OB_PROP_DISP_SEARCH_OFFSET_INT, 0);
-      RCLCPP_INFO_STREAM(logger_, "Set default disparity_search_offset ");
     }
     if (offset_index0_ >= 0 && offset_index0_ <= 127 && offset_index1_ >= 0 &&
         offset_index1_ <= 127) {
@@ -1927,16 +1954,7 @@ void OBCameraNode::setDisparitySearchOffset() {
       RCLCPP_INFO_STREAM(logger_, "disparity_offset_config: "
                                       << disparity_offset_config_ << "  offset_index0:"
                                       << offset_index0_ << "  offset_index1:" << offset_index1_);
-    } else {
-      config.enable = false;
-      config.offset0 = 0;
-      config.offset1 = 0;
-      config.reserved = 0;
-
-      device_->setStructuredData(OB_STRUCT_DISP_OFFSET_CONFIG,
-                                 reinterpret_cast<const uint8_t *>(&config), sizeof(config));
-      RCLCPP_INFO_STREAM(logger_, "Set default disparity_offset_config ");
-    }
+    } 
   }
   has_run = true;
 }

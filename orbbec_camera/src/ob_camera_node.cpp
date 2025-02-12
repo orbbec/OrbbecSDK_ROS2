@@ -415,6 +415,11 @@ void OBCameraNode::setupDevices() {
     RCLCPP_INFO_STREAM(logger_, "Setting color hue to " << color_hue_);
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_HUE_INT, color_hue_);
   }
+  if (enable_color_backlight_compenstation_ != -1 &&
+      device_->isPropertySupported(OB_PROP_COLOR_BACKLIGHT_COMPENSATION_INT, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting color backlight compenstation to " << (enable_color_backlight_compenstation_ ? "ON" : "OFF"));
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_BACKLIGHT_COMPENSATION_INT, enable_color_backlight_compenstation_);
+  }
   // ir ae max
   if (ir_ae_max_exposure_ != -1 &&
       device_->isPropertySupported(OB_PROP_IR_AE_MAX_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
@@ -1269,6 +1274,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(color_saturation_, "color_saturation", -1);
   setAndGetNodeParameter<int>(color_constrast_, "color_constrast", -1);
   setAndGetNodeParameter<int>(color_hue_, "color_hue", -1);
+  setAndGetNodeParameter<int>(enable_color_backlight_compenstation_, "enable_color_backlight_compenstation", -1);
   setAndGetNodeParameter(enable_ir_auto_exposure_, "enable_ir_auto_exposure", true);
   setAndGetNodeParameter<int>(ir_exposure_, "ir_exposure", -1);
   setAndGetNodeParameter<int>(ir_gain_, "ir_gain", -1);

@@ -7,7 +7,6 @@
 #include <message_filters/sync_policies/approximate_time.h>
 #include <message_filters/synchronizer.h>
 #include <filesystem>
-#include <cpuid.h>
 
 namespace orbbec_camera {
 namespace tools {
@@ -150,29 +149,6 @@ class ObBenchmark : public rclcpp::Node {
     std::stringstream formatted_result;
     formatted_result << std::fixed << std::setprecision(1) << memory_usage_mb;
     return std::stof(formatted_result.str());
-  }
-
-  std::string get_cpu() {
-    unsigned int CPUInfo[4] = {0, 0, 0, 0};
-    char CPUBrandString[0x40] = {0};
-
-    __cpuid(0x80000000, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
-
-    for (unsigned int i = 0x80000002; i <= 0x80000004; ++i) {
-      __cpuid(i, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
-
-      if (i == 0x80000002) {
-        memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
-      } else if (i == 0x80000003) {
-        memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
-      } else if (i == 0x80000004) {
-        memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
-      }
-    }
-
-    char* ptr = CPUBrandString;
-    while (*ptr == ' ') ptr++;
-    return std::string(ptr);
   }
   std::string getCurrentTimes() {
     auto now = std::chrono::system_clock::now();

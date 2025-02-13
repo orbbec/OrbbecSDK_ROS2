@@ -116,7 +116,7 @@ def generate_launch_description():
     ]
     launch1_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "gemini_330_series_component.launch.py")
+            os.path.join(launch_file_dir, "gemini_330_series_benchmark.launch.py")
         ),
         launch_arguments={
             "camera_name": "camera_01",
@@ -129,7 +129,7 @@ def generate_launch_description():
     )
     launch2_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "gemini_330_series_component.launch.py")
+            os.path.join(launch_file_dir, "gemini_330_series_benchmark.launch.py")
         ),
         launch_arguments={
             "camera_name": "camera_02",
@@ -142,7 +142,7 @@ def generate_launch_description():
     )
     launch3_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "gemini_330_series_component.launch.py")
+            os.path.join(launch_file_dir, "gemini_330_series_benchmark.launch.py")
         ),
         launch_arguments={
             "camera_name": "camera_03",
@@ -155,7 +155,7 @@ def generate_launch_description():
     )
     launch4_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "gemini_330_series_component.launch.py")
+            os.path.join(launch_file_dir, "gemini_330_series_benchmark.launch.py")
         ),
         launch_arguments={
             "camera_name": "camera_04",

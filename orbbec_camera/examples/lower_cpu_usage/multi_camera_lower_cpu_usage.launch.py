@@ -65,58 +65,12 @@ def generate_launch_description():
         output="screen",
         condition=UnlessCondition(attach_to_shared_component_container_arg),
     )
-    start_benchmark = LoadComposableNodes(
-        target_container=component_container_name_arg,
-        composable_node_descriptions=[
-        ComposableNode(
-            namespace="start_benchmark",
-            name="start_benchmark",
-            package='orbbec_camera',
-            plugin='orbbec_camera::tools::StartBenchmark',
-            )
-        ]
-    )
 
     attach_to_shared_component_container_arg = TextSubstitution(text="true")
 
-    args = [
-        DeclareLaunchArgument('uvc_backend', default_value='libuvc'),
-        DeclareLaunchArgument('depth_registration', default_value='false'),
-        DeclareLaunchArgument('color_width', default_value='848'),
-        DeclareLaunchArgument('color_height', default_value='480'),
-        DeclareLaunchArgument('color_fps', default_value='30'),
-        DeclareLaunchArgument('color_format', default_value='MJPG'),
-        DeclareLaunchArgument('enable_color', default_value='true'),
-        DeclareLaunchArgument('depth_width', default_value='848'),
-        DeclareLaunchArgument('depth_height', default_value='480'),
-        DeclareLaunchArgument('depth_fps', default_value='30'),
-        DeclareLaunchArgument('depth_format', default_value='ANY'),
-        DeclareLaunchArgument('enable_depth', default_value='true'),
-        DeclareLaunchArgument('left_ir_width', default_value='848'),
-        DeclareLaunchArgument('left_ir_height', default_value='480'),
-        DeclareLaunchArgument('left_ir_fps', default_value='30'),
-        DeclareLaunchArgument('left_ir_format', default_value='ANY'),
-        DeclareLaunchArgument('enable_left_ir', default_value='true'),
-        DeclareLaunchArgument('right_ir_width', default_value='848'),
-        DeclareLaunchArgument('right_ir_height', default_value='480'),
-        DeclareLaunchArgument('right_ir_fps', default_value='30'),
-        DeclareLaunchArgument('right_ir_format', default_value='ANY'),
-        DeclareLaunchArgument('enable_right_ir', default_value='true'),
-        DeclareLaunchArgument('enable_point_cloud', default_value='false'),
-        DeclareLaunchArgument('enable_colored_point_cloud', default_value='false'),
-        DeclareLaunchArgument('enable_decimation_filter', default_value='false'),
-        DeclareLaunchArgument('enable_hdr_merge', default_value='false'),
-        DeclareLaunchArgument('enable_sequence_id_filter', default_value='false'),
-        DeclareLaunchArgument('enable_threshold_filter', default_value='false'),
-        DeclareLaunchArgument('enable_hardware_noise_removal_filter', default_value='false'),
-        DeclareLaunchArgument('enable_noise_removal_filter', default_value='false'),
-        DeclareLaunchArgument('enable_spatial_filter', default_value='false'),
-        DeclareLaunchArgument('enable_temporal_filter', default_value='false'),
-        DeclareLaunchArgument('enable_hole_filling_filter', default_value='false'),
-    ]
     launch1_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "gemini_330_series_benchmark.launch.py")
+            os.path.join(launch_file_dir, "gemini_330_series_lower_cpu_usage.launch.py")
         ),
         launch_arguments={
             "camera_name": "camera_01",
@@ -129,7 +83,7 @@ def generate_launch_description():
     )
     launch2_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "gemini_330_series_benchmark.launch.py")
+            os.path.join(launch_file_dir, "gemini_330_series_lower_cpu_usage.launch.py")
         ),
         launch_arguments={
             "camera_name": "camera_02",
@@ -142,7 +96,7 @@ def generate_launch_description():
     )
     launch3_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "gemini_330_series_benchmark.launch.py")
+            os.path.join(launch_file_dir, "gemini_330_series_lower_cpu_usage.launch.py")
         ),
         launch_arguments={
             "camera_name": "camera_03",
@@ -155,7 +109,7 @@ def generate_launch_description():
     )
     launch4_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "gemini_330_series_benchmark.launch.py")
+            os.path.join(launch_file_dir, "gemini_330_series_lower_cpu_usage.launch.py")
         ),
         launch_arguments={
             "camera_name": "camera_04",
@@ -186,11 +140,10 @@ def generate_launch_description():
     ld = LaunchDescription(
         [
             shared_orbbec_container,
-            start_benchmark,
-            delayed_left_camera,
-            delayed_right_camera,
-            delayed_rear_camera,
-            delayed_front_camera,
+            TimerAction(period=0.0, actions=[GroupAction([delayed_left_camera])]),
+            TimerAction(period=2.0, actions=[GroupAction([delayed_right_camera])]),
+            TimerAction(period=4.0, actions=[GroupAction([delayed_rear_camera])]),
+            TimerAction(period=6.0, actions=[GroupAction([delayed_front_camera])]),
         ]
     )
 

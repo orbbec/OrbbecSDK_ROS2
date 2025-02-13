@@ -73,6 +73,7 @@ def generate_launch_description():
         DeclareLaunchArgument('align_mode', default_value='HW'),
         DeclareLaunchArgument('laser_energy_level', default_value='-1'),
         DeclareLaunchArgument('enable_heartbeat', default_value='false'),
+        DeclareLaunchArgument('diagnostic_period', default_value='0.0'),
     ]
 
     # Node configuration

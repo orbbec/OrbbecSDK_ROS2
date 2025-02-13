@@ -584,11 +584,11 @@ typedef enum {
      * @brief ASIC serial number
      */
     OB_STRUCT_ASIC_SERIAL_NUMBER = 1063,
-    
+
     /**
      * @brief Disparity offset interleaving
      */
-    OB_STRUCT_DISP_OFFSET_CONFIG  = 1064,
+    OB_STRUCT_DISP_OFFSET_CONFIG = 1064,
 
     /**
      * @brief Color camera auto exposure
@@ -749,6 +749,10 @@ typedef enum {
      * @brief Color camera FOCUS
      */
     OB_PROP_COLOR_FOCUS_INT = 2038,
+    /**
+     * @brief ir rectify status,true: ir rectify, false: no rectify
+     */
+    OB_PROP_IR_RECTIFY_BOOL = 2040,
 
     /**
      * @brief Depth camera priority

@@ -629,7 +629,7 @@ OB_EXPORT void ob_frameset_push_frame(ob_frame *frameset, const ob_frame *frame,
 #define ob_gyro_frame_temperature ob_gyro_frame_get_temperature
 #define ob_frameset_get_frame_count ob_frameset_get_count
 
-#define ob_frame_time_stamp(frame, err) (ob_frame_get_timestamp_us(frame, err))
+#define ob_frame_time_stamp(frame, err) (ob_frame_get_timestamp_us(frame, err) / 1000)
 #define ob_frame_system_time_stamp(frame, err) (ob_frame_get_system_timestamp_us(frame, err))
 #define ob_frame_set_system_time_stamp(frame, system_timestamp, err) (ob_frame_set_system_timestamp_us(frame, system_timestamp * 1000, err))
 #define ob_frame_set_device_time_stamp(frame, device_timestamp, err) (ob_frame_set_timestamp_us(frame, device_timestamp * 1000, err))
@@ -637,4 +637,3 @@ OB_EXPORT void ob_frameset_push_frame(ob_frame *frameset, const ob_frame *frame,
 #ifdef __cplusplus
 }
 #endif
-

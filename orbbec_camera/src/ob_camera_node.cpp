@@ -2955,7 +2955,7 @@ void OBCameraNode::setFilterCallback(const std::shared_ptr<SetFilter ::Request> 
                                      std::shared_ptr<SetFilter ::Response> &response) {
   try {
     RCLCPP_INFO_STREAM(logger_, "filter_name: " << request->filter_name
-                                                << "  filter_enable: " << request->filter_enable);
+                                                << "  filter_enable: " << (request->filter_enable? "true" : "false"));
     auto it = std::remove_if(filter_list_.begin(), filter_list_.end(),
                              [&request](const std::shared_ptr<ob::Filter> &filter) {
                                return filter->getName() == request->filter_name;
@@ -2994,7 +2994,7 @@ void OBCameraNode::setFilterCallback(const std::shared_ptr<SetFilter ::Request> 
                                                    << "\ngain_1: " << request->filter_param[1]
                                                    << "\nexposure_2: " << request->filter_param[2]
                                                    << "\ngain_2: " << request->filter_param[3]);
-    } else if (request->filter_name == "SequencedFilter") {
+    } else if (request->filter_name == "SequenceIdFilter") {
       auto sequenced_filter = std::make_shared<ob::SequenceIdFilter>();
       sequenced_filter->enable(request->filter_enable);
       filter_list_.push_back(sequenced_filter);
@@ -3072,7 +3072,7 @@ void OBCameraNode::setFilterCallback(const std::shared_ptr<SetFilter ::Request> 
                          request->filter_name
                              << "Cannot be set\n"
                              << "The filter_name value that can be set is "
-                                "DecimationFilter、HDRMerge、SequencedFilter、ThresholdFilter、Nois"
+                                "DecimationFilter、HDRMerge、SequenceIdFilter、ThresholdFilter、Nois"
                                 "eRemovalFilter、SpatialAdvancedFilter and TemporalFilter");
     }
     for (auto &filter : filter_list_) {

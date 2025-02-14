@@ -52,18 +52,23 @@ void D2CViewer::messageCallback(const sensor_msgs::msg::Image::ConstSharedPtr& r
                  rgb_msg->height, depth_msg->width, depth_msg->height);
     return;
   }
-  auto rgb_encode = (rgb_msg->step == 5760) ? sensor_msgs::image_encodings::RGB8 : sensor_msgs::image_encodings::RGBA8;
+  auto rgb_encode = (rgb_msg->step == 5760) ? sensor_msgs::image_encodings::RGB8
+                                            : sensor_msgs::image_encodings::RGBA8;
   auto gray_type = (rgb_msg->step == 5760) ? cv::COLOR_GRAY2RGB : cv::COLOR_GRAY2RGBA;
   auto rgb_img_ptr = cv_bridge::toCvCopy(rgb_msg, rgb_encode);
   auto depth_img_ptr = cv_bridge::toCvCopy(depth_msg, sensor_msgs::image_encodings::TYPE_16UC1);
   cv::Mat gray_depth, depth_img, d2c_img;
   depth_img_ptr->image.convertTo(gray_depth, CV_8UC1);
   cv::cvtColor(gray_depth, depth_img, gray_type);
-  depth_img.setTo(cv::Scalar(255, 255, 0 ), depth_img);
+  depth_img.setTo(cv::Scalar(255, 255, 0), depth_img);
   cv::bitwise_or(rgb_img_ptr->image, depth_img, d2c_img);
   sensor_msgs::msg::Image::SharedPtr d2c_msg =
       cv_bridge::CvImage(std_msgs::msg::Header(), rgb_encode, d2c_img).toImageMsg();
-  d2c_msg->header = rgb_msg->header;
-  d2c_viewer_pub_->publish(*d2c_msg);
+  if (d2c_msg != nullptr) {
+    d2c_msg->header = rgb_msg->header;
+    d2c_viewer_pub_->publish(*d2c_msg);
+  }else{
+    RCLCPP_ERROR(logger_, "-----------------------d2c_viewer publishing failed-----------------------");
+  }
 }
 }  // namespace orbbec_camera

@@ -242,7 +242,7 @@ def generate_launch_description():
                 condition=UnlessCondition(attach_to_shared_component_container_arg)
             )
             return [
-                # orbbec_container,
+                orbbec_container,
                 LoadComposableNodes(
                   target_container=component_container_name_arg,
                   composable_node_descriptions=[

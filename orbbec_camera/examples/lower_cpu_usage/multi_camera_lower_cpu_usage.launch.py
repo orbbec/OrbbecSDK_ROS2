@@ -53,7 +53,7 @@ def load_parameters(context, args):
 def generate_launch_description():
     # Include launch files
     package_dir = get_package_share_directory("orbbec_camera")
-    launch_file_dir = os.path.join(package_dir, "launch")
+    launch_file_dir = os.path.join(package_dir, "examples/lower_cpu_usage")
 
     attach_to_shared_component_container_arg = LaunchConfiguration('attach_to_shared_component_container', default=False)
     component_container_name_arg = LaunchConfiguration('component_container_name', default='shared_orbbec_container')
@@ -66,7 +66,7 @@ def generate_launch_description():
         condition=UnlessCondition(attach_to_shared_component_container_arg),
     )
 
-    attach_to_shared_component_container_arg = TextSubstitution(text="true")
+
 
     launch1_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -123,19 +123,19 @@ def generate_launch_description():
 
     delayed_left_camera = TimerAction(
         period=2.0,
-        actions=args+[launch1_include],
+        actions=[launch1_include],
     )
     delayed_right_camera = TimerAction(
         period=4.0,
-        actions=args+[launch2_include],
+        actions=[launch2_include],
     )
     delayed_rear_camera = TimerAction(
         period=6.0,
-        actions=args+[launch3_include],
+        actions=[launch3_include],
     )
     delayed_front_camera = TimerAction(
         period=8.0,
-        actions=args+[launch4_include],
+        actions=[launch4_include],
     )
     ld = LaunchDescription(
         [

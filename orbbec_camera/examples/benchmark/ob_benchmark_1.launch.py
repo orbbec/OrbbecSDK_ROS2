@@ -53,7 +53,7 @@ def load_parameters(context, args):
 def generate_launch_description():
     # Include launch files
     package_dir = get_package_share_directory("orbbec_camera")
-    launch_file_dir = os.path.join(package_dir, "launch")
+    launch_file_dir = os.path.join(package_dir, "examples/benchmark")
 
     attach_to_shared_component_container_arg = LaunchConfiguration('attach_to_shared_component_container', default=False)
     component_container_name_arg = LaunchConfiguration('component_container_name', default='shared_orbbec_container')

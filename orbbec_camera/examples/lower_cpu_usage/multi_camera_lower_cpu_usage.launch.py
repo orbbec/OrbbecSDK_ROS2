@@ -66,7 +66,7 @@ def generate_launch_description():
         condition=UnlessCondition(attach_to_shared_component_container_arg),
     )
 
-
+    attach_to_shared_component_container_arg = TextSubstitution(text="true")
 
     launch1_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -100,7 +100,7 @@ def generate_launch_description():
         ),
         launch_arguments={
             "camera_name": "camera_03",
-            "usb_port": "2-1",
+            "usb_port": "2-6",
             "device_num": "4",
             "sync_mode": "standalone",
             "attach_to_shared_component_container": attach_to_shared_component_container_arg,

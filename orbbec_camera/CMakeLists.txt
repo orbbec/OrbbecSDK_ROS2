@@ -215,7 +215,6 @@ add_orbbec_executable(list_devices_node tools/list_devices_node.cpp)
 add_orbbec_executable(list_depth_work_mode_node tools/list_depth_work_mode.cpp)
 add_orbbec_executable(list_camera_profile_mode_node tools/list_camera_profile.cpp)
 add_orbbec_executable(topic_statistics_node tools/topic_statistics.cpp)
-add_orbbec_executable(multi_save_rgbir_node tools/multi_save_rgbir_node.cpp)
 add_orbbec_executable(metadata_save_files_node tools/metadata_save_files.cpp)
 add_orbbec_executable(metadata_export_files_node tools/metadata_export_files.cpp)
 add_orbbec_executable(ob_benchmark_node tools/ob_benchmark.cpp)
@@ -240,9 +239,20 @@ rclcpp_components_register_node(start_benchmark
         EXECUTABLE start_benchmark_node
 )
 
+add_library(multi_save_rgbir SHARED tools/multi_save_rgbir.cpp)
+target_include_directories(multi_save_rgbir PUBLIC ${COMMON_INCLUDE_DIRS} )
+target_link_libraries(multi_save_rgbir ${COMMON_LIBRARIES})
+ament_target_dependencies(multi_save_rgbir ${dependencies})
+
+rclcpp_components_register_node(multi_save_rgbir
+        PLUGIN "orbbec_camera::tools::MultiCameraSubscriber"
+        EXECUTABLE multi_save_rgbir_node
+)
+
 # Install rules
 install(TARGETS ${PROJECT_NAME} frame_latency
   start_benchmark
+  multi_save_rgbir
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
@@ -266,7 +276,6 @@ install(TARGETS list_devices_node
   list_depth_work_mode_node
   list_camera_profile_mode_node
   topic_statistics_node
-  multi_save_rgbir_node
   metadata_save_files_node
   metadata_export_files_node
   ob_benchmark_node

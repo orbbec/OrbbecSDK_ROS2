@@ -1,14 +1,16 @@
-#pragma once
-#include <rclcpp/rclcpp.hpp>
 
+#include <rclcpp/rclcpp.hpp>
+#include <rclcpp_components/register_node_macro.hpp>
 #include <orbbec_camera/ob_camera_node_driver.h>
 #include <orbbec_camera/utils.h>
+#include "orbbec_camera/ob_camera_node.h"
 #include "orbbec_camera_msgs/msg/metadata.hpp"
 #include <message_filters/subscriber.h>
 #include <message_filters/sync_policies/approximate_time.h>
 #include <message_filters/synchronizer.h>
 #include <std_msgs/msg/int32.hpp>
 #include <filesystem>
+#include <regex>
 namespace orbbec_camera {
 namespace tools {
 struct ImageMetadata {
@@ -18,7 +20,10 @@ struct ImageMetadata {
 
 class MultiCameraSubscriber : public rclcpp::Node {
  public:
-  MultiCameraSubscriber() : Node("multi_camera_subscriber") { device_init(); }
+  explicit MultiCameraSubscriber(const rclcpp::NodeOptions &options)
+      : Node("MultiCameraSubscriber", options) {
+    device_init();
+  }
   ~MultiCameraSubscriber() {
     ir_image_buffers_.clear();
     ir_current_timestamp_buffers_.clear();
@@ -41,7 +46,9 @@ class MultiCameraSubscriber : public rclcpp::Node {
         auto device_info = device->getDeviceInfo();
         std::string serial = device_info->serialNumber();
         std::string uid = device_info->uid();
-        auto usb_port = orbbec_camera::parseUsbPort(uid);
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"),
+                           "jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj ");
+        auto usb_port = parseUsbPort(uid);
         serial_numbers_[usb_port] = serial;
         // RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), ":list->deviceCount(): " <<
         // list->deviceCount());
@@ -70,10 +77,9 @@ class MultiCameraSubscriber : public rclcpp::Node {
       RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_camera_subscriber"),
                          "usb_port: " << pair.first << ", index: " << pair.second);
     }
-    auto custom_qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));
-    capture_control_sub_ = this->create_subscription<std_msgs::msg::Int32>(
-        "start_capture", custom_qos,
-        std::bind(&MultiCameraSubscriber::controlCaptureCallback, this, std::placeholders::_1));
+    capture_control_srv_ = this->create_service<orbbec_camera_msgs::srv::SetInt32>(
+        "start_capture", std::bind(&MultiCameraSubscriber::controlCaptureCallback, this,
+                                   std::placeholders::_1, std::placeholders::_2));
   }
 
  private:
@@ -104,6 +110,41 @@ class MultiCameraSubscriber : public rclcpp::Node {
       color_topics_[i] = "/" + camera_name_[i] + "/color/image_raw";
       color_metadata_topic_[i] = "/" + camera_name_[i] + "/color/metadata";
     }
+  }
+  std::string parseUsbPort(const std::string &line) {
+    std::string port_id;
+    std::regex usb_regex("(?:[^ ]+/usb[0-9]+[0-9./-]*/){0,1}([0-9.-]+)(:){0,1}[^ ]*",
+                         std::regex_constants::ECMAScript);
+    std::smatch base_match;
+    bool found_usb = std::regex_match(line, base_match, usb_regex);
+
+    if (found_usb) {
+      port_id = base_match[1].str();
+      std::cout << "USB port_id: " << port_id << std::endl;
+
+      if (base_match[2].str().empty()) {
+        std::regex end_regex(".+(-[0-9]+$)", std::regex_constants::ECMAScript);
+        bool found_end = std::regex_match(port_id, base_match, end_regex);
+
+        if (found_end) {
+          port_id = port_id.substr(0, port_id.size() - base_match[1].str().size());
+          std::cout << "Modified USB port_id: " << port_id << std::endl;
+        }
+      }
+
+      return port_id;
+    }
+
+    std::regex gmsl_regex("(gmsl[0-9]+)(?:-[0-9]+)*(-[0-9]+)$", std::regex_constants::ECMAScript);
+    bool found_gmsl = std::regex_match(line, base_match, gmsl_regex);
+
+    if (found_gmsl) {
+      port_id = base_match[1].str() + base_match[2].str();
+      std::cout << "Parsed GMSL Port ID: " << port_id << std::endl;
+      return port_id;
+    }
+
+    return "";
   }
   void topic_init() {
     ir_image_buffers_.resize(left_ir_topics_.size());
@@ -277,9 +318,12 @@ class MultiCameraSubscriber : public rclcpp::Node {
     }
   }
 
-  void controlCaptureCallback(const std_msgs::msg::Int32::SharedPtr msg) {
+  void controlCaptureCallback(
+      const std::shared_ptr<orbbec_camera_msgs::srv::SetInt32::Request> request,
+      std::shared_ptr<orbbec_camera_msgs::srv::SetInt32::Response> response) {
+    (void)response;
     currenttimes_ = getCurrentTimes();
-    saving_images_number_ = msg->data;
+    saving_images_number_ = request->data;
     if (!topic_init_) {
       topic_init();
       topic_init_ = true;
@@ -360,7 +404,8 @@ class MultiCameraSubscriber : public rclcpp::Node {
       color_meta_subscribers_;
   std::vector<rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr> ir_subscribers_;
   std::vector<rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr> color_subscribers_;
-  rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr capture_control_sub_;
+  //   rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr capture_control_sub_;
+  rclcpp::Service<orbbec_camera_msgs::srv::SetInt32>::SharedPtr capture_control_srv_;
 
   std::map<std::string, int> usb_index_map_;
   std::map<std::string, std::string> serial_numbers_;
@@ -390,7 +435,7 @@ class MultiCameraSubscriber : public rclcpp::Node {
   std::string currenttimes_;
 
   size_t count_ = 0;
-  int saving_images_number_ = 0;
+  int saving_images_number_ = 100;
 
   bool topic_init_ = false;
 
@@ -399,3 +444,4 @@ class MultiCameraSubscriber : public rclcpp::Node {
 };
 }  // namespace tools
 }  // namespace orbbec_camera
+RCLCPP_COMPONENTS_REGISTER_NODE(orbbec_camera::tools::MultiCameraSubscriber)

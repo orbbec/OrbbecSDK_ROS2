@@ -353,12 +353,12 @@ void OBCameraNode::setupDevices() {
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_GAIN_INT, color_gain_);
     }
   }
-  if (enable_color_auto_exposure_priority_ != -1 &&
-      device_->isPropertySupported(OB_PROP_COLOR_AUTO_EXPOSURE_PRIORITY_INT, OB_PERMISSION_WRITE)) {
+  if (device_->isPropertySupported(OB_PROP_COLOR_AUTO_EXPOSURE_PRIORITY_INT, OB_PERMISSION_WRITE)) {
+    int set_enable_color_auto_exposure_priority = enable_color_auto_exposure_priority_ ? 1 : 0;
     RCLCPP_INFO_STREAM(logger_, "Setting color auto exposure priority to "
-                                    << (enable_color_auto_exposure_priority_ ? "ON" : "OFF"));
+                                    << (set_enable_color_auto_exposure_priority ? "ON" : "OFF"));
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_AUTO_EXPOSURE_PRIORITY_INT,
-                        enable_color_auto_exposure_priority_);
+                        set_enable_color_auto_exposure_priority);
   }
   if (device_->isPropertySupported(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
     RCLCPP_INFO_STREAM(
@@ -415,10 +415,12 @@ void OBCameraNode::setupDevices() {
     RCLCPP_INFO_STREAM(logger_, "Setting color hue to " << color_hue_);
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_HUE_INT, color_hue_);
   }
-  if (enable_color_backlight_compenstation_ != -1 &&
-      device_->isPropertySupported(OB_PROP_COLOR_BACKLIGHT_COMPENSATION_INT, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting color backlight compenstation to " << (enable_color_backlight_compenstation_ ? "ON" : "OFF"));
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_BACKLIGHT_COMPENSATION_INT, enable_color_backlight_compenstation_);
+  if (device_->isPropertySupported(OB_PROP_COLOR_BACKLIGHT_COMPENSATION_INT, OB_PERMISSION_WRITE)) {
+    int set_enable_color_backlight_compenstation = enable_color_backlight_compenstation_ ? 1 : 0;
+    RCLCPP_INFO_STREAM(logger_, "Setting color backlight compenstation to "
+                                    << (set_enable_color_backlight_compenstation ? "ON" : "OFF"));
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_BACKLIGHT_COMPENSATION_INT,
+                        set_enable_color_backlight_compenstation);
   }
   // ir ae max
   if (ir_ae_max_exposure_ != -1 &&
@@ -1261,7 +1263,7 @@ void OBCameraNode::getParameters() {
   }
   setAndGetNodeParameter(enable_frame_sync_, "enable_frame_sync", false);
   setAndGetNodeParameter(enable_color_auto_exposure_priority_,
-                         "enable_color_auto_exposure_priority", -1);
+                         "enable_color_auto_exposure_priority", false);
   setAndGetNodeParameter(enable_color_auto_exposure_, "enable_color_auto_exposure", true);
   setAndGetNodeParameter(enable_color_auto_white_balance_, "enable_color_auto_white_balance", true);
   setAndGetNodeParameter<int>(color_exposure_, "color_exposure", -1);
@@ -1274,7 +1276,8 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(color_saturation_, "color_saturation", -1);
   setAndGetNodeParameter<int>(color_constrast_, "color_constrast", -1);
   setAndGetNodeParameter<int>(color_hue_, "color_hue", -1);
-  setAndGetNodeParameter<int>(enable_color_backlight_compenstation_, "enable_color_backlight_compenstation", -1);
+  setAndGetNodeParameter<bool>(enable_color_backlight_compenstation_,
+                               "enable_color_backlight_compenstation", false);
   setAndGetNodeParameter(enable_ir_auto_exposure_, "enable_ir_auto_exposure", true);
   setAndGetNodeParameter<int>(ir_exposure_, "ir_exposure", -1);
   setAndGetNodeParameter<int>(ir_gain_, "ir_gain", -1);
@@ -2954,8 +2957,8 @@ orbbec_camera_msgs::msg::IMUInfo OBCameraNode::createIMUInfo(
 void OBCameraNode::setFilterCallback(const std::shared_ptr<SetFilter ::Request> &request,
                                      std::shared_ptr<SetFilter ::Response> &response) {
   try {
-    RCLCPP_INFO_STREAM(logger_, "filter_name: " << request->filter_name
-                                                << "  filter_enable: " << (request->filter_enable? "true" : "false"));
+    RCLCPP_INFO_STREAM(logger_, "filter_name: " << request->filter_name << "  filter_enable: "
+                                                << (request->filter_enable ? "true" : "false"));
     auto it = std::remove_if(filter_list_.begin(), filter_list_.end(),
                              [&request](const std::shared_ptr<ob::Filter> &filter) {
                                return filter->getName() == request->filter_name;
@@ -3068,12 +3071,12 @@ void OBCameraNode::setFilterCallback(const std::shared_ptr<SetFilter ::Request> 
                                                                   << " - "
                                                                   << request->filter_param[1]);
     } else {
-      RCLCPP_INFO_STREAM(logger_,
-                         request->filter_name
-                             << "Cannot be set\n"
-                             << "The filter_name value that can be set is "
-                                "DecimationFilter、HDRMerge、SequenceIdFilter、ThresholdFilter、Nois"
-                                "eRemovalFilter、SpatialAdvancedFilter and TemporalFilter");
+      RCLCPP_INFO_STREAM(
+          logger_, request->filter_name
+                       << "Cannot be set\n"
+                       << "The filter_name value that can be set is "
+                          "DecimationFilter、HDRMerge、SequenceIdFilter、ThresholdFilter、Nois"
+                          "eRemovalFilter、SpatialAdvancedFilter and TemporalFilter");
     }
     for (auto &filter : filter_list_) {
       std::cout << " - " << filter->getName() << ": "

@@ -854,6 +854,7 @@ int OBCameraNode::init_interleave_hdr_param() {
   device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_CONFIG_INDEX_INT, 1);
   device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, hdr_index1_laser_control_);
   device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, hdr_index1_depth_exposure_);
+  device_->setIntProperty(OB_PROP_IR_EXPOSURE_INT, hdr_index1_depth_exposure_);
   device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, hdr_index1_depth_gain_);
   device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, hdr_index1_ir_brightness_);
   device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, hdr_index1_ir_ae_max_exposure_);
@@ -862,6 +863,7 @@ int OBCameraNode::init_interleave_hdr_param() {
   device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_CONFIG_INDEX_INT, 0);
   device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, hdr_index0_laser_control_);
   device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, hdr_index0_depth_exposure_);
+  device_->setIntProperty(OB_PROP_IR_EXPOSURE_INT, hdr_index0_depth_exposure_);
   device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, hdr_index0_depth_gain_);
   device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, hdr_index0_ir_brightness_);
   device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, hdr_index0_ir_ae_max_exposure_);
@@ -872,6 +874,7 @@ int OBCameraNode::init_interleave_laser_param() {
   device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_CONFIG_INDEX_INT, 1);
   device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, laser_index1_laser_control_);
   device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, laser_index1_depth_exposure_);
+  device_->setIntProperty(OB_PROP_IR_EXPOSURE_INT, laser_index1_depth_exposure_);
   device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, laser_index1_depth_gain_);
   device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, laser_index1_ir_brightness_);
   device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, laser_index1_ir_ae_max_exposure_);
@@ -880,6 +883,7 @@ int OBCameraNode::init_interleave_laser_param() {
   device_->setIntProperty(OB_PROP_FRAME_INTERLEAVE_CONFIG_INDEX_INT, 0);
   device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, laser_index0_laser_control_);
   device_->setIntProperty(OB_PROP_DEPTH_EXPOSURE_INT, laser_index0_depth_exposure_);
+  device_->setIntProperty(OB_PROP_IR_EXPOSURE_INT, laser_index0_depth_exposure_);
   device_->setIntProperty(OB_PROP_DEPTH_GAIN_INT, laser_index0_depth_gain_);
   device_->setIntProperty(OB_PROP_IR_BRIGHTNESS_INT, laser_index0_ir_brightness_);
   device_->setIntProperty(OB_PROP_IR_AE_MAX_EXPOSURE_INT, laser_index0_ir_ae_max_exposure_);

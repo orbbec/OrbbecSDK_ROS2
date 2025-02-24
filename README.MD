@@ -769,16 +769,18 @@ For optimal performance, we strongly recommend updating to the latest firmware v
 
 | Product List | Minimal Firmware Version | **Launch File**       |
 | :----------- | :----------------------- | :-------------------------- |
-| Astra2       | 2.8.20                   | astra2.launch.py            |
-| Femto Mega   | 1.1.7/1.2.7              | femto_mega.launch.py        |
-| Femto Bolt   | 1.0.6/1.0.9              | femto_bolt.launch.py        |
-| Gemini 2     | 1.4.60 /1.4.76           | gemini2.launch.py           |
-| Gemini 2 L   | 1.4.32                   | gemini2L.launch.py          |
+| Gemini 330   | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 330L  | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 335   | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 335L  | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 335Lg | 1.3.46                   | gemini_330_series.launch.py |
 | Gemini 336   | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 336L  | 1.2.20                   | gemini_330_series.launch.py |
+| Femto Bolt   | 1.1.2                    | femto_bolt.launch.py        |
+| Femto Mega   | 1.3.0                    | femto_mega.launch.py        |
+| Astra 2      | 2.8.20                   | astra2.launch.py            |
+| Gemini 2 L   | 1.4.53                   | gemini2L.launch.py          |
+| Gemini 2     | 1.4.92                   | gemini2.launch.py           |
 
 All launch files are essentially similar, with the primary difference being the default values of the parameters set
 for different models within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution settings in the launch file, as well as other parameters, to ensure compatibility and optimal performance.

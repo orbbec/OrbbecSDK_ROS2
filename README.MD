@@ -1,8 +1,4 @@
-ros-${ROS_DISTRO}-image-transport-plugins
-
 # OrbbecSDK ROS2 Wrapper
-
-[![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) ![version](https://img.shields.io/badge/version-1.5.11-green)
 
 > [!IMPORTANT]
 >
@@ -477,13 +473,13 @@ these settings.*
 
 ## Predefined presets
 
-| Preset         | Features                                                                                                                                                                                                           | Recommended use cases                                                                                                                                              |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Default        | - Best visual perception``- Overall good performance in accuracy, fill rate, tiny objects, etc.                                                                                                                    | - Generic `<br>`- Robotics                                                                                                                                       |
-| Hand           | - Clear hand and finger edges                                                                                                                                                                                      | - Gesture recognition                                                                                                                                              |
-| High Accuracy  | - Depth of high confidence `<br>`- Barely noise depth values `<br>`- Lower fill rate                                                                                                                           | - Collision avoidance `<br>`- Object scanning                                                                                                                    |
-| High Density   | - Higher fill rate `<br>`- More tiny objects `<br>`- May suffer from noise depth values                                                                                                                        | - Object recognition `<br>`- Pick & place `<br>`- Foreground & background animation                                                                            |
-| Medium Density | - Balanced performance in fill rate and accuracy `<br>`- In comparison to Default: lower fill rate, better edge quality                                                                                          | - Generic and alternative to Default                                                                                                                               |
+| Preset         | Features                                                                                                                                                                                                         | Recommended use cases                                                                                                                                            |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Default        | - Best visual perception``- Overall good performance in accuracy, fill rate, tiny objects, etc.                                                                                                                  | - Generic `<br>`- Robotics                                                                                                                                       |
+| Hand           | - Clear hand and finger edges                                                                                                                                                                                    | - Gesture recognition                                                                                                                                            |
+| High Accuracy  | - Depth of high confidence `<br>`- Barely noise depth values `<br>`- Lower fill rate                                                                                                                             | - Collision avoidance `<br>`- Object scanning                                                                                                                    |
+| High Density   | - Higher fill rate `<br>`- More tiny objects `<br>`- May suffer from noise depth values                                                                                                                          | - Object recognition `<br>`- Pick & place `<br>`- Foreground & background animation                                                                              |
+| Medium Density | - Balanced performance in fill rate and accuracy `<br>`- In comparison to Default: lower fill rate, better edge quality                                                                                          | - Generic and alternative to Default                                                                                                                             |
 | Custom         | - User defined Preset `<br>`- Derived from Presets above, with customized modifications, e.g. a new configuration for the post-processing pipeline, modified mean intensity set point of depth AE function, etc. | - Better depth performance achieved using customized configurations in comparison to using predefined presets `<br>`- For well-established custom configurations |
 
 Choose the appropriate preset name based on your specific use case and set it as the value for the `device_preset`
@@ -747,24 +743,24 @@ bash .make_deb.sh
 The following devices are supported by the OrbbecSDK ROS2 Wrapper.
 
 | Product                               | **Minimal Firmware Version** | launch file                 |
-| ------------------------------------- | ---------------------------------- | --------------------------- |
-| Astra+                                | 1.0.19                             | astra_adv.launch.py         |
-| Astra Mini /Astra Mini Pro /Astra Pro | 1007                               | astra.launch.py             |
-| Astra Mini Pro S                      | 1005                               | astra.launch.py             |
-| Astra 2                               | 2.8.20                             | astra2.launch.py            |
-| Dabai                                 | 2436                               | dabai.launch.py             |
-| Dabai DW                              | 2606                               | dabai_dw.launch.py          |
-| Dabai DCW                             | 2460                               | dabai_dcw.launch.py         |
-| Femto/Femto W                         | 1.1.8                              | femto.launch.py             |
-| Femto Mega                            | 1.1.7                              | femto_mega.launch.py        |
-| Femto Bolt                            | 1.0.6                              | femto_bolt.launch.py        |
-| Femto Mega I                          | 2.0.2                              | femto_net_camera.launch.py  |
-| Gemini                                | 3018                               | gemini.launch.py            |
-| Gemini 2 / Dabai DCL                  | 1.4.60                             | gemini2.launch.py           |
-| Gemini 2 L                            | 1.4.32                             | gemini2L.launch.py          |
-| Gemini E                              | 3460                               | gemini_e.launch.py          |
-| Gemini E Lite                         | 3606                               | gemini_e_lite.launch.py     |
-| Gemini 335/335L/336/336L              | 1.2.20                             | gemini_330_series.launch.py |
+| ------------------------------------- | ---------------------------- | --------------------------- |
+| Astra+                                | 1.0.19                       | astra_adv.launch.py         |
+| Astra Mini /Astra Mini Pro /Astra Pro | 1007                         | astra.launch.py             |
+| Astra Mini Pro S                      | 1005                         | astra.launch.py             |
+| Astra 2                               | 2.8.20                       | astra2.launch.py            |
+| Dabai                                 | 2436                         | dabai.launch.py             |
+| Dabai DW                              | 2606                         | dabai_dw.launch.py          |
+| Dabai DCW                             | 2460                         | dabai_dcw.launch.py         |
+| Femto/Femto W                         | 1.1.8                        | femto.launch.py             |
+| Femto Mega                            | 1.1.7                        | femto_mega.launch.py        |
+| Femto Bolt                            | 1.0.6                        | femto_bolt.launch.py        |
+| Femto Mega I                          | 2.0.2                        | femto_net_camera.launch.py  |
+| Gemini                                | 3018                         | gemini.launch.py            |
+| Gemini 2 / Dabai DCL                  | 1.4.60                       | gemini2.launch.py           |
+| Gemini 2 L                            | 1.4.32                       | gemini2L.launch.py          |
+| Gemini E                              | 3460                         | gemini_e.launch.py          |
+| Gemini E Lite                         | 3606                         | gemini_e_lite.launch.py     |
+| Gemini 335/335L/336/336L              | 1.2.20                       | gemini_330_series.launch.py |
 
 > [!IMPORTANT]
 >

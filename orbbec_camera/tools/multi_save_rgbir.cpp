@@ -46,12 +46,8 @@ class MultiCameraSubscriber : public rclcpp::Node {
         auto device_info = device->getDeviceInfo();
         std::string serial = device_info->serialNumber();
         std::string uid = device_info->uid();
-        RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"),
-                           "jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj ");
         auto usb_port = parseUsbPort(uid);
         serial_numbers_[usb_port] = serial;
-        // RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), ":list->deviceCount(): " <<
-        // list->deviceCount());
         color_frame_counters_[count_] = 0;
         ir_frame_counters_[count_] = 0;
         count_++;
@@ -404,7 +400,6 @@ class MultiCameraSubscriber : public rclcpp::Node {
       color_meta_subscribers_;
   std::vector<rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr> ir_subscribers_;
   std::vector<rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr> color_subscribers_;
-  //   rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr capture_control_sub_;
   rclcpp::Service<orbbec_camera_msgs::srv::SetInt32>::SharedPtr capture_control_srv_;
 
   std::map<std::string, int> usb_index_map_;

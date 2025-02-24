@@ -746,37 +746,25 @@ bash .make_deb.sh
 
 The following devices are supported by the OrbbecSDK ROS2 Wrapper.
 
-| Product                               | launch file                 |
-| ------------------------------------- | --------------------------- |
-| Astra+                                | astra_adv.launch.py         |
-| Astra Mini /Astra Mini Pro /Astra Pro | astra.launch.py             |
-| Astra Mini Pro S                      | astra.launch.py             |
-| Astra 2                               | astra2.launch.py            |
-| Astra Stereo S                        | stereo_s_u3.launch.py       |
-| Astra Pro 2                           | astra_pro2.launch.py        |
-| Dabai                                 | dabai.launch.py             |
-| Dabai D1                              | dabai_d1.launch.py          |
-| Dabai DW                              | dabai_dw.launch.py          |
-| Dabai DCW                             | dabai_dcw.launch.py         |
-| Dabai Pro                             | dabai_pro.launch.py         |
-| Dabai Max                             | dabai_max.launch.py         |
-| Dabai Max Pro                         | dabai_max_pro.launch.py     |
-| Dabai DW 2                            | dabai_dw2.launch.py         |
-| Dabai DCW 2                           | dabai_dcw2.launch.py        |
-| Deeya                                 | deeya.launch.py             |
-| Femto/Femto W                         | femto.launch.py             |
-| Femto Mega                            | femto_mega.launch.py        |
-| Femto Bolt                            | femto_bolt.launch.py        |
-| Femto Mega I                          | femto_net_camera.launch.py  |
-| Gemini                                | gemini.launch.py            |
-| Gemini 2 / Dabai DCL                  | gemini2.launch.py           |
-| Gemini 2 L                            | gemini2L.launch.py          |
-| Gemini E                              | gemini_e.launch.py          |
-| Gemini E Lite                         | gemini_e_lite.launch.py     |
-| Gemini UW                             | gemini_uw.launch.py         |
-| Gemini EW                             | gemini_ew.launch.py         |
-| Gemini EW Lite                        | gemini_ew_lite.launch.py    |
-| Gemini 335/335L/336/336L              | gemini_330_series.launch.py |
+| Product                               | **Minimal Firmware Version** | launch file                 |
+| ------------------------------------- | ---------------------------------- | --------------------------- |
+| Astra+                                | 1.0.19                             | astra_adv.launch.py         |
+| Astra Mini /Astra Mini Pro /Astra Pro | 1007                               | astra.launch.py             |
+| Astra Mini Pro S                      | 1005                               | astra.launch.py             |
+| Astra 2                               | 2.8.20                             | astra2.launch.py            |
+| Dabai                                 | 2436                               | dabai.launch.py             |
+| Dabai DW                              | 2606                               | dabai_dw.launch.py          |
+| Dabai DCW                             | 2460                               | dabai_dcw.launch.py         |
+| Femto/Femto W                         | 1.1.8                              | femto.launch.py             |
+| Femto Mega                            | 1.1.7                              | femto_mega.launch.py        |
+| Femto Bolt                            | 1.0.6                              | femto_bolt.launch.py        |
+| Femto Mega I                          | 2.0.2                              | femto_net_camera.launch.py  |
+| Gemini                                | 3018                               | gemini.launch.py            |
+| Gemini 2 / Dabai DCL                  | 1.4.60                             | gemini2.launch.py           |
+| Gemini 2 L                            | 1.4.32                             | gemini2L.launch.py          |
+| Gemini E                              | 3460                               | gemini_e.launch.py          |
+| Gemini E Lite                         | 3606                               | gemini_e_lite.launch.py     |
+| Gemini 335/335L/336/336L              | 1.2.20                             | gemini_330_series.launch.py |
 
 > [!IMPORTANT]
 >

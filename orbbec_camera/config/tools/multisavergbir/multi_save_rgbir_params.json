@@ -1,17 +1,13 @@
 {
   "save_rgbir_params": {
-      "time_domain": "device",
+      "time_domain": "global",
       "usb_ports": [
           "2-1",
-          "2-4",
-          "2-7",
           "2-3"
       ],
       "camera_name": [
-          "G330_0",
-          "G330_1",
-          "G330_2",
-          "G330_3"
+          "camera_01",
+          "camera_02"
       ]
   }
 }

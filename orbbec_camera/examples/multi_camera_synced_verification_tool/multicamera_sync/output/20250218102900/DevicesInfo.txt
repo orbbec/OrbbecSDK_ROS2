@@ -1,0 +1,42 @@
+{
+	"deviceVid":	"0x2BC5",
+	"devicePid":	"0x0800",
+	"primarySerialNumber":	"CP1E5420006D",
+	"devices":	[{
+			"index":	0,
+			"isPrimaryDevice":	true,
+			"vid":	"0x2BC5",
+			"pid":	"0x0800",
+			"name":	"Orbbec Gemini 335",
+			"firmwareVersion":	"1.3.64",
+			"serialNumber":	"CP1E5420006D",
+			"hardwareVersion":	"0.1",
+			"ipAddress":	"0.0.0.0",
+			"extensionInfo":	{
+				"ExtensionInfo":	{
+					"IspFwVer":	"20240820",
+					"IspNeedVer":	"20240820",
+					"HwType":	"R1",
+					"HwVer":	"V1.1"
+				}
+			}
+		}, {
+			"index":	1,
+			"isPrimaryDevice":	false,
+			"vid":	"0x2BC5",
+			"pid":	"0x0800",
+			"name":	"Orbbec Gemini 335",
+			"firmwareVersion":	"1.3.64",
+			"serialNumber":	"CP1L44P00051",
+			"hardwareVersion":	"0.1",
+			"ipAddress":	"0.0.0.0",
+			"extensionInfo":	{
+				"ExtensionInfo":	{
+					"IspFwVer":	"20240820",
+					"IspNeedVer":	"20240820",
+					"HwType":	"R1",
+					"HwVer":	"V1.0"
+				}
+			}
+		}]
+}

@@ -15,7 +15,7 @@ interleave_skip_index: 1
 time_domain: "global" # global, device, system
 enable_sync_host_time: true
 
-trigger_out_enabled: true
+trigger_out_enabled: false
 frames_per_trigger: 0
 software_trigger_period: 0
 
@@ -31,7 +31,7 @@ color_exposure: 30 # 3ms
 color_gain: 16 # -1 default
 
 # depth params
-enable_depth: true
+enable_depth: false
 depth_width: 0
 depth_height: 0
 depth_fps: 0
@@ -39,7 +39,7 @@ depth_format: "Y16"
 
 
 #left ir params
-enable_left_ir: false
+enable_left_ir: true
 left_ir_width: 0
 left_ir_height: 0
 left_ir_fps: 0

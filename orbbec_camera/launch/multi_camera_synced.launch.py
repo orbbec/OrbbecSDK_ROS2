@@ -13,26 +13,26 @@ def generate_launch_description():
     config_file_dir = os.path.join(package_dir, "config")
     config_file_path = os.path.join(config_file_dir, "camera_params.yaml")
 
-    G330_0 = IncludeLaunchDescription(
+    launch1_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(launch_file_dir, "gemini_330_series.launch.py")
         ),
         launch_arguments={
-            "camera_name": "G330_0",
-            "usb_port": "2-7",
+            "camera_name": "camera_01",
+            "usb_port": "2-1",
             "device_num": "2",
             "sync_mode": "primary",
             "config_file_path": config_file_path,
         }.items(),
     )
 
-    G330_1 = IncludeLaunchDescription(
+    launch2_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(launch_file_dir, "gemini_330_series.launch.py")
         ),
         launch_arguments={
-            "camera_name": "G330_1",
-            "usb_port": "2-1",
+            "camera_name": "camera_02",
+            "usb_port": "2-3",
             "device_num": "2",
             "sync_mode": "secondary_synced",
             "config_file_path": config_file_path,
@@ -47,8 +47,8 @@ def generate_launch_description():
     ld = LaunchDescription(
         [
 
-            TimerAction(period=0.0, actions=[GroupAction([G330_1])]),
-            TimerAction(period=2.0, actions=[GroupAction([G330_0])]),
+            TimerAction(period=0.0, actions=[GroupAction([launch2_include])]),
+            TimerAction(period=2.0, actions=[GroupAction([launch1_include])]),
             # The primary camera should be launched at last
         ]
     )

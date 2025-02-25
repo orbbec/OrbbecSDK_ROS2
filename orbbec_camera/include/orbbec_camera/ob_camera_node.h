@@ -497,6 +497,7 @@ class OBCameraNode {
   bool enable_ir_auto_exposure_ = true;
   bool enable_ir_long_exposure_ = false;
   bool enable_lrm_ = true;
+  int lrm_power_level_=-1;
   int color_exposure_ = -1;
   int color_gain_ = -1;
   int color_white_balance_ = -1;

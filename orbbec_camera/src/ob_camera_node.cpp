@@ -217,6 +217,17 @@ void OBCameraNode::setupDevices() {
     RCLCPP_INFO_STREAM(logger_, "Setting LRM to " << (enable_lrm_ ? "ON" : "OFF"));
     TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_LDP_BOOL, enable_lrm_);
   }
+  if (lrm_power_level_ != -1 &&
+      device_->isPropertySupported(OB_PROP_LASER_POWER_LEVEL_CONTROL_INT, OB_PERMISSION_WRITE)) {
+    auto range = device_->getIntPropertyRange(OB_PROP_LASER_POWER_LEVEL_CONTROL_INT);
+    if (lrm_power_level_ < range.min || lrm_power_level_ > range.max) {
+      RCLCPP_ERROR(logger_, "lrm power level value is out of range[%d,%d], please check the value",
+                   range.min, range.max);
+    } else {
+      RCLCPP_INFO_STREAM(logger_, "Setting lrm power level to " << lrm_power_level_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_POWER_LEVEL_CONTROL_INT, lrm_power_level_);
+    }
+  }
   if (device_->isPropertySupported(OB_PROP_LASER_CONTROL_INT, OB_PERMISSION_READ_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting G300 laser control to " << enable_laser_);
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_CONTROL_INT, enable_laser_);
@@ -368,7 +379,6 @@ void OBCameraNode::setupDevices() {
   }
   if (color_white_balance_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_WHITE_BALANCE_INT, OB_PERMISSION_WRITE)) {
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_COLOR_AUTO_WHITE_BALANCE_BOOL, false);
     auto range = device_->getIntPropertyRange(OB_PROP_COLOR_WHITE_BALANCE_INT);
     if (color_white_balance_ < range.min || color_white_balance_ > range.max) {
       RCLCPP_ERROR(logger_,
@@ -382,38 +392,82 @@ void OBCameraNode::setupDevices() {
 
   if (color_ae_max_exposure_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_AE_MAX_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting color AE max exposure to " << color_ae_max_exposure_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_AE_MAX_EXPOSURE_INT, color_ae_max_exposure_);
+    auto range = device_->getIntPropertyRange(OB_PROP_COLOR_AE_MAX_EXPOSURE_INT);
+    if (color_ae_max_exposure_ < range.min || color_ae_max_exposure_ > range.max) {
+      RCLCPP_ERROR(logger_,
+                   "color AE max exposure value is out of range[%d,%d], please check the value",
+                   range.min, range.max);
+    } else {
+      RCLCPP_INFO_STREAM(logger_, "Setting color AE max exposure to " << color_ae_max_exposure_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_AE_MAX_EXPOSURE_INT,
+                          color_ae_max_exposure_);
+    }
   }
   if (color_brightness_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_BRIGHTNESS_INT, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting color brightness to " << color_brightness_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_BRIGHTNESS_INT, color_brightness_);
+    auto range = device_->getIntPropertyRange(OB_PROP_COLOR_BRIGHTNESS_INT);
+    if (color_brightness_ < range.min || color_brightness_ > range.max) {
+      RCLCPP_ERROR(logger_, "color brightness value is out of range[%d,%d], please check the value",
+                   range.min, range.max);
+    } else {
+      RCLCPP_INFO_STREAM(logger_, "Setting color brightness to " << color_brightness_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_BRIGHTNESS_INT, color_brightness_);
+    }
   }
   if (color_sharpness_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_SHARPNESS_INT, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting color sharpness to " << color_sharpness_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_SHARPNESS_INT, color_sharpness_);
+    auto range = device_->getIntPropertyRange(OB_PROP_COLOR_SHARPNESS_INT);
+    if (color_sharpness_ < range.min || color_sharpness_ > range.max) {
+      RCLCPP_ERROR(logger_, "color sharpness value is out of range[%d,%d], please check the value",
+                   range.min, range.max);
+    } else {
+      RCLCPP_INFO_STREAM(logger_, "Setting color sharpness to " << color_sharpness_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_SHARPNESS_INT, color_sharpness_);
+    }
   }
   if (color_gamma_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_GAMMA_INT, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting color gamm to " << color_gamma_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_GAMMA_INT, color_gamma_);
+    auto range = device_->getIntPropertyRange(OB_PROP_COLOR_GAMMA_INT);
+    if (color_gamma_ < range.min || color_gamma_ > range.max) {
+      RCLCPP_ERROR(logger_, "color gamm value is out of range[%d,%d], please check the value",
+                   range.min, range.max);
+    } else {
+      RCLCPP_INFO_STREAM(logger_, "Setting color gamm to " << color_gamma_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_GAMMA_INT, color_gamma_);
+    }
   }
   if (color_saturation_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_SATURATION_INT, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting color saturation to " << color_saturation_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_SATURATION_INT, color_saturation_);
+    auto range = device_->getIntPropertyRange(OB_PROP_COLOR_SATURATION_INT);
+    if (color_saturation_ < range.min || color_saturation_ > range.max) {
+      RCLCPP_ERROR(logger_, "color saturation value is out of range[%d,%d], please check the value",
+                   range.min, range.max);
+    } else {
+      RCLCPP_INFO_STREAM(logger_, "Setting color saturation to " << color_saturation_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_SATURATION_INT, color_saturation_);
+    }
   }
   if (color_constrast_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_CONTRAST_INT, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting color constrast to " << color_constrast_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_CONTRAST_INT, color_constrast_);
+    auto range = device_->getIntPropertyRange(OB_PROP_COLOR_CONTRAST_INT);
+    if (color_constrast_ < range.min || color_constrast_ > range.max) {
+      RCLCPP_ERROR(logger_, "color constrast value is out of range[%d,%d], please check the value",
+                   range.min, range.max);
+    } else {
+      RCLCPP_INFO_STREAM(logger_, "Setting color constrast to " << color_constrast_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_CONTRAST_INT, color_constrast_);
+    }
   }
   if (color_hue_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_HUE_INT, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting color hue to " << color_hue_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_HUE_INT, color_hue_);
+    auto range = device_->getIntPropertyRange(OB_PROP_COLOR_HUE_INT);
+    if (color_hue_ < range.min || color_hue_ > range.max) {
+      RCLCPP_ERROR(logger_, "color hue value is out of range[%d,%d], please check the value",
+                   range.min, range.max);
+    } else {
+      RCLCPP_INFO_STREAM(logger_, "Setting color hue to " << color_hue_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_HUE_INT, color_hue_);
+    }
   }
   if (device_->isPropertySupported(OB_PROP_COLOR_BACKLIGHT_COMPENSATION_INT, OB_PERMISSION_WRITE)) {
     int set_enable_color_backlight_compenstation = enable_color_backlight_compenstation_ ? 1 : 0;
@@ -431,21 +485,44 @@ void OBCameraNode::setupDevices() {
   }
   if (depth_mean_intensity_set_point_ != -1 &&
       device_->isPropertySupported(OB_PROP_IR_BRIGHTNESS_INT, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(
-        logger_, "Setting depth mea intensity set point to " << depth_mean_intensity_set_point_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_BRIGHTNESS_INT, depth_mean_intensity_set_point_);
+    auto range = device_->getIntPropertyRange(OB_PROP_IR_BRIGHTNESS_INT);
+    if (depth_mean_intensity_set_point_ < range.min ||
+        depth_mean_intensity_set_point_ > range.max) {
+      RCLCPP_ERROR(
+          logger_,
+          "depth mean intensity set point value is out of range[%d,%d], please check the value",
+          range.min, range.max);
+    } else {
+      RCLCPP_INFO_STREAM(
+          logger_, "Setting depth mean intensity set point to " << depth_mean_intensity_set_point_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_BRIGHTNESS_INT,
+                          depth_mean_intensity_set_point_);
+    }
   }
   // ir ae max
   if (ir_ae_max_exposure_ != -1 &&
       device_->isPropertySupported(OB_PROP_IR_AE_MAX_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting IR AE max exposure to " << ir_ae_max_exposure_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_AE_MAX_EXPOSURE_INT, ir_ae_max_exposure_);
+    auto range = device_->getIntPropertyRange(OB_PROP_IR_AE_MAX_EXPOSURE_INT);
+    if (ir_ae_max_exposure_ < range.min || ir_ae_max_exposure_ > range.max) {
+      RCLCPP_ERROR(logger_,
+                   "IR AE max exposure value is out of range[%d,%d], please check the value",
+                   range.min, range.max);
+    } else {
+      RCLCPP_INFO_STREAM(logger_, "Setting IR AE max exposure to " << ir_ae_max_exposure_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_AE_MAX_EXPOSURE_INT, ir_ae_max_exposure_);
+    }
   }
   // ir brightness
   if (ir_brightness_ != -1 &&
       device_->isPropertySupported(OB_PROP_IR_BRIGHTNESS_INT, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting IR brightness to " << ir_brightness_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_BRIGHTNESS_INT, ir_brightness_);
+    auto range = device_->getIntPropertyRange(OB_PROP_IR_BRIGHTNESS_INT);
+    if (ir_brightness_ < range.min || ir_brightness_ > range.max) {
+      RCLCPP_ERROR(logger_, "IR brightness value is out of range[%d,%d], please check the value",
+                   range.min, range.max);
+    } else {
+      RCLCPP_INFO_STREAM(logger_, "Setting IR brightness to " << ir_brightness_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_BRIGHTNESS_INT, ir_brightness_);
+    }
   }
 
   if (ir_exposure_ != -1 &&
@@ -1309,6 +1386,7 @@ void OBCameraNode::getParameters() {
     depth_registration_ = false;
   }
   setAndGetNodeParameter<bool>(enable_lrm_, "enable_lrm", true);
+  setAndGetNodeParameter<int>(lrm_power_level_, "lrm_power_level", -1);
   setAndGetNodeParameter<int>(soft_filter_max_diff_, "soft_filter_max_diff", -1);
   setAndGetNodeParameter<int>(soft_filter_speckle_size_, "soft_filter_speckle_size", -1);
   setAndGetNodeParameter<double>(liner_accel_cov_, "linear_accel_cov", 0.0003);

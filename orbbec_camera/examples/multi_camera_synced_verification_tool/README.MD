@@ -35,7 +35,7 @@ In the output example provided
 
 #### Python
 
-Config.ini : Configuration file for Python analysis script (need to be modified).
+* `Config.ini` : Configuration file for Python analysis script (need to be modified).
 
 ## Preparation for operation
 
@@ -113,7 +113,7 @@ When the terminal displays "over", the image is saved.A new multicamera_sync fol
 
 ### Analyzing camera image data
 
-You need to copy the modified [Pyhotn folder](./Python) to the new multi_camera_synced subdirectory, and copy the modified [DevicesInfo.txt ](./multicamera_sync/output/20250218102900/DevicesInfo.txt)and [StreamProfileInfo.txt](./multicamera_sync/output/20250218102900/StreamProfileInfo.txt) to the same level directory as the TotalModeFrames folder.
+You need to copy the modified [Pyhotn folder](./multicamera_sync/Python) to the new multi_camera_synced subdirectory, and copy the modified [DevicesInfo.txt ](./multicamera_sync/output/20250218102900/DevicesInfo.txt)and [StreamProfileInfo.txt](./multicamera_sync/output/20250218102900/StreamProfileInfo.txt) to the same level directory as the TotalModeFrames folder.
 
 * Finally everything is ready, run the python script
 
@@ -122,4 +122,10 @@ cd multicamera_sync/Python
 python3 SyncFramesMain.py
 ```
 
-After the operation is successful, you can view the synchronization effect in the r`esults folder`
+After the operation is successful, you can view the synchronization effect in the r `esults folder`
+
+## Files that need to be changed
+
+* [multi_save_rgbir_params.json](../../config/tools/multisavergbir/multi_save_rgbir_params.json)
+* [DevicesInfo.txt ](./multicamera_sync/output/20250218102900/DevicesInfo.txt)
+* [Config.ini](./multicamera_sync/Python/Config.ini)

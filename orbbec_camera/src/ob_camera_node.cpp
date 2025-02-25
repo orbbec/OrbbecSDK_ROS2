@@ -429,6 +429,12 @@ void OBCameraNode::setupDevices() {
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_DEPTH_AUTO_EXPOSURE_PRIORITY_INT,
                         set_enable_depth_auto_exposure_priority);
   }
+  if (depth_mean_intensity_set_point_ != -1 &&
+      device_->isPropertySupported(OB_PROP_IR_BRIGHTNESS_INT, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(
+        logger_, "Setting depth mea intensity set point to " << depth_mean_intensity_set_point_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_BRIGHTNESS_INT, depth_mean_intensity_set_point_);
+  }
   // ir ae max
   if (ir_ae_max_exposure_ != -1 &&
       device_->isPropertySupported(OB_PROP_IR_AE_MAX_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
@@ -1274,8 +1280,9 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(color_hue_, "color_hue", -1);
   setAndGetNodeParameter<bool>(enable_color_backlight_compenstation_,
                                "enable_color_backlight_compenstation", false);
-    setAndGetNodeParameter(enable_depth_auto_exposure_priority_,
+  setAndGetNodeParameter(enable_depth_auto_exposure_priority_,
                          "enable_depth_auto_exposure_priority", false);
+  setAndGetNodeParameter(depth_mean_intensity_set_point_, "depth_mean_intensity_set_point", -1);
   setAndGetNodeParameter(enable_ir_auto_exposure_, "enable_ir_auto_exposure", true);
   setAndGetNodeParameter<int>(ir_exposure_, "ir_exposure", -1);
   setAndGetNodeParameter<int>(ir_gain_, "ir_gain", -1);

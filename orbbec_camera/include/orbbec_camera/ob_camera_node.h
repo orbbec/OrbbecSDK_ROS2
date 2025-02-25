@@ -322,6 +322,8 @@ class OBCameraNode {
 
   std::shared_ptr<ob::Frame> processDepthFrameFilter(std::shared_ptr<ob::Frame>& frame);
 
+  std::shared_ptr<ob::Frame> processColorFrameFilter(std::shared_ptr<ob::Frame>& frame);
+
   uint64_t getFrameTimestampUs(const std::shared_ptr<ob::Frame>& frame);
 
   void onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set);
@@ -365,6 +367,7 @@ class OBCameraNode {
   static bool isGemini335PID(uint32_t pid);
 
   void setupDepthPostProcessFilter();
+  void setupColorPostProcessFilter();
 
   // interleave AE
   int init_interleave_hdr_param();
@@ -497,7 +500,7 @@ class OBCameraNode {
   bool enable_ir_auto_exposure_ = true;
   bool enable_ir_long_exposure_ = false;
   bool enable_lrm_ = true;
-  int lrm_power_level_=-1;
+  int lrm_power_level_ = -1;
   int color_exposure_ = -1;
   int color_gain_ = -1;
   int color_white_balance_ = -1;
@@ -509,6 +512,8 @@ class OBCameraNode {
   int color_constrast_ = -1;
   int color_hue_ = -1;
   bool enable_color_backlight_compenstation_ = false;
+  bool enable_color_decimation_filter_ = false;
+  int color_decimation_filter_scale_ = -1;
   int depth_brightness_ = -1;
   int ir_exposure_ = -1;
   int ir_gain_ = -1;
@@ -625,7 +630,8 @@ class OBCameraNode {
   bool has_first_color_frame_ = false;
   bool use_intra_process_ = false;
   std::string cloud_frame_id_;
-  std::vector<std::shared_ptr<ob::Filter>> filter_list_;
+  std::vector<std::shared_ptr<ob::Filter>> depth_filter_list_;
+  std::vector<std::shared_ptr<ob::Filter>> color_filter_list_;
 
   // interleave AE
   std::string interleave_ae_mode_ = "hdr";  // hdr or laser

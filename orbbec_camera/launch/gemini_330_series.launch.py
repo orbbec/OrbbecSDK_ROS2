@@ -83,6 +83,8 @@ def generate_launch_description():
         DeclareLaunchArgument('color_constrast', default_value='-1'),
         DeclareLaunchArgument('color_hue', default_value='-1'),
         DeclareLaunchArgument('enable_color_backlight_compenstation', default_value='false'),
+        DeclareLaunchArgument('enable_color_decimation_filter', default_value='false'),
+        DeclareLaunchArgument('color_decimation_filter_scale', default_value='-1'),
         DeclareLaunchArgument('depth_width', default_value='0'),
         DeclareLaunchArgument('depth_height', default_value='0'),
         DeclareLaunchArgument('depth_fps', default_value='0'),

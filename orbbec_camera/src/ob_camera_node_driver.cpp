@@ -31,6 +31,7 @@
 #include <iomanip>  // For std::put_time
 
 std::string g_camera_name = "orbbec_camera";  // Assuming this is declared elsewhere
+std::string g_time_domain = "global";         // Assuming this is declared elsewhere
 
 void signalHandler(int sig) {
   std::cout << "Received signal: " << sig << std::endl;
@@ -129,6 +130,7 @@ void OBCameraNodeDriver::init() {
   connection_delay_ = static_cast<int>(declare_parameter<int>("connection_delay", 100));
   enable_sync_host_time_ = declare_parameter<bool>("enable_sync_host_time", true);
   g_camera_name = declare_parameter<std::string>("camera_name", g_camera_name);
+  g_time_domain = declare_parameter<std::string>("time_domain", g_time_domain);
   ob::Context::setLoggerToConsole(log_level);
   orb_device_lock_shm_fd_ = shm_open(ORB_DEFAULT_LOCK_NAME.c_str(), O_CREAT | O_RDWR, 0666);
   if (orb_device_lock_shm_fd_ < 0) {
@@ -439,6 +441,13 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
 
   if (enable_sync_host_time_ && !isOpenNIDevice(device_info_->pid())) {
     TRY_EXECUTE_BLOCK(device_->timerSyncWithHost());
+    if (g_time_domain != "global") {
+      sync_host_time_timer_ = this->create_wall_timer(std::chrono::milliseconds(60000), [this]() {
+        if (device_) {
+          TRY_EXECUTE_BLOCK(device_->timerSyncWithHost());
+        }
+      });
+    }
   }
 
   RCLCPP_INFO_STREAM(logger_, "Device " << device_info_->getName() << " connected");

@@ -493,6 +493,7 @@ class OBCameraNode {
   bool enable_color_auto_exposure_priority_ = false;
   bool enable_color_auto_exposure_ = true;
   bool enable_color_auto_white_balance_ = true;
+  bool enable_depth_auto_exposure_priority_ = false;
   bool enable_ir_auto_exposure_ = true;
   bool enable_ir_long_exposure_ = false;
   bool enable_ldp_ = true;

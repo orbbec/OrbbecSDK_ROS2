@@ -76,7 +76,7 @@ def generate_launch_description():
         DeclareLaunchArgument('log_level', default_value='none'),
         DeclareLaunchArgument('enable_publish_extrinsic', default_value='false'),
         DeclareLaunchArgument('enable_d2c_viewer', default_value='false'),
-        DeclareLaunchArgument('enable_ldp', default_value='true'),
+        DeclareLaunchArgument('enable_lrm', default_value='true'),
         DeclareLaunchArgument('enable_decimation_filter', default_value='false'),
         DeclareLaunchArgument('decimation_filter_scale', default_value='-1'),
         # Configure the path for depth filter file, for example: /config/depthfilter/Gemini2_v1.7.json

@@ -264,7 +264,7 @@ class OBCameraNode {
                               const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
                               std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
 
-  void setLdpEnableCallback(const std::shared_ptr<rmw_request_id_t>& request_header,
+  void setLrmEnableCallback(const std::shared_ptr<rmw_request_id_t>& request_header,
                             const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
                             std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
 
@@ -285,10 +285,10 @@ class OBCameraNode {
                          std::shared_ptr<SetBool::Response>& response,
                          const stream_index_pair& stream_index);
 
-  void getLdpStatusCallback(const std::shared_ptr<GetBool::Request>& request,
+  void getLrmStatusCallback(const std::shared_ptr<GetBool::Request>& request,
                             std::shared_ptr<GetBool::Response>& response);
 
-  void getLdpMeasureDistanceCallback(const std::shared_ptr<GetInt32::Request>& request,
+  void getLrmMeasureDistanceCallback(const std::shared_ptr<GetInt32::Request>& request,
                                      std::shared_ptr<GetInt32::Response>& response);
 
   void setRESETTimestampCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
@@ -444,12 +444,12 @@ class OBCameraNode {
       set_auto_exposure_srv_;
   rclcpp::Service<GetDeviceInfo>::SharedPtr get_device_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_laser_enable_srv_;
-  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_ldp_enable_srv_;
-  rclcpp::Service<orbbec_camera_msgs::srv::GetBool>::SharedPtr get_ldp_status_srv_;
+  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_lrm_enable_srv_;
+  rclcpp::Service<orbbec_camera_msgs::srv::GetBool>::SharedPtr get_lrm_status_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_floor_enable_srv_;
   rclcpp::Service<SetInt32>::SharedPtr set_fan_work_mode_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr toggle_sensors_srv_;
-  rclcpp::Service<GetInt32>::SharedPtr get_ldp_measure_distance_srv_;
+  rclcpp::Service<GetInt32>::SharedPtr get_lrm_measure_distance_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_reset_timestamp_srv_;
   rclcpp::Service<SetInt32>::SharedPtr set_interleaver_laser_sync_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_sync_host_time_srv_;
@@ -496,7 +496,7 @@ class OBCameraNode {
   bool enable_depth_auto_exposure_priority_ = false;
   bool enable_ir_auto_exposure_ = true;
   bool enable_ir_long_exposure_ = false;
-  bool enable_ldp_ = true;
+  bool enable_lrm_ = true;
   int color_exposure_ = -1;
   int color_gain_ = -1;
   int color_white_balance_ = -1;

@@ -214,8 +214,8 @@ void OBCameraNode::setupDevices() {
     RCLCPP_INFO_STREAM(logger_, "Depth process is " << d2d_mode);
   }
   if (device_->isPropertySupported(OB_PROP_LDP_BOOL, OB_PERMISSION_READ_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting LDP to " << (enable_ldp_ ? "ON" : "OFF"));
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_LDP_BOOL, enable_ldp_);
+    RCLCPP_INFO_STREAM(logger_, "Setting LRM to " << (enable_lrm_ ? "ON" : "OFF"));
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_LDP_BOOL, enable_lrm_);
   }
   if (device_->isPropertySupported(OB_PROP_LASER_CONTROL_INT, OB_PERMISSION_READ_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting G300 laser control to " << enable_laser_);
@@ -1308,7 +1308,7 @@ void OBCameraNode::getParameters() {
     enable_colored_point_cloud_ = false;
     depth_registration_ = false;
   }
-  setAndGetNodeParameter<bool>(enable_ldp_, "enable_ldp", true);
+  setAndGetNodeParameter<bool>(enable_lrm_, "enable_lrm", true);
   setAndGetNodeParameter<int>(soft_filter_max_diff_, "soft_filter_max_diff", -1);
   setAndGetNodeParameter<int>(soft_filter_speckle_size_, "soft_filter_speckle_size", -1);
   setAndGetNodeParameter<double>(liner_accel_cov_, "linear_accel_cov", 0.0003);

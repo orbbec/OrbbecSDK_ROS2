@@ -100,18 +100,18 @@ void OBCameraNode::setupCameraCtrlServices() {
                                  std::shared_ptr<SetBool::Response> response) {
         setLaserEnableCallback(request_header, request, response);
       });
-  set_ldp_enable_srv_ = node_->create_service<SetBool>(
-      "set_ldp_enable", [this](const std::shared_ptr<rmw_request_id_t> request_header,
+  set_lrm_enable_srv_ = node_->create_service<SetBool>(
+      "set_lrm_enable", [this](const std::shared_ptr<rmw_request_id_t> request_header,
                                const std::shared_ptr<SetBool::Request> request,
                                std::shared_ptr<SetBool::Response> response) {
-        setLdpEnableCallback(request_header, request, response);
+        setLrmEnableCallback(request_header, request, response);
       });
-  get_ldp_status_srv_ = node_->create_service<GetBool>(
-      "get_ldp_status", [this](const std::shared_ptr<rmw_request_id_t> request_header,
+  get_lrm_status_srv_ = node_->create_service<GetBool>(
+      "get_lrm_status", [this](const std::shared_ptr<rmw_request_id_t> request_header,
                                const std::shared_ptr<GetBool::Request> request,
                                std::shared_ptr<GetBool::Response> response) {
         (void)request_header;
-        getLdpStatusCallback(request, response);
+        getLrmStatusCallback(request, response);
       });
 
   get_white_balance_srv_ = node_->create_service<GetInt32>(
@@ -164,10 +164,10 @@ void OBCameraNode::setupCameraCtrlServices() {
                                      std::shared_ptr<SetBool::Response> response) {
         setIRLongExposureCallback(request, response);
       });
-  get_ldp_measure_distance_srv_ = node_->create_service<GetInt32>(
-      "get_ldp_measure_distance", [this](const std::shared_ptr<GetInt32::Request> request,
+  get_lrm_measure_distance_srv_ = node_->create_service<GetInt32>(
+      "get_lrm_measure_distance", [this](const std::shared_ptr<GetInt32::Request> request,
                                          std::shared_ptr<GetInt32::Response> response) {
-        getLdpMeasureDistanceCallback(request, response);
+        getLrmMeasureDistanceCallback(request, response);
       });
   set_reset_timestamp_srv_ = node_->create_service<SetBool>(
       "set_reset_timestamp", [this](const std::shared_ptr<SetBool::Request> request,
@@ -494,21 +494,21 @@ void OBCameraNode::setLaserEnableCallback(
   }
 }
 
-void OBCameraNode::setLdpEnableCallback(
+void OBCameraNode::setLrmEnableCallback(
     const std::shared_ptr<rmw_request_id_t>& request_header,
     const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
     std::shared_ptr<std_srvs::srv::SetBool::Response>& response) {
   (void)request_header;
   (void)response;
-  bool ldp_enable = request->data;
+  bool lrm_enable = request->data;
   try {
     if (device_->isPropertySupported(OB_PROP_LASER_CONTROL_INT, OB_PERMISSION_READ_WRITE)) {
       auto laser_enable = device_->getIntProperty(OB_PROP_LASER_CONTROL_INT);
-      device_->setBoolProperty(OB_PROP_LDP_BOOL, ldp_enable);
+      device_->setBoolProperty(OB_PROP_LDP_BOOL, lrm_enable);
       device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, laser_enable);
     } else if (device_->isPropertySupported(OB_PROP_LASER_BOOL, OB_PERMISSION_READ_WRITE)) {
       auto laser_enable = device_->getIntProperty(OB_PROP_LASER_BOOL);
-      device_->setBoolProperty(OB_PROP_LDP_BOOL, ldp_enable);
+      device_->setBoolProperty(OB_PROP_LDP_BOOL, lrm_enable);
       device_->setIntProperty(OB_PROP_LASER_BOOL, laser_enable);
     }
     response->success = true;
@@ -642,7 +642,7 @@ void OBCameraNode::setMirrorCallback(const std::shared_ptr<SetBool::Request>& re
   }
 }
 
-void OBCameraNode::getLdpStatusCallback(const std::shared_ptr<GetBool::Request>& request,
+void OBCameraNode::getLrmStatusCallback(const std::shared_ptr<GetBool::Request>& request,
                                         std::shared_ptr<GetBool::Response>& response) {
   (void)request;
   try {
@@ -660,7 +660,7 @@ void OBCameraNode::getLdpStatusCallback(const std::shared_ptr<GetBool::Request>&
   }
 }
 
-void OBCameraNode::getLdpMeasureDistanceCallback(const std::shared_ptr<GetInt32::Request>& request,
+void OBCameraNode::getLrmMeasureDistanceCallback(const std::shared_ptr<GetInt32::Request>& request,
                                                  std::shared_ptr<GetInt32::Response>& response) {
   (void)request;
   try {

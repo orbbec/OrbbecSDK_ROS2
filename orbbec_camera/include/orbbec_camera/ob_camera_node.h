@@ -509,7 +509,7 @@ class OBCameraNode {
   int color_constrast_ = -1;
   int color_hue_ = -1;
   bool enable_color_backlight_compenstation_ = false;
-  int depth_mean_intensity_set_point_ = -1;
+  int depth_brightness_ = -1;
   int ir_exposure_ = -1;
   int ir_gain_ = -1;
   int ir_ae_max_exposure_ = -1;

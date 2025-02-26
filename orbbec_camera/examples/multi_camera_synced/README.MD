@@ -22,11 +22,17 @@ Open multi_camera_synced.launch.py, and configure the camera settings as shown b
 ![Depth Point Cloud Visualization](image/multi_camera_synced2.png)
 
 1. `gemini_330_series.launch.py` is the launch file for starting the camera.
+
 2. Set `camera_name` to `G330_0`. For example, the published color image topic will be `/G330_0/color/image_raw`.
+
 3. Set `usb_port` to `2-2`, indicating that the camera device on port `2-2` is being used. This value can be found in the output of the `ros2 run orbbec_camera list_devices_node` command.
+
 4. Set `device_num` to `2`, meaning two cameras will be used.
+
 5. Set `sync_mode` to `primary` to indicate that the `2-7` camera device is in primary mode. The multi-camera sync mode options can be found in the figure below.
+
 6. Parameters from the `config_file_path` can override the parameters set in `gemini_330_series.launch.py` (optional).
+
 7. For slave cameras, set `trigger_out_enabled` to false.
 
 | **Pattern Nam**e | **Setting effect description**                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |

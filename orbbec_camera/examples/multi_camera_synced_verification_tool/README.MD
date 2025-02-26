@@ -21,6 +21,10 @@
 
 ### multicamera_sync
 
+* `gemini_330_series_synced_verify.launch.py` : Single camera runs launch, which provides the camera running node for multi_camera_synced_verify.launch.py.
+
+* `multi_camera_synced_verify.launch.py` : Multi camer synced + launch of save_rgbir tool.
+
 #### output
 
 > The ouput folder is the folder where the camera pictures are output
@@ -28,9 +32,13 @@
 In the output example provided
 
 * `20250218102900` : Represents the camera image information collected at 10:29:00 on February 18, 2025.
+
 * `TotalModeFrames` : Camera image information storage directory.
+
 * `results-2025-02-25_163648` : The result after analyzing and matching the image information of TotalModeFrames.
+
 * `DevicesInfo.txt` : Camera equipment basic information (need to be modified).
+
 * `StreamProfileInfo.txt` : Camera video stream information (no need to modify).
 
 #### Python
@@ -86,7 +94,9 @@ save_rgbir is a tool for saving images. The configuration file of this tool is i
 Edit DevicesInfo.txt. Only the `primarySerialNumber`, `index` and `serialNumber` parameters need to be changed. Other parameters do not need to be changed.Refer to the example of [20250218102900](./multicamera_sync/output/20250218102900).
 
 * `primarySerialNumber` : The SN serial number of the primary camera
+
 * `index` : Camera index
+
 * `serialNumber` : The SN serial number of the camera
 
 ### Config.ini
@@ -111,6 +121,26 @@ ros2 service call /save_rgbir/start_capture orbbec_camera_msgs/srv/SetInt32 '{da
 
 When the terminal displays "over", the image is saved.A new multicamera_sync folder will be generated under the workspace.
 
+#### Camera pictures naming format
+
+Take [color_SNCP1E5420006D_Index0_g1739874543227_f0_s1739874543327_e50_d16_.jpg](./multicamera_sync/./output/20250218102900/TotalModeFrames/SNCP1E5420006D_Index0/color_SNCP1E5420006D_Index0_g1739874543227_f0_s1739874543327_e50_d16_.jpg) as an example
+
+* `color` : This image is a snapshot of the color stream.
+
+* `SNCP1E5420006D` : The camera's SN serial number is CP1E5420006D.
+
+* `Index0` : Camera 0 (usually referred to primary camera).
+
+* `g1739874543227` : “g” represents the global timestamp, which means the global timestamp of this frame is 1739874543227.
+
+* `f0` : The 0th picture of the color stream acquisition of this camera.
+
+* `s1739874543327` : "s" represents the timestamp of the current system, which means the current system timestamp of this frame is 1739874543327.
+
+* `e50` : The exposure of this frame is 50.
+
+* `d16` : The gain of this frame is 16.
+
 ### Analyzing camera image data
 
 You need to copy the modified [Pyhotn folder](./multicamera_sync/Python) to the new multi_camera_synced subdirectory, and copy the modified [DevicesInfo.txt ](./multicamera_sync/output/20250218102900/DevicesInfo.txt)and [StreamProfileInfo.txt](./multicamera_sync/output/20250218102900/StreamProfileInfo.txt) to the same level directory as the TotalModeFrames folder.
@@ -126,6 +156,16 @@ After the operation is successful, you can view the synchronization effect in th
 
 ## Files that need to be changed
 
+### Analysis tools
+
 * [multi_save_rgbir_params.json](../../config/tools/multisavergbir/multi_save_rgbir_params.json)
+
 * [DevicesInfo.txt ](./multicamera_sync/output/20250218102900/DevicesInfo.txt)
+
 * [Config.ini](./multicamera_sync/Python/Config.ini)
+
+### Camera Configuration
+
+[camera_params.yaml](../../config/camera_params.yaml)(Camera startup parameter settings)
+
+[multi_camera_synced_verify.launch.py](./multi_camera_synced_verify.launch.py)

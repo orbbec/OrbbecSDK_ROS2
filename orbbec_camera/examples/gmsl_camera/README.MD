@@ -35,6 +35,7 @@ In addition, GMSL multi-camera synced does not require Multi-Camera Sync Hub Pro
 ### Additional Parameter Settings
 
 * `gmsl_trigger_fps` : set hardware soc trigger source frame rate.
+
 * `enable_gmsl_trigger` : enable hardware soc trigger.
 
 ### Run the launch

@@ -1,4 +1,4 @@
-# ob_benchmark tool
+# Ob_benchmark tool
 
 > The goal of this tool is to benchmark the performance of various OrbbecSDK_ROS2 camera configurations. The benchmark results depend on the camera and settings used.(Currently only works with ROS2 Humble)
 
@@ -26,10 +26,8 @@
 
 * `camera_name`: Names of the cameras to be configured. Example: `"camera_01"`, `"camera_02"`, etc.
 * `process_name`: The name of the process to be monitored. For example, `"component_conta"` will monitor the data of the container process.
-
 * `switch_cycle`: The cycle time for switching configurations, in seconds. For example, setting it to `300` means the configuration will switch every 300 seconds.
 * `test_cycle`: The testing cycle, in seconds. For example, setting it to `1` means the tool will collect data for the monitored process every 1 second.
-
 * `skip_number`: The number of data points to skip. For example, setting it to `30` means that the first 30 data points will be ignored.
 
 ### Camera configuration (launch files)

@@ -1,4 +1,4 @@
-# multi_camera_synced_verification_tool
+# Multi_camera_synced_verification_tool
 
 > This article will introduce how to verify the synchronization accuracy of multi-camera synchronization.
 >

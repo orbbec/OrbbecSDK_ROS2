@@ -10,6 +10,10 @@ How to use multi-camera synced in OrbbecSDK_ROS2.
 
 How to use interleave_ae in OrbbecSDK_ROS2.
 
+# disparity_search_offset
+
+How to use disparity_search_offset in OrbbecSDK_ROS2.
+
 # multi_camera_synced_verification_tool
 
 How to verify the synchronization accuracy of multi-camera synced.

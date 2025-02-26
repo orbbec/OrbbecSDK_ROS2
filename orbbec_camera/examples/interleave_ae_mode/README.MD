@@ -1,6 +1,6 @@
 # Using interleave_ae with Gemini330 series cameras
 
-> This section describes how to use interleave_ae in Gemini330 series cameras (minimum camera firmware version [1.4.00](https://www.orbbec.com/docs/g330-firmware-release/))
+> This section describes how to use interleave_ae in Gemini 330 series cameras (minimum camera firmware version [1.4.00](https://www.orbbec.com/docs/g330-firmware-release/))
 
 ## Parameter Introduction
 

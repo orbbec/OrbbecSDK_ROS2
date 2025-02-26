@@ -12,15 +12,13 @@ The definition of disparity search range: For any pixel *(u_l, v)* in the left i
 
 The disparity_search_offset related parameters are set in [gemini_330_series.launch.py](../../launch/gemini_330_series.launch.py)
 
-disparity_range_mode : Disparity search length,can only be set to 64, 128 and 256.
+* `disparity_range_mode` : Disparity search length,can only be set to 64, 128 and 256.
+* `disparity_search_offset` : Disparity search offset value,Disparity search offset value, can be set from 0 to 127.
 
-disparity_search_offset : Disparity search offset value,Disparity search offset value, can be set from 0 to 127.
+* `disparity_offset_config` : Disparity search offset interleave frames.
+* `offset_index0` : Frame 0 disparity search offset value.
 
-disparity_offset_config : Disparity search offset interleave frames.
-
-offset_index0 : Frame 0 disparity search offset value.
-
-offset_index1 : Frame 1 disparity search offset value.
+* `offset_index1` : Frame 1 disparity search offset value.
 
 | disparity range mode | disparity search offset | Minimum depth of inclined wall (mm) |
 | :------------------: | :---------------------: | :---------------------------------: |

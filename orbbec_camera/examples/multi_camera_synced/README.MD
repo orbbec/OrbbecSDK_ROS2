@@ -27,7 +27,7 @@ Open multi_camera_synced.launch.py, and configure the camera settings as shown b
 4. Set `device_num` to `2`, meaning two cameras will be used.
 5. Set `sync_mode` to `primary` to indicate that the `2-7` camera device is in primary mode. The multi-camera sync mode options can be found in the figure below.
 6. Parameters from the `config_file_path` can override the parameters set in `gemini_330_series.launch.py` (optional).
-7. For slave cameras, set trigger_out_enabled to false.
+7. For slave cameras, set `trigger_out_enabled` to false.
 
 | **Pattern Nam**e | **Setting effect description**                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

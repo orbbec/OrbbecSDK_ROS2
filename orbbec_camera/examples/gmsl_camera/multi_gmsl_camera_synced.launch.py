@@ -19,11 +19,13 @@ def generate_launch_description():
         ),
         launch_arguments={
             "camera_name": "camera_01",
-            "usb_port": "2-1",
+            "usb_port": "gmsl2-1",
             "device_num": "2",
-            "sync_mode": "primary",
+            "sync_mode": "secondary_synced",
             "config_file_path": config_file_path,
-            "trigger_out_enabled": "true"
+            "trigger_out_enabled": "false",
+            "gmsl_trigger_fps": "3000",
+            "enable_gmsl_trigger": "true",
         }.items(),
     )
 
@@ -33,25 +35,23 @@ def generate_launch_description():
         ),
         launch_arguments={
             "camera_name": "camera_02",
-            "usb_port": "2-3",
+            "usb_port": "gmsl2-3",
             "device_num": "2",
             "sync_mode": "secondary_synced",
             "config_file_path": config_file_path,
-            "trigger_out_enabled": "false"
+            "trigger_out_enabled": "false",
+            "enable_gmsl_trigger": "false",
         }.items(),
     )
-
 
 
     # Launch description
     ld = LaunchDescription(
         [
-
-            TimerAction(period=0.0, actions=[GroupAction([launch2_include])]),
-            TimerAction(period=2.0, actions=[GroupAction([launch1_include])]),
-            # The primary camera should be launched at last
+            # The sending the gmsl_trigger signal gsml camera should be launched at lfirst
+            TimerAction(period=0.0, actions=[GroupAction([launch1_include])]),
+            TimerAction(period=2.0, actions=[GroupAction([launch2_include])]),
         ]
     )
 
     return ld
-

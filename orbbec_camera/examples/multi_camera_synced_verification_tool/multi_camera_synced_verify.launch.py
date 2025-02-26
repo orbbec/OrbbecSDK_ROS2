@@ -88,7 +88,7 @@ def generate_launch_description():
             "device_num": "2",
             "sync_mode": "primary",
             "config_file_path": config_file_path,
-            "trigger_out_enabled": "false",
+            "trigger_out_enabled": "true",
             "attach_to_shared_component_container": attach_to_shared_component_container_arg,
             "component_container_name": component_container_name_arg,
         }.items(),

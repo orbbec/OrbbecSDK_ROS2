@@ -100,18 +100,18 @@ void OBCameraNode::setupCameraCtrlServices() {
                                  std::shared_ptr<SetBool::Response> response) {
         setLaserEnableCallback(request_header, request, response);
       });
-  set_lrm_enable_srv_ = node_->create_service<SetBool>(
-      "set_lrm_enable", [this](const std::shared_ptr<rmw_request_id_t> request_header,
+  set_ldp_enable_srv_ = node_->create_service<SetBool>(
+      "set_ldp_enable", [this](const std::shared_ptr<rmw_request_id_t> request_header,
                                const std::shared_ptr<SetBool::Request> request,
                                std::shared_ptr<SetBool::Response> response) {
-        setLrmEnableCallback(request_header, request, response);
+        setLdpEnableCallback(request_header, request, response);
       });
-  get_lrm_status_srv_ = node_->create_service<GetBool>(
-      "get_lrm_status", [this](const std::shared_ptr<rmw_request_id_t> request_header,
+  get_ldp_status_srv_ = node_->create_service<GetBool>(
+      "get_ldp_status", [this](const std::shared_ptr<rmw_request_id_t> request_header,
                                const std::shared_ptr<GetBool::Request> request,
                                std::shared_ptr<GetBool::Response> response) {
         (void)request_header;
-        getLrmStatusCallback(request, response);
+        getLdpStatusCallback(request, response);
       });
 
   get_white_balance_srv_ = node_->create_service<GetInt32>(
@@ -494,26 +494,26 @@ void OBCameraNode::setLaserEnableCallback(
   }
 }
 
-void OBCameraNode::setLrmEnableCallback(
+void OBCameraNode::setLdpEnableCallback(
     const std::shared_ptr<rmw_request_id_t>& request_header,
     const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
     std::shared_ptr<std_srvs::srv::SetBool::Response>& response) {
   (void)request_header;
   (void)response;
-  bool lrm_enable = request->data;
+  bool ldp_enable = request->data;
   try {
     if (device_->isPropertySupported(OB_PROP_LASER_CONTROL_INT, OB_PERMISSION_READ_WRITE)) {
       auto laser_enable = device_->getIntProperty(OB_PROP_LASER_CONTROL_INT);
-      device_->setBoolProperty(OB_PROP_LDP_BOOL, lrm_enable);
+      device_->setBoolProperty(OB_PROP_LDP_BOOL, ldp_enable);
       device_->setIntProperty(OB_PROP_LASER_CONTROL_INT, laser_enable);
     } else if (device_->isPropertySupported(OB_PROP_LASER_BOOL, OB_PERMISSION_READ_WRITE)) {
-      if (!lrm_enable) {
+      if (!ldp_enable) {
         auto laser_enable = device_->getIntProperty(OB_PROP_LASER_BOOL);
-        device_->setBoolProperty(OB_PROP_LDP_BOOL, lrm_enable);
+        device_->setBoolProperty(OB_PROP_LDP_BOOL, ldp_enable);
         std::this_thread::sleep_for(std::chrono::milliseconds(3));
         device_->setIntProperty(OB_PROP_LASER_BOOL, laser_enable);
       } else {
-        device_->setBoolProperty(OB_PROP_LDP_BOOL, lrm_enable);
+        device_->setBoolProperty(OB_PROP_LDP_BOOL, ldp_enable);
       }
     }
     response->success = true;
@@ -647,7 +647,7 @@ void OBCameraNode::setMirrorCallback(const std::shared_ptr<SetBool::Request>& re
   }
 }
 
-void OBCameraNode::getLrmStatusCallback(const std::shared_ptr<GetBool::Request>& request,
+void OBCameraNode::getLdpStatusCallback(const std::shared_ptr<GetBool::Request>& request,
                                         std::shared_ptr<GetBool::Response>& response) {
   (void)request;
   try {

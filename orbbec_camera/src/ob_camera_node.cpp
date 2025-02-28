@@ -209,18 +209,18 @@ void OBCameraNode::setupDevices() {
     RCLCPP_INFO_STREAM(logger_, "Depth process is " << d2d_mode);
   }
   if (device_->isPropertySupported(OB_PROP_LDP_BOOL, OB_PERMISSION_READ_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting LRM to " << (enable_lrm_ ? "ON" : "OFF"));
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_LDP_BOOL, enable_lrm_);
+    RCLCPP_INFO_STREAM(logger_, "Setting LDP to " << (enable_ldp_ ? "ON" : "OFF"));
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_LDP_BOOL, enable_ldp_);
   }
-  if (lrm_power_level_ != -1 &&
+  if (ldp_power_level_ != -1 &&
       device_->isPropertySupported(OB_PROP_LASER_POWER_LEVEL_CONTROL_INT, OB_PERMISSION_WRITE)) {
     auto range = device_->getIntPropertyRange(OB_PROP_LASER_POWER_LEVEL_CONTROL_INT);
-    if (lrm_power_level_ < range.min || lrm_power_level_ > range.max) {
-      RCLCPP_ERROR(logger_, "lrm power level value is out of range[%d,%d], please check the value",
+    if (ldp_power_level_ < range.min || ldp_power_level_ > range.max) {
+      RCLCPP_ERROR(logger_, "ldp power level value is out of range[%d,%d], please check the value",
                    range.min, range.max);
     } else {
-      RCLCPP_INFO_STREAM(logger_, "Setting lrm power level to " << lrm_power_level_);
-      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_POWER_LEVEL_CONTROL_INT, lrm_power_level_);
+      RCLCPP_INFO_STREAM(logger_, "Setting lrm power level to " << ldp_power_level_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_POWER_LEVEL_CONTROL_INT, ldp_power_level_);
     }
   }
   if (device_->isPropertySupported(OB_PROP_LASER_CONTROL_INT, OB_PERMISSION_READ_WRITE)) {
@@ -1429,8 +1429,8 @@ void OBCameraNode::getParameters() {
     enable_colored_point_cloud_ = false;
     depth_registration_ = false;
   }
-  setAndGetNodeParameter<bool>(enable_lrm_, "enable_lrm", true);
-  setAndGetNodeParameter<int>(lrm_power_level_, "lrm_power_level", -1);
+  setAndGetNodeParameter<bool>(enable_ldp_, "enable_ldp", true);
+  setAndGetNodeParameter<int>(ldp_power_level_, "ldp_power_level", -1);
   setAndGetNodeParameter<int>(soft_filter_max_diff_, "soft_filter_max_diff", -1);
   setAndGetNodeParameter<int>(soft_filter_speckle_size_, "soft_filter_speckle_size", -1);
   setAndGetNodeParameter<double>(liner_accel_cov_, "linear_accel_cov", 0.0003);

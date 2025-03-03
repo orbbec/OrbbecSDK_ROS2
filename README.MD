@@ -234,7 +234,7 @@ Launch camera node
 
 ```bash
 . ./install/setup.bash
-ros2 launch orbbec_camera astra.launch.py # or other launch file, see below table
+ros2 launch orbbec_camera gemini_330_series.launch.py # or other launch file, see below table
 ```
 
 - On terminal 2
@@ -319,142 +319,61 @@ ros2 service call /camera/toggle_ir std_srvs/srv/SetBool "{data : true}"
 ros2 service call /camera/save_point_cloud std_srvs/srv/Empty "{}"
 ```
 
-## Efficient intra-process communication:
+## Network device enumeration
 
-Our ROS2 Wrapper node supports zero-copy communications if loaded in the same process as a subscriber node. This can reduce copy times on image/pointcloud topics, especially with big frame resolutions and high FPS.
+When using Femto_Mega, you can use the network to connect the device.
 
-You will need to launch a component container and launch our node as a component together with other component nodes. Further details on "Composing multiple nodes in a single process" can be found [here](https://docs.ros.org/en/rolling/Tutorials/Composition.html).
+For more information about network device enumeration.Reference:[Network device documentation](./docs/network_device_enumeration.md)
 
-Further details on efficient intra-process communication can be found [here](https://docs.ros.org/en/humble/Tutorials/Intra-Process-Communication.html#efficient-intra-process-communication).
+## Multi-Camera
 
-### Example
+When you have multiple cameras, you can activate all of them at the same time.
 
-#### Manually loading multiple components into the same process
-
-* Start the component:
-
-  ```bash
-  ros2 run rclcpp_components component_container
-  ```
-* Add the wrapper:
-
-  ```bash
-  ros2 component load /ComponentManager orbbec_camera orbbec_camera::OBCameraNodeDriver -e use_intra_process_comms:=true
-  ```
-
-  Load other component nodes (consumers of the wrapper topics) in the same way.
-
-#### Using a launch file
-
-```bash
-ros2 launch orbbec_camera gemini_intra_process_demo_launch.py
-```
-
-### Limitations
-
-* Node components are currently not supported on RCLPY
-* Compressed images using `image_transport` will be disabled as this isn't supported with intra-process communication
-
-## Use V4L2 backend
-
-[Setting uvc_backend](#launch-parameters)
-
-Note: The V4L2 backend is not enabled by default.
+For more information about Multi camera.Reference:[Multi camera documentation](./docs/network_device_enumeration.md)
 
 ## Launch parameters
 
-The following are the launch parameters available:
+For the entire list of parameters type `ros2 param list`.
 
-- `connection_delay`: The delay time in milliseconds for reopening the device. Some devices, such as Astra mini, require
-  a longer time to initialize and reopening the device immediately can cause firmware crashes when hot plugging.
-- `enable_point_cloud`: Enables the point cloud.
-- `enable_colored_point_cloud`: Enables the RGB point cloud.
-- `cloud_frame_id`:Modifying the frame_id name within the ros message.
-- `ordered_pc`:Enable filtering of invalid point clouds.
-- `point_cloud_qos`, `[color|depth|ir]_qos`, `[color|depth|ir]_camera_info_qos`: ROS 2 Message Quality of Service (QoS)
-  settings. The possible values
-  are `SYSTEM_DEFAULT`, `DEFAULT`, `PARAMETER_EVENTS`, `SERVICES_DEFAULT`, `PARAMETERS`, `SENSOR_DATA` and are
-  case-insensitive. These correspond
-  to `rmw_qos_profile_system_default`, `rmw_qos_profile_default`, `rmw_qos_profile_parameter_events`, `rmw_qos_profile_services_default`, `rmw_qos_profile_parameters`,
-  and `SENSOR_DATA`, respectively.
-- `enable_d2c_viewer`: Publishes the D2C overlay image (for testing only).
-- `device_num`: The number of devices. This must be filled in if multiple cameras are required.
-- `uvc_backend`:Optional values: v4l2, libuvc
-- `color_width`, `color_height`, `color_fps`: The resolution and frame rate of the color stream.
-- `ir_width`, `ir_height`, `ir_fps`: The resolution and frame rate of the IR stream.
-- `depth_width`, `depth_height`, `depth_fps`: The resolution and frame rate of the depth stream.
-- `enable_color`: Enables the RGB camera.
-- `enable_depth`: Enables the depth camera.
-- `enable_ir`: Enables the IR camera.
-- `depth_registration`: Enables alignment of the depth frame to the color frame. This field is required when
-  the `enable_colored_point_cloud` is set to `true`.
-- `usb_port`: The USB port of the camera. This is required when multiple cameras are used.
-- `enable_accel`: Enables the accelerometer.
-- `accel_rate`: The frequency of the accelerometer, the optional values
-  are `1.5625hz`, `3.125hz`, `6.25hz`, `12.5hz`, `25hz`, `50hz`, `100hz`, `200hz`, `500hz`, `1khz`, `2khz`, `4khz`, `8khz`, `16khz`, `32khz`.
-  The specific value depends on the current camera.
-- `accel_range`: The range of the accelerometer, the optional values are `2g`, `4g`, `8g`, `16g`. The specific value
-  depends on the current camera.
-- `enable_gyro`: Enables the gyroscope.
-- `gyro_rate`: The frequency of the gyroscope, the optional values
-  are `1.5625hz`, `3.125hz`, `6.25hz`, `12.5hz`, `25hz`, `50hz`, `100hz`, `200hz`, `500hz`, `1khz`, `2khz`, `4khz`, `8khz`, `16khz`, `32khz`.
-  The specific value depends on the current camera.
-- `gyro_range`: The range of the gyroscope, the optional values
-  are `16dps`, `31dps`, `62dps`, `125dps`, `250dps`, `500dps`, `1000dps`, `2000dps`. The specific value depends on the
-  current camera.
-- `enumerate_net_device`: Enables the function of enumerating network devices. True means enabled, false means disabled.
-  This feature is only supported by Femto Mega and Gemini 2 XL devices. When accessing these devices through the
-  network, the IP address of the device needs to be configured in advance. The enable switch needs to be set to true.
-- `depth_filter_config`: Configures the loading path for the depth filtering configuration file. By default, the depth
-  filtering configuration file is located in the /config/depthfilter directory. Supported only on Gemini2.
-- `depth_precision`: The depth precision should be in the format `1mm`. The default value is `1mm`.
-- `enable_laser`: Enables the laser. The default value is `true`.
-- `device_preset`: The default value is `Default`. Only the G330 series is supported. For more information, refer to
-  the [G330 documentation](https://www.orbbec.com/docs/g330-use-depth-presets/). Please refer to the table below to set
-  the `device_preset` value based on your use case. The value should be one of the preset names
-  listed [in the table](#predefined-presets).
-- `enable_decimation_filter`: This filter effectively reduces the depth scene complexity. The filter runs on kernel
-  sizes [2x2] to [8x8] pixels. The image size is scaled down proportionally in both dimensions to preserve the aspect
-  ratio.
-- `enable_hdr_merge`: This filter is used jointly with the depth HDR function. By merging consecutive depth images of
-  alternating exposure values, we can overcome challenges in acquiring depth values for under-illuminated and
-  over-illuminated objects simultaneously.
-- `enable_sequence_id_filter`: This filter is used jointly with the depth HDR function and outputs only the sequence
-  with the specified sequence ID.
-- `enable_threshold_filter`: This filter preserves depth values of interest and omits depth values out of scope.
-- `enable_noise_removal_filter`: This filter removes speckle noise in clusters and gives rise to a less-filled depth
-  map.
-- `enable_spatial_filter`: This filter performs multiple iterations of processing as specified by the magnitude
-  parameter to enhance the smoothness of depth data. It is also capable of filling small holes in depth maps.
-- `enable_temporal_filter`: This filter is intended to improve the depth data persistency by manipulating per-pixel
-  values based on previous frames. The filter performs a single pass on the data, adjusting the depth values while also
-  updating the tracking history.
-- `enable_hole_filling_filter`: This filter fills all holes in the depth map using the specified mode.
-- `retry_on_usb3_detection_failure`: If the camera is connected to a USB 2.0 port and is not detected, the system will
-  attempt to reset the camera up to three times. This setting aims to prevent USB 3.0 devices from being incorrectly
-  recognized as USB 2.0. It is recommended to set this parameter to `false` when using a USB 2.0 connection to avoid
-  unnecessary resets.
-- `tf_publish_rate`: The rate at which the camera publishes dynamic transforms. The default value is `0.0`, which means static transforms are published.
-- `time_domain`: The frame time domain, string type, can be `device`, `global`, or `system`. `device` means using the hardware timestamp from the camera,
-  `system` means using the timestamp when the PC received the first packet of data or frame, and `global` is used for synchronized time across multiple
-  devices, aligning data from different sources to a common time base.
-- `enable_sync_host_time`: Enables synchronization of the host time with the camera time. The default value is `true`, if
-  use global time, set to `false`. Some old devices may not support this feature.
-- `config_file_path`: The path to the YAML configuration file. The default value is `""`. If the configuration file is not specified,
-  the default parameters from the launch file will be used. If you want to use a custom configuration file, please refer to `gemini_330_series.launch.py`.
-  `enable_heartbeat` enables the heartbeat function, which is set to `false` by default. If set to `true`, the camera node will send heartbeat signals to
-  the firmware, and if hardware logging is desired, it should also be set to `true`.
-- `log_level` : SDK log level, the default value is `info`, the optional values are `debug`, `info`, `warn`, `error`, `fatal`.
-- `enable_color_undistortion`: Enables color undistortion, the default value is `false`. Note that our color cameras exhibit minimal distortion, and typically, undistortion is not necessary.
-- `interleave_ae_mode` : Set laser or hdr interleave.
-- `interleave_frame_enable` : Whether to enable interleave frame mode.
-- `interleave_skip_enable` : Whether to enable skip frames.
-- `interleave_skip_index` : Set skip pattern IR or flood IR.
-- `[hdr|laser]_index[0|1]_[laser_control|depth_exposure|depth_gain|ir_brightness|ae_max_exposure]`:In interleave frame mode, set the 0th and 1st frame parameters of hdr or laser interleaving frames
+Explanation of parameters.Reference:[Launch parameters documentation](./docs/launch_parameters.md)
 
-**IMPORTANT**: *Please carefully read the instructions regarding software filtering settings
-at [this link](https://www.orbbec.com/docs/g330-use-depth-post-processing-blocks/). If you are uncertain, do not modify
-these settings.*
+## All available service for camera control
+
+For the entire list of service `ros2 service list`.
+
+Explanation of service.Reference:[All available service fo camera control documentation](./docs/all_available_service_for_camera_control.md)
+
+## All available topics
+
+For the entire list of topic `ros2 topic list`.
+
+Explanation of topic.Reference:[All available topics documentation](./docs/all_available_topics.md)
+
+## Configuration of depth NFOV and WFOV modes
+
+For the Femto Mega and Femto Bolt devices setting NFOV and WFOV modes.Reference:[Configuration of depth NFOV and WFOV modes documentation](./docs/configuration_of_depth_NFOV_and_WFOV_modes.md)
+
+## Depth work mode switch
+
+Gemini 2, Gemini 2 L,and Femto and Femto Bolt cameras setting depth work mode.Reference:[Depth work mode switch documentation](./docs/depth_work_mode_switch.md)
+
+## Predefined presets
+
+About the mode settings of Predefined presets.Reference:[Predefined presets documentation](./docs/predefined_presets.md)
+
+## Efficient intra-process communication
+
+Our ROS2 Wrapper node supports zero-copy communications if loaded in the same process as a subscriber node. This can reduce copy times on image/pointcloud topics, especially with big frame resolutions and high FPS.Reference:[Efficient intra-process communication documentation](./docs/efficient_intra_process_communication.md)
+
+## Building a Debian Package
+
+If you want to build the Debian package of OrbbecSDK_ROS2.Reference:[Building a Debian Package documentation](./docs/building_a_Debian_Package.md)
+
+## Use V4L2 backend
+
+[Setting uvc_backend](./docs/launch_parameters.md)
+
+Note: The V4L2 backend is not enabled by default.
 
 ## ROS2(Robot) vs Optical(Camera) Coordination Systems
 
@@ -462,7 +381,7 @@ these settings.*
   * Imagine we are standing behind of the camera, and looking forward.
   * Always use this point of view when talking about coordinates, left vs right IRs, position of sensor, etc..
 
-![ROS2 and Camera Coordinate System](docs/source/image/image7.png)
+![ROS2 and Camera Coordinate System](./docs/images/image0.png)
 
 * ROS2 Coordinate System: (X: Forward, Y:Left, Z: Up)
 * Camera Optical Coordinate System: (X: Right, Y: Down, Z: Forward)
@@ -471,9 +390,9 @@ these settings.*
 
 ## Camera sensor structure
 
-![module in rviz2](docs/source/image/image9.png)
+![module in rviz2](./docs/images/image3.png)
 
-![module in rviz2](docs/source/image/image10.png)
+![module in rviz2](./docs/images/image1.png)
 
 ## TF from coordinate A to coordinate B:
 
@@ -489,200 +408,7 @@ Example of static TFs of RGB sensor and right infra sensor of Gemini335 module a
 ros2 launch orbbec_description view_model.launch.py model:=gemini_335_336.urdf.xacro
 ```
 
-![module in rviz2](docs/source/image/image8.png)
-
-## Predefined presets
-
-| Preset         | Features                                                                                                                                                                                                           | Recommended use cases                                                                                                                                              |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Default        | - Best visual perception``- Overall good performance in accuracy, fill rate, tiny objects, etc.                                                                                                                    | - Generic `<br>`- Robotics                                                                                                                                       |
-| Hand           | - Clear hand and finger edges                                                                                                                                                                                      | - Gesture recognition                                                                                                                                              |
-| High Accuracy  | - Depth of high confidence `<br>`- Barely noise depth values `<br>`- Lower fill rate                                                                                                                           | - Collision avoidance `<br>`- Object scanning                                                                                                                    |
-| High Density   | - Higher fill rate `<br>`- More tiny objects `<br>`- May suffer from noise depth values                                                                                                                        | - Object recognition `<br>`- Pick & place `<br>`- Foreground & background animation                                                                            |
-| Medium Density | - Balanced performance in fill rate and accuracy `<br>`- In comparison to Default: lower fill rate, better edge quality                                                                                          | - Generic and alternative to Default                                                                                                                               |
-| Custom         | - User defined Preset `<br>`- Derived from Presets above, with customized modifications, e.g. a new configuration for the post-processing pipeline, modified mean intensity set point of depth AE function, etc. | - Better depth performance achieved using customized configurations in comparison to using predefined presets `<br>`- For well-established custom configurations |
-
-Choose the appropriate preset name based on your specific use case and set it as the value for the `device_preset`
-parameter.
-
-## Depth work mode switch
-
-Orbbec SDK ROS 2 supports the depth work mode switch. The depth work mode switch is supported by Gemini 2, Gemini 2 L,
-and Femto and Femto Bolt cameras.
-
-- Before starting the camera, depth work mode (depth_work_mode) can be configured for the corresponding xxx.launch.py
-  file's support.
-- The depth work mode switch is supported by Gemini 2, Gemini 2 L, and Gemini 2 XL cameras.
-- The default depth work mode configuration of xxx.launch.py is the camera's default configuration. If you need to
-  modify it, you can switch to the corresponding mode as needed.
-- The specific camera depth work mode support types can be found in the comments of the depth mode.
-
-```python
-# Depth work mode support is as follows:
-# Unbinned Dense Default
-# Unbinned Sparse Default
-# Binned Sparse Default
-# Obstacle Avoidance
-DeclareLaunchArgument('depth_work_mode', default_value='')
-```
-
-- View depth work modes:
-
-```bash
-ros2 run orbbec_camera list_depth_work_mode_node
-```
-
-## Configuration of depth NFOV and WFOV modes
-
-For the Femto Mega and Femto Bolt devices, the NFOV and WFOV modes are implemented by configuring the resolution of
-Depth and IR in the launch file.
-In launch file, depth_width、depth_height、ir_width、ir_height represents the resolution of the depth and the resolution of
-the IR.
-The frame fps and resolution of IR must be consistent with the depth. The correspondence between different modes and
-resolutions is as follows:
-
-- NFOV unbinned: 640 x 576.
-- NFOV binned: 320 x 288.
-- WFOV unbinned: 1024 x 1024.
-- WFOV binned: 512 x 512.
-
-## All available service for camera control
-
-The name of the following service already expresses its function.
-However, it should be noted that the corresponding `set_[ir|depth|color]*`
-and `get[ir|depth|color]*` **services are only available if you set** `enable[ir|depth|color]`
-to `true` in the stream that corresponds to the argument of the launch file.
-
-- `/camera/get_auto_white_balance`
-- `/camera/get_color_exposure`
-- `/camera/get_color_gain`
-- `/camera/get_depth_exposure`
-- `/camera/get_depth_gain`
-- `/camera/get_device_info`
-- `/camera/get_ir_exposure`
-- `/camera/get_ir_gain`
-- `/camera/get_ldp_status`
-- `/camera/get_sdk_version`
-- `/camera/get_white_balance`
-- `/camera/set_auto_white_balance`
-- `/camera/set_color_auto_exposure`
-- `/camera/set_color_exposure`
-- `/camera/set_color_gain`
-- `/camera/set_depth_auto_exposure`
-- `/camera/set_depth_exposure`
-- `/camera/set_depth_gain`
-- `/camera/set_fan_work_mode`
-- `/camera/set_floor_enable`
-- `/camera/set_ir_auto_exposure`
-- `/camera/set_ir_exposure`
-- `/camera/set_ir_gain`
-- `/camera/set_laser_enable`
-- `/camera/set_ldp_enable`
-- `/camera/set_white_balance`
-- `/camera/toggle_color`
-- `/camera/toggle_depth`
-- `/camera/toggle_ir`
-- `/camera/set_reset_timestamp`
-- `/camera/set_sync_interleaverlaser`
-- `/camera/set_sync_hosttime`
-
-## All available topics
-
-- `/camera/color/camera_info` : The color camera info.
-- `/camera/color/image_raw`: The color stream image.
-- `/camera/depth/camera_info`: The depth stream image.
-- `/camera/depth/image_raw`: The depth stream image
-- `/camera/depth/points` : The point cloud, only available when `enable_point_cloud` is `true`.
-- `/camera/depth_registered/points`: The colored point cloud, only available when `enable_colored_point_cloud`
-  is `true`.
-- `/camera/ir/camera_info`: The IR camera info.
-- `/camera/ir/image_raw`: The IR stream image
-- `/camera/accel/sample`: Acceleration data stream `enable_sync_output_accel_gyro`turned off，`enable_accel`turned on
-- `/camera/gyro/sample`: Gyroscope data stream，enable_sync_output_accel_gyro `turned off，`enable_gyro`turned on
-- `camera/gyro_accel/sample`: Synchronized data stream of acceleration and gyroscope，`enable_sync_output_accel_gyro`
-  turned on
-- `/diagnostics`: The diagnostic information of the camera, Currently, the diagnostic information only includes the
-  temperature of the camera.
-
-## Network device enumeration
-
-Currently, the network device enumeration function is supported only by the Femto Mega device. When accessing this
-device over the network, if `enumerate_net_device` is set to `true`, the device will be automatically enumerated,
-eliminating the need to configure the IP address in advance or set the enable switch to true. The specific configuration
-methods are as follows:
-
-- `enumerate_net_device`: enumeration network device automatically, only supported by Femto Mega.
-  if `enumerate_net_device` set to `true`, the device will be enumerated automatically,No need to set
-  the `net_device_ip`
-  and `net_device_port` parameters.
-- `net_device_ip`: The IP address of the device.
-- `net_device_port`: The port number of the device.
-
-## Multi-Camera
-
-- To get the `usb_port` of the camera, plug in the camera and run the following command in the terminal:
-
-```bash
-ros2 run orbbec_camera list_devices_node
-```
-
-- Set the `device_num` parameter to the number of cameras you have.
-- Go to the `OrbbecSDK_ROS2/launch/multi_xxx.launch.py` file and change the `usb_port`.
-- Don't forget to put the `include` tag inside the `group` tag.
-  Otherwise, the parameter values of different cameras may become contaminated.
-
-```python
-from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, GroupAction, ExecuteProcess
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch_ros.actions import Node
-from ament_index_python.packages import get_package_share_directory
-import os
-
-
-def generate_launch_description():
-    # Include launch files
-    package_dir = get_package_share_directory('orbbec_camera')
-    launch_file_dir = os.path.join(package_dir, 'launch')
-    launch1_include = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, 'gemini2L.launch.py')
-        ),
-        launch_arguments={
-            'camera_name': 'camera_01',
-            'usb_port': '6-2.4.4.2',  # replace your usb port here
-            'device_num': '2'
-        }.items()
-    )
-
-    launch2_include = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, 'gemini2L.launch.py')
-        ),
-        launch_arguments={
-            'camera_name': 'camera_02',
-            'usb_port': '6-2.4.1',  # replace your usb port here
-            'device_num': '2'
-        }.items()
-    )
-
-    # If you need more cameras, just add more launch_include here, and change the usb_port and device_num
-
-    # Launch description
-    ld = LaunchDescription([
-        GroupAction([launch1_include]),
-        GroupAction([launch2_include]),
-    ])
-
-    return ld
-
-```
-
-- To launch the cameras, run the following command:
-
-```bash
-ros2 launch orbbec_camera multi_camera.launch.py
-```
+![module in rviz2](./docs/images/image2.png)
 
 ## Compressed Image
 
@@ -696,69 +422,10 @@ ros2 topic echo /camera/color/image_raw/compressed --no-arr
 
 This command will allow you to receive the compressed color image from the specified topic.
 
-## Use hardware decoder to decode JPEG
-
-### rockchip and Amlogic
-
-Depends on `rockchip-mpp-dev` and `rockchip-rga-dev`, not all systems have these two packages, the names may be
-different, please search by yourself.
-Open `CMakeLists.txt` and set `USE_RK_HW_DECODER` to `ON`.
-
-### Nvidia Jetson
-
-Depends on: `jetson_multimedia_api`,`libyuv`.
-Open `CMakeLists.txt` and set `USE_NV_HW_DECODER` to `ON`.
-
 ## Check which profiles the camera supports
 
 ```bash
 ros2 run orbbec_camera list_camera_profile_mode_node
-```
-
-## Building a Debian Package
-
-### Preparing the Environment
-
-Before starting, install the required tools:
-
-```bash
-sudo apt install debhelper fakeroot python3-bloom
-```
-
-### Configuring ROS Dependencies
-
-Add the following YAML file to your system at `/etc/ros/rosdep/sources.list.d/00-orbbec.yaml`. Make sure to
-replace `focal` with the codename of your Ubuntu version and `humble` with your ROS2 distribution name:
-
-```yaml
-orbbec_camera_msgs:
-  ubuntu:
-    focal: [ ros-humble-orbbec-camera-msgs ]
-```
-
-Next, create a new file `/etc/ros/rosdep/sources.list.d/50-orbbec.list` and add this line to specify the path to the
-YAML file:
-
-```bash
-yaml file:///etc/ros/rosdep/sources.list.d/00-orbbec.yaml
-```
-
-Update the rosdep database to reflect these changes:
-
-```bash
-rosdep update
-```
-
-### Building the Package
-
-Navigate to your workspace and build the project:
-
-```bash
-cd ~/ros2_ws/
-colcon build --event-handlers console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=Release
-. install/setup.bash
-cd src/OrbbecSDK_ROS2/
-bash .make_deb.sh
 ```
 
 ## Supported Devices

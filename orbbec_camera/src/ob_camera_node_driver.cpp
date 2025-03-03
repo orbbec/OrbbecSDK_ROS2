@@ -252,7 +252,6 @@ void OBCameraNodeDriver::resetDevice() {
       device_info_.reset();
       device_connected_ = false;
       device_unique_id_.clear();
-      serial_number_.clear();
       reset_device_flag_ = false;
     }
     RCLCPP_INFO_STREAM(logger_, "Reset device uid: " << device_unique_id_ << " done");

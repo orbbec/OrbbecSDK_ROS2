@@ -16,7 +16,7 @@ def generate_launch_description():
         ),
         launch_arguments={
             'camera_name': 'camera_01',
-            'serial_number': 'CP769450007K',
+            'usb_port': '2-1',
             'device_num': '2',
             'sync_mode': 'standalone',
             'enable_left_ir': 'true',
@@ -30,7 +30,7 @@ def generate_launch_description():
         ),
         launch_arguments={
             'camera_name': 'camera_02',
-            'serial_number': 'CP1E542000F0',
+            'usb_port': '2-3',
             'device_num': '2',
             'sync_mode': 'standalone',
             'enable_left_ir': 'true',

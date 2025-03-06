@@ -134,32 +134,22 @@ The following instructions are only applicable to traditional launch files. If y
   - [Table of Contents](#table-of-contents)
   - [Installation Instructions](#installation-instructions)
   - [Getting start](#getting-start)
-  - [Efficient intra-process communication:](#efficient-intra-process-communication)
-    - [Example](#example)
-      - [Manually loading multiple components into the same process](#manually-loading-multiple-components-into-the-same-process)
-      - [Using a launch file](#using-a-launch-file)
-    - [Limitations](#limitations)
-  - [Use V4L2 backend](#use-v4l2-backend)
-  - [Launch parameters](#launch-parameters)
-  - [ROS2(Robot) vs Optical(Camera) Coordination Systems](#ros2robot-vs-opticalcamera-coordination-systems)
-  - [Camera sensor structure](#camera-sensor-structure)
-  - [TF from coordinate A to coordinate B:](#tf-from-coordinate-a-to-coordinate-b)
-  - [Predefined presets](#predefined-presets)
-  - [Depth work mode switch](#depth-work-mode-switch)
-  - [Configuration of depth NFOV and WFOV modes](#configuration-of-depth-nfov-and-wfov-modes)
-  - [All available service for camera control](#all-available-service-for-camera-control)
-  - [All available topics](#all-available-topics)
   - [Network device enumeration](#network-device-enumeration)
   - [Multi-Camera](#multi-camera)
-  - [Compressed Image](#compressed-image)
-  - [Use hardware decoder to decode JPEG](#use-hardware-decoder-to-decode-jpeg)
-    - [rockchip and Amlogic](#rockchip-and-amlogic)
-    - [Nvidia Jetson](#nvidia-jetson)
-  - [Check which profiles the camera supports](#check-which-profiles-the-camera-supports)
+  - [Launch parameters](#launch-parameters)
+  - [All available service for camera control](#all-available-service-for-camera-control)
+  - [All available topics](#all-available-topics)
+  - [Configuration of depth NFOV and WFOV modes](#configuration-of-depth-nfov-and-wfov-modes)
+  - [Depth work mode switch](#depth-work-mode-switch)
+  - [Predefined presets](#predefined-presets)
+  - [Efficient intra-process communication](#efficient-intra-process-communication)
   - [Building a Debian Package](#building-a-debian-package)
-    - [Preparing the Environment](#preparing-the-environment)
-    - [Configuring ROS Dependencies](#configuring-ros-dependencies)
-    - [Building the Package](#building-the-package)
+  - [Use V4L2 backend](#use-v4l2-backend)
+  - [ROS2(Robot) vs Optical(Camera) Coordination Systems](#ros2robot-vs-opticalcamera-coordination-systems)
+  - [Camera sensor structure](#camera-sensor-structure)
+  - [TF from coordinate A to coordinate B](#tf-from-coordinate-a-to-coordinate-b)
+  - [Compressed Image](#compressed-image)
+  - [Check which profiles the camera supports](#check-which-profiles-the-camera-supports)
   - [Supported Devices](#supported-devices)
   - [DDS Tuning](#dds-tuning)
   - [Frequently Asked Questions](#frequently-asked-questions)
@@ -329,7 +319,7 @@ For more information about network device enumeration.Reference:[Network device 
 
 When you have multiple cameras, you can activate all of them at the same time.
 
-For more information about Multi camera.Reference:[Multi camera documentation](./docs/network_device_enumeration.md)
+For more information about Multi camera.Reference:[Multi camera documentation](./orbbec_camera/examples/multi_camera/multi_camera.MD)
 
 ## Launch parameters
 
@@ -434,7 +424,7 @@ Currently, the following devices are supported by the OrbbecSDK ROS2 Wrapper v2-
 
 For optimal performance, we strongly recommend updating to the latest firmware version. This ensures that you benefit from the most recent enhancements and bug fixes.
 
-| Product List | Minimal Firmware Version | **Launch File**       |
+| Product List | Minimal Firmware Version | **Launch File**             |
 | :----------- | :----------------------- | :-------------------------- |
 | Gemini 330   | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 330L  | 1.2.20                   | gemini_330_series.launch.py |

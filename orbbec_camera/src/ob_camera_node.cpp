@@ -1379,7 +1379,6 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<std::string>(point_cloud_qos_, "point_cloud_qos", "default");
   setAndGetNodeParameter<bool>(enable_d2c_viewer_, "enable_d2c_viewer", false);
   setAndGetNodeParameter<bool>(enable_hardware_d2d_, "enable_hardware_d2d", true);
-  setAndGetNodeParameter<bool>(enable_soft_filter_, "enable_soft_filter", false);
   setAndGetNodeParameter<std::string>(depth_filter_config_, "depth_filter_config", "");
   if (!depth_filter_config_.empty()) {
     enable_depth_filter_ = true;
@@ -1431,8 +1430,6 @@ void OBCameraNode::getParameters() {
   }
   setAndGetNodeParameter<bool>(enable_ldp_, "enable_ldp", true);
   setAndGetNodeParameter<int>(ldp_power_level_, "ldp_power_level", -1);
-  setAndGetNodeParameter<int>(soft_filter_max_diff_, "soft_filter_max_diff", -1);
-  setAndGetNodeParameter<int>(soft_filter_speckle_size_, "soft_filter_speckle_size", -1);
   setAndGetNodeParameter<double>(liner_accel_cov_, "linear_accel_cov", 0.0003);
   setAndGetNodeParameter<double>(angular_vel_cov_, "angular_vel_cov", 0.02);
   setAndGetNodeParameter<bool>(ordered_pc_, "ordered_pc", false);

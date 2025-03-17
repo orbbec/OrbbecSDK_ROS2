@@ -113,6 +113,7 @@ public:
 
     /**
      * @brief Set the device plug-in callback function.
+     * @attention This function supports multiple callbacks. Each call to this function adds a new callback to an internal list.
      *
      * @param callback The function triggered when the device is plugged and unplugged.
      */

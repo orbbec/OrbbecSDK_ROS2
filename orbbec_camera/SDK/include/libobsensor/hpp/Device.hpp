@@ -384,6 +384,20 @@ public:
     }
 
     /**
+     * @brief Update the device optional depth presets
+     *
+     * @param filePathList A list(2D array) of preset file paths, each up to OB_PATH_MAX characters.
+     * @param pathCount The number of the preset file paths.
+     * @param callback Preset update progress and status callback
+     */
+    void updateOptionalDepthPresets(const char filePathList[][OB_PATH_MAX], uint8_t pathCount, DeviceFwUpdateCallback callback) {
+        ob_error *error   = nullptr;
+        fwUpdateCallback_ = callback;
+        ob_device_update_optional_depth_presets(impl_, filePathList, pathCount, &Device::firmwareUpdateCallback, this, &error);
+        Error::handle(&error);
+    }
+
+    /**
      * @brief Set the device state changed callbacks
      *
      * @param callback The callback function that is triggered when the device status changes (for example, the frame rate is automatically reduced or the

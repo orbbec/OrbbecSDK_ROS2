@@ -662,8 +662,7 @@ class OBCameraNode {
   VideoStreamInfo depth_stream_info_ = {OB_FRAME_DEPTH, 0};
   VideoStreamInfo left_ir_stream_info_ = {OB_FRAME_IR_LEFT, 0};
   VideoStreamInfo right_ir_stream_info_ = {OB_FRAME_IR_RIGHT, 0};
-  std::shared_ptr<char[]> buffer_left_ir_ = nullptr;
-  std::shared_ptr<char[]> buffer_right_ir_ = nullptr;
-  std::shared_ptr<char[]> buffer_depth_ = nullptr;
+  uint64_t left_last_time=0;
+  uint64_t right_last_time=0;
 };
 }  // namespace orbbec_camera

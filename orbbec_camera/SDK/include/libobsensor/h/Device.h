@@ -242,6 +242,19 @@ OB_EXPORT void ob_device_update_firmware_from_data(ob_device *device, const uint
                                                    bool async, void *user_data, ob_error **error);
 
 /**
+ * @brief Update the device optional depth presets.
+ *
+ * @param[in] device The device object.
+ * @param[in] file_path_list A list(2D array) of preset file paths, each up to OB_PATH_MAX characters.
+ * @param[in] path_count The number of the preset file paths.
+ * @param[in] callback The preset upgrade progress callback.
+ * @param[in] user_data User-defined data that will be returned in the callback.
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
+ */
+OB_EXPORT void ob_device_update_optional_depth_presets(ob_device *device, const char file_path_list[][OB_PATH_MAX], uint8_t path_count,
+                                                       ob_device_fw_update_callback callback, void *user_data, ob_error **error);
+
+/**
  * @brief Device reboot
  * @attention The device will be disconnected and reconnected. After the device is disconnected, the interface access to the device handle may be abnormal.
  * Please use the ob_delete_device interface to delete the handle directly. After the device is reconnected, it can be obtained again.

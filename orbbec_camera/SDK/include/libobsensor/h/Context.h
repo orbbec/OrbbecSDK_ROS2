@@ -77,6 +77,7 @@ OB_EXPORT ob_device *ob_create_net_device(ob_context *context, const char *addre
 /**
  * @brief Set a device plug-in callback function
  * @attention The added and removed device lists returned through the callback interface need to be released manually
+ * @attention This function supports multiple callbacks. Each call to this function adds a new callback to an internal list.
  *
  * @param[in] context Pointer to the context object
  * @param[in] callback Pointer to the callback function triggered when a device is plugged or unplugged

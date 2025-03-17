@@ -50,6 +50,11 @@ typedef struct ob_device_frame_interleave_list_t ob_device_frame_interleave_list
 #define OB_GYRO_SAMPLE_RATE_ANY OB_SAMPLE_RATE_UNKNOWN
 
 /**
+ * @brief maximum path length
+ */
+#define OB_PATH_MAX (1024)
+
+/**
  * @brief the permission type of api or property
  */
 typedef enum {
@@ -238,20 +243,24 @@ typedef enum {
  * @brief Enumeration value describing the firmware upgrade status
  */
 typedef enum {
-    STAT_VERIFY_SUCCESS = 5,  /**< Image file verifify success */
-    STAT_FILE_TRANSFER  = 4,  /**< file transfer */
-    STAT_DONE           = 3,  /**< update completed */
-    STAT_IN_PROGRESS    = 2,  /**< upgrade in process */
-    STAT_START          = 1,  /**< start the upgrade */
-    STAT_VERIFY_IMAGE   = 0,  /**< Image file verification */
-    ERR_VERIFY          = -1, /**< Verification failed */
-    ERR_PROGRAM         = -2, /**< Program execution failed */
-    ERR_ERASE           = -3, /**< Flash parameter failed */
-    ERR_FLASH_TYPE      = -4, /**< Flash type error */
-    ERR_IMAGE_SIZE      = -5, /**< Image file size error */
-    ERR_OTHER           = -6, /**< other errors */
-    ERR_DDR             = -7, /**< DDR access error */
-    ERR_TIMEOUT         = -8  /**< timeout error */
+    STAT_DONE_WITH_DUPLICATES = 6,   /**< update completed, but some files were duplicated and ignored */
+    STAT_VERIFY_SUCCESS       = 5,   /**< Image file verifify success */
+    STAT_FILE_TRANSFER        = 4,   /**< file transfer */
+    STAT_DONE                 = 3,   /**< update completed */
+    STAT_IN_PROGRESS          = 2,   /**< upgrade in process */
+    STAT_START                = 1,   /**< start the upgrade */
+    STAT_VERIFY_IMAGE         = 0,   /**< Image file verification */
+    ERR_VERIFY                = -1,  /**< Verification failed */
+    ERR_PROGRAM               = -2,  /**< Program execution failed */
+    ERR_ERASE                 = -3,  /**< Flash parameter failed */
+    ERR_FLASH_TYPE            = -4,  /**< Flash type error */
+    ERR_IMAGE_SIZE            = -5,  /**< Image file size error */
+    ERR_OTHER                 = -6,  /**< other errors */
+    ERR_DDR                   = -7,  /**< DDR access error */
+    ERR_TIMEOUT               = -8,  /**< timeout error */
+    ERR_MISMATCH              = -9,  /**< Mismatch firmware error */
+    ERR_UNSUPPORT_DEV         = -10, /**< Unsupported device error */
+    ERR_INVALID_COUNT         = -11, /**< invalid firmware/preset count */
 } OBUpgradeState,
     OBFwUpdateState, ob_upgrade_state, ob_fw_update_state;
 
@@ -856,6 +865,11 @@ typedef enum {
     OB_SYNC_MODE_SECONDARY_SOFT_TRIGGER = 0x07,
 
     /**
+     * @brief IR and IMU sync signal
+     */
+    OB_SYNC_MODE_IR_IMU_SYNC = 0x08,
+
+    /**
      * @brief Unknown type
      */
     OB_SYNC_MODE_UNKNOWN = 0xff,
@@ -920,6 +934,16 @@ typedef struct {
     uint16_t deviceId;
 
 } OBDeviceSyncConfig, ob_device_sync_config, OB_DEVICE_SYNC_CONFIG;
+
+/**
+ * @brief Preset tag
+ */
+typedef enum {
+    OB_DEVICE_DEPTH_WORK_MODE = 0,
+    OB_CUSTOM_DEPTH_WORK_MODE = 1,
+} OBDepthWorkModeTag,
+    ob_depth_work_mode_tag;
+
 /**
  * @brief Depth work mode
  */
@@ -933,6 +957,11 @@ typedef struct {
      * @brief Name of work mode
      */
     char name[32];
+    /**
+     * @brief Preset tag
+     */
+    OBDepthWorkModeTag tag;
+
 } OBDepthWorkMode, ob_depth_work_mode;
 
 /**
@@ -1128,6 +1157,12 @@ typedef enum {
      * @attention In this mode, the user may return null when getting the specified type of data frame from the acquired FrameSet
      */
     OB_FRAME_AGGREGATE_OUTPUT_ANY_SITUATION,
+    /**
+     * @brief Disable Frame Aggreate
+     *
+     * @attention In this mode, All types of data frames will output independently.
+     */
+    OB_FRAME_AGGREGATE_OUTPUT_DISABLE,
 } OB_FRAME_AGGREGATE_OUTPUT_MODE,
     OBFrameAggregateOutputMode, ob_frame_aggregate_output_mode;
 #define OB_FRAME_AGGREGATE_OUTPUT_FULL_FRAME_REQUIRE OB_FRAME_AGGREGATE_OUTPUT_ALL_TYPE_FRAME_REQUIRE
@@ -1239,6 +1274,11 @@ typedef enum {
      * signal as input-trigger signal.
      */
     OB_MULTI_DEVICE_SYNC_MODE_HARDWARE_TRIGGERING = 1 << 6,
+
+    /**
+     * @brief IR and IMU sync mode
+     */
+    OB_MULTI_DEVICE_SYNC_MODE_IR_IMU_SYNC = 1 << 7,
 
 } ob_multi_device_sync_mode,
     OBMultiDeviceSyncMode;
@@ -1404,6 +1444,16 @@ typedef struct {
 typedef struct {
     char numberStr[16];
 } OBDeviceSerialNumber, ob_device_serial_number, OBSerialNumber, ob_serial_number;
+
+/**
+ * @brief Disparity offset interleaving configuration
+ */
+typedef struct {
+    uint8_t enable;
+    uint8_t offset0;
+    uint8_t offset1;
+    uint8_t reserved;
+} OBDispOffsetConfig, ob_disp_offset_config;
 
 /**
  * @brief Frame metadata types
@@ -1587,6 +1637,16 @@ typedef enum {
      * @brief GPIO input data
      */
     OB_FRAME_METADATA_TYPE_GPIO_INPUT_DATA = 31,
+
+    /**
+     * @brief disparity search offset value
+     */
+    OB_FRAME_METADATA_TYPE_DISPARITY_SEARCH_OFFSET = 32,
+
+    /**
+     * @brief disparity search range
+     */
+    OB_FRAME_METADATA_TYPE_DISPARITY_SEARCH_RANGE = 33,
 
     /**
      * @brief The number of frame metadata types, using for types iterating

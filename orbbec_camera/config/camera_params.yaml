@@ -1,6 +1,6 @@
 # common params
 depth_registration: false
-enable_point_cloud: false
+enable_point_cloud: true
 enable_colored_point_cloud: false
 device_preset: "High Accuracy"
 time_domain: "global" # global, device, system
@@ -22,6 +22,7 @@ enable_color_auto_exposure: true
 color_exposure: 50 # 5ms
 color_gain: -1 # -1 default
 color_qos: "sensor_data"
+color_camera_info_qos: "sensor_data"
 
 # depth params
 enable_depth: true
@@ -30,6 +31,7 @@ depth_height: 360
 depth_fps: 60
 depth_format: "Y16"
 depth_qos: "sensor_data"
+depth_camera_info_qos: "sensor_data"
 
 # ir exposure
 enable_ir_auto_exposure: true
@@ -43,6 +45,7 @@ left_ir_height: 360
 left_ir_fps: 60
 left_ir_format: "Y8"
 left_ir_qos: "sensor_data"
+left_ir_camera_info_qos: "sensor_data"
 
 #right ir params
 enable_right_ir: true
@@ -51,3 +54,5 @@ right_ir_height: 360
 right_ir_fps: 60
 right_ir_format: "Y8"
 right_ir_qos: "sensor_data"
+right_ir_camera_info_qos: "sensor_data"
+

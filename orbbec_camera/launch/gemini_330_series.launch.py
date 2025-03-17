@@ -201,8 +201,8 @@ def generate_launch_description():
         DeclareLaunchArgument('laser_index1_ir_brightness', default_value='60'),
         DeclareLaunchArgument('laser_index1_ir_ae_max_exposure', default_value='17000'),
         DeclareLaunchArgument('laser_index0_laser_control', default_value='1'),
-        DeclareLaunchArgument('laser_index0_depth_exposure', default_value='3000'),
-        DeclareLaunchArgument('laser_index0_depth_gain', default_value='16'),
+        DeclareLaunchArgument('laser_index0_depth_exposure', default_value='6000'),
+        DeclareLaunchArgument('laser_index0_depth_gain', default_value='20'),
         DeclareLaunchArgument('laser_index0_ir_brightness', default_value='60'),
         DeclareLaunchArgument('laser_index0_ir_ae_max_exposure', default_value='30000'),
 

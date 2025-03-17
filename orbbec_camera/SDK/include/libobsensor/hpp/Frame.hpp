@@ -957,7 +957,9 @@ private:
 
     static void BufferDestroy(uint8_t *buffer, void *context) {
         auto *ctx = static_cast<BufferDestroyContext *>(context);
-        ctx->callback(buffer);
+        if (ctx->callback) {
+            ctx->callback(buffer);
+        }
         delete ctx;
     }
 };

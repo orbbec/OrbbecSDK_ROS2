@@ -78,7 +78,7 @@ class MultiCameraSubscriber : public rclcpp::Node {
 
  private:
   std::mutex image_mutex_;
-  std::mutex meta_mutex_;
+//   std::mutex meta_mutex_;
   void params_init() {
     std::ifstream file(
         "install/orbbec_camera/share/orbbec_camera/config/tools/multisavergbir/"
@@ -117,7 +117,8 @@ class MultiCameraSubscriber : public rclcpp::Node {
     color_metadata_.exposure_buffs.resize(left_ir_topics_.size());
     color_metadata_.gain_buffs.resize(left_ir_topics_.size());
     callback_called_ = std::vector<bool>(left_ir_topics_.size(), false);
-    auto custom_qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
+    auto custom_qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));
+    custom_qos.reliability(rclcpp::ReliabilityPolicy::BestEffort);
     RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_camera_subscriber"),
                        "camera_name_.size(): " << camera_name_.size());
     for (size_t i = 0; i < camera_name_.size(); ++i) {
@@ -336,7 +337,7 @@ class MultiCameraSubscriber : public rclcpp::Node {
 
   void ir_meta_Callback(std::shared_ptr<const orbbec_camera_msgs::msg::Metadata> msg,
                         size_t index) {
-    std::lock_guard<std::mutex> lock(meta_mutex_);
+    std::lock_guard<std::mutex> lock(image_mutex_);
     if (!callback_called_[index] && static_cast<size_t>(saving_images_number_)) {
       nlohmann::json json_data = nlohmann::json::parse(msg->json_data);
       left_ir_metadata_.exposure_buffs[index].push_back(json_data["exposure"].dump());
@@ -345,7 +346,7 @@ class MultiCameraSubscriber : public rclcpp::Node {
   }
   void color_meta_Callback(std::shared_ptr<const orbbec_camera_msgs::msg::Metadata> msg,
                            size_t index) {
-    std::lock_guard<std::mutex> lock(meta_mutex_);
+    std::lock_guard<std::mutex> lock(image_mutex_);
     if (!callback_called_[index] && static_cast<size_t>(saving_images_number_)) {
       nlohmann::json json_data = nlohmann::json::parse(msg->json_data);
       color_metadata_.exposure_buffs[index].push_back(json_data["exposure"].dump());

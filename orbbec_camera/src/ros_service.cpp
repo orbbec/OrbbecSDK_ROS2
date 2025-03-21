@@ -67,6 +67,14 @@ void OBCameraNode::setupCameraCtrlServices() {
           setAutoExposureCallback(request, response, stream_index);
         });
 
+    service_name = "set_" + stream_name + "_ae_roi";
+    set_ae_roi_srv_[stream_index] = node_->create_service<SetArrays>(
+        service_name,
+        [this, stream_index = stream_index](const std::shared_ptr<SetArrays::Request> request,
+                                            std::shared_ptr<SetArrays::Response> response) {
+          setAeRoiCallback(request, response, stream_index);
+        });
+
     service_name = "toggle_" + stream_name;
 
     toggle_sensor_srv_[stream_index] = node_->create_service<SetBool>(
@@ -288,6 +296,59 @@ void OBCameraNode::setGainCallback(const std::shared_ptr<SetInt32 ::Request>& re
       return;
     }
     device_->setIntProperty(prop_id, request->data);
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->success = false;
+    response->message = e.getMessage();
+  } catch (const std::exception& e) {
+    response->success = false;
+    response->message = e.what();
+  } catch (...) {
+    response->success = false;
+    response->message = "unknown error";
+  }
+}
+
+void OBCameraNode::setAeRoiCallback(const std::shared_ptr<SetArrays ::Request>& request,
+                                    std::shared_ptr<SetArrays::Response>& response,
+                                    const stream_index_pair& stream_index) {
+  auto stream = stream_index.first;
+  auto config = OBRegionOfInterest();
+  try {
+    switch (stream) {
+      case OB_STREAM_IR_LEFT:
+      case OB_STREAM_IR_RIGHT:
+      case OB_STREAM_IR:
+      case OB_STREAM_DEPTH:
+        config.x0_left = static_cast<short int>(request->data_param[0]);
+        config.x1_right = static_cast<short int>(request->data_param[1]);
+        config.y0_top = static_cast<short int>(request->data_param[2]);
+        config.y1_bottom = static_cast<short int>(request->data_param[3]);
+        device_->setStructuredData(OB_STRUCT_DEPTH_AE_ROI,
+                                   reinterpret_cast<const uint8_t*>(&config), sizeof(config));
+        RCLCPP_INFO_STREAM(logger_,
+                           "set depth AE ROI : " << "[Left: " << config.x0_left << ", Right: "
+                                                 << config.x1_right << ", Top: " << config.y0_top
+                                                 << ", Bottom: " << config.y1_bottom << " ]");
+        break;
+      case OB_STREAM_COLOR:
+        config.x0_left = static_cast<short int>(request->data_param[0]);
+        config.x1_right = static_cast<short int>(request->data_param[1]);
+        config.y0_top = static_cast<short int>(request->data_param[2]);
+        config.y1_bottom = static_cast<short int>(request->data_param[3]);
+        device_->setStructuredData(OB_STRUCT_COLOR_AE_ROI,
+                                   reinterpret_cast<const uint8_t*>(&config), sizeof(config));
+        RCLCPP_INFO_STREAM(logger_,
+                           "set color AE ROI : " << "[Left: " << config.x0_left << ", Right: "
+                                                 << config.x1_right << ", Top: " << config.y0_top
+                                                 << ", Bottom: " << config.y1_bottom << " ]");
+        break;
+      default:
+        RCLCPP_ERROR(logger_, "%s NOT a video stream", __FUNCTION__);
+        response->success = false;
+        response->message = "NOT a video stream";
+        return;
+    }
     response->success = true;
   } catch (const ob::Error& e) {
     response->success = false;

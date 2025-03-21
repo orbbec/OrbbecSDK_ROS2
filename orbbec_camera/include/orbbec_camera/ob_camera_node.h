@@ -57,6 +57,7 @@
 #include "orbbec_camera_msgs/srv/get_bool.hpp"
 #include "orbbec_camera_msgs/srv/set_string.hpp"
 #include "orbbec_camera_msgs/srv/set_filter.hpp"
+#include "orbbec_camera_msgs/srv/set_arrays.hpp"
 #include "orbbec_camera/constants.h"
 #include "orbbec_camera/dynamic_params.h"
 #include "orbbec_camera/d2c_viewer.h"
@@ -109,6 +110,7 @@ using SetString = orbbec_camera_msgs::srv::SetString;
 using SetBool = std_srvs::srv::SetBool;
 using GetBool = orbbec_camera_msgs::srv::GetBool;
 using SetFilter = orbbec_camera_msgs::srv::SetFilter;
+using SetArrays = orbbec_camera_msgs::srv::SetArrays;
 
 typedef std::pair<ob_stream_type, int> stream_index_pair;
 
@@ -255,6 +257,10 @@ class OBCameraNode {
   void setAutoExposureCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
                                std::shared_ptr<std_srvs::srv::SetBool::Response>& response,
                                const stream_index_pair& stream_index);
+
+  void setAeRoiCallback(const std::shared_ptr<SetArrays::Request>& request,
+                        std::shared_ptr<SetArrays::Response>& response,
+                        const stream_index_pair& stream_index);
 
   void setLaserEnableCallback(const std::shared_ptr<rmw_request_id_t>& request_header,
                               const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
@@ -445,6 +451,7 @@ class OBCameraNode {
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_ir_long_exposure_srv_;
   std::map<stream_index_pair, rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr>
       set_auto_exposure_srv_;
+  std::map<stream_index_pair, rclcpp::Service<SetArrays>::SharedPtr> set_ae_roi_srv_;
   rclcpp::Service<GetDeviceInfo>::SharedPtr get_device_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_laser_enable_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_ldp_enable_srv_;

@@ -15,6 +15,7 @@ def generate_launch_description():
     launch_file_dir = os.path.join(package_dir, "launch")
     config_file_dir = os.path.join(package_dir, "config")
     config_file_path = os.path.join(config_file_dir, "camera_params.yaml")
+    secondary_config_file_path = os.path.join(config_file_dir, "camera_secondary_params.yaml")
 
     use_intra_process_comms_declare = DeclareLaunchArgument(
         'use_intra_process_comms', default_value='false',
@@ -68,7 +69,7 @@ def generate_launch_description():
             # "usb_port": "gmsl2-3",
             "device_num": "4",
             "sync_mode": "secondary_synced",
-            "config_file_path": config_file_path,
+            "config_file_path": secondary_config_file_path,
             'use_intra_process_comms': LaunchConfiguration("use_intra_process_comms"),
             'attach_to_shared_component_container': attach_to_shared_component_container_arg,
             'component_container_name': component_container_name_arg,
@@ -84,7 +85,7 @@ def generate_launch_description():
             # "usb_port": "gmsl2-1",
             "device_num": "4",
             "sync_mode": "secondary_synced",
-            "config_file_path": config_file_path,
+            "config_file_path": secondary_config_file_path,
             'use_intra_process_comms': LaunchConfiguration("use_intra_process_comms"),
             'attach_to_shared_component_container': attach_to_shared_component_container_arg,
             'component_container_name': component_container_name_arg,
@@ -100,7 +101,7 @@ def generate_launch_description():
             # "usb_port": "gmsl2-7",
             "device_num": "4",
             "sync_mode": "secondary_synced",
-            "config_file_path": config_file_path,
+            "config_file_path": secondary_config_file_path,
             'use_intra_process_comms': LaunchConfiguration("use_intra_process_comms"),
             'attach_to_shared_component_container': attach_to_shared_component_container_arg,
             'component_container_name': component_container_name_arg,

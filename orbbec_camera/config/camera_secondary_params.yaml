@@ -1,0 +1,59 @@
+# common params
+depth_registration: false
+enable_point_cloud: true
+enable_colored_point_cloud: false
+device_preset: "High Accuracy"
+time_domain: "global" # global, device, system
+enable_sync_host_time: true
+frames_per_trigger: 1
+log_level: "warning"
+enable_laser: false
+trigger_out_enabled: false
+
+interleave_frame_enable: false
+interleave_skip_enable: false
+
+# color params
+enable_color: true
+color_width: 640
+color_height: 360
+color_fps: 60
+color_format: "MJPG"
+enable_color_auto_exposure: true
+color_exposure: 50 # 5ms
+color_gain: -1 # -1 default
+color_qos: "sensor_data"
+color_camera_info_qos: "sensor_data"
+
+# depth params
+enable_depth: true
+depth_width: 640
+depth_height: 360
+depth_fps: 60
+depth_format: "Y16"
+depth_qos: "sensor_data"
+depth_camera_info_qos: "sensor_data"
+
+# ir exposure
+enable_ir_auto_exposure: true
+ir_exposure: 5000
+ir_gain: 40
+
+#left ir params
+enable_left_ir: true
+left_ir_width: 640
+left_ir_height: 360
+left_ir_fps: 60
+left_ir_format: "Y8"
+left_ir_qos: "sensor_data"
+left_ir_camera_info_qos: "sensor_data"
+
+#right ir params
+enable_right_ir: true
+right_ir_width: 640
+right_ir_height: 360
+right_ir_fps: 60
+right_ir_format: "Y8"
+right_ir_qos: "sensor_data"
+right_ir_camera_info_qos: "sensor_data"
+

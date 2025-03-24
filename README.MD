@@ -294,6 +294,14 @@ ros2 service call /camera/get_white_balance orbbec_camera_msgs/srv/GetInt32 '{}'
 ros2 service call /camera/set_color_auto_exposure std_srvs/srv/SetBool '{data: false}'
 ```
 
+- Set auto exposure ROI
+
+  > In data_param, the first value is the `Left` setting, the second value is the `Right` setting, the third value is the `Top` setting, and the fourth value is the `Bottom` setting.
+  >
+
+  ```bash
+  ros2 service call /camera/set_color_ae_roi orbbec_camera_msgs/srv/SetArrays '{data_param: [0,1279,0,719]}'
+  ```
 - Set white balance
 
 ```bash

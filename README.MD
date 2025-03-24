@@ -385,6 +385,7 @@ The following are the launch parameters available:
   case-insensitive. These correspond
   to `rmw_qos_profile_system_default`, `rmw_qos_profile_default`, `rmw_qos_profile_parameter_events`, `rmw_qos_profile_services_default`, `rmw_qos_profile_parameters`,
   and `SENSOR_DATA`, respectively.
+- `color_ae_roi_[left|right|top|bottom]`,`depth_ae_roi_[left|right|top|bottom]`:Set Color and Depth auto exposure ROI.
 - `enable_d2c_viewer`: Publishes the D2C overlay image (for testing only).
 - `device_num`: The number of devices. This must be filled in if multiple cameras are required.
 - `uvc_backend`:Optional values: v4l2, libuvc
@@ -470,7 +471,7 @@ these settings.*
   * Imagine we are standing behind of the camera, and looking forward.
   * Always use this point of view when talking about coordinates, left vs right IRs, position of sensor, etc..
 
-![ROS2 and Camera Coordinate System](docs/source/image/image7.png)
+![ROS2 and Camera Coordinate System](docs/images/image13.png)
 
 * ROS2 Coordinate System: (X: Forward, Y:Left, Z: Up)
 * Camera Optical Coordinate System: (X: Right, Y: Down, Z: Forward)
@@ -479,9 +480,9 @@ these settings.*
 
 ## Camera sensor structure
 
-![module in rviz2](docs/source/image/image9.png)
+![module in rviz2](docs/images/image16.png)
 
-![module in rviz2](docs/source/image/image10.png)
+![module in rviz2](docs/images/image14.png)
 
 ## TF from coordinate A to coordinate B:
 
@@ -497,7 +498,7 @@ Example of static TFs of RGB sensor and right infra sensor of Gemini335 module a
 ros2 launch orbbec_description view_model.launch.py model:=gemini_335_336.urdf.xacro
 ```
 
-![module in rviz2](docs/source/image/image8.png)
+![module in rviz2](docs/images/image15.png)
 
 ## Predefined presets
 

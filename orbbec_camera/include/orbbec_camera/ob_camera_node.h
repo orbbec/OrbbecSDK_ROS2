@@ -379,6 +379,10 @@ class OBCameraNode {
   int init_interleave_hdr_param();
   int init_interleave_laser_param();
 
+  // Set ROI
+  void setColorAutoExposureROI();
+  void setDepthAutoExposureROI();
+
   void setDisparitySearchOffset();
 
  private:
@@ -508,6 +512,11 @@ class OBCameraNode {
   bool enable_ir_long_exposure_ = false;
   bool enable_ldp_ = true;
   int ldp_power_level_ = -1;
+  // color ae roi
+  int color_ae_roi_left_ = -1;
+  int color_ae_roi_top_ = -1;
+  int color_ae_roi_right_ = -1;
+  int color_ae_roi_bottom_ = -1;
   int color_exposure_ = -1;
   int color_gain_ = -1;
   int color_white_balance_ = -1;
@@ -521,6 +530,11 @@ class OBCameraNode {
   bool enable_color_backlight_compenstation_ = false;
   bool enable_color_decimation_filter_ = false;
   int color_decimation_filter_scale_ = -1;
+  // depth ae roi
+  int depth_ae_roi_left_ = -1;
+  int depth_ae_roi_top_ = -1;
+  int depth_ae_roi_right_ = -1;
+  int depth_ae_roi_bottom_ = -1;
   int depth_brightness_ = -1;
   int ir_exposure_ = -1;
   int ir_gain_ = -1;

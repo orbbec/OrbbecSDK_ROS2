@@ -1390,6 +1390,10 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<bool>(enable_color_auto_exposure_, "enable_color_auto_exposure", true);
   setAndGetNodeParameter<bool>(enable_color_auto_white_balance_, "enable_color_auto_white_balance",
                                true);
+  setAndGetNodeParameter<int>(color_ae_roi_left_, "color_ae_roi_left", -1);
+  setAndGetNodeParameter<int>(color_ae_roi_top_, "color_ae_roi_top", -1);
+  setAndGetNodeParameter<int>(color_ae_roi_right_, "color_ae_roi_right", -1);
+  setAndGetNodeParameter<int>(color_ae_roi_bottom_, "color_ae_roi_bottom", -1);
   setAndGetNodeParameter<int>(color_exposure_, "color_exposure", -1);
   setAndGetNodeParameter<int>(color_gain_, "color_gain", -1);
   setAndGetNodeParameter<int>(color_white_balance_, "color_white_balance", -1);
@@ -1407,6 +1411,10 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(color_decimation_filter_scale_, "color_decimation_filter_scale", -1);
   setAndGetNodeParameter<bool>(enable_depth_auto_exposure_priority_,
                                "enable_depth_auto_exposure_priority", false);
+  setAndGetNodeParameter<int>(depth_ae_roi_left_, "depth_ae_roi_left", -1);
+  setAndGetNodeParameter<int>(depth_ae_roi_top_, "depth_ae_roi_top", -1);
+  setAndGetNodeParameter<int>(depth_ae_roi_right_, "depth_ae_roi_right", -1);
+  setAndGetNodeParameter<int>(depth_ae_roi_bottom_, "depth_ae_roi_bottom", -1);
   setAndGetNodeParameter<int>(depth_brightness_, "depth_brightness", -1);
   setAndGetNodeParameter<bool>(enable_ir_auto_exposure_, "enable_ir_auto_exposure", true);
   setAndGetNodeParameter<int>(ir_exposure_, "ir_exposure", -1);
@@ -2122,6 +2130,50 @@ void OBCameraNode::setDisparitySearchOffset() {
   has_run = true;
 }
 
+void OBCameraNode::setDepthAutoExposureROI() {
+  static bool depth_roi_has_run = false;
+  if (depth_roi_has_run) {
+    return;
+  }
+  if (depth_ae_roi_left_ != -1 && depth_ae_roi_top_ != -1 && depth_ae_roi_right_ != -1 &&
+      depth_ae_roi_bottom_ != -1 &&
+      device_->isPropertySupported(OB_STRUCT_DEPTH_AE_ROI, OB_PERMISSION_READ_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting depth AE ROI to "
+                                    << depth_ae_roi_left_ << ", " << depth_ae_roi_top_ << ", "
+                                    << depth_ae_roi_right_ << ", " << depth_ae_roi_bottom_);
+    auto config = OBRegionOfInterest();
+    config.x0_left = depth_ae_roi_left_;
+    config.y0_top = depth_ae_roi_top_;
+    config.x1_right = depth_ae_roi_right_;
+    config.y1_bottom = depth_ae_roi_bottom_;
+    device_->setStructuredData(OB_STRUCT_DEPTH_AE_ROI,
+                                   reinterpret_cast<const uint8_t*>(&config), sizeof(config));
+  }
+  depth_roi_has_run = true;
+}
+
+void OBCameraNode::setColorAutoExposureROI() {
+  static bool color_roi_has_run = false;
+  if (color_roi_has_run) {
+    return;
+  }
+  if (color_ae_roi_left_ != -1 && color_ae_roi_top_ != -1 && color_ae_roi_right_ != -1 &&
+      color_ae_roi_bottom_ != -1 &&
+      device_->isPropertySupported(OB_STRUCT_COLOR_AE_ROI, OB_PERMISSION_READ_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting color AE ROI to "
+                                    << color_ae_roi_left_ << ", " << color_ae_roi_top_ << ", "
+                                    << color_ae_roi_right_ << ", " << color_ae_roi_bottom_);
+    auto config = OBRegionOfInterest();
+    config.x0_left = color_ae_roi_left_;
+    config.y0_top = color_ae_roi_top_;
+    config.x1_right = color_ae_roi_right_;
+    config.y1_bottom = color_ae_roi_bottom_;
+    device_->setStructuredData(OB_STRUCT_COLOR_AE_ROI,
+                                   reinterpret_cast<const uint8_t*>(&config), sizeof(config));
+  }
+  color_roi_has_run = true;
+}
+
 uint64_t OBCameraNode::getFrameTimestampUs(const std::shared_ptr<ob::Frame> &frame) {
   if (frame == nullptr) {
     RCLCPP_WARN(logger_, "getFrameTimestampUs: frame is nullptr, return 0");
@@ -2154,10 +2206,12 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
     auto color_frame = frame_set->getFrame(OB_FRAME_COLOR);
     if (depth_frame) {
       setDisparitySearchOffset();
+      setDepthAutoExposureROI();
       depth_frame = processDepthFrameFilter(depth_frame);
       frame_set->pushFrame(depth_frame);
     }
     if (color_frame) {
+      setColorAutoExposureROI();
       color_frame = processColorFrameFilter(color_frame);
       frame_set->pushFrame(color_frame);
     }

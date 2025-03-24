@@ -210,7 +210,20 @@ void OBCameraNode::setupDevices() {
   }
   if (device_->isPropertySupported(OB_PROP_LDP_BOOL, OB_PERMISSION_READ_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting LDP to " << (enable_ldp_ ? "ON" : "OFF"));
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_LDP_BOOL, enable_ldp_);
+    if (device_->isPropertySupported(OB_PROP_LASER_CONTROL_INT, OB_PERMISSION_READ_WRITE)) {
+      auto laser_enable = device_->getIntProperty(OB_PROP_LASER_CONTROL_INT);
+      TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_LDP_BOOL, enable_ldp_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_CONTROL_INT, laser_enable);
+    } else if (device_->isPropertySupported(OB_PROP_LASER_BOOL, OB_PERMISSION_READ_WRITE)) {
+      if (!enable_ldp_) {
+        auto laser_enable = device_->getIntProperty(OB_PROP_LASER_BOOL);
+        TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_LDP_BOOL, enable_ldp_);
+        std::this_thread::sleep_for(std::chrono::milliseconds(3));
+        TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_BOOL, laser_enable);
+      } else {
+        TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_LDP_BOOL, enable_ldp_);
+      }
+    }
   }
   if (ldp_power_level_ != -1 &&
       device_->isPropertySupported(OB_PROP_LASER_POWER_LEVEL_CONTROL_INT, OB_PERMISSION_WRITE)) {
@@ -619,7 +632,7 @@ void OBCameraNode::setupColorPostProcessFilter() {
   auto color_sensor = device_->getSensor(OB_SENSOR_COLOR);
   color_filter_list_ = color_sensor->createRecommendedFilters();
   if (color_filter_list_.empty()) {
-    RCLCPP_ERROR(logger_, "Failed to get color sensor filter list");
+    RCLCPP_WARN_STREAM(logger_, "Failed to get color sensor filter list");
     return;
   }
   for (size_t i = 0; i < color_filter_list_.size(); i++) {
@@ -656,7 +669,7 @@ void OBCameraNode::setupDepthPostProcessFilter() {
   // set depth sensor to filter
   depth_filter_list_ = depth_sensor->createRecommendedFilters();
   if (depth_filter_list_.empty()) {
-    RCLCPP_ERROR(logger_, "Failed to get depth sensor filter list");
+    RCLCPP_WARN_STREAM(logger_, "Failed to get depth sensor filter list");
     return;
   }
   for (size_t i = 0; i < depth_filter_list_.size(); i++) {
@@ -2146,8 +2159,8 @@ void OBCameraNode::setDepthAutoExposureROI() {
     config.y0_top = depth_ae_roi_top_;
     config.x1_right = depth_ae_roi_right_;
     config.y1_bottom = depth_ae_roi_bottom_;
-    device_->setStructuredData(OB_STRUCT_DEPTH_AE_ROI,
-                                   reinterpret_cast<const uint8_t*>(&config), sizeof(config));
+    device_->setStructuredData(OB_STRUCT_DEPTH_AE_ROI, reinterpret_cast<const uint8_t *>(&config),
+                               sizeof(config));
   }
   depth_roi_has_run = true;
 }
@@ -2168,8 +2181,8 @@ void OBCameraNode::setColorAutoExposureROI() {
     config.y0_top = color_ae_roi_top_;
     config.x1_right = color_ae_roi_right_;
     config.y1_bottom = color_ae_roi_bottom_;
-    device_->setStructuredData(OB_STRUCT_COLOR_AE_ROI,
-                                   reinterpret_cast<const uint8_t*>(&config), sizeof(config));
+    device_->setStructuredData(OB_STRUCT_COLOR_AE_ROI, reinterpret_cast<const uint8_t *>(&config),
+                               sizeof(config));
   }
   color_roi_has_run = true;
 }

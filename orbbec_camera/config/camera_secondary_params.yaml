@@ -10,8 +10,8 @@ log_level: "warning"
 enable_laser: false
 trigger_out_enabled: false
 
-interleave_frame_enable: false
-interleave_skip_enable: false
+interleave_frame_enable: true
+interleave_skip_enable: true
 
 # color params
 enable_color: true

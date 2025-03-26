@@ -68,9 +68,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#if defined(ROS_JAZZY) || defined(ROS_IRON)
+#if __has_include(<cv_bridge/cv_bridge.hpp>)
 #include <cv_bridge/cv_bridge.hpp>
-#else
+#elif __has_include(<cv_bridge/cv_bridge.h>)
 #include <cv_bridge/cv_bridge.h>
 #endif
 

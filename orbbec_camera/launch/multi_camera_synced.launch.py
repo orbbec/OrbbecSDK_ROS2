@@ -8,6 +8,8 @@ from launch.actions import DeclareLaunchArgument
 from launch.conditions import UnlessCondition, IfCondition
 from launch.substitutions import LaunchConfiguration
 from launch.substitutions import TextSubstitution
+from launch_ros.actions import Node, LoadComposableNodes
+from launch_ros.descriptions import ComposableNode
 
 def generate_launch_description():
     # Include launch files
@@ -36,6 +38,18 @@ def generate_launch_description():
         executable='component_container_mt',
         output='screen',
         condition=UnlessCondition(attach_to_shared_component_container_arg)
+    )
+
+    save_rgbir = LoadComposableNodes(
+        target_container=component_container_name_arg,
+        composable_node_descriptions=[
+            ComposableNode(
+                namespace="save_rgbir",
+                name="save_rgbir",
+                package="orbbec_camera",
+                plugin="orbbec_camera::tools::MultiCameraSubscriber",
+            )
+        ],
     )
 
     attach_to_shared_component_container_arg = TextSubstitution(text='true')
@@ -124,6 +138,10 @@ def generate_launch_description():
         period=8.0,
         actions=[front_camera],
     )
+    delayed_save_rgbir = TimerAction(
+        period=16.0,
+        actions=[save_rgbir],
+    )
     ld = LaunchDescription(
       [
         use_intra_process_comms_declare,
@@ -134,6 +152,7 @@ def generate_launch_description():
         delayed_right_camera,
         delayed_rear_camera,
         delayed_front_camera,
+        delayed_save_rgbir,
       ]
     )
 

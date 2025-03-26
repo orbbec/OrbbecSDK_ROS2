@@ -240,6 +240,7 @@ rclcpp_components_register_node(multi_save_rgbir
 )
 # Install rules
 install(TARGETS ${PROJECT_NAME} frame_latency
+  multi_save_rgbir
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin

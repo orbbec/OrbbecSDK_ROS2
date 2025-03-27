@@ -12,6 +12,7 @@ def generate_launch_description():
     launch_file_dir = os.path.join(package_dir, "launch")
     config_file_dir = os.path.join(package_dir, "config")
     config_file_path = os.path.join(config_file_dir, "camera_params.yaml")
+    secondary_config_file_path = os.path.join(config_file_dir, "camera_secondary_params.yaml")
 
     launch1_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -36,7 +37,7 @@ def generate_launch_description():
             "usb_port": "2-3",
             "device_num": "2",
             "sync_mode": "secondary_synced",
-            "config_file_path": config_file_path,
+            "config_file_path": secondary_config_file_path,
             "trigger_out_enabled": "false"
         }.items(),
     )

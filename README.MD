@@ -380,6 +380,9 @@ The following are the launch parameters available:
 - `color_width`, `color_height`, `color_fps`: The resolution and frame rate of the color stream.
 - `ir_width`, `ir_height`, `ir_fps`: The resolution and frame rate of the IR stream.
 - `depth_width`, `depth_height`, `depth_fps`: The resolution and frame rate of the depth stream.
+  If you set `sync_mode` to `free_run`, the `color_fps` value can be different from the other values.
+  `depth_fps` and `ir_fps` should always be the same.
+- `sync_mode`: The mode of data synchronization. The possible calue are `standalone` and `free_run`
 - `enable_color`: Enables the RGB camera.
 - `enable_depth`: Enables the depth camera.
 - `enable_ir`: Enables the IR camera.

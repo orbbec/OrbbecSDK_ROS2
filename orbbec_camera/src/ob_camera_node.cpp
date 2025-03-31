@@ -3405,12 +3405,11 @@ void OBCameraNode::setFilterCallback(const std::shared_ptr<SetFilter ::Request> 
                            "Setting hardware_noise_removal_filter:" << request->filter_enable);
         if (device_->isPropertySupported(OB_PROP_HW_NOISE_REMOVE_FILTER_THRESHOLD_FLOAT,
                                          OB_PERMISSION_READ_WRITE)) {
-          if (hardware_noise_removal_filter_threshold_ != -1.0 &&
-              enable_hardware_noise_removal_filter_) {
+          if (request->filter_enable) {
             device_->setFloatProperty(OB_PROP_HW_NOISE_REMOVE_FILTER_THRESHOLD_FLOAT,
-                                      hardware_noise_removal_filter_threshold_);
+                                      request->filter_param[0]);
             RCLCPP_INFO_STREAM(logger_, "Setting hardware_noise_removal_filter_threshold :"
-                                            << hardware_noise_removal_filter_threshold_);
+                                            << request->filter_param[0]);
           }
         }
       }

@@ -13,7 +13,6 @@ This section explains how to align depth images with color images to create an o
    ```
 
    This command activates the depth registration feature without opening a viewer.
-
 2. **Viewing Depth to Color Overlay:**
 
    If you wish to view the depth to color overlay, you need to enable the viewer by using the command below:
@@ -30,11 +29,11 @@ To visualize the aligned images in RViz2:
 
 1. Launch RViz2 after running one of the above commands.
 2. Select the topic for the depth to color overlay image. An example topic selection is shown here:
-   
-   ![Topic Selection for Depth to Color Overlay](./images/image3.png)
+
+   ![Topic Selection for Depth to Color Overlay](./image/image3.png)
 
 ### Example of Depth to Color Overlay
 
 After selecting the appropriate topic in RViz2, you will be able to see the depth to color overlay image. Here's what it might look like:
 
-![Depth to Color Overlay Image](./images/image4.jpg)
+![Depth to Color Overlay Image](./image/image4.jpg)

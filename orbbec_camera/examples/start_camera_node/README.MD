@@ -17,19 +17,20 @@ This command initiates the camera node and enables the colored point cloud.
 Once the camera node is running, it will publish data on several ROS topics. Below is a list of the available topics:
 
 - **IMU Data and IMU Information:**
+
   - `camera/accel/imu_info`
   - `camera/gyro/imu_info`
   - `camera/gyro_accel/sample`
-
 - **Color Camera Topics:**
+
   - `/camera/color/camera_info`
   - `/camera/color/image_raw`
   - `/camera/color/image_raw/compressed`
   - `/camera/color/image_raw/compressedDepth`
   - `/camera/color/image_raw/theora`
   - `/camera/color/metadata`
-
 - **Depth Camera Topics:**
+
   - `/camera/depth/camera_info`
   - `/camera/depth/image_raw`
   - `/camera/depth/image_raw/compressed`
@@ -42,8 +43,8 @@ Once the camera node is running, it will publish data on several ROS topics. Bel
   - `/camera/depth_to_color`
   - `/camera/depth_to_left_ir`
   - `/camera/depth_to_right_ir`
-
 - **Infrared Camera Topics:**
+
   - `/camera/left_ir/camera_info`
   - `/camera/left_ir/image_raw`
   - `/camera/left_ir/image_raw/compressed`
@@ -56,8 +57,8 @@ Once the camera node is running, it will publish data on several ROS topics. Bel
   - `/camera/right_ir/image_raw/compressedDepth`
   - `/camera/right_ir/image_raw/theora`
   - `/camera/right_ir/metadata`
-
 - **Miscellaneous Topics:**
+
   - `/diagnostics`
   - `/parameter_events`
   - `/rosout`
@@ -76,8 +77,6 @@ To view the PointCloud or Image data, use RViz2:
 Here are examples of how the visualization might appear in RViz2:
 
 - **PointCloud Visualization**
-  ![PointCloud View](./images/image1.jpg)
-  
+  ![PointCloud View](./image/image1.jpg)
 - **Image Data Visualization**
-  ![Image Data View](./images/image2.jpg)
-
+  ![Image Data View](./image/image2.jpg)

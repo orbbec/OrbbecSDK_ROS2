@@ -9,9 +9,7 @@ Network device settings: default `enumerate_net_device` is set to true, which wi
 If you do not want to automatically enumerate network devices,you can set `enumerate_net_device` to false, `net_device_ip` to the device's IP address, and `net_device_port` to the default value of 8090.
 
 * `enumerate_net_device` : Enable automatically enumerate network devices.
-
 * `net_device_ip` : Setting net device's IP address.
-
 * `net_device_port` : Setting net device's port.Usually, you can set it to 8090.
 
 ## Single Net camera

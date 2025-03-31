@@ -901,19 +901,19 @@ std::string getDistortionModels(OBCameraDistortion distortion){
     switch (distortion.model)
     {
     case OB_DISTORTION_NONE:
-        return "ob_distortion_none";
+        return sensor_msgs::distortion_models::PLUMB_BOB;
     case OB_DISTORTION_MODIFIED_BROWN_CONRADY:
-        return "ob_distortion_modified_brown_conrady";
+        return sensor_msgs::distortion_models::PLUMB_BOB;
     case OB_DISTORTION_INVERSE_BROWN_CONRADY:
-        return "ob_distortion_inverse_brown_conrady";
+        return sensor_msgs::distortion_models::PLUMB_BOB;
     case OB_DISTORTION_BROWN_CONRADY:
-        return "ob_distortion_brown_conrady";
+        return sensor_msgs::distortion_models::PLUMB_BOB;
     case OB_DISTORTION_BROWN_CONRADY_K6:
-        return "ob_distortion_brown_conrady_k6";
+        return sensor_msgs::distortion_models::PLUMB_BOB;
     case OB_DISTORTION_KANNALA_BRANDT4:
-        return "ob_distortion_kannala_brandt4";
+        return sensor_msgs::distortion_models::EQUIDISTANT;
     default:
-        return "unknown_field";
+        return sensor_msgs::distortion_models::PLUMB_BOB;
     }
 }
 }  // namespace orbbec_camera

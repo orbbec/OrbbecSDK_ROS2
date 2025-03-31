@@ -388,6 +388,7 @@ The following are the launch parameters available:
 - `color_ae_roi_[left|right|top|bottom]`,`depth_ae_roi_[left|right|top|bottom]`:Set Color and Depth auto exposure ROI.
 - `enable_d2c_viewer`: Publishes the D2C overlay image (for testing only).
 - `device_num`: The number of devices. This must be filled in if multiple cameras are required.
+- `preset_firmware_path` : The input parameter is the perset firmware path. If multiple paths are input, each path needs to be separated by `,`and a maximum of 3 firmware paths can be input
 - `uvc_backend`:Optional values: v4l2, libuvc
 - `color_width`, `color_height`, `color_fps`: The resolution and frame rate of the color stream.
 - `ir_width`, `ir_height`, `ir_fps`: The resolution and frame rate of the IR stream.

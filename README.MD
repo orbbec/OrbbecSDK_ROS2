@@ -126,6 +126,7 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
 **Documentation Note:**
 
 The following instructions are only applicable to traditional launch files. If you want to experience our latest launch file format, please refer to the following link:
+[https://orbbec.github.io/OrbbecSDK_ROS2_Docs/](https://orbbec.github.io/OrbbecSDK_ROS2_Docs/)
 
 ## Table of Contents
 
@@ -293,7 +294,15 @@ ros2 service call /camera/get_white_balance orbbec_camera_msgs/srv/GetInt32 '{}'
 ros2 service call /camera/set_color_auto_exposure std_srvs/srv/SetBool '{data: false}'
 ```
 
-- Set white balance
+* Set auto exposure ROI
+
+> In data_param, the first value is the `Left` setting, the second value is the `Right` setting, the third value is the `Top` setting, and the fourth value is the `Bottom` setting.
+
+```bash
+ros2 service call /camera/set_color_ae_roi orbbec_camera_msgs/srv/SetArrays '{data_param: [0,1279,0,719]}'
+```
+
+* Set white balance
 
 ```bash
 ros2 service call /camera/set_white_balance orbbec_camera_msgs/srv/SetInt32 '{data: 4600}'
@@ -376,8 +385,10 @@ The following are the launch parameters available:
   case-insensitive. These correspond
   to `rmw_qos_profile_system_default`, `rmw_qos_profile_default`, `rmw_qos_profile_parameter_events`, `rmw_qos_profile_services_default`, `rmw_qos_profile_parameters`,
   and `SENSOR_DATA`, respectively.
+- `color_ae_roi_[left|right|top|bottom]`,`depth_ae_roi_[left|right|top|bottom]`:Set Color and Depth auto exposure ROI.
 - `enable_d2c_viewer`: Publishes the D2C overlay image (for testing only).
 - `device_num`: The number of devices. This must be filled in if multiple cameras are required.
+- `preset_firmware_path` : The input parameter is the perset firmware path. If multiple paths are input, each path needs to be separated by `,`and a maximum of 3 firmware paths can be input
 - `uvc_backend`:Optional values: v4l2, libuvc
 - `color_width`, `color_height`, `color_fps`: The resolution and frame rate of the color stream.
 - `ir_width`, `ir_height`, `ir_fps`: The resolution and frame rate of the IR stream.
@@ -433,8 +444,6 @@ The following are the launch parameters available:
   attempt to reset the camera up to three times. This setting aims to prevent USB 3.0 devices from being incorrectly
   recognized as USB 2.0. It is recommended to set this parameter to `false` when using a USB 2.0 connection to avoid
   unnecessary resets.
-- `enable_3d_reconstruction_mode`: Enables 3D reconstruction mode. Default is `false`. When set to `true`, the camera
-  laser operates in on-off mode, capturing IR images (laser off) for VSLAM localization and depth images (laser on) for point cloud computation.
 - `tf_publish_rate`: The rate at which the camera publishes dynamic transforms. The default value is `0.0`, which means static transforms are published.
 - `time_domain`: The frame time domain, string type, can be `device`, `global`, or `system`. `device` means using the hardware timestamp from the camera,
   `system` means using the timestamp when the PC received the first packet of data or frame, and `global` is used for synchronized time across multiple
@@ -463,7 +472,7 @@ these settings.*
   * Imagine we are standing behind of the camera, and looking forward.
   * Always use this point of view when talking about coordinates, left vs right IRs, position of sensor, etc..
 
-![ROS2 and Camera Coordinate System](docs/source/image/image7.png)
+![ROS2 and Camera Coordinate System](docs/images/image13.png)
 
 * ROS2 Coordinate System: (X: Forward, Y:Left, Z: Up)
 * Camera Optical Coordinate System: (X: Right, Y: Down, Z: Forward)
@@ -472,9 +481,9 @@ these settings.*
 
 ## Camera sensor structure
 
-![module in rviz2](docs/source/image/image9.png)
+![module in rviz2](docs/images/image16.png)
 
-![module in rviz2](docs/source/image/image10.png)
+![module in rviz2](docs/images/image14.png)
 
 ## TF from coordinate A to coordinate B:
 
@@ -490,7 +499,7 @@ Example of static TFs of RGB sensor and right infra sensor of Gemini335 module a
 ros2 launch orbbec_description view_model.launch.py model:=gemini_335_336.urdf.xacro
 ```
 
-![module in rviz2](docs/source/image/image8.png)
+![module in rviz2](docs/images/image15.png)
 
 ## Predefined presets
 
@@ -770,16 +779,18 @@ For optimal performance, we strongly recommend updating to the latest firmware v
 
 | Product List | Minimal Firmware Version | **Launch File**       |
 | :----------- | :----------------------- | :-------------------------- |
-| Astra2       | 2.8.20                   | astra2.launch.py            |
-| Femto Mega   | 1.1.7/1.2.7              | femto_mega.launch.py        |
-| Femto Bolt   | 1.0.6/1.0.9              | femto_bolt.launch.py        |
-| Gemini 2     | 1.4.60 /1.4.76           | gemini2.launch.py           |
-| Gemini 2 L   | 1.4.32                   | gemini2L.launch.py          |
+| Gemini 330   | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 330L  | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 335   | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 335L  | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 335Lg | 1.3.46                   | gemini_330_series.launch.py |
 | Gemini 336   | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 336L  | 1.2.20                   | gemini_330_series.launch.py |
+| Femto Bolt   | 1.1.2                    | femto_bolt.launch.py        |
+| Femto Mega   | 1.3.0                    | femto_mega.launch.py        |
+| Astra 2      | 2.8.20                   | astra2.launch.py            |
+| Gemini 2 L   | 1.4.53                   | gemini2L.launch.py          |
+| Gemini 2     | 1.4.92                   | gemini2.launch.py           |
 
 All launch files are essentially similar, with the primary difference being the default values of the parameters set
 for different models within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution settings in the launch file, as well as other parameters, to ensure compatibility and optimal performance.

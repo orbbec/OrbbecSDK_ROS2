@@ -1,0 +1,16 @@
+{
+	"D2CAlignMode":	"ALIGN_D2C_SW_MODE",
+	"streamProfiles":	[{
+			"sensorType":	"OB_SENSOR_COLOR",
+			"width":	1280,
+			"height":	720,
+			"fps":	30,
+			"format":	"MJPEG"
+		}, {
+			"sensorType":	"OB_SENSOR_IR_LEFT",
+			"width":	848,
+			"height":	480,
+			"fps":	30,
+			"format":	"Y8"
+		}]
+}

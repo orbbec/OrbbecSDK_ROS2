@@ -128,7 +128,7 @@ public:
      *      OB_STREAM_VIDEO,
      *      OB_STREAM_DEPTH,
      *      OB_STREAM_COLOR,
-     *      OB_STREAM_IR，
+     *      OB_STREAM_IR,
      *      OB_STREAM_IR_LEFT,
      *      OB_STREAM_IR_RIGHT,
      *

@@ -32,6 +32,7 @@ def generate_launch_arguments():
         DeclareLaunchArgument('usb_port', default_value=''),
         DeclareLaunchArgument('device_num', default_value='1'),
         DeclareLaunchArgument('sync_mode', default_value='standalone'),
+        DeclareLaunchArgument('trigger_out_enabled', default_value='true'),
         #instra-process demo set
         DeclareLaunchArgument('use_intra_process_comms', default_value='false'),
         DeclareLaunchArgument('attach_component_container_enable', default_value='false'),

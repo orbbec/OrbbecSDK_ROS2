@@ -193,4 +193,5 @@ OBStreamType obStreamTypeFromString(const std::string& stream_type);
 cv::Mat undistortImage(const cv::Mat& image, const OBCameraIntrinsic& intrinsic,
                        const OBCameraDistortion& distortion);
 
+std::string getDistortionModels(OBCameraDistortion distortion);
 }  // namespace orbbec_camera

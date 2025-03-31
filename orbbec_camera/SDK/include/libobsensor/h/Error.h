@@ -68,7 +68,7 @@ OB_EXPORT ob_exception_type ob_error_get_exception_type(const ob_error *error);
 /**
  * @brief Delete the error object.
  *
- * @param[in] error The error object to delete.
+ * @param[in] error The error object to delete, you should set the pointer to NULL after calling this function.
  */
 OB_EXPORT void ob_delete_error(ob_error *error);
 

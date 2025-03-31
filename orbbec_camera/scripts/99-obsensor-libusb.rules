@@ -15,6 +15,8 @@ SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0670", MODE:="066
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0671", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Orbbec Gemini 2 XL"
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0673", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Orbbec Gemini 2 L"
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0675", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Orbbec Gemini 2 VL"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0808", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Orbbec Gemini 215"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0809", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Orbbec Gemini 210"
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0800", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Orbbec Gemini 335"
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0801", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Orbbec Gemini 330"
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0802", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Orbbec Gemini dm330"
@@ -30,6 +32,8 @@ SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0810", MODE:="066
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0674", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Orbbec Gemini 2 I"
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0701", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Dabai DCL"
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="069d", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Astra Pro2"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0a12", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Orbbec DaBai A"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0a13", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Orbbec DaBai AL"
 
 # OpenNI Modules
 SUBSYSTEM=="usb", ATTR{idProduct}=="0401", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="astra"

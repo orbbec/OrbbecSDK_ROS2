@@ -101,7 +101,7 @@ public:
      * @brief Creates a network device with the specified IP address and port.
      *
      * @param[in] address The IP address, ipv4 only. such as "192.168.1.10"
-     * @param[in] port The port number， currently only support 8090
+     * @param[in] port The port number, currently only support 8090
      * @return std::shared_ptr<Device> The created device object.
      */
     std::shared_ptr<Device> createNetDevice(const char *address, uint16_t port) const {
@@ -210,7 +210,7 @@ public:
 
     /**
      * @brief Set the extensions directory
-     * @brief The extensions directory is used to search for dynamic libraries that provide additional functionality to the SDK， such as the Frame filters.
+     * @brief The extensions directory is used to search for dynamic libraries that provide additional functionality to the SDK, such as the Frame filters.
      *
      * @attention Should be called before creating the context and pipeline, otherwise the default extensions directory (./extensions) will be used.
      *

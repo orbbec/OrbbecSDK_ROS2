@@ -155,7 +155,7 @@ OB_EXPORT void ob_set_logger_to_console(ob_log_severity severity, ob_error **err
 
 /**
  * @brief Set the extensions directory
- * @brief The extensions directory is used to search for dynamic libraries that provide additional functionality to the SDK， such as the Frame filters.
+ * @brief The extensions directory is used to search for dynamic libraries that provide additional functionality to the SDK, such as the Frame filters.
  *
  * @attention Should be called before creating the context and pipeline, otherwise the default extensions directory (./extensions) will be used.
  *

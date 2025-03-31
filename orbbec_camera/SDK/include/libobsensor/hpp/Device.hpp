@@ -491,7 +491,7 @@ public:
      *   Please delete the object directly and obtain it again after the device is reconnected.
      * Support devices: Gemini2 L
      *
-     * @param[in] delayMs Time unit：ms。delayMs == 0：No delay；delayMs > 0, Delay millisecond connect to host device after reboot
+     * @param[in] delayMs Time unit: ms. delayMs == 0: No delay; delayMs > 0, Delay millisecond connect to host device after reboot
      */
     void reboot(uint32_t delayMs) const {
         setIntProperty(OB_PROP_DEVICE_REBOOT_DELAY_INT, delayMs);
@@ -564,7 +564,7 @@ public:
      *
      * @attention The frequency of the user call this function multiplied by the number of frames per trigger should be less than the frame rate of the stream.
      * The number of frames per trigger can be set by @ref framesPerTrigger.
-     * @attention For some models，receive and execute the capture command will have a certain delay and performance consumption, so the frequency of calling
+     * @attention For some models, receive and execute the capture command will have a certain delay and performance consumption, so the frequency of calling
      * this function should not be too high, please refer to the product manual for the specific supported frequency.
      * @attention If the device is not in the @ref OB_MULTI_DEVICE_SYNC_MODE_HARDWARE_TRIGGERING mode, device will ignore the capture command.
      */
@@ -919,7 +919,7 @@ public:
     /**
      * @brief Get the connection type of the device
      *
-     * @return const char* the connection type of the device，currently supports："USB", "USB1.0", "USB1.1", "USB2.0", "USB2.1", "USB3.0", "USB3.1",
+     * @return const char* the connection type of the device, currently supports: "USB", "USB1.0", "USB1.1", "USB2.0", "USB2.1", "USB3.0", "USB3.1",
      * "USB3.2", "Ethernet"
      */
     const char *getConnectionType() const {
@@ -1141,7 +1141,7 @@ public:
      * @brief Get device connection type
      *
      * @param index device index
-     * @return const char* returns connection type，currently supports："USB", "USB1.0", "USB1.1", "USB2.0", "USB2.1", "USB3.0", "USB3.1", "USB3.2", "Ethernet"
+     * @return const char* returns connection type, currently supports: "USB", "USB1.0", "USB1.1", "USB2.0", "USB2.1", "USB3.0", "USB3.1", "USB3.2", "Ethernet"
      */
     const char *getConnectionType(uint32_t index) const {
         ob_error *error = nullptr;
@@ -1163,6 +1163,21 @@ public:
         auto      ip    = ob_device_list_get_device_ip_address(impl_, index, &error);
         Error::handle(&error);
         return ip;
+    }
+
+    /**
+     * @brief get the local mac address of the device at the specified index
+     *
+     * @attention Only valid for network devices, otherwise it will return "0:0:0:0:0:0".
+     *
+     * @param index the index of the device
+     * @return const char* the local mac address of the device
+     */
+    const char *getLocalMacAddress(uint32_t index) const {
+        ob_error *error = nullptr;
+        auto      mac    = ob_device_list_get_device_local_mac(impl_, index, &error);
+        Error::handle(&error);
+        return mac;
     }
 
     /**
@@ -1200,7 +1215,7 @@ public:
      * @brief On Linux platform, for usb device, the uid of the device is composed of bus-port-dev, for example 1-1.2-1. But the SDK will remove the dev number
      * and only keep the bus-port as the uid to create the device, for example 1-1.2, so that we can create a device connected to the specified USB port.
      * Similarly, users can also directly pass in bus-port as uid to create device.
-     * @brief For GMSL device，the uid is GMSL port with “gmsl2-” prefix, for example gmsl2-1.
+     * @brief For GMSL device, the uid is GMSL port with "gmsl2-" prefix, for example gmsl2-1.
      *
      * @attention If the device has been acquired and created elsewhere, repeated acquisition will throw an exception
      *

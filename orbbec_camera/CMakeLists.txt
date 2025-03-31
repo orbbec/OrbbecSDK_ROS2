@@ -217,7 +217,7 @@ add_orbbec_executable(list_camera_profile_mode_node tools/list_camera_profile.cp
 add_orbbec_executable(topic_statistics_node tools/topic_statistics.cpp)
 add_orbbec_executable(metadata_save_files_node tools/metadata_save_files.cpp)
 add_orbbec_executable(metadata_export_files_node tools/metadata_export_files.cpp)
-add_orbbec_executable(multi_save_cloud_node tools/multi_save_cloud_node.cpp)
+add_orbbec_executable(ob_benchmark_node tools/ob_benchmark.cpp)
 
 add_library(frame_latency SHARED tools/frame_latency.cpp)
 target_include_directories(frame_latency PUBLIC ${COMMON_INCLUDE_DIRS})
@@ -229,6 +229,16 @@ rclcpp_components_register_node(frame_latency
         EXECUTABLE frame_latency_node
 )
 
+add_library(start_benchmark SHARED tools/start_benchmark.cpp)
+target_include_directories(start_benchmark PUBLIC ${COMMON_INCLUDE_DIRS})
+target_link_libraries(start_benchmark ${COMMON_LIBRARIES})
+ament_target_dependencies(start_benchmark ${dependencies})
+
+rclcpp_components_register_node(start_benchmark
+        PLUGIN "orbbec_camera::tools::StartBenchmark"
+        EXECUTABLE start_benchmark_node
+)
+
 add_library(multi_save_rgbir SHARED tools/multi_save_rgbir.cpp)
 target_include_directories(multi_save_rgbir PUBLIC ${COMMON_INCLUDE_DIRS} )
 target_link_libraries(multi_save_rgbir ${COMMON_LIBRARIES})
@@ -238,8 +248,10 @@ rclcpp_components_register_node(multi_save_rgbir
         PLUGIN "orbbec_camera::tools::MultiCameraSubscriber"
         EXECUTABLE multi_save_rgbir_node
 )
+
 # Install rules
 install(TARGETS ${PROJECT_NAME} frame_latency
+  start_benchmark
   multi_save_rgbir
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
@@ -249,6 +261,7 @@ install(TARGETS ${PROJECT_NAME} frame_latency
 install(DIRECTORY include/ DESTINATION include)
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME}/)
+install(DIRECTORY examples DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY ${ORBBEC_INCLUDE_DIR} DESTINATION include)
 install(DIRECTORY ${ORBBEC_LIBS_DIR}/ DESTINATION lib/ FILES_MATCHING PATTERN "*.so*")
 install(DIRECTORY ${ORBBEC_LIBS_DIR}/extensions DESTINATION lib/)
@@ -265,7 +278,7 @@ install(TARGETS list_devices_node
   topic_statistics_node
   metadata_save_files_node
   metadata_export_files_node
-  multi_save_cloud_node
+  ob_benchmark_node
   DESTINATION lib/${PROJECT_NAME}/)
 
 if (BUILD_TESTING)

@@ -23,7 +23,7 @@ sensor_msgs::msg::CameraInfo convertToCameraInfo(OBCameraIntrinsic intrinsic,
                                                  OBCameraDistortion distortion, int width) {
   (void)width;
   sensor_msgs::msg::CameraInfo info;
-  info.distortion_model = sensor_msgs::distortion_models::RATIONAL_POLYNOMIAL;
+  info.distortion_model = getDistortionModels(distortion);
   info.width = intrinsic.width;
   info.height = intrinsic.height;
   info.d.resize(8, 0.0);
@@ -896,5 +896,24 @@ cv::Mat undistortImage(const cv::Mat &image, const OBCameraIntrinsic &intrinsic,
   cv::undistort(image, undistorted_image, camera_matrix, dist_coeffs);
 
   return undistorted_image;
+}
+std::string getDistortionModels(OBCameraDistortion distortion){
+    switch (distortion.model)
+    {
+    case OB_DISTORTION_NONE:
+        return "ob_distortion_none";
+    case OB_DISTORTION_MODIFIED_BROWN_CONRADY:
+        return "ob_distortion_modified_brown_conrady";
+    case OB_DISTORTION_INVERSE_BROWN_CONRADY:
+        return "ob_distortion_inverse_brown_conrady";
+    case OB_DISTORTION_BROWN_CONRADY:
+        return "ob_distortion_brown_conrady";
+    case OB_DISTORTION_BROWN_CONRADY_K6:
+        return "ob_distortion_brown_conrady_k6";
+    case OB_DISTORTION_KANNALA_BRANDT4:
+        return "ob_distortion_kannala_brandt4";
+    default:
+        return "unknown_field";
+    }
 }
 }  // namespace orbbec_camera

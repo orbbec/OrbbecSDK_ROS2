@@ -254,7 +254,6 @@ ros2 service call /camera/get_device_info orbbec_camera_msgs/srv/GetDeviceInfo '
 
 ```bash
 ros2 service call /camera/get_sdk_version orbbec_camera_msgs/srv/GetString '{}'
-
 ```
 
 - Get exposure
@@ -325,17 +324,55 @@ For more information about Multi camera.Reference:[Multi camera documentation](.
 
 For the entire list of parameters type `ros2 param list`.
 
+* `color_width`, `color_height`, `color_fps`,`color_format`: The resolution and frame rate of the color stream
+* `enable_color_auto_exposure_priority` : Enables the Color auto exposure priority
+* `enable_color_auto_exposure` : Enables the Color auto exposure
+* `color_exposure` : Set the Color exposure
+* `color_gain` :Set the Color gain
+* `depth_width`, `depth_height`, `depth_fps`,`depth_format`: The resolution and frame rate of the depth stream
+* `enable_depth_auto_exposure_priority` : Enables the Depth auto exposure priority
+* `depth_brightness` : Set the Depth brightness
+
+[......](./docs/launch_parameters.md)
+
 Explanation of parameters.Reference:[Launch parameters documentation](./docs/launch_parameters.md)
 
 ## All available service for camera control
 
 For the entire list of service `ros2 service list`.
 
+* `/camera/get_device_info`
+
+```bash
+ros2 service call /camera/get_device_info orbbec_camera_msgs/srv/GetDeviceInfo
+```
+
+* `/camera/get_sdk_version`
+
+```bash
+ros2 service call /camera/get_sdk_version orbbec_camera_msgs/srv/GetString
+```
+
+* `/camera/reboot_device`
+
+```bash
+ros2 service call /camera/reboot_device std_srvs/srv/Empty '{}'
+```
+
+[......](./docs/all_available_service_for_camera_control.md)
+
 Explanation of service.Reference:[All available service fo camera control documentation](./docs/all_available_service_for_camera_control.md)
 
 ## All available topics
 
 For the entire list of topic `ros2 topic list`.
+
+- `/camera/color/camera_info` : The color camera info.
+- `/camera/color/image_raw`: The color stream image.
+- `/camera/depth/camera_info`: The depth stream image.
+- `/camera/depth/image_raw`: The depth stream image.
+
+[......](./docs/all_available_topics.md)
 
 Explanation of topic.Reference:[All available topics documentation](./docs/all_available_topics.md)
 
@@ -424,7 +461,7 @@ Currently, the following devices are supported by the OrbbecSDK ROS2 Wrapper v2-
 
 For optimal performance, we strongly recommend updating to the latest firmware version. This ensures that you benefit from the most recent enhancements and bug fixes.
 
-| Product List | Minimal Firmware Version | **Launch File**             |
+| Product List | Minimal Firmware Version | **Launch File**       |
 | :----------- | :----------------------- | :-------------------------- |
 | Gemini 330   | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 330L  | 1.2.20                   | gemini_330_series.launch.py |

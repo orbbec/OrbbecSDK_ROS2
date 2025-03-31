@@ -62,7 +62,7 @@ OB_EXPORT ob_multi_device_sync_config ob_device_get_multi_device_sync_config(con
  *
  * @attention The frequency of the user call this function multiplied by the number of frames per trigger should be less than the frame rate of the stream. The
  * number of frames per trigger can be set by @ref framesPerTrigger.
- * @attention For some models，receive and execute the capture command will have a certain delay and performance consumption, so the frequency of calling this
+ * @attention For some models, receive and execute the capture command will have a certain delay and performance consumption, so the frequency of calling this
  * function should not be too high, please refer to the product manual for the specific supported frequency.
  * @attention If the device is not in the @ref OB_MULTI_DEVICE_SYNC_MODE_HARDWARE_TRIGGERING mode, device will ignore the capture command.
  *

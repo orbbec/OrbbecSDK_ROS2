@@ -23,6 +23,8 @@ typedef struct ob_context_t                      ob_context;
 typedef struct ob_device_t                       ob_device;
 typedef struct ob_device_info_t                  ob_device_info;
 typedef struct ob_device_list_t                  ob_device_list;
+typedef struct ob_record_device_t                ob_record_device;
+typedef struct ob_playback_device_t              ob_playback_device;
 typedef struct ob_camera_param_list_t            ob_camera_param_list;
 typedef struct ob_sensor_t                       ob_sensor;
 typedef struct ob_sensor_list_t                  ob_sensor_list;
@@ -496,6 +498,15 @@ typedef enum {
     ob_align_mode;
 
 /**
+ * @brief Camera performance mode
+ */
+typedef enum {
+    ADAPTIVE_PERFORMANCE_MODE, /**< Camera adaptive mode */
+    HIGH_PERFORMANCE_MODE,     /**< High Performance Mode */
+} OBCameraPerformanceMode,
+    ob_camera_performance_mode;
+
+/**
  * @brief Rectangle
  */
 typedef struct {
@@ -714,14 +725,14 @@ typedef struct {
     double  zpps;          // zpps=z0/fx
     float   baseline;      // baseline length, for monocular camera,it means the distance of laser to the center of IR-CMOS
     double  fx;            // focus
-    uint8_t bitSize;       // disparity bit size（raw disp bit size，for example: MX6000 is 12, MX6600 is 14）
-    float   unit;          // reference units：unit=10 denote 1cm; unit=1 denote 1mm; unit=0.5 denote 0.5mm; and so on
+    uint8_t bitSize;       // disparity bit size (raw disp bit size, for example: MX6000 is 12, MX6600 is 14)
+    float   unit;          // reference units: unit=10 denote 1cm; unit=1 denote 1mm; unit=0.5 denote 0.5mm; and so on
     float   minDisparity;  // dual disparity coefficient
     uint8_t packMode;      // data pack mode
-    float   dispOffset;    // disparity offset，actual disp=chip disp + disp_offset
-    int32_t invalidDisp;   // invalid disparity，usually is 0，dual IR add a auxiliary value.
-    int32_t dispIntPlace;  // disp integer digits，default is 8，Gemini2 XL is 10
-    uint8_t isDualCamera;  // 0 monocular camera，1 dual camera
+    float   dispOffset;    // disparity offset, actual disp=chip disp + disp_offset
+    int32_t invalidDisp;   // invalid disparity, usually is 0, dual IR add a auxiliary value.
+    int32_t dispIntPlace;  // disp integer digits, default is 8, Gemini2 XL is 10
+    uint8_t isDualCamera;  // 0 monocular camera, 1 dual camera
 } OBDisparityParam, ob_disparity_param;
 
 /**
@@ -826,7 +837,7 @@ typedef enum {
     /**
      * @brief Secondary synchronize mode
      * @brief Secondary device. Both process input trigger signal and output trigger signal to other devices.
-     * @brief Different sensors in a single devices receive trigger signals respectively：ext trigger -> RGB && ext trigger -> IR/Depth/TOF
+     * @brief Different sensors in a single devices receive trigger signals respectively: ext trigger -> RGB && ext trigger -> IR/Depth/TOF
      *
      * @attention With the current Gemini 2 device set to this mode, each Sensor receives the first external trigger signal
      *     after the stream is turned on and starts timing self-triggering at the set frame rate until the stream is turned off
@@ -860,7 +871,7 @@ typedef enum {
      * @brief Software trigger synchronize mode as secondary device
      * @brief The slave receives the external trigger signal (the external trigger signal comes from the soft trigger host) and outputs the trigger signal to
      * the external relay.
-     * @brief Different sensors in a single machine receive trigger signals respectively：ext trigger -> RGB && ext  trigger -> IR/Depth/TOF
+     * @brief Different sensors in a single machine receive trigger signals respectively: ext trigger -> RGB && ext  trigger -> IR/Depth/TOF
      */
     OB_SYNC_MODE_SECONDARY_SOFT_TRIGGER = 0x07,
 
@@ -1295,14 +1306,14 @@ typedef struct {
     /**
      * @brief The delay time of the depth image capture after receiving the capture command or trigger signal in microseconds.
      *
-     * @attention This parameter is only valid for some models， please refer to the product manual for details.
+     * @attention This parameter is only valid for some models, please refer to the product manual for details.
      */
     int depthDelayUs;
 
     /**
      * @brief The delay time of the color image capture after receiving the capture command or trigger signal in microseconds.
      *
-     * @attention This parameter is only valid for some models， please refer to the product manual for details.
+     * @attention This parameter is only valid for some models, please refer to the product manual for details.
      */
     int colorDelayUs;
 
@@ -1548,14 +1559,14 @@ typedef enum {
 
     /**
      * @brief Power line frequency
-     * @brief For anti-flickering， 0：Close， 1： 50Hz， 2： 60Hz， 3： Auto
+     * @brief For anti-flickering, 0: Close, 1: 50Hz, 2: 60Hz, 3: Auto
      */
     OB_FRAME_METADATA_TYPE_POWER_LINE_FREQUENCY = 15,
 
     /**
      * @brief Low light compensation
      *
-     * @attention The low light compensation is a feature inside the device，and can not manually control it.
+     * @attention The low light compensation is a feature inside the device, and can not manually control it.
      */
     OB_FRAME_METADATA_TYPE_LOW_LIGHT_COMPENSATION = 16,
 
@@ -1678,8 +1689,25 @@ typedef enum {
      *
      */
     OB_UVC_BACKEND_TYPE_V4L2,
+
+    /**
+     * @brief Use MSMF backend to access the UVC device
+     */
+    OB_UVC_BACKEND_TYPE_MSMF,
 } ob_uvc_backend_type,
     OBUvcBackendType;
+
+
+/**
+ * @brief The playback status of the media
+ */
+typedef enum {
+    OB_PLAYBACK_UNKNOWN ,
+    OB_PLAYBACK_PLAYING,  /**< The media is playing */
+    OB_PLAYBACK_PAUSED, /**< The media is paused */
+    OB_PLAYBACK_STOPPED, /**< The media is stopped */
+    OB_PLAYBACK_COUNT,
+} ob_playback_status, OBPlaybackStatus;
 
 // For compatibility
 #define OB_FRAME_METADATA_TYPE_LASER_POWER_MODE OB_FRAME_METADATA_TYPE_LASER_POWER_LEVEL
@@ -1787,6 +1815,7 @@ typedef void(ob_frame_destroy_callback)(uint8_t *buffer, void *user_data);
  */
 typedef void(ob_log_callback)(ob_log_severity severity, const char *message, void *user_data);
 
+typedef void(*ob_playback_status_changed_callback)(ob_playback_status status, void *user_data);
 /**
  * @brief Check if the sensor_type is a video sensor
  *

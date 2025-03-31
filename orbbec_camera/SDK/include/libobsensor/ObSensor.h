@@ -20,4 +20,4 @@
 #include <libobsensor/h/StreamProfile.h>
 #include <libobsensor/h/Version.h>
 #include <libobsensor/h/TypeHelper.h>
-
+#include <libobsensor/h/RecordPlayback.h>

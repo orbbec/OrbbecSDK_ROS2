@@ -148,7 +148,7 @@ OB_EXPORT void ob_delete_frame(const ob_frame *frame, ob_error **error);
 
 /**
  * @brief Copy the information of the source frame object to the destination frame object.
- * @brief Including the index，timestamp，system timestamp，global timestamp and metadata will be copied.
+ * @brief Including the index, timestamp, system timestamp, global timestamp and metadata will be copied.
  *
  * @param[in] src_frame Source frame object to copy the information from.
  * @param[in] dst_frame Destination frame object to copy the information to.
@@ -224,7 +224,7 @@ OB_EXPORT void ob_frame_set_system_timestamp_us(ob_frame *frame, uint64_t system
 
 /**
  * @brief Get the global timestamp of the frame in microseconds.
- * @brief The global timestamp is the time point when the frame was was captured by the device, and has been converted to the host clock domain. The
+ * @brief The global timestamp is the time point when the frame was captured by the device, and has been converted to the host clock domain. The
  * conversion process base on the frame timestamp and can eliminate the timer drift of the device
  *
  * @attention The global timestamp is disabled by default. If global timestamp is not enabled, the function will return 0. To enable it, call @ref
@@ -602,6 +602,24 @@ OB_EXPORT ob_frame *ob_frameset_get_frame_by_index(const ob_frame *frameset, uin
  * @param[out] error Pointer to an error object that will be set if an error occurs.
  */
 OB_EXPORT void ob_frameset_push_frame(ob_frame *frameset, const ob_frame *frame, ob_error **error);
+
+/**
+ * @brief Get point cloud frame width
+ *
+ * @param[in] frame point cloud Frame object
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
+ * @return uint32_t return the point cloud frame width
+ */
+OB_EXPORT uint32_t ob_point_cloud_frame_get_width(const ob_frame *frame, ob_error **error);
+
+/**
+ * @brief Get point cloud frame height
+ *
+ * @param[in] frame point cloud Frame object
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
+ * @return uint32_t return the point cloud frame height
+ */
+OB_EXPORT uint32_t ob_point_cloud_frame_get_height(const ob_frame *frame, ob_error **error);
 
 // The following interfaces are deprecated and are retained here for compatibility purposes.
 #define ob_frame_index ob_frame_get_index

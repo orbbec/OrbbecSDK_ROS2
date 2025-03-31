@@ -598,6 +598,7 @@ class OBCameraNode {
   int sequence_id_filter_id_ = -1;
   int threshold_filter_max_ = -1;
   int threshold_filter_min_ = -1;
+  float hardware_noise_removal_filter_threshold_ = -1.0;
   int noise_removal_filter_min_diff_ = 256;
   int noise_removal_filter_max_size_ = 80;
   float spatial_filter_alpha_ = -1;

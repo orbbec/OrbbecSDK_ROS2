@@ -626,6 +626,16 @@ void OBCameraNode::setupDevices() {
                              enable_hardware_noise_removal_filter_);
     RCLCPP_INFO_STREAM(
         logger_, "Setting hardware_noise_removal_filter:" << enable_hardware_noise_removal_filter_);
+    if (device_->isPropertySupported(OB_PROP_HW_NOISE_REMOVE_FILTER_THRESHOLD_FLOAT,
+                                     OB_PERMISSION_READ_WRITE)) {
+      if (hardware_noise_removal_filter_threshold_ != -1.0 &&
+          enable_hardware_noise_removal_filter_) {
+        device_->setFloatProperty(OB_PROP_HW_NOISE_REMOVE_FILTER_THRESHOLD_FLOAT,
+                                  hardware_noise_removal_filter_threshold_);
+        RCLCPP_INFO_STREAM(logger_, "Setting hardware_noise_removal_filter_threshold :"
+                                        << hardware_noise_removal_filter_threshold_);
+      }
+    }
   }
 }
 void OBCameraNode::setupColorPostProcessFilter() {
@@ -1474,6 +1484,8 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(sequence_id_filter_id_, "sequence_id_filter_id", -1);
   setAndGetNodeParameter<int>(threshold_filter_max_, "threshold_filter_max", -1);
   setAndGetNodeParameter<int>(threshold_filter_min_, "threshold_filter_min", -1);
+  setAndGetNodeParameter<float>(hardware_noise_removal_filter_threshold_,
+                              "hardware_noise_removal_filter_threshold", -1.0);
   setAndGetNodeParameter<int>(noise_removal_filter_min_diff_, "noise_removal_filter_min_diff", 256);
   setAndGetNodeParameter<int>(noise_removal_filter_max_size_, "noise_removal_filter_max_size", 80);
   setAndGetNodeParameter<float>(spatial_filter_alpha_, "spatial_filter_alpha", -1.0);
@@ -3263,6 +3275,16 @@ void OBCameraNode::setFilterCallback(const std::shared_ptr<SetFilter ::Request> 
                                  request->filter_enable);
         RCLCPP_INFO_STREAM(logger_,
                            "Setting hardware_noise_removal_filter:" << request->filter_enable);
+        if (device_->isPropertySupported(OB_PROP_HW_NOISE_REMOVE_FILTER_THRESHOLD_FLOAT,
+                                         OB_PERMISSION_READ_WRITE)) {
+          if (hardware_noise_removal_filter_threshold_ != -1.0 &&
+              enable_hardware_noise_removal_filter_) {
+            device_->setFloatProperty(OB_PROP_HW_NOISE_REMOVE_FILTER_THRESHOLD_FLOAT,
+                                      hardware_noise_removal_filter_threshold_);
+            RCLCPP_INFO_STREAM(logger_, "Setting hardware_noise_removal_filter_threshold :"
+                                            << hardware_noise_removal_filter_threshold_);
+          }
+        }
       }
     } else if (request->filter_name == "SpatialAdvancedFilter") {
       auto spatial_filter = std::make_shared<ob::SpatialAdvancedFilter>();

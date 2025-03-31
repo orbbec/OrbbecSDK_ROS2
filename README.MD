@@ -145,7 +145,7 @@ The following instructions are only applicable to traditional launch files. If y
   - [Efficient intra-process communication](#efficient-intra-process-communication)
   - [Building a Debian Package](#building-a-debian-package)
   - [Use V4L2 backend](#use-v4l2-backend)
-  - [Examples](#examples)
+  - [Examples](#use-v4l2-backend)
   - [ROS2(Robot) vs Optical(Camera) Coordination Systems](#ros2robot-vs-opticalcamera-coordination-systems)
   - [Camera sensor structure](#camera-sensor-structure)
   - [TF from coordinate A to coordinate B](#tf-from-coordinate-a-to-coordinate-b)
@@ -405,9 +405,9 @@ Note: The V4L2 backend is not enabled by default.
 
 ## Examples
 
-* [Start_camera_node](./start_camera_node)
-* [Align_depth_color](./align_depth_color)
-* [Point_cloud](./point_cloud)
+* [Start_camera_node](./orbbec_camera/examples/start_camera_node)
+* [Align_depth_color](./orbbec_camera/examples/align_depth_color)
+* [Point_cloud](./orbbec_camera/examples/point_cloud)
 
 [......](./orbbec_camera/examples)
 

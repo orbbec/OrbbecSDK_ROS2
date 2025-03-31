@@ -107,7 +107,6 @@ The following are the launch parameters available:
 * `interleave_skip_enable` : Whether to enable skip frames,this parameter is usually used [interleave ae mode](./orbbec_camera/examples/interleave_ae_mode/README.MD)
 * `interleave_skip_index` : Set skip pattern IR or flood IR,this parameter is usually used [interleave ae mode](./orbbec_camera/examples/interleave_ae_mode/README.MD)
 * `[hdr|laser]_index[0|1]_[laser_control|depth_exposure|depth_gain|ir_brightness|ae_max_exposure]`:In interleave frame mode, set the 0th and 1st frame parameters of hdr or laser interleaving frames,this parameter is usually used [interleave ae mode](./orbbec_camera/examples/interleave_ae_mode/README.MD)
-* `color_ae_roi_[left|right|top|bottom]`,`depth_ae_roi_[left|right|top|bottom]`:Set Color and Depth auto exposure ROI.
 
 **IMPORTANT**: *Please carefully read the instructions regarding software filtering settings
 at [this link](https://www.orbbec.com/docs/g330-use-depth-post-processing-blocks/). If you are uncertain, do not modify

@@ -164,6 +164,7 @@ void OBCameraNode::setupDevices() {
     }
   }
   auto info = device_->getDeviceInfo();
+
   if (retry_on_usb3_detection_failure_ &&
       device_->isPropertySupported(OB_PROP_DEVICE_USB3_REPEAT_IDENTIFY_BOOL,
                                    OB_PERMISSION_READ_WRITE)) {
@@ -675,60 +676,70 @@ void OBCameraNode::setupColorPostProcessFilter() {
   }
 }
 void OBCameraNode::setupLeftIrPostProcessFilter() {
-  auto left_ir_sensor = device_->getSensor(OB_SENSOR_IR_LEFT);
-  left_ir_filter_list_ = left_ir_sensor->createRecommendedFilters();
-  if (left_ir_filter_list_.empty()) {
-    RCLCPP_WARN_STREAM(logger_, "Failed to get left ir sensor filter list");
-    return;
-  }
-  for (size_t i = 0; i < left_ir_filter_list_.size(); i++) {
-    auto filter = left_ir_filter_list_[i];
-    std::map<std::string, bool> filter_params = {
-        {"SequenceIdFilter", enable_left_ir_sequence_id_filter_},
-    };
-    std::string filter_name = filter->type();
-    RCLCPP_INFO_STREAM(logger_, "Setting " << filter_name << "......");
-    if (filter_params.find(filter_name) != filter_params.end()) {
-      std::string value = filter_params[filter_name] ? "true" : "false";
-      RCLCPP_INFO_STREAM(logger_, "set left ir " << filter_name << " to " << value);
-      filter->enable(filter_params[filter_name]);
+  auto device_info = device_->getDeviceInfo();
+  CHECK_NOTNULL(device_info);
+  auto pid = device_info->getPid();
+  if (isGemini335PID(pid)) {
+    auto left_ir_sensor = device_->getSensor(OB_SENSOR_IR_LEFT);
+    left_ir_filter_list_ = left_ir_sensor->createRecommendedFilters();
+    if (left_ir_filter_list_.empty()) {
+      RCLCPP_WARN_STREAM(logger_, "Failed to get left ir sensor filter list");
+      return;
     }
-    if (filter_name == "SequenceIdFilter" && enable_left_ir_sequence_id_filter_) {
-      auto sequenced_filter = filter->as<ob::SequenceIdFilter>();
-      if (left_ir_sequence_id_filter_id_ != -1) {
-        sequenced_filter->selectSequenceId(left_ir_sequence_id_filter_id_);
-        RCLCPP_INFO_STREAM(logger_,
-                           "Set left ir SequenceIdFilter ID to " << left_ir_sequence_id_filter_id_);
+    for (size_t i = 0; i < left_ir_filter_list_.size(); i++) {
+      auto filter = left_ir_filter_list_[i];
+      std::map<std::string, bool> filter_params = {
+          {"SequenceIdFilter", enable_left_ir_sequence_id_filter_},
+      };
+      std::string filter_name = filter->type();
+      RCLCPP_INFO_STREAM(logger_, "Setting " << filter_name << "......");
+      if (filter_params.find(filter_name) != filter_params.end()) {
+        std::string value = filter_params[filter_name] ? "true" : "false";
+        RCLCPP_INFO_STREAM(logger_, "set left ir " << filter_name << " to " << value);
+        filter->enable(filter_params[filter_name]);
+      }
+      if (filter_name == "SequenceIdFilter" && enable_left_ir_sequence_id_filter_) {
+        auto sequenced_filter = filter->as<ob::SequenceIdFilter>();
+        if (left_ir_sequence_id_filter_id_ != -1) {
+          sequenced_filter->selectSequenceId(left_ir_sequence_id_filter_id_);
+          RCLCPP_INFO_STREAM(
+              logger_, "Set left ir SequenceIdFilter ID to " << left_ir_sequence_id_filter_id_);
+        }
       }
     }
   }
 }
 
 void OBCameraNode::setupRightIrPostProcessFilter() {
-  auto right_ir_sensor = device_->getSensor(OB_SENSOR_IR_RIGHT);
-  right_ir_filter_list_ = right_ir_sensor->createRecommendedFilters();
-  if (right_ir_filter_list_.empty()) {
-    RCLCPP_WARN_STREAM(logger_, "Failed to get right ir sensor filter list");
-    return;
-  }
-  for (size_t i = 0; i < right_ir_filter_list_.size(); i++) {
-    auto filter = right_ir_filter_list_[i];
-    std::map<std::string, bool> filter_params = {
-        {"SequenceIdFilter", enable_right_ir_sequence_id_filter_},
-    };
-    std::string filter_name = filter->type();
-    RCLCPP_INFO_STREAM(logger_, "Setting " << filter_name << "......");
-    if (filter_params.find(filter_name) != filter_params.end()) {
-      std::string value = filter_params[filter_name] ? "true" : "false";
-      RCLCPP_INFO_STREAM(logger_, "set right ir " << filter_name << " to " << value);
-      filter->enable(filter_params[filter_name]);
+  auto device_info = device_->getDeviceInfo();
+  CHECK_NOTNULL(device_info);
+  auto pid = device_info->getPid();
+  if (isGemini335PID(pid)) {
+    auto right_ir_sensor = device_->getSensor(OB_SENSOR_IR_RIGHT);
+    right_ir_filter_list_ = right_ir_sensor->createRecommendedFilters();
+    if (right_ir_filter_list_.empty()) {
+      RCLCPP_WARN_STREAM(logger_, "Failed to get right ir sensor filter list");
+      return;
     }
-    if (filter_name == "SequenceIdFilter" && enable_right_ir_sequence_id_filter_) {
-      auto sequenced_filter = filter->as<ob::SequenceIdFilter>();
-      if (right_ir_sequence_id_filter_id_ != -1) {
-        sequenced_filter->selectSequenceId(right_ir_sequence_id_filter_id_);
-        RCLCPP_INFO_STREAM(
-            logger_, "Set right ir SequenceIdFilter ID to " << right_ir_sequence_id_filter_id_);
+    for (size_t i = 0; i < right_ir_filter_list_.size(); i++) {
+      auto filter = right_ir_filter_list_[i];
+      std::map<std::string, bool> filter_params = {
+          {"SequenceIdFilter", enable_right_ir_sequence_id_filter_},
+      };
+      std::string filter_name = filter->type();
+      RCLCPP_INFO_STREAM(logger_, "Setting " << filter_name << "......");
+      if (filter_params.find(filter_name) != filter_params.end()) {
+        std::string value = filter_params[filter_name] ? "true" : "false";
+        RCLCPP_INFO_STREAM(logger_, "set right ir " << filter_name << " to " << value);
+        filter->enable(filter_params[filter_name]);
+      }
+      if (filter_name == "SequenceIdFilter" && enable_right_ir_sequence_id_filter_) {
+        auto sequenced_filter = filter->as<ob::SequenceIdFilter>();
+        if (right_ir_sequence_id_filter_id_ != -1) {
+          sequenced_filter->selectSequenceId(right_ir_sequence_id_filter_id_);
+          RCLCPP_INFO_STREAM(
+              logger_, "Set right ir SequenceIdFilter ID to " << right_ir_sequence_id_filter_id_);
+        }
       }
     }
   }
@@ -2331,6 +2342,9 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
       publishStaticTransforms();
       tf_published_ = true;
     }
+    auto device_info = device_->getDeviceInfo();
+    CHECK_NOTNULL(device_info);
+    auto pid = device_info->getPid();
     auto depth_frame = frame_set->getFrame(OB_FRAME_DEPTH);
     auto color_frame = frame_set->getFrame(OB_FRAME_COLOR);
     auto left_ir_frame = frame_set->getFrame(OB_FRAME_IR_LEFT);
@@ -2346,13 +2360,13 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
       color_frame = processColorFrameFilter(color_frame);
       frame_set->pushFrame(color_frame);
     }
-    if (left_ir_frame) {
-        left_ir_frame=processLeftIrFrameFilter(left_ir_frame);
-        frame_set->pushFrame(left_ir_frame);
+    if (left_ir_frame && isGemini335PID(pid)) {
+      left_ir_frame = processLeftIrFrameFilter(left_ir_frame);
+      frame_set->pushFrame(left_ir_frame);
     }
-    if (right_ir_frame) {
-        right_ir_frame=processRightIrFrameFilter(right_ir_frame);
-        frame_set->pushFrame(right_ir_frame);
+    if (right_ir_frame && isGemini335PID(pid)) {
+      right_ir_frame = processRightIrFrameFilter(right_ir_frame);
+      frame_set->pushFrame(right_ir_frame);
     }
     if (depth_registration_ && align_filter_ && depth_frame) {
       if (auto new_frame = align_filter_->process(frame_set)) {

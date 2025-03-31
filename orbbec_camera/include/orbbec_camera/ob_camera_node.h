@@ -330,6 +330,10 @@ class OBCameraNode {
 
   std::shared_ptr<ob::Frame> processColorFrameFilter(std::shared_ptr<ob::Frame>& frame);
 
+  std::shared_ptr<ob::Frame> processRightIrFrameFilter(std::shared_ptr<ob::Frame>& frame);
+
+  std::shared_ptr<ob::Frame> processLeftIrFrameFilter(std::shared_ptr<ob::Frame>& frame);
+
   uint64_t getFrameTimestampUs(const std::shared_ptr<ob::Frame>& frame);
 
   void onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set);
@@ -374,6 +378,8 @@ class OBCameraNode {
 
   void setupDepthPostProcessFilter();
   void setupColorPostProcessFilter();
+  void setupRightIrPostProcessFilter();
+  void setupLeftIrPostProcessFilter();
 
   // interleave AE
   int init_interleave_hdr_param();
@@ -540,6 +546,10 @@ class OBCameraNode {
   int ir_gain_ = -1;
   int ir_ae_max_exposure_ = -1;
   int ir_brightness_ = -1;
+  bool enable_right_ir_sequence_id_filter_=false;
+  int right_ir_sequence_id_filter_id_=-1;
+  bool enable_left_ir_sequence_id_filter_=false;
+  int left_ir_sequence_id_filter_id_=-1;
   int soft_filter_max_diff_ = -1;
   int soft_filter_speckle_size_ = -1;
   bool enable_frame_sync_ = false;
@@ -654,6 +664,8 @@ class OBCameraNode {
   std::string cloud_frame_id_;
   std::vector<std::shared_ptr<ob::Filter>> depth_filter_list_;
   std::vector<std::shared_ptr<ob::Filter>> color_filter_list_;
+  std::vector<std::shared_ptr<ob::Filter>> left_ir_filter_list_;
+  std::vector<std::shared_ptr<ob::Filter>> right_ir_filter_list_;
 
   // interleave AE
   std::string interleave_ae_mode_ = "hdr";  // hdr or laser

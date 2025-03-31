@@ -674,6 +674,65 @@ void OBCameraNode::setupColorPostProcessFilter() {
     }
   }
 }
+void OBCameraNode::setupLeftIrPostProcessFilter() {
+  auto left_ir_sensor = device_->getSensor(OB_SENSOR_IR_LEFT);
+  left_ir_filter_list_ = left_ir_sensor->createRecommendedFilters();
+  if (left_ir_filter_list_.empty()) {
+    RCLCPP_WARN_STREAM(logger_, "Failed to get left ir sensor filter list");
+    return;
+  }
+  for (size_t i = 0; i < left_ir_filter_list_.size(); i++) {
+    auto filter = left_ir_filter_list_[i];
+    std::map<std::string, bool> filter_params = {
+        {"SequenceIdFilter", enable_left_ir_sequence_id_filter_},
+    };
+    std::string filter_name = filter->type();
+    RCLCPP_INFO_STREAM(logger_, "Setting " << filter_name << "......");
+    if (filter_params.find(filter_name) != filter_params.end()) {
+      std::string value = filter_params[filter_name] ? "true" : "false";
+      RCLCPP_INFO_STREAM(logger_, "set left ir " << filter_name << " to " << value);
+      filter->enable(filter_params[filter_name]);
+    }
+    if (filter_name == "SequenceIdFilter" && enable_left_ir_sequence_id_filter_) {
+      auto sequenced_filter = filter->as<ob::SequenceIdFilter>();
+      if (left_ir_sequence_id_filter_id_ != -1) {
+        sequenced_filter->selectSequenceId(left_ir_sequence_id_filter_id_);
+        RCLCPP_INFO_STREAM(logger_,
+                           "Set left ir SequenceIdFilter ID to " << left_ir_sequence_id_filter_id_);
+      }
+    }
+  }
+}
+
+void OBCameraNode::setupRightIrPostProcessFilter() {
+  auto right_ir_sensor = device_->getSensor(OB_SENSOR_IR_RIGHT);
+  right_ir_filter_list_ = right_ir_sensor->createRecommendedFilters();
+  if (right_ir_filter_list_.empty()) {
+    RCLCPP_WARN_STREAM(logger_, "Failed to get right ir sensor filter list");
+    return;
+  }
+  for (size_t i = 0; i < right_ir_filter_list_.size(); i++) {
+    auto filter = right_ir_filter_list_[i];
+    std::map<std::string, bool> filter_params = {
+        {"SequenceIdFilter", enable_right_ir_sequence_id_filter_},
+    };
+    std::string filter_name = filter->type();
+    RCLCPP_INFO_STREAM(logger_, "Setting " << filter_name << "......");
+    if (filter_params.find(filter_name) != filter_params.end()) {
+      std::string value = filter_params[filter_name] ? "true" : "false";
+      RCLCPP_INFO_STREAM(logger_, "set right ir " << filter_name << " to " << value);
+      filter->enable(filter_params[filter_name]);
+    }
+    if (filter_name == "SequenceIdFilter" && enable_right_ir_sequence_id_filter_) {
+      auto sequenced_filter = filter->as<ob::SequenceIdFilter>();
+      if (right_ir_sequence_id_filter_id_ != -1) {
+        sequenced_filter->selectSequenceId(right_ir_sequence_id_filter_id_);
+        RCLCPP_INFO_STREAM(
+            logger_, "Set right ir SequenceIdFilter ID to " << right_ir_sequence_id_filter_id_);
+      }
+    }
+  }
+}
 void OBCameraNode::setupDepthPostProcessFilter() {
   auto depth_sensor = device_->getSensor(OB_SENSOR_DEPTH);
   // set depth sensor to filter
@@ -1445,6 +1504,13 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(ir_ae_max_exposure_, "ir_ae_max_exposure", -1);
   setAndGetNodeParameter<int>(ir_brightness_, "ir_brightness", -1);
   setAndGetNodeParameter<bool>(enable_ir_long_exposure_, "enable_ir_long_exposure", true);
+  setAndGetNodeParameter<bool>(enable_right_ir_sequence_id_filter_,
+                               "enable_right_ir_sequence_id_filter", false);
+  setAndGetNodeParameter<int>(right_ir_sequence_id_filter_id_, "right_ir_sequence_id_filter_id",
+                              -1);
+  setAndGetNodeParameter<bool>(enable_left_ir_sequence_id_filter_,
+                               "enable_left_ir_sequence_id_filter", false);
+  setAndGetNodeParameter<int>(left_ir_sequence_id_filter_id_, "left_ir_sequence_id_filter_id", -1);
   setAndGetNodeParameter<std::string>(depth_work_mode_, "depth_work_mode", "");
   setAndGetNodeParameter<std::string>(sync_mode_str_, "sync_mode", "");
   setAndGetNodeParameter<int>(depth_delay_us_, "depth_delay_us", 0);
@@ -1485,7 +1551,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(threshold_filter_max_, "threshold_filter_max", -1);
   setAndGetNodeParameter<int>(threshold_filter_min_, "threshold_filter_min", -1);
   setAndGetNodeParameter<float>(hardware_noise_removal_filter_threshold_,
-                              "hardware_noise_removal_filter_threshold", -1.0);
+                                "hardware_noise_removal_filter_threshold", -1.0);
   setAndGetNodeParameter<int>(noise_removal_filter_min_diff_, "noise_removal_filter_min_diff", 256);
   setAndGetNodeParameter<int>(noise_removal_filter_max_size_, "noise_removal_filter_max_size", 80);
   setAndGetNodeParameter<float>(spatial_filter_alpha_, "spatial_filter_alpha", -1.0);
@@ -1603,6 +1669,8 @@ void OBCameraNode::setupTopics() {
     setupDevices();
     setupDepthPostProcessFilter();
     setupColorPostProcessFilter();
+    setupRightIrPostProcessFilter();
+    setupLeftIrPostProcessFilter();
     setupProfiles();
     selectBaseStream();
     setupCameraCtrlServices();
@@ -2091,6 +2159,42 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
 
   depth_registration_cloud_pub_->publish(std::move(point_cloud_msg));
 }
+std::shared_ptr<ob::Frame> OBCameraNode::processRightIrFrameFilter(
+    std::shared_ptr<ob::Frame> &frame) {
+  if (frame == nullptr || frame->getType() != OB_FRAME_IR_RIGHT) {
+    return nullptr;
+  }
+  for (size_t i = 0; i < right_ir_filter_list_.size(); i++) {
+    auto filter = right_ir_filter_list_[i];
+    CHECK_NOTNULL(filter.get());
+    if (filter->isEnabled() && frame != nullptr) {
+      frame = filter->process(frame);
+      if (frame == nullptr) {
+        RCLCPP_ERROR_STREAM(logger_, "Right Ir filter process failed");
+        break;
+      }
+    }
+  }
+  return frame;
+}
+std::shared_ptr<ob::Frame> OBCameraNode::processLeftIrFrameFilter(
+    std::shared_ptr<ob::Frame> &frame) {
+  if (frame == nullptr || frame->getType() != OB_FRAME_IR_LEFT) {
+    return nullptr;
+  }
+  for (size_t i = 0; i < left_ir_filter_list_.size(); i++) {
+    auto filter = left_ir_filter_list_[i];
+    CHECK_NOTNULL(filter.get());
+    if (filter->isEnabled() && frame != nullptr) {
+      frame = filter->process(frame);
+      if (frame == nullptr) {
+        RCLCPP_ERROR_STREAM(logger_, "Left Ir filter process failed");
+        break;
+      }
+    }
+  }
+  return frame;
+}
 std::shared_ptr<ob::Frame> OBCameraNode::processColorFrameFilter(
     std::shared_ptr<ob::Frame> &frame) {
   if (frame == nullptr || frame->getType() != OB_FRAME_COLOR) {
@@ -2102,7 +2206,7 @@ std::shared_ptr<ob::Frame> OBCameraNode::processColorFrameFilter(
     if (filter->isEnabled() && frame != nullptr) {
       frame = filter->process(frame);
       if (frame == nullptr) {
-        RCLCPP_ERROR_STREAM(logger_, "Depth filter process failed");
+        RCLCPP_ERROR_STREAM(logger_, "Color filter process failed");
         break;
       }
     }
@@ -2229,6 +2333,8 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
     }
     auto depth_frame = frame_set->getFrame(OB_FRAME_DEPTH);
     auto color_frame = frame_set->getFrame(OB_FRAME_COLOR);
+    auto left_ir_frame = frame_set->getFrame(OB_FRAME_IR_LEFT);
+    auto right_ir_frame = frame_set->getFrame(OB_FRAME_IR_RIGHT);
     if (depth_frame) {
       setDisparitySearchOffset();
       setDepthAutoExposureROI();
@@ -2239,6 +2345,14 @@ void OBCameraNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set
       setColorAutoExposureROI();
       color_frame = processColorFrameFilter(color_frame);
       frame_set->pushFrame(color_frame);
+    }
+    if (left_ir_frame) {
+        left_ir_frame=processLeftIrFrameFilter(left_ir_frame);
+        frame_set->pushFrame(left_ir_frame);
+    }
+    if (right_ir_frame) {
+        right_ir_frame=processRightIrFrameFilter(right_ir_frame);
+        frame_set->pushFrame(right_ir_frame);
     }
     if (depth_registration_ && align_filter_ && depth_frame) {
       if (auto new_frame = align_filter_->process(frame_set)) {

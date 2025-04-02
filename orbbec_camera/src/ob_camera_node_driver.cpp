@@ -250,9 +250,6 @@ void OBCameraNodeDriver::checkConnectTimer() {
 
 void OBCameraNodeDriver::queryDevice() {
   while (is_alive_ && rclcpp::ok() && !device_connected_.load()) {
-    RCLCPP_INFO_STREAM(logger_, "enumerate_net_device: " << enumerate_net_device_);
-    RCLCPP_INFO_STREAM(logger_, "net_device_ip_: " << net_device_ip_);
-    RCLCPP_INFO_STREAM(logger_, "net_device_port_: " << net_device_port_);
     if (!enumerate_net_device_ && !net_device_ip_.empty() && net_device_port_ != 0) {
       connectNetDevice(net_device_ip_, net_device_port_);
     } else {
@@ -399,37 +396,35 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByUSBPort(
 
 std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByNetIP(
     const std::shared_ptr<ob::DeviceList> &list, const std::string &net_ip) {
-  try {
-    RCLCPP_INFO_STREAM(logger_, "Before lock: Select device net ip: " << net_ip);
-    std::lock_guard<decltype(device_lock_)> lock(device_lock_);
-    RCLCPP_INFO_STREAM(logger_, "After lock: Select device net ip: " << net_ip);
-    std::shared_ptr<ob::Device> device = nullptr;
-    for (size_t i = 0; i < list->getCount(); i++) {
-      try {
-        device = list->getDevice(i);
-      } catch (ob::Error &e) {
-        continue;
-      } catch (std::exception &e) {
-        continue;
-      } catch (...) {
+  RCLCPP_INFO_STREAM(logger_, "Before lock: Select device net ip: " << net_ip);
+  std::lock_guard<decltype(device_lock_)> lock(device_lock_);
+  RCLCPP_INFO_STREAM(logger_, "After lock: Select device net ip: " << net_ip);
+  std::shared_ptr<ob::Device> device = nullptr;
+  for (size_t i = 0; i < list->getCount(); i++) {
+    try {
+      device = list->getDevice(i);
+      auto device_info = device->getDeviceInfo();
+      if(std::string(device_info->getConnectionType())!="Ethernet"){
         continue;
       }
-      auto device_info = device->getDeviceInfo();
-      RCLCPP_INFO_STREAM(logger_, "FindDeviceByNetIP device net ip " << net_ip);
       if (device_info->getIpAddress() == nullptr) {
         continue;
       }
+      RCLCPP_INFO_STREAM(logger_, "FindDeviceByNetIP device net ip " << device_info->getIpAddress());
       if (std::string(device_info->getIpAddress()) == net_ip) {
         RCLCPP_INFO_STREAM(logger_, "getDeviceByNetIP device net ip " << net_ip << " done");
         return list->getDevice(i);
       }
+    } catch (ob::Error &e) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to get device info " << e.getMessage());
+      continue;
+    } catch (std::exception &e) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to get device info " << e.what());
+      continue;
+    } catch (...) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to get device info");
+      continue;
     }
-  } catch (ob::Error &e) {
-    RCLCPP_ERROR_STREAM(logger_, "Failed to get device info " << e.getMessage());
-  } catch (std::exception &e) {
-    RCLCPP_ERROR_STREAM(logger_, "Failed to get device info " << e.what());
-  } catch (...) {
-    RCLCPP_ERROR_STREAM(logger_, "Failed to get device info");
   }
 
   return nullptr;

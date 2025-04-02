@@ -48,6 +48,9 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::shared_ptr<ob::Device> selectDeviceByUSBPort(const std::shared_ptr<ob::DeviceList>& list,
                                                     const std::string& usb_port);
 
+  std::shared_ptr<ob::Device> selectDeviceByNetIP(const std::shared_ptr<ob::DeviceList>& list,
+                                                  const std::string& net_ip);
+
   void initializeDevice(const std::shared_ptr<ob::Device>& device);
 
   void startDevice(const std::shared_ptr<ob::DeviceList>& list);

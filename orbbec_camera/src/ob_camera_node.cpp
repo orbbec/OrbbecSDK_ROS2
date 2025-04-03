@@ -108,6 +108,11 @@ void OBCameraNode::rebootDevice() {
 void OBCameraNode::clean() noexcept {
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
   RCLCPP_WARN_STREAM(logger_, "Do destroy ~OBCameraNode");
+  if (diagnostic_updater_) {
+    RCLCPP_WARN_STREAM(logger_, "diagnostic_updater_ is alive");
+  } else {
+    RCLCPP_WARN_STREAM(logger_, "diagnostic_updater_ is clean");
+  }
   is_running_.store(false);
   RCLCPP_WARN_STREAM(logger_, "Stop tf thread");
   if (tf_thread_ && tf_thread_->joinable()) {
@@ -1718,7 +1723,17 @@ void OBCameraNode::onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapp
     status.add("Chip Bottom Temperature", temperature.chipBottomTemp);
     status.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, "Temperature is normal");
   } catch (const ob::Error &e) {
+    if (is_running_.load()) {
+      diagnostic_timer_->cancel();
+      diagnostic_timer_.reset();
+    }
+    RCLCPP_ERROR_STREAM(logger_, "Failed to TemperatureUpdate: " << e.getMessage());
     status.summary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, e.getMessage());
+  } catch (const std::exception &e) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to TemperatureUpdate: " << e.what());
+    status.summary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, e.what());
+  } catch (...) {
+    RCLCPP_ERROR(logger_, "Failed to TemperatureUpdate");
   }
 }
 
@@ -1730,11 +1745,17 @@ void OBCameraNode::setupDiagnosticUpdater() {
     RCLCPP_INFO_STREAM(logger_, "Publish diagnostics every " << diagnostic_period_ << " seconds");
     auto info = device_->getDeviceInfo();
     std::string serial_number = info->getSerialNumber();
-    diagnostic_updater_ = std::make_unique<diagnostic_updater::Updater>(node_, diagnostic_period_);
+    diagnostic_updater_ = std::make_unique<diagnostic_updater::Updater>(node_, 10000.0);
     diagnostic_updater_->setHardwareID(serial_number);
     diagnostic_updater_->add("Temperatures", this, &OBCameraNode::onTemperatureUpdate);
+    diagnostic_timer_ = node_->create_wall_timer(std::chrono::seconds(int(diagnostic_period_)),
+                                                 [this]() { diagnostic_updater_->force_update(); });
+  } catch (const ob::Error &e) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to setup diagnostic updater: " << e.getMessage());
   } catch (const std::exception &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to setup diagnostic updater: " << e.what());
+  } catch (...) {
+    RCLCPP_ERROR(logger_, "Failed to TemperatureUpdate");
   }
 }
 

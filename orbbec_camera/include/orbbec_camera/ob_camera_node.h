@@ -546,10 +546,10 @@ class OBCameraNode {
   int ir_gain_ = -1;
   int ir_ae_max_exposure_ = -1;
   int ir_brightness_ = -1;
-  bool enable_right_ir_sequence_id_filter_=false;
-  int right_ir_sequence_id_filter_id_=-1;
-  bool enable_left_ir_sequence_id_filter_=false;
-  int left_ir_sequence_id_filter_id_=-1;
+  bool enable_right_ir_sequence_id_filter_ = false;
+  int right_ir_sequence_id_filter_id_ = -1;
+  bool enable_left_ir_sequence_id_filter_ = false;
+  int left_ir_sequence_id_filter_id_ = -1;
   int soft_filter_max_diff_ = -1;
   int soft_filter_speckle_size_ = -1;
   bool enable_frame_sync_ = false;
@@ -655,6 +655,7 @@ class OBCameraNode {
   std::string time_domain_ = "global";  // device, system, global
   // soft ware trigger
   rclcpp::TimerBase::SharedPtr software_trigger_timer_;
+  rclcpp::TimerBase::SharedPtr diagnostic_timer_;
   std::chrono::milliseconds software_trigger_period_{33};
   bool enable_heartbeat_ = false;
   bool enable_color_undistortion_ = false;

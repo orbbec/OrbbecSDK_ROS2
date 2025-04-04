@@ -108,11 +108,6 @@ void OBCameraNode::rebootDevice() {
 void OBCameraNode::clean() noexcept {
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
   RCLCPP_WARN_STREAM(logger_, "Do destroy ~OBCameraNode");
-  if (diagnostic_updater_) {
-    RCLCPP_WARN_STREAM(logger_, "diagnostic_updater_ is alive");
-  } else {
-    RCLCPP_WARN_STREAM(logger_, "diagnostic_updater_ is clean");
-  }
   is_running_.store(false);
   RCLCPP_WARN_STREAM(logger_, "Stop tf thread");
   if (tf_thread_ && tf_thread_->joinable()) {

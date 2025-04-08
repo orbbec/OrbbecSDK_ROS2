@@ -564,7 +564,7 @@ void OBCameraNode::setupDevices() {
   if (device_->isPropertySupported(OB_PROP_DEPTH_MAX_DIFF_INT, OB_PERMISSION_WRITE)) {
     auto default_noise_removal_filter_min_diff =
         device_->getIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT);
-    RCLCPP_INFO_STREAM(logger_, "default_noise_removal_filter_min_diff: "
+    RCLCPP_INFO_STREAM(logger_, "default noise removal filter min diff: "
                                     << default_noise_removal_filter_min_diff);
     if (noise_removal_filter_min_diff_ != -1 &&
         default_noise_removal_filter_min_diff != noise_removal_filter_min_diff_) {
@@ -579,7 +579,7 @@ void OBCameraNode::setupDevices() {
         device_->setIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT, noise_removal_filter_min_diff_);
         auto new_noise_removal_filter_min_diff =
             device_->getIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT);
-        RCLCPP_INFO_STREAM(logger_, "after set noise_removal_filter_min_diff: "
+        RCLCPP_INFO_STREAM(logger_, "after set noise removal filter min diff: "
                                         << new_noise_removal_filter_min_diff);
       }
     }
@@ -588,7 +588,7 @@ void OBCameraNode::setupDevices() {
   if (device_->isPropertySupported(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT, OB_PERMISSION_WRITE)) {
     auto default_noise_removal_filter_max_size =
         device_->getIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT);
-    RCLCPP_INFO_STREAM(logger_, "default_noise_removal_filter_max_size: "
+    RCLCPP_INFO_STREAM(logger_, "default noise removal filter max size: "
                                     << default_noise_removal_filter_max_size);
     if (noise_removal_filter_max_size_ != -1 &&
         default_noise_removal_filter_max_size != noise_removal_filter_max_size_) {
@@ -603,14 +603,14 @@ void OBCameraNode::setupDevices() {
         device_->setIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT, noise_removal_filter_max_size_);
         auto new_noise_removal_filter_max_size =
             device_->getIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT);
-        RCLCPP_INFO_STREAM(logger_, "after set noise_removal_filter_max_size: "
+        RCLCPP_INFO_STREAM(logger_, "after set noise removal filter max size: "
                                         << new_noise_removal_filter_max_size);
       }
     }
   }
   if (disparity_range_mode_ != -1 &&
       device_->isPropertySupported(OB_PROP_DISP_SEARCH_RANGE_MODE_INT, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting disparity_range_mode: " << disparity_range_mode_);
+    RCLCPP_INFO_STREAM(logger_, "Setting disparity range mode: " << disparity_range_mode_);
     if (disparity_range_mode_ == 64) {
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_DISP_SEARCH_RANGE_MODE_INT, 0);
     } else if (disparity_range_mode_ == 128) {
@@ -618,7 +618,7 @@ void OBCameraNode::setupDevices() {
     } else if (disparity_range_mode_ == 256) {
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_DISP_SEARCH_RANGE_MODE_INT, 2);
     } else {
-      RCLCPP_ERROR(logger_, "disparity_range_mode does not support this setting");
+      RCLCPP_ERROR(logger_, "disparity range mode does not support this setting");
     }
   }
   if (device_->isPropertySupported(OB_PROP_HW_NOISE_REMOVE_FILTER_ENABLE_BOOL,
@@ -626,16 +626,27 @@ void OBCameraNode::setupDevices() {
     device_->setBoolProperty(OB_PROP_HW_NOISE_REMOVE_FILTER_ENABLE_BOOL,
                              enable_hardware_noise_removal_filter_);
     RCLCPP_INFO_STREAM(
-        logger_, "Setting hardware_noise_removal_filter:" << enable_hardware_noise_removal_filter_);
+        logger_, "Setting hardware noise removal filter:" << enable_hardware_noise_removal_filter_);
     if (device_->isPropertySupported(OB_PROP_HW_NOISE_REMOVE_FILTER_THRESHOLD_FLOAT,
                                      OB_PERMISSION_READ_WRITE)) {
       if (hardware_noise_removal_filter_threshold_ != -1.0 &&
           enable_hardware_noise_removal_filter_) {
         device_->setFloatProperty(OB_PROP_HW_NOISE_REMOVE_FILTER_THRESHOLD_FLOAT,
                                   hardware_noise_removal_filter_threshold_);
-        RCLCPP_INFO_STREAM(logger_, "Setting hardware_noise_removal_filter_threshold :"
+        RCLCPP_INFO_STREAM(logger_, "Setting hardware noise removal filter threshold :"
                                         << hardware_noise_removal_filter_threshold_);
       }
+    }
+  }
+  if (exposure_range_mode_ != "default" &&
+      device_->isPropertySupported(OB_PROP_DEVICE_PERFORMANCE_MODE_INT, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting exposure range mode : " << exposure_range_mode_);
+    if (exposure_range_mode_ == "ultimate") {
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_DEVICE_PERFORMANCE_MODE_INT, 1);
+    } else if (exposure_range_mode_ == "regular") {
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_DEVICE_PERFORMANCE_MODE_INT, 0);
+    }  else {
+      RCLCPP_ERROR(logger_, "exposure range mode does not support this setting");
     }
   }
 }
@@ -1591,6 +1602,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<bool>(enable_heartbeat_, "enable_heartbeat", false);
   setAndGetNodeParameter<bool>(enable_color_undistortion_, "enable_color_undistortion", false);
   setAndGetNodeParameter<std::string>(time_domain_, "time_domain", "global");
+  setAndGetNodeParameter<std::string>(exposure_range_mode_, "exposure_range_mode", "default");
   auto device_info = device_->getDeviceInfo();
   CHECK_NOTNULL(device_info.get());
   auto pid = device_info->getPid();

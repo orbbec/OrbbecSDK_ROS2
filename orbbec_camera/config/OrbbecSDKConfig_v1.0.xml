@@ -74,10 +74,10 @@
     <!--Default configuration of data streams for different types of devices-->
     <Device>
         <EnumerateNetDevice>false</EnumerateNetDevice>
-		
+
         <!--UVC Backend select on Linux; optional values: Auto, V4L2, LibUVC; Auto is the default value-->
         <LinuxUVCBackend>LibUVC</LinuxUVCBackend>
-        
+
         <!--The device corresponding to Astra adv is astra+-->
         <AstraAdv>
             <Depth>
@@ -1356,7 +1356,7 @@
 	        <DefaultHeartBeat>0</DefaultHeartBeat>
 			<!--Whether to enable firmware upgrade foolproof by default, only internal version supports-->
 			<FirmwareUpgradeFoolproof>1</FirmwareUpgradeFoolproof>
-            
+
             <!-- Depth Filter Params -->
             <!--
             <DepthFilterDDOConfig>./Gemini2_v1.0.json</DepthFilterDDOConfig>
@@ -1520,7 +1520,7 @@
 				</IR_RIGHT>
 			</In-sceneCalibration>
         </OrbbecGemini2>
-        
+
         <!--DaBaiDCL config-->
         <DaBaiDCL>
 	        <!--Whether to enable heartbeat by default-->
@@ -2384,7 +2384,7 @@
                 <Format>Y8</Format>
             </IR_RIGHT>
         </OrbbecGemini335>
-		
+
 		   <!--Gemini2RL config-->
         <OrbbecGemini335L>
 	        <!--Whether to enable heartbeat by default-->
@@ -2450,7 +2450,7 @@
                 <Format>Y8</Format>
             </IR_RIGHT>
         </OrbbecGemini335L>
-        
+
         <!--Gemini 336 config-->
         <OrbbecGemini336>
 	        <!--Whether to enable heartbeat by default-->
@@ -2516,7 +2516,7 @@
                 <Format>Y8</Format>
             </IR_RIGHT>
         </OrbbecGemini336>
-		
+
 		<!--Gemini 336L config-->
         <OrbbecGemini336L>
 	        <!--Whether to enable heartbeat by default-->
@@ -2596,11 +2596,6 @@
                 <!--The frame rate of the resolution enabled by default, int type-->
                 <FPS>15</FPS>
                 <Format>Y16</Format>
-                <ProfileFilter>
-				<profile>
-				<Format>Y8</Format>
-				</profile>
-				</ProfileFilter>
             </Depth>
             <Color>
                 <!--The resolution width is enabled by default, int type-->
@@ -2637,11 +2632,6 @@
                 <!--The frame rate of the resolution enabled by default, int type-->
                 <FPS>15</FPS>
                 <Format>Y16</Format>
-                <ProfileFilter>
-				<profile>
-				<Format>Y8</Format>
-				</profile>
-				</ProfileFilter>
             </IR_RIGHT>
         </OrbbecGemini215>
         <!--Gemini 210 config-->
@@ -2658,11 +2648,6 @@
                 <!--The frame rate of the resolution enabled by default, int type-->
                 <FPS>15</FPS>
                 <Format>Y16</Format>
-                <ProfileFilter>
-				<profile>
-				<Format>Y8</Format>
-				</profile>
-				</ProfileFilter>
             </Depth>
             <Color>
                 <!--The resolution width is enabled by default, int type-->
@@ -2699,11 +2684,6 @@
                 <!--The frame rate of the resolution enabled by default, int type-->
                 <FPS>15</FPS>
                 <Format>Y16</Format>
-                <ProfileFilter>
-				<profile>
-				<Format>Y8</Format>
-				</profile>
-				</ProfileFilter>
             </IR_RIGHT>
         </OrbbecGemini210>
     </Device>

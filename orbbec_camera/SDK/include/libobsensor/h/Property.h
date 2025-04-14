@@ -51,6 +51,10 @@ typedef enum {
      * @brief IR flood level
      */
     OB_PROP_FLOOD_LEVEL_INT = 7,
+    /**
+     * @brief temperature compensation switch
+     */
+    OB_PROP_TEMPERATURE_COMPENSATION_BOOL = 8,
 
     /**
      * @brief Depth mirror

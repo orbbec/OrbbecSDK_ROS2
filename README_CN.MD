@@ -2,7 +2,7 @@
 
 > [!重要]
 >
-> 欢迎使用 OrbbecSDK ROS2 Wrapper v2。在开始使用本版本的 ROS2 封装前，请务必查看以下的 [设备支持列表](#supported-devices)，以确认您的设备是否兼容。
+> 欢迎使用 OrbbecSDK ROS2 Wrapper v2。在开始使用本版本的 ROS2 封装前，请务必查看以下的 [设备支持列表](#支持的设备)，以确认您的设备是否兼容。
 
 OrbbecSDK ROS2 封装包为 Orbbec 相机与 ROS 2 环境之间提供了无缝集成，支持 ROS2 的 Foxy、Humble 和 Jazzy 发行版。
 
@@ -396,7 +396,7 @@ ros2 launch orbbec_camera gemini_intra_process_demo_launch.py
 - `enumerate_net_device`: 启用枚举网络设备的功能。true 表示启用，false 表示禁用。
   此功能仅支持 Femto Mega 和 Gemini 2 XL 设备。通过网络访问这些设备时，需要提前配置设备的 IP 地址。启用开关需要设置为 true。
 - `depth_filter_config`: 配置深度过滤配置文件的加载路径。默认情况下，深度过滤配置文件位于 /config/depthfilter 目录。仅 Gemini2 支持。
-- `depth_precision`: 深度精度应采用 `1mm`格式。默认值为`1mm`。
+- `depth_precision`: 深度精度应采用 `1mm`格式。默认值为 `1mm`。
 - `enable_laser`: 启用激光。默认值为“true”。
 - `device_preset`: 默认值为 `Default`。仅支持 G330 系列。更多信息，请参阅 [G330 文档](https://www.orbbec.com/docs/g330-use-depth-presets/)。请参考下表，根据您的使用情况设置 `device_preset` 值。该值应为[表格](#predefined-presets) 中列出的预设名称之一。
 - `enable_decimation_filter`: 此滤波器有效降低了深度场景的复杂度。滤波器在核尺寸 [2x2] 至 [8x8] 像素上运行。图像尺寸在两个维度上均按比例缩小，以保持纵横比。
@@ -434,7 +434,7 @@ ros2 launch orbbec_camera gemini_intra_process_demo_launch.py
 * ROS2 Coordinate System: (X: Forward, Y:Left, Z: Up)
 * Camera Optical Coordinate System: (X: Right, Y: Down, Z: Forward)
 * 我们的包装主题中发布的所有数据都是直接从我们的相机传感器获取的光学数据。
-* 静态和动态 TF 主题发布光学 CS 和 ROS CS，使用户能够从一个 CS 移动到另一个 CS。
+* 静态和动态 TF 主题发布光学坐标系和ROS坐标系，允许客户在两个坐标系之间进行转换。
 
 ## 相机传感器结构
 
@@ -444,7 +444,7 @@ ros2 launch orbbec_camera gemini_intra_process_demo_launch.py
 
 ## 从坐标A到坐标B的TF
 
-在奥比中，原点 (0,0,0) 取自 camera_link 位置。
+原点 (0,0,0) 取自 camera_link 位置。
 
 我们的包装器提供每个传感器坐标到相机基座 (camera_link) 之间的静态 TF 值。
 
@@ -473,7 +473,7 @@ ros2 launch orbbec_description view_model.launch.py model:=gemini_335_336.urdf.x
 
 ## 深度工作模式开关
 
-Orbbec SDK ROS 2 支持深度工作模式切换。Gemini 2、Gemini 2 L、Femto 和 Femto Bolt 相机均支持深度工作模式切换。
+Orbbec SDK ROS2 支持深度工作模式切换。Gemini 2、Gemini 2 L、Femto 和 Femto Bolt 相机均支持深度工作模式切换。
 
 - 在启动相机之前，可以配置深度工作模式（depth_work_mode），以获得相应 xxx.launch.py 文件的支持。
 - 深度工作模式切换支持 Gemini 2、Gemini 2 L 和 Gemini 2 XL 相机。
@@ -495,7 +495,7 @@ DeclareLaunchArgument('depth_work_mode', default_value='')
 ros2 run orbbec_camera list_depth_work_mode_node
 ```
 
-## Configuration of depth NFOV and WFOV modes
+## 深度 NFOV 和 WFOV 模式的配置
 
 对于 Femto Mega 和 Femto Bolt 设备，NFOV 和 WFOV 模式是通过在启动文件中配置深度和红外分辨率来实现的。
 在启动文件中，depth_width、depth_height、ir_width、ir_height 分别表示深度分辨率和红外分辨率。
@@ -557,7 +557,7 @@ ros2 run orbbec_camera list_depth_work_mode_node
 - `/camera/ir/camera_info`: 红外相机信息。
 - `/camera/ir/image_raw`: 红外流图像
 - `/camera/accel/sample`: 加速度数据流 `enable_sync_output_accel_gyro`关闭，`enable_accel`开启
-- `/camera/gyro/sample`: 陀螺仪数据流，enable_sync_output_accel_gyro `关闭，`enable_gyro`开启
+- `/camera/gyro/sample`: 陀螺仪数据流，`enable_sync_output_accel_gyro` 关闭，`enable_gyro`开启
 - `camera/gyro_accel/sample`: 加速度计和陀螺仪数据流同步，`enable_sync_output_accel_gyro` 已开启
 - `/diagnostics`: 摄像机的诊断信息。目前，诊断信息仅包括摄像机的温度。
 

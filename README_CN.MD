@@ -397,7 +397,7 @@ ros2 launch orbbec_camera gemini_intra_process_demo_launch.py
 - `depth_filter_config`: 配置深度过滤配置文件的加载路径。默认情况下，深度过滤配置文件位于 /config/depthfilter 目录。仅 Gemini2 支持。
 - `depth_precision`: 深度精度应采用 `1mm`格式。默认值为 `1mm`。
 - `enable_laser`: 启用激光。默认值为 `true`。
-- `device_preset`: 默认值为 `Default`。仅支持 G330 系列。更多信息，请参阅 [G330 文档](https://www.orbbec.com/docs/g330-use-depth-presets/)。请参考下表，根据您的使用情况设置 `device_preset` 值。该值应为[表格](#predefined-presets) 中列出的预设名称之一。
+- `device_preset`: 默认值为 `Default`。仅支持 G330 系列。更多信息，请参阅 [G330 文档](https://www.orbbec.com/docs/g330-use-depth-presets/)。请参考下表，根据您的使用情况设置 `device_preset` 值。该值应为[表格](#预设presets) 中列出的预设名称之一。
 - `enable_decimation_filter`: 此滤波器有效降低了深度场景的复杂度。滤波器在核尺寸 [2x2] 至 [8x8] 像素上运行。图像尺寸在两个维度上均按比例缩小，以保持纵横比。
 - `enable_hdr_merge`: 此滤镜与深度 HDR 功能配合使用。通过合并交替曝光值的连续深度图像，我们可以克服同时获取欠照和过照物体深度值的挑战。
 - `enable_sequence_id_filter`: 此过滤器与深度 HDR 函数联合使用，仅输出具有指定序列 ID 的序列。
@@ -423,14 +423,14 @@ ros2 launch orbbec_camera gemini_intra_process_demo_launch.py
 
 ## 预设presets
 
-| Preset         | 特征                                                                                                            | 推荐用例                                                                                  |
-| -------------- | --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Default        | - 最佳视觉感知 - 准确度、填充率、微小物体等方面的整体表现良好。                                                 | - Generic `<br>`- Robotics                                                              |
-| Hand           | - 清除手和手指边缘                                                                                              | - Gesture recognition                                                                     |
-| High Accuracy  | - 高置信度的深度 - 几乎没有噪声的深度值  - 较低的填充率                                                        | - Collision avoidance `<br>`- Object scanning                                           |
-| High Density   | - 更高的填充率 - 更多微小物体  - 可能受到噪声深度值的影响                                                      | - Object recognition `<br>`- Pick & place `<br>`- Foreground & background animation   |
-| Medium Density | - 填充率和准确度的平衡性能 - 与默认设置相比：填充率较低，边缘质量更好                                           | - Generic and alternative to Default                                                      |
-| Custom         | - 用户定义预设 - 从上述预设衍生，并经过自定义修改，例如后处理管道的新配置、深度 AE 函数的修改平均强度设定点等。 | - 与使用预定义预设相比，使用自定义配置可实现更好的深度性能 `<br>`- 对于完善的自定义配置 |
+| Preset         | 特征                                                                                                            | 推荐用例                                                                          |
+| -------------- | --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Default        | - 最佳视觉感知 - 准确度、填充率、微小物体等方面的整体表现良好。                                                 | - 通用 - 机器人                                                                  |
+| Hand           | - 清除手和手指边缘                                                                                              | - 手势识别                                                                       |
+| High Accuracy  | - 高置信度的深度 - 几乎没有噪声的深度值  - 较低的填充率                                                        | - 防撞 - 物体扫描                                                                |
+| High Density   | - 更高的填充率 - 更多微小物体  - 可能受到噪声深度值的影响                                                      | - 物体识别 - 拾取和放置 - 前景和背景动画                                         |
+| Medium Density | - 填充率和准确度的平衡性能 - 与默认设置相比：填充率较低，边缘质量更好                                           | - 通用且可替代默认                                                               |
+| Custom         | - 用户定义预设 - 从上述预设衍生，并经过自定义修改，例如后处理管道的新配置、深度 AE 函数的修改平均强度设定点等。 | - 与使用预定义预设相比，使用自定义配置可实现更好的深度性能 - 对于完善的自定义配置 |
 
 根据您的具体用例选择合适的预设名称，并将其设置为 `device_preset` 参数的值。
 
@@ -512,7 +512,7 @@ ros2 run orbbec_camera list_depth_work_mode_node
 - `/camera/color/image_raw`: 彩色流图像。
 - `/camera/depth/camera_info`: 深度相机信息。
 - `/camera/depth/image_raw`: 深度流图像。
-- `/camera/depth/points` :点云，仅当 `enable_point_cloud`为`true`时可用。
+- `/camera/depth/points` :点云，仅当 `enable_point_cloud`为 `true`时可用。
 - `/camera/depth_registered/points`: 彩色点云，仅当 `enable_colored_point_cloud` 为 `true` 时可用。
 - `/camera/ir/camera_info`: 红外相机信息。
 - `/camera/ir/image_raw`: 红外流图像
@@ -533,7 +533,7 @@ ros2 run orbbec_camera list_depth_work_mode_node
 
 ## 多相机
 
-- 要获取相机的`usb_port`，请插入相机并在终端中运行以下命令：
+- 要获取相机的 `usb_port`，请插入相机并在终端中运行以下命令：
 
 ```bash
 ros2 run orbbec_camera list_devices_node
@@ -676,25 +676,25 @@ bash .make_deb.sh
 
 OrbbecSDK ROS2 Wrapper 支持以下设备。
 
-| 产品列表     | 最低固件版本 | **Launch File**       |
-| :----------- | :----------- | :-------------------------- |
-| Astra+                                | 1.0.19                             | astra_adv.launch.py         |
-| Astra Mini /Astra Mini Pro /Astra Pro | 1007                               | astra.launch.py             |
-| Astra Mini Pro S                      | 1005                               | astra.launch.py             |
-| Astra 2                               | 2.8.20                             | astra2.launch.py            |
-| Dabai                                 | 2436                               | dabai.launch.py             |
-| Dabai DW                              | 2606                               | dabai_dw.launch.py          |
-| Dabai DCW                             | 2460                               | dabai_dcw.launch.py         |
-| Femto/Femto W                         | 1.1.8                              | femto.launch.py             |
-| Femto Mega                            | 1.1.7                              | femto_mega.launch.py        |
-| Femto Bolt                            | 1.0.6                              | femto_bolt.launch.py        |
-| Femto Mega I                          | 2.0.2                              | femto_net_camera.launch.py  |
-| Gemini                                | 3018                               | gemini.launch.py            |
-| Gemini 2 / Dabai DCL                  | 1.4.60                             | gemini2.launch.py           |
-| Gemini 2 L                            | 1.4.32                             | gemini2L.launch.py          |
-| Gemini E                              | 3460                               | gemini_e.launch.py          |
-| Gemini E Lite                         | 3606                               | gemini_e_lite.launch.py     |
-| Gemini 335/335L/336/336L              | 1.2.20                             | gemini_330_series.launch.py |
+| 产品列表                              | 最低固件版本 | **Launch File**       |
+| :------------------------------------ | :----------- | :-------------------------- |
+| Astra+                                | 1.0.19       | astra_adv.launch.py         |
+| Astra Mini /Astra Mini Pro /Astra Pro | 1007         | astra.launch.py             |
+| Astra Mini Pro S                      | 1005         | astra.launch.py             |
+| Astra 2                               | 2.8.20       | astra2.launch.py            |
+| Dabai                                 | 2436         | dabai.launch.py             |
+| Dabai DW                              | 2606         | dabai_dw.launch.py          |
+| Dabai DCW                             | 2460         | dabai_dcw.launch.py         |
+| Femto/Femto W                         | 1.1.8        | femto.launch.py             |
+| Femto Mega                            | 1.1.7        | femto_mega.launch.py        |
+| Femto Bolt                            | 1.0.6        | femto_bolt.launch.py        |
+| Femto Mega I                          | 2.0.2        | femto_net_camera.launch.py  |
+| Gemini                                | 3018         | gemini.launch.py            |
+| Gemini 2 / Dabai DCL                  | 1.4.60       | gemini2.launch.py           |
+| Gemini 2 L                            | 1.4.32       | gemini2L.launch.py          |
+| Gemini E                              | 3460         | gemini_e.launch.py          |
+| Gemini E Lite                         | 3606         | gemini_e_lite.launch.py     |
+| Gemini 335/335L/336/336L              | 1.2.20       | gemini_330_series.launch.py |
 
 > [!重要]
 >
@@ -794,7 +794,7 @@ net.core.rmem_default=2147483647
 
 - 如果您遇到其他问题，请将 `log_level` 参数设置为 `debug`。这将在运行目录中生成一个 SDK 日志文件：`Log/OrbbecSDK.log.txt`。
   请将此文件提供给支持团队以获取进一步帮助。
-- 如果需要固件日志，请将 `enable_heartbeat`设置为`true`以激活此功能。
+- 如果需要固件日志，请将 `enable_heartbeat`设置为 `true`以激活此功能。
 
 ### 为什么有这么多启动文件？
 

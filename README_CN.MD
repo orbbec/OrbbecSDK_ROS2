@@ -140,7 +140,7 @@ OrbbecSDK ROS2 封装包为 Orbbec 相机与 ROS 2 环境之间提供了无缝�
   - [Launch参数](#launch参数)
   - [ROS2(Robot) vs Optical(Camera) Coordination Systems](#ros2robot-vs-opticalcamera-coordination-systems)
   - [相机传感器结构](#相机传感器结构)
-  - [从坐标A到坐标B的TF](#从坐标a到坐标b的TF)
+  - [从坐标A到坐标B的TF](#从坐标a到坐标b的tf)
   - [预设presets](#预设presets)
   - [深度工作模式开关](#深度工作模式开关)
   - [深度 NFOV 和 WFOV 模式的配置](#深度-nfov-和-wfov-模式的配置)
@@ -398,7 +398,7 @@ ros2 launch orbbec_camera gemini_intra_process_demo_launch.py
 - `depth_filter_config`: 配置深度过滤配置文件的加载路径。默认情况下，深度过滤配置文件位于 /config/depthfilter 目录。仅 Gemini2 支持。
 - `depth_precision`: 深度精度应采用 `1mm`格式。默认值为 `1mm`。
 - `enable_laser`: 启用激光。默认值为 `true`。
-- `device_preset`: 默认值为 `Default`。仅支持 G330 系列。更多信息，请参阅 [G330 文档](https://www.orbbec.com/docs/g330-use-depth-presets/)。请参考下表，根据您的使用情况设置 `device_preset` 值。该值应为[表格](#predefined-presets) 中列出的预设名称之一。
+- `device_preset`: 默认值为 `Default`。仅支持 G330 系列。更多信息，请参阅 [G330 文档](https://www.orbbec.com/docs/g330-use-depth-presets/)。请参考下表，根据您的使用情况设置 `device_preset` 值。该值应为[表格](#预设presets) 中列出的预设名称之一。
 - `enable_decimation_filter`: 此滤波器有效降低了深度场景的复杂度。滤波器在核尺寸 [2x2] 至 [8x8] 像素上运行。图像尺寸在两个维度上均按比例缩小，以保持纵横比。
 - `enable_hdr_merge`: 此滤镜与深度 HDR 功能配合使用。通过合并交替曝光值的连续深度图像，我们可以克服同时获取欠照和过照物体深度值的挑战。
 - `enable_sequence_id_filter`: 此过滤器与深度 HDR 函数联合使用，仅输出具有指定序列 ID 的序列。
@@ -460,14 +460,14 @@ ros2 launch orbbec_description view_model.launch.py model:=gemini_335_336.urdf.x
 
 ## 预设presets
 
-| Preset         | 特征                                                                                                            | 推荐用例                                                                                  |
-| -------------- | --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Default        | - 最佳视觉感知 - 准确度、填充率、微小物体等方面的整体表现良好。                                                | - Generic `<br>`- Robotics                                                              |
-| Hand           | - 清除手和手指边缘                                                                                              | - Gesture recognition                                                                     |
-| High Accuracy  | - 高置信度的深度  - 几乎没有噪声的深度值  - 较低的填充率                                                      | - Collision avoidance `<br>`- Object scanning                                           |
-| High Density   | - 更高的填充率  - 更多微小物体  - 可能受到噪声深度值的影响                                                    | - Object recognition `<br>`- Pick & place `<br>`- Foreground & background animation   |
-| Medium Density | - 填充率和准确度的平衡性能  - 与默认设置相比：填充率较低，边缘质量更好                                         | - Generic and alternative to Default                                                      |
-| Custom         | - 用户定义预设 - 从上述预设衍生，并经过自定义修改，例如后处理管道的新配置、深度 AE 函数的修改平均强度设定点等。 | - 与使用预定义预设相比，使用自定义配置可实现更好的深度性能 `<br>`- 对于完善的自定义配置 |
+| Preset         | 特征                                                                                                            | 推荐用例                                                                          |
+| -------------- | --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Default        | - 最佳视觉感知 - 准确度、填充率、微小物体等方面的整体表现良好。                                                | - 通用 - 机器人                                                                  |
+| Hand           | - 清除手和手指边缘                                                                                              | - 手势识别                                                                       |
+| High Accuracy  | - 高置信度的深度  - 几乎没有噪声的深度值  - 较低的填充率                                                      | - 防撞 - 物体扫描                                                                |
+| High Density   | - 更高的填充率  - 更多微小物体  - 可能受到噪声深度值的影响                                                    | - 物体识别 - 拾取和放置 - 前景和背景动画                                         |
+| Medium Density | - 填充率和准确度的平衡性能  - 与默认设置相比：填充率较低，边缘质量更好                                         | - 通用且可替代默认                                                               |
+| Custom         | - 用户定义预设 - 从上述预设衍生，并经过自定义修改，例如后处理管道的新配置、深度 AE 函数的修改平均强度设定点等。 | - 与使用预定义预设相比，使用自定义配置可实现更好的深度性能 - 对于完善的自定义配置 |
 
 根据您的具体用例选择合适的预设名称，并将其设置为 `device_preset` 参数的值。
 
@@ -827,7 +827,7 @@ net.core.rmem_default=2147483647
 
 - 如果您遇到其他问题，请将 `log_level` 参数设置为 `debug`。这将在运行目录中生成一个 SDK 日志文件：`Log/OrbbecSDK.log.txt`。
   请将此文件提供给支持团队以获取进一步帮助。
-- 如果需要固件日志，请将 `enable_heartbeat`设置为`true`以激活此功能。
+- 如果需要固件日志，请将 `enable_heartbeat`设置为 `true`以激活此功能。
 
 ### 为什么有这么多启动文件？
 

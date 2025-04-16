@@ -21,7 +21,7 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
   </thead>
   <tbody>
     <tr>
-      <td rowspan="7" style="text-align: center; font-weight: bold;">Gemini 330</td>
+      <td rowspan="8" style="text-align: center; font-weight: bold;">Gemini 330</td>
       <td>Gemini 335</td>
       <td>full maintenance</td>
       <td>recommended for new designs</td>
@@ -53,6 +53,11 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
     </tr>
     <tr>
       <td>Gemini 335Lg</td>
+      <td>not supported</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 335Le</td>
       <td>not supported</td>
       <td>recommended for new designs</td>
     </tr>
@@ -786,6 +791,7 @@ For optimal performance, we strongly recommend updating to the latest firmware v
 | Gemini 335Lg | 1.3.46                   | gemini_330_series.launch.py |
 | Gemini 336   | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 336L  | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 335Le | 1.5.31                   | gemini_330_series.launch.py |
 | Femto Bolt   | 1.1.2                    | femto_bolt.launch.py        |
 | Femto Mega   | 1.3.0                    | femto_mega.launch.py        |
 | Astra 2      | 2.8.20                   | astra2.launch.py            |

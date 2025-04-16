@@ -23,7 +23,7 @@ OrbbecSDK ROS2 封装包为 Orbbec 相机与 ROS 2 环境之间提供了无缝�
   </thead>
   <tbody>
     <tr>
-      <td rowspan="7" style="text-align: center; font-weight: bold;">Gemini 330</td>
+      <td rowspan="8" style="text-align: center; font-weight: bold;">Gemini 330</td>
       <td>Gemini 335</td>
       <td>全面维护</td>
       <td>推荐用于新设计</td>
@@ -55,6 +55,11 @@ OrbbecSDK ROS2 封装包为 Orbbec 相机与 ROS 2 环境之间提供了无缝�
     </tr>
     <tr>
       <td>Gemini 335Lg</td>
+      <td>不支持</td>
+      <td>推荐用于新设计</td>
+    </tr>
+    <tr>
+      <td>Gemini 335Le</td>
       <td>不支持</td>
       <td>推荐用于新设计</td>
     </tr>
@@ -727,6 +732,7 @@ bash .make_deb.sh
 | Gemini 335Lg | 1.3.46       | gemini_330_series.launch.py |
 | Gemini 336   | 1.2.20       | gemini_330_series.launch.py |
 | Gemini 336L  | 1.2.20       | gemini_330_series.launch.py |
+| Gemini 335Le | 1.5.31       | gemini_330_series.launch.py |
 | Femto Bolt   | 1.1.2        | femto_bolt.launch.py        |
 | Femto Mega   | 1.3.0        | femto_mega.launch.py        |
 | Astra 2      | 2.8.20       | astra2.launch.py            |

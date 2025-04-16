@@ -375,6 +375,7 @@ The following are the launch parameters available:
   to `rmw_qos_profile_system_default`, `rmw_qos_profile_default`, `rmw_qos_profile_parameter_events`,
   `rmw_qos_profile_services_default`, `rmw_qos_profile_parameters`,
   and `SENSOR_DATA`, respectively.
+- `color_ae_roi_[left|right|top|bottom],depth_ae_roi_[left|right|top|bottom]`:Set Color and Depth auto exposure ROI.
 - `enable_d2c_viewer`: Publishes the D2C overlay image (for testing only).
 - `device_num`: The number of devices. This must be filled in if multiple cameras are required.
 - `color_width`, `color_height`, `color_fps`: The resolution and frame rate of the color stream.
@@ -436,9 +437,6 @@ The following are the launch parameters available:
   attempt to reset the camera up to three times. This setting aims to prevent USB 3.0 devices from being incorrectly
   recognized as USB 2.0. It is recommended to set this parameter to `false` when using a USB 2.0 connection to avoid
   unnecessary resets.
-- `enable_3d_reconstruction_mode`: Enables 3D reconstruction mode. Default is `false`. When set to `true`, the camera
-  laser operates in on-off mode, capturing IR images (laser off) for VSLAM localization and depth images (laser on) for
-  point cloud computation.
 - `tf_publish_rate`: The rate at which the camera publishes dynamic transforms. The default value is `0.0`, which means
   static transforms are published.
 - `time_domain`: The frame time domain, string type, can be `device`, `global`, or `system`. `device` means using the

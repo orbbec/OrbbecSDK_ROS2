@@ -88,7 +88,7 @@ The following are the launch parameters available:
 * `diagnostic_period` : Diagnostic period in seconds
 * `enable_laser` : Enables the laser. The default value is `true`
 * `depth_precision` : The depth precision should be in the format `1mm`. The default value is `1mm`
-* `device_preset` : The default value is `Default`. Only the G330 series is supported. For more information, refer to the [G330 documentation](https://www.orbbec.com/docs/g330-use-depth-presets/). Please refer to the table below to set the `device_preset` value based on your use case. The value should be one of the preset names listed [in the table](#predefined-presets)
+* `device_preset` : The default value is `Default`. Only the G330 series is supported. For more information, refer to the [G330 documentation](https://www.orbbec.com/docs/g330-use-depth-presets/). Please refer to the table below to set the `device_preset` value based on your use case. The value should be one of the preset names listed [in the table](./predefined_presets.md)
 * `retry_on_usb3_detection_failure` : If the camera is connected to a USB 2.0 port and is not detected, the system will attempt to reset the camera up to three times. This setting aims to prevent USB 3.0 devices from being incorrectly recognized as USB 2.0. It is recommended to set this parameter to `false` when using a USB 2.0 connection to avoid unnecessary resets
 * `laser_energy_level` : Set the laser energy level
 * enable_sync_host_time : Enables synchronization of the host time with the camera time. The default value is `true`, if use global time, Set to `false`. Some old devices may not support this feature

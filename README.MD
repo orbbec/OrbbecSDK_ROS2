@@ -133,26 +133,30 @@ The following instructions are only applicable to traditional launch files. If y
 - [OrbbecSDK ROS2 Wrapper v2](#orbbecsdk-ros2-wrapper-v2)
   - [Table of Contents](#table-of-contents)
   - [Installation Instructions](#installation-instructions)
-  - [Getting start](#getting-start)
-  - [Network device enumeration](#network-device-enumeration)
-  - [Multi-Camera](#multi-camera)
-  - [Launch parameters](#launch-parameters)
-  - [All available service for camera control](#all-available-service-for-camera-control)
-  - [All available topics](#all-available-topics)
-  - [Configuration of depth NFOV and WFOV modes](#configuration-of-depth-nfov-and-wfov-modes)
-  - [Depth work mode switch](#depth-work-mode-switch)
-  - [Predefined presets](#predefined-presets)
-  - [Efficient intra-process communication](#efficient-intra-process-communication)
-  - [Building a Debian Package](#building-a-debian-package)
-  - [Use V4L2 backend](#use-v4l2-backend)
-  - [Examples](#examples)
-  - [ROS2(Robot) vs Optical(Camera) Coordination Systems](#ros2robot-vs-opticalcamera-coordination-systems)
-  - [Camera sensor structure](#camera-sensor-structure)
-  - [TF from coordinate A to coordinate B](#tf-from-coordinate-a-to-coordinate-b)
-  - [Compressed Image](#compressed-image)
-  - [Check which profiles the camera supports](#check-which-profiles-the-camera-supports)
   - [Supported Devices](#supported-devices)
-  - [DDS Tuning](#dds-tuning)
+  - [Getting start](#getting-start)
+  - [Usage](#usage)
+    - [Network device enumeration](#network-device-enumeration)
+    - [GMSL device enumeration](#network-device-enumeration)
+    - [Multi-Camera](#multi-camera)
+    - [Launch parameters](#launch-parameters)
+    - [All available service for camera control](#all-available-service-for-camera-control)
+    - [All available topics](#all-available-topics)
+    - [Check which profiles the camera supports](#check-which-profiles-the-camera-supports)
+    - [Predefined presets](#predefined-presets)
+      - [Optional depth presets](#optional-depth-presets)
+    - [Depth work mode switch](#depth-work-mode-switch)
+    - [Configuration of depth NFOV and WFOV modes](#configuration-of-depth-nfov-and-wfov-modes)
+  - [Advanced Usage](#advanced-usage)
+    - [Use V4L2 backend](#use-v4l2-backend)
+    - [DDS Tuning](#dds-tuning)
+    - [Efficient intra-process communication](#efficient-intra-process-communication)
+    - [ROS2(Robot) vs Optical(Camera) Coordination Systems](#ros2robot-vs-opticalcamera-coordination-systems)
+    - [Camera sensor structure](#camera-sensor-structure)
+    - [TF from coordinate A to coordinate B](#tf-from-coordinate-a-to-coordinate-b)
+    - [Compressed Image](#compressed-image)
+    - [Building a Debian Package](#building-a-debian-package)
+  - [Examples](#examples)
   - [Frequently Asked Questions](#frequently-asked-questions)
     - [Unexpected Crash](#unexpected-crash)
     - [No Data Stream from Multiple Cameras](#no-data-stream-from-multiple-cameras)
@@ -210,6 +214,30 @@ cd  ~/ros2_ws/src/OrbbecSDK_ROS2/orbbec_camera/scripts
 sudo bash install_udev_rules.sh
 sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
+
+## Supported Devices
+
+Currently, the following devices are supported by the OrbbecSDK ROS2 Wrapper v2-main branch.  More devices support will be added in the near future. If you can not find your device in the table below, try the [main](https://github.com/orbbec/OrbbecSDK_ROS2)  branch.
+
+For optimal performance, we strongly recommend updating to the latest firmware version. This ensures that you benefit from the most recent enhancements and bug fixes.
+
+| Product List | Minimal Firmware Version | **Launch File**       |
+| :----------- | :----------------------- | :-------------------------- |
+| Gemini 330   | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 330L  | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 335   | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 335L  | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 335Lg | 1.3.46                   | gemini_330_series.launch.py |
+| Gemini 336   | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 336L  | 1.2.20                   | gemini_330_series.launch.py |
+| Femto Bolt   | 1.1.2                    | femto_bolt.launch.py        |
+| Femto Mega   | 1.3.0                    | femto_mega.launch.py        |
+| Astra 2      | 2.8.20                   | astra2.launch.py            |
+| Gemini 2 L   | 1.4.53                   | gemini2L.launch.py          |
+| Gemini 2     | 1.4.92                   | gemini2.launch.py           |
+
+All launch files are essentially similar, with the primary difference being the default values of the parameters set
+for different models within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution settings in the launch file, as well as other parameters, to ensure compatibility and optimal performance.
 
 ## Getting start
 
@@ -309,21 +337,31 @@ ros2 service call /camera/toggle_ir std_srvs/srv/SetBool "{data : true}"
 ros2 service call /camera/save_point_cloud std_srvs/srv/Empty "{}"
 ```
 
-## Network device enumeration
+## Usage
 
-When using Femto_Mega, you can use the network to connect the device.
+### Network device enumeration
+
+When using Femto_Mega and Gemini 335Le, you can use the network to connect the device.
 
 For more information about network device enumeration.Reference:[Network device documentation](./docs/network_device_enumeration.md)
 
-## Multi-Camera
+### GMSL device enumeration
+
+### Multi-Camera
 
 When you have multiple cameras, you can activate all of them at the same time.
 
 For more information about Multi camera.Reference:[Multi camera documentation](./orbbec_camera/examples/multi_camera/multi_camera.MD)
 
-## Launch parameters
+### Launch parameters
 
 For the entire list of parameters type `ros2 param list`.
+
+Modify parameters when launching launch:
+
+```bash
+ros2 launch orbbec_camera gemini_330_series.launch.py color_width:=640 color_height:=480
+```
 
 * `color_width`, `color_height`, `color_fps`,`color_format`: The resolution and frame rate of the color stream
 * `enable_color_auto_exposure_priority` : Enables the Color auto exposure priority
@@ -338,7 +376,7 @@ For the entire list of parameters type `ros2 param list`.
 
 Explanation of parameters.Reference:[Launch parameters documentation](./docs/launch_parameters.md)
 
-## All available service for camera control
+### All available service for camera control
 
 For the entire list of service `ros2 service list`.
 
@@ -364,7 +402,7 @@ ros2 service call /camera/reboot_device std_srvs/srv/Empty '{}'
 
 Explanation of service.Reference:[All available service fo camera control documentation](./docs/all_available_service_for_camera_control.md)
 
-## All available topics
+### All available topics
 
 For the entire list of topic `ros2 topic list`.
 
@@ -377,120 +415,41 @@ For the entire list of topic `ros2 topic list`.
 
 Explanation of topic.Reference:[All available topics documentation](./docs/all_available_topics.md)
 
-## Configuration of depth NFOV and WFOV modes
-
-For the Femto Mega and Femto Bolt devices setting NFOV and WFOV modes.Reference:[Configuration of depth NFOV and WFOV modes documentation](./docs/configuration_of_depth_NFOV_and_WFOV_modes.md)
-
-## Depth work mode switch
-
-Gemini 2, Gemini 2 L,and Femto and Femto Bolt cameras setting depth work mode.Reference:[Depth work mode switch documentation](./docs/depth_work_mode_switch.md)
-
-## Predefined presets
-
-About the mode settings of Predefined presets.Reference:[Predefined presets documentation](./docs/predefined_presets.md)
-
-## Efficient intra-process communication
-
-Our ROS2 Wrapper node supports zero-copy communications if loaded in the same process as a subscriber node. This can reduce copy times on image/pointcloud topics, especially with big frame resolutions and high FPS.Reference:[Efficient intra-process communication documentation](./docs/efficient_intra_process_communication.md)
-
-## Building a Debian Package
-
-If you want to build the Debian package of OrbbecSDK_ROS2.Reference:[Building a Debian Package documentation](./docs/building_a_Debian_Package.md)
-
-## Use V4L2 backend
-
-[Setting uvc_backend](./docs/launch_parameters.md)
-
-Note: The V4L2 backend is not enabled by default.
-
-## Examples
-
-* [Start_camera_node](./orbbec_camera/examples/start_camera_node)
-* [Align_depth_color](./orbbec_camera/examples/align_depth_color)
-* [Point_cloud](./orbbec_camera/examples/point_cloud)
-
-[......](./orbbec_camera/examples)
-
-Explanation of examples.Reference:[All available topics documentation](./orbbec_camera/examples)
-
-## ROS2(Robot) vs Optical(Camera) Coordination Systems
-
-* Point Of View:
-  * Imagine we are standing behind of the camera, and looking forward.
-  * Always use this point of view when talking about coordinates, left vs right IRs, position of sensor, etc..
-
-![ROS2 and Camera Coordinate System](./docs/images/image0.png)
-
-* ROS2 Coordinate System: (X: Forward, Y:Left, Z: Up)
-* Camera Optical Coordinate System: (X: Right, Y: Down, Z: Forward)
-* All data published in our wrapper topics is optical data taken directly from our camera sensors.
-* static and dynamic TF topics publish optical CS and ROS CS to give the user the ability to move from one CS to other CS.
-
-## Camera sensor structure
-
-![module in rviz2](./docs/images/image3.png)
-
-![module in rviz2](./docs/images/image1.png)
-
-## TF from coordinate A to coordinate B:
-
-In Orbbec cameras, the origin point (0,0,0) is taken from the camera_link position
-
-Our wrapper provide static TFs between each sensor coordinate to the camera base (camera_link)
-
-Also, it provides TFs from each sensor ROS coordinates to its corrosponding optical coordinates.
-
-Example of static TFs of RGB sensor and right infra sensor of Gemini335 module as it shown in rviz2:
-
-```bash
-ros2 launch orbbec_description view_model.launch.py model:=gemini_335_336.urdf.xacro
-```
-
-![module in rviz2](./docs/images/image2.png)
-
-## Compressed Image
-
-You can use `image_transport` to compress the image using `jpeg`. Below is an example of how to use it:
-
-To access the compressed color image, you can use the following command:
-
-```bash
-ros2 topic echo /camera/color/image_raw/compressed --no-arr
-```
-
-This command will allow you to receive the compressed color image from the specified topic.
-
-## Check which profiles the camera supports
+### Check which profiles the camera supports
 
 ```bash
 ros2 run orbbec_camera list_camera_profile_mode_node
 ```
 
-## Supported Devices
+### Predefined presets
 
-Currently, the following devices are supported by the OrbbecSDK ROS2 Wrapper v2-main branch.  More devices support will be added in the near future. If you can not find your device in the table below, try the [main](https://github.com/orbbec/OrbbecSDK_ROS2)  branch.
+About the mode settings of Predefined presets.Reference:[Predefined presets documentation](./docs/predefined_presets.md)
 
-For optimal performance, we strongly recommend updating to the latest firmware version. This ensures that you benefit from the most recent enhancements and bug fixes.
+#### Optional depth presets
 
-| Product List | Minimal Firmware Version | **Launch File**       |
-| :----------- | :----------------------- | :-------------------------- |
-| Gemini 330   | 1.2.20                   | gemini_330_series.launch.py |
-| Gemini 330L  | 1.2.20                   | gemini_330_series.launch.py |
-| Gemini 335   | 1.2.20                   | gemini_330_series.launch.py |
-| Gemini 335L  | 1.2.20                   | gemini_330_series.launch.py |
-| Gemini 335Lg | 1.3.46                   | gemini_330_series.launch.py |
-| Gemini 336   | 1.2.20                   | gemini_330_series.launch.py |
-| Gemini 336L  | 1.2.20                   | gemini_330_series.launch.py |
-| Femto Bolt   | 1.1.2                    | femto_bolt.launch.py        |
-| Femto Mega   | 1.3.0                    | femto_mega.launch.py        |
-| Astra 2      | 2.8.20                   | astra2.launch.py            |
-| Gemini 2 L   | 1.4.53                   | gemini2L.launch.py          |
-| Gemini 2     | 1.4.92                   | gemini2.launch.py           |
+> You can pass the firmware path of the Optional preset into the `preset_firmware_path` launch param
 
-All launch files are essentially similar, with the primary difference being the default values of the parameters set
-for different models within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution settings in the launch file, as well as other parameters, to ensure compatibility and optimal performance.
+```bash
+ros2 launch orbbec_camera gemini_330_series.launch.py preset_firmware_path:=/home/orbbec/G336X_Dimensioning_Accurate_0.0.1_78C743B9.bin,/home/orbbec/G336X_Dimensioning_Dense_0.0.1_4E70D227.bin device_preset:=G336X Dimensioning Dense
+```
 
-## DDS Tuning
+### Depth work mode switch
+
+Gemini 2, Gemini 2 L,and Femto and Femto Bolt cameras setting depth work mode.Reference:[Depth work mode switch documentation](./docs/depth_work_mode_switch.md)
+
+### Configuration of depth NFOV and WFOV modes
+
+For the Femto Mega and Femto Bolt devices setting NFOV and WFOV modes.Reference:[Configuration of depth NFOV and WFOV modes documentation](./docs/configuration_of_depth_NFOV_and_WFOV_modes.md)
+
+## Advanced Usage
+
+### Use V4L2 backend
+
+[Setting uvc_backend](./docs/launch_parameters.md)
+
+Note: The V4L2 backend is not enabled by default.
+
+### DDS Tuning
 
 The default DDS settings (Galactic) may not be optimal for data transmission. Different DDS settings can have varying
 performance. In this example, we use CycloneDDS. For more detailed information, please refer to the
@@ -552,6 +511,65 @@ net.core.rmem_default=2147483647
 ```
 
 If you use Fast DDS, you can refer to the [Fast DDS Configuration](./docs/fastdds_tuning.md) file.
+
+### Efficient intra-process communication
+
+Our ROS2 Wrapper node supports zero-copy communications if loaded in the same process as a subscriber node. This can reduce copy times on image/pointcloud topics, especially with big frame resolutions and high FPS.Reference:[Efficient intra-process communication documentation](./docs/efficient_intra_process_communication.md)
+
+### ROS2(Robot) vs Optical(Camera) Coordination Systems
+
+* Point Of View:
+  * Imagine we are standing behind of the camera, and looking forward.
+  * Always use this point of view when talking about coordinates, left vs right IRs, position of sensor, etc..
+
+![ROS2 and Camera Coordinate System](./docs/images/image0.png)
+
+* ROS2 Coordinate System: (X: Forward, Y:Left, Z: Up)
+* Camera Optical Coordinate System: (X: Right, Y: Down, Z: Forward)
+* All data published in our wrapper topics is optical data taken directly from our camera sensors.
+* static and dynamic TF topics publish optical CS and ROS CS to give the user the ability to move from one CS to other CS.
+
+### Camera sensor structure
+
+![module in rviz2](./docs/images/image3.png)
+
+![module in rviz2](./docs/images/image1.png)
+
+### TF from coordinate A to coordinate B:
+
+In Orbbec cameras, the origin point (0,0,0) is taken from the camera_link position
+
+Our wrapper provide static TFs between each sensor coordinate to the camera base (camera_link)
+
+Also, it provides TFs from each sensor ROS coordinates to its corrosponding optical coordinates.
+
+Example of static TFs of RGB sensor and right infra sensor of Gemini335 module as it shown in rviz2:
+
+```bash
+ros2 launch orbbec_description view_model.launch.py model:=gemini_335_336.urdf.xacro
+```
+
+![module in rviz2](./docs/images/image2.png)
+
+### Compressed Image
+
+You can use `image_transport` to compress the image using `jpeg`. Below is an example of how to use it:
+
+To access the compressed color image, you can use the following command:
+
+```bash
+ros2 topic echo /camera/color/image_raw/compressed --no-arr
+```
+
+This command will allow you to receive the compressed color image from the specified topic.
+
+### Building a Debian Package
+
+If you want to build the Debian package of OrbbecSDK_ROS2.Reference:[Building a Debian Package documentation](./docs/building_a_Debian_Package.md)
+
+## Examples
+
+To explore practical examples and gain insight into how to use the camera in ROS, please navigate to the [Examples](./orbbec_camera/examples/) section for more information.
 
 ## Frequently Asked Questions
 

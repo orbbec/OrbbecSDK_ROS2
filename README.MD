@@ -141,12 +141,12 @@ The following instructions are only applicable to traditional launch files. If y
   - [Supported Devices](#supported-devices)
   - [Getting start](#getting-start)
   - [Usage](#usage)
-    - [Network device enumeration](#network-device-enumeration)
-    - [GMSL device enumeration](#gmsl-device-enumeration)
-    - [Multi-Camera](#multi-camera)
     - [Launch parameters](#launch-parameters)
     - [All available service for camera control](#all-available-service-for-camera-control)
     - [All available topics](#all-available-topics)
+    - [Network device enumeration](#network-device-enumeration)
+    - [GMSL device enumeration](#gmsl-device-enumeration)
+    - [Multi-Camera](#multi-camera)
     - [Check which profiles the camera supports](#check-which-profiles-the-camera-supports)
     - [Predefined presets](#predefined-presets)
       - [Optional depth presets](#optional-depth-presets)
@@ -345,40 +345,6 @@ ros2 service call /camera/save_point_cloud std_srvs/srv/Empty "{}"
 
 ## Usage
 
-### Network device enumeration
-
-When using Femto Mega and Gemini 335Le, you can use the network to connect the device.
-
-**Femto Mega:**
-
-```bash
-ros2 launch orbbec_camera femto_mega.launch.py enumerate_net_device:=true
-```
-
-**Gemini 335Le:**
-
-```bash
-ros2 launch orbbec_camera gemini_330_series.launch.py enumerate_net_device:=true
-```
-
-For more information about network device enumeration.Reference:[Network device documentation](./orbbec_camera/examples/net_camera/)
-
-### GMSL device enumeration
-
-When using Gemini 335Lg, you can use the GMSL to connect the device.
-
-```bash
-ros2 launch orbbec_camera gemini_330_gmsl.launch.py
-```
-
-For more information about GMSL device enumeration.Reference:[GMSL device documentation](./orbbec_camera/examples/gmsl_camera/)
-
-### Multi-Camera
-
-When you have multiple cameras, you can activate all of them at the same time.
-
-For more information about Multi camera.Reference:[Multi camera documentation](./orbbec_camera/examples/multi_camera/multi_camera.MD)
-
 ### Launch parameters
 
 For the entire list of parameters type `ros2 param list`.
@@ -440,6 +406,41 @@ For the entire list of topic `ros2 topic list`.
 [......](./docs/all_available_topics.md)
 
 Explanation of topic.Reference:[All available topics documentation](./docs/all_available_topics.md)
+
+### Network device enumeration
+
+When using Femto Mega and Gemini 335Le, you can use the network to connect the device.
+
+**Femto Mega:**
+
+```bash
+ros2 launch orbbec_camera femto_mega.launch.py enumerate_net_device:=true
+```
+
+**Gemini 335Le:**
+
+```bash
+ros2 launch orbbec_camera gemini_330_series.launch.py enumerate_net_device:=true
+```
+
+For more information about network device enumeration.Reference:[Network device documentation](./orbbec_camera/examples/net_camera/)
+
+### GMSL device enumeration
+
+When using Gemini 335Lg, you can use the GMSL to connect the device.
+
+```bash
+ros2 launch orbbec_camera gemini_330_gmsl.launch.py
+```
+
+For more information about GMSL device enumeration.Reference:[GMSL device documentation](./orbbec_camera/examples/gmsl_camera/)
+
+### Multi-Camera
+
+When you have multiple cameras, you can activate all of them at the same time.
+
+For more information about Multi camera.Reference:[Multi camera documentation](./orbbec_camera/examples/multi_camera/multi_camera.MD)
+
 
 ### Check which profiles the camera supports
 

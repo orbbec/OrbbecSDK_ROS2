@@ -17,7 +17,7 @@ def generate_launch_description():
     launch_file_dir = os.path.join(package_dir, "launch")
     launch1_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "femto_mega.launch.py")
+            os.path.join(launch_file_dir, "femto_mega.launch.py")#If you are using Gemini 335Le, replace femto_mega.launch.py ​​with gemini_330_series.launch.py
         ),
         launch_arguments={
             "camera_name": "camera_01",
@@ -29,7 +29,7 @@ def generate_launch_description():
 
     launch2_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "femto_mega.launch.py")
+            os.path.join(launch_file_dir, "femto_mega.launch.py")#If you are using Gemini 335Le, replace femto_mega.launch.py ​​with gemini_330_series.launch.py
         ),
         launch_arguments={
             "camera_name": "camera_02",

@@ -25,7 +25,7 @@ enable_color: true
 color_width: 0
 color_height: 0
 color_fps: 0
-color_format: "MJPG"
+color_format: "ANY"
 enable_color_auto_exposure: true
 color_exposure: 30 # 3ms
 color_gain: 16 # -1 default
@@ -35,7 +35,7 @@ enable_depth: false
 depth_width: 0
 depth_height: 0
 depth_fps: 0
-depth_format: "Y16"
+depth_format: "ANY"
 
 
 #left ir params
@@ -43,7 +43,7 @@ enable_left_ir: true
 left_ir_width: 0
 left_ir_height: 0
 left_ir_fps: 0
-left_ir_format: "Y8"
+left_ir_format: "ANY"
 enable_ir_auto_exposure: true
 ir_exposure: 3000 # 3ms
 ir_gain: 16 # -1 default
@@ -53,6 +53,6 @@ enable_right_ir: false
 right_ir_width: 0
 right_ir_height: 0
 right_ir_fps: 0
-right_ir_format: "Y8"
+right_ir_format: "ANY"
 
 

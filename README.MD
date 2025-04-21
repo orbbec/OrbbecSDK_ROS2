@@ -21,7 +21,7 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
   </thead>
   <tbody>
     <tr>
-      <td rowspan="7" style="text-align: center; font-weight: bold;">Gemini 330</td>
+      <td rowspan="8" style="text-align: center; font-weight: bold;">Gemini 330</td>
       <td>Gemini 335</td>
       <td>full maintenance</td>
       <td>recommended for new designs</td>
@@ -53,6 +53,11 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
     </tr>
     <tr>
       <td>Gemini 335Lg</td>
+      <td>not supported</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 335Le</td>
       <td>not supported</td>
       <td>recommended for new designs</td>
     </tr>
@@ -137,7 +142,7 @@ The following instructions are only applicable to traditional launch files. If y
   - [Getting start](#getting-start)
   - [Usage](#usage)
     - [Network device enumeration](#network-device-enumeration)
-    - [GMSL device enumeration](#network-device-enumeration)
+    - [GMSL device enumeration](#gmsl-device-enumeration)
     - [Multi-Camera](#multi-camera)
     - [Launch parameters](#launch-parameters)
     - [All available service for camera control](#all-available-service-for-camera-control)
@@ -221,7 +226,7 @@ Currently, the following devices are supported by the OrbbecSDK ROS2 Wrapper v2-
 
 For optimal performance, we strongly recommend updating to the latest firmware version. This ensures that you benefit from the most recent enhancements and bug fixes.
 
-| Product List | Minimal Firmware Version | **Launch File**       |
+| Product List | Minimal Firmware Version | **Launch File**             |
 | :----------- | :----------------------- | :-------------------------- |
 | Gemini 330   | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 330L  | 1.2.20                   | gemini_330_series.launch.py |
@@ -230,6 +235,7 @@ For optimal performance, we strongly recommend updating to the latest firmware v
 | Gemini 335Lg | 1.3.46                   | gemini_330_series.launch.py |
 | Gemini 336   | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 336L  | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 335Le | 1.5.31                   | gemini_330_series.launch.py |
 | Femto Bolt   | 1.1.2                    | femto_bolt.launch.py        |
 | Femto Mega   | 1.3.0                    | femto_mega.launch.py        |
 | Astra 2      | 2.8.20                   | astra2.launch.py            |
@@ -341,11 +347,31 @@ ros2 service call /camera/save_point_cloud std_srvs/srv/Empty "{}"
 
 ### Network device enumeration
 
-When using Femto_Mega and Gemini 335Le, you can use the network to connect the device.
+When using Femto Mega and Gemini 335Le, you can use the network to connect the device.
 
-For more information about network device enumeration.Reference:[Network device documentation](./docs/network_device_enumeration.md)
+**Femto Mega:**
+
+```bash
+ros2 launch orbbec_camera femto_mega.launch.py enumerate_net_device:=true
+```
+
+**Gemini 335Le:**
+
+```bash
+ros2 launch orbbec_camera gemini_330_series.launch.py enumerate_net_device:=true
+```
+
+For more information about network device enumeration.Reference:[Network device documentation](./orbbec_camera/examples/net_camera/)
 
 ### GMSL device enumeration
+
+When using Gemini 335Lg, you can use the GMSL to connect the device.
+
+```bash
+ros2 launch orbbec_camera gemini_330_gmsl.launch.py
+```
+
+For more information about GMSL device enumeration.Reference:[GMSL device documentation](./orbbec_camera/examples/gmsl_camera/)
 
 ### Multi-Camera
 
@@ -357,7 +383,7 @@ For more information about Multi camera.Reference:[Multi camera documentation](.
 
 For the entire list of parameters type `ros2 param list`.
 
-Modify parameters when launching launch:
+**Modify parameters when launching launch**:
 
 ```bash
 ros2 launch orbbec_camera gemini_330_series.launch.py color_width:=640 color_height:=480

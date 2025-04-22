@@ -645,9 +645,18 @@ void OBCameraNode::setupDevices() {
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_DEVICE_PERFORMANCE_MODE_INT, 1);
     } else if (exposure_range_mode_ == "regular") {
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_DEVICE_PERFORMANCE_MODE_INT, 0);
-    }  else {
+    } else {
       RCLCPP_ERROR(logger_, "exposure range mode does not support this setting");
     }
+  }
+  if (!load_config_json_file_path_.empty()) {
+    device_->loadPresetFromJsonFile(load_config_json_file_path_.c_str());
+    RCLCPP_INFO_STREAM(logger_, "Loading config json file path : " << load_config_json_file_path_);
+  }
+  if (!export_config_json_file_path_.empty()) {
+    device_->exportSettingsAsPresetJsonFile(export_config_json_file_path_.c_str());
+    RCLCPP_INFO_STREAM(logger_,
+                       "Exporting config json file path : " << export_config_json_file_path_);
   }
 }
 void OBCameraNode::setupColorPostProcessFilter() {
@@ -1603,6 +1612,10 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<bool>(enable_color_undistortion_, "enable_color_undistortion", false);
   setAndGetNodeParameter<std::string>(time_domain_, "time_domain", "global");
   setAndGetNodeParameter<std::string>(exposure_range_mode_, "exposure_range_mode", "default");
+  setAndGetNodeParameter<std::string>(load_config_json_file_path_, "load_config_json_file_path",
+                                      "");
+  setAndGetNodeParameter<std::string>(export_config_json_file_path_, "export_config_json_file_path",
+                                      "");
   auto device_info = device_->getDeviceInfo();
   CHECK_NOTNULL(device_info.get());
   auto pid = device_info->getPid();

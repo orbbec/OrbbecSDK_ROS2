@@ -654,6 +654,8 @@ class OBCameraNode {
   int max_depth_limit_ = 0;
   std::string time_domain_ = "global";  // device, system, global
   std::string exposure_range_mode_ = "default";
+  std::string load_config_json_file_path_ = "";
+  std::string export_config_json_file_path_ = "";
   // soft ware trigger
   rclcpp::TimerBase::SharedPtr software_trigger_timer_;
   rclcpp::TimerBase::SharedPtr diagnostic_timer_;

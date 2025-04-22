@@ -57,6 +57,8 @@ def generate_launch_description():
         DeclareLaunchArgument('usb_port', default_value=''),
         DeclareLaunchArgument('device_num', default_value='1'),
         DeclareLaunchArgument('preset_firmware_path', default_value=''),
+        DeclareLaunchArgument('load_config_json_file_path', default_value=''),
+        DeclareLaunchArgument('export_config_json_file_path', default_value=''),
         DeclareLaunchArgument('uvc_backend', default_value='libuvc'),#libuvc or v4l2
         DeclareLaunchArgument('point_cloud_qos', default_value='default'),
         DeclareLaunchArgument('enable_point_cloud', default_value='true'),

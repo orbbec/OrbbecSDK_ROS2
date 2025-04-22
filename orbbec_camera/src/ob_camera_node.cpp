@@ -320,7 +320,30 @@ void OBCameraNode::setupDevices() {
     roi.y1_bottom = depth_ae_roi_bottom_;
     device_->setStructuredData(OB_STRUCT_DEPTH_AE_ROI, &roi, sizeof(AE_ROI));
   }
-
+  if (color_rotation_ != -1 &&
+      device_->isPropertySupported(OB_PROP_COLOR_ROTATE_INT, OB_PERMISSION_READ_WRITE)) {
+    device_->setIntProperty(OB_PROP_COLOR_ROTATE_INT, color_rotation_);
+    RCLCPP_INFO_STREAM(
+        logger_, "set color rotation  to " << device_->getIntProperty(OB_PROP_COLOR_ROTATE_INT));
+  }
+  if (depth_rotation_ != -1 &&
+      device_->isPropertySupported(OB_PROP_DEPTH_ROTATE_INT, OB_PERMISSION_READ_WRITE)) {
+    device_->setIntProperty(OB_PROP_DEPTH_ROTATE_INT, depth_rotation_);
+    RCLCPP_INFO_STREAM(
+        logger_, "set depth rotation  to " << device_->getIntProperty(OB_PROP_DEPTH_ROTATE_INT));
+  }
+  if (left_ir_rotation_ != -1 &&
+      device_->isPropertySupported(OB_PROP_IR_ROTATE_INT, OB_PERMISSION_READ_WRITE)) {
+    device_->setIntProperty(OB_PROP_IR_ROTATE_INT, left_ir_rotation_);
+    RCLCPP_INFO_STREAM(
+        logger_, "set left ir rotation  to " << device_->getIntProperty(OB_PROP_IR_ROTATE_INT));
+  }
+  if (right_ir_rotation_ != -1 &&
+      device_->isPropertySupported(OB_PROP_IR_RIGHT_ROTATE_INT, OB_PERMISSION_READ_WRITE)) {
+    device_->setIntProperty(OB_PROP_IR_RIGHT_ROTATE_INT, right_ir_rotation_);
+    RCLCPP_INFO_STREAM(logger_, "set right ir rotation  to "
+                                    << device_->getIntProperty(OB_PROP_IR_RIGHT_ROTATE_INT));
+  }
   if (device_->isPropertySupported(OB_PROP_DEPTH_PRECISION_LEVEL_INT, OB_PERMISSION_READ_WRITE) &&
       !depth_precision_str_.empty()) {
     auto default_precision_level = device_->getIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT);
@@ -1096,6 +1119,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter(enable_frame_sync_, "enable_frame_sync", false);
   setAndGetNodeParameter(enable_color_auto_exposure_, "enable_color_auto_exposure", true);
   setAndGetNodeParameter(enable_color_auto_white_balance_, "enable_color_auto_white_balance", true);
+  setAndGetNodeParameter<int>(color_rotation_, "color_rotation", -1);
   setAndGetNodeParameter<int>(color_exposure_, "color_exposure", -1);
   setAndGetNodeParameter<int>(color_gain_, "color_gain", -1);
   setAndGetNodeParameter<int>(color_white_balance_, "color_white_balance", -1);
@@ -1106,6 +1130,9 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(color_contrast_, "color_contrast", -1);
   setAndGetNodeParameter<int>(color_gamma_, "color_gamma", -1);
   setAndGetNodeParameter<int>(color_hue_, "color_hue", -1);
+  setAndGetNodeParameter<int>(depth_rotation_, "depth_rotation", -1);
+  setAndGetNodeParameter<int>(left_ir_rotation_, "left_ir_rotation", -1);
+  setAndGetNodeParameter<int>(right_ir_rotation_, "right_ir_rotation", -1);
   setAndGetNodeParameter(enable_ir_auto_exposure_, "enable_ir_auto_exposure", true);
   setAndGetNodeParameter<int>(ir_exposure_, "ir_exposure", -1);
   setAndGetNodeParameter<int>(ir_gain_, "ir_gain", -1);

@@ -68,6 +68,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_color', default_value='true'),
         DeclareLaunchArgument('color_qos', default_value='default'),
         DeclareLaunchArgument('color_camera_info_qos', default_value='default'),
+        DeclareLaunchArgument('color_rotation', default_value='0'),#color rotation degree : 0, 90, 180, 270
         DeclareLaunchArgument('enable_color_auto_exposure', default_value='true'),
         DeclareLaunchArgument('color_exposure', default_value='-1'),
         DeclareLaunchArgument('color_gain', default_value='-1'),
@@ -93,6 +94,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_depth', default_value='true'),
         DeclareLaunchArgument('depth_qos', default_value='default'),
         DeclareLaunchArgument('depth_camera_info_qos', default_value='default'),
+        DeclareLaunchArgument('depth_rotation', default_value='0'),#depth rotation degree : 0, 90, 180, 270
         DeclareLaunchArgument('depth_ae_roi_left', default_value='-1'),
         DeclareLaunchArgument('depth_ae_roi_top', default_value='-1'),
         DeclareLaunchArgument('depth_ae_roi_right', default_value='-1'),
@@ -104,6 +106,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_left_ir', default_value='false'),
         DeclareLaunchArgument('left_ir_qos', default_value='default'),
         DeclareLaunchArgument('left_ir_camera_info_qos', default_value='default'),
+        DeclareLaunchArgument('left_ir_rotation', default_value='0'),#left ir rotation degree : 0, 90, 180, 270
         DeclareLaunchArgument('right_ir_width', default_value='0'),
         DeclareLaunchArgument('right_ir_height', default_value='0'),
         DeclareLaunchArgument('right_ir_fps', default_value='0'),
@@ -111,6 +114,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_right_ir', default_value='false'),
         DeclareLaunchArgument('right_ir_qos', default_value='default'),
         DeclareLaunchArgument('right_ir_camera_info_qos', default_value='default'),
+        DeclareLaunchArgument('right_ir_rotation', default_value='0'),#right ir rotation degree : 0, 90, 180, 270
         DeclareLaunchArgument('enable_ir_auto_exposure', default_value='true'),
         DeclareLaunchArgument('ir_exposure', default_value='-1'),
         DeclareLaunchArgument('ir_gain', default_value='-1'),

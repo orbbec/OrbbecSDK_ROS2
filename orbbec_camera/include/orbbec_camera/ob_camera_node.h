@@ -579,7 +579,7 @@ class OBCameraNode {
   rclcpp::TimerBase::SharedPtr software_trigger_timer_;
   std::chrono::milliseconds software_trigger_period_{33};
   bool enable_heartbeat_ = false;
-  std::string industry_mode_ = "default";
+  std::string industry_mode_ = "";
   bool enable_color_undistortion_ = false;
   std::shared_ptr<image_publisher> color_undistortion_publisher_;
   bool has_first_color_frame_ = false;

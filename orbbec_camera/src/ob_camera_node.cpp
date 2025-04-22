@@ -177,7 +177,8 @@ void OBCameraNode::setupDevices() {
     RCLCPP_INFO_STREAM(logger_, "Setting heartbeat to " << (enable_heartbeat_ ? "ON" : "OFF"));
     TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_HEARTBEAT_BOOL, enable_heartbeat_);
   }
-  if (device_->isPropertySupported(OB_PROP_DEPTH_INDUSTRY_MODE_INT, OB_PERMISSION_READ_WRITE)) {
+  if (!industry_mode_.empty() &&
+      device_->isPropertySupported(OB_PROP_DEPTH_INDUSTRY_MODE_INT, OB_PERMISSION_READ_WRITE)) {
     if (industry_mode_ == "default") {
       OBDepthIndustryMode mode = OB_INDUSTRY_DEFAULT;
       device_->setIntProperty(OB_PROP_DEPTH_INDUSTRY_MODE_INT, (int32_t)mode);
@@ -1208,7 +1209,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(min_depth_limit_, "min_depth_limit", 0);
   setAndGetNodeParameter<int>(max_depth_limit_, "max_depth_limit", 0);
   setAndGetNodeParameter<bool>(enable_heartbeat_, "enable_heartbeat", false);
-  setAndGetNodeParameter<std::string>(industry_mode_, "industry_mode", "default");
+  setAndGetNodeParameter<std::string>(industry_mode_, "industry_mode", "");
   setAndGetNodeParameter<bool>(enable_color_undistortion_, "enable_color_undistortion", false);
   setAndGetNodeParameter<int>(color_ae_roi_left_, "color_ae_roi_left", -1);
   setAndGetNodeParameter<int>(color_ae_roi_top_, "color_ae_roi_top", -1);

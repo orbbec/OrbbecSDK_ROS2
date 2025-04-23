@@ -342,7 +342,8 @@ void OBCameraNode::setupDevices() {
 
   if (device_->isPropertySupported(OB_PROP_DEPTH_SOFT_FILTER_BOOL, OB_PERMISSION_READ_WRITE)) {
     device_->setBoolProperty(OB_PROP_DEPTH_SOFT_FILTER_BOOL, enable_noise_removal_filter_);
-    RCLCPP_INFO_STREAM(logger_, "enable_noise_removal_filter:" << enable_noise_removal_filter_);
+    RCLCPP_INFO_STREAM(
+        logger_, "Setting noise removal filter:" << (enable_noise_removal_filter_ ? "ON" : "OFF"));
   }
 
   if (device_->isPropertySupported(OB_PROP_COLOR_AUTO_WHITE_BALANCE_BOOL, OB_PERMISSION_WRITE)) {
@@ -625,8 +626,8 @@ void OBCameraNode::setupDevices() {
                                    OB_PERMISSION_READ_WRITE)) {
     device_->setBoolProperty(OB_PROP_HW_NOISE_REMOVE_FILTER_ENABLE_BOOL,
                              enable_hardware_noise_removal_filter_);
-    RCLCPP_INFO_STREAM(
-        logger_, "Setting hardware noise removal filter:" << enable_hardware_noise_removal_filter_);
+    RCLCPP_INFO_STREAM(logger_, "Setting hardware noise removal filter:"
+                                    << (enable_hardware_noise_removal_filter_ ? "ON" : "OFF"));
     if (device_->isPropertySupported(OB_PROP_HW_NOISE_REMOVE_FILTER_THRESHOLD_FLOAT,
                                      OB_PERMISSION_READ_WRITE)) {
       if (hardware_noise_removal_filter_threshold_ != -1.0 &&
@@ -3365,117 +3366,165 @@ void OBCameraNode::setFilterCallback(const std::shared_ptr<SetFilter ::Request> 
       auto decimation_filter = std::make_shared<ob::DecimationFilter>();
       decimation_filter->enable(request->filter_enable);
       depth_filter_list_.push_back(decimation_filter);
-      auto range = decimation_filter->getScaleRange();
-      auto decimation_filter_scale = request->filter_param[0];
-      if (decimation_filter_scale < range.max && decimation_filter_scale > range.min) {
-        RCLCPP_INFO_STREAM(logger_,
-                           "Set decimation filter scale value to " << decimation_filter_scale);
-        decimation_filter->setScaleValue(decimation_filter_scale);
+      if (request->filter_param.size() > 0) {
+        auto range = decimation_filter->getScaleRange();
+        auto decimation_filter_scale = request->filter_param[0];
+        if (decimation_filter_scale < range.max && decimation_filter_scale > range.min) {
+          RCLCPP_INFO_STREAM(logger_,
+                             "Set decimation filter scale value to " << decimation_filter_scale);
+          decimation_filter->setScaleValue(decimation_filter_scale);
+        }
+        if (decimation_filter_scale != -1 &&
+            (decimation_filter_scale < range.min || decimation_filter_scale > range.max)) {
+          RCLCPP_ERROR_STREAM(logger_, "Decimation filter scale value is out of range "
+                                           << range.min << " - " << range.max);
+        }
+      } else {
+        response->message =
+            "The filter switch setting is successful, but the filter parameter setting fails";
+        return;
       }
-      if (decimation_filter_scale != -1 &&
-          (decimation_filter_scale < range.min || decimation_filter_scale > range.max)) {
-        RCLCPP_ERROR_STREAM(logger_, "Decimation filter scale value is out of range "
-                                         << range.min << " - " << range.max);
-      }
+
     } else if (request->filter_name == "HDRMerge") {
       auto hdr_merge_filter = std::make_shared<ob::HdrMerge>();
       hdr_merge_filter->enable(request->filter_enable);
       depth_filter_list_.push_back(hdr_merge_filter);
-      auto config = OBHdrConfig();
-      config.enable = true;
-      config.exposure_1 = request->filter_param[0];
-      config.gain_1 = request->filter_param[1];
-      config.exposure_2 = request->filter_param[2];
-      config.gain_2 = request->filter_param[3];
-      device_->setStructuredData(OB_STRUCT_DEPTH_HDR_CONFIG,
-                                 reinterpret_cast<const uint8_t *>(&config), sizeof(config));
-      RCLCPP_INFO_STREAM(
-          logger_, "Set HDR merge filter params: " << "\nexposure_1: " << request->filter_param[0]
-                                                   << "\ngain_1: " << request->filter_param[1]
-                                                   << "\nexposure_2: " << request->filter_param[2]
-                                                   << "\ngain_2: " << request->filter_param[3]);
+      if (request->filter_param.size() > 3) {
+        auto config = OBHdrConfig();
+        config.enable = true;
+        config.exposure_1 = request->filter_param[0];
+        config.gain_1 = request->filter_param[1];
+        config.exposure_2 = request->filter_param[2];
+        config.gain_2 = request->filter_param[3];
+        device_->setStructuredData(OB_STRUCT_DEPTH_HDR_CONFIG,
+                                   reinterpret_cast<const uint8_t *>(&config), sizeof(config));
+        RCLCPP_INFO_STREAM(
+            logger_, "Set HDR merge filter params: " << "\nexposure_1: " << request->filter_param[0]
+                                                     << "\ngain_1: " << request->filter_param[1]
+                                                     << "\nexposure_2: " << request->filter_param[2]
+                                                     << "\ngain_2: " << request->filter_param[3]);
+      } else {
+        response->message =
+            "The filter switch setting is successful, but the filter parameter setting fails";
+        return;
+      }
+
     } else if (request->filter_name == "SequenceIdFilter") {
       auto sequenced_filter = std::make_shared<ob::SequenceIdFilter>();
       sequenced_filter->enable(request->filter_enable);
       depth_filter_list_.push_back(sequenced_filter);
-      sequenced_filter->selectSequenceId(request->filter_param[0]);
-      RCLCPP_INFO_STREAM(
-          logger_, "Set sequenced filter selectSequenceId value to " << request->filter_param[0]);
+      if (request->filter_param.size() > 0) {
+        sequenced_filter->selectSequenceId(request->filter_param[0]);
+        RCLCPP_INFO_STREAM(
+            logger_, "Set sequenced filter selectSequenceId value to " << request->filter_param[0]);
+      } else {
+        response->message =
+            "The filter switch setting is successful, but the filter parameter setting fails";
+        return;
+      }
+
     } else if (request->filter_name == "ThresholdFilter") {
       auto threshold_filter = std::make_shared<ob::ThresholdFilter>();
       threshold_filter->enable(request->filter_enable);
       depth_filter_list_.push_back(threshold_filter);
-      auto threshold_filter_min = request->filter_param[0];
-      auto threshold_filter_max = request->filter_param[1];
-      threshold_filter->setValueRange(threshold_filter_min, threshold_filter_max);
-      RCLCPP_INFO_STREAM(logger_, "Set threshold filter value range to "
-                                      << threshold_filter_min << " - " << threshold_filter_max);
+      if (request->filter_param.size() > 1) {
+        auto threshold_filter_min = request->filter_param[0];
+        auto threshold_filter_max = request->filter_param[1];
+        threshold_filter->setValueRange(threshold_filter_min, threshold_filter_max);
+        RCLCPP_INFO_STREAM(logger_, "Set threshold filter value range to "
+                                        << threshold_filter_min << " - " << threshold_filter_max);
+      } else {
+        response->message =
+            "The filter switch setting is successful, but the filter parameter setting fails";
+        return;
+      }
+
     } else if (request->filter_name == "NoiseRemovalFilter") {
       if (device_->isPropertySupported(OB_PROP_DEPTH_SOFT_FILTER_BOOL, OB_PERMISSION_READ_WRITE)) {
         device_->setBoolProperty(OB_PROP_DEPTH_SOFT_FILTER_BOOL, request->filter_enable);
-        RCLCPP_INFO_STREAM(logger_, "enable_noise_removal_filter:" << request->filter_enable);
       }
-      if (device_->isPropertySupported(OB_PROP_DEPTH_MAX_DIFF_INT, OB_PERMISSION_WRITE)) {
-        auto default_noise_removal_filter_min_diff =
-            device_->getIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT);
-        RCLCPP_INFO_STREAM(logger_, "default_noise_removal_filter_min_diff: "
-                                        << default_noise_removal_filter_min_diff);
-        device_->setIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT, request->filter_param[0]);
-        auto new_noise_removal_filter_min_diff =
-            device_->getIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT);
-        RCLCPP_INFO_STREAM(logger_, "after set noise_removal_filter_min_diff: "
-                                        << new_noise_removal_filter_min_diff);
-      }
-      if (device_->isPropertySupported(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT, OB_PERMISSION_WRITE)) {
-        auto default_noise_removal_filter_max_size =
-            device_->getIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT);
-        RCLCPP_INFO_STREAM(logger_, "default_noise_removal_filter_max_size: "
-                                        << default_noise_removal_filter_max_size);
-        device_->setIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT, request->filter_param[1]);
-        auto new_noise_removal_filter_max_size =
-            device_->getIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT);
-        RCLCPP_INFO_STREAM(logger_, "after set noise_removal_filter_max_size: "
-                                        << new_noise_removal_filter_max_size);
+      if (request->filter_param.size() > 1) {
+        if (device_->isPropertySupported(OB_PROP_DEPTH_MAX_DIFF_INT, OB_PERMISSION_WRITE)) {
+          auto default_noise_removal_filter_min_diff =
+              device_->getIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT);
+          RCLCPP_INFO_STREAM(logger_, "default noise removal filter min diff: "
+                                          << default_noise_removal_filter_min_diff);
+          device_->setIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT, request->filter_param[0]);
+          auto new_noise_removal_filter_min_diff =
+              device_->getIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT);
+          RCLCPP_INFO_STREAM(logger_, "after set noise removal filter min diff: "
+                                          << new_noise_removal_filter_min_diff);
+        }
+        if (device_->isPropertySupported(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT, OB_PERMISSION_WRITE)) {
+          auto default_noise_removal_filter_max_size =
+              device_->getIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT);
+          RCLCPP_INFO_STREAM(logger_, "default noise removal filter max size: "
+                                          << default_noise_removal_filter_max_size);
+          device_->setIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT, request->filter_param[1]);
+          auto new_noise_removal_filter_max_size =
+              device_->getIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT);
+          RCLCPP_INFO_STREAM(logger_, "after set noise removal filter max size: "
+                                          << new_noise_removal_filter_max_size);
+        }
+      } else {
+        response->message =
+            "The filter switch setting is successful, but the filter parameter setting fails";
+        return;
       }
     } else if (request->filter_name == "HardwareNoiseRemoval") {
       if (device_->isPropertySupported(OB_PROP_HW_NOISE_REMOVE_FILTER_ENABLE_BOOL,
                                        OB_PERMISSION_READ_WRITE)) {
         device_->setBoolProperty(OB_PROP_HW_NOISE_REMOVE_FILTER_ENABLE_BOOL,
                                  request->filter_enable);
-        RCLCPP_INFO_STREAM(logger_,
-                           "Setting hardware_noise_removal_filter:" << request->filter_enable);
-        if (device_->isPropertySupported(OB_PROP_HW_NOISE_REMOVE_FILTER_THRESHOLD_FLOAT,
+        if (request->filter_param.size() > 0 &&
+            device_->isPropertySupported(OB_PROP_HW_NOISE_REMOVE_FILTER_THRESHOLD_FLOAT,
                                          OB_PERMISSION_READ_WRITE)) {
           if (request->filter_enable) {
             device_->setFloatProperty(OB_PROP_HW_NOISE_REMOVE_FILTER_THRESHOLD_FLOAT,
                                       request->filter_param[0]);
-            RCLCPP_INFO_STREAM(logger_, "Setting hardware_noise_removal_filter_threshold :"
+            RCLCPP_INFO_STREAM(logger_, "Setting hardware noise removal filter threshold :"
                                             << request->filter_param[0]);
           }
+        } else {
+          response->message =
+              "The filter switch setting is successful, but the filter parameter setting fails";
+          return;
         }
       }
     } else if (request->filter_name == "SpatialAdvancedFilter") {
       auto spatial_filter = std::make_shared<ob::SpatialAdvancedFilter>();
       spatial_filter->enable(request->filter_enable);
       depth_filter_list_.push_back(spatial_filter);
-      OBSpatialAdvancedFilterParams params{};
-      params.alpha = request->filter_param[0];
-      params.disp_diff = request->filter_param[1];
-      params.magnitude = request->filter_param[2];
-      params.radius = request->filter_param[3];
-      spatial_filter->setFilterParams(params);
-      RCLCPP_INFO_STREAM(logger_, "Set spatial filter params: "
-                                      << "\nalpha:" << params.alpha << "\nradius:" << params.radius
-                                      << "\ndisp_diff:" << params.disp_diff);
+      if (request->filter_param.size() > 3) {
+        OBSpatialAdvancedFilterParams params{};
+        params.alpha = request->filter_param[0];
+        params.disp_diff = request->filter_param[1];
+        params.magnitude = request->filter_param[2];
+        params.radius = request->filter_param[3];
+        spatial_filter->setFilterParams(params);
+        RCLCPP_INFO_STREAM(logger_, "Set spatial filter params: "
+                                        << "\nalpha:" << params.alpha << "\nradius:"
+                                        << params.radius << "\ndisp_diff:" << params.disp_diff);
+      } else {
+        response->message =
+            "The filter switch setting is successful, but the filter parameter setting fails";
+        return;
+      }
     } else if (request->filter_name == "TemporalFilter") {
       auto temporal_filter = std::make_shared<ob::TemporalFilter>();
       temporal_filter->enable(request->filter_enable);
       depth_filter_list_.push_back(temporal_filter);
-      temporal_filter->setDiffScale(request->filter_param[0]);
-      temporal_filter->setWeight(request->filter_param[1]);
-      RCLCPP_INFO_STREAM(logger_, "Set temporal filter value to " << request->filter_param[0]
-                                                                  << " - "
-                                                                  << request->filter_param[1]);
+      if (request->filter_param.size() > 1) {
+        temporal_filter->setDiffScale(request->filter_param[0]);
+        temporal_filter->setWeight(request->filter_param[1]);
+        RCLCPP_INFO_STREAM(logger_, "Set temporal filter value to " << request->filter_param[0]
+                                                                    << " - "
+                                                                    << request->filter_param[1]);
+      } else {
+        response->message =
+            "The filter switch setting is successful, but the filter parameter setting fails";
+        return;
+      }
     } else {
       RCLCPP_INFO_STREAM(
           logger_, request->filter_name
@@ -3483,6 +3532,7 @@ void OBCameraNode::setFilterCallback(const std::shared_ptr<SetFilter ::Request> 
                        << "The filter_name value that can be set is "
                           "DecimationFilter、HDRMerge、SequenceIdFilter、ThresholdFilter、Nois"
                           "eRemovalFilter、SpatialAdvancedFilter and TemporalFilter");
+      return;
     }
     for (auto &filter : depth_filter_list_) {
       std::cout << " - " << filter->getName() << ": "

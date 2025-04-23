@@ -486,6 +486,19 @@ void OBCameraNode::setupDevices() {
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_BACKLIGHT_COMPENSATION_INT,
                         set_enable_color_backlight_compenstation);
   }
+  if (!color_powerline_freq_.empty() &&
+      device_->isPropertySupported(OB_PROP_COLOR_POWER_LINE_FREQUENCY_INT, OB_PERMISSION_WRITE)) {
+    if (color_powerline_freq_ == "disable") {
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_POWER_LINE_FREQUENCY_INT, 2);
+    } else if (color_powerline_freq_ == "50hz") {
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_POWER_LINE_FREQUENCY_INT, 0);
+    } else if (color_powerline_freq_ == "60hz") {
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_POWER_LINE_FREQUENCY_INT, 1);
+    } else if (color_powerline_freq_ == "auto") {
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_POWER_LINE_FREQUENCY_INT, 3);
+    }
+    RCLCPP_INFO_STREAM(logger_, "Setting color powerline freq to " << color_powerline_freq_);
+  }
   if (device_->isPropertySupported(OB_PROP_DEPTH_AUTO_EXPOSURE_PRIORITY_INT, OB_PERMISSION_WRITE)) {
     int set_enable_depth_auto_exposure_priority = enable_depth_auto_exposure_priority_ ? 1 : 0;
     RCLCPP_INFO_STREAM(logger_, "Setting depth auto exposure priority to "
@@ -1520,6 +1533,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(color_hue_, "color_hue", -1);
   setAndGetNodeParameter<bool>(enable_color_backlight_compenstation_,
                                "enable_color_backlight_compenstation", false);
+  setAndGetNodeParameter<std::string>(color_powerline_freq_, "color_powerline_freq", "");
   setAndGetNodeParameter<bool>(enable_color_decimation_filter_, "enable_color_decimation_filter",
                                false);
   setAndGetNodeParameter<int>(color_decimation_filter_scale_, "color_decimation_filter_scale", -1);
@@ -2335,13 +2349,11 @@ void OBCameraNode::setDepthAutoExposureROI() {
       config.x1_right = (depth_ae_roi_right_ < 0) ? 0 : depth_ae_roi_right_;
       config.x1_right =
           (depth_ae_roi_right_ > width_[DEPTH] - 1) ? width_[DEPTH] - 1 : config.x1_right;
-
     }
     if (depth_ae_roi_bottom_ != -1) {
       config.y1_bottom = (depth_ae_roi_bottom_ < 0) ? 0 : depth_ae_roi_bottom_;
       config.y1_bottom =
           (depth_ae_roi_bottom_ > height_[DEPTH] - 1) ? height_[DEPTH] - 1 : config.y1_bottom;
-
     }
     device_->setStructuredData(OB_STRUCT_DEPTH_AE_ROI, reinterpret_cast<const uint8_t *>(&config),
                                sizeof(config));

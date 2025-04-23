@@ -534,6 +534,7 @@ class OBCameraNode {
   int color_constrast_ = -1;
   int color_hue_ = -1;
   bool enable_color_backlight_compenstation_ = false;
+  std::string color_powerline_freq_;
   bool enable_color_decimation_filter_ = false;
   int color_decimation_filter_scale_ = -1;
   // depth ae roi

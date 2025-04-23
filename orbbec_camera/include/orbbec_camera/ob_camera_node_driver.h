@@ -75,6 +75,8 @@ class OBCameraNodeDriver : public rclcpp::Node {
                             uint8_t percent);
   void updatePresetFirmware(std::string path);
 
+  void firmwareUpdateCallback(OBFwUpdateState state, const char* message, uint8_t percent);
+
  private:
   const rclcpp::NodeOptions node_options_;
   std::string config_path_;
@@ -115,5 +117,6 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::chrono::time_point<std::chrono::system_clock> start_time_;
   std::string extension_path_;
   static backward::SignalHandling sh;  // for stack trace
+  std::string upgrade_firmware_;
 };
 }  // namespace orbbec_camera

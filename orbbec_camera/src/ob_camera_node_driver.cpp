@@ -129,6 +129,7 @@ void OBCameraNodeDriver::init() {
   auto log_level = obLogSeverityFromString(log_level_str);
   connection_delay_ = static_cast<int>(declare_parameter<int>("connection_delay", 100));
   enable_sync_host_time_ = declare_parameter<bool>("enable_sync_host_time", true);
+  upgrade_firmware_ = declare_parameter<std::string>("upgrade_firmware", "");
   g_camera_name = declare_parameter<std::string>("camera_name", g_camera_name);
   g_time_domain = declare_parameter<std::string>("time_domain", g_time_domain);
   preset_firmware_path_ =
@@ -404,13 +405,14 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByNetIP(
     try {
       device = list->getDevice(i);
       auto device_info = device->getDeviceInfo();
-      if(std::string(device_info->getConnectionType())!="Ethernet"){
+      if (std::string(device_info->getConnectionType()) != "Ethernet") {
         continue;
       }
       if (device_info->getIpAddress() == nullptr) {
         continue;
       }
-      RCLCPP_INFO_STREAM(logger_, "FindDeviceByNetIP device net ip " << device_info->getIpAddress());
+      RCLCPP_INFO_STREAM(logger_,
+                         "FindDeviceByNetIP device net ip " << device_info->getIpAddress());
       if (std::string(device_info->getIpAddress()) == net_ip) {
         RCLCPP_INFO_STREAM(logger_, "getDeviceByNetIP device net ip " << net_ip << " done");
         return list->getDevice(i);
@@ -462,6 +464,13 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
                                        << retry_count + 1 << " of " << max_retries << ")");
     }
     retry_count++;
+  }
+  if (!upgrade_firmware_.empty()) {
+    device_->updateFirmware(
+        upgrade_firmware_.c_str(),
+        std::bind(&OBCameraNodeDriver::firmwareUpdateCallback, this, std::placeholders::_1,
+                  std::placeholders::_2, std::placeholders::_3),
+        false);
   }
 
   if (!initialized) {
@@ -611,7 +620,7 @@ void OBCameraNodeDriver::updatePresetFirmware(std::string path) {
     }
     uint8_t index = 0;
     uint8_t count = static_cast<uint8_t>(paths.size());
-    char(*filePaths)[OB_PATH_MAX] = new char[count][OB_PATH_MAX];
+    char (*filePaths)[OB_PATH_MAX] = new char[count][OB_PATH_MAX];
     RCLCPP_INFO_STREAM(this->get_logger(), "paths.cout : " << (uint32_t)count);
     for (const auto &p : paths) {
       strcpy(filePaths[index], p.c_str());
@@ -699,6 +708,46 @@ void OBCameraNodeDriver::presetUpdateCallback(bool firstCall, OBFwUpdateState st
 
   std::cout << "\033[K";
   std::cout << "Message : " << message << std::endl << std::flush;
+}
+void OBCameraNodeDriver::firmwareUpdateCallback(OBFwUpdateState state, const char *message,
+                                                uint8_t percent) {
+  std::cout << "\033[K";  // Clear the current line
+  std::cout << "Progress: " << static_cast<uint32_t>(percent) << "%" << std::endl;
+
+  std::cout << "\033[K";
+  std::cout << "Status  : ";
+  switch (state) {
+    case STAT_VERIFY_SUCCESS:
+      std::cout << "Image file verification success" << std::endl;
+      break;
+    case STAT_FILE_TRANSFER:
+      std::cout << "File transfer in progress" << std::endl;
+      break;
+    case STAT_DONE:
+      std::cout << "Update completed" << std::endl;
+      break;
+    case STAT_IN_PROGRESS:
+      std::cout << "Upgrade in progress" << std::endl;
+      break;
+    case STAT_START:
+      std::cout << "Starting the upgrade" << std::endl;
+      break;
+    case STAT_VERIFY_IMAGE:
+      std::cout << "Verifying image file" << std::endl;
+      break;
+    default:
+      std::cout << "Unknown status or error" << std::endl;
+      break;
+  }
+
+  std::cout << "\033[K";
+  std::cout << "Message : " << message << std::endl << std::flush;
+  if (state == STAT_DONE) {
+    RCLCPP_INFO(logger_, "Reboot device");
+    ob_camera_node_->rebootDevice();
+    device_connected_ = false;
+    upgrade_firmware_ = "";
+  }
 }
 }  // namespace orbbec_camera
 

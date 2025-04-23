@@ -2317,19 +2317,39 @@ void OBCameraNode::setDepthAutoExposureROI() {
   if (depth_roi_has_run) {
     return;
   }
-  if (depth_ae_roi_left_ != -1 && depth_ae_roi_top_ != -1 && depth_ae_roi_right_ != -1 &&
-      depth_ae_roi_bottom_ != -1 &&
-      device_->isPropertySupported(OB_STRUCT_DEPTH_AE_ROI, OB_PERMISSION_READ_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting depth AE ROI to "
-                                    << depth_ae_roi_left_ << ", " << depth_ae_roi_top_ << ", "
-                                    << depth_ae_roi_right_ << ", " << depth_ae_roi_bottom_);
+  if (device_->isPropertySupported(OB_STRUCT_DEPTH_AE_ROI, OB_PERMISSION_READ_WRITE)) {
     auto config = OBRegionOfInterest();
-    config.x0_left = depth_ae_roi_left_;
-    config.y0_top = depth_ae_roi_top_;
-    config.x1_right = depth_ae_roi_right_;
-    config.y1_bottom = depth_ae_roi_bottom_;
+    uint32_t data_size = sizeof(config);
+    device_->getStructuredData(OB_STRUCT_DEPTH_AE_ROI, reinterpret_cast<uint8_t *>(&config),
+                               &data_size);
+    if (depth_ae_roi_left_ != -1) {
+      config.x0_left = (depth_ae_roi_left_ < 0) ? 0 : depth_ae_roi_left_;
+      config.x0_left =
+          (depth_ae_roi_left_ > width_[DEPTH] - 1) ? width_[DEPTH] - 1 : config.x0_left;
+    }
+    if (depth_ae_roi_top_ != -1) {
+      config.y0_top = (depth_ae_roi_top_ < 0) ? 0 : depth_ae_roi_top_;
+      config.y0_top = (depth_ae_roi_top_ > height_[DEPTH] - 1) ? height_[DEPTH] - 1 : config.y0_top;
+    }
+    if (depth_ae_roi_right_ != -1) {
+      config.x1_right = (depth_ae_roi_right_ < 0) ? 0 : depth_ae_roi_right_;
+      config.x1_right =
+          (depth_ae_roi_right_ > width_[DEPTH] - 1) ? width_[DEPTH] - 1 : config.x1_right;
+
+    }
+    if (depth_ae_roi_bottom_ != -1) {
+      config.y1_bottom = (depth_ae_roi_bottom_ < 0) ? 0 : depth_ae_roi_bottom_;
+      config.y1_bottom =
+          (depth_ae_roi_bottom_ > height_[DEPTH] - 1) ? height_[DEPTH] - 1 : config.y1_bottom;
+
+    }
     device_->setStructuredData(OB_STRUCT_DEPTH_AE_ROI, reinterpret_cast<const uint8_t *>(&config),
                                sizeof(config));
+    device_->getStructuredData(OB_STRUCT_DEPTH_AE_ROI, reinterpret_cast<uint8_t *>(&config),
+                               &data_size);
+    RCLCPP_INFO_STREAM(logger_, "Setting depth AE ROI to "
+                                    << config.x0_left << ", " << config.y0_top << ", "
+                                    << config.x1_right << ", " << config.y1_bottom);
   }
   depth_roi_has_run = true;
 }
@@ -2339,19 +2359,37 @@ void OBCameraNode::setColorAutoExposureROI() {
   if (color_roi_has_run) {
     return;
   }
-  if (color_ae_roi_left_ != -1 && color_ae_roi_top_ != -1 && color_ae_roi_right_ != -1 &&
-      color_ae_roi_bottom_ != -1 &&
-      device_->isPropertySupported(OB_STRUCT_COLOR_AE_ROI, OB_PERMISSION_READ_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting color AE ROI to "
-                                    << color_ae_roi_left_ << ", " << color_ae_roi_top_ << ", "
-                                    << color_ae_roi_right_ << ", " << color_ae_roi_bottom_);
+  if (device_->isPropertySupported(OB_STRUCT_COLOR_AE_ROI, OB_PERMISSION_READ_WRITE)) {
     auto config = OBRegionOfInterest();
-    config.x0_left = color_ae_roi_left_;
-    config.y0_top = color_ae_roi_top_;
-    config.x1_right = color_ae_roi_right_;
-    config.y1_bottom = color_ae_roi_bottom_;
+    uint32_t data_size = sizeof(config);
+    device_->getStructuredData(OB_STRUCT_COLOR_AE_ROI, reinterpret_cast<uint8_t *>(&config),
+                               &data_size);
+    if (color_ae_roi_left_ != -1) {
+      config.x0_left = (color_ae_roi_left_ < 0) ? 0 : color_ae_roi_left_;
+      config.x0_left =
+          (color_ae_roi_left_ > width_[COLOR] - 1) ? width_[COLOR] - 1 : config.x0_left;
+    }
+    if (color_ae_roi_top_ != -1) {
+      config.y0_top = (color_ae_roi_top_ < 0) ? 0 : color_ae_roi_top_;
+      config.y0_top = (color_ae_roi_top_ > height_[COLOR] - 1) ? height_[COLOR] - 1 : config.y0_top;
+    }
+    if (color_ae_roi_right_ != -1) {
+      config.x1_right = (color_ae_roi_right_ < 0) ? 0 : color_ae_roi_right_;
+      config.x1_right =
+          (color_ae_roi_right_ > width_[COLOR] - 1) ? width_[COLOR] - 1 : config.x1_right;
+    }
+    if (color_ae_roi_bottom_ != -1) {
+      config.y1_bottom = (color_ae_roi_bottom_ < 0) ? 0 : color_ae_roi_bottom_;
+      config.y1_bottom =
+          (color_ae_roi_bottom_ > height_[COLOR] - 1) ? height_[COLOR] - 1 : config.y1_bottom;
+    }
     device_->setStructuredData(OB_STRUCT_COLOR_AE_ROI, reinterpret_cast<const uint8_t *>(&config),
                                sizeof(config));
+    device_->getStructuredData(OB_STRUCT_COLOR_AE_ROI, reinterpret_cast<uint8_t *>(&config),
+                               &data_size);
+    RCLCPP_INFO_STREAM(logger_, "Setting color AE ROI to "
+                                    << config.x0_left << ", " << config.y0_top << ", "
+                                    << config.x1_right << ", " << config.y1_bottom);
   }
   color_roi_has_run = true;
 }

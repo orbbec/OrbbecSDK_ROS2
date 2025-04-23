@@ -580,6 +580,8 @@ class OBCameraNode {
   double angular_vel_cov_ = 0.0001;
   std::deque<IMUData> imu_history_;
   IMUData accel_data_{ACCEL, {0, 0, 0}, -1.0};
+  bool enable_accel_data_correction_ = true;
+  bool enable_gyro_data_correction_ = true;
   // mjpeg decoder
   std::shared_ptr<JPEGDecoder> jpeg_decoder_ = nullptr;
   uint8_t* rgb_buffer_ = nullptr;

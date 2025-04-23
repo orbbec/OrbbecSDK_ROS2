@@ -672,6 +672,18 @@ void OBCameraNode::setupDevices() {
     RCLCPP_INFO_STREAM(logger_,
                        "Exporting config json file path : " << export_config_json_file_path_);
   }
+  if (device_->isPropertySupported(OB_PROP_SDK_ACCEL_FRAME_TRANSFORMED_BOOL, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting accel data correction to "
+                                    << (enable_accel_data_correction_ ? "ON" : "OFF"));
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_SDK_ACCEL_FRAME_TRANSFORMED_BOOL,
+                        enable_accel_data_correction_);
+  }
+  if (device_->isPropertySupported(OB_PROP_SDK_GYRO_FRAME_TRANSFORMED_BOOL, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting gyro data correction to "
+                                    << (enable_gyro_data_correction_ ? "ON" : "OFF"));
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_SDK_GYRO_FRAME_TRANSFORMED_BOOL,
+                        enable_gyro_data_correction_);
+  }
 }
 void OBCameraNode::setupColorPostProcessFilter() {
   auto color_sensor = device_->getSensor(OB_SENSOR_COLOR);
@@ -1631,6 +1643,8 @@ void OBCameraNode::getParameters() {
                                       "");
   setAndGetNodeParameter<std::string>(export_config_json_file_path_, "export_config_json_file_path",
                                       "");
+  setAndGetNodeParameter<bool>(enable_accel_data_correction_, "enable_accel_data_correction", true);
+  setAndGetNodeParameter<bool>(enable_gyro_data_correction_, "enable_gyro_data_correction", true);
   auto device_info = device_->getDeviceInfo();
   CHECK_NOTNULL(device_info.get());
   auto pid = device_info->getPid();

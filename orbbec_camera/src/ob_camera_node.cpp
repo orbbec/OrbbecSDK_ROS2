@@ -2348,8 +2348,8 @@ void OBCameraNode::setDepthAutoExposureROI() {
     device_->getStructuredData(OB_STRUCT_DEPTH_AE_ROI, reinterpret_cast<uint8_t *>(&config),
                                &data_size);
     RCLCPP_INFO_STREAM(logger_, "Setting depth AE ROI to "
-                                    << config.x0_left << ", " << config.y0_top << ", "
-                                    << config.x1_right << ", " << config.y1_bottom);
+                                    << config.x0_left << ", " << config.x1_right << ", "
+                                    << config.y0_top << ", " << config.y1_bottom);
   }
   depth_roi_has_run = true;
 }
@@ -2388,8 +2388,8 @@ void OBCameraNode::setColorAutoExposureROI() {
     device_->getStructuredData(OB_STRUCT_COLOR_AE_ROI, reinterpret_cast<uint8_t *>(&config),
                                &data_size);
     RCLCPP_INFO_STREAM(logger_, "Setting color AE ROI to "
-                                    << config.x0_left << ", " << config.y0_top << ", "
-                                    << config.x1_right << ", " << config.y1_bottom);
+                                    << config.x0_left << ", " << config.x1_right << ", "
+                                    << config.y0_top << ", " << config.y1_bottom);
   }
   color_roi_has_run = true;
 }

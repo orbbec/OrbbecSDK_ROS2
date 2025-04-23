@@ -314,30 +314,75 @@ void OBCameraNode::setAeRoiCallback(const std::shared_ptr<SetArrays ::Request>& 
                                     const stream_index_pair& stream_index) {
   auto stream = stream_index.first;
   auto config = OBRegionOfInterest();
+  uint32_t data_size = sizeof(config);
   try {
     switch (stream) {
       case OB_STREAM_IR_LEFT:
       case OB_STREAM_IR_RIGHT:
       case OB_STREAM_IR:
       case OB_STREAM_DEPTH:
-        config.x0_left = static_cast<short int>(request->data_param[0]);
-        config.x1_right = static_cast<short int>(request->data_param[1]);
-        config.y0_top = static_cast<short int>(request->data_param[2]);
-        config.y1_bottom = static_cast<short int>(request->data_param[3]);
+        config.x0_left = (static_cast<short int>(request->data_param[0]) < 0)
+                             ? 0
+                             : static_cast<short int>(request->data_param[0]);
+        config.x0_left = (static_cast<short int>(request->data_param[0]) > width_[DEPTH] - 1)
+                             ? width_[DEPTH] - 1
+                             : config.x0_left;
+        config.y0_top = (static_cast<short int>(request->data_param[2]) < 0)
+                            ? 0
+                            : static_cast<short int>(request->data_param[2]);
+        config.y0_top = (static_cast<short int>(request->data_param[2]) > height_[DEPTH] - 1)
+                            ? height_[DEPTH] - 1
+                            : config.y0_top;
+        config.x1_right = (static_cast<short int>(request->data_param[1]) < 0)
+                              ? 0
+                              : static_cast<short int>(request->data_param[1]);
+        config.x1_right = (static_cast<short int>(request->data_param[1]) > width_[DEPTH] - 1)
+                              ? width_[DEPTH] - 1
+                              : config.x1_right;
+        config.y1_bottom = (static_cast<short int>(request->data_param[3]) < 0)
+                               ? 0
+                               : static_cast<short int>(request->data_param[3]);
+        config.y1_bottom = (static_cast<short int>(request->data_param[3]) > height_[DEPTH] - 1)
+                               ? height_[DEPTH] - 1
+                               : config.y1_bottom;
         device_->setStructuredData(OB_STRUCT_DEPTH_AE_ROI,
                                    reinterpret_cast<const uint8_t*>(&config), sizeof(config));
+        device_->getStructuredData(OB_STRUCT_DEPTH_AE_ROI, reinterpret_cast<uint8_t*>(&config),
+                                   &data_size);
         RCLCPP_INFO_STREAM(logger_,
                            "set depth AE ROI : " << "[Left: " << config.x0_left << ", Right: "
                                                  << config.x1_right << ", Top: " << config.y0_top
                                                  << ", Bottom: " << config.y1_bottom << " ]");
         break;
       case OB_STREAM_COLOR:
-        config.x0_left = static_cast<short int>(request->data_param[0]);
-        config.x1_right = static_cast<short int>(request->data_param[1]);
-        config.y0_top = static_cast<short int>(request->data_param[2]);
-        config.y1_bottom = static_cast<short int>(request->data_param[3]);
+        config.x0_left = (static_cast<short int>(request->data_param[0]) < 0)
+                             ? 0
+                             : static_cast<short int>(request->data_param[0]);
+        config.x0_left = (static_cast<short int>(request->data_param[0]) > width_[COLOR] - 1)
+                             ? width_[COLOR] - 1
+                             : config.x0_left;
+        config.y0_top = (static_cast<short int>(request->data_param[2]) < 0)
+                            ? 0
+                            : static_cast<short int>(request->data_param[2]);
+        config.y0_top = (static_cast<short int>(request->data_param[2]) > height_[COLOR] - 1)
+                            ? height_[COLOR] - 1
+                            : config.y0_top;
+        config.x1_right = (static_cast<short int>(request->data_param[1]) < 0)
+                              ? 0
+                              : static_cast<short int>(request->data_param[1]);
+        config.x1_right = (static_cast<short int>(request->data_param[1]) > width_[COLOR] - 1)
+                              ? width_[COLOR] - 1
+                              : config.x1_right;
+        config.y1_bottom = (static_cast<short int>(request->data_param[3]) < 0)
+                               ? 0
+                               : static_cast<short int>(request->data_param[3]);
+        config.y1_bottom = (static_cast<short int>(request->data_param[3]) > height_[COLOR] - 1)
+                               ? height_[COLOR] - 1
+                               : config.y1_bottom;
         device_->setStructuredData(OB_STRUCT_COLOR_AE_ROI,
                                    reinterpret_cast<const uint8_t*>(&config), sizeof(config));
+        device_->getStructuredData(OB_STRUCT_COLOR_AE_ROI, reinterpret_cast<uint8_t*>(&config),
+                                   &data_size);
         RCLCPP_INFO_STREAM(logger_,
                            "set color AE ROI : " << "[Left: " << config.x0_left << ", Right: "
                                                  << config.x1_right << ", Top: " << config.y0_top

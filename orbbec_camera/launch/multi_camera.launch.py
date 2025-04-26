@@ -16,7 +16,7 @@ def generate_launch_description():
         ),
         launch_arguments={
             'camera_name': 'camera_01',
-            'usb_port': '2-1',
+            'usb_port': 'gmsl2-1',
             'device_num': '2',
             'sync_mode': 'standalone',
             'enable_left_ir': 'true',
@@ -24,13 +24,27 @@ def generate_launch_description():
         }.items()
     )
 
-    launch2_include = IncludeLaunchDescription(
+    # launch2_include = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         os.path.join(launch_file_dir, 'gemini_330_series.launch.py')
+    #     ),
+    #     launch_arguments={
+    #         'camera_name': 'camera_02',
+    #         'usb_port': 'gmsl2-2',
+    #         'device_num': '3',
+    #         'sync_mode': 'standalone',
+    #         'enable_left_ir': 'false',
+    #         'enable_right_ir': 'false',
+    #     }.items()
+    # )
+
+    launch3_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(launch_file_dir, 'gemini_330_series.launch.py')
         ),
         launch_arguments={
-            'camera_name': 'camera_02',
-            'usb_port': '2-3',
+            'camera_name': 'camera_03',
+            'usb_port': 'gmsl2-3',
             'device_num': '2',
             'sync_mode': 'standalone',
             'enable_left_ir': 'true',
@@ -43,7 +57,8 @@ def generate_launch_description():
     # Launch description
     ld = LaunchDescription([
         GroupAction([launch1_include]),
-        GroupAction([launch2_include]),
+        # GroupAction([launch2_include]),
+        GroupAction([launch3_include]),
     ])
 
     return ld

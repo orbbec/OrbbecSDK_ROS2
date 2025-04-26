@@ -14,8 +14,9 @@
 #include <libobsensor/hpp/Filter.hpp>
 #include <libobsensor/hpp/Frame.hpp>
 #include <libobsensor/hpp/Pipeline.hpp>
-#include <libobsensor/hpp/RecordPlayback.hpp>
+// #include <libobsensor/hpp/RecordPlayback.hpp>
 #include <libobsensor/hpp/Sensor.hpp>
 #include <libobsensor/hpp/StreamProfile.hpp>
 #include <libobsensor/hpp/Version.hpp>
 #include <libobsensor/hpp/TypeHelper.hpp>
+

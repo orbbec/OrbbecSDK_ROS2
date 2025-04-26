@@ -9,78 +9,113 @@ orbbec_ros:
             config_file_path: "gemini2L.yaml"
 
         deivce:
+            # camera name, usually overwritten by launch file
             camera_name: "camera"
+            # camera serial number, usually overwritten by launch file
             serial_number: ""
+            # The USB port of the camera. This parameter is required when using multiple cameras.
             usb_port: ""
+            # Number of devices. If multiple cameras are required, this parameter must be filled in launch file
             device_num: 1
-            uvc_backend: "libuvc"
-            product_id: ""
+            # The delay time for reopening the device, in milliseconds. Usually, there is no need to modify by default.
             connection_delay: 100
-            time_domain: "global"
-            retry_on_usb3_detection_failure: false
-            enable_heartbeat: false
-            enable_ldp: true
+
+            network_device:
+                # Whether to enable the function of enumerating network devices. True means enabled and false means disabled. This function is only supported by Femto Mega and Gemini 2 XL devices.
+                # When accessing these devices through the network, the IP address of the device needs to be preconfigured. The enable switch needs to be set to true.
+                enumerate_net_device: false
+                # Port number of the network device. If 0, a random port will be used
+                net_device_port: 0
+                # IP address of the network device.
+                net_device_ip: ""
 
         color:
+            # If true, the color image will be enabled
             enable_color: true
-            color_qos: "default"
-            color_camera_info_qos: "default"
+            # Width of the color image. If 0, the default width will be used
             color_width: 1280
+            # Height of the color image. If 0, the default height will be used
             color_height: 800
+            # fps of the color image. If 0, the default FPS will be used
             color_fps: 30
+            # Format of the color image.
             color_format: "MJPG"
-            enable_color_auto_white_balance: true
-            color_white_balance: -1
-            color_auto_ae:
-                enable_color_auto_exposure: true
-                color_ae_max_exposure: -1
-            color_manual_ae:
-                color_exposure: -1
-                color_gain: -1
-                color_brightness: -1
 
         depth:
+            # If true, the depth image will be enabled
             enable_depth: true
-            depth_qos: "default"
-            depth_camera_info_qos: "default"
+            # Width of the depth image. If 0, the default width will be used
             depth_width: 1280
+            # Height of the depth image. If 0, the default height will be used
             depth_height: 800
+            # If 0, the default FPS will be used
             depth_fps: 30
+            # Format of the depth image.
             depth_format: "Y16"
+            # If false, the depth scale will not be enabled
+            enable_depth_scale: true
+
+            # Depth registration mode.
             depth_registration: false
+            # The alignment mode to be used. Options are "HW" for hardware alignment and "SW" for software alignment
             align_mode: "HW"
+
+            # Gemini 2, Gemini 2 L, and Gemini 2 XL cameras support deep working mode switching
+            # Specific camera deep working mode support types can be found in the deep mode comments.
+            # Deep working mode support is as follows:{"Unbinned Dense Default","Unbinned Sparse Default","Binned Sparse Default","Obstacle Avoidance"}
+            # Depth work mode. #For details, Please refer to the comments in SDK/include/libobsensor/Advanced.h for a detailed explanation.
+            depth_work_mode: ""
+
+            # Configure the loading path of the deep filtering configuration file. By default, the deep filtering configuration file is located in the /config/depthfilter directory and is only supported by Gemini2.
+            depth_filter_config: ""
+
+            filter:
+                soft_filter:
+                    # If true, the soft filter will be enabled
+                    enable_soft_filter: true
+                    # soft_filter_max_diff, If -1, the default value will be used
+                    soft_filter_max_diff: -1
+                    # soft_filter_speckle_size, If -1, the default value will be used
+                    soft_filter_speckle_size: -1
+
+                noise_removal_filter:
+                    # If true, the noise removal filter will be enabled
+                    enable_noise_removal_filter: true
+
         ir:
+            # enable the ir camera stream
             enable_ir: true
-            ir_qos: "default"
-            ir_camera_info_qos: "default"
+            # Width of the left IR image. If 0, the default width will be used
             ir_width: 640
+            # Height of the left IR image. If 0, the default height will be used
             ir_height: 400
+            # If 0, the default FPS will be used
             ir_fps: 15
+            # Format of the left IR image.
             ir_format: "Y8"
 
-        ir_parameters:
-            enable_ir_auto_exposure: true
-            ir_ae_max_exposure: -1
-            ir_exposure: -1
-            ir_gain: -1
-            ir_brightness: -1
-
         imu:
+            # If true, enable the IMU accelerometer data  will be enabled
             enable_accel: false
+            # Rate of the accelerometer
             accel_rate: "100hz"
+            # Range of the accelerometer.
             accel_range: "4g"
+            # If true, enable the IMU gyroscope data  will be enabled
             enable_gyro: false
+            # Rate of the gyroscope.
             gyro_rate: "100hz"
+            # Range of the gyroscope.
             gyro_range: "1000dps"
+            # enable_sync_output_accel_gyro
             enable_sync_output_accel_gyro: false
-            liner_accel_cov: 0.01
-            angular_vel_cov: 0.01
 
         point_cloud:
+            # If true, the depth point cloud will be enabled
             enable_point_cloud: true
+            # enable color point cloud. {fase:disable, true:enable}
             enable_colored_point_cloud: false
 
         advanced:
-            enable_frame_sync: true
-            enable_d2c_viewer: false
-
+            # If false, the hardware time will not be used
+            use_hardware_time: true

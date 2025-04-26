@@ -9,78 +9,103 @@ orbbec_ros:
             config_file_path: "astra2.yaml"
 
         deivce:
+            # camera name, usually overwritten by launch file
             camera_name: "camera"
+            # camera serial number, usually overwritten by launch file
             serial_number: ""
+            # The USB port of the camera. This parameter is required when using multiple cameras.
             usb_port: ""
+            # Number of devices. If multiple cameras are required, this parameter must be filled in launch file
             device_num: 1
-            uvc_backend: "libuvc"
-            vendor_id: "0x2bc5"
-            product_id: ""
+            # The delay time for reopening the device, in milliseconds. Usually, there is no need to modify by default.
             connection_delay: 100
-            time_domain: "global"
-            enable_heartbeat: false
-            enable_ldp: true
 
         color:
+            # If true, the color image will be enabled
             enable_color: true
-            color_qos: "default"
-            color_camera_info_qos: "default"
+            # Width of the color image. If 0, the default width will be used
             color_width: 1280
+            # Height of the color image. If 0, the default height will be used
             color_height: 720
+            # Fps of the color image. If 0, the default FPS will be used
             color_fps: 30
-            color_format: "MJPG"
-            enable_color_auto_white_balance: true
-            color_white_balance: -1
-            color_auto_ae:
-                enable_color_auto_exposure: true
-                color_ae_max_exposure: -1
-            color_manual_ae:
-                color_exposure: -1
-                color_gain: -1
-                color_brightness: -1
 
         depth:
+            # If true, the depth image will be enabled
             enable_depth: true
-            depth_qos: "default"
-            depth_camera_info_qos: "default"
+            # Width of the depth image. If 0, the default width will be used
             depth_width: 800
+            # Height of the depth image. If 0, the default height will be used
             depth_height: 600
+            # Fps of the depth image. If 0, the default FPS will be used
             depth_fps: 30
+            # Format of the depth image.
             depth_format: "RLE"
+            # Depth registration mode.
             depth_registration: false
+            # The alignment mode to be used.
             align_mode: "HW"
+
         ir:
+            # If false, the left IR image will not be enabled
             enable_ir: true
-            ir_qos: "default"
-            ir_camera_info_qos: "default"
+            # Width of the left IR image. If 0, the default width will be used
             ir_width: 800
+            # Height of the left IR image. If 0, the default height will be used
             ir_height: 600
+            # Fps of the ir image. If 0, the default FPS will be used
             ir_fps: 30
+            # Format of the left IR image. Supported formats are 'Y8'
             ir_format: "Y8"
 
-        ir_parameters:
-            enable_ir_auto_exposure: true
-            ir_ae_max_exposure: -1
-            ir_exposure: -1
-            ir_gain: -1
-            ir_brightness: -1
-
         imu:
+            # If true, the IMU accelerometer data will be enabled
             enable_accel: false
+            # Rate of the
             accel_rate: "100hz"
+            # Range of the accelerometer.
             accel_range: "4g"
+            # If true, the IMU gyroscope data will be enabled
             enable_gyro: false
+            # Rate of the gyroscope.
             gyro_rate: "100hz"
+            # Range of the gyroscope.
             gyro_range: "1000dps"
-            enable_sync_output_accel_gyro: true
-            liner_accel_cov: 0.01
-            angular_vel_cov: 0.01
 
         point_cloud:
+            # If true, the point cloud will be enabled
             enable_point_cloud: true
+            # enable color point cloud. {fase:disable, true:enable}
             enable_colored_point_cloud: false
 
         advanced:
+            # If true, the extrinsics publish will be enabled
+            enable_publish_extrinsic: false
+            # If true, the frame synchronization will be enabled
             enable_frame_sync: true
+            # Publish D2C superimposed image (only for testing).
             enable_d2c_viewer: false
+            # If false, the hardware time will not be used
+            use_hardware_time: false
+            # If false, the host time will not be synchronized with the device time
+            enable_sync_host_time: false
 
+            device_sync:
+                # Device synchronization mode. supports: {1.FREE_RUN 2.STANDALONE 3.PRIMARY 4.SECONDARY 5.SECONDARY_SYNCED 6.SOFTWARE_TRIGGERING 7.HARDWARE_TRIGGERING}.
+                # For details, Please refer to the OBMultiDeviceSyncMode-related comments in SDK/include/libobsensor/ObTypes.h for a detailed explanation of each mode.
+                sync_mode: "STANDALONE"
+                # The delay time of the depth image capture after receiving the capture command or trigger signal in microseconds.
+                # For details, Please refer to the OBMultiDeviceSyncConfig-related comments in SDK/include/libobsensor/ObTypes.h
+                depth_delay_us: 0
+                # The delay time of the color image capture after receiving the capture command or trigger signal in microseconds.
+                color_delay_us: 0
+                # The delay time of the image capture after receiving the capture command or trigger signal in microseconds.
+                trigger2image_delay_us: 0
+                # Trigger signal output enable flag.
+                trigger_out_enabled: true
+                # The delay time of the trigger signal output after receiving the capture command or trigger signal in microseconds.
+                trigger_out_delay_us: 0
+                # The frame number of each stream after each trigger in triggering mode.
+                frames_per_trigger: 2
+                # software trigger period in ms
+                software_trigger_period: 33

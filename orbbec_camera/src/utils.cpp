@@ -23,7 +23,7 @@ sensor_msgs::msg::CameraInfo convertToCameraInfo(OBCameraIntrinsic intrinsic,
                                                  OBCameraDistortion distortion, int width) {
   (void)width;
   sensor_msgs::msg::CameraInfo info;
-  info.distortion_model = getDistortionModels(distortion);
+  info.distortion_model = sensor_msgs::distortion_models::RATIONAL_POLYNOMIAL;
   info.width = intrinsic.width;
   info.height = intrinsic.height;
   info.d.resize(8, 0.0);
@@ -339,9 +339,9 @@ OBFormat OBFormatFromString(const std::string &format) {
   } else if (fixed_format == "RW16") {
     return OB_FORMAT_RW16;
   }
-  //   else if (fixed_format == "DISP16") {
-  //     return OB_FORMAT_DISP16;
-  //   }
+//   else if (fixed_format == "DISP16") {
+//     return OB_FORMAT_DISP16;
+//   }
   else {
     return OB_FORMAT_UNKNOWN;
   }
@@ -436,8 +436,8 @@ std::string ObDeviceTypeToString(const OBDeviceType &type) {
     case OBDeviceType::OB_TOF_CAMERA:
       return "tof camera";
     default:
-      // 处理其他未预见的情况
-      break;
+        // 处理其他未预见的情况
+        break;
   }
   return "unknown technology camera";
 }
@@ -700,9 +700,9 @@ std::ostream &operator<<(std::ostream &os, const OBAccelFullScaleRange &rhs) {
 }
 
 std::string parseUsbPort(const std::string &line) {
-  std::string port_id;
+ std::string port_id;
   std::regex usb_regex("(?:[^ ]+/usb[0-9]+[0-9./-]*/){0,1}([0-9.-]+)(:){0,1}[^ ]*",
-                       std::regex_constants::ECMAScript);
+                        std::regex_constants::ECMAScript);
   std::smatch base_match;
   bool found_usb = std::regex_match(line, base_match, usb_regex);
 
@@ -815,10 +815,6 @@ std::string metaDataTypeToString(const OBFrameMetadataType &meta_data_type) {
       return "frame_emitter_mode";
     case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_GPIO_INPUT_DATA:
       return "gpio_input_data";
-    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_DISPARITY_SEARCH_OFFSET:
-      return "disparity_search_offset";
-    case OBFrameMetadataType::OB_FRAME_METADATA_TYPE_DISPARITY_SEARCH_RANGE:
-      return "disparity search range";
     default:
       return "unknown_field";
   }
@@ -896,24 +892,5 @@ cv::Mat undistortImage(const cv::Mat &image, const OBCameraIntrinsic &intrinsic,
   cv::undistort(image, undistorted_image, camera_matrix, dist_coeffs);
 
   return undistorted_image;
-}
-std::string getDistortionModels(OBCameraDistortion distortion){
-    switch (distortion.model)
-    {
-    case OB_DISTORTION_NONE:
-        return "ob_distortion_none";
-    case OB_DISTORTION_MODIFIED_BROWN_CONRADY:
-        return "ob_distortion_modified_brown_conrady";
-    case OB_DISTORTION_INVERSE_BROWN_CONRADY:
-        return "ob_distortion_inverse_brown_conrady";
-    case OB_DISTORTION_BROWN_CONRADY:
-        return "ob_distortion_brown_conrady";
-    case OB_DISTORTION_BROWN_CONRADY_K6:
-        return "ob_distortion_brown_conrady_k6";
-    case OB_DISTORTION_KANNALA_BRANDT4:
-        return "ob_distortion_kannala_brandt4";
-    default:
-        return "unknown_field";
-    }
 }
 }  // namespace orbbec_camera

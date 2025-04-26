@@ -31,7 +31,6 @@
 #include <iomanip>  // For std::put_time
 
 std::string g_camera_name = "orbbec_camera";  // Assuming this is declared elsewhere
-std::string g_time_domain = "global";         // Assuming this is declared elsewhere
 
 void signalHandler(int sig) {
   std::cout << "Received signal: " << sig << std::endl;
@@ -130,9 +129,6 @@ void OBCameraNodeDriver::init() {
   connection_delay_ = static_cast<int>(declare_parameter<int>("connection_delay", 100));
   enable_sync_host_time_ = declare_parameter<bool>("enable_sync_host_time", true);
   g_camera_name = declare_parameter<std::string>("camera_name", g_camera_name);
-  g_time_domain = declare_parameter<std::string>("time_domain", g_time_domain);
-  preset_firmware_path_ =
-      declare_parameter<std::string>("preset_firmware_path", preset_firmware_path_);
   ob::Context::setLoggerToConsole(log_level);
   orb_device_lock_shm_fd_ = shm_open(ORB_DEFAULT_LOCK_NAME.c_str(), O_CREAT | O_RDWR, 0666);
   if (orb_device_lock_shm_fd_ < 0) {
@@ -281,6 +277,7 @@ void OBCameraNodeDriver::resetDevice() {
       device_info_.reset();
       device_connected_ = false;
       device_unique_id_.clear();
+      serial_number_.clear();
       reset_device_flag_ = false;
     }
     RCLCPP_INFO_STREAM(logger_, "Reset device uid: " << device_unique_id_ << " done");
@@ -393,7 +390,6 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByUSBPort(
 
 void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &device) {
   device_ = device;
-  updatePresetFirmware(preset_firmware_path_);
   CHECK_NOTNULL(device_);
   CHECK_NOTNULL(device_.get());
   if (ob_camera_node_) {
@@ -443,13 +439,6 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
 
   if (enable_sync_host_time_ && !isOpenNIDevice(device_info_->pid())) {
     TRY_EXECUTE_BLOCK(device_->timerSyncWithHost());
-    if (g_time_domain != "global") {
-      sync_host_time_timer_ = this->create_wall_timer(std::chrono::milliseconds(60000), [this]() {
-        if (device_) {
-          TRY_EXECUTE_BLOCK(device_->timerSyncWithHost());
-        }
-      });
-    }
   }
 
   RCLCPP_INFO_STREAM(logger_, "Device " << device_info_->getName() << " connected");
@@ -491,30 +480,7 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
     device_.reset();
   }
   std::this_thread::sleep_for(std::chrono::milliseconds(connection_delay_));
-  int try_lock_count = 0;
-  int max_try_lock_count = 5;
-
-  while (try_lock_count < max_try_lock_count) {
-    int try_lock_result = pthread_mutex_trylock(orb_device_lock_);
-
-    if (try_lock_result == 0) {
-      // success get lock,break
-      break;
-    } else if (try_lock_result == EBUSY) {
-      RCLCPP_INFO_STREAM(logger_, "Device lock is held by another process, waiting 100ms");
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    } else {
-      RCLCPP_ERROR_STREAM(logger_, "Failed to lock orb_device_lock_");
-      return;  // Not EBUSY, return
-    }
-
-    try_lock_count++;
-  }
-  if (try_lock_count >= max_try_lock_count) {
-    RCLCPP_ERROR_STREAM(logger_, "Failed to lock orb_device_lock_");
-    return;
-  }
-
+  pthread_mutex_lock(orb_device_lock_);
   std::shared_ptr<int> lock_holder(nullptr,
                                    [this](int *) { pthread_mutex_unlock(orb_device_lock_); });
   bool start_device_failed = false;
@@ -556,110 +522,6 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
     reset_device_flag_ = true;
     reset_device_cond_.notify_all();
   }
-}
-void OBCameraNodeDriver::updatePresetFirmware(std::string path) {
-  if (path.empty()) {
-    return;
-  } else {
-    std::stringstream ss(path);
-    std::string path_segment;
-    std::vector<std::string> paths;
-    OBFwUpdateState updateState = STAT_START;
-    bool firstCall = true;
-
-    while (std::getline(ss, path_segment, ',')) {
-      paths.push_back(path_segment);
-    }
-    uint8_t index = 0;
-    uint8_t count = static_cast<uint8_t>(paths.size());
-    char(*filePaths)[OB_PATH_MAX] = new char[count][OB_PATH_MAX];
-    RCLCPP_INFO_STREAM(this->get_logger(), "paths.cout : " << (uint32_t)count);
-    for (const auto &p : paths) {
-      strcpy(filePaths[index], p.c_str());
-      RCLCPP_INFO_STREAM(this->get_logger(),
-                         "path: " << (uint32_t)index << ":" << filePaths[index]);
-      index++;
-    }
-    RCLCPP_INFO_STREAM(this->get_logger(),
-                       "Start to update optional depth preset, please wait a moment...");
-    try {
-      device_->updateOptionalDepthPresets(
-          filePaths, count,
-          [this, &updateState, &firstCall](OBFwUpdateState state, const char *message,
-                                           uint8_t percent) {
-            updateState = state;
-            presetUpdateCallback(firstCall, state, message, percent);
-            // firstCall = false;
-          });
-
-      delete[] filePaths;
-      filePaths = nullptr;
-      if (updateState == STAT_DONE || updateState == STAT_DONE_WITH_DUPLICATES) {
-        RCLCPP_INFO_STREAM(this->get_logger(), "After updating the preset: ");
-        auto presetList = device_->getAvailablePresetList();
-        RCLCPP_INFO_STREAM(this->get_logger(), "Preset count: " << presetList->getCount());
-        for (uint32_t i = 0; i < presetList->getCount(); ++i) {
-          RCLCPP_INFO_STREAM(this->get_logger(), "  - " << presetList->getName(i));
-        }
-        RCLCPP_INFO_STREAM(this->get_logger(),
-                           "Current preset: " << device_->getCurrentPresetName());
-        std::string key = "PresetVer";
-        if (device_->isExtensionInfoExist(key)) {
-          std::string value = device_->getExtensionInfo(key);
-          RCLCPP_INFO_STREAM(this->get_logger(), "Preset version: " << value);
-        } else {
-          RCLCPP_INFO_STREAM(this->get_logger(), "PresetVer: ");
-        }
-      }
-    } catch (ob::Error &e) {
-      RCLCPP_ERROR_STREAM(logger_, "Failed to update Preset Firmware " << e.getMessage());
-    } catch (std::exception &e) {
-      RCLCPP_ERROR_STREAM(logger_, "Failed to update Preset Firmware " << e.what());
-    } catch (...) {
-      RCLCPP_ERROR_STREAM(logger_, "Failed to update Preset Firmware");
-    }
-  }
-}
-void OBCameraNodeDriver::presetUpdateCallback(bool firstCall, OBFwUpdateState state,
-                                              const char *message, uint8_t percent) {
-  if (!firstCall) {
-    std::cout << "\033[3F";
-  }
-
-  std::cout << "\033[K";
-  std::cout << "Progress: " << static_cast<uint32_t>(percent) << "%" << std::endl;
-
-  std::cout << "\033[K";
-  std::cout << "Status  : ";
-  switch (state) {
-    case STAT_VERIFY_SUCCESS:
-      std::cout << "Image file verification success" << std::endl;
-      break;
-    case STAT_FILE_TRANSFER:
-      std::cout << "File transfer in progress" << std::endl;
-      break;
-    case STAT_DONE:
-      std::cout << "Update completed" << std::endl;
-      break;
-    case STAT_DONE_WITH_DUPLICATES:
-      std::cout << "Update completed, duplicated presets have been ignored" << std::endl;
-      break;
-    case STAT_IN_PROGRESS:
-      std::cout << "Update in progress" << std::endl;
-      break;
-    case STAT_START:
-      std::cout << "Starting the update" << std::endl;
-      break;
-    case STAT_VERIFY_IMAGE:
-      std::cout << "Verifying image file" << std::endl;
-      break;
-    default:
-      std::cout << "Unknown status or error" << std::endl;
-      break;
-  }
-
-  std::cout << "\033[K";
-  std::cout << "Message : " << message << std::endl << std::flush;
 }
 }  // namespace orbbec_camera
 

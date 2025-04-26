@@ -3,7 +3,7 @@
 orbbec_ros:
     camera_parameters:
         general:
-            # Camera model. support product models by referencing config/*.yaml
+            # Camera model. upport product models by referencing config/*.yaml
             camera_model: "gemini330_series"
             # The configuration file for yaml params.
             config_file_path: "gemini330_series.yaml"
@@ -21,6 +21,8 @@ orbbec_ros:
             device_num: 1
             # Optional values: v4l2, libuvc
             uvc_backend: "libuvc"
+            # Usually no need to change
+            vendor_id: "0x2bc5"
             # Usually no need to change,will be read from the device
             product_id: ""
             # The delay time for reopening the device, in milliseconds. Usually, there is no need to modify by default.
@@ -366,6 +368,8 @@ orbbec_ros:
             ir_info_url: ""
             # URL of the color image info
             color_info_url: ""
+            # If true, the 3D reconstruction mode will be enabled
+            enable_3d_reconstruction_mode: false
             # Diagnostic period in seconds
             diagnostic_period: 1.0
 

@@ -816,8 +816,8 @@
             </Misc>
 
             <DepthPostProcessing>
-                <HardwareNoiseRemoveFilter>true</HardwareNoiseRemoveFilter>
-                <SoftwareNoiseRemoveFilter>false</SoftwareNoiseRemoveFilter>
+                <HardwareNoiseRemoveFilter>false</HardwareNoiseRemoveFilter>
+                <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
             </DepthPostProcessing>
 
             <!-- Whether to enable heartbeat by default -->
@@ -893,8 +893,8 @@
             </Misc>
 
             <DepthPostProcessing>
-                <HardwareNoiseRemoveFilter>true</HardwareNoiseRemoveFilter>
-                <SoftwareNoiseRemoveFilter>false</SoftwareNoiseRemoveFilter>
+                <HardwareNoiseRemoveFilter>false</HardwareNoiseRemoveFilter>
+                <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
             </DepthPostProcessing>
 
             <!-- Whether to enable heartbeat by default -->
@@ -969,8 +969,8 @@
             </Misc>
 
             <DepthPostProcessing>
-                <HardwareNoiseRemoveFilter>true</HardwareNoiseRemoveFilter>
-                <SoftwareNoiseRemoveFilter>false</SoftwareNoiseRemoveFilter>
+                <HardwareNoiseRemoveFilter>false</HardwareNoiseRemoveFilter>
+                <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
             </DepthPostProcessing>
 
             <!-- Whether to enable heartbeat by default -->
@@ -1057,8 +1057,8 @@
             </Misc>
 
             <DepthPostProcessing>
-                <HardwareNoiseRemoveFilter>true</HardwareNoiseRemoveFilter>
-                <SoftwareNoiseRemoveFilter>false</SoftwareNoiseRemoveFilter>
+                <HardwareNoiseRemoveFilter>false</HardwareNoiseRemoveFilter>
+                <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
             </DepthPostProcessing>
 
             <!-- Whether to enable heartbeat by default -->
@@ -1145,8 +1145,8 @@
             </Misc>
 
             <DepthPostProcessing>
-                <HardwareNoiseRemoveFilter>true</HardwareNoiseRemoveFilter>
-                <SoftwareNoiseRemoveFilter>false</SoftwareNoiseRemoveFilter>
+                <HardwareNoiseRemoveFilter>false</HardwareNoiseRemoveFilter>
+                <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
             </DepthPostProcessing>
 
             <!-- Whether to enable heartbeat by default -->
@@ -1219,8 +1219,8 @@
             </Misc>
 			
 			<DepthPostProcessing>
-                <HardwareNoiseRemoveFilter>true</HardwareNoiseRemoveFilter>
-                <SoftwareNoiseRemoveFilter>false</SoftwareNoiseRemoveFilter>
+                <HardwareNoiseRemoveFilter>false</HardwareNoiseRemoveFilter>
+                <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
             </DepthPostProcessing>
 			
 			<!-- Whether to enable heartbeat by default -->
@@ -1278,8 +1278,8 @@
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
 
             <DepthPostProcessing>
-                <HardwareNoiseRemoveFilter>true</HardwareNoiseRemoveFilter>
-                <SoftwareNoiseRemoveFilter>false</SoftwareNoiseRemoveFilter>
+                <HardwareNoiseRemoveFilter>false</HardwareNoiseRemoveFilter>
+                <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
             </DepthPostProcessing>
 
             <Misc>
@@ -1312,12 +1312,12 @@
             </Depth>
             <Color>
                 <!-- The resolution width is enabled by default, int type -->
-                <Width>1280</Width>
+                <Width>1920</Width>
                 <!-- High resolution is enabled by default, int type -->
-                <Height>720</Height>
+                <Height>1080</Height>
                 <!-- The frame rate of the resolution enabled by default, int type -->
                 <FPS>30</FPS>
-                <Format>MJPG</Format>
+                <Format>RGB</Format>
             </Color>
             <IR>
                 <!-- The resolution width is enabled by default, int type -->
@@ -1355,8 +1355,8 @@
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
 
             <DepthPostProcessing>
-                <HardwareNoiseRemoveFilter>true</HardwareNoiseRemoveFilter>
-                <SoftwareNoiseRemoveFilter>false</SoftwareNoiseRemoveFilter>
+                <HardwareNoiseRemoveFilter>false</HardwareNoiseRemoveFilter>
+                <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
             </DepthPostProcessing>
 
             <Misc>
@@ -1862,8 +1862,8 @@
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
 
             <DepthPostProcessing>
-                <HardwareNoiseRemoveFilter>true</HardwareNoiseRemoveFilter>
-                <SoftwareNoiseRemoveFilter>false</SoftwareNoiseRemoveFilter>
+                <HardwareNoiseRemoveFilter>false</HardwareNoiseRemoveFilter>
+                <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
             </DepthPostProcessing>
 
             <Misc>
@@ -1950,8 +1950,8 @@
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
 
             <DepthPostProcessing>
-                <HardwareNoiseRemoveFilter>true</HardwareNoiseRemoveFilter>
-                <SoftwareNoiseRemoveFilter>false</SoftwareNoiseRemoveFilter>
+                <HardwareNoiseRemoveFilter>false</HardwareNoiseRemoveFilter>
+                <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
             </DepthPostProcessing>
 
             <Misc>

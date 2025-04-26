@@ -35,7 +35,7 @@ depth_qos: "sensor_data"
 depth_camera_info_qos: "sensor_data"
 
 # ir exposure
-enable_ir_auto_exposure: false
+enable_ir_auto_exposure: true
 ir_exposure: 5000
 ir_gain: 40
 

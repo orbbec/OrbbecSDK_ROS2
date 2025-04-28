@@ -378,6 +378,12 @@ Note: The V4L2 backend is not enabled by default.
 
 The following are the launch parameters available:
 
+**Modify parameters when launching launch**:
+
+```bash
+ros2 launch orbbec_camera gemini_330_series.launch.py color_width:=640 color_height:=480
+```
+
 - `connection_delay`: The delay time in milliseconds for reopening the device. Some devices, such as Astra mini, require
   a longer time to initialize and reopening the device immediately can cause firmware crashes when hot plugging.
 - `enable_point_cloud`: Enables the point cloud.

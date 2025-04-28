@@ -600,6 +600,7 @@ class OBCameraNode {
   bool enable_decimation_filter_ = false;
   bool enable_hdr_merge_ = false;
   bool enable_sequence_id_filter_ = false;
+  bool enable_disaparity_to_depth_ = true;
   bool enable_threshold_filter_ = false;
   bool enable_hardware_noise_removal_filter_ = true;
   bool enable_noise_removal_filter_ = true;

@@ -807,6 +807,7 @@ void OBCameraNode::setupDepthPostProcessFilter() {
         {"SpatialAdvancedFilter", enable_spatial_filter_},
         {"TemporalFilter", enable_temporal_filter_},
         {"HoleFillingFilter", enable_hole_filling_filter_},
+        {"DisparityTransform", enable_disaparity_to_depth_},
         {"ThresholdFilter", enable_threshold_filter_},
     };
     std::string filter_name = filter->type();
@@ -1597,6 +1598,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<bool>(enable_decimation_filter_, "enable_decimation_filter", false);
   setAndGetNodeParameter<bool>(enable_hdr_merge_, "enable_hdr_merge", false);
   setAndGetNodeParameter<bool>(enable_sequence_id_filter_, "enable_sequence_id_filter", false);
+  setAndGetNodeParameter<bool>(enable_disaparity_to_depth_, "enable_disaparity_to_depth", true);
   setAndGetNodeParameter<bool>(enable_threshold_filter_, "enable_threshold_filter", false);
   setAndGetNodeParameter<bool>(enable_hardware_noise_removal_filter_,
                                "enable_hardware_noise_removal_filter", true);

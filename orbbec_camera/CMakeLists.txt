@@ -15,12 +15,6 @@ option(USE_NV_HW_DECODER "Use Nvidia hardware decoder" OFF)
 if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Werror -Wno-pedantic -Wno-array-bounds)
 endif ()
-# Check if ROS Jazzy or iron is installed
-if ("$ENV{ROS_DISTRO}" STREQUAL "jazzy")
-  add_compile_definitions(ROS_JAZZY)
-elseif ("$ENV{ROS_DISTRO}" STREQUAL "iron")
-  add_compile_definitions(ROS_IRON)
-endif ()
 
 # find dependencies
 set(dependencies

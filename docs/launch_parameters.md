@@ -55,9 +55,9 @@ The following are the launch parameters available:
 * `tf_publish_rate` : Set Rate of the TF publication
 * `ir_info_url` : Set URL of the IR image info
 * `color_info_url` : Set URL of the color image info
-* `enumerate_net_device` : Enable automatically enumerate network devices,this parameter is usually used [net camera](./orbbec_camera/examples/net_camera/README.MD)
-* `net_device_ip` : Setting net device's IP address,this parameter is usually used [net camera](./orbbec_camera/examples/net_camera/README.MD)
-* `net_device_port` : Setting net device's port.Usually, you can set it to 8090,this parameter is usually used [net camera](./orbbec_camera/examples/net_camera/README.MD)
+* `enumerate_net_device` : Enable automatically enumerate network devices,this parameter is usually used [net camera](../orbbec_camera/examples/net_camera/README.MD)
+* `net_device_ip` : Setting net device's IP address,this parameter is usually used [net camera](../orbbec_camera/examples/net_camera/README.MD)
+* `net_device_port` : Setting net device's port.Usually, you can set it to 8090,this parameter is usually used [net camera](../orbbec_camera/examples/net_camera/README.MD)
 * `log_level` : SDK log level, the default value is `info`, the optional values are `debug`, `info`, `warn`, `error`, `fatal`
 * `enable_publish_extrinsic` : Enables the extrinsics publish
 * `enable_d2c_viewer` : Publishes the D2C overlay image (for testing only)

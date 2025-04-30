@@ -1,99 +1,86 @@
-## Using the Orbbec ROS package to get lower CPU usage
+## Reducing CPU Usage with Orbbec ROS Package
 
-This section shows you how to reduce CPU usage for one or more cameras in a ROS 2 environment. This method only works with Gemini 330 series cameras, and the firmware version needs to be above 1.4.10(`device_preset `is set to Default).
+This document outlines strategies for minimizing CPU usage in the **OrbbecSDK_ROS2 v2** environment when using **Gemini 330 series cameras**. The firmware version must be **no lower than 1.4.10**, and `device` should be set to **Default**.
 
-The example launch files used in this section are `gemini_330_series_lower_cpu_usage.launch.py` and `multi_camera_lower_cpu_usage.launch.py`.
+### Recommended Settings for Lower CPU Usage
 
-### Parameters that affect CPU usage
+To achieve the lowest possible CPU usage in OrbbecSDK_ROS2, it is recommended to configure the following parameters.
 
-* `uvc_backend`:Global UVC Backend select on Linux,optional values: libuvc, v4l2.(v4l2 is lower)
+|    Parameter    |             Recommendation             |                      Note                      |
+| :--------------: | :------------------------------------: | :--------------------------------------------: |
+| `uvc_backend` |                `v4l2`                |     Lower CPU usage compared to `libuvc`     |
+| `color_format` |                `RGB`                |         Lower CPU usage than `MJPG`         |
+|    `filter`    | Only `hardware_noise_removal_filter` | Other filters significantly increase CPU usage |
 
-* `color_format`:Color Stream coding format.(RGB is lower)
+### Launch Files Used for Testing
 
-* `depth_registration`: Enables alignment of the depth frame to the color frame.(align_mode is set to HW lower)
+* `gemini_330_series_lower_cpu_usage.launch.py`
+* `multi_camera_lower_cpu_usage.launch.py`
 
-* `enable_point_cloud`:Disables the point cloud
+### Test environment
 
-* `enable_colored_point_cloud`:Disables the RGB point cloud
+#### Hardware Configuration
 
-* `filter`:decimation_filter,hdr_merge,sequenced_filter,threshold_filter,hardware_noise_removal_filter,noise_removal_filter,spatial_filter,temporal_filter,hole_filling_filter.(hardware_noise_removal_filter is lower)
+* **CPU**: Intel i7-8700 @ 3.20GHz
+* **Memory**: 24 GB
+* **Storage**: Micron 2200S NVMe 256GB
+* **GPU**: NVIDIA GeForce GTX 1660Ti
+* **OS**: Ubuntu22.04
 
-### Data comparison
+#### ROS Configuration
 
-> Since different machines and different software environments will result in different CPU usage, the CPU improvement rate is calculated based on the device's CPU benchmark.
-> A comparing B:
-> `CPU improvement rate=（CPUA-CPUB）/CPUB*100`
+* **ROS Version**: ROS2 Humble
+* **SDK Version**: OrbbecSDK_ROS2 v2.2.1
 
-In this example, we used two different video stream resolutions as test benchmarks to provide a performance comparison between lower and higher resolutions.(Currently, data is only provided for `uvc_backend`, `color_format`, and some `filter`)
+#### Camera Setup
 
-#### Depth&Left_ir&Right_ir 424 * 266 15fps,Color 848 * 480 15fps
+* Devices: 2x Gemini 335, 1x Gemini 336, 1x Gemini 336L
+* Firmware Version: 1.4.10
 
-##### uvc_backend
+### Test Setup
 
-libuvc comparing v4l2 In the same environment, CPU improvement rate is ***13.1%***
+* **Stream Settings:**
+  * Depth / IR Left / IR Right: 848×480 @ 30fps
+  * Color: 848×480 @ 30fps
 
-* libuvc is ***72.3%***
-* v4l2 is ***62.8%***
+Note: The following CPU usage data focuses on `uvc_backend`, `color_format` and various filter combinations.
 
-##### color_format
+### Test Results
 
-ROS2 color stream sets MJPG encoding format and decodes it to RGB comparing RGB encoding format (including YUYV format to RGB conversion operation cost).The CPU improvement rate under the libuvc protocol is ***14.2%*** the CPU improvement rate under the v4l2 protocol is ***30.8%***
+### 1.  `uvc_backend` Comparison (RGB format)
 
-* libuvc:RGB encoding format is ***63.3%***，MJPG encoding format and decoded into RGB is ***72.3%***
-* v4l2:RGB encoding format is ***48%***，MJPG encoding format and decoded into RGB is ***62.8%***
+| libuvc CPU Usage | v4l2 CPU Usage | Absolute Change |
+| :--------------: | :------------: | :-------------: |
+|      182.8%      |     118.8%     |     -64.0%     |
 
-##### filter
+The CPU usage can be significantly reduced with v4l2 backend. In our implementation, v4l2 works without requiring any patches to the Linux kernel, allowing users to easily switch between v4l2 and libuvc and maintaining full compatibility with standard Linux distributions.
 
-The color stream setting RGB encoding and MJPG have no effect on filtering and are basically the same. The CPU usage of the depth stream is basically the same under the configuration of 424*266 15fps.
+### 2. `color_format` Comparison (MJPG vs RGB)
 
-|             Filter Configuration             | libuvc(CPU improvement rate) | v4l2(CPU improvement rate) |
-| :------------------------------------------: | :--------------------------: | :------------------------: |
-|                  No filter                  |          63.3%(0%)          |         48.0%(0%)         |
-|        hardware_noise_removal_filter        |         61.2%(-3.3%)         |        47.9%(-0.2%)        |
-| hardware_noise_removal_filter+spatial_filter |         65.3%(3.2%)         |        51.2%(6.7%)        |
-|             noise_removal_filter             |         77.0%(21.6%)         |        53.3%(11.0%)        |
-|     noise_removal_filter+spatial_filter     |         78.4%(23.9%)         |        54.8%(14.2%)        |
+| Backend | MJPG CPU Usage | RGB CPU Usage | Absolute Change |
+| :-----: | :------------: | :-----------: | :-------------: |
+| libuvc |     347.7%     |    182.8%    |     -164.9%     |
+|  v4l2  |     170.0%     |    118.8%    |     -51.2%     |
 
-#### Depth&Left_ir&Right_ir 848 * 480 30fps,Color 848 * 480 30fps
+The CPU usage can be reduced if the RGB format is selected instead of MJPG, since the decoding of MJPG image will consume the host CPU resource.
 
-##### uvc_backend
+### 3. Filter Configuration Impact
 
-libuvc comparing v4l2 In the same environment, CPU improvement rate is ***53.9%***
+| Filters Applied                                       | libuvc CPU Usage | CPU Usage Increase | v4l2 CPU Usage | CPU Usage Increase |
+| ----------------------------------------------------- | ---------------- | ------------------ | -------------- | ------------------ |
+| No Filter (benchmark)                                 | 182.8%           | 0.0%(benchmark)    | 118.8%         | 0.0%(benchmark)    |
+| `(software)noise_removal_filter`                    | 218.0%           | +35.2%             | 128.5%         | +9.7%              |
+| `(software)noise_removal_filter + spatial_filter` | 469.6%           | +286.8%            | 336.7%         | +217.9%            |
+| `hardware_noise_removal_filter`                     | 186.3%           | +3.5%              | 115.4%         | -3.4%              |
+| `hardware_noise_removal_filter + spatial_filter`  | 251.3%           | +68.5%             | 152.5%         | +33.7%             |
 
-* libuvc is ***182.8%***
-* v4l2 is ***118.8%***
+Based on the test results, using only the `hardware_noise_removal_filter` results in a negligible change in CPU usage for both `libuvc` (+3.5%) and `v4l2` (-3.4%) compared to the no-filter benchmark, as this filter runs internally on the camera hardware. In contrast, other filters execute on the host system. Adding the `spatial_filter` to the hardware filter leads to a moderate increase in CPU usage, while applying the software-based `noise_removal_filter` —either alone or combined with `spatial_filter` —significantly increases CPU load. To maintain low CPU usage, it is recommended to avoid software-based filters and rely solely on the `hardware_noise_removal_filter`.
 
-##### color_format
+## Further Optimization
 
-ROS2 color stream sets MJPG encoding format and decodes it to RGB comparing RGB encoding format (including YUYV format to RGB conversion operation cost).The CPU improvement rate under the libuvc protocol is ***90.2%*** the CPU improvement rate under the v4l2 protocol is ***43.1%***
+|           Parameter           |                  Recommendation                  |                      Note                      |
+| :----------------------------: | :----------------------------------------------: | :---------------------------------------------: |
+|     `depth_registration`     | `false` or `true` with `align_mode=HW` |      Software alignment consumes more CPU      |
+|     `enable_point_cloud`     |                    `false`                    |     Disabling point cloud reduces CPU usage     |
+| `enable_colored_point_cloud` |                    `false`                    | Disabling colored point cloud reduces CPU usage |
 
-* libuvc:RGB encoding format is ***182.8%***，MJPG encoding format and decoded into RGB is ***347.7%***
-* v4l2:RGB encoding format is ***118.8%***，MJPG encoding format and decoded into RGB is ***170.0%***
-
-##### filter
-
-When the depth stream is configured at 848*480 30fps, the CPU usage is significantly different.
-
-|             Filter Configuration             | libuvc(CPU improvement rate) | v4l2(CPU improvement rate) |
-| :------------------------------------------: | :--------------------------: | :------------------------: |
-|                  No filter                  |          182.8%(0%)          |         118.8%(0%)         |
-|        hardware_noise_removal_filter        |         186.3%(1.9%)         |       115.4%(-2.9%)       |
-| hardware_noise_removal_filter+spatial_filter |        251.3%(37.5%)        |       152.5%(28.4%)       |
-|             noise_removal_filter             |        218.0%(16.1%)        |        128.5%(8.2%)        |
-|     noise_removal_filter+spatial_filter     |        469.6%(156.9%)        |       336.7%(183.4%)       |
-
-### Example launch
-
-This is the current example file for running the camera to achieve the lowest CPU usage, excluding the impact of filters.
-
-Use the following command to start the single-camera configuration:
-
-```bash
-ros2 launch orbbec_camera gemini_330_series_lower_cpu_usage.launch.py
-```
-
-Use the following command to start the multi-camera configuration:
-
-```bash
-roslaunch orbbec_camera multi_camera_lower_cpu_usage.launch.py
-```

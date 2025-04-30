@@ -24,3 +24,9 @@ DeclareLaunchArgument('depth_work_mode', default_value='')
 ```bash
 ros2 run orbbec_camera list_depth_work_mode_node
 ```
+
+* Example:
+
+```bash
+ros2 launch orbbec_camera gemini2L.launch.py depth_work_mode:="Unbinned Dense Default"
+```

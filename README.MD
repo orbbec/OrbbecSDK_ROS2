@@ -23,18 +23,18 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
     <tr>
       <td rowspan="8" style="text-align: center; font-weight: bold;">Gemini 330</td>
       <td>Gemini 335</td>
-      <td>full maintenance</td>
-      <td>recommended for new designs</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
     </tr>
     <tr>
       <td>Gemini 336</td>
-      <td>full maintenance</td>
-      <td>recommended for new designs</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
     </tr>
     <tr>
       <td>Gemini 330</td>
-      <td>full maintenance</td>
-      <td>recommended for new designs</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
     </tr>
     <tr>
       <td>Gemini 335L</td>
@@ -43,77 +43,77 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
     </tr>
     <tr>
       <td>Gemini 336L</td>
-      <td>full maintenance</td>
-      <td>recommended for new designs</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
     </tr>
     <tr>
       <td>Gemini 330L</td>
-      <td>full maintenance</td>
-      <td>recommended for new designs</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
     </tr>
     <tr>
       <td>Gemini 335Lg</td>
-      <td>not supported</td>
-      <td>recommended for new designs</td>
+      <td>Not supported</td>
+      <td>Recommended for new designs</td>
     </tr>
     <tr>
       <td>Gemini 335Le</td>
-      <td>not supported</td>
-      <td>recommended for new designs</td>
+      <td>Not supported</td>
+      <td>Recommended for new designs</td>
     </tr>
     <tr>
       <td rowspan="3" style="text-align: center; font-weight: bold;">Gemini 2</td>
       <td>Gemini 2</td>
-      <td>full maintenance</td>
-      <td>recommended for new designs</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
     </tr>
     <tr>
       <td>Gemini 2 L</td>
-      <td>full maintenance</td>
-      <td>recommended for new designs</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
     </tr>
     <tr>
       <td>Gemini 2 XL</td>
-      <td>recommended for new designs</td>
-      <td>to be supported</td>
+      <td>Recommended for new designs</td>
+      <td>To be supported</td>
     </tr>
     <tr>
       <td rowspan="3" style="text-align: center; font-weight: bold;">Femto</td>
       <td>Femto Bolt</td>
-      <td>full maintenance</td>
-      <td>recommended for new designs</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
     </tr>
     <tr>
       <td>Femto Mega</td>
-      <td>full maintenance</td>
-      <td>recommended for new designs</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
     </tr>
     <tr>
       <td>Femto Mega I</td>
-      <td>full maintenance</td>
-      <td>to be supported</td>
+      <td>Full maintenance</td>
+      <td>To be supported</td>
     </tr>
     <tr>
       <td rowspan="3" style="text-align: center; font-weight: bold;">Astra</td>
       <td>Astra 2</td>
-      <td>full maintenance</td>
-      <td>recommended for new designs</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
     </tr>
     <tr>
       <td>Astra+</td>
-      <td>limited maintenance</td>
-      <td>not supported</td>
+      <td>Limited maintenance</td>
+      <td>Not supported</td>
     </tr>
     <tr>
       <td>Astra Pro Plus</td>
-      <td>limited maintenance</td>
-      <td>not supported</td>
+      <td>Limited maintenance</td>
+      <td>Not supported</td>
     </tr>
     <tr>
       <td style="text-align: center; font-weight: bold;">Astra Mini</td>
       <td>Astra Mini Pro</td>
-      <td>full maintenance</td>
-      <td>not supported</td>
+      <td>Full maintenance</td>
+      <td>Not supported</td>
     </tr>
   </tbody>
 </table>
@@ -122,11 +122,11 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
 
 **Definition**:
 
-1. recommended for new designs: we will provide full supports with new features,  bug fix and performance optimization;
-2. full maintenance: we will provide bug fix support;
-3. limited maintenance: we will provide critical bug fix support;
-4. not supported: we will not support specific device in this version;
-5. to be supported: we will add support in the near future.
+1. Recommended for new designs: we will provide full supports with new features,  bug fix and performance optimization;
+2. Full maintenance: we will provide bug fix support;
+3. Limited maintenance: we will provide critical bug fix support;
+4. Not supported: we will not support specific device in this version;
+5. To be supported: we will add support in the near future.
 
 **Documentation Note:**
 
@@ -199,6 +199,7 @@ cd ~/ros2_ws/src
 git clone https://github.com/orbbec/OrbbecSDK_ROS2.git
 cd OrbbecSDK_ROS2
 git checkout v2-main
+git branch  #Check whether the branch switch is successful
 ```
 
 Install deb dependencies
@@ -226,7 +227,7 @@ Currently, the following devices are supported by the OrbbecSDK ROS2 Wrapper v2-
 
 For optimal performance, we strongly recommend updating to the latest firmware version. This ensures that you benefit from the most recent enhancements and bug fixes.
 
-| Product List | Minimal Firmware Version | **Launch File**             |
+| Product List | Minimal Firmware Version | **Launch File**       |
 | :----------- | :----------------------- | :-------------------------- |
 | Gemini 330   | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 330L  | 1.2.20                   | gemini_330_series.launch.py |
@@ -259,6 +260,7 @@ Launch camera node
 
 ```bash
 . ./install/setup.bash
+ros2 run orbbec_camera list_devices_node #Check if the camera is connected
 ros2 launch orbbec_camera gemini_330_series.launch.py # or other launch file, see below table
 ```
 
@@ -441,7 +443,6 @@ When you have multiple cameras, you can activate all of them at the same time.
 
 For more information about Multi camera.Reference:[Multi camera documentation](./orbbec_camera/examples/multi_camera/multi_camera.MD)
 
-
 ### Check which profiles the camera supports
 
 ```bash
@@ -475,6 +476,12 @@ For the Femto Mega and Femto Bolt devices setting NFOV and WFOV modes.Reference:
 [Setting uvc_backend](./docs/launch_parameters.md)
 
 Note: The V4L2 backend is not enabled by default.
+
+* Example:
+
+```bash
+ros2 launch orbbec_camera gemini_330_series.launch.py uvc_backend:=v4l2
+```
 
 ### DDS Tuning
 

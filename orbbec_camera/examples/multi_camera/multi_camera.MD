@@ -1,4 +1,3 @@
-
 # Multi-Camera
 
 - To get the `usb_port` of the camera, plug in the camera and run the following command in the terminal:
@@ -64,3 +63,29 @@ def generate_launch_description():
 ```bash
 ros2 launch orbbec_camera multi_camera.launch.py
 ```
+
+## No Data Stream from Multiple Cameras
+
+**Insufficient Power Supply**:
+
+- Ensure that each camera is connected to a separate hub.
+- Use a powered hub to provide sufficient power to each camera.
+
+**High Resolution**:
+
+- Try lowering the resolution to resolve data stream issues.
+
+**Increase usbfs_memory_mb Value**:
+
+- Increase the `usbfs_memory_mb` value to 128MB (this is a reference value and can be adjusted based on your system’s needs)
+  by running the following command:
+
+```bash
+    echo 128 | sudo tee /sys/module/usbcore/parameters/usbfs_memory_mb
+```
+
+- To make this change permanent, check [this link](https://github.com/OpenKinect/libfreenect2/issues/807).
+
+## Image topic frame rate too low from Multiple Cameras
+
+Refer to the [Fast DDS Configuration](./docs/fastdds_tuning.md) file.

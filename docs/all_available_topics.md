@@ -7,7 +7,7 @@
 - `/camera/color/camera_info` : The color camera info.
 - `/camera/color/image_raw`: The color stream image.
 - `/camera/color/metadata`: The color stream firmware data.
-- `/camera/depth/camera_info`: The depth stream image.
+- `/camera/depth/camera_info`: The depth camera info.
 - `/camera/depth/image_raw`: The depth stream image.
 - `/camera/depth/metadata`:The depth stream firmware data.
 - `/camera/depth/points` : The point cloud, only available when `enable_point_cloud` is `true`.

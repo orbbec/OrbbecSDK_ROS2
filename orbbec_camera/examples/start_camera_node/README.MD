@@ -7,7 +7,7 @@ This guide provides instructions on how to launch the camera node with a colored
 To start the camera node, execute the following command in your terminal:
 
 ```bash
-ros2 launch orbbec_camera gemini_330_series.launch.py enable_colored_point_cloud:=true
+ros2 launch orbbec_camera gemini_330_series.launch.py enable_colored_point_cloud:=true enable_d2c_viewer:=true enable_right_ir:=true enable_left_ir:=true enable_sync_output_accel_gyro:=true enable_accel:=true enable_gyro:=true
 ```
 
 This command initiates the camera node and enables the colored point cloud.

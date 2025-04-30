@@ -46,6 +46,10 @@ In the output example provided
 
 Edit multi_camera_synced_verify.launch.py and fill in the activated camera device,we can find that save_rgbir is started at the end.
 
+> IMPORTANT
+>
+> If you are using ROS 2 Foxy, you need to launch the save_rgbir node first.
+
 ```python
 # Launch description
     ld = LaunchDescription(
@@ -138,7 +142,7 @@ cd multicamera_sync/Python
 python3 SyncFramesMain.py
 ```
 
-After the operation is successful, you can view the synchronization effect in the r `esults folder`
+After the operation is successful, you can view the synchronization effect in the  `results folder`
 
 ## Files that need to be changed
 
@@ -153,3 +157,4 @@ After the operation is successful, you can view the synchronization effect in th
 [camera_params.yaml](../../config/camera_params.yaml)(Camera startup parameter settings)
 
 [multi_camera_synced_verify.launch.py](./multi_camera_synced_verify.launch.py)
+

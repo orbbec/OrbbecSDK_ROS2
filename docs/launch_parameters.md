@@ -64,14 +64,14 @@ The following are the launch parameters available:
 * `enable_hardware_d2d` : false: switch to software disparity convert to depth, true: switch to hardware disparity convert to depth
 * `enable_ldp` : Enables the LDP
 * `ldp_power_level` : Set power level of the LDP
-* `sync_mode` : Set sync mode.The default value is standalone,this parameter is usually used [multi camera synced](./orbbec_camera/examples/multi_camera_synced/README.MD)
-* `depth_delay_us` : The delay time of the depth image capture after receiving the capture command or trigger signal in microseconds,this parameter is usually used [multi camera synced](./orbbec_camera/examples/multi_camera_synced/README.MD)
-* `color_delay_us` : The delay time of the color image capture after receiving the capture command or trigger signal in microseconds,this parameter is usually used [multi camera synced](./orbbec_camera/examples/multi_camera_synced/README.MD)
-* `trigger2image_delay_us` : The delay time of the image capture after receiving the capture command or trigger signal in microseconds,this parameter is usually used [multi camera synced](./orbbec_camera/examples/multi_camera_synced/README.MD)
-* `trigger_out_delay_us` : The delay time of the trigger signal output after receiving the capture command or trigger signal in microseconds,this parameter is usually used [multi camera synced](./orbbec_camera/examples/multi_camera_synced/README.MD)
-* `trigger_out_enabled` : Enables the trigger out signal,this parameter is usually used [multi camera synced](./orbbec_camera/examples/multi_camera_synced/README.MD)
-* `frames_per_trigger` : The frame number of each stream after each trigger in triggering mode,this parameter is usually used [multi camera synced](./orbbec_camera/examples/multi_camera_synced/README.MD)
-* `software_trigger_period` : software trigger period in ms,this parameter is usually used [multi camera synced](./orbbec_camera/examples/multi_camera_synced/README.MD)
+* `sync_mode` : Set sync mode.The default value is standalone,this parameter is usually used [multi camera synced](../orbbec_camera/examples/multi_camera_synced/README.MD)
+* `depth_delay_us` : The delay time of the depth image capture after receiving the capture command or trigger signal in microseconds,this parameter is usually used [multi camera synced](../orbbec_camera/examples/multi_camera_synced/README.MD)
+* `color_delay_us` : The delay time of the color image capture after receiving the capture command or trigger signal in microseconds,this parameter is usually used [multi camera synced](../orbbec_camera/examples/multi_camera_synced/README.MD)
+* `trigger2image_delay_us` : The delay time of the image capture after receiving the capture command or trigger signal in microseconds,this parameter is usually used [multi camera synced](../orbbec_camera/examples/multi_camera_synced/README.MD)
+* `trigger_out_delay_us` : The delay time of the trigger signal output after receiving the capture command or trigger signal in microseconds,this parameter is usually used [multi camera synced](../orbbec_camera/examples/multi_camera_synced/README.MD)
+* `trigger_out_enabled` : Enables the trigger out signal,this parameter is usually used [multi camera synced](../orbbec_camera/examples/multi_camera_synced/README.MD)
+* `frames_per_trigger` : The frame number of each stream after each trigger in triggering mode,this parameter is usually used [multi camera synced](../orbbec_camera/examples/multi_camera_synced/README.MD)
+* `software_trigger_period` : software trigger period in ms,this parameter is usually used [multi camera synced](../orbbec_camera/examples/multi_camera_synced/README.MD)
 * `enable_frame_sync` : Enables the frame synchronization
 * `ordered_pc` : Enable filtering of invalid point clouds
 * `enable_depth_scale` : Enables the depth scale
@@ -96,17 +96,17 @@ The following are the launch parameters available:
 * `enable_color_undistortion` : Enables the Color undistortion
 * `config_file_path` : The path to the YAML configuration file. The default value is `""`. If the configuration file is not specified,the default parameters from the launch file will be used. If you want to use a custom configuration file, please refer to `gemini_330_series.launch.py`.`enable_heartbeat` enables the heartbeat function, which is set to `false` by default. If set to `true`, the camera node will send heartbeat signals to the firmware, and if hardware logging is desired, it should also be set to `true`
 * `enable_heartbeat` : Enables the heartbeat function, which is set to `false` by default. If set to `true`, the camera node will send heartbeat signals to the firmware, and if hardware logging is desired, it should also be set to `true`
-* `gmsl_trigger_fps` : Set gmsl trigger fps,this parameter is usually used [gmsl camera](./orbbec_camera/examples/gmsl_camera/README.MD)
-* `enable_gmsl_trigger` : Enables the gmsl trigger out signal,this parameter is usually used [gmsl camera](./orbbec_camera/examples/gmsl_camera/README.MD)
-* `disparity_range_mode` : Disparity search length,this parameter is usually used [disparity search offset](./orbbec_camera/examples/disparity_search_offset/README.MD)
-* `disparity_search_offset` : Set Disparity search offset value,this parameter is usually used [disparity search offset](./orbbec_camera/examples/disparity_search_offset/README.MD)
-* `disparity_offset_config` : Disparity search offset interleave frames,this parameter is usually used [disparity search offset](./orbbec_camera/examples/disparity_search_offset/README.MD)
+* `gmsl_trigger_fps` : Set gmsl trigger fps,this parameter is usually used [gmsl camera](../orbbec_camera/examples/gmsl_camera/README.MD)
+* `enable_gmsl_trigger` : Enables the gmsl trigger out signal,this parameter is usually used [gmsl camera](../orbbec_camera/examples/gmsl_camera/README.MD)
+* `disparity_range_mode` : Disparity search length,this parameter is usually used [disparity search offset](../orbbec_camera/examples/disparity_search_offset/README.MD)
+* `disparity_search_offset` : Set Disparity search offset value,this parameter is usually used [disparity search offset](../orbbec_camera/examples/disparity_search_offset/README.MD)
+* `disparity_offset_config` : Disparity search offset interleave frames,this parameter is usually used [disparity search offset](../orbbec_camera/examples/disparity_search_offset/README.MD)
 * `frame_aggregate_mode` : Set frame aggregate output mode.The optional values are `full_frame`,`color_frame`,`ANY`,`disable`
-* `interleave_ae_mode` : Set laser or hdr interleave,this parameter is usually used [interleave ae mode](./orbbec_camera/examples/interleave_ae_mode/README.MD)
-* `interleave_frame_enable` : Whether to enable interleave frame mode,this parameter is usually used [interleave ae mode](./orbbec_camera/examples/interleave_ae_mode/README.MD)
-* `interleave_skip_enable` : Whether to enable skip frames,this parameter is usually used [interleave ae mode](./orbbec_camera/examples/interleave_ae_mode/README.MD)
-* `interleave_skip_index` : Set skip pattern IR or flood IR,this parameter is usually used [interleave ae mode](./orbbec_camera/examples/interleave_ae_mode/README.MD)
-* `[hdr|laser]_index[0|1]_[laser_control|depth_exposure|depth_gain|ir_brightness|ae_max_exposure]`:In interleave frame mode, set the 0th and 1st frame parameters of hdr or laser interleaving frames,this parameter is usually used [interleave ae mode](./orbbec_camera/examples/interleave_ae_mode/README.MD)
+* `interleave_ae_mode` : Set laser or hdr interleave,this parameter is usually used [interleave ae mode](../orbbec_camera/examples/interleave_ae_mode/README.MD)
+* `interleave_frame_enable` : Whether to enable interleave frame mode,this parameter is usually used [interleave ae mode](../orbbec_camera/examples/interleave_ae_mode/README.MD)
+* `interleave_skip_enable` : Whether to enable skip frames,this parameter is usually used [interleave ae mode](../orbbec_camera/examples/interleave_ae_mode/README.MD)
+* `interleave_skip_index` : Set skip pattern IR or flood IR,this parameter is usually used [interleave ae mode](../orbbec_camera/examples/interleave_ae_mode/README.MD)
+* `[hdr|laser]_index[0|1]_[laser_control|depth_exposure|depth_gain|ir_brightness|ae_max_exposure]`:In interleave frame mode, set the 0th and 1st frame parameters of hdr or laser interleaving frames,this parameter is usually used [interleave ae mode](../orbbec_camera/examples/interleave_ae_mode/README.MD)
 
 **IMPORTANT**: *Please carefully read the instructions regarding software filtering settings
 at [this link](https://www.orbbec.com/docs/g330-use-depth-post-processing-blocks/). If you are uncertain, do not modify

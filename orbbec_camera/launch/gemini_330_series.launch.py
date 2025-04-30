@@ -102,6 +102,7 @@ def generate_launch_description():
         DeclareLaunchArgument('depth_qos', default_value='default'),
         DeclareLaunchArgument('depth_camera_info_qos', default_value='default'),
         DeclareLaunchArgument('enable_depth_auto_exposure_priority', default_value='false'),
+        DeclareLaunchArgument('depth_precision', default_value=''),
         DeclareLaunchArgument('depth_ae_roi_left', default_value='-1'),
         DeclareLaunchArgument('depth_ae_roi_right', default_value='-1'),
         DeclareLaunchArgument('depth_ae_roi_top', default_value='-1'),

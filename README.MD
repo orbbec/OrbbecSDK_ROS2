@@ -227,7 +227,7 @@ Currently, the following devices are supported by the OrbbecSDK ROS2 Wrapper v2-
 
 For optimal performance, we strongly recommend updating to the latest firmware version. This ensures that you benefit from the most recent enhancements and bug fixes.
 
-| Product List | Minimal Firmware Version | **Launch File**             |
+| Product List | Minimal Firmware Version | **Launch File**       |
 | :----------- | :----------------------- | :-------------------------- |
 | Gemini 330   | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 330L  | 1.2.20                   | gemini_330_series.launch.py |
@@ -357,22 +357,29 @@ For the entire list of parameters type `ros2 param list`.
 ros2 launch orbbec_camera gemini_330_series.launch.py enable_color:=true color_width:=640 color_height:=480
 ```
 
-* `[color|depth|left_ir|right_ir|ir]_width`,`[color|depth|left_ir|right_ir|ir]_height`,`[color|depth|left_ir|right_ir|ir]_fps`,`[color|depth|left_ir|right_ir|ir]_format`: The resolution and frame rate of the sensor stream
+* **[color|depth|left_ir|right_ir|ir]_width,[color|depth|left_ir|right_ir|ir]_height,[color|depth|left_ir|right_ir|ir]_fps,[color|depth|left_ir|right_ir|ir]_format**
+  * The resolution and frame rate of the sensor stream
   * Run `ros2 run orbbec_camera list_camera_profile_mode_node` to get the list of supported profiles
   * For example:`color_width:=640 color_height:=480 color_fps:=30 color_format:=MJPG depth_width:=640 depth_height:=480 depth_fps:=30 depth_format:=Y16 ir_width:=640 ir_height:=480 ir_fps:=30 ir_format:=Y8`
-* `enable_color_auto_exposure_priority` : Enables the Color auto exposure priority
+* **enable_color_auto_exposure_priority**
+  * Enable the Color auto exposure priority
   * For example:`enable_color_auto_exposure_priority:=true`
-* `enable_color_auto_exposure` : Enables the Color auto exposure
+* **enable_color_auto_exposure**
+  * Enable the Color auto exposure
   * For example:`enable_color_auto_exposure:=true`
-* `color_exposure` : Set the Color exposure
+* **color_exposure**
+  * Set the Color exposure
   * For example:`color_exposure:=30`
   * Note:To ensure that the `color_exposure` setting takes effect, make sure to set `enable_color_auto_exposure:=false`.
-* `color_gain` :Set the Color gain
+* **color_gain**
+  * Set the Color gain
   * For example:`color_gain:=16`
   * Note:To ensure that the `color_gain` setting takes effect, make sure to set `enable_color_auto_exposure:=false`.
-* `enable_depth_auto_exposure_priority` : Enables the Depth auto exposure priority
+* **enable_depth_auto_exposure_priority**
+  * Enable the Depth auto exposure priority
   * For example:`enable_depth_auto_exposure_priority:=true`
-* `depth_brightness` : Set the Depth brightness
+* **depth_brightness**
+  * Set the Depth brightness
   * For example:`depth_brightness:=100`
 
 [......](./docs/launch_parameters.md)

@@ -157,3 +157,4 @@ After the operation is successful, you can view the synchronization effect in th
 [camera_params.yaml](../../config/camera_params.yaml)(Camera startup parameter settings)
 
 [multi_camera_synced_verify.launch.py](./multi_camera_synced_verify.launch.py)
+

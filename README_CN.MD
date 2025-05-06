@@ -23,7 +23,7 @@ OrbbecSDK ROS2 封装包为 Orbbec 相机与 ROS 2 环境之间提供了无缝�
   </thead>
   <tbody>
     <tr>
-      <td rowspan="8" style="text-align: center; font-weight: bold;">Gemini 330</td>
+      <td rowspan="7" style="text-align: center; font-weight: bold;">Gemini 330</td>
       <td>Gemini 335</td>
       <td>全面维护</td>
       <td>推荐用于新设计</td>
@@ -55,11 +55,6 @@ OrbbecSDK ROS2 封装包为 Orbbec 相机与 ROS 2 环境之间提供了无缝�
     </tr>
     <tr>
       <td>Gemini 335Lg</td>
-      <td>不支持</td>
-      <td>推荐用于新设计</td>
-    </tr>
-    <tr>
-      <td>Gemini 335Le</td>
       <td>不支持</td>
       <td>推荐用于新设计</td>
     </tr>
@@ -145,7 +140,7 @@ OrbbecSDK ROS2 封装包为 Orbbec 相机与 ROS 2 环境之间提供了无缝�
   - [Launch参数](#launch参数)
   - [ROS2(Robot) vs Optical(Camera) Coordination Systems](#ros2robot-vs-opticalcamera-coordination-systems)
   - [相机传感器结构](#相机传感器结构)
-  - [从坐标A到坐标B的TF](#从坐标a到坐标b的tf)
+  - [从坐标A到坐标B的TF](#从坐标a到坐标b的TF)
   - [预设presets](#预设presets)
   - [深度工作模式开关](#深度工作模式开关)
   - [深度 NFOV 和 WFOV 模式的配置](#深度-nfov-和-wfov-模式的配置)
@@ -381,7 +376,7 @@ ros2 launch orbbec_camera gemini_intra_process_demo_launch.py
 - `color_ae_roi_[left|right|top|bottom]`,`depth_ae_roi_[left|right|top|bottom]`:设置Color或Depth的自动曝光ROI区域。
 - `enable_d2c_viewer`: 发布depth图像叠加到彩色图像的D2C话题（仅提供测试）。
 - `device_num`: 设备数量。
-- `preset_firmware_path` : 输入参数为预设的固件路径，若输入多个路径，每个路径之间需用 `,`分隔，最多可输入3个固件路径。
+- `preset_firmware_path` : 输入参数为预设的固件路径，若输入多个路径，每个路径之间需用“,”分隔，最多可输入3个固件路径。
 - `color_width`, `color_height`, `color_fps`: 彩色流的分辨率和帧率。
 - `ir_width`, `ir_height`, `ir_fps`: 红外流的分辨率和帧速率。
 - `depth_width`, `depth_height`, `depth_fps`: 深度流的分辨率和帧速率。
@@ -402,8 +397,8 @@ ros2 launch orbbec_camera gemini_intra_process_demo_launch.py
   此功能仅支持 Femto Mega 和 Gemini 2 XL 设备。通过网络访问这些设备时，需要提前配置设备的 IP 地址。启用开关需要设置为 true。
 - `depth_filter_config`: 配置深度过滤配置文件的加载路径。默认情况下，深度过滤配置文件位于 /config/depthfilter 目录。仅 Gemini2 支持。
 - `depth_precision`: 深度精度应采用 `1mm`格式。默认值为 `1mm`。
-- `enable_laser`: 启用激光。默认值为 `true`。
-- `device_preset`: 默认值为 `Default`。仅支持 G330 系列。更多信息，请参阅 [G330 文档](https://www.orbbec.com/docs/g330-use-depth-presets/)。请参考下表，根据您的使用情况设置 `device_preset` 值。该值应为[表格](#预设presets) 中列出的预设名称之一。
+- `enable_laser`: 启用激光。默认值为“true”。
+- `device_preset`: 默认值为 `Default`。仅支持 G330 系列。更多信息，请参阅 [G330 文档](https://www.orbbec.com/docs/g330-use-depth-presets/)。请参考下表，根据您的使用情况设置 `device_preset` 值。该值应为[表格](#predefined-presets) 中列出的预设名称之一。
 - `enable_decimation_filter`: 此滤波器有效降低了深度场景的复杂度。滤波器在核尺寸 [2x2] 至 [8x8] 像素上运行。图像尺寸在两个维度上均按比例缩小，以保持纵横比。
 - `enable_hdr_merge`: 此滤镜与深度 HDR 功能配合使用。通过合并交替曝光值的连续深度图像，我们可以克服同时获取欠照和过照物体深度值的挑战。
 - `enable_sequence_id_filter`: 此过滤器与深度 HDR 函数联合使用，仅输出具有指定序列 ID 的序列。
@@ -412,14 +407,14 @@ ros2 launch orbbec_camera gemini_intra_process_demo_launch.py
 - `enable_spatial_filter`: 此滤波器根据幅值参数的指定执行多次迭代处理，以增强深度数据的平滑度。它还能够填充深度图中的小孔。
 - `enable_temporal_filter`: 此滤镜旨在通过基于先前帧操纵每个像素的值来提高深度数据的持久性。该滤镜对数据执行单次传递，在调整深度值的同时更新追踪历史记录。
 - `enable_hole_filling_filter`: 此过滤器使用指定的模式填充深度图中的所有孔洞。
-- `retry_on_usb3_detection_failure`:如果摄像头连接到 USB 2.0 端口但未被检测到，系统将尝试重置摄像头最多三次。此设置旨在防止 USB 3.0 设备被错误地识别为 USB 2.0。建议在使用 USB 2.0 连接时将此参数设置为 `false`，以避免不必要的重置。
-- `tf_publish_rate`: 相机发布动态变换的速率。默认值为 `0.0`，表示发布静态变换。
-- `time_domain`: 帧时间域，字符串类型，可以是 `device`、`global`或 `system`。`device`表示使用相机的硬件时间戳；`system`表示使用PC接收到第一个数据包或帧的时间戳；`global`用于跨多个设备同步时间，将来自不同来源的数据对齐到公共时间基准。
+- `retry_on_usb3_detection_failure`:如果摄像头连接到 USB 2.0 端口但未被检测到，系统将尝试重置摄像头最多三次。此设置旨在防止 USB 3.0 设备被错误地识别为 USB 2.0。建议在使用 USB 2.0 连接时将此参数设置为“false”，以避免不必要的重置。
+- `tf_publish_rate`: 相机发布动态变换的速率。默认值为 0.0，表示发布静态变换。
+- `time_domain`: 帧时间域，字符串类型，可以是“device”、“global”或“system”。“device”表示使用相机的硬件时间戳；“system”表示使用PC接收到第一个数据包或帧的时间戳；“global”用于跨多个设备同步时间，将来自不同来源的数据对齐到公共时间基准。
 - `enable_sync_host_time`: 启用主机时间与相机时间的同步。默认值为 `true`，如果使用全局时间，请设置为 `false`。某些旧设备可能不支持此功能。
-- `config_file_path`: YAML 配置文件的路径。如果未指定配置文件，则将使用启动文件中的默认参数。如果您想使用自定义配置文件，请参阅 `gemini_330_series.launch.py`。
-  “enable_heartbeat”启用心跳功能，默认设置为 `false`。如果设置为 `true`，摄像头节点将向固件发送心跳信号；如果需要硬件日志记录，也应设置为 `true`。
+- `config_file_path`: YAML 配置文件的路径。默认值为“"”。如果未指定配置文件，则将使用启动文件中的默认参数。如果您想使用自定义配置文件，请参阅“gemini_330_series.launch.py”。
+  “enable_heartbeat”启用心跳功能，默认设置为“false”。如果设置为“true”，摄像头节点将向固件发送心跳信号；如果需要硬件日志记录，也应设置为“true”。
 - `log_level` : SDK 日志级别，默认值为 `info`，可选值为 `debug`, `info`, `warn`, `error`, `fatal`。
-- `enable_color_undistortion`: 启用颜色去畸变功能，默认值为 `false`。请注意，我们的彩色相机畸变程度极小，通常无需进行去畸变设置。
+- `enable_color_undistortion`: 启用颜色去畸变功能，默认值为“false”。请注意，我们的彩色相机畸变程度极小，通常无需进行去畸变设置。
 - `interleave_ae_mode` : 设置激光或 hdr 交错。
 - `interleave_frame_enable` : 是否启用交错帧模式。
 - `interleave_skip_enable` : 是否启用跳帧。
@@ -434,7 +429,7 @@ ros2 launch orbbec_camera gemini_intra_process_demo_launch.py
   * 想象一下我们站在镜头后面，向前看.
   * 在谈论坐标、左右 IR、传感器位置等时，请始终使用这个观点。
 
-![ROS2 and Camera Coordinate System](docs/images/image13.png)
+![ROS2 and Camera Coordinate System](./docs/images/image0.png)
 
 * ROS2 Coordinate System: (X: Forward, Y:Left, Z: Up)
 * Camera Optical Coordinate System: (X: Right, Y: Down, Z: Forward)
@@ -443,9 +438,9 @@ ros2 launch orbbec_camera gemini_intra_process_demo_launch.py
 
 ## 相机传感器结构
 
-![module in rviz2](docs/images/image16.png)
+![module in rviz2](./docs/images/image3.png)
 
-![module in rviz2](docs/images/image14.png)
+![module in rviz2](./docs/images/image1.png)
 
 ## 从坐标A到坐标B的TF
 
@@ -461,18 +456,18 @@ Gemini335 模块的 RGB 传感器和右侧红外传感器的静态 TF 值示例�
 ros2 launch orbbec_description view_model.launch.py model:=gemini_335_336.urdf.xacro
 ```
 
-![module in rviz2](./docs/images/image15.png)
+![module in rviz2](./docs/images/image2.png)
 
 ## 预设presets
 
-| Preset         | 特征                                                                                                            | 推荐用例                                                                          |
-| -------------- | --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Default        | - 最佳视觉感知 - 准确度、填充率、微小物体等方面的整体表现良好。                                                | - 通用 - 机器人                                                                  |
-| Hand           | - 清除手和手指边缘                                                                                              | - 手势识别                                                                       |
-| High Accuracy  | - 高置信度的深度  - 几乎没有噪声的深度值  - 较低的填充率                                                      | - 防撞 - 物体扫描                                                                |
-| High Density   | - 更高的填充率  - 更多微小物体  - 可能受到噪声深度值的影响                                                    | - 物体识别 - 拾取和放置 - 前景和背景动画                                         |
-| Medium Density | - 填充率和准确度的平衡性能  - 与默认设置相比：填充率较低，边缘质量更好                                         | - 通用且可替代默认                                                               |
-| Custom         | - 用户定义预设 - 从上述预设衍生，并经过自定义修改，例如后处理管道的新配置、深度 AE 函数的修改平均强度设定点等。 | - 与使用预定义预设相比，使用自定义配置可实现更好的深度性能 - 对于完善的自定义配置 |
+| Preset         | 特征                                                                                                                    | 推荐用例                                                                                  |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Default        | - 最佳视觉感知——准确度、填充率、微小物体等方面的整体表现良好。                                                        | - Generic `<br>`- Robotics                                                              |
+| Hand           | - 清除手和手指边缘                                                                                                      | - Gesture recognition                                                                     |
+| High Accuracy  | - 高置信度的深度 `<br>`- 几乎没有噪声的深度值 `<br>`- 较低的填充率                                                  | - Collision avoidance `<br>`- Object scanning                                           |
+| High Density   | - 更高的填充率 `<br>`- 更多微小物体 `<br>`- 可能受到噪声深度值的影响                                                | - Object recognition `<br>`- Pick & place `<br>`- Foreground & background animation   |
+| Medium Density | - 填充率和准确度的平衡性能 `<br>`- 与默认设置相比：填充率较低，边缘质量更好                                           | - Generic and alternative to Default                                                      |
+| Custom         | - 用户定义预设 `<br>`- 从上述预设衍生，并经过自定义修改，例如后处理管道的新配置、深度 AE 函数的修改平均强度设定点等。 | - 与使用预定义预设相比，使用自定义配置可实现更好的深度性能 `<br>`- 对于完善的自定义配置 |
 
 根据您的具体用例选择合适的预设名称，并将其设置为 `device_preset` 参数的值。
 
@@ -514,8 +509,8 @@ ros2 run orbbec_camera list_depth_work_mode_node
 ## 所有可用的摄像机控制服务
 
 以下服务的名称已经表达了其功能。
-但需要注意的是，相应的 `set_[ir|depth|color]`
-和 `get[ir|depth|color]` 服务只有在启动文件参数对应的流中将 `enable[ir|depth|color]`
+但需要注意的是，相应的 `set_[ir|depth|color]*`
+和 `get[ir|depth|color]*` 服务只有在启动文件参数对应的流中将 `enable[ir|depth|color]`
 设置为 `true` 时才可用。
 
 - `/camera/get_auto_white_balance`
@@ -557,7 +552,7 @@ ros2 run orbbec_camera list_depth_work_mode_node
 - `/camera/color/image_raw`: 彩色流图像。
 - `/camera/depth/camera_info`: 深度相机信息。
 - `/camera/depth/image_raw`: 深度流图像。
-- `/camera/depth/points` :点云，仅当 `enable_point_cloud`为 `true`时可用。
+- `/camera/depth/points` :点云，仅当“enable_point_cloud”为“true”时可用。
 - `/camera/depth_registered/points`: 彩色点云，仅当 `enable_colored_point_cloud` 为 `true` 时可用。
 - `/camera/ir/camera_info`: 红外相机信息。
 - `/camera/ir/image_raw`: 红外流图像
@@ -578,13 +573,13 @@ ros2 run orbbec_camera list_depth_work_mode_node
 
 ## 多相机
 
-- 要获取相机的 `usb_port`，请插入相机并在终端中运行以下命令：
+- 要获取相机的“usb_port”，请插入相机并在终端中运行以下命令：
 
 ```bash
 ros2 run orbbec_camera list_devices_node
 ```
 
-- 将 `device_num`参数设置为您拥有的摄像机数量。
+- 将“device_num”参数设置为您拥有的摄像机数量。
 - 进入 `OrbbecSDK_ROS2/launch/multi_xxx.launch.py`文件，修改 `usb_port`。
 - 不要忘记将 `include` 标签放在 `group` 标签内。
   否则，不同摄像机的参数值可能会受到污染。
@@ -732,7 +727,6 @@ bash .make_deb.sh
 | Gemini 335Lg | 1.3.46       | gemini_330_series.launch.py |
 | Gemini 336   | 1.2.20       | gemini_330_series.launch.py |
 | Gemini 336L  | 1.2.20       | gemini_330_series.launch.py |
-| Gemini 335Le | 1.5.31       | gemini_330_series.launch.py |
 | Femto Bolt   | 1.1.2        | femto_bolt.launch.py        |
 | Femto Mega   | 1.3.0        | femto_mega.launch.py        |
 | Astra 2      | 2.8.20       | astra2.launch.py            |
@@ -833,7 +827,7 @@ net.core.rmem_default=2147483647
 
 - 如果您遇到其他问题，请将 `log_level` 参数设置为 `debug`。这将在运行目录中生成一个 SDK 日志文件：`Log/OrbbecSDK.log.txt`。
   请将此文件提供给支持团队以获取进一步帮助。
-- 如果需要固件日志，请将 `enable_heartbeat`设置为 `true`以激活此功能。
+- 如果需要固件日志，请将“enable_heartbeat”设置为“true”以激活此功能。
 
 ### 为什么有这么多启动文件？
 
@@ -847,12 +841,15 @@ net.core.rmem_default=2147483647
 
 ## License
 
-版权所有 2024 Orbbec Ltd。
+Copyright 2024 Orbbec Ltd.
 
-根据 Apache 许可证 2.0 版（"许可证"）获得许可；除非遵守许可证，否则您不得使用此项目。您可以在以下网址获取许可证副本：
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this project except in compliance with
+the License. You may obtain a copy of the License at
 
 [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
-除非适用法律要求或书面同意，否则根据本许可证分发的软件均按“原样”分发，不附带任何明示或暗示的保证或条件。请参阅许可证，了解本许可证下特定语言的权限和限制规定。
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "
+AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
+language governing permissions and limitations under the License.
 
 **Other names and brands may be claimed as the property of others**

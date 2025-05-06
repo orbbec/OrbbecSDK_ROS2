@@ -83,3 +83,4 @@ Based on the test results, using only the `hardware_noise_removal_filter` result
 |     `depth_registration`     | `false` or `true` with `align_mode=HW` |      Software alignment consumes more CPU      |
 |     `enable_point_cloud`     |                    `false`                    |     Disabling point cloud reduces CPU usage     |
 | `enable_colored_point_cloud` |                    `false`                    | Disabling colored point cloud reduces CPU usage |
+

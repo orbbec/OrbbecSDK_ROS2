@@ -48,7 +48,6 @@ def generate_launch_description():
     )
     config_file_dir = os.path.join(package_dir, "config")
     config_file_path = os.path.join(config_file_dir, "camera_params.yaml")
-    secondary_config_file_path = os.path.join(config_file_dir, "camera_secondary_params.yaml")
 
     attach_to_shared_component_container_arg = LaunchConfiguration(
         "attach_to_shared_component_container", default=False
@@ -104,7 +103,7 @@ def generate_launch_description():
             "usb_port": "2-3",
             "device_num": "2",
             "sync_mode": "secondary_synced",
-            "config_file_path": secondary_config_file_path,
+            "config_file_path": config_file_path,
             "trigger_out_enabled": "false",
             "attach_to_shared_component_container": attach_to_shared_component_container_arg,
             "component_container_name": component_container_name_arg,

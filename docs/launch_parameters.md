@@ -7,7 +7,7 @@ The following are the launch parameters available:
 * **camera_name**
   * Start the node namespace
 * **depth_registration**
-  * Enables alignment of the depth frame to the color frame. This field is required when the `enable_colored_point_cloud` is set to `true`.
+  * Enable alignment of the depth frame to the color frame. This field is required when the `enable_colored_point_cloud` is set to `true`.
 * **serial_number**
   * The serial number of the camera. This is required when multiple cameras are used
 * **usb_port**
@@ -23,19 +23,19 @@ The following are the launch parameters available:
 * **color_ae_roi_[left|right|top|bottom],depth_ae_roi_[left|right|top|bottom]**
   * Set Color and Depth auto exposure ROI.
 * **enable_point_cloud**
-  * Enables the point cloud
+  * Enable the point cloud
 * **enable_colored_point_cloud**
-  * Enables the RGB point cloud
+  * Enable the RGB point cloud
 * **cloud_frame_id**
-  * Modifying the frame_id name within the ros message
+  * Modify the frame_id name within the ros message
 * **connection_delay**
   * The delay time in milliseconds for reopening the device. Some devices, such as Astra mini, require a longer time to initialize and reopening the device immediately can cause firmware crashes when hot plugging
 * **[color|depth|left_ir|right_ir|ir]_width,[color|depth|left_ir|right_ir|ir]_height,[color|depth|left_ir|right_ir|ir]_fps,[color|depth|left_ir|right_ir|ir]_format**
   * The resolution and frame rate of the sensor stream
 * **enable_color_auto_exposure_priority**
-  * Enables the Color auto exposure priority
+  * Enable the Color auto exposure priority
 * **enable_color_auto_exposure**
-  * Enables the Color auto exposure
+  * Enable the Color auto exposure
 * **color_exposure**
   * Set the Color exposure
 * **color_gain**
@@ -59,17 +59,17 @@ The following are the launch parameters available:
 * **color_hue**
   * Set the Color hue
 * **enable_color_backlight_compenstation**
-  * Enables the Color backlight compenstation
+  * Enable the Color backlight compenstation
 * **enable_color_decimation_filter**
-  * Enables the Color decimation filter
+  * Enable the Color decimation filter
 * **color_decimation_filter_scale**
   * Set the Color decimation filter scale
 * **enable_depth_auto_exposure_priority**
-  * Enables the Depth auto exposure priority
+  * Enable the Depth auto exposure priority
 * **depth_brightness**
   * Set the Depth brightness
 * **enable_ir_auto_exposure**
-  * Enables the IR auto exposure
+  * Enable the IR auto exposure
 * **ir_exposure**
   * Set the IR exposure
 * **ir_gain**
@@ -79,15 +79,15 @@ The following are the launch parameters available:
 * **ir_brightness**
   * Set the IR brightness
 * **enable_sync_output_accel_gyro**
-  * Enables the sync accel_gyro,and output IMU topic real-time data
+  * Enable the sync accel_gyro,and output IMU topic real-time data
 * **enable_accel**
-  * Enables the Accelerometer,and output Accelerometer info topic data
+  * Enable the Accelerometer,and output Accelerometer info topic data
 * **accel_rate**
   * The frequency of the accelerometer, the optional values are `1.5625hz`, `3.125hz`, `6.25hz`, `12.5hz`, `25hz`, `50hz`, `100hz`, `200hz`, `500hz`, `1khz`, `2khz`, `4khz`, `8khz`, `16khz`, `32khz`
 * **accel_range**
   * The range of the accelerometer, the optional values are `2g`, `4g`, `8g`, `16g`. The specific value depends on the current camera
 * **enable_gyro**
-  * Enables the gyroscope,and output gyroscope info topic data
+  * Enable the gyroscope,and output gyroscope info topic data
 * **gyro_rate**
   * The frequency of the gyroscope, the optional values are `1.5625hz`, `3.125hz`, `6.25hz`, `12.5hz`, `25hz`, `50hz`, `100hz`, `200hz`, `500hz`, `1khz`, `2khz`, `4khz`, `8khz`, `16khz`, `32khz`.The specific value depends on the current camera
 * **gyro_range**
@@ -98,7 +98,7 @@ The following are the launch parameters available:
 * **angular_vel_cov**
   * Covariance of the angular velocity
 * **publish_tf**
-  * Enables the TF publish
+  * Enable the TF publish
 * **tf_publish_rate**
   * Set Rate of the TF publication
 * **ir_info_url**
@@ -114,13 +114,13 @@ The following are the launch parameters available:
 * **log_level**
   * SDK log level, the default value is `info`, the optional values are `debug`, `info`, `warn`, `error`, `fatal`
 * **enable_publish_extrinsic**
-  * Enables the extrinsics publish
+  * Enable the extrinsics publish
 * **enable_d2c_viewer**
   * Publishes the D2C overlay image (for testing only)
 * **enable_hardware_d2d**
-  * false: switch to software disparity convert to depth, true: switch to hardware disparity convert to depth
+  * `false`: switch to software disparity convert to depth, true: switch to hardware disparity convert to depth
 * **enable_ldp**
-  * Enables the LDP
+  * Enable the LDP
 * **ldp_power_level**
   * Set power level of the LDP
 * **sync_mode**
@@ -134,7 +134,7 @@ The following are the launch parameters available:
 * **trigger_out_delay_us**
   * The delay time of the trigger signal output after receiving the capture command or trigger signal in microseconds,this parameter is usually used [multi camera synced](../orbbec_camera/examples/multi_camera_synced/README.MD)
 * **trigger_out_enabled**
-  * Enables the trigger out signal,this parameter is usually used [multi camera synced](../orbbec_camera/examples/multi_camera_synced/README.MD)
+  * Enable the trigger out signal,this parameter is usually used [multi camera synced](../orbbec_camera/examples/multi_camera_synced/README.MD)
 * **frames_per_trigger**
   * The frame number of each stream after each trigger in triggering mode,this parameter is usually used [multi camera synced](../orbbec_camera/examples/multi_camera_synced/README.MD)
 * **software_trigger_period**

@@ -38,7 +38,7 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
     </tr>
     <tr>
       <td>Gemini 335L</td>
-      <td>full maintenance</td>
+      <td>Full maintenance</td>
       <td>Recommended for new designs</td>
     </tr>
     <tr>
@@ -261,7 +261,7 @@ Launch camera node
 ```bash
 . ./install/setup.bash
 ros2 run orbbec_camera list_devices_node #Check if the camera is connected
-ros2 launch orbbec_camera gemini_330_series.launch.py # or other launch file, see below table
+ros2 launch orbbec_camera gemini_330_series.launch.py # Or other launch file, see below table
 ```
 
 - On terminal 2

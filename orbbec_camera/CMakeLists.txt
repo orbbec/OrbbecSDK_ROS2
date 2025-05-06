@@ -40,7 +40,6 @@ set(dependencies
   std_msgs
   std_srvs
   tf2
-  tf2_eigen
   tf2_msgs
   tf2_ros
   tf2_sensor_msgs

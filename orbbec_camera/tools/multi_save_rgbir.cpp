@@ -44,13 +44,12 @@ class MultiCameraSubscriber : public rclcpp::Node {
       for (size_t i = 0; i < list->deviceCount(); i++) {
         auto device = list->getDevice(i);
         auto device_info = device->getDeviceInfo();
+        auto pid = device_info->getPid();
         std::string serial = device_info->serialNumber();
         std::string uid = device_info->uid();
         auto usb_port = parseUsbPort(uid);
         serial_numbers_[usb_port] = serial;
-        color_frame_counters_[count_] = 0;
-        ir_frame_counters_[count_] = 0;
-        count_++;
+        is_gemini330_ = isGemini335PID(pid);
       }
     } catch (ob::Error &e) {
       RCLCPP_ERROR_STREAM(get_logger(), e.getMessage());
@@ -64,7 +63,6 @@ class MultiCameraSubscriber : public rclcpp::Node {
       usb_numbers_[i] = usb_params_[i];
       usb_index_map_[usb_params_[i]] = i;
     }
-    reentrant_callback_group_ = this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
     for (const auto &pair : serial_numbers_) {
       RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_camera_subscriber"),
                          "usb_port: " << pair.first << ", serial: " << pair.second);
@@ -81,6 +79,13 @@ class MultiCameraSubscriber : public rclcpp::Node {
  private:
   std::mutex image_mutex_;
   std::mutex meta_mutex_;
+  bool isGemini335PID(uint32_t pid) {
+    return pid == GEMINI_335_PID || pid == GEMINI_330_PID || pid == GEMINI_336_PID ||
+           pid == GEMINI_335L_PID || pid == GEMINI_330L_PID || pid == GEMINI_336L_PID ||
+           pid == GEMINI_335LG_PID || pid == GEMINI_336LG_PID || pid == GEMINI_335LE_PID ||
+           pid == GEMINI_336LE_PID || pid == CUSTOM_ADVANTECH_GEMINI_336_PID ||
+           pid == CUSTOM_ADVANTECH_GEMINI_336L_PID;
+  }
   void params_init() {
     std::ifstream file(
         "install/orbbec_camera/share/orbbec_camera/config/tools/multisavergbir/"
@@ -101,46 +106,13 @@ class MultiCameraSubscriber : public rclcpp::Node {
     color_topics_.resize(camera_name_.size());
     color_metadata_topic_.resize(camera_name_.size());
     for (size_t i = 0; i < camera_name_.size(); ++i) {
-      left_ir_topics_[i] = "/" + camera_name_[i] + "/left_ir/image_raw";
-      left_ir_metadata_topic_[i] = "/" + camera_name_[i] + "/left_ir/metadata";
+      left_ir_topics_[i] =
+          "/" + camera_name_[i] + "/" + (is_gemini330_ ? "left_ir" : "ir") + "/image_raw";
+      left_ir_metadata_topic_[i] =
+          "/" + camera_name_[i] + "/" + (is_gemini330_ ? "left_ir" : "ir") + "/metadata";
       color_topics_[i] = "/" + camera_name_[i] + "/color/image_raw";
       color_metadata_topic_[i] = "/" + camera_name_[i] + "/color/metadata";
     }
-  }
-  std::string parseUsbPort(const std::string &line) {
-    std::string port_id;
-    std::regex usb_regex("(?:[^ ]+/usb[0-9]+[0-9./-]*/){0,1}([0-9.-]+)(:){0,1}[^ ]*",
-                         std::regex_constants::ECMAScript);
-    std::smatch base_match;
-    bool found_usb = std::regex_match(line, base_match, usb_regex);
-
-    if (found_usb) {
-      port_id = base_match[1].str();
-      std::cout << "USB port_id: " << port_id << std::endl;
-
-      if (base_match[2].str().empty()) {
-        std::regex end_regex(".+(-[0-9]+$)", std::regex_constants::ECMAScript);
-        bool found_end = std::regex_match(port_id, base_match, end_regex);
-
-        if (found_end) {
-          port_id = port_id.substr(0, port_id.size() - base_match[1].str().size());
-          std::cout << "Modified USB port_id: " << port_id << std::endl;
-        }
-      }
-
-      return port_id;
-    }
-
-    std::regex gmsl_regex("(gmsl[0-9]+)(?:-[0-9]+)*(-[0-9]+)$", std::regex_constants::ECMAScript);
-    bool found_gmsl = std::regex_match(line, base_match, gmsl_regex);
-
-    if (found_gmsl) {
-      port_id = base_match[1].str() + base_match[2].str();
-      std::cout << "Parsed GMSL Port ID: " << port_id << std::endl;
-      return port_id;
-    }
-
-    return "";
   }
   void topic_init() {
     ir_image_buffers_.resize(left_ir_topics_.size());
@@ -155,6 +127,7 @@ class MultiCameraSubscriber : public rclcpp::Node {
     color_metadata_.gain_buffs.resize(left_ir_topics_.size());
     callback_called_ = std::vector<bool>(left_ir_topics_.size(), false);
     auto custom_qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
+    rclcpp::CallbackGroup::SharedPtr reentrant_callback_group_;
     RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_camera_subscriber"),
                        "camera_name_.size(): " << camera_name_.size());
     for (size_t i = 0; i < camera_name_.size(); ++i) {
@@ -166,7 +139,7 @@ class MultiCameraSubscriber : public rclcpp::Node {
                          "color_topic: " << color_topics_[i]);
       RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_camera_subscriber"),
                          "color_metadata_topic_: " << color_metadata_topic_[i]);
-
+      reentrant_callback_group_ = this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
       rclcpp::SubscriptionOptions ir_sub_options;
       ir_sub_options.callback_group = reentrant_callback_group_;
 
@@ -270,11 +243,12 @@ class MultiCameraSubscriber : public rclcpp::Node {
 
     for (size_t i = 0; i < static_cast<size_t>(saving_images_number_); i++) {
       std::string folder = generateFolderName(serial_index, usb_index);
-      std::string ir_filename = folder + "/ir#left_SN" + serial_index + "_Index" +
-                                std::to_string(usb_index) + time_domain_ +
-                                ir_current_timestamps[i] + "_f" + std::to_string(i) + "_s" +
-                                ir_timestamps[i] + "_e" + left_ir_meta_exposure[i] + "_d" +
-                                left_ir_meta_gain[i] + "_.jpg";
+      std::string ir_filename =
+          folder + "/ir#left_SN" + serial_index + "_Index" + std::to_string(usb_index) +
+          time_domain_ + ir_current_timestamps[i] + "_f" + std::to_string(i) + "_s" +
+          ir_timestamps[i] +
+          (is_gemini330_ ? ("_e" + left_ir_meta_exposure[i] + "_d" + left_ir_meta_gain[i]) : "") +
+          "_.jpg";
       if (ir_images[i].empty()) {
         RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_camera_subscriber"), "over ");
         continue;
@@ -284,7 +258,9 @@ class MultiCameraSubscriber : public rclcpp::Node {
       std::string color_filename =
           folder + "/color_SN" + serial_index + "_Index" + std::to_string(usb_index) +
           time_domain_ + color_current_timestamps[i] + "_f" + std::to_string(i) + "_s" +
-          color_timestamps[i] + "_e" + color_meta_exposure[i] + "_d" + color_meta_gain[i] + "_.jpg";
+          color_timestamps[i] +
+          (is_gemini330_ ? ("_e" + color_meta_exposure[i] + "_d" + color_meta_gain[i]) : "") +
+          "_.jpg";
       if (color_images[i].empty()) {
         continue;
       }
@@ -336,15 +312,14 @@ class MultiCameraSubscriber : public rclcpp::Node {
       ir_image_buffers_[index].push_back(ir_mat);
       ir_current_timestamp_buffers_[index].push_back(current_timestamp_ir);
       ir_timestamp_buffers_[index].push_back(timestamp_ir);
-      ir_resolution_ = std::to_string(image->width) + "x" + std::to_string(image->height);
       RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_camera_subscriber"),
                          ":ir: " << index << ":" << ir_image_buffers_[index].size());
       if (ir_image_buffers_[index].size() >= static_cast<size_t>(saving_images_number_) &&
           color_image_buffers_[index].size() >= static_cast<size_t>(saving_images_number_) &&
-          color_metadata_.exposure_buffs[index].size() >=
-              static_cast<size_t>(saving_images_number_) &&
-          left_ir_metadata_.exposure_buffs[index].size() >=
-              static_cast<size_t>(saving_images_number_)) {
+          (!is_gemini330_ || (color_metadata_.exposure_buffs[index].size() >=
+                                  static_cast<size_t>(saving_images_number_) &&
+                              left_ir_metadata_.exposure_buffs[index].size() >=
+                                  static_cast<size_t>(saving_images_number_)))) {
         saveAlignedImages(index);
       }
     }
@@ -360,15 +335,14 @@ class MultiCameraSubscriber : public rclcpp::Node {
       color_image_buffers_[index].push_back(corrected_image);
       color_current_timestamp_buffers_[index].push_back(current_timestamp_color);
       color_timestamp_buffers_[index].push_back(timestamp_color);
-      color_resolution_ = std::to_string(image->width) + "x" + std::to_string(image->height);
       RCLCPP_INFO_STREAM(rclcpp::get_logger("multi_camera_subscriber"),
                          ":color: " << index << ":" << color_image_buffers_[index].size());
       if (ir_image_buffers_[index].size() >= static_cast<size_t>(saving_images_number_) &&
           color_image_buffers_[index].size() >= static_cast<size_t>(saving_images_number_) &&
-          color_metadata_.exposure_buffs[index].size() >=
-              static_cast<size_t>(saving_images_number_) &&
-          left_ir_metadata_.exposure_buffs[index].size() >=
-              static_cast<size_t>(saving_images_number_)) {
+          (!is_gemini330_ || (color_metadata_.exposure_buffs[index].size() >=
+                                  static_cast<size_t>(saving_images_number_) &&
+                              left_ir_metadata_.exposure_buffs[index].size() >=
+                                  static_cast<size_t>(saving_images_number_)))) {
         saveAlignedImages(index);
       }
     }
@@ -393,7 +367,6 @@ class MultiCameraSubscriber : public rclcpp::Node {
     }
   }
 
-  rclcpp::CallbackGroup::SharedPtr reentrant_callback_group_;
   std::vector<rclcpp::Subscription<orbbec_camera_msgs::msg::Metadata>::SharedPtr>
       ir_meta_subscribers_;
   std::vector<rclcpp::Subscription<orbbec_camera_msgs::msg::Metadata>::SharedPtr>
@@ -405,8 +378,6 @@ class MultiCameraSubscriber : public rclcpp::Node {
   std::map<std::string, int> usb_index_map_;
   std::map<std::string, std::string> serial_numbers_;
   std::array<std::string, 10> usb_numbers_;
-  std::array<size_t, 10> color_frame_counters_;
-  std::array<size_t, 10> ir_frame_counters_;
 
   std::vector<std::string> usb_params_;
   std::vector<std::string> camera_name_;
@@ -425,14 +396,12 @@ class MultiCameraSubscriber : public rclcpp::Node {
 
   std::vector<bool> callback_called_;
 
-  std::string color_resolution_;
-  std::string ir_resolution_;
   std::string currenttimes_;
 
-  size_t count_ = 0;
   int saving_images_number_ = 100;
 
   bool topic_init_ = false;
+  bool is_gemini330_ = true;
 
   ImageMetadata left_ir_metadata_ = ImageMetadata();
   ImageMetadata color_metadata_ = ImageMetadata();

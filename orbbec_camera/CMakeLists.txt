@@ -215,8 +215,6 @@ add_orbbec_executable(list_devices_node tools/list_devices_node.cpp)
 add_orbbec_executable(list_depth_work_mode_node tools/list_depth_work_mode.cpp)
 add_orbbec_executable(list_camera_profile_mode_node tools/list_camera_profile.cpp)
 add_orbbec_executable(topic_statistics_node tools/topic_statistics.cpp)
-add_orbbec_executable(metadata_save_files_node tools/metadata_save_files.cpp)
-add_orbbec_executable(metadata_export_files_node tools/metadata_export_files.cpp)
 add_orbbec_executable(ob_benchmark_node tools/ob_benchmark.cpp)
 
 add_library(frame_latency SHARED tools/frame_latency.cpp)
@@ -239,7 +237,10 @@ rclcpp_components_register_node(start_benchmark
         EXECUTABLE start_benchmark_node
 )
 
-add_library(multi_save_rgbir SHARED tools/multi_save_rgbir.cpp)
+add_library(multi_save_rgbir SHARED
+    tools/multi_save_rgbir.cpp
+    src/utils.cpp
+)
 target_include_directories(multi_save_rgbir PUBLIC ${COMMON_INCLUDE_DIRS} )
 target_link_libraries(multi_save_rgbir ${COMMON_LIBRARIES})
 ament_target_dependencies(multi_save_rgbir ${dependencies})
@@ -276,8 +277,6 @@ install(TARGETS list_devices_node
   list_depth_work_mode_node
   list_camera_profile_mode_node
   topic_statistics_node
-  metadata_save_files_node
-  metadata_export_files_node
   ob_benchmark_node
   DESTINATION lib/${PROJECT_NAME}/)
 

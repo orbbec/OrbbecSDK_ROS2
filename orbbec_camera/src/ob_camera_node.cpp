@@ -707,14 +707,14 @@ void OBCameraNode::setupColorPostProcessFilter() {
     if (filter_name == "DecimationFilter" && enable_color_decimation_filter_) {
       auto decimation_filter = filter->as<ob::DecimationFilter>();
       auto range = decimation_filter->getScaleRange();
-      if (color_decimation_filter_scale_ != -1 && color_decimation_filter_scale_ < range.max &&
-          color_decimation_filter_scale_ > range.min) {
+      if (color_decimation_filter_scale_ != -1 && color_decimation_filter_scale_ <= range.max &&
+          color_decimation_filter_scale_ >= range.min) {
         RCLCPP_INFO_STREAM(logger_, "Set color decimation filter scale value to "
                                         << color_decimation_filter_scale_);
         decimation_filter->setScaleValue(color_decimation_filter_scale_);
       }
-      if (color_decimation_filter_scale_ != -1 && (color_decimation_filter_scale_ < range.min ||
-                                                   color_decimation_filter_scale_ > range.max)) {
+      if (color_decimation_filter_scale_ != -1 && (color_decimation_filter_scale_ <= range.min ||
+                                                   color_decimation_filter_scale_ >= range.max)) {
         RCLCPP_ERROR_STREAM(logger_, "Color Decimation filter scale value is out of range "
                                          << range.min << " - " << range.max);
       }
@@ -821,14 +821,14 @@ void OBCameraNode::setupDepthPostProcessFilter() {
     if (filter_name == "DecimationFilter" && enable_decimation_filter_) {
       auto decimation_filter = filter->as<ob::DecimationFilter>();
       auto range = decimation_filter->getScaleRange();
-      if (decimation_filter_scale_ != -1 && decimation_filter_scale_ < range.max &&
-          decimation_filter_scale_ > range.min) {
+      if (decimation_filter_scale_ != -1 && decimation_filter_scale_ <= range.max &&
+          decimation_filter_scale_ >= range.min) {
         RCLCPP_INFO_STREAM(logger_,
                            "Set decimation filter scale value to " << decimation_filter_scale_);
         decimation_filter->setScaleValue(decimation_filter_scale_);
       }
       if (decimation_filter_scale_ != -1 &&
-          (decimation_filter_scale_ < range.min || decimation_filter_scale_ > range.max)) {
+          (decimation_filter_scale_ <= range.min || decimation_filter_scale_ >= range.max)) {
         RCLCPP_ERROR_STREAM(logger_, "Decimation filter scale value is out of range "
                                          << range.min << " - " << range.max);
       }
@@ -903,14 +903,14 @@ void OBCameraNode::setupDepthPostProcessFilter() {
       decimation_filter->enable(true);
       depth_filter_list_.push_back(decimation_filter);
       auto range = decimation_filter->getScaleRange();
-      if (decimation_filter_scale_ != -1 && decimation_filter_scale_ < range.max &&
-          decimation_filter_scale_ > range.min) {
+      if (decimation_filter_scale_ != -1 && decimation_filter_scale_ <= range.max &&
+          decimation_filter_scale_ >= range.min) {
         RCLCPP_INFO_STREAM(logger_,
                            "Set decimation filter scale value to " << decimation_filter_scale_);
         decimation_filter->setScaleValue(decimation_filter_scale_);
       }
       if (decimation_filter_scale_ != -1 &&
-          (decimation_filter_scale_ < range.min || decimation_filter_scale_ > range.max)) {
+          (decimation_filter_scale_ <= range.min || decimation_filter_scale_ >= range.max)) {
         RCLCPP_ERROR_STREAM(logger_, "Decimation filter scale value is out of range "
                                          << range.min << " - " << range.max);
       }
@@ -3437,13 +3437,13 @@ void OBCameraNode::setFilterCallback(const std::shared_ptr<SetFilter ::Request> 
       if (request->filter_param.size() > 0) {
         auto range = decimation_filter->getScaleRange();
         auto decimation_filter_scale = request->filter_param[0];
-        if (decimation_filter_scale < range.max && decimation_filter_scale > range.min) {
+        if (decimation_filter_scale <= range.max && decimation_filter_scale >= range.min) {
           RCLCPP_INFO_STREAM(logger_,
                              "Set decimation filter scale value to " << decimation_filter_scale);
           decimation_filter->setScaleValue(decimation_filter_scale);
         }
         if (decimation_filter_scale != -1 &&
-            (decimation_filter_scale < range.min || decimation_filter_scale > range.max)) {
+            (decimation_filter_scale <= range.min || decimation_filter_scale >= range.max)) {
           RCLCPP_ERROR_STREAM(logger_, "Decimation filter scale value is out of range "
                                            << range.min << " - " << range.max);
         }

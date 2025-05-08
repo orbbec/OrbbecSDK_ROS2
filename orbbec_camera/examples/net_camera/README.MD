@@ -42,7 +42,7 @@ Network device settings: `enumerate_net_device` must be set to true, set `net_de
 
 ### Single Net camera
 
-For [femto_mega.launch.py](../../launch/femto_mega.launch.py) as an example:
+For [gemini_330_series.launch.py](../../launch/gemini_330_series.launch.py) as an example:
 
 #### automatically enumerate network devices:
 

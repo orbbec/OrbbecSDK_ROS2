@@ -41,7 +41,7 @@ The following are the launch parameters available:
 * **color_gain**
   * Set the Color gain
 * **enable_color_auto_white_balance**
-  * Enables the Color auto white balance
+  * Enable the Color auto white balance
 * **color_white_balance**
   * Set the Color white balance
 * **color_ae_max_exposure**
@@ -108,9 +108,9 @@ The following are the launch parameters available:
 * **enumerate_net_device**
   * Enable automatically enumerate network devices,this parameter is usually used [net camera](../orbbec_camera/examples/net_camera/README.MD)
 * **net_device_ip**
-  * Setting net device's IP address,this parameter is usually used [net camera](../orbbec_camera/examples/net_camera/README.MD)
+  * Set net device's IP address,this parameter is usually used [net camera](../orbbec_camera/examples/net_camera/README.MD)
 * **net_device_port**
-  * Setting net device's port.Usually, you can set it to 8090,this parameter is usually used [net camera](../orbbec_camera/examples/net_camera/README.MD)
+  * Set net device's port.Usually, you can set it to 8090,this parameter is usually used [net camera](../orbbec_camera/examples/net_camera/README.MD)
 * **log_level**
   * SDK log level, the default value is `info`, the optional values are `debug`, `info`, `warn`, `error`, `fatal`
 * **enable_publish_extrinsic**

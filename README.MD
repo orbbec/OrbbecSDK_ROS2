@@ -128,11 +128,6 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
 4. Not supported: we will not support specific device in this version;
 5. To be supported: we will add support in the near future.
 
-**Documentation Note:**
-
-The following instructions are only applicable to traditional launch files. If you want to experience our latest launch file format, please refer to the following link:
-[https://orbbec.github.io/OrbbecSDK_ROS2_Docs/](https://orbbec.github.io/OrbbecSDK_ROS2_Docs/)
-
 ## Table of Contents
 
 - [OrbbecSDK ROS2 Wrapper v2](#orbbecsdk-ros2-wrapper-v2)
@@ -273,7 +268,7 @@ rviz2
 
 Select the topic you want to display
 
-- List topics / services/ parameters ( on terminal 3)
+- List topics / services/ parameters ( On terminal 3)
 
 ```bash
 ros2 topic list
@@ -457,7 +452,7 @@ For more information about GMSL device enumeration.Reference:[GMSL device docume
 
 When you have multiple cameras, you can activate all of them at the same time.
 
-For more information about Multi camera.Reference:[Multi camera documentation](./orbbec_camera/examples/multi_camera/multi_camera.MD)
+For more information about Multi camera.Reference:[Multi camera documentation](./orbbec_camera/examples/multi_camera/)
 
 ### Check which profiles the camera supports
 

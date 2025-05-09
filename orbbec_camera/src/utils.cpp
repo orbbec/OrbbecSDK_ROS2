@@ -35,6 +35,8 @@ sensor_msgs::msg::CameraInfo convertToCameraInfo(OBCameraIntrinsic intrinsic,
   info.d[5] = distortion.k4;
   info.d[6] = distortion.k5;
   info.d[7] = distortion.k6;
+  bool all_zero = std::all_of(info.d.begin(), info.d.end(), [](double val) { return val == 0.0; });
+  info.roi.do_rectify = all_zero;
 
   info.k.fill(0.0);
   info.k[0] = intrinsic.fx;
@@ -897,23 +899,22 @@ cv::Mat undistortImage(const cv::Mat &image, const OBCameraIntrinsic &intrinsic,
 
   return undistorted_image;
 }
-std::string getDistortionModels(OBCameraDistortion distortion){
-    switch (distortion.model)
-    {
+std::string getDistortionModels(OBCameraDistortion distortion) {
+  switch (distortion.model) {
     case OB_DISTORTION_NONE:
-        return sensor_msgs::distortion_models::PLUMB_BOB;
+      return sensor_msgs::distortion_models::PLUMB_BOB;
     case OB_DISTORTION_MODIFIED_BROWN_CONRADY:
-        return sensor_msgs::distortion_models::PLUMB_BOB;
+      return sensor_msgs::distortion_models::PLUMB_BOB;
     case OB_DISTORTION_INVERSE_BROWN_CONRADY:
-        return sensor_msgs::distortion_models::PLUMB_BOB;
+      return sensor_msgs::distortion_models::PLUMB_BOB;
     case OB_DISTORTION_BROWN_CONRADY:
-        return sensor_msgs::distortion_models::PLUMB_BOB;
+      return sensor_msgs::distortion_models::PLUMB_BOB;
     case OB_DISTORTION_BROWN_CONRADY_K6:
-        return sensor_msgs::distortion_models::PLUMB_BOB;
+      return sensor_msgs::distortion_models::PLUMB_BOB;
     case OB_DISTORTION_KANNALA_BRANDT4:
-        return sensor_msgs::distortion_models::EQUIDISTANT;
+      return sensor_msgs::distortion_models::EQUIDISTANT;
     default:
-        return sensor_msgs::distortion_models::PLUMB_BOB;
-    }
+      return sensor_msgs::distortion_models::PLUMB_BOB;
+  }
 }
 }  // namespace orbbec_camera

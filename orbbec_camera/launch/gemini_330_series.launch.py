@@ -74,7 +74,10 @@ def generate_launch_description():
         DeclareLaunchArgument('color_qos', default_value='default'),
         DeclareLaunchArgument('color_camera_info_qos', default_value='default'),
         DeclareLaunchArgument('enable_color_auto_exposure_priority', default_value='false'),
-        DeclareLaunchArgument('enable_color_auto_exposure', default_value='true'),
+        DeclareLaunchArgument('color_rotation', default_value='-1'),#color rotation degree : 0, 90, 180, 270
+        DeclareLaunchArgument('color_flip', default_value='false'),
+        DeclareLaunchArgument('color_mirror', default_value='false'),
+        DeclareLaunchArgument('color_ae_roi_left', default_value='-1'),
         DeclareLaunchArgument('color_ae_roi_left', default_value='-1'),
         DeclareLaunchArgument('color_ae_roi_right', default_value='-1'),
         DeclareLaunchArgument('color_ae_roi_top', default_value='-1'),
@@ -103,6 +106,9 @@ def generate_launch_description():
         DeclareLaunchArgument('depth_camera_info_qos', default_value='default'),
         DeclareLaunchArgument('enable_depth_auto_exposure_priority', default_value='false'),
         DeclareLaunchArgument('depth_precision', default_value=''),
+        DeclareLaunchArgument('depth_rotation', default_value='-1'),#depth rotation degree : 0, 90, 180, 270
+        DeclareLaunchArgument('depth_flip', default_value='false'),
+        DeclareLaunchArgument('depth_mirror', default_value='false'),
         DeclareLaunchArgument('depth_ae_roi_left', default_value='-1'),
         DeclareLaunchArgument('depth_ae_roi_right', default_value='-1'),
         DeclareLaunchArgument('depth_ae_roi_top', default_value='-1'),
@@ -115,6 +121,9 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_left_ir', default_value='false'),
         DeclareLaunchArgument('left_ir_qos', default_value='default'),
         DeclareLaunchArgument('left_ir_camera_info_qos', default_value='default'),
+        DeclareLaunchArgument('left_ir_rotation', default_value='-1'),#left_ir rotation degree : 0, 90, 180, 270
+        DeclareLaunchArgument('left_ir_flip', default_value='false'),
+        DeclareLaunchArgument('left_ir_mirror', default_value='false'),
         DeclareLaunchArgument('enable_left_ir_sequence_id_filter', default_value='false'),
         DeclareLaunchArgument('left_ir_sequence_id_filter_id', default_value='-1'),
         DeclareLaunchArgument('right_ir_width', default_value='0'),
@@ -124,6 +133,9 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_right_ir', default_value='false'),
         DeclareLaunchArgument('right_ir_qos', default_value='default'),
         DeclareLaunchArgument('right_ir_camera_info_qos', default_value='default'),
+        DeclareLaunchArgument('right_ir_rotation', default_value='-1'),#right_ir rotation degree : 0, 90, 180, 270
+        DeclareLaunchArgument('right_ir_flip', default_value='false'),
+        DeclareLaunchArgument('right_ir_mirror', default_value='false'),
         DeclareLaunchArgument('enable_right_ir_sequence_id_filter', default_value='false'),
         DeclareLaunchArgument('right_ir_sequence_id_filter_id', default_value='-1'),
         DeclareLaunchArgument('enable_ir_auto_exposure', default_value='true'),

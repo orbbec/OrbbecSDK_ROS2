@@ -90,6 +90,20 @@ void OBCameraNode::setupCameraCtrlServices() {
                                             std::shared_ptr<SetBool::Response> response) {
           setMirrorCallback(request, response, stream_index);
         });
+    service_name = "set_" + stream_name + "_flip";
+    set_flip_srv_[stream_index] = node_->create_service<SetBool>(
+        service_name,
+        [this, stream_index = stream_index](const std::shared_ptr<SetBool::Request> request,
+                                            std::shared_ptr<SetBool::Response> response) {
+          setFlipCallback(request, response, stream_index);
+        });
+    service_name = "set_" + stream_name + "_rotation";
+    set_rotation_srv_[stream_index] = node_->create_service<SetInt32>(
+        service_name,
+        [this, stream_index = stream_index](const std::shared_ptr<SetInt32::Request> request,
+                                            std::shared_ptr<SetInt32::Response> response) {
+          setRotationCallback(request, response, stream_index);
+        });
   }
   set_fan_work_mode_srv_ = node_->create_service<SetInt32>(
       "set_fan_work_mode", [this](const std::shared_ptr<SetInt32::Request> request,
@@ -735,6 +749,84 @@ void OBCameraNode::setMirrorCallback(const std::shared_ptr<SetBool::Request>& re
         break;
       case OB_STREAM_COLOR:
         device_->setBoolProperty(OB_PROP_COLOR_MIRROR_BOOL, request->data);
+        break;
+      default:
+        RCLCPP_ERROR(logger_, " %s NOT a video stream", __FUNCTION__);
+        break;
+    }
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->message = e.getMessage();
+    response->success = false;
+  } catch (const std::exception& e) {
+    response->message = e.what();
+    response->success = false;
+  } catch (...) {
+    response->message = "unknown error";
+    response->success = false;
+  }
+}
+
+void OBCameraNode::setFlipCallback(const std::shared_ptr<SetBool::Request>& request,
+                                   std::shared_ptr<SetBool::Response>& response,
+                                   const stream_index_pair& stream_index) {
+  (void)request;
+  auto stream = stream_index.first;
+  try {
+    switch (stream) {
+      case OB_STREAM_IR_RIGHT:
+        device_->setBoolProperty(OB_PROP_IR_RIGHT_FLIP_BOOL, request->data);
+        break;
+      case OB_STREAM_IR_LEFT:
+        device_->setBoolProperty(OB_PROP_IR_FLIP_BOOL, request->data);
+        break;
+      case OB_STREAM_IR:
+        device_->setBoolProperty(OB_PROP_IR_FLIP_BOOL, request->data);
+        break;
+      case OB_STREAM_DEPTH:
+        device_->setBoolProperty(OB_PROP_DEPTH_FLIP_BOOL, request->data);
+        break;
+      case OB_STREAM_COLOR:
+        device_->setBoolProperty(OB_PROP_COLOR_FLIP_BOOL, request->data);
+        break;
+      default:
+        RCLCPP_ERROR(logger_, " %s NOT a video stream", __FUNCTION__);
+        break;
+    }
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->message = e.getMessage();
+    response->success = false;
+  } catch (const std::exception& e) {
+    response->message = e.what();
+    response->success = false;
+  } catch (...) {
+    response->message = "unknown error";
+    response->success = false;
+  }
+}
+
+void OBCameraNode::setRotationCallback(const std::shared_ptr<SetInt32::Request>& request,
+                                       std::shared_ptr<SetInt32::Response>& response,
+                                       const stream_index_pair& stream_index) {
+  (void)request;
+  auto stream = stream_index.first;
+  try {
+    switch (stream) {
+      case OB_STREAM_IR_RIGHT:
+        device_->setIntProperty(OB_PROP_IR_RIGHT_ROTATE_INT, request->data);
+        break;
+      case OB_STREAM_IR_LEFT:
+        device_->setIntProperty(OB_PROP_IR_ROTATE_INT, request->data);
+        break;
+      case OB_STREAM_IR:
+        device_->setIntProperty(OB_PROP_IR_ROTATE_INT, request->data);
+        break;
+      case OB_STREAM_DEPTH:
+        device_->setIntProperty(OB_PROP_DEPTH_ROTATE_INT, request->data);
+        break;
+      case OB_STREAM_COLOR:
+        device_->setIntProperty(OB_PROP_COLOR_ROTATE_INT, request->data);
         break;
       default:
         RCLCPP_ERROR(logger_, " %s NOT a video stream", __FUNCTION__);

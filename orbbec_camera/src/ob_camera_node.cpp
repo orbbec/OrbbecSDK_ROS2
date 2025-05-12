@@ -325,17 +325,50 @@ void OBCameraNode::setupDevices() {
         mirrorPropertyID = OB_PROP_DEPTH_MIRROR_BOOL;
       } else if (stream_index == INFRA0) {
         mirrorPropertyID = OB_PROP_IR_MIRROR_BOOL;
-
       } else if (stream_index == INFRA1) {
         mirrorPropertyID = OB_PROP_IR_MIRROR_BOOL;
       } else if (stream_index == INFRA2) {
         mirrorPropertyID = OB_PROP_IR_RIGHT_MIRROR_BOOL;
       }
-
       if (device_->isPropertySupported(mirrorPropertyID, OB_PERMISSION_WRITE)) {
         RCLCPP_INFO_STREAM(logger_, "Setting " << stream_name_[stream_index] << " mirror to "
+                                               << (mirror_stream_[stream_index] ? "ON" : "OFF"));
+        TRY_TO_SET_PROPERTY(setBoolProperty, mirrorPropertyID, mirror_stream_[stream_index]);
+      }
+      OBPropertyID flipPropertyID = OB_PROP_DEPTH_FLIP_BOOL;
+      if (stream_index == COLOR) {
+        flipPropertyID = OB_PROP_COLOR_FLIP_BOOL;
+      } else if (stream_index == DEPTH) {
+        flipPropertyID = OB_PROP_DEPTH_FLIP_BOOL;
+      } else if (stream_index == INFRA0) {
+        flipPropertyID = OB_PROP_IR_FLIP_BOOL;
+      } else if (stream_index == INFRA1) {
+        flipPropertyID = OB_PROP_IR_FLIP_BOOL;
+      } else if (stream_index == INFRA2) {
+        flipPropertyID = OB_PROP_IR_RIGHT_FLIP_BOOL;
+      }
+      if (device_->isPropertySupported(flipPropertyID, OB_PERMISSION_WRITE)) {
+        RCLCPP_INFO_STREAM(logger_, "Setting " << stream_name_[stream_index] << " flip to "
                                                << (flip_stream_[stream_index] ? "ON" : "OFF"));
-        TRY_TO_SET_PROPERTY(setBoolProperty, mirrorPropertyID, flip_stream_[stream_index]);
+        TRY_TO_SET_PROPERTY(setBoolProperty, flipPropertyID, flip_stream_[stream_index]);
+      }
+      OBPropertyID rotationPropertyID = OB_PROP_DEPTH_ROTATE_INT;
+      if (stream_index == COLOR) {
+        rotationPropertyID = OB_PROP_COLOR_ROTATE_INT;
+      } else if (stream_index == DEPTH) {
+        rotationPropertyID = OB_PROP_DEPTH_ROTATE_INT;
+      } else if (stream_index == INFRA0) {
+        rotationPropertyID = OB_PROP_IR_ROTATE_INT;
+      } else if (stream_index == INFRA1) {
+        rotationPropertyID = OB_PROP_IR_ROTATE_INT;
+      } else if (stream_index == INFRA2) {
+        rotationPropertyID = OB_PROP_IR_RIGHT_ROTATE_INT;
+      }
+      if (rotation_stream_[stream_index] != -1 &&
+          device_->isPropertySupported(rotationPropertyID, OB_PERMISSION_WRITE)) {
+        RCLCPP_INFO_STREAM(logger_, "Setting " << stream_name_[stream_index] << " rotation to "
+                                               << rotation_stream_[stream_index]);
+        TRY_TO_SET_PROPERTY(setIntProperty, rotationPropertyID, rotation_stream_[stream_index]);
       }
     }
   }
@@ -1459,8 +1492,12 @@ void OBCameraNode::getParameters() {
     } else {
       setAndGetNodeParameter(enable_stream_[stream_index], param_name, false);
     }
-    param_name = "flip_" + stream_name_[stream_index];
-    setAndGetNodeParameter(flip_stream_[stream_index], param_name, false);
+    param_name = stream_name_[stream_index] + "_flip";
+    setAndGetNodeParameter<bool>(flip_stream_[stream_index], param_name, false);
+    param_name = stream_name_[stream_index] + "_mirror";
+    setAndGetNodeParameter<bool>(mirror_stream_[stream_index], param_name, false);
+    param_name = stream_name_[stream_index] + "_rotation";
+    setAndGetNodeParameter<int>(rotation_stream_[stream_index], param_name, -1);
     param_name = camera_name_ + "_" + stream_name_[stream_index] + "_frame_id";
     std::string default_frame_id = camera_name_ + "_" + stream_name_[stream_index] + "_frame";
     setAndGetNodeParameter(frame_id_[stream_index], param_name, default_frame_id);

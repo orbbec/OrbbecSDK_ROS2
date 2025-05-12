@@ -291,6 +291,14 @@ class OBCameraNode {
                          std::shared_ptr<SetBool::Response>& response,
                          const stream_index_pair& stream_index);
 
+  void setFlipCallback(const std::shared_ptr<SetBool::Request>& request,
+                       std::shared_ptr<SetBool::Response>& response,
+                       const stream_index_pair& stream_index);
+
+  void setRotationCallback(const std::shared_ptr<SetInt32::Request>& request,
+                           std::shared_ptr<SetInt32::Response>& response,
+                           const stream_index_pair& stream_index);
+
   void getLdpStatusCallback(const std::shared_ptr<GetBool::Request>& request,
                             std::shared_ptr<GetBool::Response>& response);
 
@@ -441,6 +449,8 @@ class OBCameraNode {
 
   std::map<stream_index_pair, bool> enable_stream_;
   std::map<stream_index_pair, bool> flip_stream_;
+  std::map<stream_index_pair, bool> mirror_stream_;
+  std::map<stream_index_pair, int> rotation_stream_;
   std::map<stream_index_pair, std::string> stream_name_;
   std::map<stream_index_pair, std::shared_ptr<image_publisher>> image_publishers_;
   std::map<stream_index_pair, rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr>
@@ -452,6 +462,8 @@ class OBCameraNode {
   std::map<stream_index_pair, rclcpp::Service<SetInt32>::SharedPtr> set_gain_srv_;
   std::map<stream_index_pair, rclcpp::Service<SetBool>::SharedPtr> toggle_sensor_srv_;
   std::map<stream_index_pair, rclcpp::Service<SetBool>::SharedPtr> set_mirror_srv_;
+  std::map<stream_index_pair, rclcpp::Service<SetBool>::SharedPtr> set_flip_srv_;
+  std::map<stream_index_pair, rclcpp::Service<SetInt32>::SharedPtr> set_rotation_srv_;
   rclcpp::Service<GetInt32>::SharedPtr get_white_balance_srv_;
   rclcpp::Service<SetInt32>::SharedPtr set_white_balance_srv_;
   rclcpp::Service<GetInt32>::SharedPtr get_auto_white_balance_srv_;
@@ -518,6 +530,7 @@ class OBCameraNode {
   bool enable_ir_long_exposure_ = false;
   bool enable_ldp_ = true;
   int ldp_power_level_ = -1;
+  int color_rotation_ = -1;
   // color ae roi
   int color_ae_roi_left_ = -1;
   int color_ae_roi_top_ = -1;

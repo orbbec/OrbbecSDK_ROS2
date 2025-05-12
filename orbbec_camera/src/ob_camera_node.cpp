@@ -930,7 +930,7 @@ void OBCameraNode::setupDepthPostProcessFilter() {
   auto device_info = device_->getDeviceInfo();
   CHECK_NOTNULL(device_info);
   auto pid = device_info->getPid();
-  if (!isGemini335PID(pid)) {
+  if (pid == GEMINI2_PID || pid == GEMINI2L_PID) {
     if (enable_decimation_filter_) {
       auto decimation_filter = std::make_shared<ob::DecimationFilter>();
       decimation_filter->enable(true);

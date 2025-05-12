@@ -29,9 +29,11 @@ int main() {
       std::string serial = device_info->serialNumber();
       std::string uid = device_info->uid();
       auto usb_port = orbbec_camera::parseUsbPort(uid);
+      std::stringstream pid_hex;
+      pid_hex<< std::hex << std::setw(4) << std::setfill('0') << device_info->getPid();
       RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"),
                          "- Name: " << device_info->getName() << ", PID: 0x"
-                                    << device_info->getPid() << ", SN/ID: " << serial
+                                    << pid_hex.str() << ", SN/ID: " << serial
                                     << ", Connection: " << device_info->getConnectionType());
       RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), "serial: " << serial);
       RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), "usb port: " << usb_port);

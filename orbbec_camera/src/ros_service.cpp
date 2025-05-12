@@ -206,6 +206,16 @@ void OBCameraNode::setupCameraCtrlServices() {
                                   std::shared_ptr<SetBool::Response> response) {
         setSYNCHostimeCallback(request, response);
       });
+  set_write_customerdata_srv_ = node_->create_service<SetString>(
+      "set_write_customer_data", [this](const std::shared_ptr<SetString::Request> request,
+                                        std::shared_ptr<SetString::Response> response) {
+        setWriteCustomerData(request, response);
+      });
+  set_read_customerdata_srv_ = node_->create_service<SetString>(
+      "set_read_customer_data", [this](const std::shared_ptr<SetString::Request> request,
+                                       std::shared_ptr<SetString::Response> response) {
+        setReadCustomerData(request, response);
+      });
 }
 
 void OBCameraNode::setExposureCallback(const std::shared_ptr<SetInt32::Request>& request,
@@ -1048,4 +1058,50 @@ void OBCameraNode::setSYNCHostimeCallback(
   }
 }
 
+void OBCameraNode::setWriteCustomerData(const std::shared_ptr<SetString::Request>& request,
+                                        std::shared_ptr<SetString::Response>& response) {
+  if (request->data.empty()) {
+    response->success = false;
+    response->message = "set write customer data is empty";
+    return;
+  }
+  try {
+    device_->writeCustomerData(request->data.c_str(), request->data.size());
+    response->message = "set write customer data is " + request->data;
+    response->success = true;
+    return;
+  } catch (const ob::Error& e) {
+    response->message = e.getMessage();
+    response->success = false;
+  } catch (const std::exception& e) {
+    response->message = e.what();
+    response->success = false;
+  } catch (...) {
+    response->message = "unknown error";
+    response->success = false;
+  }
+}
+void OBCameraNode::setReadCustomerData(const std::shared_ptr<SetString::Request>& request,
+                                       std::shared_ptr<SetString::Response>& response) {
+  (void)request;
+  try {
+    std::vector<uint8_t> customer_date;
+    customer_date.resize(40960);
+    uint32_t customer_date_len = 0;
+    device_->readCustomerData(customer_date.data(), &customer_date_len);
+    std::string customer_date_str(customer_date.begin(), customer_date.end());
+    response->message = "read customer data is " + customer_date_str;
+    response->success = true;
+    return;
+  } catch (const ob::Error& e) {
+    response->message = e.getMessage();
+    response->success = false;
+  } catch (const std::exception& e) {
+    response->message = e.what();
+    response->success = false;
+  } catch (...) {
+    response->message = "unknown error";
+    response->success = false;
+  }
+}
 }  // namespace orbbec_camera

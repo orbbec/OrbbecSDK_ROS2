@@ -325,6 +325,12 @@ class OBCameraNode {
   void switchIRCameraCallback(const std::shared_ptr<SetString::Request>& request,
                               std::shared_ptr<SetString::Response>& response);
 
+  void setWriteCustomerData(const std::shared_ptr<SetString::Request>& request,
+                            std::shared_ptr<SetString::Response>& response);
+
+  void setReadCustomerData(const std::shared_ptr<SetString::Request>& request,
+                           std::shared_ptr<SetString::Response>& response);
+
   void setIRLongExposureCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
                                  std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
 
@@ -470,6 +476,8 @@ class OBCameraNode {
   rclcpp::Service<SetBool>::SharedPtr set_auto_white_balance_srv_;
   rclcpp::Service<GetString>::SharedPtr get_sdk_version_srv_;
   rclcpp::Service<SetString>::SharedPtr switch_ir_camera_srv_;
+  rclcpp::Service<SetString>::SharedPtr set_write_customerdata_srv_;
+  rclcpp::Service<SetString>::SharedPtr set_read_customerdata_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_ir_long_exposure_srv_;
   std::map<stream_index_pair, rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr>
       set_auto_exposure_srv_;

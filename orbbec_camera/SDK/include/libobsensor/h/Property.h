@@ -509,6 +509,12 @@ typedef enum {
      * @brief soft trigger auto capture interval time, use in OB_MULTI_DEVICE_SYNC_MODE_SOFTWARE_TRIGGERING mode
      */
     OB_DEVICE_AUTO_CAPTURE_INTERVAL_TIME_INT = 217,
+
+    /**
+     * @brief PTP time synchronization enable
+     */
+    OB_DEVICE_PTP_CLOCK_SYNC_ENABLE_BOOL = 223,
+
     /**
      * @brief Baseline calibration parameters
      */
@@ -817,6 +823,11 @@ typedef enum {
      * @brief Calibration JSON file read from device (Femto Mega, read only)
      */
     OB_RAW_DATA_CAMERA_CALIB_JSON_FILE = 4029,
+
+    /**
+     * @brief Confidence degree
+     */
+    OB_PROP_DEBUG_ESGM_CONFIDENCE_FLOAT = 5013,
 } OBPropertyID,
     ob_property_id;
 

@@ -104,7 +104,7 @@ OB_EXPORT void ob_enable_device_clock_sync(ob_context *context, uint64_t repeat_
 OB_EXPORT void ob_free_idle_memory(ob_context *context, ob_error **error);
 
 /**
- * @brief For linux, there are two ways to enable the UVC backend: libuvc and libusb. This function is used to set the backend type.
+ * @brief For linux, there are two ways to enable the UVC backend: libuvc and v4l2. This function is used to set the backend type.
  * @brief It is effective when the new device is created.
  *
  * @attention This interface is only available for Linux.

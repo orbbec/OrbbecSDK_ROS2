@@ -24,10 +24,9 @@ OB_EXPORT bool ob_transformation_3d_to_3d(const OBPoint3f source_point3f, OBExtr
 /**
  * @brief Transform a 2d pixel coordinate with an associated depth value of the source camera into a 3d point of the target coordinate system.
  *
- * @param[in] source_intrinsic Source intrinsic parameters
- * @param[in] source_distortion Source distortion parameters
  * @param[in] source_point2f Source 2d point value
  * @param[in] source_depth_pixel_value The depth of sourcePoint2f in millimeters
+ * @param[in] source_intrinsic Source intrinsic parameters
  * @param[in] extrinsic Transformation matrix from source to target
  * @param[out] target_point3f Target 3d point value
  * @param[out] error Pointer to an error object that will be set if an error occurs.

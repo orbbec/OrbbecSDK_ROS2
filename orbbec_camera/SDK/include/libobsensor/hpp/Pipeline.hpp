@@ -95,7 +95,7 @@ public:
      * If no parameters are specified, the stream will be enabled with default resolution settings.
      * Users who wish to set custom resolutions should refer to the product manual, as available resolutions vary by camera model.
      *
-     * @param type The video stream type.
+     * @param streamType The video stream type.
      * @param width The video stream width (default is OB_WIDTH_ANY, which selects the default resolution).
      * @param height The video stream height (default is OB_HEIGHT_ANY, which selects the default resolution).
      * @param fps The video stream frame rate (default is OB_FPS_ANY, which selects the default frame rate).
@@ -182,7 +182,7 @@ public:
      * @brief Disable a sensor stream to be used in the pipeline.
      * @brief Will convert sensor type to stream type automatically.
      *
-     * @param sensorType
+     * @param sensorType The sensor configuration to be disabled
      */
     void disableStream(OBSensorType sensorType) const {
         auto streamType = ob::TypeHelper::convertSensorTypeToStreamType(sensorType);
@@ -346,7 +346,7 @@ public:
     /**
      * @brief Wait for frameset
      *
-     * @param timeout_ms The waiting timeout in milliseconds
+     * @param timeoutMs The waiting timeout in milliseconds
      * @return std::shared_ptr<FrameSet> The waiting frameset data
      */
     std::shared_ptr<FrameSet> waitForFrameset(uint32_t timeoutMs = 1000) const {

@@ -293,6 +293,30 @@ public:
     }
 
     /**
+     * @brief Set the customer data type of a device property
+     *
+     * @param data The data to set
+     * @param dataSize The size of the data to set,the maximum length cannot exceed 65532 bytes.
+     */
+    void writeCustomerData(const void *data, uint32_t dataSize) {
+        ob_error *error = nullptr;
+        ob_device_write_customer_data(impl_, data, dataSize, &error);
+        Error::handle(&error);
+    }
+
+    /**
+     * @brief Get the customer data type of a device property
+     *
+     * @param data The property data obtained
+     * @param dataSize The size of the data obtained
+     */
+    void readCustomerData(void *data, uint32_t *dataSize) {
+        ob_error *error = nullptr;
+        ob_device_read_customer_data(impl_, data, dataSize, &error);
+        Error::handle(&error);
+    }
+
+    /**
      * @brief Get the number of properties supported by the device
      *
      * @return The number of supported properties
@@ -755,7 +779,7 @@ public:
      * @param[in] sendData The data to be sent to the device.
      * @param[in] sendDataSize The size of the data to be sent to the device.
      * @param[out] receiveData The data received from the device.
-     * @param[in out] receiveDataSize The requeseted size of the data received from the device, and the actual size of the data received from the device.
+     * @param[in,out] receiveDataSize The requeseted size of the data received from the device, and the actual size of the data received from the device.
      */
     void sendAndReceiveData(const uint8_t *sendData, uint32_t sendDataSize, uint8_t *receiveData, uint32_t *receiveDataSize) const {
         ob_error *error = nullptr;
@@ -1394,9 +1418,9 @@ public:
     }
 
     /**
-     * @brief Get the number of device presets in the list
+     * @brief Get the number of camera parameters in the list.
      *
-     * @return uint32_t the number of device presets in the list
+     * @return uint32_t the number of camera parameters in the list.
      */
     uint32_t getCount() {
         ob_error *error = nullptr;

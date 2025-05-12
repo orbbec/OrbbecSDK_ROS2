@@ -311,7 +311,7 @@ public:
      * @brief Some private filters require an activation key to be activated, its depends on the vendor of the filter.
      *
      * @param name The name of the filter.
-     * @param activation_key The activation key of the filter.
+     * @param activationKey The activation key of the filter.
      */
     static std::shared_ptr<Filter> createPrivateFilter(const std::string &name, const std::string &activationKey) {
         ob_error *error = nullptr;
@@ -352,7 +352,7 @@ public:
     /**
      * @brief Set the output pointcloud frame format.
      *
-     * @param type The point cloud frame format: OB_FORMAT_POINT or OB_FORMAT_RGB_POINT
+     * @param format The point cloud frame format: OB_FORMAT_POINT or OB_FORMAT_RGB_POINT
      */
     void setCreatePointFormat(OBFormat format) {
         setConfigValue("pointFormat", static_cast<double>(format));
@@ -534,7 +534,7 @@ public:
     /**
      * @brief Set the sequenceId filter params.
      *
-     * @param sequence id to pass the filter.
+     * @param sequence_id id to pass the filter.
      */
     void selectSequenceId(int sequence_id) {
         setConfigValue("sequenceid", static_cast<double>(sequence_id));
@@ -580,7 +580,7 @@ public:
     /**
      * @brief Set the decimation filter scale value.
      *
-     * @param type The decimation filter scale value.
+     * @param value The decimation filter scale value.
      */
     void setScaleValue(uint8_t value) {
         setConfigValue("decimate", static_cast<double>(value));
@@ -796,7 +796,6 @@ public:
     /**
      * @brief Set the HoleFillingFilter mode.
      *
-     * @param[in] filter A holefilling_filter object.
      * @param mode OBHoleFillingMode, OB_HOLE_FILL_TOP,OB_HOLE_FILL_NEAREST or OB_HOLE_FILL_FAREST.
      */
     void setFilterMode(OBHoleFillingMode mode) {
@@ -830,7 +829,7 @@ public:
     /**
      * @brief Set the noise removal filter params.
      *
-     * @param[in] params ob_noise_removal_filter_params.
+     * @param[in] filterParams ob_noise_removal_filter_params.
      */
     void setFilterParams(OBNoiseRemovalFilterParams filterParams) {
         setConfigValue("max_size", static_cast<double>(filterParams.max_size));

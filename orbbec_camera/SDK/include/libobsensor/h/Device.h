@@ -167,6 +167,26 @@ OB_EXPORT void ob_device_get_structured_data(ob_device *device, ob_property_id p
 OB_EXPORT void ob_device_get_raw_data(ob_device *device, ob_property_id property_id, ob_get_data_callback cb, void *user_data, ob_error **error);
 
 /**
+ * @brief Set customer data.
+ *
+ * @param[in] device The device object.
+ * @param[in] data The property data to be set.
+ * @param[in] data_size The size of the property to be set,the maximum length cannot exceed 65532 bytes.
+ * @param[out] error Log error messages.
+ */
+OB_EXPORT void ob_device_write_customer_data(ob_device *device, const void *data, uint32_t data_size, ob_error **error);
+
+/**
+ * @brief Get customer data of a device property.
+ *
+ * @param[in] device The device object.
+ * @param[out] data The obtained property data.
+ * @param[out] data_size The size of the obtained property data.
+ * @param[out] error Log error messages.
+ */
+OB_EXPORT void ob_device_read_customer_data(ob_device *device, void *data, uint32_t *data_size, ob_error **error);
+
+/**
  * @brief Get the number of properties supported by the device.
  *
  * @param[in] device The device object.
@@ -305,9 +325,8 @@ OB_EXPORT void ob_device_enable_heartbeat(ob_device *device, bool enable, ob_err
  * @param[in] send_data The data to be sent to the device.
  * @param[in] send_data_size The size of the data to be sent to the device.
  * @param[out] receive_data The data received from the device.
- * @param[in, out] receive_data_size Pass in the expected size of the receive data, and return the actual size of the received data.
+ * @param[in,out] receive_data_size Pass in the expected size of the receive data, and return the actual size of the received data.
  * @param error Pointer to an error object that will be set if an error occurs.
- * @return OB_EXPORT
  */
 OB_EXPORT void ob_device_send_and_receive_data(ob_device *device, const uint8_t *send_data, uint32_t send_data_size, uint8_t *receive_data,
                                                uint32_t *receive_data_size, ob_error **error);

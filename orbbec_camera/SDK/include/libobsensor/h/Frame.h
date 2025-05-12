@@ -62,7 +62,7 @@ OB_EXPORT ob_frame *ob_create_frame_from_stream_profile(const ob_stream_profile 
  * no longer needed.
  *
  * @param[in] frame_type Frame object type.
- * @param[in] frame_format Frame object format.
+ * @param[in] format Frame object format.
  * @param[in] width Frame object width.
  * @param[in] height Frame object height.
  * @param[in] stride_bytes Row span in bytes. If 0, the stride is calculated based on the width and format.

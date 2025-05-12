@@ -211,12 +211,12 @@ OB_EXPORT bool ob_device_preset_list_has_preset(const ob_device_preset_list *pre
  * @return bool Returns true if the device supports the frame interleave feature.
  */
 OB_EXPORT bool ob_device_is_frame_interleave_supported(const ob_device *device, ob_error **error);
-    /**
+/**
  *
  * @brief load the frame interleave mode according to frame interleavee name.
  *
  * @param device The device object.
- * @param interleave_ae_name  The name should be one of the frame interleave names returned by @ref ob_device_get_available_frame_interleave_list.
+ * @param frame_interleave_name  The name should be one of the frame interleave names returned by @ref ob_device_get_available_frame_interleave_list.
  * @param error  Log error messages.
  */
 OB_EXPORT void ob_device_load_frame_interleave(ob_device *device, const char *frame_interleave_name, ob_error **error);
@@ -230,11 +230,10 @@ OB_EXPORT void ob_device_load_frame_interleave(ob_device *device, const char *fr
  */
 OB_EXPORT ob_device_frame_interleave_list *ob_device_get_available_frame_interleave_list(ob_device *device, ob_error **error);
 
-
 /**
  * @brief Delete the available frame interleave list.
  *
- * @param interleave_ae_list The available frame interleave list.
+ * @param frame_interleave_list The available frame interleave list.
  * @param error  Log error messages.
  */
 OB_EXPORT void ob_delete_frame_interleave_list(ob_device_frame_interleave_list *frame_interleave_list, ob_error **error);
@@ -242,7 +241,7 @@ OB_EXPORT void ob_delete_frame_interleave_list(ob_device_frame_interleave_list *
 /**
  * @brief Get the number of frame interleave in the frame interleave list.
  *
- * @param interleave_ae_list The available frame interleave  list.
+ * @param frame_interleave_list The available frame interleave list.
  * @param error  Log error messages.
  * @return  The number of frame interleave in the frame interleave list.
  */
@@ -251,7 +250,7 @@ OB_EXPORT uint32_t ob_device_frame_interleave_list_get_count(ob_device_frame_int
 /**
  * @brief Get the name of frame interleave in the frame interleave list.
  *
- * @param interleave_ae_list The available frame interleave list.
+ * @param frame_interleave_list The available frame interleave list.
  * @param index  The index of frame interleave in the frame interleave list.
  * @param error  Log error messages.
  * @return  The name of frame interleave in the frame interleave list..
@@ -261,8 +260,8 @@ OB_EXPORT const char *ob_device_frame_interleave_list_get_name(ob_device_frame_i
 /**
  * @brief Check if the interleave ae list has the interleave ae.
  *
- * @param interleave_ae_list The available interleave ae list.
- * @param interleave_ae_name  The name of the interleave ae.
+ * @param frame_interleave_list The available interleave ae list.
+ * @param frame_interleave_name  The name of the interleave ae.
  * @param error  Log error messages.
  * @return  Whether the interleave ae list has the interleave ae. If true, the interleave ae list has the interleave ae. If false, the interleave ae list does
  * not have the interleave ae.

@@ -127,7 +127,7 @@ public:
     /**
      * @brief Activates device clock synchronization to synchronize the clock of the host and all created devices (if supported).
      *
-     * @param repeatInterval The interval for auto-repeated synchronization, in milliseconds. If the value is 0, synchronization is performed only once.
+     * @param repeatIntervalMsec The interval for auto-repeated synchronization, in milliseconds. If the value is 0, synchronization is performed only once.
      */
     void enableDeviceClockSync(uint64_t repeatIntervalMsec) const {
         ob_error *error = nullptr;
@@ -146,12 +146,12 @@ public:
     }
 
     /**
-     * @brief For linux, there are two ways to enable the UVC backend: libuvc and libusb. This function is used to set the backend type.
+     * @brief For linux, there are two ways to enable the UVC backend: libuvc and v4l2. This function is used to set the backend type.
      * @brief It is effective when the new device is created.
      *
      * @attention This interface is only available for Linux.
      *
-     * @param[in] backend_type The backend type to be used.
+     * @param[in] type The backend type to be used.
      */
     void setUvcBackendType(OBUvcBackendType type) const {
         ob_error *error = nullptr;
@@ -202,7 +202,7 @@ public:
      * @param callback The callback function.
      */
     static void setLoggerToCallback(OBLogSeverity severity, LogCallback callback) {
-        ob_error *error       = nullptr;
+        ob_error *error           = nullptr;
         Context::getLogCallback() = callback;
         ob_set_logger_to_callback(severity, &Context::logCallback, &Context::getLogCallback(), &error);
         Error::handle(&error);
@@ -240,7 +240,7 @@ private:
     }
 
     // Lazy initialization of the logcallback_. The purpose is to initialize logcallback_ in .hpp
-    static LogCallback& getLogCallback() {
+    static LogCallback &getLogCallback() {
         static LogCallback logCallback_ = nullptr;
         return logCallback_;
     }
@@ -249,4 +249,3 @@ private:
 #define enableMultiDeviceSync enableDeviceClockSync
 };
 }  // namespace ob
-

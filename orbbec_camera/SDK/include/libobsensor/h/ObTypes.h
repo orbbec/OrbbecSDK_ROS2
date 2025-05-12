@@ -10,14 +10,14 @@
 
 #include "Export.h"
 
+#include <stdbool.h>
+#include <stdint.h>
+
 #pragma pack(push, 1)  // struct 1-byte align
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <stdbool.h>
-#include <stdint.h>
 
 typedef struct ob_context_t                      ob_context;
 typedef struct ob_device_t                       ob_device;
@@ -185,6 +185,7 @@ typedef enum {
     OB_PIXEL_DEPTH     = 0,   // Depth pixel type, the value of the pixel is the distance from the camera to the object
     OB_PIXEL_DISPARITY = 2,   // Disparity for structured light camera
     OB_PIXEL_RAW_PHASE = 3,   // Raw phase for tof camera
+    OB_PIXEL_TOF_DEPTH = 4,   // Depth for tof camera
 } OBPixelType,
     ob_pixel_type;
 
@@ -192,7 +193,7 @@ typedef enum {
  * @brief Enumeration value describing the pixel format
  */
 typedef enum {
-    OB_FORMAT_UNKNOWN    = -1, /*< unknown format */
+    OB_FORMAT_UNKNOWN    = -1, /**< unknown format */
     OB_FORMAT_YUYV       = 0,  /**< YUYV format */
     OB_FORMAT_YUY2       = 1,  /**< YUY2 format (the actual format is the same as YUYV) */
     OB_FORMAT_UYVY       = 2,  /**< UYVY format */
@@ -538,6 +539,10 @@ typedef enum {
     FORMAT_YUYV_TO_BGRA,    /**< YUYV to BGRA */
     FORMAT_YUYV_TO_Y16,     /**< YUYV to Y16 */
     FORMAT_YUYV_TO_Y8,      /**< YUYV to Y8 */
+    FORMAT_RGBA_TO_RGB,     /**< RGBA to RGB */
+    FORMAT_BGRA_TO_BGR,     /**< BGRA to BGR */
+    FORMAT_Y16_TO_RGB,      /**< Y16 to RGB */
+    FORMAT_Y8_TO_RGB,       /**< Y8 to RGB */
 } OBConvertFormat,
     ob_convert_format;
 
@@ -1697,17 +1702,17 @@ typedef enum {
 } ob_uvc_backend_type,
     OBUvcBackendType;
 
-
 /**
  * @brief The playback status of the media
  */
 typedef enum {
-    OB_PLAYBACK_UNKNOWN ,
-    OB_PLAYBACK_PLAYING,  /**< The media is playing */
-    OB_PLAYBACK_PAUSED, /**< The media is paused */
+    OB_PLAYBACK_UNKNOWN,
+    OB_PLAYBACK_PLAYING, /**< The media is playing */
+    OB_PLAYBACK_PAUSED,  /**< The media is paused */
     OB_PLAYBACK_STOPPED, /**< The media is stopped */
     OB_PLAYBACK_COUNT,
-} ob_playback_status, OBPlaybackStatus;
+} ob_playback_status,
+    OBPlaybackStatus;
 
 // For compatibility
 #define OB_FRAME_METADATA_TYPE_LASER_POWER_MODE OB_FRAME_METADATA_TYPE_LASER_POWER_LEVEL
@@ -1815,7 +1820,7 @@ typedef void(ob_frame_destroy_callback)(uint8_t *buffer, void *user_data);
  */
 typedef void(ob_log_callback)(ob_log_severity severity, const char *message, void *user_data);
 
-typedef void(*ob_playback_status_changed_callback)(ob_playback_status status, void *user_data);
+typedef void (*ob_playback_status_changed_callback)(ob_playback_status status, void *user_data);
 /**
  * @brief Check if the sensor_type is a video sensor
  *

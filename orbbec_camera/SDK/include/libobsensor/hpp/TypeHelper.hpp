@@ -113,7 +113,7 @@ public:
      *      OB_SENSOR_IR_LEFT,
      *      OB_SENSOR_IR_RIGHT,
      *
-     * @param type
+     * @param type The sensor type
      * @return true
      * @return false
      */

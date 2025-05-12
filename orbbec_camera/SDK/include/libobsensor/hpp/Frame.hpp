@@ -929,11 +929,11 @@ public:
      * @attention The buffer is owned by the caller, and will not be destroyed by the frame object. The user should ensure that the buffer is valid and not
      * modified.
      *
-     * @param[in] frame_type Frame object type.
+     * @param[in] frameType Frame object type.
      * @param[in] format Frame object format.
      * @param[in] buffer Frame object buffer.
-     * @param[in] buffer_size Frame object buffer size.
      * @param[in] destroyCallback Destroy callback, will be called when the frame object is destroyed.
+     * @param[in] bufferSize Frame object buffer size.
      *
      * @return std::shared_ptr<Frame> The created frame object.
      */

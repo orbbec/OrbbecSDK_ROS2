@@ -21,7 +21,7 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
   </thead>
   <tbody>
     <tr>
-      <td rowspan="8" style="text-align: center; font-weight: bold;">Gemini 330</td>
+      <td rowspan="9" style="text-align: center; font-weight: bold;">Gemini 330</td>
       <td>Gemini 335</td>
       <td>Full maintenance</td>
       <td>Recommended for new designs</td>
@@ -58,6 +58,11 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
     </tr>
     <tr>
       <td>Gemini 335Le</td>
+      <td>Not supported</td>
+      <td>Recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 435Le</td>
       <td>Not supported</td>
       <td>Recommended for new designs</td>
     </tr>
@@ -222,7 +227,7 @@ Currently, the following devices are supported by the OrbbecSDK ROS2 Wrapper v2-
 
 For optimal performance, we strongly recommend updating to the latest firmware version. This ensures that you benefit from the most recent enhancements and bug fixes.
 
-| Product List | Minimal Firmware Version | **Launch File**       |
+| Product List | Minimal Firmware Version | **Launch File**             |
 | :----------- | :----------------------- | :-------------------------- |
 | Gemini 330   | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 330L  | 1.2.20                   | gemini_330_series.launch.py |
@@ -232,11 +237,14 @@ For optimal performance, we strongly recommend updating to the latest firmware v
 | Gemini 336   | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 336L  | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 335Le | 1.5.31                   | gemini_330_series.launch.py |
+| Gemini 435Le | /                        | gemini_330_series.launch.py |
 | Femto Bolt   | 1.1.2                    | femto_bolt.launch.py        |
 | Femto Mega   | 1.3.0                    | femto_mega.launch.py        |
 | Astra 2      | 2.8.20                   | astra2.launch.py            |
 | Gemini 2 L   | 1.4.53                   | gemini2L.launch.py          |
 | Gemini 2     | 1.4.92                   | gemini2.launch.py           |
+| DaBai A      | /                        | dabai_a.launch.py           |
+| DaBai AL     | /                        | dabai_al.launch.py          |
 
 All launch files are essentially similar, with the primary difference being the default values of the parameters set
 for different models within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution settings in the launch file, as well as other parameters, to ensure compatibility and optimal performance.
@@ -422,7 +430,7 @@ Explanation of topic.Reference:[All available topics documentation](./docs/all_a
 
 ### Network device enumeration
 
-When using Femto Mega and Gemini 335Le, you can use the network to connect the device.
+When using Femto Mega, Gemini 335Le and Gemini 435Le, you can use the network to connect the device.
 
 **Femto Mega:**
 
@@ -430,7 +438,7 @@ When using Femto Mega and Gemini 335Le, you can use the network to connect the d
 ros2 launch orbbec_camera femto_mega.launch.py enumerate_net_device:=true
 ```
 
-**Gemini 335Le:**
+**Gemini 335Le & Gemini 435Le:**
 
 ```bash
 ros2 launch orbbec_camera gemini_330_series.launch.py enumerate_net_device:=true

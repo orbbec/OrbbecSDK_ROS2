@@ -45,8 +45,19 @@ ros2 service call /camera/set_color_ae_roi orbbec_camera_msgs/srv/SetArrays '{da
 * `/camera/set_color_mirror`
 
 ```bash
-#v2 version is not supported yet
 ros2 service call /camera/set_color_mirror std_srvs/srv/SetBool '{data: true}'
+```
+
+* `/camera/set_color_flip`
+
+```bash
+ros2 service call /camera/set_color_flip std_srvs/srv/SetBool '{data: true}'
+```
+
+* `/camera/set_color_rotation`
+
+```bash
+ros2 service call /camera/set_color_rotation orbbec_camera_msgs/srv/SetInt32 '{data: 180}'
 ```
 
 * `/camera/toggle_color`
@@ -82,7 +93,6 @@ ros2 service call /camera/set_depth_auto_exposure std_srvs/srv/SetBool '{data: t
 * `/camera/set_depth_gain`
 
 ```bash
-#v2 version is not supported yet
 ros2 service call /camera/set_depth_gain orbbec_camera_msgs/srv/SetInt32 '{data: 64}'
 ```
 
@@ -97,6 +107,18 @@ ros2 service call /camera/set_depth_ae_roi orbbec_camera_msgs/srv/SetArrays '{da
 
 ```bash
 ros2 service call /camera/set_depth_mirror std_srvs/srv/SetBool '{data: true}'
+```
+
+* `/camera/set_depth_flip`
+
+```bash
+ros2 service call /camera/set_depth_flip std_srvs/srv/SetBool '{data: true}'
+```
+
+* `/camera/set_depth_rotation`
+
+```bash
+ros2 service call /camera/set_depth_rotation orbbec_camera_msgs/srv/SetInt32 '{data: 180}'
 ```
 
 * `/camera/toggle_depth`
@@ -144,8 +166,19 @@ ros2 service call /camera/set_ir_gain orbbec_camera_msgs/srv/SetInt32 '{data: 64
 * `/camera/set_ir_mirror`
 
 ```bash
-#v2 version is not supported yet
 ros2 service call /camera/set_ir_mirror std_srvs/srv/SetBool '{data: true}'
+```
+
+* `/camera/set_ir_flip`
+
+```bash
+ros2 service call /camera/set_ir_flip std_srvs/srv/SetBool '{data: true}'
+```
+
+* `/camera/set_ir_rotation`
+
+```bash
+ros2 service call /camera/set_ir_rotation orbbec_camera_msgs/srv/SetInt32 '{data: 180}'
 ```
 
 * `/camera/switch_ir`

@@ -14,6 +14,8 @@ The following are the launch parameters available:
   * The USB port of the camera. This is required when multiple cameras are used
 * **device_num**
   * The number of devices. This must be filled in if multiple cameras are required
+* **upgrade_firmware**
+  * The input parameter is the firmware path
 * **preset_firmware_path**
   * The input parameter is the perset firmware path. If multiple paths are input, each path needs to be separated by `,`and a maximum of 3 firmware paths can be input
 * **uvc_backend**
@@ -22,6 +24,13 @@ The following are the launch parameters available:
   * ROS 2 Message Quality of Service (QoS) settings. The possible values are `SYSTEM_DEFAULT`, `DEFAULT`, `PARAMETER_EVENTS`, `SERVICES_DEFAULT`, `PARAMETERS`, `SENSOR_DATA` and are case-insensitive. These correspond to `rmw_qos_profile_system_default`, `rmw_qos_profile_default`, `rmw_qos_profile_parameter_events`, `rmw_qos_profile_services_default`, `rmw_qos_profile_parameters`, and `SENSOR_DATA`, respectively.
 * **color_ae_roi_[left|right|top|bottom],depth_ae_roi_[left|right|top|bottom]**
   * Set Color and Depth auto exposure ROI.
+* **[color|depth|left_ir|right_ir|ir]_rotation**
+  * Set stream image rotation
+  * The possible values are `0`,`90`,`180`,`270`
+* **[color|depth|left_ir|right_ir|ir]_flip**
+  * Enable the stream image flip
+* **[color|depth|left_ir|right_ir|ir]_mirror**
+  * Enable the stream image mirror
 * **enable_point_cloud**
   * Enable the point cloud
 * **enable_colored_point_cloud**
@@ -60,6 +69,9 @@ The following are the launch parameters available:
   * Set the Color hue
 * **enable_color_backlight_compenstation**
   * Enable the Color backlight compenstation
+* **color_powerline_freq**
+  * Set the power line freq
+  * The possible values are `disable`,`50hz`,`60hz`,`auto`
 * **enable_color_decimation_filter**
   * Enable the Color decimation filter
 * **color_decimation_filter_scale**
@@ -82,12 +94,16 @@ The following are the launch parameters available:
   * Enable the sync accel_gyro,and output IMU topic real-time data
 * **enable_accel**
   * Enable the Accelerometer,and output Accelerometer info topic data
+* **enable_accel_data_correction**
+  * Enable the Accelerometer data correction
 * **accel_rate**
   * The frequency of the accelerometer, the optional values are `1.5625hz`, `3.125hz`, `6.25hz`, `12.5hz`, `25hz`, `50hz`, `100hz`, `200hz`, `500hz`, `1khz`, `2khz`, `4khz`, `8khz`, `16khz`, `32khz`
 * **accel_range**
   * The range of the accelerometer, the optional values are `2g`, `4g`, `8g`, `16g`. The specific value depends on the current camera
 * **enable_gyro**
   * Enable the gyroscope,and output gyroscope info topic data
+* **enable_gyro_data_correction**
+  * Enable the gyroscope data correction
 * **gyro_rate**
   * The frequency of the gyroscope, the optional values are `1.5625hz`, `3.125hz`, `6.25hz`, `12.5hz`, `25hz`, `50hz`, `100hz`, `200hz`, `500hz`, `1khz`, `2khz`, `4khz`, `8khz`, `16khz`, `32khz`.The specific value depends on the current camera
 * **gyro_range**
@@ -139,6 +155,10 @@ The following are the launch parameters available:
   * The frame number of each stream after each trigger in triggering mode,this parameter is usually used [multi camera synced](../orbbec_camera/examples/multi_camera_synced/README.MD)
 * **software_trigger_period**
   * Software trigger period in ms,this parameter is usually used [multi camera synced](../orbbec_camera/examples/multi_camera_synced/README.MD)
+* **enable_ptp_config**
+  * Enable PTP time synchronization
+  * Only for Gemini 335Le
+  * Note: To enable PTP time synchronization, you must set the **enable_sync_host_time** parameter to `false`.
 * **enable_frame_sync**
   * Enable the frame synchronization
 * **ordered_pc**
@@ -165,6 +185,11 @@ The following are the launch parameters available:
   * Enable the Depth hole filling filter.The Depth hole filling filter setting parameter is `hole_filling_filter_mode`
 * **align_mode**
   * The alignment mode to be used. Options are `HW` for hardware alignment and `SW` for software alignment
+* **align_target_stream**
+  * Set align target stream mode
+  * The possible values are `COLOR`,`DEPTH`
+  * `COLOR`:Align depth to color
+  * `DEPTH`:Align color to depth
 * **diagnostic_period**
   * Diagnostic period in seconds
 * **enable_laser**

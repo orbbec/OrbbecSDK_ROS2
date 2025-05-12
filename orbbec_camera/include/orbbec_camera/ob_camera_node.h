@@ -521,7 +521,6 @@ class OBCameraNode {
   rclcpp::Service<std_srvs::srv::Empty>::SharedPtr save_point_cloud_srv_;
   std::string depth_filter_config_;
   bool enable_depth_filter_ = false;
-  bool enable_soft_filter_ = true;
   bool enable_color_auto_exposure_priority_ = false;
   bool enable_color_auto_exposure_ = true;
   bool enable_color_auto_white_balance_ = true;
@@ -564,8 +563,6 @@ class OBCameraNode {
   int right_ir_sequence_id_filter_id_ = -1;
   bool enable_left_ir_sequence_id_filter_ = false;
   int left_ir_sequence_id_filter_id_ = -1;
-  int soft_filter_max_diff_ = -1;
-  int soft_filter_speckle_size_ = -1;
   bool enable_frame_sync_ = false;
   // Only for Gemini2 device
   bool enable_hardware_d2d_ = true;

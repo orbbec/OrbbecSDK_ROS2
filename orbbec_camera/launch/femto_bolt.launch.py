@@ -92,6 +92,7 @@ def generate_launch_description():
         DeclareLaunchArgument('spatial_filter_radius', default_value='-1'),
         DeclareLaunchArgument('temporal_filter_diff_threshold', default_value='-1.0'),
         DeclareLaunchArgument('temporal_filter_weight', default_value='-1.0'),
+        DeclareLaunchArgument('hole_filling_filter_mode', default_value=''),
         DeclareLaunchArgument("threshold_filter_max", default_value="-1"),
         DeclareLaunchArgument("threshold_filter_min", default_value="-1"),
         DeclareLaunchArgument("sync_mode", default_value="standalone"),

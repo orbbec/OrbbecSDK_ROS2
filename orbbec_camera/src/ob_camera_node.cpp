@@ -1282,12 +1282,12 @@ void OBCameraNode::startIMUSyncStream() {
   auto accelProfiles = imuPipeline_->getStreamProfileList(OB_SENSOR_ACCEL);
   auto accel_range = fullAccelScaleRangeFromString(imu_range_[ACCEL]);
   auto accel_rate = sampleRateFromString(imu_rate_[ACCEL]);
-  auto accelProfile = accelProfiles->getAccelStreamProfile(OB_ACCEL_FS_3g, OB_SAMPLE_RATE_200_HZ);
+  auto accelProfile = accelProfiles->getAccelStreamProfile(accel_range, accel_rate);
   // GYRO
   auto gyroProfiles = imuPipeline_->getStreamProfileList(OB_SENSOR_GYRO);
   auto gyro_range = fullGyroScaleRangeFromString(imu_range_[GYRO]);
   auto gyro_rate = sampleRateFromString(imu_rate_[GYRO]);
-  auto gyroProfile = gyroProfiles->getGyroStreamProfile(OB_GYRO_FS_250dps, OB_SAMPLE_RATE_200_HZ);
+  auto gyroProfile = gyroProfiles->getGyroStreamProfile(gyro_range, gyro_rate);
   std::shared_ptr<ob::Config> imuConfig = std::make_shared<ob::Config>();
   imuConfig->enableStream(accelProfile);
   imuConfig->enableStream(gyroProfile);

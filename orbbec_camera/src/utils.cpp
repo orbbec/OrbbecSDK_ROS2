@@ -674,6 +674,14 @@ OBAccelFullScaleRange fullAccelScaleRangeFromString(std::string &full_scale_rang
     return OB_ACCEL_FS_8g;
   } else if (full_scale_range == "16g") {
     return OB_ACCEL_FS_16g;
+  } else if (full_scale_range == "3g") {
+    return OB_ACCEL_FS_3g;
+  } else if (full_scale_range == "6g") {
+    return OB_ACCEL_FS_6g;
+  } else if (full_scale_range == "12g") {
+    return OB_ACCEL_FS_12g;
+  } else if (full_scale_range == "24g") {
+    return OB_ACCEL_FS_24g;
   } else {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger("utils"),
                         "Unknown OB_ACCEL_FULL_SCALE_RANGE: " << full_scale_range);
@@ -691,6 +699,14 @@ std::string fullAccelScaleRangeToString(const OBAccelFullScaleRange &full_scale_
       return "8g";
     case OB_ACCEL_FS_16g:
       return "16g";
+    case OB_ACCEL_FS_3g:
+      return "3g";
+    case OB_ACCEL_FS_6g:
+      return "6g";
+    case OB_ACCEL_FS_12g:
+      return "12g";
+    case OB_ACCEL_FS_24g:
+      return "24g";
     default:
       return "2g";
   }

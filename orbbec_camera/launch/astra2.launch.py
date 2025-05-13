@@ -76,7 +76,6 @@ def generate_launch_description():
         DeclareLaunchArgument("log_level", default_value="none"),
         DeclareLaunchArgument("enable_publish_extrinsic", default_value="false"),
         DeclareLaunchArgument("enable_frame_sync", default_value="true"),
-
         DeclareLaunchArgument('enable_decimation_filter', default_value='false'),
         DeclareLaunchArgument('enable_threshold_filter', default_value='false'),
         DeclareLaunchArgument('enable_noise_removal_filter', default_value='true'),
@@ -88,7 +87,7 @@ def generate_launch_description():
         DeclareLaunchArgument('threshold_filter_max', default_value='-1'),
         DeclareLaunchArgument('threshold_filter_min', default_value='-1'),
         DeclareLaunchArgument('noise_removal_filter_min_diff', default_value='256'),
-        DeclareLaunchArgument('noise_removal_filter_max_size', default_value='80'),
+        DeclareLaunchArgument('noise_removal_filter_max_size', default_value='1000'),
         DeclareLaunchArgument('spatial_filter_alpha', default_value='-1.0'),
         DeclareLaunchArgument('spatial_filter_diff_threshold', default_value='-1'),
         DeclareLaunchArgument('spatial_filter_magnitude', default_value='-1'),
@@ -96,7 +95,6 @@ def generate_launch_description():
         DeclareLaunchArgument('temporal_filter_diff_threshold', default_value='-1.0'),
         DeclareLaunchArgument('temporal_filter_weight', default_value='-1.0'),
         DeclareLaunchArgument('hole_filling_filter_mode', default_value=''),
-
         DeclareLaunchArgument("enable_d2c_viewer", default_value="false"),
         DeclareLaunchArgument("enable_ldp", default_value="true"),
         DeclareLaunchArgument("ordered_pc", default_value="false"),

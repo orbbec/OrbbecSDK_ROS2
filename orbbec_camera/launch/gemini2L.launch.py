@@ -88,7 +88,7 @@ def generate_launch_description():
         DeclareLaunchArgument('threshold_filter_max', default_value='-1'),
         DeclareLaunchArgument('threshold_filter_min', default_value='-1'),
         DeclareLaunchArgument('noise_removal_filter_min_diff', default_value='256'),
-        DeclareLaunchArgument('noise_removal_filter_max_size', default_value='80'),
+        DeclareLaunchArgument('noise_removal_filter_max_size', default_value='200'),
         DeclareLaunchArgument('spatial_filter_alpha', default_value='-1.0'),
         DeclareLaunchArgument('spatial_filter_diff_threshold', default_value='-1'),
         DeclareLaunchArgument('spatial_filter_magnitude', default_value='-1'),

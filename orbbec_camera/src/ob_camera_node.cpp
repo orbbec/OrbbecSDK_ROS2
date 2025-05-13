@@ -203,11 +203,20 @@ void OBCameraNode::setupDevices() {
     RCLCPP_INFO_STREAM(logger_, "Create align filter");
     align_filter_ = std::make_unique<ob::Align>(align_target_stream_);
   }
-  if (device_->isPropertySupported(OB_PROP_DISPARITY_TO_DEPTH_BOOL, OB_PERMISSION_READ_WRITE)) {
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_DISPARITY_TO_DEPTH_BOOL, enable_hardware_d2d_);
-    bool is_hardware_d2d = device_->getBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL);
-    std::string d2d_mode = is_hardware_d2d ? "HW D2D" : "SW D2D";
-    RCLCPP_INFO_STREAM(logger_, "Depth process is " << d2d_mode);
+  if (disaparity_to_depth_mode_ == "HW") {
+    device_->setBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL, 1);
+    device_->setBoolProperty(OB_PROP_SDK_DISPARITY_TO_DEPTH_BOOL, 0);
+    RCLCPP_INFO_STREAM(logger_, "Depth process is HW");
+  } else if (disaparity_to_depth_mode_ == "SW") {
+    device_->setBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL, 0);
+    device_->setBoolProperty(OB_PROP_SDK_DISPARITY_TO_DEPTH_BOOL, 1);
+    RCLCPP_INFO_STREAM(logger_, "Depth process is SW");
+  } else if (disaparity_to_depth_mode_ == "disable") {
+    device_->setBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL, 0);
+    device_->setBoolProperty(OB_PROP_SDK_DISPARITY_TO_DEPTH_BOOL, 0);
+    RCLCPP_INFO_STREAM(logger_, "Depth process is disable");
+  } else {
+    RCLCPP_ERROR_STREAM(logger_, "Depth process is keep default");
   }
   if (device_->isPropertySupported(OB_PROP_LDP_BOOL, OB_PERMISSION_READ_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting LDP to " << (enable_ldp_ ? "ON" : "OFF"));
@@ -1560,7 +1569,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<bool>(enable_point_cloud_, "enable_point_cloud", false);
   setAndGetNodeParameter<std::string>(point_cloud_qos_, "point_cloud_qos", "default");
   setAndGetNodeParameter<bool>(enable_d2c_viewer_, "enable_d2c_viewer", false);
-  setAndGetNodeParameter<bool>(enable_hardware_d2d_, "enable_hardware_d2d", true);
+  setAndGetNodeParameter<std::string>(disaparity_to_depth_mode_, "disaparity_to_depth_mode", "HW");
   setAndGetNodeParameter<std::string>(depth_filter_config_, "depth_filter_config", "");
   if (!depth_filter_config_.empty()) {
     enable_depth_filter_ = true;

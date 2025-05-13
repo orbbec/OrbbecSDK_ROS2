@@ -527,11 +527,11 @@ void OBCameraNode::setupDevices() {
   if (!color_powerline_freq_.empty() &&
       device_->isPropertySupported(OB_PROP_COLOR_POWER_LINE_FREQUENCY_INT, OB_PERMISSION_WRITE)) {
     if (color_powerline_freq_ == "disable") {
-      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_POWER_LINE_FREQUENCY_INT, 2);
-    } else if (color_powerline_freq_ == "50hz") {
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_POWER_LINE_FREQUENCY_INT, 0);
-    } else if (color_powerline_freq_ == "60hz") {
+    } else if (color_powerline_freq_ == "50hz") {
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_POWER_LINE_FREQUENCY_INT, 1);
+    } else if (color_powerline_freq_ == "60hz") {
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_POWER_LINE_FREQUENCY_INT, 2);
     } else if (color_powerline_freq_ == "auto") {
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_POWER_LINE_FREQUENCY_INT, 3);
     }
@@ -1282,12 +1282,12 @@ void OBCameraNode::startIMUSyncStream() {
   auto accelProfiles = imuPipeline_->getStreamProfileList(OB_SENSOR_ACCEL);
   auto accel_range = fullAccelScaleRangeFromString(imu_range_[ACCEL]);
   auto accel_rate = sampleRateFromString(imu_rate_[ACCEL]);
-  auto accelProfile = accelProfiles->getAccelStreamProfile(accel_range, accel_rate);
+  auto accelProfile = accelProfiles->getAccelStreamProfile(OB_ACCEL_FS_3g, OB_SAMPLE_RATE_200_HZ);
   // GYRO
   auto gyroProfiles = imuPipeline_->getStreamProfileList(OB_SENSOR_GYRO);
   auto gyro_range = fullGyroScaleRangeFromString(imu_range_[GYRO]);
   auto gyro_rate = sampleRateFromString(imu_rate_[GYRO]);
-  auto gyroProfile = gyroProfiles->getGyroStreamProfile(gyro_range, gyro_rate);
+  auto gyroProfile = gyroProfiles->getGyroStreamProfile(OB_GYRO_FS_250dps, OB_SAMPLE_RATE_200_HZ);
   std::shared_ptr<ob::Config> imuConfig = std::make_shared<ob::Config>();
   imuConfig->enableStream(accelProfile);
   imuConfig->enableStream(gyroProfile);

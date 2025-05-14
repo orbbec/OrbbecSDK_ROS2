@@ -55,4 +55,11 @@ right_ir_height: 0
 right_ir_fps: 0
 right_ir_format: "ANY"
 
+#ir params
+# enable_ir: true
+# ir_width: 0
+# ir_height: 0
+# ir_fps: 0
+# ir_format: "ANY"
+
 

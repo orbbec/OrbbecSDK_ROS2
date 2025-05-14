@@ -203,20 +203,23 @@ void OBCameraNode::setupDevices() {
     RCLCPP_INFO_STREAM(logger_, "Create align filter");
     align_filter_ = std::make_unique<ob::Align>(align_target_stream_);
   }
-  if (disaparity_to_depth_mode_ == "HW") {
-    device_->setBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL, 1);
-    device_->setBoolProperty(OB_PROP_SDK_DISPARITY_TO_DEPTH_BOOL, 0);
-    RCLCPP_INFO_STREAM(logger_, "Depth process is HW");
-  } else if (disaparity_to_depth_mode_ == "SW") {
-    device_->setBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL, 0);
-    device_->setBoolProperty(OB_PROP_SDK_DISPARITY_TO_DEPTH_BOOL, 1);
-    RCLCPP_INFO_STREAM(logger_, "Depth process is SW");
-  } else if (disaparity_to_depth_mode_ == "disable") {
-    device_->setBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL, 0);
-    device_->setBoolProperty(OB_PROP_SDK_DISPARITY_TO_DEPTH_BOOL, 0);
-    RCLCPP_INFO_STREAM(logger_, "Depth process is disable");
-  } else {
-    RCLCPP_ERROR_STREAM(logger_, "Depth process is keep default");
+  if (device_->isPropertySupported(OB_PROP_DISPARITY_TO_DEPTH_BOOL, OB_PERMISSION_READ_WRITE) &&
+      device_->isPropertySupported(OB_PROP_SDK_DISPARITY_TO_DEPTH_BOOL, OB_PERMISSION_READ_WRITE)) {
+    if (disaparity_to_depth_mode_ == "HW") {
+      device_->setBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL, 1);
+      device_->setBoolProperty(OB_PROP_SDK_DISPARITY_TO_DEPTH_BOOL, 0);
+      RCLCPP_INFO_STREAM(logger_, "Depth process is HW");
+    } else if (disaparity_to_depth_mode_ == "SW") {
+      device_->setBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL, 0);
+      device_->setBoolProperty(OB_PROP_SDK_DISPARITY_TO_DEPTH_BOOL, 1);
+      RCLCPP_INFO_STREAM(logger_, "Depth process is SW");
+    } else if (disaparity_to_depth_mode_ == "disable") {
+      device_->setBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL, 0);
+      device_->setBoolProperty(OB_PROP_SDK_DISPARITY_TO_DEPTH_BOOL, 0);
+      RCLCPP_INFO_STREAM(logger_, "Depth process is disable");
+    } else {
+      RCLCPP_ERROR_STREAM(logger_, "Depth process is keep default");
+    }
   }
   if (device_->isPropertySupported(OB_PROP_LDP_BOOL, OB_PERMISSION_READ_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting LDP to " << (enable_ldp_ ? "ON" : "OFF"));

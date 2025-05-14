@@ -76,6 +76,7 @@ def generate_launch_description():
         DeclareLaunchArgument("log_level", default_value="none"),
         DeclareLaunchArgument("enable_publish_extrinsic", default_value="false"),
         DeclareLaunchArgument("enable_d2c_viewer", default_value="false"),
+        DeclareLaunchArgument('disaparity_to_depth_mode', default_value='SW'),
         DeclareLaunchArgument("enable_ldp", default_value="true"),
         DeclareLaunchArgument('enable_decimation_filter', default_value='false'),
         DeclareLaunchArgument('enable_threshold_filter', default_value='false'),

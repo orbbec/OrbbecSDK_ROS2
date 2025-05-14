@@ -219,7 +219,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_color_undistortion', default_value='false'),
         DeclareLaunchArgument('config_file_path', default_value=''),
         DeclareLaunchArgument('enable_heartbeat', default_value='false'),
-        DeclareLaunchArgument('frame_aggregate_mode', default_value='ANY'), # full_frame、color_frame、ANY or disable
+        DeclareLaunchArgument('frame_aggregate_mode', default_value='ANY'), # full_frame, olor_frame, ANY or disable
         DeclareLaunchArgument('interleave_ae_mode', default_value='laser'), # 'hdr' or 'laser'
         DeclareLaunchArgument('interleave_frame_enable', default_value='false'),
         DeclareLaunchArgument('interleave_skip_enable', default_value='false'),

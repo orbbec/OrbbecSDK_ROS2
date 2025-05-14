@@ -25,7 +25,7 @@ orbbec_ros:
       product_id: ""
       # The delay time for reopening the device, in milliseconds. Usually, there is no need to modify by default.
       connection_delay: 10
-      # Select timestamp type: "device" 、 “global” and "system"
+      # Select timestamp type: "device" , “global” and "system"
       time_domain: "device"
       # If the camera is connected to a USB 2.0 port and is not detected, the system will attempt to reset the camera up to three times. This setting is designed to prevent USB 3.0 devices from being mistakenly identified as USB 2.0.
       # It is recommended to set this parameter to false when using a USB 2.0 connection to avoid unnecessary resets

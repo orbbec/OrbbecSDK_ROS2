@@ -3650,8 +3650,8 @@ void OBCameraNode::setFilterCallback(const std::shared_ptr<SetFilter ::Request> 
           logger_, request->filter_name
                        << "Cannot be set\n"
                        << "The filter_name value that can be set is "
-                          "DecimationFilter、HDRMerge、SequenceIdFilter、ThresholdFilter、Nois"
-                          "eRemovalFilter、SpatialAdvancedFilter and TemporalFilter");
+                          "DecimationFilter, HDRMerge, SequenceIdFilter, ThresholdFilter, Nois"
+                          "eRemovalFilter, SpatialAdvancedFilter and TemporalFilter");
       return;
     }
     for (auto &filter : depth_filter_list_) {

@@ -729,6 +729,6 @@ class OBCameraNode {
   int offset_index0_ = -1;
   int offset_index1_ = -1;
 
-  std::string frame_aggregate_mode_ = "ANY";  // # full_frame、color_frame、ANY or disable
+  std::string frame_aggregate_mode_ = "ANY";  // # full_frame, color_frame, ANY or disable
 };
 }  // namespace orbbec_camera

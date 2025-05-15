@@ -114,10 +114,6 @@ OBCameraNodeDriver::~OBCameraNodeDriver() {
 }
 
 void OBCameraNodeDriver::init() {
-  signal(SIGSEGV, signalHandler);  // segment fault
-  signal(SIGABRT, signalHandler);  // abort
-  signal(SIGFPE, signalHandler);   // float point exception
-  signal(SIGILL, signalHandler);   // illegal instruction
   ob::Context::setExtensionsDirectory(extension_path_.c_str());
   if (config_path_.empty()) {
     ctx_ = std::make_unique<ob::Context>();
@@ -621,7 +617,7 @@ void OBCameraNodeDriver::updatePresetFirmware(std::string path) {
     }
     uint8_t index = 0;
     uint8_t count = static_cast<uint8_t>(paths.size());
-    char (*filePaths)[OB_PATH_MAX] = new char[count][OB_PATH_MAX];
+    char(*filePaths)[OB_PATH_MAX] = new char[count][OB_PATH_MAX];
     RCLCPP_INFO_STREAM(this->get_logger(), "paths.cout : " << (uint32_t)count);
     for (const auto &p : paths) {
       strcpy(filePaths[index], p.c_str());

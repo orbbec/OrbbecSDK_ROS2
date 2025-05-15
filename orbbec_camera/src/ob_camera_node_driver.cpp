@@ -465,13 +465,6 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
     }
     retry_count++;
   }
-  if (!upgrade_firmware_.empty()) {
-    device_->updateFirmware(
-        upgrade_firmware_.c_str(),
-        std::bind(&OBCameraNodeDriver::firmwareUpdateCallback, this, std::placeholders::_1,
-                  std::placeholders::_2, std::placeholders::_3),
-        false);
-  }
 
   if (!initialized) {
     RCLCPP_ERROR_STREAM(logger_,
@@ -479,9 +472,6 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
     throw std::runtime_error("Device initialization failed after " + std::to_string(max_retries) +
                              " attempts.");
   }
-
-  ob_camera_node_->startIMU();
-  ob_camera_node_->startStreams();
 
   device_connected_ = true;
   device_info_ = device_->getDeviceInfo();
@@ -510,6 +500,20 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   auto time_cost = std::chrono::duration_cast<std::chrono::milliseconds>(
       std::chrono::high_resolution_clock::now() - start_time_);
   RCLCPP_INFO_STREAM(logger_, "Start device cost " << time_cost.count() << " ms");
+  if (!upgrade_firmware_.empty()) {
+    device_->updateFirmware(
+        upgrade_firmware_.c_str(),
+        std::bind(&OBCameraNodeDriver::firmwareUpdateCallback, this, std::placeholders::_1,
+                  std::placeholders::_2, std::placeholders::_3),
+        false);
+  }
+  if (ob_camera_node_) {
+    ob_camera_node_->startIMU();
+    ob_camera_node_->startStreams();
+  } else {
+    RCLCPP_INFO_STREAM(logger_, "ob_camera_node_ is nullptr");
+  }
+
 }  // namespace orbbec_camera
 
 void OBCameraNodeDriver::connectNetDevice(const std::string &net_device_ip, int net_device_port) {

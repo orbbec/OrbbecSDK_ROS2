@@ -1,10 +1,5 @@
 from launch import LaunchDescription
-from launch.actions import (
-    DeclareLaunchArgument,
-    IncludeLaunchDescription,
-    GroupAction,
-    ExecuteProcess,
-)
+from launch.actions import IncludeLaunchDescription, GroupAction, TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
@@ -17,11 +12,11 @@ def generate_launch_description():
     launch_file_dir = os.path.join(package_dir, "launch")
     launch1_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "femto_mega.launch.py")#If you are using Gemini 335Le, replace femto_mega.launch.py ​​with gemini_330_series.launch.py
+            os.path.join(launch_file_dir, "femto_mega.launch.py")  # If you are using Gemini 335Le, replace femto_mega.launch.py ​​with gemini_330_series.launch.py
         ),
         launch_arguments={
             "camera_name": "camera_01",
-            "net_device_ip": "192.168.2.10",
+            "net_device_ip": "192.168.1.10",
             "net_device_port": "8090",
             "sync_mode": "standalone",
         }.items(),
@@ -29,7 +24,7 @@ def generate_launch_description():
 
     launch2_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "femto_mega.launch.py")#If you are using Gemini 335Le, replace femto_mega.launch.py ​​with gemini_330_series.launch.py
+            os.path.join(launch_file_dir, "femto_mega.launch.py")  # If you are using Gemini 335Le, replace femto_mega.launch.py ​​with gemini_330_series.launch.py
         ),
         launch_arguments={
             "camera_name": "camera_02",
@@ -44,8 +39,8 @@ def generate_launch_description():
     # Launch description
     ld = LaunchDescription(
         [
-            GroupAction([launch1_include]),
-            GroupAction([launch2_include]),
+            TimerAction(period=0.0, actions=[GroupAction([launch1_include])]),
+            TimerAction(period=2.0, actions=[GroupAction([launch2_include])]),
         ]
     )
 

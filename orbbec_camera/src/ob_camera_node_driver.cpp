@@ -403,17 +403,14 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByNetIP(
   std::shared_ptr<ob::Device> device = nullptr;
   for (size_t i = 0; i < list->getCount(); i++) {
     try {
-      device = list->getDevice(i);
-      auto device_info = device->getDeviceInfo();
-      if (std::string(device_info->getConnectionType()) != "Ethernet") {
+      if (std::string(list->getConnectionType(i)) != "Ethernet") {
         continue;
       }
-      if (device_info->getIpAddress() == nullptr) {
+      if (list->getIpAddress(i) == nullptr) {
         continue;
       }
-      RCLCPP_INFO_STREAM(logger_,
-                         "FindDeviceByNetIP device net ip " << device_info->getIpAddress());
-      if (std::string(device_info->getIpAddress()) == net_ip) {
+      RCLCPP_INFO_STREAM(logger_, "FindDeviceByNetIP device net ip " << list->getIpAddress(i));
+      if (std::string(list->getIpAddress(i)) == net_ip) {
         RCLCPP_INFO_STREAM(logger_, "getDeviceByNetIP device net ip " << net_ip << " done");
         return list->getDevice(i);
       }

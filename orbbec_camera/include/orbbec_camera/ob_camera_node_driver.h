@@ -48,6 +48,9 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::shared_ptr<ob::Device> selectDeviceByUSBPort(const std::shared_ptr<ob::DeviceList>& list,
                                                     const std::string& usb_port);
 
+  std::shared_ptr<ob::Device> selectDeviceByNetIP(const std::shared_ptr<ob::DeviceList>& list,
+                                                  const std::string& net_ip);
+
   void initializeDevice(const std::shared_ptr<ob::Device>& device);
 
   void startDevice(const std::shared_ptr<ob::DeviceList>& list);
@@ -68,6 +71,11 @@ class OBCameraNodeDriver : public rclcpp::Node {
 
   void rebootDeviceCallback(const std::shared_ptr<std_srvs::srv::Empty::Request> request,
                             std::shared_ptr<std_srvs::srv::Empty::Response> response);
+  void presetUpdateCallback(bool firstCall, OBFwUpdateState state, const char* message,
+                            uint8_t percent);
+  void updatePresetFirmware(std::string path);
+
+  void firmwareUpdateCallback(OBFwUpdateState state, const char* message, uint8_t percent);
 
  private:
   const rclcpp::NodeOptions node_options_;
@@ -104,9 +112,11 @@ class OBCameraNodeDriver : public rclcpp::Node {
   int net_device_port_ = 0;
   int connection_delay_ = 100;
   bool enable_sync_host_time_ = true;
+  std::string preset_firmware_path_;
   rclcpp::Service<std_srvs::srv::Empty>::SharedPtr reboot_device_srv_ = nullptr;
   std::chrono::time_point<std::chrono::system_clock> start_time_;
   std::string extension_path_;
   static backward::SignalHandling sh;  // for stack trace
+  std::string upgrade_firmware_;
 };
 }  // namespace orbbec_camera

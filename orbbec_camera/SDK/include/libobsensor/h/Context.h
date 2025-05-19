@@ -104,7 +104,7 @@ OB_EXPORT void ob_enable_device_clock_sync(ob_context *context, uint64_t repeat_
 OB_EXPORT void ob_free_idle_memory(ob_context *context, ob_error **error);
 
 /**
- * @brief For linux, there are two ways to enable the UVC backend: libuvc and libusb. This function is used to set the backend type.
+ * @brief For linux, there are two ways to enable the UVC backend: libuvc and v4l2. This function is used to set the backend type.
  * @brief It is effective when the new device is created.
  *
  * @attention This interface is only available for Linux.
@@ -155,7 +155,7 @@ OB_EXPORT void ob_set_logger_to_console(ob_log_severity severity, ob_error **err
 
 /**
  * @brief Set the extensions directory
- * @brief The extensions directory is used to search for dynamic libraries that provide additional functionality to the SDK， such as the Frame filters.
+ * @brief The extensions directory is used to search for dynamic libraries that provide additional functionality to the SDK, such as the Frame filters.
  *
  * @attention Should be called before creating the context and pipeline, otherwise the default extensions directory (./extensions) will be used.
  *

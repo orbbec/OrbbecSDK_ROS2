@@ -51,9 +51,9 @@ public:
     }
 
     /**
-     * @brief Get the format of the stream
+     * @brief Get the format of the stream.
      *
-     * @return OBFormat return the format of the stream
+     * @return OBFormat return the format of the stream.
      */
     OBFormat getFormat() const {
         ob_error *error  = nullptr;
@@ -63,9 +63,9 @@ public:
     }
 
     /**
-     * @brief Get the type of stream
+     * @brief Get the type of stream.
      *
-     * @return OBStreamType return the type of the stream
+     * @return OBStreamType return the type of the stream.
      */
     OBStreamType getType() const {
         ob_error *error = nullptr;
@@ -75,7 +75,7 @@ public:
     }
 
     /**
-     * @brief Get the extrinsic parameters from current stream profile to the given target stream profile
+     * @brief Get the extrinsic parameters from current stream profile to the given target stream profile.
      *
      * @return OBExtrinsic Return the extrinsic parameters.
      */
@@ -87,17 +87,41 @@ public:
     }
 
     /**
-     * @brief Check if frame object is compatible with the given type
+     * @brief Set the extrinsic parameters from current stream profile to the given target stream profile.
+     * 
+     * @tparam target Target stream profile.
+     * @tparam extrinsic The extrinsic.
+     */
+    void bindExtrinsicTo(std::shared_ptr<StreamProfile> target, const OBExtrinsic &extrinsic) {
+        ob_error *error = nullptr;
+        ob_stream_profile_set_extrinsic_to(const_cast<ob_stream_profile_t *>(impl_), const_cast<const ob_stream_profile_t *>(target->getImpl()), extrinsic, &error);
+        Error::handle(&error);
+    }
+
+    /**
+     * @brief Set the extrinsic parameters from current stream profile to the given target stream type.
+     * 
+     * @tparam targetStreamType Target stream type.
+     * @tparam extrinsic The extrinsic.
+     */
+    void bindExtrinsicTo(const OBStreamType &targetStreamType, const OBExtrinsic &extrinsic) {
+        ob_error *error = nullptr;
+        ob_stream_profile_set_extrinsic_to_type(const_cast<ob_stream_profile_t *>(impl_),targetStreamType,extrinsic, &error);
+        Error::handle(&error);
+    }
+
+    /**
+     * @brief Check if frame object is compatible with the given type.
      *
-     * @tparam T  Given type
-     * @return bool return result
+     * @tparam T  Given type.
+     * @return bool return result.
      */
     template <typename T> bool is() const;
 
     /**
-     * @brief Converts object type to target type
+     * @brief Converts object type to target type.
      *
-     * @tparam T Target type
+     * @tparam T Target type.
      * @return std::shared_ptr<T> Return the result. Throws an exception if conversion is not possible.
      */
     template <typename T> std::shared_ptr<T> as() {
@@ -109,9 +133,9 @@ public:
     }
 
     /**
-     * @brief Converts object type to target type (const version)
+     * @brief Converts object type to target type (const version).
      *
-     * @tparam T Target type
+     * @tparam T Target type.
      * @return std::shared_ptr<T> Return the result. Throws an exception if conversion is not possible.
      */
     template <typename T> std::shared_ptr<const T> as() const {
@@ -193,6 +217,17 @@ public:
     }
 
     /**
+     * @brief Set the intrinsic parameters of the stream.
+     *
+     * @param intrinsic The intrinsic parameters.
+     */
+    void setIntrinsic(const OBCameraIntrinsic &intrinsic) {
+        ob_error *error = nullptr;
+        ob_video_stream_profile_set_intrinsic(const_cast<ob_stream_profile_t *>(impl_), intrinsic, &error);
+        Error::handle(&error);
+    }
+
+    /**
      * @brief Get the distortion parameters of the stream.
      * @brief Brown distortion model
      *
@@ -203,6 +238,17 @@ public:
         auto      distortion = ob_video_stream_profile_get_distortion(impl_, &error);
         Error::handle(&error);
         return distortion;
+    }
+
+    /**
+     * @brief Set the distortion parameters of the stream.
+     *
+     * @param distortion The distortion parameters.
+     */
+    void setDistortion(const OBCameraDistortion &distortion) {
+        ob_error *error = nullptr;
+        ob_video_stream_profile_set_distortion(const_cast<ob_stream_profile_t *>(impl_), distortion, &error);
+        Error::handle(&error);
     }
 
 public:

@@ -205,13 +205,13 @@ OB_EXPORT void ob_config_enable_stream_with_stream_profile(ob_config *config, co
  *
  * @attention The stream_type should be a video stream type, such as OB_STREAM_IR, OB_STREAM_COLOR, OB_STREAM_DEPTH, etc.
  *
- * @param config[in] The pipeline configuration object
- * @param stream_type[in] The type of the stream to be enabled
- * @param width[in] The width of the video stream
- * @param height[in] The height of the video stream
- * @param fps[in] The frame rate of the video stream
- * @param format[in] The format of the video stream
- * @param error[out] Pointer to an error object that will be set if an error occurs.
+ * @param[in] config The pipeline configuration object
+ * @param[in] stream_type The type of the stream to be enabled
+ * @param[in] width The width of the video stream
+ * @param[in] height The height of the video stream
+ * @param[in] fps The frame rate of the video stream
+ * @param[in] format The format of the video stream
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
  */
 OB_EXPORT void ob_config_enable_video_stream(ob_config *config, ob_stream_type stream_type, uint32_t width, uint32_t height, uint32_t fps, ob_format format,
                                              ob_error **error);
@@ -219,20 +219,20 @@ OB_EXPORT void ob_config_enable_video_stream(ob_config *config, ob_stream_type s
 /**
  * @brief Enable accelerometer stream with specified parameters
  *
- * @param config[in] The pipeline configuration object
- * @param full_scale_range[in] The full scale range of the accelerometer
- * @param sample_rate[in] The sample rate of the accelerometer
- * @param error[out] Pointer to an error object that will be set if an error occurs.
+ * @param[in] config The pipeline configuration object
+ * @param[in] full_scale_range The full scale range of the accelerometer
+ * @param[in] sample_rate The sample rate of the accelerometer
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
  */
 OB_EXPORT void ob_config_enable_accel_stream(ob_config *config, ob_accel_full_scale_range full_scale_range, ob_accel_sample_rate sample_rate, ob_error **error);
 
 /**
  * @brief Enable gyroscope stream with specified parameters
  *
- * @param config[in] The pipeline configuration object
- * @param full_scale_range[in] The full scale range of the gyroscope
- * @param sample_rate[in] The sample rate of the gyroscope
- * @param error[out] Pointer to an error object that will be set if an error occurs.
+ * @param[in] config The pipeline configuration object
+ * @param[in] full_scale_range The full scale range of the gyroscope
+ * @param[in] sample_rate The sample rate of the gyroscope
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
  */
 OB_EXPORT void ob_config_enable_gyro_stream(ob_config *config, ob_gyro_full_scale_range full_scale_range, ob_gyro_sample_rate sample_rate, ob_error **error);
 

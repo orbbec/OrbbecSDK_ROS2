@@ -18,7 +18,7 @@
 #include <functional>
 
 /**
- *  Frame classis inheritance hierarchy：
+ *  Frame classis inheritance hierarchy:
  *         Frame
  *          |
  *      +-----------+----------+----------+-----------+
@@ -181,7 +181,7 @@ public:
 
     /**
      * @brief Get the global timestamp of the frame in microseconds.
-     * @brief The global timestamp is the time point when the frame was was captured by the device, and has been converted to the host clock domain. The
+     * @brief The global timestamp is the time point when the frame was captured by the device, and has been converted to the host clock domain. The
      * conversion process base on the device timestamp and can eliminate the timer drift of the device
      *
      * @attention The global timestamp disable by default. If global timestamp is not enabled, the function will return 0. To enable the global timestamp,
@@ -593,6 +593,33 @@ public:
         return scale;
     }
 
+    /**
+     * @brief Get the width of the frame.
+     *
+     * @return uint32_t The width of the frame.
+     */
+    uint32_t getWidth() const {
+        ob_error *error = nullptr;
+        // TODO
+        auto width = ob_point_cloud_frame_get_width(impl_, &error);
+        Error::handle(&error);
+
+        return width;
+    }
+
+    /**
+     * @brief Get the height of the frame.
+     *
+     * @return uint32_t The height of the frame.
+     */
+    uint32_t getHeight() const {
+        ob_error *error  = nullptr;
+        auto      height = ob_point_cloud_frame_get_height(impl_, &error);
+        Error::handle(&error);
+
+        return height;
+    }
+
 public:
     // The following interfaces are deprecated and are retained here for compatibility purposes.
 #define getPositionValueScale getCoordinateValueScale
@@ -902,11 +929,11 @@ public:
      * @attention The buffer is owned by the caller, and will not be destroyed by the frame object. The user should ensure that the buffer is valid and not
      * modified.
      *
-     * @param[in] frame_type Frame object type.
+     * @param[in] frameType Frame object type.
      * @param[in] format Frame object format.
      * @param[in] buffer Frame object buffer.
-     * @param[in] buffer_size Frame object buffer size.
      * @param[in] destroyCallback Destroy callback, will be called when the frame object is destroyed.
+     * @param[in] bufferSize Frame object buffer size.
      *
      * @return std::shared_ptr<Frame> The created frame object.
      */
@@ -957,7 +984,7 @@ private:
 
     static void BufferDestroy(uint8_t *buffer, void *context) {
         auto *ctx = static_cast<BufferDestroyContext *>(context);
-        if (ctx->callback) {
+        if(ctx->callback) {
             ctx->callback(buffer);
         }
         delete ctx;

@@ -134,12 +134,22 @@ OB_EXPORT ob_extrinsic ob_stream_profile_get_extrinsic_to(const ob_stream_profil
 /**
  * @brief Set the extrinsic for source stream to target stream
  *
- * @param[in] profile Stream profile object
+ * @param[in] source Stream profile object
  * @param[in] target  Target stream type
  * @param[in] extrinsic The extrinsic
  * @param[out] error   Pointer to an error object that will be set if an error occurs.
  */
 OB_EXPORT void ob_stream_profile_set_extrinsic_to(ob_stream_profile *source, const ob_stream_profile *target, ob_extrinsic extrinsic, ob_error **error);
+
+/**
+ * @brief Set the extrinsic for source stream to target stream type
+ *
+ * @param[in] source Source stream profile
+ * @param[in]  type Target stream type
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
+ * @return ob_extrinsic The extrinsic
+ */
+OB_EXPORT void ob_stream_profile_set_extrinsic_to_type(ob_stream_profile *source, const ob_stream_type type, ob_extrinsic extrinsic, ob_error **error);
 
 /**
  * @brief Get the frame rate of the video stream
@@ -235,7 +245,7 @@ OB_EXPORT ob_disparity_param ob_disparity_based_stream_profile_get_disparity_par
  * @brief Set the disparity process param of the disparity stream.
  *
  * @param[in] profile Stream profile object. If the profile is not for the disparity stream, an error will be returned.
- * @param[in]  intrinsic The disparity process param of the disparity stream.
+ * @param[in] param The disparity process param of the disparity stream.
  * @param[out] error Pointer to an error object that will be set if an error occurs.
  */
 OB_EXPORT void ob_disparity_based_stream_profile_set_disparity_param(ob_stream_profile *profile, ob_disparity_param param, ob_error **error);

@@ -167,6 +167,26 @@ OB_EXPORT void ob_device_get_structured_data(ob_device *device, ob_property_id p
 OB_EXPORT void ob_device_get_raw_data(ob_device *device, ob_property_id property_id, ob_get_data_callback cb, void *user_data, ob_error **error);
 
 /**
+ * @brief Set customer data.
+ *
+ * @param[in] device The device object.
+ * @param[in] data The property data to be set.
+ * @param[in] data_size The size of the property to be set,the maximum length cannot exceed 65532 bytes.
+ * @param[out] error Log error messages.
+ */
+OB_EXPORT void ob_device_write_customer_data(ob_device *device, const void *data, uint32_t data_size, ob_error **error);
+
+/**
+ * @brief Get customer data of a device property.
+ *
+ * @param[in] device The device object.
+ * @param[out] data The obtained property data.
+ * @param[out] data_size The size of the obtained property data.
+ * @param[out] error Log error messages.
+ */
+OB_EXPORT void ob_device_read_customer_data(ob_device *device, void *data, uint32_t *data_size, ob_error **error);
+
+/**
  * @brief Get the number of properties supported by the device.
  *
  * @param[in] device The device object.
@@ -305,9 +325,8 @@ OB_EXPORT void ob_device_enable_heartbeat(ob_device *device, bool enable, ob_err
  * @param[in] send_data The data to be sent to the device.
  * @param[in] send_data_size The size of the data to be sent to the device.
  * @param[out] receive_data The data received from the device.
- * @param[in, out] receive_data_size Pass in the expected size of the receive data, and return the actual size of the received data.
+ * @param[in,out] receive_data_size Pass in the expected size of the receive data, and return the actual size of the received data.
  * @param error Pointer to an error object that will be set if an error occurs.
- * @return OB_EXPORT
  */
 OB_EXPORT void ob_device_send_and_receive_data(ob_device *device, const uint8_t *send_data, uint32_t send_data_size, uint8_t *receive_data,
                                                uint32_t *receive_data_size, ob_error **error);
@@ -388,7 +407,7 @@ OB_EXPORT const char *ob_device_info_get_firmware_version(const ob_device_info *
  *
  * @param[in] info Device Information
  * @param[out] error Pointer to an error object that will be set if an error occurs.
- * @return const char* The connection type，currently supports："USB", "USB1.0", "USB1.1", "USB2.0", "USB2.1", "USB3.0", "USB3.1", "USB3.2", "Ethernet"
+ * @return const char* The connection type, currently supports: "USB", "USB1.0", "USB1.1", "USB2.0", "USB2.1", "USB3.0", "USB3.1", "USB3.2", "Ethernet"
  */
 OB_EXPORT const char *ob_device_info_get_connection_type(const ob_device_info *info, ob_error **error);
 
@@ -399,7 +418,7 @@ OB_EXPORT const char *ob_device_info_get_connection_type(const ob_device_info *i
  *
  * @param info Device Information
  * @param error Pointer to an error object that will be set if an error occurs.
- * @return const char* The IP address，such as "192.168.1.10"
+ * @return const char* The IP address, such as "192.168.1.10"
  */
 OB_EXPORT const char *ob_device_info_get_ip_address(const ob_device_info *info, ob_error **error);
 
@@ -533,7 +552,7 @@ OB_EXPORT const char *ob_device_list_get_device_serial_number(const ob_device_li
  * @param[in] list Device list object
  * @param[in] index Device index
  * @param[out] error Pointer to an error object that will be set if an error occurs.
- * @return const char* returns the device connection type，currently supports："USB", "USB1.0", "USB1.1", "USB2.0", "USB2.1", "USB3.0", "USB3.1", "USB3.2",
+ * @return const char* returns the device connection type, currently supports: "USB", "USB1.0", "USB1.1", "USB2.0", "USB2.1", "USB3.0", "USB3.1", "USB3.2",
  * "Ethernet"
  */
 OB_EXPORT const char *ob_device_list_get_device_connection_type(const ob_device_list *list, uint32_t index, ob_error **error);
@@ -546,9 +565,21 @@ OB_EXPORT const char *ob_device_list_get_device_connection_type(const ob_device_
  * @param list Device list object
  * @param index Device index
  * @param error Pointer to an error object that will be set if an error occurs.
- * @return const char* returns the device ip address，such as "192.168.1.10"
+ * @return const char* returns the device ip address, such as "192.168.1.10"
  */
 OB_EXPORT const char *ob_device_list_get_device_ip_address(const ob_device_list *list, uint32_t index, ob_error **error);
+
+/**
+ * @brief Get device local mac address
+ *
+ * @attention Only valid for network devices, otherwise it will return "0:0:0:0:0:0".
+ *
+ * @param list Device list object
+ * @param index Device index
+ * @param error Pointer to an error object that will be set if an error occurs.
+ * @return const char* returns the device mac address
+ */
+OB_EXPORT const char *ob_device_list_get_device_local_mac(const ob_device_list *list, uint32_t index, ob_error **error);
 
 /**
  * @brief Create a device.
@@ -580,7 +611,7 @@ OB_EXPORT ob_device *ob_device_list_get_device_by_serial_number(const ob_device_
  * @brief On Linux platform, for usb device, the uid of the device is composed of bus-port-dev, for example 1-1.2-1. But the SDK will remove the dev number and
  * only keep the bus-port as the uid to create the device, for example 1-1.2, so that we can create a device connected to the specified USB port. Similarly,
  * users can also directly pass in bus-port as uid to create device.
- * @brief For GMSL device，the uid is GMSL port with “gmsl2-” prefix, for example gmsl2-1.
+ * @brief For GMSL device, the uid is GMSL port with "gmsl2-" prefix, for example gmsl2-1.
  *
  * @attention If the device has already been acquired and created elsewhere, repeated acquisitions will return an error.
  *

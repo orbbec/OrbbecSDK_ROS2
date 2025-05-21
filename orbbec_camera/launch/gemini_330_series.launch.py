@@ -86,6 +86,7 @@ def generate_launch_description():
         DeclareLaunchArgument('color_gain', default_value='-1'),
         DeclareLaunchArgument('enable_color_auto_white_balance', default_value='true'),
         DeclareLaunchArgument('color_white_balance', default_value='-1'),
+        DeclareLaunchArgument('enable_color_auto_exposure', default_value='true'),
         DeclareLaunchArgument('color_ae_max_exposure', default_value='-1'),
         DeclareLaunchArgument('color_brightness', default_value='-1'),
         DeclareLaunchArgument('color_sharpness', default_value='-1'),
@@ -161,10 +162,10 @@ def generate_launch_description():
         # Network device settings: default enumerate_net_device is set to true, which will automatically enumerate network devices
         # If you do not want to automatically enumerate network devices,
         # you can set enumerate_net_device to true, net_device_ip to the device's IP address, and net_device_port to the default value of 8090
-        DeclareLaunchArgument("enumerate_net_device", default_value="false"),
-        DeclareLaunchArgument("net_device_ip", default_value=""),
-        DeclareLaunchArgument("net_device_port", default_value="0"),
-        DeclareLaunchArgument("exposure_range_mode", default_value="default"),#default, ultimate or regular
+        DeclareLaunchArgument('enumerate_net_device', default_value='false'),
+        DeclareLaunchArgument('net_device_ip', default_value=''),
+        DeclareLaunchArgument('net_device_port', default_value='0'),
+        DeclareLaunchArgument('exposure_range_mode', default_value='default'),#default, ultimate or regular
         DeclareLaunchArgument('log_level', default_value='none'),
         DeclareLaunchArgument('enable_publish_extrinsic', default_value='false'),
         DeclareLaunchArgument('enable_d2c_viewer', default_value='false'),

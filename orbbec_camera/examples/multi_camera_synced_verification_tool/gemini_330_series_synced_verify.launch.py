@@ -57,7 +57,10 @@ def generate_launch_description():
         DeclareLaunchArgument('serial_number', default_value=''),
         DeclareLaunchArgument('usb_port', default_value=''),
         DeclareLaunchArgument('device_num', default_value='1'),
+        DeclareLaunchArgument('upgrade_firmware', default_value=''),
         DeclareLaunchArgument('preset_firmware_path', default_value=''),
+        DeclareLaunchArgument('load_config_json_file_path', default_value=''),
+        DeclareLaunchArgument('export_config_json_file_path', default_value=''),
         DeclareLaunchArgument('uvc_backend', default_value='libuvc'),#libuvc or v4l2
         DeclareLaunchArgument('point_cloud_qos', default_value='default'),
         DeclareLaunchArgument('enable_point_cloud', default_value='true'),
@@ -72,7 +75,10 @@ def generate_launch_description():
         DeclareLaunchArgument('color_qos', default_value='default'),
         DeclareLaunchArgument('color_camera_info_qos', default_value='default'),
         DeclareLaunchArgument('enable_color_auto_exposure_priority', default_value='false'),
-        DeclareLaunchArgument('enable_color_auto_exposure', default_value='true'),
+        DeclareLaunchArgument('color_rotation', default_value='-1'),#color rotation degree : 0, 90, 180, 270
+        DeclareLaunchArgument('color_flip', default_value='false'),
+        DeclareLaunchArgument('color_mirror', default_value='false'),
+        DeclareLaunchArgument('color_ae_roi_left', default_value='-1'),
         DeclareLaunchArgument('color_ae_roi_left', default_value='-1'),
         DeclareLaunchArgument('color_ae_roi_right', default_value='-1'),
         DeclareLaunchArgument('color_ae_roi_top', default_value='-1'),
@@ -81,6 +87,7 @@ def generate_launch_description():
         DeclareLaunchArgument('color_gain', default_value='-1'),
         DeclareLaunchArgument('enable_color_auto_white_balance', default_value='true'),
         DeclareLaunchArgument('color_white_balance', default_value='-1'),
+        DeclareLaunchArgument('enable_color_auto_exposure', default_value='true'),
         DeclareLaunchArgument('color_ae_max_exposure', default_value='-1'),
         DeclareLaunchArgument('color_brightness', default_value='-1'),
         DeclareLaunchArgument('color_sharpness', default_value='-1'),
@@ -89,6 +96,7 @@ def generate_launch_description():
         DeclareLaunchArgument('color_constrast', default_value='-1'),
         DeclareLaunchArgument('color_hue', default_value='-1'),
         DeclareLaunchArgument('enable_color_backlight_compenstation', default_value='false'),
+        DeclareLaunchArgument('color_powerline_freq', default_value=''),#disable ,50hz ,60hz ,auto
         DeclareLaunchArgument('enable_color_decimation_filter', default_value='false'),
         DeclareLaunchArgument('color_decimation_filter_scale', default_value='-1'),
         DeclareLaunchArgument('depth_width', default_value='0'),
@@ -99,6 +107,10 @@ def generate_launch_description():
         DeclareLaunchArgument('depth_qos', default_value='default'),
         DeclareLaunchArgument('depth_camera_info_qos', default_value='default'),
         DeclareLaunchArgument('enable_depth_auto_exposure_priority', default_value='false'),
+        DeclareLaunchArgument('depth_precision', default_value=''),
+        DeclareLaunchArgument('depth_rotation', default_value='-1'),#depth rotation degree : 0, 90, 180, 270
+        DeclareLaunchArgument('depth_flip', default_value='false'),
+        DeclareLaunchArgument('depth_mirror', default_value='false'),
         DeclareLaunchArgument('depth_ae_roi_left', default_value='-1'),
         DeclareLaunchArgument('depth_ae_roi_right', default_value='-1'),
         DeclareLaunchArgument('depth_ae_roi_top', default_value='-1'),
@@ -111,6 +123,9 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_left_ir', default_value='false'),
         DeclareLaunchArgument('left_ir_qos', default_value='default'),
         DeclareLaunchArgument('left_ir_camera_info_qos', default_value='default'),
+        DeclareLaunchArgument('left_ir_rotation', default_value='-1'),#left_ir rotation degree : 0, 90, 180, 270
+        DeclareLaunchArgument('left_ir_flip', default_value='false'),
+        DeclareLaunchArgument('left_ir_mirror', default_value='false'),
         DeclareLaunchArgument('enable_left_ir_sequence_id_filter', default_value='false'),
         DeclareLaunchArgument('left_ir_sequence_id_filter_id', default_value='-1'),
         DeclareLaunchArgument('right_ir_width', default_value='0'),
@@ -120,6 +135,9 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_right_ir', default_value='false'),
         DeclareLaunchArgument('right_ir_qos', default_value='default'),
         DeclareLaunchArgument('right_ir_camera_info_qos', default_value='default'),
+        DeclareLaunchArgument('right_ir_rotation', default_value='-1'),#right_ir rotation degree : 0, 90, 180, 270
+        DeclareLaunchArgument('right_ir_flip', default_value='false'),
+        DeclareLaunchArgument('right_ir_mirror', default_value='false'),
         DeclareLaunchArgument('enable_right_ir_sequence_id_filter', default_value='false'),
         DeclareLaunchArgument('right_ir_sequence_id_filter_id', default_value='-1'),
         DeclareLaunchArgument('enable_ir_auto_exposure', default_value='true'),
@@ -129,9 +147,11 @@ def generate_launch_description():
         DeclareLaunchArgument('ir_brightness', default_value='-1'),
         DeclareLaunchArgument('enable_sync_output_accel_gyro', default_value='false'),
         DeclareLaunchArgument('enable_accel', default_value='false'),
+        DeclareLaunchArgument('enable_accel_data_correction', default_value='true'),
         DeclareLaunchArgument('accel_rate', default_value='200hz'),
         DeclareLaunchArgument('accel_range', default_value='4g'),
         DeclareLaunchArgument('enable_gyro', default_value='false'),
+        DeclareLaunchArgument('enable_gyro_data_correction', default_value='true'),
         DeclareLaunchArgument('gyro_rate', default_value='200hz'),
         DeclareLaunchArgument('gyro_range', default_value='1000dps'),
         DeclareLaunchArgument('liner_accel_cov', default_value='0.01'),
@@ -143,10 +163,10 @@ def generate_launch_description():
         # Network device settings: default enumerate_net_device is set to true, which will automatically enumerate network devices
         # If you do not want to automatically enumerate network devices,
         # you can set enumerate_net_device to true, net_device_ip to the device's IP address, and net_device_port to the default value of 8090
-        DeclareLaunchArgument("enumerate_net_device", default_value="false"),
-        DeclareLaunchArgument("net_device_ip", default_value=""),
-        DeclareLaunchArgument("net_device_port", default_value="0"),
-        DeclareLaunchArgument("exposure_range_mode", default_value="default"),#default, ultimate or regular
+        DeclareLaunchArgument('enumerate_net_device', default_value='false'),
+        DeclareLaunchArgument('net_device_ip', default_value=''),
+        DeclareLaunchArgument('net_device_port', default_value='0'),
+        DeclareLaunchArgument('exposure_range_mode', default_value='default'),#default, ultimate or regular
         DeclareLaunchArgument('log_level', default_value='none'),
         DeclareLaunchArgument('enable_publish_extrinsic', default_value='false'),
         DeclareLaunchArgument('enable_d2c_viewer', default_value='false'),
@@ -161,6 +181,7 @@ def generate_launch_description():
         DeclareLaunchArgument('trigger_out_enabled', default_value='true'),
         DeclareLaunchArgument('frames_per_trigger', default_value='2'),
         DeclareLaunchArgument('software_trigger_period', default_value='33'),  # ms
+        DeclareLaunchArgument('enable_ptp_config', default_value='false'),#Only for Gemini 335Le
         DeclareLaunchArgument('enable_frame_sync', default_value='true'),
         DeclareLaunchArgument('ordered_pc', default_value='false'),
         DeclareLaunchArgument('enable_depth_scale', default_value='true'),
@@ -172,6 +193,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_noise_removal_filter', default_value='true'),
         DeclareLaunchArgument('enable_spatial_filter', default_value='false'),
         DeclareLaunchArgument('enable_temporal_filter', default_value='false'),
+        DeclareLaunchArgument('enable_disaparity_to_depth', default_value='true'),
         DeclareLaunchArgument('enable_hole_filling_filter', default_value='false'),
         DeclareLaunchArgument('decimation_filter_scale', default_value='-1'),
         DeclareLaunchArgument('sequence_id_filter_id', default_value='-1'),
@@ -192,6 +214,7 @@ def generate_launch_description():
         DeclareLaunchArgument('hdr_merge_exposure_2', default_value='-1'),
         DeclareLaunchArgument('hdr_merge_gain_2', default_value='-1'),
         DeclareLaunchArgument('align_mode', default_value='SW'),
+        DeclareLaunchArgument('align_target_stream', default_value='COLOR'),# COLOR or DEPTH
         DeclareLaunchArgument('diagnostic_period', default_value='1.0'),
         DeclareLaunchArgument('enable_laser', default_value='true'),
         DeclareLaunchArgument('depth_precision', default_value=''),

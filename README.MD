@@ -21,18 +21,19 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
   </thead>
   <tbody>
     <tr>
-      <td rowspan="9" style="text-align: center; font-weight: bold;">Gemini 330</td>
+      <td style="text-align: center; font-weight: bold;">Gemini 435Le</td>
+      <td>Gemini 435Le</td>
+      <td>Not supported</td>
+      <td>Recommended for new designs</td>
+    </tr>
+    <tr>
+      <td rowspan="8" style="text-align: center; font-weight: bold;">Gemini 330</td>
       <td>Gemini 335</td>
       <td>Full maintenance</td>
       <td>Recommended for new designs</td>
     </tr>
     <tr>
       <td>Gemini 336</td>
-      <td>Full maintenance</td>
-      <td>Recommended for new designs</td>
-    </tr>
-    <tr>
-      <td>Gemini 330</td>
       <td>Full maintenance</td>
       <td>Recommended for new designs</td>
     </tr>
@@ -47,11 +48,6 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
       <td>Recommended for new designs</td>
     </tr>
     <tr>
-      <td>Gemini 330L</td>
-      <td>Full maintenance</td>
-      <td>Recommended for new designs</td>
-    </tr>
-    <tr>
       <td>Gemini 335Lg</td>
       <td>Not supported</td>
       <td>Recommended for new designs</td>
@@ -62,8 +58,13 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
       <td>Recommended for new designs</td>
     </tr>
     <tr>
-      <td>Gemini 435Le</td>
-      <td>Not supported</td>
+      <td>Gemini 330</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 330L</td>
+      <td>Full maintenance</td>
       <td>Recommended for new designs</td>
     </tr>
     <tr>
@@ -227,24 +228,22 @@ Currently, the following devices are supported by the OrbbecSDK ROS2 Wrapper v2-
 
 For optimal performance, we strongly recommend updating to the latest firmware version. This ensures that you benefit from the most recent enhancements and bug fixes.
 
-| Product List | Minimal Firmware Version | **Launch File**             |
+| Product List | Minimal Firmware Version | **Launch File**       |
 | :----------- | :----------------------- | :-------------------------- |
+| Gemini 435Le | 1.2.04                   | gemini435_le.launch.py      |
+| Gemini 335   | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 336   | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 335L  | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 336L  | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 335Lg | 1.3.46                   | gemini_330_series.launch.py |
+| Gemini 335Le | 1.5.31                   | gemini_330_series.launch.py |
 | Gemini 330   | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 330L  | 1.2.20                   | gemini_330_series.launch.py |
-| Gemini 335   | 1.2.20                   | gemini_330_series.launch.py |
-| Gemini 335L  | 1.2.20                   | gemini_330_series.launch.py |
-| Gemini 335Lg | 1.3.46                   | gemini_330_series.launch.py |
-| Gemini 336   | 1.2.20                   | gemini_330_series.launch.py |
-| Gemini 336L  | 1.2.20                   | gemini_330_series.launch.py |
-| Gemini 335Le | 1.5.31                   | gemini_330_series.launch.py |
-| Gemini 435Le | 1.2.04                   | gemini435_le.launch.py      |
+| Gemini 2     | 1.4.92                   | gemini2.launch.py           |
+| Gemini 2 L   | 1.4.53                   | gemini2L.launch.py          |
 | Femto Bolt   | 1.1.2                    | femto_bolt.launch.py        |
 | Femto Mega   | 1.3.0                    | femto_mega.launch.py        |
 | Astra 2      | 2.8.20                   | astra2.launch.py            |
-| Gemini 2 L   | 1.4.53                   | gemini2L.launch.py          |
-| Gemini 2     | 1.4.92                   | gemini2.launch.py           |
-| DaBai A      | /                        | dabai_a.launch.py           |
-| DaBai AL     | /                        | dabai_al.launch.py          |
 
 All launch files are essentially similar, with the primary difference being the default values of the parameters set
 for different models within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution settings in the launch file, as well as other parameters, to ensure compatibility and optimal performance.

@@ -237,7 +237,7 @@ For optimal performance, we strongly recommend updating to the latest firmware v
 | Gemini 336   | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 336L  | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 335Le | 1.5.31                   | gemini_330_series.launch.py |
-| Gemini 435Le | /                        | gemini_330_series.launch.py |
+| Gemini 435Le | 1.2.04                   | gemini435_le.launch.py      |
 | Femto Bolt   | 1.1.2                    | femto_bolt.launch.py        |
 | Femto Mega   | 1.3.0                    | femto_mega.launch.py        |
 | Astra 2      | 2.8.20                   | astra2.launch.py            |
@@ -438,10 +438,16 @@ When using Femto Mega, Gemini 335Le and Gemini 435Le, you can use the network to
 ros2 launch orbbec_camera femto_mega.launch.py enumerate_net_device:=true
 ```
 
-**Gemini 335Le & Gemini 435Le:**
+**Gemini 335Le:**
 
 ```bash
 ros2 launch orbbec_camera gemini_330_series.launch.py enumerate_net_device:=true
+```
+
+**Gemini 435Le:**
+
+```bash
+ros2 launch orbbec_camera gemini435_le.launch.py enumerate_net_device:=true
 ```
 
 For more information about network device enumeration.Reference:[Network device documentation](./orbbec_camera/examples/net_camera/)

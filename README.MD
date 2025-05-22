@@ -8,6 +8,8 @@ OrbbecSDK ROS2 Wrapper provides seamless integration of Orbbec cameras with ROS 
 
 With a major update in October 2024, we release the [OrbbecSDK ROS2 Wrapper v2](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main) connected to the open source [OrbbecSDK v2](https://github.com/orbbec/OrbbecSDK_v2/releases) with enhanced flexibility and extensibility. This update ensures compatibility with all Orbbec USB products adhering to UVC standard. However, it no longer supports Orbbec's traditional OpenNI protocol devices. We strongly encourage you to use the v2-main branch if your device is supported.
 
+If you are a user in China, it is recommended to use [gitee Repo](https://gitee.com/orbbecdeveloper/OrbbecSDK_ROS2).
+
 Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
 
 <table border="1" style="border-collapse: collapse; text-align: left; width: 100%;">

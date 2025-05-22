@@ -8,7 +8,7 @@
         <!-- Log output level, int type, optional values: 0-DEBUG, 1-INFO, 2-WARN, 3-ERROR, 4-FATAL,
         5-OFF -->
         <!-- File log output level -->
-        <FileLogLevel>0</FileLogLevel>
+        <FileLogLevel>5</FileLogLevel>
         <!-- Console log output level -->
         <ConsoleLogLevel>3</ConsoleLogLevel>
         <!-- Default log output file path, string type. If this item is not configured, the default

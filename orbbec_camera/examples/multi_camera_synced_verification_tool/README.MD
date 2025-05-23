@@ -104,7 +104,7 @@ Edit Config.ini.Modify `frameRate` and `tspRangeThreshold`.
 
 ### Run launch and save camera pictures
 
-* Frst terminal
+* First terminal
 
 ```bash
 ros2 launch orbbec_camera multi_camera_synced_verify.launch.py
@@ -133,7 +133,7 @@ Take [color_SNCP1E5420006D_Index0_g1739874543227_f0_s1739874543327_e50_d16_.jpg]
 
 ### Analyzing camera image data
 
-You need to copy the modified [Pyhotn folder](./multicamera_sync/Python) to the new multi_camera_synced subdirectory, and copy the modified [DevicesInfo.txt ](./multicamera_sync/output/20250218102900/DevicesInfo.txt)and [StreamProfileInfo.txt](./multicamera_sync/output/20250218102900/StreamProfileInfo.txt) to the same level directory as the TotalModeFrames folder.
+You need to copy the modified [Python folder](./multicamera_sync/Python) to the new multi_camera_synced subdirectory, and copy the modified [DevicesInfo.txt ](./multicamera_sync/output/20250218102900/DevicesInfo.txt)and [StreamProfileInfo.txt](./multicamera_sync/output/20250218102900/StreamProfileInfo.txt) to the same level directory as the TotalModeFrames folder.
 
 * Finally everything is ready, run the python script
 
@@ -157,4 +157,3 @@ After the operation is successful, you can view the synchronization effect in th
 [camera_params.yaml](../../config/camera_params.yaml)(Camera startup parameter settings)
 
 [multi_camera_synced_verify.launch.py](./multi_camera_synced_verify.launch.py)
-

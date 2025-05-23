@@ -1,0 +1,526 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by
+Stephen Brawner (brawner@gmail.com)
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="gemini335_336Lg">
+    <xacro:property name="mesh_path" value="package://orbbec_description/meshes/gemini335Lg/" />
+
+    <link
+    name="camera_link">
+    <inertial>
+      <origin
+        xyz="-0.00289247601040677 -0.0017677758607654 0.0142809419586764"
+        rpy="0 0 0" />
+      <mass
+        value="0.0325749377048239" />
+      <inertia
+        ixx="4.2090908565379E-05"
+        ixy="-6.50624838746019E-07"
+        ixz="-2.08039071582348E-08"
+        iyy="4.19290333002548E-06"
+        iyz="1.26504526469951E-07"
+        izz="4.0397995330315E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.749019607843137 0.576470588235294 0.631372549019608 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="camera_bottom_screw_frame">
+    <inertial>
+      <origin
+        xyz="-0.000509549530802827 -0.000723575304053956 0.0135324058538218"
+        rpy="0 0 0" />
+      <mass
+        value="0.00667731245337829" />
+      <inertia
+        ixx="6.28717759812297E-06"
+        ixy="-2.63093402952502E-08"
+        ixz="-3.24406818500365E-10"
+        iyy="3.46547116520772E-07"
+        iyz="9.65620190743408E-08"
+        izz="5.98310336335606E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}camera_bottom_screw_frame.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}camera_bottom_screw_frame.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="camera_bottom_screw_frame"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="camera_link" />
+    <child
+      link="camera_bottom_screw_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="camera_infra1_frame">
+    <inertial>
+      <origin
+        xyz="-0.00158020638644197 -1.72113892998871E-08 -1.52265896555797E-07"
+        rpy="0 0 0" />
+      <mass
+        value="0.000453167757456349" />
+      <inertia
+        ixx="4.34107394943177E-09"
+        ixy="-3.70457372455307E-13"
+        ixz="-1.46474854151394E-13"
+        iyy="4.84011101176503E-09"
+        iyz="2.21976196909763E-14"
+        izz="4.84043649602512E-09" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}camera_infra1_frame.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}camera_infra1_frame.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="camera_infra1_frame"
+    type="fixed">
+    <origin
+      xyz="0.0117149999999995 0.0475 0.0143111800025738"
+      rpy="0 0 0" />
+    <parent
+      link="camera_bottom_screw_frame" />
+    <child
+      link="camera_infra1_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="camera_infra1_optical_frame">
+    <inertial>
+      <origin
+        xyz="1.72113892998871E-08 1.52265896555812E-07 -0.00158020638644197"
+        rpy="0 0 0" />
+      <mass
+        value="0.000453167757456349" />
+      <inertia
+        ixx="4.84011101176503E-09"
+        ixy="2.21976196909534E-14"
+        ixz="3.70457372455358E-13"
+        iyy="4.84043649602512E-09"
+        iyz="1.46474854151393E-13"
+        izz="4.34107394943177E-09" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}camera_infra1_optical_frame.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}camera_infra1_optical_frame.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="camera_infra1_optical_frame"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="-1.5707963267949 0 -1.5707963267949" />
+    <parent
+      link="camera_infra1_frame" />
+    <child
+      link="camera_infra1_optical_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="camera_color_frame">
+    <inertial>
+      <origin
+        xyz="-0.00158020000774523 -2.01759723546246E-08 -1.59601568159221E-07"
+        rpy="0 0 0" />
+      <mass
+        value="0.000453166139060251" />
+      <inertia
+        ixx="4.34106103694204E-09"
+        ixy="-3.74557114274145E-13"
+        ixz="-1.54573397796035E-13"
+        iyy="4.84009698974187E-09"
+        iyz="1.91083540162802E-14"
+        izz="4.84042884844639E-09" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}camera_color_frame.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.501960784313725 0.250980392156863 0.250980392156863 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}camera_color_frame.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="camera_color_frame"
+    type="fixed">
+    <origin
+      xyz="0.0117149999999995 0.02375 0.0143111800025738"
+      rpy="0 0 0" />
+    <parent
+      link="camera_bottom_screw_frame" />
+    <child
+      link="camera_color_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="camera_color_optical_frame">
+    <inertial>
+      <origin
+        xyz="2.01759723546246E-08 1.59601568105527E-07 -0.00158020000774523"
+        rpy="0 0 0" />
+      <mass
+        value="0.000453166139060251" />
+      <inertia
+        ixx="4.84009698974187E-09"
+        ixy="1.91083540162691E-14"
+        ixz="3.74557114274215E-13"
+        iyy="4.84042884844639E-09"
+        iyz="1.54573397779039E-13"
+        izz="4.34106103694204E-09" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}camera_color_optical_frame.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.501960784313725 0.250980392156863 0.250980392156863 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}camera_color_optical_frame.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="camera_color_optical_frame"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="-1.57079632679486 0 -1.5707963267949" />
+    <parent
+      link="camera_color_frame" />
+    <child
+      link="camera_color_optical_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="camera_infra2_frame">
+    <inertial>
+      <origin
+        xyz="-0.00158020638644197 -1.7211389306826E-08 -1.5226589655147E-07"
+        rpy="0 0 0" />
+      <mass
+        value="0.00045316775745635" />
+      <inertia
+        ixx="4.34107394943178E-09"
+        ixy="-3.70457372454612E-13"
+        ixz="-1.46474854155703E-13"
+        iyy="4.84011101176504E-09"
+        iyz="2.21976196913668E-14"
+        izz="4.84043649602513E-09" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}camera_infra2_frame.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}camera_infra2_frame.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="camera_infra2_frame"
+    type="fixed">
+    <origin
+      xyz="0.0117149999999995 -0.0475 0.0143111800025738"
+      rpy="0 0 0" />
+    <parent
+      link="camera_bottom_screw_frame" />
+    <child
+      link="camera_infra2_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="camera_infra2_optical_frame">
+    <inertial>
+      <origin
+        xyz="1.7211389306826E-08 1.52265896497699E-07 -0.00158020638644197"
+        rpy="0 0 0" />
+      <mass
+        value="0.00045316775745635" />
+      <inertia
+        ixx="4.84011101176504E-09"
+        ixy="2.21976196913637E-14"
+        ixz="3.70457372454685E-13"
+        iyy="4.84043649602512E-09"
+        iyz="1.46474854138719E-13"
+        izz="4.34107394943178E-09" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}camera_infra2_optical_frame.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}camera_infra2_optical_frame.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="camera_infra2_optical_frame"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="-1.57079632679486 0 -1.5707963267949" />
+    <parent
+      link="camera_infra2_frame" />
+    <child
+      link="camera_infra2_optical_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="camera_IMU_frame">
+    <inertial>
+      <origin
+        xyz="-0.000485747949726976 -9.01982197890061E-07 -5.03896938954429E-07"
+        rpy="0 0 0" />
+      <mass
+        value="1.12241987710975E-05" />
+      <inertia
+        ixx="2.18588933476699E-11"
+        ixy="-6.98281572974588E-20"
+        ixz="9.51263088105533E-24"
+        iyy="1.02152608199458E-11"
+        iyz="3.0508583355698E-24"
+        izz="1.34030857613463E-11" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}camera_IMU_frame.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}camera_IMU_frame.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="camera_IMU_frame"
+    type="fixed">
+    <origin
+      xyz="-0.00253500000000046 0.036187989999999 0.0136240800025733"
+      rpy="0 0 0" />
+    <parent
+      link="camera_bottom_screw_frame" />
+    <child
+      link="camera_IMU_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="camera_depth_frame">
+    <inertial>
+      <origin
+        xyz="-0.00158020638644197 -1.72113892998871E-08 -1.52265896555784E-07"
+        rpy="0 0 0" />
+      <mass
+        value="0.000453167757456349" />
+      <inertia
+        ixx="4.34107394943177E-09"
+        ixy="-3.70457372455296E-13"
+        ixz="-1.46474854151391E-13"
+        iyy="4.84011101176503E-09"
+        iyz="2.21976196909582E-14"
+        izz="4.84043649602512E-09" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}camera_depth_frame.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}camera_depth_frame.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="camera_depth_frame"
+    type="fixed">
+    <origin
+      xyz="0.0117149999999995 0.0475 0.0143111800025738"
+      rpy="0 0 0" />
+    <parent
+      link="camera_bottom_screw_frame" />
+    <child
+      link="camera_depth_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+</robot>

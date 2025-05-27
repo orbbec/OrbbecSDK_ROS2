@@ -828,6 +828,176 @@ typedef enum {
      * @brief Confidence degree
      */
     OB_PROP_DEBUG_ESGM_CONFIDENCE_FLOAT = 5013,
+
+    /**
+     * @brief LiDAR: set/get IP address
+     */
+    OB_RAW_DATA_LIDAR_IP_ADDRESS = 8000,
+
+    /**
+     * @brief LiDAR: set/get port
+     */
+    OB_PROP_LIDAR_PORT_INT = 8001,
+
+    /**
+     * @brief LiDAR: set/get MAC address
+     */
+    OB_RAW_DATA_LIDAR_MAC_ADDRESS = 8002,
+
+    /**
+     * @brief LiDAR: set/get subnet mask
+     */
+    OB_RAW_DATA_LIDAR_SUBNET_MASK = 8003,
+
+    /**
+     * @brief LiDAR: set/get scan speed
+     */
+    OB_PROP_LIDAR_SCAN_SPEED_INT = 8004,
+
+    /**
+     * @brief LiDAR: set/get scan direction
+     */
+    OB_PROP_LIDAR_SCAN_DIRECTION_INT = 8005,
+
+    /**
+     * @brief LiDAR: set/get transfer protocol
+     */
+    OB_PROP_LIDAR_TRANSFER_PROTOCOL_INT = 8006,
+
+    /**
+     * @brief LiDAR: set/get transfer protocol
+     */
+    OB_PROP_LIDAR_WORK_MODE_INT = 8007,
+
+    /**
+     * @brief LiDAR: initiate device connection
+     */
+    OB_PROP_LIDAR_INITIATE_DEVICE_CONNECTION_INT = 8008,
+
+    /**
+     * @brief LiDAR: set/get serial number
+     */
+    OB_RAW_DATA_LIDAR_SERIAL_NUMBER = 8009,
+
+    /**
+     * @brief LiDAR: set/get echo mode
+     */
+    OB_PROP_LIDAR_ECHO_MODE_INT = 8010,
+
+    /**
+     * @brief LiDAR: apply configs
+     */
+    OB_PROP_LIDAR_APPLY_CONFIGS_INT = 8011,
+
+    /**
+     * @brief LiDAR: set/get tail filter level
+     */
+    OB_PROP_LIDAR_TAIL_FILTER_LEVEL_INT = 8012,
+
+    /**
+     * @brief LiDAR: set/get mems fov size
+     */
+    OB_PROP_LIDAR_MEMS_FOV_SIZE_FLOAT = 8013,
+
+    /**
+     * @brief LiDAR: set/get mems frequency
+     */
+    OB_PROP_LIDAR_MEMS_FRENQUENCY_FLOAT = 8014,
+
+    /**
+     * @brief LiDAR: set / get mems fov factor
+     */
+    OB_PROP_LIDAR_MEMS_FOV_FACTOR_FLOAT = 8015,
+
+    /**
+     * @brief LiDAR: mems on/off
+     */
+    OB_PROP_LIDAR_MEMS_ON_OFF_INT = 8016,
+
+    /**
+     * @brief LiDAR: restart mems
+     */
+    OB_PROP_LIDAR_RESTART_MEMS_INT = 8017,
+
+    /**
+     * @brief LiDAR: save mems param
+     */
+    OB_PROP_LIDAR_SAVE_MEMS_PARAM_INT = 8018,
+
+    /**
+     * @brief LiDAR: get product model
+     */
+    OB_RAW_DATA_LIDAR_PRODUCT_MODEL = 8019,
+
+    /**
+     * @brief LiDAR: get firmware version
+     */
+    OB_RAW_DATA_LIDAR_FIRMWARE_VERSION = 8020,
+
+    /**
+     * @brief LiDAR: get fpga version
+     */
+    OB_RAW_DATA_LIDAR_FPGA_VERSION = 8021,
+
+    /**
+     * @brief LiDAR: get status info
+     */
+    OB_STRUCT_LIDAR_STATUS_INFO = 8022,
+
+    /**
+     * @brief LiDAR: get warning info
+     */
+    OB_PROP_LIDAR_WARNING_INFO_INT = 8023,
+
+    /**
+     * @brief LiDAR: get realtime motor spin speed
+     */
+    OB_PROP_LIDAR_MOTOR_SPIN_SPEED_INT = 8024,
+
+    /**
+     * @brief LiDAR: get mcu temperature
+     */
+    OB_PROP_LIDAR_MCU_TEMPERATURE_FLOAT = 8025,
+
+    /**
+     * @brief LiDAR: get fpga temperature
+     */
+    OB_PROP_LIDAR_FPGA_TEMPERATURE_FLOAT = 8026,
+
+    /**
+     * @brief LiDAR: get motor version
+     */
+    OB_RAW_DATA_LIDAR_MOTOR_VERSION = 8027,
+
+    /**
+     * @brief LiDAR: get apd high voltage
+     */
+    OB_PROP_LIDAR_APD_HIGH_VOLTAGE_FLOAT = 8028,
+
+    /**
+     * @brief LiDAR: get apd temperature
+     */
+    OB_PROP_LIDAR_APD_TEMPERATURE_FLOAT = 8029,
+
+    /**
+     * @brief LiDAR: get tx high power voltage
+     */
+    OB_PROP_LIDAR_TX_HIGH_POWER_VOLTAGE_FLOAT = 8030,
+
+    /**
+     * @brief LiDAR: get tx lower power voltage
+     */
+    OB_PROP_LIDAR_TX_LOWER_POWER_VOLTAGE_FLOAT = 8031,
+
+    /**
+     * @brief LiDAR: get mems version
+     */
+    OB_RAW_DATA_LIDAR_MEMS_VERSION = 8032,
+
+    /**
+     * @brief LiDAR: get/set specific mode
+     */
+    OB_PROP_LIDAR_SPECIFIC_MODE = 8033,
 } OBPropertyID,
     ob_property_id;
 

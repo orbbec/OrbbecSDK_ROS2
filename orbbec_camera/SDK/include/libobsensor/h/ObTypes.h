@@ -50,6 +50,7 @@ typedef struct ob_device_frame_interleave_list_t ob_device_frame_interleave_list
 #define OB_ACCEL_SAMPLE_RATE_ANY OB_SAMPLE_RATE_UNKNOWN
 #define OB_GYRO_FULL_SCALE_RANGE_ANY OB_GYRO_FS_UNKNOWN
 #define OB_GYRO_SAMPLE_RATE_ANY OB_SAMPLE_RATE_UNKNOWN
+#define OB_LIDAR_SCAN_ANY OB_LIDAR_SCAN_UNKNOWN
 
 /**
  * @brief maximum path length
@@ -134,6 +135,7 @@ typedef enum {
     OB_SENSOR_IR_LEFT   = 6, /**< left IR for stereo camera*/
     OB_SENSOR_IR_RIGHT  = 7, /**< Right IR for stereo camera*/
     OB_SENSOR_RAW_PHASE = 8, /**< Raw Phase */
+    OB_SENSOR_LIDAR     = 9, /**< LiDAR */
     OB_SENSOR_TYPE_COUNT,    /**The total number of sensor types, is not a valid sensor type */
 } OBSensorType,
     ob_sensor_type;
@@ -152,6 +154,7 @@ typedef enum {
     OB_STREAM_IR_LEFT   = 6,  /**< Left IR stream for stereo camera */
     OB_STREAM_IR_RIGHT  = 7,  /**< Right IR stream for stereo camera */
     OB_STREAM_RAW_PHASE = 8,  /**< RawPhase Stream */
+    OB_STREAM_LIDAR     = 9,  /**< LiDAR Stream for LiDAR device*/
     OB_STREAM_TYPE_COUNT,     /**< The total number of stream type,is not a valid stream type */
 } OBStreamType,
     ob_stream_type;
@@ -160,19 +163,20 @@ typedef enum {
  * @brief Enumeration value describing the type of frame
  */
 typedef enum {
-    OB_FRAME_UNKNOWN   = -1, /**< Unknown frame type */
-    OB_FRAME_VIDEO     = 0,  /**< Video frame */
-    OB_FRAME_IR        = 1,  /**< IR frame */
-    OB_FRAME_COLOR     = 2,  /**< Color frame */
-    OB_FRAME_DEPTH     = 3,  /**< Depth frame */
-    OB_FRAME_ACCEL     = 4,  /**< Accelerometer data frame */
-    OB_FRAME_SET       = 5,  /**< Frame collection (internally contains a variety of data frames) */
-    OB_FRAME_POINTS    = 6,  /**< Point cloud frame */
-    OB_FRAME_GYRO      = 7,  /**< Gyroscope data frame */
-    OB_FRAME_IR_LEFT   = 8,  /**< Left IR frame for stereo camera */
-    OB_FRAME_IR_RIGHT  = 9,  /**< Right IR frame for stereo camera */
-    OB_FRAME_RAW_PHASE = 10, /**< Raw Phase frame*/
-    OB_FRAME_TYPE_COUNT,     /**< The total number of frame types, is not a valid frame type */
+    OB_FRAME_UNKNOWN      = -1, /**< Unknown frame type */
+    OB_FRAME_VIDEO        = 0,  /**< Video frame */
+    OB_FRAME_IR           = 1,  /**< IR frame */
+    OB_FRAME_COLOR        = 2,  /**< Color frame */
+    OB_FRAME_DEPTH        = 3,  /**< Depth frame */
+    OB_FRAME_ACCEL        = 4,  /**< Accelerometer data frame */
+    OB_FRAME_SET          = 5,  /**< Frame collection (internally contains a variety of data frames) */
+    OB_FRAME_POINTS       = 6,  /**< Point cloud frame */
+    OB_FRAME_GYRO         = 7,  /**< Gyroscope data frame */
+    OB_FRAME_IR_LEFT      = 8,  /**< Left IR frame for stereo camera */
+    OB_FRAME_IR_RIGHT     = 9,  /**< Right IR frame for stereo camera */
+    OB_FRAME_RAW_PHASE    = 10, /**< Raw Phase frame*/
+    OB_FRAME_LIDAR_POINTS = 11, /**< LiDAR point3d cloud frame*/
+    OB_FRAME_TYPE_COUNT,        /**< The total number of frame types, is not a valid frame type */
 } OBFrameType,
     ob_frame_type;
 
@@ -193,40 +197,44 @@ typedef enum {
  * @brief Enumeration value describing the pixel format
  */
 typedef enum {
-    OB_FORMAT_UNKNOWN    = -1, /**< unknown format */
-    OB_FORMAT_YUYV       = 0,  /**< YUYV format */
-    OB_FORMAT_YUY2       = 1,  /**< YUY2 format (the actual format is the same as YUYV) */
-    OB_FORMAT_UYVY       = 2,  /**< UYVY format */
-    OB_FORMAT_NV12       = 3,  /**< NV12 format */
-    OB_FORMAT_NV21       = 4,  /**< NV21 format */
-    OB_FORMAT_MJPG       = 5,  /**< MJPEG encoding format */
-    OB_FORMAT_H264       = 6,  /**< H.264 encoding format */
-    OB_FORMAT_H265       = 7,  /**< H.265 encoding format */
-    OB_FORMAT_Y16        = 8,  /**< Y16 format, 16-bit per pixel, single-channel*/
-    OB_FORMAT_Y8         = 9,  /**< Y8 format, 8-bit per pixel, single-channel */
-    OB_FORMAT_Y10        = 10, /**< Y10 format, 10-bit per pixel, single-channel(SDK will unpack into Y16 by default) */
-    OB_FORMAT_Y11        = 11, /**< Y11 format, 11-bit per pixel, single-channel (SDK will unpack into Y16 by default) */
-    OB_FORMAT_Y12        = 12, /**< Y12 format, 12-bit per pixel, single-channel(SDK will unpack into Y16 by default) */
-    OB_FORMAT_GRAY       = 13, /**< GRAY (the actual format is the same as YUYV) */
-    OB_FORMAT_HEVC       = 14, /**< HEVC encoding format (the actual format is the same as H265) */
-    OB_FORMAT_I420       = 15, /**< I420 format */
-    OB_FORMAT_ACCEL      = 16, /**< Acceleration data format */
-    OB_FORMAT_GYRO       = 17, /**< Gyroscope data format */
-    OB_FORMAT_POINT      = 19, /**< XYZ 3D coordinate point format, @ref OBPoint */
-    OB_FORMAT_RGB_POINT  = 20, /**< XYZ 3D coordinate point format with RGB information, @ref OBColorPoint */
-    OB_FORMAT_RLE        = 21, /**< RLE pressure test format (SDK will be unpacked into Y16 by default) */
-    OB_FORMAT_RGB        = 22, /**< RGB format (actual RGB888)  */
-    OB_FORMAT_BGR        = 23, /**< BGR format (actual BGR888) */
-    OB_FORMAT_Y14        = 24, /**< Y14 format, 14-bit per pixel, single-channel (SDK will unpack into Y16 by default) */
-    OB_FORMAT_BGRA       = 25, /**< BGRA format */
-    OB_FORMAT_COMPRESSED = 26, /**< Compression format */
-    OB_FORMAT_RVL        = 27, /**< RVL pressure test format (SDK will be unpacked into Y16 by default) */
-    OB_FORMAT_Z16        = 28, /**< Is same as Y16*/
-    OB_FORMAT_YV12       = 29, /**< Is same as Y12, using for right ir stream*/
-    OB_FORMAT_BA81       = 30, /**< Is same as Y8, using for right ir stream*/
-    OB_FORMAT_RGBA       = 31, /**< RGBA format */
-    OB_FORMAT_BYR2       = 32, /**< byr2 format */
-    OB_FORMAT_RW16       = 33, /**< RAW16 format */
+    OB_FORMAT_UNKNOWN            = -1, /**< unknown format */
+    OB_FORMAT_YUYV               = 0,  /**< YUYV format */
+    OB_FORMAT_YUY2               = 1,  /**< YUY2 format (the actual format is the same as YUYV) */
+    OB_FORMAT_UYVY               = 2,  /**< UYVY format */
+    OB_FORMAT_NV12               = 3,  /**< NV12 format */
+    OB_FORMAT_NV21               = 4,  /**< NV21 format */
+    OB_FORMAT_MJPG               = 5,  /**< MJPEG encoding format */
+    OB_FORMAT_H264               = 6,  /**< H.264 encoding format */
+    OB_FORMAT_H265               = 7,  /**< H.265 encoding format */
+    OB_FORMAT_Y16                = 8,  /**< Y16 format, 16-bit per pixel, single-channel*/
+    OB_FORMAT_Y8                 = 9,  /**< Y8 format, 8-bit per pixel, single-channel */
+    OB_FORMAT_Y10                = 10, /**< Y10 format, 10-bit per pixel, single-channel(SDK will unpack into Y16 by default) */
+    OB_FORMAT_Y11                = 11, /**< Y11 format, 11-bit per pixel, single-channel (SDK will unpack into Y16 by default) */
+    OB_FORMAT_Y12                = 12, /**< Y12 format, 12-bit per pixel, single-channel(SDK will unpack into Y16 by default) */
+    OB_FORMAT_GRAY               = 13, /**< GRAY (the actual format is the same as YUYV) */
+    OB_FORMAT_HEVC               = 14, /**< HEVC encoding format (the actual format is the same as H265) */
+    OB_FORMAT_I420               = 15, /**< I420 format */
+    OB_FORMAT_ACCEL              = 16, /**< Acceleration data format */
+    OB_FORMAT_GYRO               = 17, /**< Gyroscope data format */
+    OB_FORMAT_POINT              = 19, /**< XYZ 3D coordinate point format, @ref OBPoint */
+    OB_FORMAT_RGB_POINT          = 20, /**< XYZ 3D coordinate point format with RGB information, @ref OBColorPoint */
+    OB_FORMAT_RLE                = 21, /**< RLE pressure test format (SDK will be unpacked into Y16 by default) */
+    OB_FORMAT_RGB                = 22, /**< RGB format (actual RGB888)  */
+    OB_FORMAT_BGR                = 23, /**< BGR format (actual BGR888) */
+    OB_FORMAT_Y14                = 24, /**< Y14 format, 14-bit per pixel, single-channel (SDK will unpack into Y16 by default) */
+    OB_FORMAT_BGRA               = 25, /**< BGRA format */
+    OB_FORMAT_COMPRESSED         = 26, /**< Compression format */
+    OB_FORMAT_RVL                = 27, /**< RVL pressure test format (SDK will be unpacked into Y16 by default) */
+    OB_FORMAT_Z16                = 28, /**< Is same as Y16*/
+    OB_FORMAT_YV12               = 29, /**< Is same as Y12, using for right ir stream*/
+    OB_FORMAT_BA81               = 30, /**< Is same as Y8, using for right ir stream*/
+    OB_FORMAT_RGBA               = 31, /**< RGBA format */
+    OB_FORMAT_BYR2               = 32, /**< byr2 format */
+    OB_FORMAT_RW16               = 33, /**< RAW16 format */
+    OB_FORMAT_LIDAR_POINT        = 34, /**< XYZ 3D coordinate point format with LiDAR information, @ref OBLiDARPoint */
+    OB_FORMAT_LIDAR_SPHERE_POINT = 35, /**< XYZ 3D coordinate point format with LiDAR information, @ref OBLiDARSpherePoint */
+    OB_FORMAT_LIDAR_SCAN         = 36, /**< LiDAR single-line scan mode data format, @ref OBLiDARScanPoint */
+    OB_FORMAT_LIDAR_CALIBRATION  = 37, /**< LiDAR calibration mode point format */
 } OBFormat,
     ob_format;
 
@@ -630,6 +638,20 @@ typedef struct {
 } OBAccelValue, OBGyroValue, OBFloat3D, ob_accel_value, ob_gyro_value, ob_float_3d;
 
 /**
+ * @brief Data structures for LiDAR scan rate
+ */
+typedef enum {
+    OB_LIDAR_SCAN_UNKNOWN = 0,
+    OB_LIDAR_SCAN_5HZ     = 1,
+    OB_LIDAR_SCAN_10HZ    = 2,
+    OB_LIDAR_SCAN_15HZ    = 3,
+    OB_LIDAR_SCAN_20HZ    = 4,
+    OB_LIDAR_SCAN_25HZ    = 5,
+    OB_LIDAR_SCAN_30HZ    = 6,
+} OBLiDARScanRate,
+    ob_lidar_scan_rate, OB_LIDAR_SCAN_RATE;
+
+/**
  * @brief Device state
  */
 typedef uint64_t OBDeviceState, ob_device_state;
@@ -785,6 +807,37 @@ typedef struct {
     float g;  ///< Green channel component
     float b;  ///< Blue channel component
 } OBColorPoint, ob_color_point;
+
+/**
+ * @brief 3D point structure with LiDAR information
+ */
+typedef struct {
+    float    angle;      ///< angle, unit: degrees
+    float    distance;   ///< distance, unit: mm
+    uint16_t intensity;  ///< intensity, 0~2000
+} OBLiDARScanPoint, ob_lidar_scan_point;
+
+/**
+ * @brief 3D point structure with LiDAR information
+ */
+typedef struct {
+    float   x;             ///< X coordinate, unit mm
+    float   y;             ///< Y coordinate, unit mm
+    float   z;             ///< Z coordinate, unit mm
+    uint8_t reflectivity;  ///< reflectivity
+    uint8_t tag;           ///< point state
+} OBLiDARPoint, ob_lidar_point;
+
+/**
+ * @brief 3D point structure with LiDAR information
+ */
+typedef struct {
+    float   distance;      ///< distance, unit: mm
+    float   theta;         ///< azimuth angle, unit: degrees
+    float   phi;           ///< zenith angle, unit: degrees
+    uint8_t reflectivity;  ///< reflectivity
+    uint8_t tag;           ///< tag
+} OBLiDARSpherePoint, ob_lidar_sphere_point;
 
 /**
  * @brief Compression mode

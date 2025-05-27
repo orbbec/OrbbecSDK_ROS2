@@ -721,6 +721,34 @@ public:
 };
 
 /**
+ * @brief Define the LiDARPointsFrame class, which inherits from the Frame class
+ * @brief The LiDARPointsFrame class is used to obtain LiDAR point cloud data.
+ *
+ * @note The pointcloud data format can be obtained from the @ref Frame::getFormat() function. Witch can be one of the following formats:
+ * - @ref OB_FORMAT_LIDAR_POINT: @ref OBLiDARPoint
+ * - @ref OB_FORMAT_LIDAR_SPHERE_POINT: @ref OBLiDARSpherePoint
+ * - @ref OB_FORMAT_LIDAR_SCAN: @ref OBLiDARScanPoint
+ * - @ref OB_FORMAT_LIDAR_CALIBRATION: LiDAR calibration mode point cloud, raw data
+ * - The pointcloud data holds a set of points. To find the number of points, divide the dataSize by the structure
+ * size of the corresponding point type.
+ */
+class LiDARPointsFrame : public Frame {
+public:
+    /**
+     * @brief Construct a new LiDARPointsFrame object with a given pointer to the internal frame object.
+     *
+     * @attention After calling this constructor, the frame object will own the internal frame object, and the internal frame object will be deleted when the
+     * frame object is destroyed.
+     * @attention The internal frame object should not be deleted by the caller.
+     * @attention Please use the FrameFactory to create a Frame object.
+     *
+     * @param impl The pointer to the internal frame object.
+     */
+    explicit LiDARPointsFrame(const ob_frame *impl) : Frame(impl){};
+    ~LiDARPointsFrame() noexcept override = default;
+};
+
+/**
  * @brief Define the FrameSet class, which inherits from the Frame class
  * @brief A FrameSet is a container for multiple frames of different types.
  */
@@ -1042,6 +1070,8 @@ template <typename T> bool Frame::is() const {
         return (typeid(T) == typeid(AccelFrame));
     case OB_FRAME_POINTS:
         return (typeid(T) == typeid(PointsFrame));
+    case OB_FRAME_LIDAR_POINTS:
+        return (typeid(T) == typeid(LiDARPointsFrame));
     case OB_FRAME_SET:
         return (typeid(T) == typeid(FrameSet));
     default:

@@ -33,7 +33,6 @@
 #  define OB_DEPRECATED_NO_EXPORT OB_NO_EXPORT OB_DEPRECATED
 #endif
 
-/* NOLINTNEXTLINE(readability-avoid-unconditional-preprocessor-if) */
 #if 0 /* DEFINE_NO_DEPRECATED */
 #  ifndef OB_NO_DEPRECATED
 #    define OB_NO_DEPRECATED

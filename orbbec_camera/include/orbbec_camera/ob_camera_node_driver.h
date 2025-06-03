@@ -118,5 +118,9 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::string extension_path_;
   static backward::SignalHandling sh;  // for stack trace
   std::string upgrade_firmware_;
+
+  // Add missed device detection counter
+  int kMaxMissedDeviceDetection = 5;
+  int missed_device_detection_count_ = 0;
 };
 }  // namespace orbbec_camera

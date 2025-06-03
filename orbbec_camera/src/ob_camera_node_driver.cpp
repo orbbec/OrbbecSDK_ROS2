@@ -243,6 +243,31 @@ void OBCameraNodeDriver::checkConnectTimer() {
   if (!device_connected_.load()) {
     RCLCPP_DEBUG_STREAM(logger_,
                         "checkConnectTimer: device " << serial_number_ << " not connected");
+    // Try to re-query and re-initialize the device
+    auto device_list = ctx_->queryDeviceList();
+    if (device_list && device_list->getCount() > 0) {
+      RCLCPP_INFO_STREAM(logger_, "Device reconnected, attempting to start device.");
+      missed_device_detection_count_ = 0;
+      startDevice(device_list);
+    } else {
+      missed_device_detection_count_++;
+      if (missed_device_detection_count_ >= kMaxMissedDeviceDetection) {
+        RCLCPP_WARN_STREAM(logger_, "No device detected...");
+        // Re-create context and re-register callback
+        ctx_.reset();
+        if (config_path_.empty()) {
+          ctx_ = std::make_unique<ob::Context>();
+        } else {
+          ctx_ = std::make_unique<ob::Context>(config_path_.c_str());
+        }
+        ctx_->setDeviceChangedCallback([this](const std::shared_ptr<ob::DeviceList> &removed_list,
+                                              const std::shared_ptr<ob::DeviceList> &added_list) {
+          onDeviceConnected(added_list);
+          onDeviceDisconnected(removed_list);
+        });
+        missed_device_detection_count_ = 0;
+      }
+    }
     return;
   } else if (!ob_camera_node_) {
     device_connected_.store(false);

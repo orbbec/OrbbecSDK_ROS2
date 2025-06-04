@@ -2165,11 +2165,10 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   std::shared_ptr<ob::VideoFrame> video_frame;
   if (frame->getType() == OB_FRAME_COLOR) {
     if (interleave_frame_enable_ && interleave_skip_enable_) {
-      interleave_skip_color_index_++;
-      if (interleave_skip_color_index_ % 2 == 0) {
+      if (std::abs(static_cast<int64_t>(getFrameTimestampUs(frame)) -
+                   static_cast<int64_t>(depth_last_time_)) < 4000) {
         return;
       }
-    //   updateStreamInfo(frame, color_stream_info_);
     }
     video_frame = frame->as<ob::ColorFrame>();
   } else if (frame->getType() == OB_FRAME_DEPTH) {
@@ -2177,6 +2176,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
     if (interleave_frame_enable_ && interleave_skip_enable_) {
       if (video_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_LASER_POWER_MODE) ==
           interleave_skip_index_) {
+        depth_last_time_ = getFrameTimestampUs(frame);
         return;
       }
     }
@@ -2188,27 +2188,6 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
       if (video_frame->getMetadataValue(OB_FRAME_METADATA_TYPE_LASER_POWER_MODE) !=
           interleave_skip_index_) {
         return;
-      } else {
-        if (frame->getType() == OB_FRAME_IR_LEFT) {
-          if ((getFrameTimestampUs(frame) - left_last_time) > 37000) {
-            RCLCPP_WARN_STREAM(logger_,
-                               "left this FrameTimestampUs:  " << (getFrameTimestampUs(frame)));
-            RCLCPP_WARN_STREAM(logger_, "left last FrameTimestampUs:  " << (left_last_time));
-            RCLCPP_WARN_STREAM(logger_, "left-between current and previous fram "
-                                            << (getFrameTimestampUs(frame) - left_last_time));
-          }
-          left_last_time = getFrameTimestampUs(frame);
-        }
-        if (frame->getType() == OB_FRAME_IR_RIGHT) {
-          if ((getFrameTimestampUs(frame) - right_last_time) > 37000) {
-            RCLCPP_WARN_STREAM(logger_,
-                               "right this FrameTimestampUs:  " << (getFrameTimestampUs(frame)));
-            RCLCPP_WARN_STREAM(logger_, "right last FrameTimestampUs:  " << (right_last_time));
-            RCLCPP_WARN_STREAM(logger_, "right-between current and previous fram "
-                                            << (getFrameTimestampUs(frame) - right_last_time));
-          }
-          right_last_time = getFrameTimestampUs(frame);
-        }
       }
     }
   } else {

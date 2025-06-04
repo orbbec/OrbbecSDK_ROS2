@@ -653,16 +653,12 @@ class OBCameraNode {
   int laser_index0_ir_brightness_ = 60;
   int laser_index0_ir_ae_max_exposure_ = 17000;
 
-  int interleave_skip_color_index_ = 1;
-  int interleave_skip_depth_index_ = 1;
-
   double delta_duration_us_ = 1000.0;
   int delta_fps_ = 2;
   VideoStreamInfo color_stream_info_ = {OB_FRAME_COLOR, 0};
   VideoStreamInfo depth_stream_info_ = {OB_FRAME_DEPTH, 0};
   VideoStreamInfo left_ir_stream_info_ = {OB_FRAME_IR_LEFT, 0};
   VideoStreamInfo right_ir_stream_info_ = {OB_FRAME_IR_RIGHT, 0};
-  uint64_t left_last_time=0;
-  uint64_t right_last_time=0;
+  uint64_t depth_last_time_ = 0;
 };
 }  // namespace orbbec_camera

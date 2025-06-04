@@ -129,7 +129,7 @@
                 <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
                 <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
             </Misc>
-            
+
             <Depth>
                 <!-- The width of the default resolution, int type -->
                 <Width>640</Width>
@@ -1200,7 +1200,7 @@
                 <Format>Y8</Format>
             </RightIR>
         </Gemini335Lg>
-		
+
 		<!-- Gemini335Le config -->
         <Gemini335Le>
             <!-- Whether to enable heartbeat by default -->
@@ -1217,12 +1217,12 @@
                 <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
                 <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
             </Misc>
-			
+
 			<DepthPostProcessing>
                 <HardwareNoiseRemoveFilter>false</HardwareNoiseRemoveFilter>
                 <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
             </DepthPostProcessing>
-			
+
 			<!-- Whether to enable heartbeat by default -->
             <DefaultHeartBeat>0</DefaultHeartBeat>
             <!-- Whether to enable firmware upgrade foolproof by default, only internal version
@@ -2047,7 +2047,7 @@
                 <Format>Y8</Format>
             </RightIR>
         </CAM-5530>
-        
+
                <!--  Gemini435Le config -->
         <Gemini435Le>
             <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item

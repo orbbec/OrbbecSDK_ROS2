@@ -8,6 +8,7 @@ enable_sync_host_time: true
 frames_per_trigger: 1
 log_level: "warning"
 enable_laser: true
+trigger_out_enabled: false
 
 interleave_frame_enable: false
 interleave_skip_enable: false

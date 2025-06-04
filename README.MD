@@ -152,7 +152,7 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
     - [Multi-Camera](#multi-camera)
     - [Check which profiles the camera supports](#check-which-profiles-the-camera-supports)
     - [Predefined presets](#predefined-presets)
-      - [Optional depth presets](#optional-depth-presets)
+    - [Optional depth presets](#optional-depth-presets)
     - [Depth work mode switch](#depth-work-mode-switch)
     - [Configuration of depth NFOV and WFOV modes](#configuration-of-depth-nfov-and-wfov-modes)
   - [Advanced Usage](#advanced-usage)
@@ -479,12 +479,12 @@ ros2 run orbbec_camera list_camera_profile_mode_node
 
 About the mode settings of Predefined presets.Reference:[Predefined presets documentation](./docs/predefined_presets.md)
 
-#### Optional depth presets
+### Optional depth presets
 
-> You can pass the firmware path of the Optional preset into the `preset_firmware_path` launch param
+> You can pass the firmware path of the Optional preset into the `preset_firmware_path` launch param.Users can download the appropriate Preset from the [Depth Preset Release](https://www.orbbec.com/docs/depth-preset-release/) page provided by Orbbec based on their specific application scenarios and update it to the camera for better depth performance in corresponding scenarios.
 
 ```bash
-ros2 launch orbbec_camera gemini_330_series.launch.py preset_firmware_path:=/home/orbbec/G336X_Dimensioning_Accurate_0.0.1_78C743B9.bin,/home/orbbec/G336X_Dimensioning_Dense_0.0.1_4E70D227.bin device_preset:=G336X Dimensioning Dense
+ros2 launch orbbec_camera gemini_330_series.launch.py preset_firmware_path:=/home/orbbec/G336X_AMR_Default_v0.0.5.bin
 ```
 
 ### Depth work mode switch

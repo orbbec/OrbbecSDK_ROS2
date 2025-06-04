@@ -152,7 +152,7 @@ def generate_launch_description():
         delayed_right_camera,
         delayed_rear_camera,
         delayed_front_camera,
-        delayed_save_rgbir,
+        # delayed_save_rgbir,
       ]
     )
 

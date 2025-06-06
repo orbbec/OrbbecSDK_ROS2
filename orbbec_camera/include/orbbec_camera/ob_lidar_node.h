@@ -26,6 +26,7 @@
 #include <utility>
 #include <vector>
 #include <atomic>
+#include "ob_camera_node.h"
 #include <opencv2/opencv.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <sensor_msgs/point_cloud2_iterator.hpp>
@@ -112,40 +113,9 @@ using GetBool = orbbec_camera_msgs::srv::GetBool;
 using SetFilter = orbbec_camera_msgs::srv::SetFilter;
 using SetArrays = orbbec_camera_msgs::srv::SetArrays;
 
-typedef std::pair<ob_stream_type, int> stream_index_pair;
-
-const stream_index_pair COLOR{OB_STREAM_COLOR, 0};
-const stream_index_pair DEPTH{OB_STREAM_DEPTH, 0};
-const stream_index_pair INFRA0{OB_STREAM_IR, 0};
-const stream_index_pair INFRA1{OB_STREAM_IR_LEFT, 0};
-const stream_index_pair INFRA2{OB_STREAM_IR_RIGHT, 0};
-const stream_index_pair LIDAR{OB_STREAM_LIDAR, 0};
-
-const stream_index_pair GYRO{OB_STREAM_GYRO, 0};
-const stream_index_pair ACCEL{OB_STREAM_ACCEL, 0};
-
-const std::vector<stream_index_pair> IMAGE_STREAMS = {COLOR, DEPTH, INFRA0, INFRA1, INFRA2, LIDAR};
-
-const std::vector<stream_index_pair> HID_STREAMS = {GYRO, ACCEL};
-
-const std::map<OBStreamType, OBFrameType> STREAM_TYPE_TO_FRAME_TYPE = {
-    {OB_STREAM_COLOR, OB_FRAME_COLOR},
-    {OB_STREAM_DEPTH, OB_FRAME_DEPTH},
-    {OB_STREAM_IR, OB_FRAME_IR},
-    {OB_STREAM_IR_LEFT, OB_FRAME_IR_LEFT},
-    {OB_STREAM_IR_RIGHT, OB_FRAME_IR_RIGHT},
-    {OB_STREAM_GYRO, OB_FRAME_GYRO},
-    {OB_STREAM_ACCEL, OB_FRAME_ACCEL},
-};
-
-typedef struct {
-  uint8_t mode;
-  uint16_t fps;
-} cs_param_t;
-
-class OBCameraNode {
+class OBLidarNode {
  public:
-  OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> device,
+  OBLidarNode(rclcpp::Node* node, std::shared_ptr<ob::Device> device,
                std::shared_ptr<Parameters> parameters, bool use_intra_process = false);
 
   template <class T>
@@ -154,257 +124,25 @@ class OBCameraNode {
       const rcl_interfaces::msg::ParameterDescriptor& parameter_descriptor =
           rcl_interfaces::msg::ParameterDescriptor());  // set and get parameter
 
-  ~OBCameraNode() noexcept;
+  ~OBLidarNode() noexcept;
 
   void clean() noexcept;
 
   void rebootDevice();
 
-  void startStreams();
-
-  void startIMUSyncStream();
-
-  void startIMU();
-
-  int openSocSyncPwmTrigger(uint16_t fps);
-  int closeSocSyncPwmTrigger();
-  void startGmslTrigger();
-  void stopGmslTrigger();
-
  private:
-  struct IMUData {
-    IMUData() = default;
-    IMUData(stream_index_pair stream, Eigen::Vector3d data, double timestamp)
-        : stream_(std::move(stream)), data_(std::move(data)), timestamp_(timestamp) {}
-    [[nodiscard]] bool isSet() const { return timestamp_ >= 0; }
-    stream_index_pair stream_{};
-    Eigen::Vector3d data_{};
-    double timestamp_ = -1;  // in nanoseconds
-  };
 
   void setupDevices();
 
-  void setupProfiles();
+//   void selectBaseStream();
 
-  void updateImageConfig(const stream_index_pair& stream_index);
-
-  void printSensorProfiles(const std::shared_ptr<ob::Sensor>& sensor);
-
-  void selectBaseStream();
+//   void setupProfiles();
 
   void getParameters();
 
   void setupTopics();
 
-  void setupPipelineConfig();
-
-  void setupDiagnosticUpdater();
-
-  void onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapper& status);
-
-  void setupCameraCtrlServices();
-
-  void stopStreams();
-
-  void stopIMU();
-
-  void setupDefaultImageFormat();
-
   void setupPublishers();
-
-  void publishStaticTF(const rclcpp::Time& t, const tf2::Vector3& trans, const tf2::Quaternion& q,
-                       const std::string& from, const std::string& to);
-
-  void calcAndPublishStaticTransform();
-
-  void publishDynamicTransforms();
-
-  void publishStaticTransforms();
-
-  std::optional<OBCameraParam> findDefaultCameraParam();
-
-  std::optional<OBCameraParam> getDepthCameraParam();
-
-  std::optional<OBCameraParam> getColorCameraParam();
-
-  void getExposureCallback(const std::shared_ptr<GetInt32::Request>& request,
-                           std::shared_ptr<GetInt32::Response>& response,
-                           const stream_index_pair& stream_index);
-
-  void setExposureCallback(const std::shared_ptr<SetInt32::Request>& request,
-                           std::shared_ptr<SetInt32::Response>& response,
-                           const stream_index_pair& stream_index);
-
-  void getGainCallback(const std::shared_ptr<GetInt32::Request>& request,
-                       std::shared_ptr<GetInt32::Response>& response,
-                       const stream_index_pair& stream_index);
-
-  void setGainCallback(const std::shared_ptr<SetInt32::Request>& request,
-                       std::shared_ptr<SetInt32::Response>& response,
-                       const stream_index_pair& stream_index);
-
-  void getWhiteBalanceCallback(const std::shared_ptr<GetInt32::Request>& request,
-                               std::shared_ptr<GetInt32::Response>& response);
-
-  void setWhiteBalanceCallback(const std::shared_ptr<SetInt32 ::Request>& request,
-                               std::shared_ptr<SetInt32 ::Response>& response);
-
-  void getAutoWhiteBalanceCallback(const std::shared_ptr<GetInt32::Request>& request,
-                                   std::shared_ptr<GetInt32::Response>& response);
-
-  void setAutoWhiteBalanceCallback(const std::shared_ptr<SetBool::Request>& request,
-                                   std::shared_ptr<SetBool::Response>& response);
-
-  void setAutoExposureCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
-                               std::shared_ptr<std_srvs::srv::SetBool::Response>& response,
-                               const stream_index_pair& stream_index);
-
-  void setAeRoiCallback(const std::shared_ptr<SetArrays::Request>& request,
-                        std::shared_ptr<SetArrays::Response>& response,
-                        const stream_index_pair& stream_index);
-
-  void setLaserEnableCallback(const std::shared_ptr<rmw_request_id_t>& request_header,
-                              const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
-                              std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
-
-  void setFloorEnableCallback(const std::shared_ptr<rmw_request_id_t>& request_header,
-                              const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
-                              std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
-
-  void setLdpEnableCallback(const std::shared_ptr<rmw_request_id_t>& request_header,
-                            const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
-                            std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
-
-  void setFanWorkModeCallback(const std::shared_ptr<SetInt32::Request>& request,
-                              std::shared_ptr<SetInt32::Response>& response);
-
-  void getDeviceInfoCallback(const std::shared_ptr<GetDeviceInfo::Request>& request,
-                             std::shared_ptr<GetDeviceInfo::Response>& response);
-
-  void getSDKVersion(const std::shared_ptr<GetString::Request>& request,
-                     std::shared_ptr<GetString::Response>& response);
-
-  void toggleSensorCallback(const std::shared_ptr<SetBool::Request>& request,
-                            std::shared_ptr<SetBool::Response>& response,
-                            const stream_index_pair& stream_index);
-
-  void setMirrorCallback(const std::shared_ptr<SetBool::Request>& request,
-                         std::shared_ptr<SetBool::Response>& response,
-                         const stream_index_pair& stream_index);
-
-  void setFlipCallback(const std::shared_ptr<SetBool::Request>& request,
-                       std::shared_ptr<SetBool::Response>& response,
-                       const stream_index_pair& stream_index);
-
-  void setRotationCallback(const std::shared_ptr<SetInt32::Request>& request,
-                           std::shared_ptr<SetInt32::Response>& response,
-                           const stream_index_pair& stream_index);
-
-  void getLdpStatusCallback(const std::shared_ptr<GetBool::Request>& request,
-                            std::shared_ptr<GetBool::Response>& response);
-
-  void getLrmMeasureDistanceCallback(const std::shared_ptr<GetInt32::Request>& request,
-                                     std::shared_ptr<GetInt32::Response>& response);
-
-  void setRESETTimestampCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
-                                 std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
-  void setSYNCInterleaveLaserCallback(const std::shared_ptr<SetInt32 ::Request>& request,
-                                      std::shared_ptr<SetInt32 ::Response>& response);
-  void setFilterCallback(const std::shared_ptr<SetFilter ::Request>& request,
-                         std::shared_ptr<SetFilter ::Response>& response);
-  void setSYNCHostimeCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
-                              std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
-
-  bool toggleSensor(const stream_index_pair& stream_index, bool enabled, std::string& msg);
-
-  void saveImageCallback(const std::shared_ptr<std_srvs::srv::Empty::Request>& request,
-                         std::shared_ptr<std_srvs::srv::Empty::Response>& response);
-
-  void savePointCloudCallback(const std::shared_ptr<std_srvs::srv::Empty::Request>& request,
-                              std::shared_ptr<std_srvs::srv::Empty::Response>& response);
-
-  void switchIRCameraCallback(const std::shared_ptr<SetString::Request>& request,
-                              std::shared_ptr<SetString::Response>& response);
-
-  void setWriteCustomerData(const std::shared_ptr<SetString::Request>& request,
-                            std::shared_ptr<SetString::Response>& response);
-
-  void setReadCustomerData(const std::shared_ptr<SetString::Request>& request,
-                           std::shared_ptr<SetString::Response>& response);
-
-  void setIRLongExposureCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
-                                 std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
-
-  void publishPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set);
-
-  void publishDepthPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set);
-
-  void publishColoredPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set);
-
-  std::shared_ptr<ob::Frame> processDepthFrameFilter(std::shared_ptr<ob::Frame>& frame);
-
-  std::shared_ptr<ob::Frame> processColorFrameFilter(std::shared_ptr<ob::Frame>& frame);
-
-  std::shared_ptr<ob::Frame> processRightIrFrameFilter(std::shared_ptr<ob::Frame>& frame);
-
-  std::shared_ptr<ob::Frame> processLeftIrFrameFilter(std::shared_ptr<ob::Frame>& frame);
-
-  uint64_t getFrameTimestampUs(const std::shared_ptr<ob::Frame>& frame);
-
-  void onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set);
-
-  std::shared_ptr<ob::Frame> softwareDecodeColorFrame(const std::shared_ptr<ob::Frame>& frame);
-
-  bool decodeColorFrameToBuffer(const std::shared_ptr<ob::Frame>& frame, uint8_t* buffer);
-
-  std::shared_ptr<ob::Frame> decodeIRMJPGFrame(const std::shared_ptr<ob::Frame>& frame);
-
-  void onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
-                          const stream_index_pair& stream_index);
-
-  void publishMetadata(const std::shared_ptr<ob::Frame>& frame,
-                       const stream_index_pair& stream_index, const std_msgs::msg::Header& header);
-
-  void onNewColorFrameCallback();
-
-  void saveImageToFile(const stream_index_pair& stream_index, const cv::Mat& image,
-                       const sensor_msgs::msg::Image& image_msg);
-
-  void onNewIMUFrameSyncOutputCallback(const std::shared_ptr<ob::Frame>& accelframe,
-                                       const std::shared_ptr<ob::Frame>& gryoframe);
-
-  void onNewIMUFrameCallback(const std::shared_ptr<ob::Frame>& frame,
-                             const stream_index_pair& stream_index);
-
-  void setDefaultIMUMessage(sensor_msgs::msg::Imu& imu_msg);
-
-  sensor_msgs::msg::Imu createUnitIMUMessage(const IMUData& accel_data, const IMUData& gyro_data);
-
-  void FillImuDataLinearInterpolation(const IMUData& imu_data,
-                                      std::deque<sensor_msgs::msg::Imu>& imu_msgs);
-
-  void FillImuDataCopy(const IMUData& imu_data, std::deque<sensor_msgs::msg::Imu>& imu_msgs);
-
-  bool setupFormatConvertType(OBFormat format);
-
-  orbbec_camera_msgs::msg::IMUInfo createIMUInfo(const stream_index_pair& stream_index);
-
-  static bool isGemini335PID(uint32_t pid);
-
-  void setupDepthPostProcessFilter();
-  void setupColorPostProcessFilter();
-  void setupRightIrPostProcessFilter();
-  void setupLeftIrPostProcessFilter();
-
-  // interleave AE
-  int init_interleave_hdr_param();
-  int init_interleave_laser_param();
-
-  // Set ROI
-  void setColorAutoExposureROI();
-  void setDepthAutoExposureROI();
-
-  void setDisparitySearchOffset();
 
  private:
   rclcpp::Node* node_ = nullptr;
@@ -503,7 +241,7 @@ class OBCameraNode {
   std::shared_ptr<tf2_ros::TransformBroadcaster> dynamic_tf_broadcaster_ = nullptr;
   std::vector<geometry_msgs::msg::TransformStamped> tf_msgs;
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr depth_registration_cloud_pub_;
-  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr depth_cloud_pub_;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr cloud_pub_;
   bool enable_point_cloud_ = true;
   bool enable_colored_point_cloud_ = false;
   std::recursive_mutex point_cloud_mutex_;
@@ -598,8 +336,6 @@ class OBCameraNode {
   std::map<stream_index_pair, bool> imu_started_;
   double liner_accel_cov_ = 0.0001;
   double angular_vel_cov_ = 0.0001;
-  std::deque<IMUData> imu_history_;
-  IMUData accel_data_{ACCEL, {0, 0, 0}, -1.0};
   bool enable_accel_data_correction_ = true;
   bool enable_gyro_data_correction_ = true;
   // mjpeg decoder
@@ -731,5 +467,6 @@ class OBCameraNode {
   int offset_index1_ = -1;
 
   std::string frame_aggregate_mode_ = "ANY";  // # full_frame, color_frame, ANY or disable
+  std::string echo_mode_ = "single channel";  
 };
 }  // namespace orbbec_camera

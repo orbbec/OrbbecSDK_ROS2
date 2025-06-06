@@ -143,6 +143,7 @@ set(SOURCE_FILES
   src/image_publisher.cpp
   src/ob_camera_node_driver.cpp
   src/ob_camera_node.cpp
+  src/ob_lidar_node.cpp
   src/ros_param_backend.cpp
   src/ros_service.cpp
   src/synced_imu_publisher.cpp

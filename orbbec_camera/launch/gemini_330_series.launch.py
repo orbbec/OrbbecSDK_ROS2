@@ -51,6 +51,7 @@ def load_parameters(context, args):
 
 def generate_launch_description():
     args = [
+        DeclareLaunchArgument('device_type', default_value='camera'),
         DeclareLaunchArgument('camera_name', default_value='camera'),
         DeclareLaunchArgument('depth_registration', default_value='true'),
         DeclareLaunchArgument('serial_number', default_value=''),

@@ -272,6 +272,7 @@ OBFormat OBFormatFromString(const std::string &format) {
   std::string fixed_format;
   std::transform(format.begin(), format.end(), std::back_inserter(fixed_format),
                  [](const auto ch) { return std::isalpha(ch) ? toupper(ch) : ch; });
+  std::cout << "OBFormatFromString: " << fixed_format << std::endl;
   if (fixed_format == "MJPG") {
     return OB_FORMAT_MJPG;
   } else if (fixed_format == "MJPEG") {
@@ -340,6 +341,14 @@ OBFormat OBFormatFromString(const std::string &format) {
     return OB_FORMAT_BYR2;
   } else if (fixed_format == "RW16") {
     return OB_FORMAT_RW16;
+  } else if (fixed_format == "LIDAR_POINT") {
+    return OB_FORMAT_LIDAR_POINT;
+  } else if (fixed_format == "LIDAR_SPHERE_POINT") {
+    return OB_FORMAT_LIDAR_SPHERE_POINT;
+  } else if (fixed_format == "LIDAR_SCAN") {
+    return OB_FORMAT_LIDAR_SCAN;
+  } else if (fixed_format == "LIDAR_CALIBRATION") {
+    return OB_FORMAT_LIDAR_CALIBRATION;
   }
   //   else if (fixed_format == "DISP16") {
   //     return OB_FORMAT_DISP16;

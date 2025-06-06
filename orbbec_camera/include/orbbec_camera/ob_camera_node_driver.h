@@ -20,6 +20,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <semaphore.h>
 #include "ob_camera_node.h"
+#include "ob_lidar_node.h"
 #include "utils.h"
 #include "dynamic_params.h"
 
@@ -83,6 +84,7 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::unique_ptr<ob::Context> ctx_ = nullptr;
   rclcpp::Logger logger_;
   std::unique_ptr<OBCameraNode> ob_camera_node_ = nullptr;
+  std::unique_ptr<OBLidarNode> ob_lidar_node_ = nullptr;
   std::shared_ptr<ob::Device> device_ = nullptr;
   std::shared_ptr<ob::DeviceInfo> device_info_ = nullptr;
   std::atomic_bool is_alive_{false};
@@ -118,5 +120,6 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::string extension_path_;
   static backward::SignalHandling sh;  // for stack trace
   std::string upgrade_firmware_;
+  std::string device_type_;
 };
 }  // namespace orbbec_camera

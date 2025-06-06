@@ -127,6 +127,7 @@ void OBCameraNodeDriver::init() {
 
   auto log_level_str = declare_parameter<std::string>("log_level", "none");
   auto log_level = obLogSeverityFromString(log_level_str);
+  device_type_ = declare_parameter<std::string>("device_type", "camera");
   connection_delay_ = static_cast<int>(declare_parameter<int>("connection_delay", 100));
   enable_sync_host_time_ = declare_parameter<bool>("enable_sync_host_time", true);
   upgrade_firmware_ = declare_parameter<std::string>("upgrade_firmware", "");
@@ -445,8 +446,14 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
 
   while (retry_count < max_retries && !initialized) {
     try {
-      ob_camera_node_ = std::make_unique<OBCameraNode>(this, device_, parameters_,
+      if (device_type_ == "camera") {
+        ob_camera_node_ = std::make_unique<OBCameraNode>(this, device_, parameters_,
+                                                         node_options_.use_intra_process_comms());
+      } else if (device_type_ == "lidar") {
+        ob_lidar_node_ = std::make_unique<OBLidarNode>(this, device_, parameters_,
                                                        node_options_.use_intra_process_comms());
+      }
+
       initialized = true;
     } catch (const ob::Error &e) {
       RCLCPP_ERROR_STREAM(logger_, "Failed to initialize device (Attempt "
@@ -476,16 +483,17 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   CHECK_NOTNULL(device_info_.get());
   device_unique_id_ = device_info_->getUid();
 
-  if (enable_sync_host_time_ && !isOpenNIDevice(device_info_->pid())) {
-    TRY_EXECUTE_BLOCK(device_->timerSyncWithHost());
-    if (g_time_domain != "global") {
-      sync_host_time_timer_ = this->create_wall_timer(std::chrono::milliseconds(60000), [this]() {
-        if (device_) {
-          TRY_EXECUTE_BLOCK(device_->timerSyncWithHost());
-        }
-      });
-    }
-  }
+  //   if (enable_sync_host_time_ && !isOpenNIDevice(device_info_->pid())) {
+  //     TRY_EXECUTE_BLOCK(device_->timerSyncWithHost());
+  //     if (g_time_domain != "global") {
+  //       sync_host_time_timer_ = this->create_wall_timer(std::chrono::milliseconds(60000),
+  //       [this]() {
+  //         if (device_) {
+  //           TRY_EXECUTE_BLOCK(device_->timerSyncWithHost());
+  //         }
+  //       });
+  //     }
+  //   }
 
   RCLCPP_INFO_STREAM(logger_, "Device " << device_info_->getName() << " connected");
   RCLCPP_INFO_STREAM(logger_, "Serial number: " << device_info_->getSerialNumber());
@@ -504,12 +512,12 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
                   std::placeholders::_2, std::placeholders::_3),
         false);
   }
-  if (ob_camera_node_) {
-    ob_camera_node_->startIMU();
-    ob_camera_node_->startStreams();
-  } else {
-    RCLCPP_INFO_STREAM(logger_, "ob_camera_node_ is nullptr");
-  }
+  //   if (ob_camera_node_) {
+  //     ob_camera_node_->startIMU();
+  //     ob_camera_node_->startStreams();
+  //   } else {
+  //     RCLCPP_INFO_STREAM(logger_, "ob_camera_node_ is nullptr");
+  //   }
 
 }  // namespace orbbec_camera
 

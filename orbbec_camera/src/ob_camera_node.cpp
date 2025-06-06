@@ -738,10 +738,10 @@ void OBCameraNode::setupDevices() {
 void OBCameraNode::setupColorPostProcessFilter() {
   auto color_sensor = device_->getSensor(OB_SENSOR_COLOR);
   color_filter_list_ = color_sensor->createRecommendedFilters();
-    if (color_filter_list_.empty()) {
-      RCLCPP_WARN_STREAM(logger_, "Failed to get color sensor filter list");
+  if (color_filter_list_.empty()) {
+    RCLCPP_WARN_STREAM(logger_, "Failed to get color sensor filter list");
     //   return;
-    }
+  }
   for (size_t i = 0; i < color_filter_list_.size(); i++) {
     auto filter = color_filter_list_[i];
     std::map<std::string, bool> filter_params = {
@@ -2787,24 +2787,16 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   auto pid = device_info->getPid();
   OBCameraIntrinsic intrinsic;
   OBCameraDistortion distortion;
-  if (isGemini335PID(pid)) {
-    auto stream_profile = frame->getStreamProfile();
-    CHECK_NOTNULL(stream_profile);
-    auto video_stream_profile = stream_profile->as<ob::VideoStreamProfile>();
-    CHECK_NOTNULL(video_stream_profile);
-    intrinsic = video_stream_profile->getIntrinsic();
-    distortion = video_stream_profile->getDistortion();
-  } else {
-    auto camera_params = pipeline_->getCameraParam();
-    intrinsic = stream_index.first == OB_STREAM_COLOR ? camera_params.rgbIntrinsic
-                                                      : camera_params.depthIntrinsic;
-    distortion = stream_index.first == OB_STREAM_COLOR ? camera_params.rgbDistortion
-                                                       : camera_params.depthDistortion;
-    if (pid == DABAI_MAX_PID) {
-      // use color param
-      intrinsic = camera_params.rgbIntrinsic;
-      distortion = camera_params.rgbDistortion;
-    }
+  auto stream_profile = frame->getStreamProfile();
+  CHECK_NOTNULL(stream_profile);
+  auto video_stream_profile = stream_profile->as<ob::VideoStreamProfile>();
+  CHECK_NOTNULL(video_stream_profile);
+  intrinsic = video_stream_profile->getIntrinsic();
+  distortion = video_stream_profile->getDistortion();
+  if (pid == DABAI_MAX_PID) {
+    // use color param
+    intrinsic = camera_params.rgbIntrinsic;
+    distortion = camera_params.rgbDistortion;
   }
   std::string frame_id = optical_frame_id_[stream_index];
   if (depth_registration_ && stream_index == DEPTH) {

@@ -39,6 +39,8 @@ def generate_launch_description():
         DeclareLaunchArgument("enable_color_auto_white_balance", default_value="true"),
         DeclareLaunchArgument("color_white_balance", default_value="-1"),
         DeclareLaunchArgument("color_brightness", default_value="-1"),
+        DeclareLaunchArgument('enable_color_decimation_filter', default_value='false'),
+        DeclareLaunchArgument('color_decimation_filter_scale', default_value='-1'),
         DeclareLaunchArgument("depth_width", default_value="1280"),
         DeclareLaunchArgument("depth_height", default_value="800"),
         DeclareLaunchArgument("depth_fps", default_value="30"),

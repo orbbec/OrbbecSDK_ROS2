@@ -199,7 +199,7 @@ void OBCameraNode::setupDevices() {
                          "Laser energy level set to " << new_laser_energy_level << " (new value)");
     }
   }
-  if (depth_registration_) {
+  if (depth_registration_ && align_mode_ == "SW") {
     RCLCPP_INFO_STREAM(logger_, "Create align filter");
     align_filter_ = std::make_unique<ob::Align>(align_target_stream_);
   }
@@ -738,10 +738,10 @@ void OBCameraNode::setupDevices() {
 void OBCameraNode::setupColorPostProcessFilter() {
   auto color_sensor = device_->getSensor(OB_SENSOR_COLOR);
   color_filter_list_ = color_sensor->createRecommendedFilters();
-  if (color_filter_list_.empty()) {
-    RCLCPP_WARN_STREAM(logger_, "Failed to get color sensor filter list");
-    return;
-  }
+    if (color_filter_list_.empty()) {
+      RCLCPP_WARN_STREAM(logger_, "Failed to get color sensor filter list");
+    //   return;
+    }
   for (size_t i = 0; i < color_filter_list_.size(); i++) {
     auto filter = color_filter_list_[i];
     std::map<std::string, bool> filter_params = {
@@ -756,6 +756,28 @@ void OBCameraNode::setupColorPostProcessFilter() {
     }
     if (filter_name == "DecimationFilter" && enable_color_decimation_filter_) {
       auto decimation_filter = filter->as<ob::DecimationFilter>();
+      auto range = decimation_filter->getScaleRange();
+      if (color_decimation_filter_scale_ != -1 && color_decimation_filter_scale_ <= range.max &&
+          color_decimation_filter_scale_ >= range.min) {
+        RCLCPP_INFO_STREAM(logger_, "Set color decimation filter scale value to "
+                                        << color_decimation_filter_scale_);
+        decimation_filter->setScaleValue(color_decimation_filter_scale_);
+      }
+      if (color_decimation_filter_scale_ != -1 && (color_decimation_filter_scale_ < range.min ||
+                                                   color_decimation_filter_scale_ > range.max)) {
+        RCLCPP_ERROR_STREAM(logger_, "Color Decimation filter scale value is out of range "
+                                         << range.min << " - " << range.max);
+      }
+    }
+  }
+  auto device_info = device_->getDeviceInfo();
+  CHECK_NOTNULL(device_info);
+  auto pid = device_info->getPid();
+  if (pid == GEMINI2_PID || pid == GEMINI2L_PID) {
+    if (enable_color_decimation_filter_) {
+      auto decimation_filter = std::make_shared<ob::DecimationFilter>();
+      decimation_filter->enable(true);
+      color_filter_list_.push_back(decimation_filter);
       auto range = decimation_filter->getScaleRange();
       if (color_decimation_filter_scale_ != -1 && color_decimation_filter_scale_ <= range.max &&
           color_decimation_filter_scale_ >= range.min) {

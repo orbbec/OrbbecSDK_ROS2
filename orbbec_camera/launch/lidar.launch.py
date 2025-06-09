@@ -57,9 +57,15 @@ def generate_launch_description():
         DeclareLaunchArgument('upgrade_firmware', default_value=''),
         DeclareLaunchArgument('connection_delay', default_value='10'),
         DeclareLaunchArgument('publish_tf', default_value='true'),
+        DeclareLaunchArgument('frame_id', default_value='scan'),
         DeclareLaunchArgument('tf_publish_rate', default_value='0.0'),
         DeclareLaunchArgument('lidar_format', default_value='ANY'),
+        DeclareLaunchArgument('lidar_rate', default_value='0'),
         DeclareLaunchArgument('scan_rate', default_value='0'),
+        DeclareLaunchArgument('min_angle', default_value='-135.0'),
+        DeclareLaunchArgument('max_angle', default_value='135.0'),
+        DeclareLaunchArgument('min_range', default_value='0.05'),
+        DeclareLaunchArgument('max_range', default_value='30.0'),
         DeclareLaunchArgument('echo_mode', default_value='single channel'),
         DeclareLaunchArgument('point_cloud_qos', default_value='default'),
         # Network device settings: default enumerate_net_device is set to true, which will automatically enumerate network devices
@@ -69,7 +75,7 @@ def generate_launch_description():
         DeclareLaunchArgument('net_device_ip', default_value=''),
         DeclareLaunchArgument('net_device_port', default_value='0'),
         DeclareLaunchArgument('log_level', default_value='none'),
-        DeclareLaunchArgument('time_domain', default_value='global'),# global, device, system
+        DeclareLaunchArgument('time_domain', default_value='device'),# global, device, system
         DeclareLaunchArgument('config_file_path', default_value=''),
         DeclareLaunchArgument('enable_heartbeat', default_value='false'),
     ]

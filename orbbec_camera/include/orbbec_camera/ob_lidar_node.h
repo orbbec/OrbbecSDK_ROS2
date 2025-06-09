@@ -26,8 +26,9 @@
 #include <utility>
 #include <vector>
 #include <atomic>
-#include "ob_camera_node.h"
+// #include "ob_lidar_node.h"
 #include <opencv2/opencv.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <sensor_msgs/point_cloud2_iterator.hpp>
 #include <tf2_ros/static_transform_broadcaster.h>
@@ -102,6 +103,7 @@
 #define DEVICE_PATH "/dev/camsync"
 
 namespace orbbec_camera {
+namespace orbbec_lidar {
 using GetDeviceInfo = orbbec_camera_msgs::srv::GetDeviceInfo;
 using Extrinsics = orbbec_camera_msgs::msg::Extrinsics;
 using SetInt32 = orbbec_camera_msgs::srv::SetInt32;
@@ -113,10 +115,21 @@ using GetBool = orbbec_camera_msgs::srv::GetBool;
 using SetFilter = orbbec_camera_msgs::srv::SetFilter;
 using SetArrays = orbbec_camera_msgs::srv::SetArrays;
 
+typedef std::pair<ob_stream_type, int> stream_index_pair;
+
+const stream_index_pair LIDAR{OB_STREAM_LIDAR, 0};
+
+const stream_index_pair GYRO{OB_STREAM_GYRO, 0};
+const stream_index_pair ACCEL{OB_STREAM_ACCEL, 0};
+
+const std::vector<stream_index_pair> IMAGE_STREAMS = {LIDAR};
+
+const std::vector<stream_index_pair> HID_STREAMS = {GYRO, ACCEL};
+
 class OBLidarNode {
  public:
   OBLidarNode(rclcpp::Node* node, std::shared_ptr<ob::Device> device,
-               std::shared_ptr<Parameters> parameters, bool use_intra_process = false);
+              std::shared_ptr<Parameters> parameters, bool use_intra_process = false);
 
   template <class T>
   void setAndGetNodeParameter(
@@ -130,19 +143,36 @@ class OBLidarNode {
 
   void rebootDevice();
 
- private:
+  void startStreams();
 
+ private:
   void setupDevices();
 
-//   void selectBaseStream();
+  void selectBaseStream();
 
-//   void setupProfiles();
+  void setupProfiles();
 
   void getParameters();
 
   void setupTopics();
 
+  void setupPipelineConfig();
+
+  void printSensorProfiles(const std::shared_ptr<ob::Sensor>& sensor);
+
   void setupPublishers();
+
+  void stopStreams();
+
+  void onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set);
+
+  void publishScan(std::shared_ptr<ob::FrameSet> frame_set);
+
+  void publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set);
+
+  uint64_t getFrameTimestampUs(const std::shared_ptr<ob::Frame>& frame);
+
+  void filterScan(sensor_msgs::msg::LaserScan& scan);
 
  private:
   rclcpp::Node* node_ = nullptr;
@@ -171,7 +201,6 @@ class OBLidarNode {
   std::map<stream_index_pair, int> width_;
   std::map<stream_index_pair, int> height_;
   std::map<stream_index_pair, int> fps_;
-  std::map<stream_index_pair, std::string> frame_id_;
   std::map<stream_index_pair, std::string> optical_frame_id_;
   std::map<stream_index_pair, std::string> depth_aligned_frame_id_;
   std::string camera_link_frame_id_;
@@ -181,10 +210,10 @@ class OBLidarNode {
   std::map<stream_index_pair, ob_format> format_;
   std::map<stream_index_pair, std::string> format_str_;
   std::map<stream_index_pair, int> image_format_;
-  std::map<stream_index_pair, std::vector<std::shared_ptr<ob::VideoStreamProfile>>>
+  std::map<stream_index_pair, std::vector<std::shared_ptr<ob::LiDARStreamProfile>>>
       supported_profiles_;
   std::map<stream_index_pair, std::shared_ptr<ob::StreamProfile>> stream_profile_;
-  stream_index_pair base_stream_ = DEPTH;
+  stream_index_pair base_stream_ = LIDAR;
   std::map<stream_index_pair, uint32_t> seq_;
   std::map<stream_index_pair, cv::Mat> images_;
   std::map<stream_index_pair, std::string> encoding_;
@@ -241,6 +270,7 @@ class OBLidarNode {
   std::shared_ptr<tf2_ros::TransformBroadcaster> dynamic_tf_broadcaster_ = nullptr;
   std::vector<geometry_msgs::msg::TransformStamped> tf_msgs;
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr depth_registration_cloud_pub_;
+  rclcpp::Publisher<sensor_msgs::msg::LaserScan>::SharedPtr scan_pub_;
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr cloud_pub_;
   bool enable_point_cloud_ = true;
   bool enable_colored_point_cloud_ = false;
@@ -467,6 +497,19 @@ class OBLidarNode {
   int offset_index1_ = -1;
 
   std::string frame_aggregate_mode_ = "ANY";  // # full_frame, color_frame, ANY or disable
-  std::string echo_mode_ = "single channel";  
+
+  // lidar
+  std::string lidar_format_ = "ANY";
+  int lidar_rate_ = 0;
+  std::string echo_mode_ = "single channel";
+  std::map<stream_index_pair, int> rate_int_;
+  std::map<stream_index_pair, OBLiDARScanRate> rate_;
+  std::string frame_id_ = "scan";
+  float min_angle_ = -135.0;
+  float max_angle_ = 135.0;
+  float min_range_ = 0.05;
+  float max_range_ = 30.0;
 };
+
+}  // namespace orbbec_lidar
 }  // namespace orbbec_camera

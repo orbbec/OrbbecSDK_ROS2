@@ -358,6 +358,25 @@ OBFormat OBFormatFromString(const std::string &format) {
   }
 }
 
+OBLiDARScanRate OBScanRateFromInt(const int rate) {
+  std::cout << "OBScanRateFromInt: " << rate << std::endl;
+  if (rate == 5) {
+    return OB_LIDAR_SCAN_5HZ;
+  } else if (rate == 10) {
+    return OB_LIDAR_SCAN_10HZ;
+  } else if (rate == 15) {
+    return OB_LIDAR_SCAN_15HZ;
+  } else if (rate == 20) {
+    return OB_LIDAR_SCAN_20HZ;
+  } else if (rate == 25) {
+    return OB_LIDAR_SCAN_25HZ;
+  } else if (rate == 30) {
+    return OB_LIDAR_SCAN_30HZ;
+  } else {
+    return OB_LIDAR_SCAN_UNKNOWN;
+  }
+}
+
 std::string OBFormatToString(const OBFormat &format) {
   switch (format) {
     case OB_FORMAT_MJPG:
@@ -941,5 +960,15 @@ std::string getDistortionModels(OBCameraDistortion distortion) {
     default:
       return sensor_msgs::distortion_models::PLUMB_BOB;
   }
+}
+
+double deg2rad(double deg) { return deg * M_PI / 180.0; }
+
+double rad2deg(double rad) {
+  double angle_degrees = rad * (180.0 / M_PI);
+  if (angle_degrees < 0) {
+    angle_degrees += 360.0;
+  }
+  return angle_degrees;
 }
 }  // namespace orbbec_camera

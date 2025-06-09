@@ -279,6 +279,7 @@ void OBCameraNodeDriver::resetDevice() {
     std::lock_guard<decltype(device_lock_)> device_lock(device_lock_);
     {
       ob_camera_node_.reset();
+      ob_lidar_node_.reset();
       device_.reset();
       device_info_.reset();
       device_connected_ = false;
@@ -450,8 +451,8 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
         ob_camera_node_ = std::make_unique<OBCameraNode>(this, device_, parameters_,
                                                          node_options_.use_intra_process_comms());
       } else if (device_type_ == "lidar") {
-        ob_lidar_node_ = std::make_unique<OBLidarNode>(this, device_, parameters_,
-                                                       node_options_.use_intra_process_comms());
+        ob_lidar_node_ = std::make_unique<orbbec_lidar::OBLidarNode>(
+            this, device_, parameters_, node_options_.use_intra_process_comms());
       }
 
       initialized = true;
@@ -512,12 +513,15 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
                   std::placeholders::_2, std::placeholders::_3),
         false);
   }
-  //   if (ob_camera_node_) {
-  //     ob_camera_node_->startIMU();
-  //     ob_camera_node_->startStreams();
-  //   } else {
-  //     RCLCPP_INFO_STREAM(logger_, "ob_camera_node_ is nullptr");
-  //   }
+  if (ob_camera_node_) {
+    ob_camera_node_->startIMU();
+    ob_camera_node_->startStreams();
+  } else if (ob_lidar_node_) {
+    //   ob_lidar_node_->startIMU();
+    ob_lidar_node_->startStreams();
+  } else {
+    RCLCPP_INFO_STREAM(logger_, "ob_camera_node_ is nullptr");
+  }
 
 }  // namespace orbbec_camera
 

@@ -84,7 +84,7 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::unique_ptr<ob::Context> ctx_ = nullptr;
   rclcpp::Logger logger_;
   std::unique_ptr<OBCameraNode> ob_camera_node_ = nullptr;
-  std::unique_ptr<OBLidarNode> ob_lidar_node_ = nullptr;
+  std::unique_ptr<orbbec_lidar::OBLidarNode> ob_lidar_node_ = nullptr;
   std::shared_ptr<ob::Device> device_ = nullptr;
   std::shared_ptr<ob::DeviceInfo> device_info_ = nullptr;
   std::atomic_bool is_alive_{false};

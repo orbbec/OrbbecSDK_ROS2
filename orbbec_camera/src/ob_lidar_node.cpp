@@ -144,17 +144,22 @@ void OBLidarNode::getParameters() {
     param_name = stream_name_[stream_index] + "_rate";
     setAndGetNodeParameter(rate_int_[stream_index], param_name, 0);
     rate_[stream_index] = OBScanRateFromInt(rate_int_[stream_index]);
-    RCLCPP_INFO_STREAM(logger_, "rate_ " << magic_enum::enum_name(rate_[LIDAR]) << "format_"
+    RCLCPP_INFO_STREAM(logger_, "rate_ " << magic_enum::enum_name(rate_[LIDAR]) << "  format_"
                                          << magic_enum::enum_name(format_[LIDAR]));
+    param_name = stream_name_[stream_index] + "_frame_id";
+    std::string default_frame_id = camera_name_ + "_" + stream_name_[stream_index] + "_frame";
+    setAndGetNodeParameter(frame_id_[stream_index], param_name, default_frame_id);
+    std::string default_optical_frame_id =
+        camera_name_ + "_" + stream_name_[stream_index] + "_optical_frame";
+    param_name = stream_name_[stream_index] + "_optical_frame_id";
+    setAndGetNodeParameter(optical_frame_id_[stream_index], param_name, default_optical_frame_id);
   }
-
   setAndGetNodeParameter<bool>(publish_tf_, "publish_tf", true);
   setAndGetNodeParameter<double>(tf_publish_rate_, "tf_publish_rate", 0.0);
   setAndGetNodeParameter<std::string>(time_domain_, "time_domain", "global");
   setAndGetNodeParameter<bool>(enable_heartbeat_, "enable_heartbeat", false);
   setAndGetNodeParameter<std::string>(echo_mode_, "echo_mode", "single channel");
   setAndGetNodeParameter<std::string>(point_cloud_qos_, "point_cloud_qos", "default");
-  setAndGetNodeParameter<std::string>(frame_id_, "frame_id", "scan");
   setAndGetNodeParameter<float>(min_angle_, "min_angle", -135.0);
   setAndGetNodeParameter<float>(max_angle_, "max_angle", 135.0);
   setAndGetNodeParameter<float>(min_range_, "min_range", 0.05);
@@ -300,7 +305,7 @@ void OBLidarNode::setupPublishers() {
                                    point_cloud_qos_profile));
   } else if (format_[LIDAR] == OB_FORMAT_LIDAR_POINT ||
              format_[LIDAR] == OB_FORMAT_LIDAR_SPHERE_POINT) {
-    cloud_pub_ = node_->create_publisher<sensor_msgs::msg::PointCloud2>(
+    point_cloud_pub_ = node_->create_publisher<sensor_msgs::msg::PointCloud2>(
         "cloud/points", rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(point_cloud_qos_profile),
                                     point_cloud_qos_profile));
   }
@@ -382,11 +387,16 @@ void OBLidarNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set)
   }
   try {
     RCLCPP_INFO_ONCE(logger_, "New frame received");
+    if (!tf_published_) {
+      publishStaticTransforms();
+      tf_published_ = true;
+    }
     if (format_[LIDAR] == OB_FORMAT_LIDAR_SCAN) {
       publishScan(frame_set);
-    } else if (format_[LIDAR] == OB_FORMAT_LIDAR_POINT ||
-               format_[LIDAR] == OB_FORMAT_LIDAR_SPHERE_POINT) {
+    } else if (format_[LIDAR] == OB_FORMAT_LIDAR_POINT) {
       publishPointCloud(frame_set);
+    } else if (format_[LIDAR] == OB_FORMAT_LIDAR_SPHERE_POINT) {
+      publishSpherePointCloud(frame_set);
     }
   } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: " << e.getMessage());
@@ -406,19 +416,11 @@ void OBLidarNode::publishScan(std::shared_ptr<ob::FrameSet> frame_set) {
   auto lidar_frame = frame_set->getFrame(OB_FRAME_LIDAR_POINTS);
   auto *scans_data = reinterpret_cast<OBLiDARScanPoint *>(lidar_frame->getData());
   auto scan_count = lidar_frame->getDataSize() / sizeof(OBLiDARScanPoint);
-  // bool valid_point = points[i].z >= min_depth && points[i].z <= max_depth;
-  // if (valid_point || ordered_pc_) {
-  //   *iter_x = static_cast<float>(points[i].x / 1000.0);
-  //   *iter_y = static_cast<float>(points[i].y / 1000.0);
-  //   *iter_z = static_cast<float>(points[i].z / 1000.0);
-  //   ++iter_x, ++iter_y, ++iter_z;
-  //   valid_count++;
-  // }
   auto frame_timestamp = getFrameTimestampUs(lidar_frame);
   auto timestamp = fromUsToROSTime(frame_timestamp);
   auto scan_msg = std::make_unique<sensor_msgs::msg::LaserScan>();
   scan_msg->header.stamp = timestamp;
-  scan_msg->header.frame_id = frame_id_;
+  scan_msg->header.frame_id = frame_id_[LIDAR];
   scan_msg->angle_min = 0.7853981852531433;
   scan_msg->angle_max = 5.495169162750244;
   scan_msg->angle_increment = 0.0026179938577115536;
@@ -429,9 +431,6 @@ void OBLidarNode::publishScan(std::shared_ptr<ob::FrameSet> frame_set) {
   scan_msg->ranges.resize(scan_count);
   scan_msg->intensities.resize(scan_count);
   for (size_t i = 0; i < scan_count; i++) {
-    // RCLCPP_INFO_STREAM(logger_, " angle: " << scans_data[i].angle
-    //                                        << " distance: " << scans_data[i].distance
-    //                                        << " intensity: " << scans_data[i].intensity);
     if (scans_data->distance < min_range_ && scans_data->distance > max_range_) {
       scans_data++;
       continue;
@@ -441,19 +440,53 @@ void OBLidarNode::publishScan(std::shared_ptr<ob::FrameSet> frame_set) {
   }
   filterScan(*scan_msg);
   scan_pub_->publish(std::move(scan_msg));
-  //   RCLCPP_INFO_STREAM(logger_, "getFormat "<<magic_enum::enum_name(lidar_frame->getFormat()));
-  // RCLCPP_INFO_STREAM(logger_, "getDataSize "<<lidar_frame->getDataSize());
-  // RCLCPP_INFO_STREAM(logger_, "getType "<<lidar_frame->getType());
-  // RCLCPP_INFO_STREAM(logger_, "getSystemTimeStampUs "<<lidar_frame->getSystemTimeStampUs());
-  // RCLCPP_INFO_STREAM(logger_, "getGlobalTimeStampUs "<<lidar_frame->getGlobalTimeStampUs());
-  // RCLCPP_INFO_STREAM(logger_, "getTimeStampUs "<<lidar_frame->getTimeStampUs());
-  // RCLCPP_INFO_STREAM(logger_, "getIndex "<<lidar_frame->getIndex());
-  // RCLCPP_INFO_STREAM(logger_, "getMetadataSize "<<lidar_frame->getMetadataSize());
 }
 
 void OBLidarNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
   (void)frame_set;
-  //   RCLCPP_INFO_STREAM(logger_, "publishPointCloud ");
+  if (frame_set == nullptr) {
+    return;
+  }
+  auto lidar_frame = frame_set->getFrame(OB_FRAME_LIDAR_POINTS);
+  auto *point_data = reinterpret_cast<OBLiDARPoint *>(lidar_frame->getData());
+  auto point_count = lidar_frame->getDataSize() / sizeof(OBLiDARScanPoint);
+  auto frame_timestamp = getFrameTimestampUs(lidar_frame);
+  auto timestamp = fromUsToROSTime(frame_timestamp);
+  auto point_cloud_msg = std::make_unique<sensor_msgs::msg::PointCloud2>();
+  sensor_msgs::PointCloud2Modifier modifier(*point_cloud_msg);
+  modifier.setPointCloud2Fields(5, "x", 1, sensor_msgs::msg::PointField::FLOAT32, "y", 1,
+                                sensor_msgs::msg::PointField::FLOAT32, "z", 1,
+                                sensor_msgs::msg::PointField::FLOAT32, "reflectivity", 1,
+                                sensor_msgs::msg::PointField::UINT8, "tag", 1,
+                                sensor_msgs::msg::PointField::UINT8);
+  modifier.resize(point_count);
+  point_cloud_msg->header.stamp = timestamp;
+  point_cloud_msg->header.frame_id = frame_id_[LIDAR];
+  point_cloud_msg->height = 1;
+  point_cloud_msg->width = point_count;
+  point_cloud_msg->is_dense = true;
+  point_cloud_msg->is_bigendian = false;
+  point_cloud_msg->row_step = point_cloud_msg->width * point_cloud_msg->point_step;
+  point_cloud_msg->data.resize(point_cloud_msg->height * point_cloud_msg->row_step);
+  sensor_msgs::PointCloud2Iterator<float> iter_x(*point_cloud_msg, "x");
+  sensor_msgs::PointCloud2Iterator<float> iter_y(*point_cloud_msg, "y");
+  sensor_msgs::PointCloud2Iterator<float> iter_z(*point_cloud_msg, "z");
+  sensor_msgs::PointCloud2Iterator<uint8_t> iter_reflectivity(*point_cloud_msg, "reflectivity");
+  sensor_msgs::PointCloud2Iterator<uint8_t> iter_tag(*point_cloud_msg, "tag");
+  for (size_t i = 0; i < point_count;
+       ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_reflectivity, ++iter_tag) {
+    *iter_x = static_cast<float>(point_data[i].x / 1000.0);
+    *iter_y = static_cast<float>(point_data[i].y / 1000.0);
+    *iter_z = static_cast<float>(point_data[i].z / 1000.0);
+    *iter_reflectivity = point_data[i].reflectivity;
+    *iter_tag = point_data[i].tag;
+  }
+  *point_cloud_msg = filterPointCloud(*point_cloud_msg);
+  point_cloud_pub_->publish(std::move(point_cloud_msg));
+}
+
+void OBLidarNode::publishSpherePointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
+  (void)frame_set;
 }
 
 uint64_t OBLidarNode::getFrameTimestampUs(const std::shared_ptr<ob::Frame> &frame) {
@@ -498,5 +531,168 @@ void OBLidarNode::filterScan(sensor_msgs::msg::LaserScan &scan) {
     }
   }
 }
+sensor_msgs::msg::PointCloud2 OBLidarNode::filterPointCloud(
+    sensor_msgs::msg::PointCloud2 &point_cloud) const {
+  // Initialize the filtered point cloud
+  sensor_msgs::msg::PointCloud2 filtered_point_cloud;
+  filtered_point_cloud.header = point_cloud.header;
+  filtered_point_cloud.height = point_cloud.height;
+  filtered_point_cloud.width = point_cloud.width;
+  filtered_point_cloud.is_dense = point_cloud.is_dense;
+  filtered_point_cloud.is_bigendian = point_cloud.is_bigendian;
+  filtered_point_cloud.fields = point_cloud.fields;
+  filtered_point_cloud.point_step = point_cloud.point_step;
+
+  // Convert filter angles from degrees to radians and normalize to [0, 2π]
+  double max_angle = deg2rad(max_angle_);
+  double min_angle = deg2rad(min_angle_);
+  max_angle = std::fmod(max_angle + M_PI, 2 * M_PI);
+  min_angle = std::fmod(min_angle + M_PI, 2 * M_PI);
+  if (min_angle < 0) {
+    min_angle += 2 * M_PI;
+  }
+  if (max_angle < 0) {
+    max_angle += 2 * M_PI;
+  }
+
+  // Swap angles if min is greater than max
+  if (min_angle > max_angle) {
+    std::swap(min_angle, max_angle);
+  }
+
+  // Reserve space for filtered point cloud data
+  filtered_point_cloud.data.reserve(point_cloud.data.size());
+
+  // Create iterators for each field
+  sensor_msgs::PointCloud2Iterator<float> iter_x(point_cloud, "x");
+  sensor_msgs::PointCloud2Iterator<float> iter_y(point_cloud, "y");
+  sensor_msgs::PointCloud2Iterator<float> iter_z(point_cloud, "z");
+  sensor_msgs::PointCloud2Iterator<uint8_t> iter_intensity(point_cloud, "intensity");
+
+  // Process each point
+  for (size_t i = 0; i < point_cloud.height * point_cloud.width;
+       ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_intensity) {
+    float x = *iter_x;
+    float y = *iter_y;
+    float z = *iter_z;
+
+    // Calculate distance from origin
+    float distance = std::sqrt(x * x + y * y + z * z);
+
+    // Calculate angle and normalize to [0, 2π]
+    float angle = std::atan2(y, x);
+    angle = std::fmod(angle + 2 * M_PI, 2 * M_PI);
+
+    // Check if point is within both angle and range limits
+    bool is_angle_in_range = (angle >= min_angle && angle <= max_angle);
+    bool is_range_in_range = (distance >= min_range_ && distance <= max_range_);
+
+    if (is_angle_in_range && is_range_in_range) {
+      // Keep points within the specified range
+      filtered_point_cloud.data.insert(filtered_point_cloud.data.end(),
+                                       point_cloud.data.begin() + i * point_cloud.point_step,
+                                       point_cloud.data.begin() + (i + 1) * point_cloud.point_step);
+    } else {
+      // Fill zero values for filtered out points
+      filtered_point_cloud.data.insert(filtered_point_cloud.data.end(), point_cloud.point_step, 0);
+    }
+  }
+
+  // Update row step and resize data
+  filtered_point_cloud.row_step = filtered_point_cloud.width * filtered_point_cloud.point_step;
+  filtered_point_cloud.data.resize(filtered_point_cloud.height * filtered_point_cloud.row_step);
+
+  return filtered_point_cloud;
+}
+
+
+void OBLidarNode::publishStaticTransforms() {
+  if (!publish_tf_) {
+    return;
+  }
+  static_tf_broadcaster_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(node_);
+  dynamic_tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(node_);
+  calcAndPublishStaticTransform();
+  if (tf_publish_rate_ > 0) {
+    tf_thread_ = std::make_shared<std::thread>([this]() { publishDynamicTransforms(); });
+  } else {
+    static_tf_broadcaster_->sendTransform(static_tf_msgs_);
+  }
+}
+
+void OBLidarNode::calcAndPublishStaticTransform() {
+  tf2::Quaternion quaternion_optical, zero_rot;
+  zero_rot.setRPY(0.0, 0.0, 0.0);
+  quaternion_optical.setRPY(-M_PI / 2, 0.0, -M_PI / 2);
+  tf2::Vector3 zero_trans(0, 0, 0);
+  auto base_stream_profile = stream_profile_[base_stream_];
+  if (!base_stream_profile) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to get base stream profile");
+    return;
+  }
+  CHECK_NOTNULL(base_stream_profile.get());
+  for (const auto &item : stream_profile_) {
+    auto stream_index = item.first;
+
+    auto stream_profile = item.second;
+    if (!stream_profile) {
+      continue;
+    }
+    OBExtrinsic ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
+
+    auto Q = rotationMatrixToQuaternion(ex.rot);
+    Q = quaternion_optical * Q * quaternion_optical.inverse();
+    tf2::Vector3 trans(ex.trans[0], ex.trans[1], ex.trans[2]);
+    auto timestamp = node_->now();
+    if (stream_index.first != base_stream_.first) {
+      if (stream_index.first == OB_STREAM_IR_RIGHT && base_stream_.first == OB_STREAM_DEPTH) {
+        trans[0] = std::abs(trans[0]);  // because left and right ir calibration is error
+      }
+      publishStaticTF(timestamp, trans, Q, frame_id_[base_stream_], frame_id_[stream_index]);
+    }
+    publishStaticTF(timestamp, zero_trans, quaternion_optical, frame_id_[stream_index],
+                    optical_frame_id_[stream_index]);
+    RCLCPP_INFO_STREAM(logger_, "Publishing static transform from " << stream_name_[stream_index]
+                                                                    << " to "
+                                                                    << stream_name_[base_stream_]);
+    RCLCPP_INFO_STREAM(logger_, "Translation " << trans[0] << ", " << trans[1] << ", " << trans[2]);
+    RCLCPP_INFO_STREAM(logger_, "Rotation " << Q.getX() << ", " << Q.getY() << ", " << Q.getZ()
+                                            << ", " << Q.getW());
+  }
+}
+void OBLidarNode::publishStaticTF(const rclcpp::Time &t, const tf2::Vector3 &trans,
+                                  const tf2::Quaternion &q, const std::string &from,
+                                  const std::string &to) {
+  geometry_msgs::msg::TransformStamped msg;
+  msg.header.stamp = t;
+  msg.header.frame_id = from;
+  msg.child_frame_id = to;
+  msg.transform.translation.x = trans[2] / 1000.0;
+  msg.transform.translation.y = -trans[0] / 1000.0;
+  msg.transform.translation.z = -trans[1] / 1000.0;
+  msg.transform.rotation.x = q.getX();
+  msg.transform.rotation.y = q.getY();
+  msg.transform.rotation.z = q.getZ();
+  msg.transform.rotation.w = q.getW();
+  static_tf_msgs_.push_back(msg);
+}
+
+void OBLidarNode::publishDynamicTransforms() {
+  RCLCPP_WARN(logger_, "Publishing dynamic camera transforms (/tf) at %g Hz", tf_publish_rate_);
+  std::mutex mu;
+  std::unique_lock<std::mutex> lock(mu);
+  while (rclcpp::ok() && is_running_) {
+    tf_cv_.wait_for(lock, std::chrono::milliseconds((int)(1000.0 / tf_publish_rate_)),
+                    [this] { return (!(is_running_)); });
+    {
+      rclcpp::Time t = node_->now();
+      for (auto &msg : static_tf_msgs_) {
+        msg.header.stamp = t;
+      }
+      dynamic_tf_broadcaster_->sendTransform(static_tf_msgs_);
+    }
+  }
+}
+
 }  // namespace orbbec_lidar
 }  // namespace orbbec_camera

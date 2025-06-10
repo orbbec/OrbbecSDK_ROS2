@@ -971,4 +971,5 @@ double rad2deg(double rad) {
   }
   return angle_degrees;
 }
+
 }  // namespace orbbec_camera

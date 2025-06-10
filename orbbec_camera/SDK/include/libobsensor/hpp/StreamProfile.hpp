@@ -88,7 +88,7 @@ public:
 
     /**
      * @brief Set the extrinsic parameters from current stream profile to the given target stream profile.
-     *
+     * 
      * @tparam target Target stream profile.
      * @tparam extrinsic The extrinsic.
      */
@@ -100,7 +100,7 @@ public:
 
     /**
      * @brief Set the extrinsic parameters from current stream profile to the given target stream type.
-     *
+     * 
      * @tparam targetStreamType Target stream type.
      * @tparam extrinsic The extrinsic.
      */

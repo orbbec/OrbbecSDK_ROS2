@@ -997,7 +997,7 @@ typedef enum {
     /**
      * @brief LiDAR: get/set specific mode
      */
-    OB_PROP_LIDAR_SPECIFIC_MODE = 8033,
+    OB_PROP_LIDAR_SPECIFIC_MODE_INT = 8033,
 } OBPropertyID,
     ob_property_id;
 

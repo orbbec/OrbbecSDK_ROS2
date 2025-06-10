@@ -12,8 +12,8 @@ set_target_properties(ob::OrbbecSDK PROPERTIES
   IMPORTED_SONAME_RELEASE "libOrbbecSDK.so.2"
   )
 
-list(APPEND _IMPORT_CHECK_TARGETS ob::OrbbecSDK )
-list(APPEND _IMPORT_CHECK_FILES_FOR_ob::OrbbecSDK "${_IMPORT_PREFIX}/lib/libOrbbecSDK.so.2.4.3" )
+list(APPEND _cmake_import_check_targets ob::OrbbecSDK )
+list(APPEND _cmake_import_check_files_for_ob::OrbbecSDK "${_IMPORT_PREFIX}/lib/libOrbbecSDK.so.2.4.3" )
 
 # Commands beyond this point should not need to know the version.
 set(CMAKE_IMPORT_FILE_VERSION)

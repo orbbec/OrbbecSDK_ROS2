@@ -60,7 +60,7 @@ def generate_launch_description():
         DeclareLaunchArgument('frame_id', default_value='scan'),
         DeclareLaunchArgument('tf_publish_rate', default_value='0.0'),
         DeclareLaunchArgument('lidar_format', default_value='ANY'),
-        DeclareLaunchArgument('lidar_rate', default_value='30'),
+        DeclareLaunchArgument('lidar_rate', default_value='15'),
         DeclareLaunchArgument('min_angle', default_value='-135.0'),
         DeclareLaunchArgument('max_angle', default_value='135.0'),
         DeclareLaunchArgument('min_range', default_value='0.05'),

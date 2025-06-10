@@ -166,6 +166,9 @@ class OBLidarNode {
 
   void onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set);
 
+  std::vector<OBLiDARPoint> spherePointToPoint(OBLiDARSpherePoint* sphere_point,
+                                               uint32_t point_count);
+
   void publishScan(std::shared_ptr<ob::FrameSet> frame_set);
 
   void publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set);
@@ -191,7 +194,6 @@ class OBLidarNode {
   rclcpp::Node* node_ = nullptr;
   std::shared_ptr<ob::Device> device_ = nullptr;
   std::shared_ptr<Parameters> parameters_ = nullptr;
-  std::condition_variable color_frame_queue_cv_;
   rclcpp::Logger logger_;
   std::atomic_bool is_running_{false};
   std::unique_ptr<ob::Pipeline> pipeline_ = nullptr;
@@ -212,12 +214,6 @@ class OBLidarNode {
 
   std::atomic_bool is_camera_node_initialized_{false};
   std::mutex device_lock_;
-  std::shared_ptr<std::thread> colorFrameThread_ = nullptr;
-  uint8_t* rgb_buffer_ = nullptr;
-  uint8_t* rgb_point_cloud_buffer_ = nullptr;
-  float* xy_table_data_ = nullptr;
-  float* depth_xy_table_data_ = nullptr;
-  uint8_t* depth_point_cloud_buffer_ = nullptr;
   bool publish_tf_ = false;
   bool tf_published_ = false;
   std::shared_ptr<tf2_ros::StaticTransformBroadcaster> static_tf_broadcaster_ = nullptr;

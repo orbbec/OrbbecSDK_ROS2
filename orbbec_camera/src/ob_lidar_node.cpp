@@ -90,29 +90,8 @@ void OBLidarNode::clean() noexcept {
     tf_thread_->join();
   }
   RCLCPP_WARN_STREAM(logger_, "Stop color frame thread");
-  if (colorFrameThread_ && colorFrameThread_->joinable()) {
-    color_frame_queue_cv_.notify_all();
-    colorFrameThread_->join();
-  }
-
   RCLCPP_WARN_STREAM(logger_, "stop streams");
   stopStreams();
-  //   stopIMU();
-  delete[] rgb_buffer_;
-  rgb_buffer_ = nullptr;
-
-  delete[] rgb_point_cloud_buffer_;
-  rgb_point_cloud_buffer_ = nullptr;
-
-  delete[] xy_table_data_;
-  xy_table_data_ = nullptr;
-
-  delete[] depth_xy_table_data_;
-  depth_xy_table_data_ = nullptr;
-
-  delete[] depth_point_cloud_buffer_;
-  depth_point_cloud_buffer_ = nullptr;
-
   RCLCPP_WARN_STREAM(logger_, "Destroy ~OBLidarNode DONE");
 }
 
@@ -144,8 +123,9 @@ void OBLidarNode::getParameters() {
     param_name = stream_name_[stream_index] + "_rate";
     setAndGetNodeParameter(rate_int_[stream_index], param_name, 0);
     rate_[stream_index] = OBScanRateFromInt(rate_int_[stream_index]);
-    RCLCPP_INFO_STREAM(logger_, "rate_ " << magic_enum::enum_name(rate_[LIDAR]) << "  format_"
-                                         << magic_enum::enum_name(format_[LIDAR]));
+    RCLCPP_INFO_STREAM(
+        logger_, "Input rate: " << magic_enum::enum_name(rate_[LIDAR])
+                                << "  Input format:" << magic_enum::enum_name(format_[LIDAR]));
     param_name = stream_name_[stream_index] + "_frame_id";
     std::string default_frame_id = camera_name_ + "_" + stream_name_[stream_index] + "_frame";
     setAndGetNodeParameter(frame_id_[stream_index], param_name, default_frame_id);
@@ -297,8 +277,6 @@ void OBLidarNode::setupPublishers() {
   if (use_intra_process_) {
     point_cloud_qos_profile = rmw_qos_profile_default;
   }
-  RCLCPP_INFO_STREAM(logger_, "rate_ " << magic_enum::enum_name(rate_[LIDAR]) << "format_"
-                                       << magic_enum::enum_name(format_[LIDAR]));
   if (format_[LIDAR] == OB_FORMAT_LIDAR_SCAN) {
     scan_pub_ = node_->create_publisher<sensor_msgs::msg::LaserScan>(
         "scan/points", rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(point_cloud_qos_profile),
@@ -449,7 +427,7 @@ void OBLidarNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
   }
   auto lidar_frame = frame_set->getFrame(OB_FRAME_LIDAR_POINTS);
   auto *point_data = reinterpret_cast<OBLiDARPoint *>(lidar_frame->getData());
-  auto point_count = lidar_frame->getDataSize() / sizeof(OBLiDARScanPoint);
+  auto point_count = lidar_frame->getDataSize() / sizeof(OBLiDARPoint);
   auto frame_timestamp = getFrameTimestampUs(lidar_frame);
   auto timestamp = fromUsToROSTime(frame_timestamp);
   auto point_cloud_msg = std::make_unique<sensor_msgs::msg::PointCloud2>();
@@ -487,6 +465,46 @@ void OBLidarNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
 
 void OBLidarNode::publishSpherePointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
   (void)frame_set;
+  if (frame_set == nullptr) {
+    return;
+  }
+  auto lidar_frame = frame_set->getFrame(OB_FRAME_LIDAR_POINTS);
+  auto *point_data = reinterpret_cast<OBLiDARSpherePoint *>(lidar_frame->getData());
+  auto point_count = lidar_frame->getDataSize() / sizeof(OBLiDARSpherePoint);
+  auto result_point = spherePointToPoint(point_data, point_count);
+  auto frame_timestamp = getFrameTimestampUs(lidar_frame);
+  auto timestamp = fromUsToROSTime(frame_timestamp);
+  auto point_cloud_msg = std::make_unique<sensor_msgs::msg::PointCloud2>();
+  sensor_msgs::PointCloud2Modifier modifier(*point_cloud_msg);
+  modifier.setPointCloud2Fields(5, "x", 1, sensor_msgs::msg::PointField::FLOAT32, "y", 1,
+                                sensor_msgs::msg::PointField::FLOAT32, "z", 1,
+                                sensor_msgs::msg::PointField::FLOAT32, "reflectivity", 1,
+                                sensor_msgs::msg::PointField::UINT8, "tag", 1,
+                                sensor_msgs::msg::PointField::UINT8);
+  modifier.resize(point_count);
+  point_cloud_msg->header.stamp = timestamp;
+  point_cloud_msg->header.frame_id = frame_id_[LIDAR];
+  point_cloud_msg->height = 1;
+  point_cloud_msg->width = point_count;
+  point_cloud_msg->is_dense = true;
+  point_cloud_msg->is_bigendian = false;
+  point_cloud_msg->row_step = point_cloud_msg->width * point_cloud_msg->point_step;
+  point_cloud_msg->data.resize(point_cloud_msg->height * point_cloud_msg->row_step);
+  sensor_msgs::PointCloud2Iterator<float> iter_x(*point_cloud_msg, "x");
+  sensor_msgs::PointCloud2Iterator<float> iter_y(*point_cloud_msg, "y");
+  sensor_msgs::PointCloud2Iterator<float> iter_z(*point_cloud_msg, "z");
+  sensor_msgs::PointCloud2Iterator<uint8_t> iter_reflectivity(*point_cloud_msg, "reflectivity");
+  sensor_msgs::PointCloud2Iterator<uint8_t> iter_tag(*point_cloud_msg, "tag");
+  for (size_t i = 0; i < point_count;
+       ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_reflectivity, ++iter_tag) {
+    *iter_x = static_cast<float>(result_point[i].x / 1000.0);
+    *iter_y = static_cast<float>(result_point[i].y / 1000.0);
+    *iter_z = static_cast<float>(result_point[i].z / 1000.0);
+    *iter_reflectivity = result_point[i].reflectivity;
+    *iter_tag = result_point[i].tag;
+  }
+  *point_cloud_msg = filterPointCloud(*point_cloud_msg);
+  point_cloud_pub_->publish(std::move(point_cloud_msg));
 }
 
 uint64_t OBLidarNode::getFrameTimestampUs(const std::shared_ptr<ob::Frame> &frame) {
@@ -501,6 +519,32 @@ uint64_t OBLidarNode::getFrameTimestampUs(const std::shared_ptr<ob::Frame> &fram
   } else {
     return frame->getSystemTimeStampUs();
   }
+}
+
+std::vector<OBLiDARPoint> OBLidarNode::spherePointToPoint(OBLiDARSpherePoint *sphere_point,
+                                                          uint32_t point_count) {
+  std::vector<OBLiDARPoint> point_cloud;
+  point_cloud.resize(point_count);
+  OBLiDARPoint *point_data = point_cloud.data();
+  for (uint32_t i = 0; i < point_count; ++i) {
+    double theta_rad = sphere_point->theta * M_PI / 180.0f;  // to unit rad
+    double phi_rad = sphere_point->phi * M_PI / 180.0f;      // to unit rad
+    auto distance = sphere_point->distance / 1000;           // mm to m
+    auto x = static_cast<float>(distance * cos(theta_rad) * cos(phi_rad));
+    auto y = static_cast<float>(distance * sin(theta_rad) * cos(phi_rad));
+    auto z = static_cast<float>(distance * sin(phi_rad));
+    if (std::isfinite(x) && std::isfinite(y) && std::isfinite(y)) {
+      // point: convert to opengl point
+      point_data->x = x;
+      point_data->y = y;
+      point_data->z = z;
+      point_data->reflectivity = sphere_point->reflectivity;
+      point_data->tag = sphere_point->tag;
+      ++point_data;
+    }
+    ++sphere_point;
+  }
+  return point_cloud;
 }
 
 void OBLidarNode::filterScan(sensor_msgs::msg::LaserScan &scan) {
@@ -567,11 +611,12 @@ sensor_msgs::msg::PointCloud2 OBLidarNode::filterPointCloud(
   sensor_msgs::PointCloud2Iterator<float> iter_x(point_cloud, "x");
   sensor_msgs::PointCloud2Iterator<float> iter_y(point_cloud, "y");
   sensor_msgs::PointCloud2Iterator<float> iter_z(point_cloud, "z");
-  sensor_msgs::PointCloud2Iterator<uint8_t> iter_intensity(point_cloud, "intensity");
+  sensor_msgs::PointCloud2Iterator<uint8_t> iter_reflectivity(point_cloud, "reflectivity");
+  sensor_msgs::PointCloud2Iterator<uint8_t> iter_tag(point_cloud, "tag");
 
   // Process each point
   for (size_t i = 0; i < point_cloud.height * point_cloud.width;
-       ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_intensity) {
+       ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_reflectivity, ++iter_tag) {
     float x = *iter_x;
     float y = *iter_y;
     float z = *iter_z;
@@ -604,7 +649,6 @@ sensor_msgs::msg::PointCloud2 OBLidarNode::filterPointCloud(
 
   return filtered_point_cloud;
 }
-
 
 void OBLidarNode::publishStaticTransforms() {
   if (!publish_tf_) {

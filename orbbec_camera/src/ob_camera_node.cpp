@@ -2794,6 +2794,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   intrinsic = video_stream_profile->getIntrinsic();
   distortion = video_stream_profile->getDistortion();
   if (pid == DABAI_MAX_PID) {
+    auto camera_params = pipeline_->getCameraParam();
     // use color param
     intrinsic = camera_params.rgbIntrinsic;
     distortion = camera_params.rgbDistortion;

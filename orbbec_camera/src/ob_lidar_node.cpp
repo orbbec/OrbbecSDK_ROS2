@@ -138,7 +138,7 @@ void OBLidarNode::getParameters() {
   setAndGetNodeParameter<double>(tf_publish_rate_, "tf_publish_rate", 0.0);
   setAndGetNodeParameter<std::string>(time_domain_, "time_domain", "global");
   setAndGetNodeParameter<bool>(enable_heartbeat_, "enable_heartbeat", false);
-  setAndGetNodeParameter<std::string>(echo_mode_, "echo_mode", "single channel");
+  setAndGetNodeParameter<std::string>(echo_mode_, "echo_mode", "");
   setAndGetNodeParameter<std::string>(point_cloud_qos_, "point_cloud_qos", "default");
   setAndGetNodeParameter<float>(min_angle_, "min_angle", -135.0);
   setAndGetNodeParameter<float>(max_angle_, "max_angle", 135.0);
@@ -164,10 +164,11 @@ void OBLidarNode::setupDevices() {
     RCLCPP_INFO_STREAM(logger_, "Setting heartbeat to " << (enable_heartbeat_ ? "ON" : "OFF"));
     TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_HEARTBEAT_BOOL, enable_heartbeat_);
   }
-  if (device_->isPropertySupported(OB_PROP_LIDAR_ECHO_MODE_INT, OB_PERMISSION_READ_WRITE)) {
-    if (echo_mode_ == "single channel") {
+  if (!echo_mode_.empty() &&
+      device_->isPropertySupported(OB_PROP_LIDAR_ECHO_MODE_INT, OB_PERMISSION_READ_WRITE)) {
+    if (echo_mode_ == "Last Echo") {
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LIDAR_ECHO_MODE_INT, 0);
-    } else if (echo_mode_ == "dual channel") {
+    } else if (echo_mode_ == "First Echo") {
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LIDAR_ECHO_MODE_INT, 1);
     }
     RCLCPP_INFO_STREAM(

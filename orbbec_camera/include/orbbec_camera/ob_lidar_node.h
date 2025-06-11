@@ -236,7 +236,7 @@ class OBLidarNode {
   // lidar
   std::string lidar_format_ = "ANY";
   int lidar_rate_ = 0;
-  std::string echo_mode_ = "single channel";
+  std::string echo_mode_ = "";
   std::map<stream_index_pair, int> rate_int_;
   std::map<stream_index_pair, OBLiDARScanRate> rate_;
   std::map<stream_index_pair, std::string> frame_id_;

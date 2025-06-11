@@ -59,8 +59,8 @@ def generate_launch_description():
         DeclareLaunchArgument('publish_tf', default_value='true'),
         DeclareLaunchArgument('frame_id', default_value='scan'),
         DeclareLaunchArgument('tf_publish_rate', default_value='0.0'),
-        DeclareLaunchArgument('lidar_format', default_value='ANY'),
-        DeclareLaunchArgument('lidar_rate', default_value='15'),
+        DeclareLaunchArgument('lidar_format', default_value='ANY'),#LIDAR_POINT, LIDAR_SPHERE_POINT, LIDAR_SCAN
+        DeclareLaunchArgument('lidar_rate', default_value='20'),
         DeclareLaunchArgument('min_angle', default_value='-135.0'),
         DeclareLaunchArgument('max_angle', default_value='135.0'),
         DeclareLaunchArgument('min_range', default_value='0.05'),
@@ -113,6 +113,7 @@ def generate_launch_description():
                                 parameters=params,
                             ),
                         ],
+                        # prefix=["xterm -e gdb -ex run --args"],
                         output="screen",
                     )
                 ])

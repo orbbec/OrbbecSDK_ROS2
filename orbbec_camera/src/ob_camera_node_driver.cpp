@@ -105,7 +105,9 @@ OBCameraNodeDriver::~OBCameraNodeDriver() {
     reset_device_cond_.notify_all();
     reset_device_thread_->join();
   }
-  ob_camera_node_->stopGmslTrigger();
+  if (ob_camera_node_) {
+    ob_camera_node_->stopGmslTrigger();
+  }
   if (orb_device_lock_shm_fd_ != -1) {
     close(orb_device_lock_shm_fd_);
     orb_device_lock_shm_fd_ = -1;
@@ -247,6 +249,8 @@ void OBCameraNodeDriver::checkConnectTimer() {
     return;
   } else if (!ob_camera_node_) {
     device_connected_.store(false);
+  } else if (!ob_lidar_node_) {
+    device_connected_.store(false);
   }
 }
 
@@ -278,8 +282,11 @@ void OBCameraNodeDriver::resetDevice() {
     RCLCPP_INFO_STREAM(logger_, "resetDevice : Reset device uid: " << device_unique_id_);
     std::lock_guard<decltype(device_lock_)> device_lock(device_lock_);
     {
-      ob_camera_node_.reset();
-      ob_lidar_node_.reset();
+      if (ob_camera_node_) {
+        ob_camera_node_.reset();
+      } else if (ob_lidar_node_) {
+        ob_lidar_node_.reset();
+      }
       device_.reset();
       device_info_.reset();
       device_connected_ = false;
@@ -300,7 +307,12 @@ void OBCameraNodeDriver::rebootDeviceCallback(
     return;
   }
   RCLCPP_INFO(logger_, "Reboot device");
-  ob_camera_node_->rebootDevice();
+  if (ob_camera_node_) {
+    ob_camera_node_->rebootDevice();
+  } else if (ob_lidar_node_) {
+    ob_lidar_node_->rebootDevice();
+  }
+
   device_connected_ = false;
   device_ = nullptr;
 }
@@ -438,6 +450,8 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   CHECK_NOTNULL(device_.get());
   if (ob_camera_node_) {
     ob_camera_node_.reset();
+  } else if (ob_lidar_node_) {
+    ob_lidar_node_.reset();
   }
   int retry_count = 0;
   constexpr int max_retries = 3;
@@ -757,7 +771,11 @@ void OBCameraNodeDriver::firmwareUpdateCallback(OBFwUpdateState state, const cha
   std::cout << "Message : " << message << std::endl << std::flush;
   if (state == STAT_DONE) {
     RCLCPP_INFO(logger_, "Reboot device");
-    ob_camera_node_->rebootDevice();
+    if (ob_camera_node_) {
+      ob_camera_node_.reset();
+    } else if (ob_lidar_node_) {
+      ob_lidar_node_.reset();
+    }
     device_connected_ = false;
     upgrade_firmware_ = "";
   }

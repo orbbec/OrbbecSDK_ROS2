@@ -454,7 +454,7 @@ void OBLidarNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
   for (size_t i = 0; i < point_count;
        ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_reflectivity, ++iter_tag) {
     *iter_x = static_cast<float>(point_data[i].x / 1000.0);
-    *iter_y = static_cast<float>(point_data[i].y / 1000.0);
+    *iter_y = static_cast<float>(point_data[i].y / -1000.0);
     *iter_z = static_cast<float>(point_data[i].z / 1000.0);
     *iter_reflectivity = point_data[i].reflectivity;
     *iter_tag = point_data[i].tag;
@@ -498,7 +498,7 @@ void OBLidarNode::publishSpherePointCloud(std::shared_ptr<ob::FrameSet> frame_se
   for (size_t i = 0; i < point_count;
        ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_reflectivity, ++iter_tag) {
     *iter_x = static_cast<float>(result_point[i].x / 1000.0);
-    *iter_y = static_cast<float>(result_point[i].y / 1000.0);
+    *iter_y = static_cast<float>(result_point[i].y / -1000.0);
     *iter_z = static_cast<float>(result_point[i].z / 1000.0);
     *iter_reflectivity = result_point[i].reflectivity;
     *iter_tag = result_point[i].tag;
@@ -529,7 +529,7 @@ std::vector<OBLiDARPoint> OBLidarNode::spherePointToPoint(OBLiDARSpherePoint *sp
   for (uint32_t i = 0; i < point_count; ++i) {
     double theta_rad = sphere_point->theta * M_PI / 180.0f;  // to unit rad
     double phi_rad = sphere_point->phi * M_PI / 180.0f;      // to unit rad
-    auto distance = sphere_point->distance / 1000;           // mm to m
+    auto distance = sphere_point->distance;
     auto x = static_cast<float>(distance * cos(theta_rad) * cos(phi_rad));
     auto y = static_cast<float>(distance * sin(theta_rad) * cos(phi_rad));
     auto z = static_cast<float>(distance * sin(phi_rad));

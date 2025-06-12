@@ -1,4 +1,4 @@
-# OrbbecSDK ROS2 Wrapper v2
+# OrbbecSDK ROS2 Wrapper
 
 > [!重要]
 >

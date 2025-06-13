@@ -116,16 +116,16 @@ void OBLidarNode::setupTopics() {
 
 void OBLidarNode::getParameters() {
   setAndGetNodeParameter<std::string>(camera_name_, "camera_name", "lidar");
-  for (auto stream_index : IMAGE_STREAMS) {
+  for (auto stream_index : LIDAR_STREAMS) {
     std::string param_name = stream_name_[stream_index] + "_format";
     setAndGetNodeParameter(format_str_[stream_index], param_name, format_str_[stream_index]);
     format_[stream_index] = OBFormatFromString(format_str_[stream_index]);
     param_name = stream_name_[stream_index] + "_rate";
     setAndGetNodeParameter(rate_int_[stream_index], param_name, 0);
     rate_[stream_index] = OBScanRateFromInt(rate_int_[stream_index]);
-    RCLCPP_INFO_STREAM(
-        logger_, "Input rate: " << magic_enum::enum_name(rate_[LIDAR])
-                                << "  Input format:" << magic_enum::enum_name(format_[LIDAR]));
+    RCLCPP_INFO_STREAM(logger_, "Input rate: " << magic_enum::enum_name(rate_[stream_index])
+                                               << "  Input format:"
+                                               << magic_enum::enum_name(format_[stream_index]));
     param_name = stream_name_[stream_index] + "_frame_id";
     std::string default_frame_id = camera_name_ + "_" + stream_name_[stream_index] + "_frame";
     setAndGetNodeParameter(frame_id_[stream_index], param_name, default_frame_id);
@@ -171,84 +171,87 @@ void OBLidarNode::setupDevices() {
     } else if (echo_mode_ == "First Echo") {
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LIDAR_ECHO_MODE_INT, 1);
     }
-    RCLCPP_INFO_STREAM(
-        logger_, "Setting echo mode to "
-                     << (device_->getIntProperty(OB_PROP_LIDAR_ECHO_MODE_INT) ? "single channel"
-                                                                              : "dual channel"));
+    RCLCPP_INFO_STREAM(logger_,
+                       "Setting echo mode to "
+                           << (device_->getIntProperty(OB_PROP_LIDAR_ECHO_MODE_INT) ? "First Echo"
+                                                                                    : "Last Echo"));
   }
 }
 
 void OBLidarNode::setupProfiles() {
-  if (enable_stream_[LIDAR]) {
-    const auto &sensor = sensors_[LIDAR];
-    CHECK_NOTNULL(sensor.get());
-    auto profiles = sensor->getStreamProfileList();
-    CHECK_NOTNULL(profiles.get());
-    CHECK(profiles->getCount() > 0);
-    for (size_t i = 0; i < profiles->getCount(); i++) {
-      auto base_profile = profiles->getProfile(i)->as<ob::LiDARStreamProfile>();
-      if (base_profile == nullptr) {
-        throw std::runtime_error("Failed to get profile " + std::to_string(i));
+  for (const auto &elem : LIDAR_STREAMS) {
+    if (enable_stream_[elem]) {
+      const auto &sensor = sensors_[elem];
+      CHECK_NOTNULL(sensor.get());
+      auto profiles = sensor->getStreamProfileList();
+      CHECK_NOTNULL(profiles.get());
+      CHECK(profiles->getCount() > 0);
+      for (size_t i = 0; i < profiles->getCount(); i++) {
+        auto base_profile = profiles->getProfile(i)->as<ob::LiDARStreamProfile>();
+        if (base_profile == nullptr) {
+          throw std::runtime_error("Failed to get profile " + std::to_string(i));
+        }
+        auto profile = base_profile->as<ob::LiDARStreamProfile>();
+        if (profile == nullptr) {
+          throw std::runtime_error("Failed cast profile to LiDARStreamProfile");
+        }
+        RCLCPP_DEBUG_STREAM(
+            logger_,
+            "Sensor profile: " << "stream_type: " << magic_enum::enum_name(profile->getType())
+                               << "Scan Rate: " << magic_enum::enum_name(profile->getScanRate())
+                               << "Format:" << magic_enum::enum_name(profile->getFormat()));
+        supported_profiles_[elem].emplace_back(profile);
       }
-      auto profile = base_profile->as<ob::LiDARStreamProfile>();
-      if (profile == nullptr) {
-        throw std::runtime_error("Failed cast profile to LiDARStreamProfile");
-      }
-      RCLCPP_DEBUG_STREAM(
-          logger_,
-          "Sensor profile: " << "stream_type: " << magic_enum::enum_name(profile->getType())
-                             << "Scan Rate: " << magic_enum::enum_name(profile->getScanRate())
-                             << "Format:" << magic_enum::enum_name(profile->getFormat()));
-      supported_profiles_[LIDAR].emplace_back(profile);
-    }
-    std::shared_ptr<ob::LiDARStreamProfile> selected_profile;
-    std::shared_ptr<ob::LiDARStreamProfile> default_profile;
-    try {
-      if (rate_[LIDAR] == OB_LIDAR_SCAN_UNKNOWN && format_[LIDAR] == OB_FORMAT_UNKNOWN) {
-        selected_profile = profiles->getProfile(0)->as<ob::LiDARStreamProfile>();
-      } else {
-        selected_profile = profiles->getLiDARStreamProfile(rate_[LIDAR], format_[LIDAR]);
-      }
+      std::shared_ptr<ob::LiDARStreamProfile> selected_profile;
+      std::shared_ptr<ob::LiDARStreamProfile> default_profile;
+      try {
+        if (rate_[elem] == OB_LIDAR_SCAN_UNKNOWN && format_[elem] == OB_FORMAT_UNKNOWN) {
+          selected_profile = profiles->getProfile(0)->as<ob::LiDARStreamProfile>();
+        } else {
+          selected_profile = profiles->getLiDARStreamProfile(rate_[elem], format_[elem]);
+        }
 
-    } catch (const ob::Error &ex) {
-      RCLCPP_ERROR_STREAM(
-          logger_, "Failed to get " << stream_name_[LIDAR] << "  profile: " << ex.getMessage());
-      RCLCPP_ERROR_STREAM(logger_, "Stream: " << magic_enum::enum_name(LIDAR.first)
-                                              << ", Stream Index: " << LIDAR.second
-                                              << ", Scan Rate: " << rate_[LIDAR]
-                                              << "Format:" << format_[LIDAR]);
-      RCLCPP_INFO_STREAM(logger_, "Available profiles:");
-      printSensorProfiles(sensor);
-      RCLCPP_ERROR(logger_, "Because can not set this stream, so exit.");
-      exit(-1);
-    }
-    if (!selected_profile) {
-      RCLCPP_WARN_STREAM(logger_, "Given stream configuration is not supported by the device! "
-                                      << " Stream: " << magic_enum::enum_name(LIDAR.first)
-                                      << ", Stream Index: " << LIDAR.second
-                                      << ", Scan Rate: " << rate_[LIDAR]);
-      if (default_profile) {
-        RCLCPP_WARN_STREAM(logger_, "Using default profile instead.");
-        RCLCPP_WARN_STREAM(logger_, "default scan Rate "
-                                        << magic_enum::enum_name(default_profile->getScanRate())
-                                        << "default format:"
-                                        << magic_enum::enum_name(default_profile->getFormat()));
-        selected_profile = default_profile;
-      } else {
+      } catch (const ob::Error &ex) {
         RCLCPP_ERROR_STREAM(
-            logger_, " NO default_profile found , Stream: " << magic_enum::enum_name(LIDAR.first)
-                                                            << " will be disable");
-        enable_stream_[LIDAR] = false;
+            logger_, "Failed to get " << stream_name_[elem] << "  profile: " << ex.getMessage());
+        RCLCPP_ERROR_STREAM(logger_, "Stream: " << magic_enum::enum_name(elem.first)
+                                                << ", Stream Index: " << elem.second
+                                                << ", Scan Rate: " << rate_[elem]
+                                                << "Format:" << format_[elem]);
+        RCLCPP_INFO_STREAM(logger_, "Available profiles:");
+        printSensorProfiles(sensor);
+        RCLCPP_ERROR(logger_, "Because can not set this stream, so exit.");
+        exit(-1);
       }
+      if (!selected_profile) {
+        RCLCPP_WARN_STREAM(logger_, "Given stream configuration is not supported by the device! "
+                                        << " Stream: " << magic_enum::enum_name(elem.first)
+                                        << ", Stream Index: " << elem.second
+                                        << ", Scan Rate: " << rate_[elem]);
+        if (default_profile) {
+          RCLCPP_WARN_STREAM(logger_, "Using default profile instead.");
+          RCLCPP_WARN_STREAM(logger_, "default scan Rate "
+                                          << magic_enum::enum_name(default_profile->getScanRate())
+                                          << "default format:"
+                                          << magic_enum::enum_name(default_profile->getFormat()));
+          selected_profile = default_profile;
+        } else {
+          RCLCPP_ERROR_STREAM(
+              logger_, " NO default_profile found , Stream: " << magic_enum::enum_name(elem.first)
+                                                              << " will be disable");
+          enable_stream_[elem] = false;
+        }
+      }
+      CHECK_NOTNULL(selected_profile);
+      stream_profile_[elem] = selected_profile;
+      rate_[elem] = selected_profile->getScanRate();
+      format_[elem] = selected_profile->getFormat();
+      RCLCPP_INFO_STREAM(logger_, " stream "
+                                      << stream_name_[elem] << " is enabled - scan rate: "
+                                      << magic_enum::enum_name(selected_profile->getScanRate())
+                                      << "  format:"
+                                      << magic_enum::enum_name(selected_profile->getFormat()));
     }
-    CHECK_NOTNULL(selected_profile);
-    stream_profile_[LIDAR] = selected_profile;
-    rate_[LIDAR] = selected_profile->getScanRate();
-    format_[LIDAR] = selected_profile->getFormat();
-    RCLCPP_INFO_STREAM(
-        logger_, " stream " << stream_name_[LIDAR] << " is enabled - scan rate: "
-                            << magic_enum::enum_name(selected_profile->getScanRate())
-                            << "  format:" << magic_enum::enum_name(selected_profile->getFormat()));
   }
 }
 
@@ -303,8 +306,6 @@ void OBLidarNode::startStreams() {
     });
   } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to start pipeline: " << e.getMessage());
-    RCLCPP_INFO_STREAM(logger_, "try to disable ir stream and try again");
-    enable_stream_[LIDAR] = false;
     setupPipelineConfig();
     pipeline_->start(pipeline_config_, [this](const std::shared_ptr<ob::FrameSet> &frame_set) {
       onNewFrameSetCallback(frame_set);
@@ -335,22 +336,25 @@ void OBLidarNode::setupPipelineConfig() {
     pipeline_config_.reset();
   }
   pipeline_config_ = std::make_shared<ob::Config>();
-  if (enable_stream_[LIDAR]) {
-    RCLCPP_INFO_STREAM(logger_, "Enable " << stream_name_[LIDAR] << " stream");
-    auto profile = stream_profile_[LIDAR]->as<ob::LiDARStreamProfile>();
+  for (const auto &stream_index : LIDAR_STREAMS) {
+    if (enable_stream_[stream_index]) {
+      RCLCPP_INFO_STREAM(logger_, "Enable " << stream_name_[stream_index] << " stream");
+      auto profile = stream_profile_[stream_index]->as<ob::LiDARStreamProfile>();
 
-    if (enable_stream_[LIDAR]) {
-      auto video_profile = profile;
+      if (enable_stream_[stream_index]) {
+        auto video_profile = profile;
+        RCLCPP_INFO_STREAM(logger_,
+                           "lidar profile: " << magic_enum::enum_name(video_profile->getScanRate())
+                                             << "  "
+                                             << magic_enum::enum_name(video_profile->getFormat()));
+      }
+
       RCLCPP_INFO_STREAM(
-          logger_, "lidar profile: " << magic_enum::enum_name(video_profile->getScanRate()) << "  "
-                                     << magic_enum::enum_name(video_profile->getFormat()));
+          logger_, "Stream " << stream_name_[stream_index]
+                             << " scan rate: " << magic_enum::enum_name(profile->getScanRate())
+                             << " format: " << magic_enum::enum_name(profile->getFormat()));
+      pipeline_config_->enableStream(stream_profile_[stream_index]);
     }
-
-    RCLCPP_INFO_STREAM(logger_,
-                       "Stream " << stream_name_[LIDAR]
-                                 << " scan rate: " << magic_enum::enum_name(profile->getScanRate())
-                                 << " format: " << magic_enum::enum_name(profile->getFormat()));
-    pipeline_config_->enableStream(stream_profile_[LIDAR]);
   }
 }
 
@@ -690,9 +694,6 @@ void OBLidarNode::calcAndPublishStaticTransform() {
     tf2::Vector3 trans(ex.trans[0], ex.trans[1], ex.trans[2]);
     auto timestamp = node_->now();
     if (stream_index.first != base_stream_.first) {
-      if (stream_index.first == OB_STREAM_IR_RIGHT && base_stream_.first == OB_STREAM_DEPTH) {
-        trans[0] = std::abs(trans[0]);  // because left and right ir calibration is error
-      }
       publishStaticTF(timestamp, trans, Q, frame_id_[base_stream_], frame_id_[stream_index]);
     }
     publishStaticTF(timestamp, zero_trans, quaternion_optical, frame_id_[stream_index],

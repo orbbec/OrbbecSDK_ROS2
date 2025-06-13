@@ -122,7 +122,7 @@ const stream_index_pair LIDAR{OB_STREAM_LIDAR, 0};
 const stream_index_pair GYRO{OB_STREAM_GYRO, 0};
 const stream_index_pair ACCEL{OB_STREAM_ACCEL, 0};
 
-const std::vector<stream_index_pair> IMAGE_STREAMS = {LIDAR};
+const std::vector<stream_index_pair> LIDAR_STREAMS = {LIDAR};
 
 const std::vector<stream_index_pair> HID_STREAMS = {GYRO, ACCEL};
 

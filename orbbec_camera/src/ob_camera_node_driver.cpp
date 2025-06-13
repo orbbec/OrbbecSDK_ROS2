@@ -247,9 +247,7 @@ void OBCameraNodeDriver::checkConnectTimer() {
     RCLCPP_DEBUG_STREAM(logger_,
                         "checkConnectTimer: device " << serial_number_ << " not connected");
     return;
-  } else if (!ob_camera_node_) {
-    device_connected_.store(false);
-  } else if (!ob_lidar_node_) {
+  } else if (!ob_camera_node_ && !ob_lidar_node_) {
     device_connected_.store(false);
   }
 }

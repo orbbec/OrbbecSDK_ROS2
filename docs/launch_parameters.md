@@ -151,6 +151,8 @@ The following are the launch parameters available:
   * The delay time of the trigger signal output after receiving the capture command or trigger signal in microseconds,this parameter is usually used [multi camera synced](../orbbec_camera/examples/multi_camera_synced/README.MD)
 * **trigger_out_enabled**
   * Enable the trigger out signal,this parameter is usually used [multi camera synced](../orbbec_camera/examples/multi_camera_synced/README.MD)
+* **software_trigger_enabled**
+  * Enable the software trigger out signal,this parameter is usually used [multi camera synced](../orbbec_camera/examples/multi_camera_synced/README.MD)
 * **frames_per_trigger**
   * The frame number of each stream after each trigger in triggering mode,this parameter is usually used [multi camera synced](../orbbec_camera/examples/multi_camera_synced/README.MD)
 * **software_trigger_period**

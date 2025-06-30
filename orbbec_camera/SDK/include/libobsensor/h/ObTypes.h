@@ -39,6 +39,7 @@ typedef struct ob_depth_work_mode_list_t         ob_depth_work_mode_list;
 typedef struct ob_device_preset_list_t           ob_device_preset_list;
 typedef struct ob_filter_config_schema_list_t    ob_filter_config_schema_list;
 typedef struct ob_device_frame_interleave_list_t ob_device_frame_interleave_list;
+typedef struct ob_preset_resolution_config_list_t ob_preset_resolution_config_list;
 
 #define OB_WIDTH_ANY 0
 #define OB_HEIGHT_ANY 0
@@ -134,6 +135,7 @@ typedef enum {
     OB_SENSOR_IR_LEFT   = 6, /**< left IR for stereo camera*/
     OB_SENSOR_IR_RIGHT  = 7, /**< Right IR for stereo camera*/
     OB_SENSOR_RAW_PHASE = 8, /**< Raw Phase */
+    OB_SENSOR_CONFIDENCE = 9,/**< Confidence */
     OB_SENSOR_TYPE_COUNT,    /**The total number of sensor types, is not a valid sensor type */
 } OBSensorType,
     ob_sensor_type;
@@ -152,6 +154,7 @@ typedef enum {
     OB_STREAM_IR_LEFT   = 6,  /**< Left IR stream for stereo camera */
     OB_STREAM_IR_RIGHT  = 7,  /**< Right IR stream for stereo camera */
     OB_STREAM_RAW_PHASE = 8,  /**< RawPhase Stream */
+    OB_STREAM_CONFIDENCE = 9, /**< Confidence Stream*/
     OB_STREAM_TYPE_COUNT,     /**< The total number of stream type,is not a valid stream type */
 } OBStreamType,
     ob_stream_type;
@@ -172,6 +175,7 @@ typedef enum {
     OB_FRAME_IR_LEFT   = 8,  /**< Left IR frame for stereo camera */
     OB_FRAME_IR_RIGHT  = 9,  /**< Right IR frame for stereo camera */
     OB_FRAME_RAW_PHASE = 10, /**< Raw Phase frame*/
+    OB_FRAME_CONFIDENCE = 11,/**< Confidence frame*/
     OB_FRAME_TYPE_COUNT,     /**< The total number of frame types, is not a valid frame type */
 } OBFrameType,
     ob_frame_type;
@@ -227,6 +231,7 @@ typedef enum {
     OB_FORMAT_RGBA       = 31, /**< RGBA format */
     OB_FORMAT_BYR2       = 32, /**< byr2 format */
     OB_FORMAT_RW16       = 33, /**< RAW16 format */
+    OB_FORMAT_Y12C4      = 34, /**<  Y12C4 format */
 } OBFormat,
     ob_format;
 
@@ -448,6 +453,13 @@ typedef struct {
     OBD2CTransform     transform;        ///< Rotation/transformation matrix
     bool               isMirrored;       ///< Whether the image frame corresponding to this group of parameters is mirrored
 } OBCameraParam, ob_camera_param;
+
+typedef struct {
+    int16_t width;                  ///< width
+    int16_t height;                 ///< height
+    int     irDecimationFactor;     ///< ir decimation factor
+    int     depthDecimationFactor;  ///< depth decimation factor
+} OBPresetResolutionConfig, ob_preset_resolution_ratio_config;
 
 /**
  * @brief calibration parameters
@@ -1829,7 +1841,7 @@ typedef void (*ob_playback_status_changed_callback)(ob_playback_status status, v
  */
 #define ob_is_video_sensor_type(sensor_type)                                                                                             \
     (sensor_type == OB_SENSOR_COLOR || sensor_type == OB_SENSOR_DEPTH || sensor_type == OB_SENSOR_IR || sensor_type == OB_SENSOR_IR_LEFT \
-     || sensor_type == OB_SENSOR_IR_RIGHT)
+     || sensor_type == OB_SENSOR_IR_RIGHT || sensor_type == OB_SENSOR_CONFIDENCE)
 
 /**
  * @brief check if the stream_type is a video stream
@@ -1839,7 +1851,7 @@ typedef void (*ob_playback_status_changed_callback)(ob_playback_status status, v
  */
 #define ob_is_video_stream_type(stream_type)                                                                                             \
     (stream_type == OB_STREAM_COLOR || stream_type == OB_STREAM_DEPTH || stream_type == OB_STREAM_IR || stream_type == OB_STREAM_IR_LEFT \
-     || stream_type == OB_STREAM_IR_RIGHT || stream_type == OB_STREAM_VIDEO)
+     || stream_type == OB_STREAM_IR_RIGHT || stream_type == OB_STREAM_VIDEO || stream_type == OB_STREAM_CONFIDENCE)
 
 /**
  * @brief Check if sensor_type is an IR sensor

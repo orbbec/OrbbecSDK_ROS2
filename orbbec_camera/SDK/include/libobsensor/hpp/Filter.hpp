@@ -347,7 +347,7 @@ public:
         init(impl);
     }
 
-    virtual ~PointCloudFilter() noexcept = default;
+    virtual ~PointCloudFilter() noexcept override = default;
 
     /**
      * @brief Set the output pointcloud frame format.
@@ -421,7 +421,7 @@ public:
         setConfigValue("AlignType", static_cast<double>(alignToStreamType));
     }
 
-    virtual ~Align() noexcept = default;
+    virtual ~Align() noexcept override = default;
 
     OBStreamType getAlignToStreamType() {
         return static_cast<OBStreamType>(static_cast<int>(getConfigValue("AlignType")));
@@ -466,7 +466,7 @@ public:
         init(impl);
     }
 
-    virtual ~FormatConvertFilter() noexcept = default;
+    virtual ~FormatConvertFilter() noexcept override = default;
 
     /**
      * @brief Set the format conversion type.
@@ -492,7 +492,7 @@ public:
         init(impl);
     }
 
-    virtual ~HdrMerge() noexcept = default;
+    virtual ~HdrMerge() noexcept override = default;
 };
 
 /**
@@ -524,7 +524,7 @@ public:
         initSequenceIdList();
     }
 
-    virtual ~SequenceIdFilter() noexcept {
+    virtual ~SequenceIdFilter() noexcept override {
         if(outputSequenceIdList_) {
             delete[] outputSequenceIdList_;
             outputSequenceIdList_ = nullptr;
@@ -575,7 +575,7 @@ public:
         init(impl);
     }
 
-    virtual ~DecimationFilter() noexcept = default;
+    virtual ~DecimationFilter() noexcept override = default;
 
     /**
      * @brief Set the decimation filter scale value.
@@ -619,7 +619,7 @@ public:
         init(impl);
     }
 
-    virtual ~ThresholdFilter() noexcept = default;
+    virtual ~ThresholdFilter() noexcept override = default;
 
     /**
      * @brief Get the threshold filter min range.
@@ -682,7 +682,7 @@ public:
         init(impl);
     }
 
-    virtual ~SpatialAdvancedFilter() noexcept = default;
+    virtual ~SpatialAdvancedFilter() noexcept override = default;
 
     /**
      * @brief Get the spatial advanced filter alpha range.
@@ -791,7 +791,7 @@ public:
         init(impl);
     }
 
-    ~HoleFillingFilter() noexcept = default;
+    ~HoleFillingFilter() noexcept override = default;
 
     /**
      * @brief Set the HoleFillingFilter mode.
@@ -824,7 +824,7 @@ public:
         init(impl);
     }
 
-    ~NoiseRemovalFilter() noexcept = default;
+    ~NoiseRemovalFilter() noexcept override = default;
 
     /**
      * @brief Set the noise removal filter params.
@@ -895,7 +895,7 @@ public:
         init(impl);
     }
 
-    ~TemporalFilter() noexcept = default;
+    ~TemporalFilter() noexcept override = default;
 
     /**
      * @brief Get the TemporalFilter diffscale range.
@@ -962,7 +962,7 @@ public:
         init(impl);
     }
 
-    ~DisparityTransform() noexcept = default;
+    ~DisparityTransform() noexcept override = default;
 };
 
 class OBFilterList {

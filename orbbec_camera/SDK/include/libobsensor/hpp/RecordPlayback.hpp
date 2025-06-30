@@ -20,7 +20,7 @@ typedef std::function<void(OBPlaybackStatus status)> PlaybackStatusChangeCallbac
 
 class RecordDevice {
 private:
-    ob_record_device_t *impl_;
+    ob_record_device_t *impl_ = nullptr;
 
 public:
     explicit RecordDevice(std::shared_ptr<Device> device, const std::string &file, bool compressionEnabled = true) {
@@ -35,14 +35,14 @@ public:
         Error::handle(&error, false);
     }
 
-    RecordDevice(RecordDevice &&other) {
+    RecordDevice(RecordDevice &&other) noexcept {
         if(this != &other) {
             impl_       = other.impl_;
             other.impl_ = nullptr;
         }
     }
 
-    RecordDevice &operator=(RecordDevice &&other) {
+    RecordDevice &operator=(RecordDevice &&other) noexcept {
         if(this != &other) {
             impl_       = other.impl_;
             other.impl_ = nullptr;
@@ -76,11 +76,11 @@ public:
         Error::handle(&error);
     }
 
-    virtual ~PlaybackDevice() noexcept = default;
+    virtual ~PlaybackDevice() noexcept override = default;
 
-    PlaybackDevice(PlaybackDevice &&other) : Device(std::move(other)) {}
+    PlaybackDevice(PlaybackDevice &&other) noexcept : Device(std::move(other)) {}
 
-    PlaybackDevice &operator=(PlaybackDevice &&other) {
+    PlaybackDevice &operator=(PlaybackDevice &&other) noexcept {
         Device::operator=(std::move(other));
         return *this;
     }

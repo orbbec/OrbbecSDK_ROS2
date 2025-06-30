@@ -269,6 +269,42 @@ OB_EXPORT const char *ob_device_frame_interleave_list_get_name(ob_device_frame_i
 OB_EXPORT bool ob_device_frame_interleave_list_has_frame_interleave(ob_device_frame_interleave_list *frame_interleave_list, const char *frame_interleave_name,
                                                                     ob_error **error);
 
+/* @brief Get the available preset resolution config list.
+ *
+ * @param device The device object.
+ * @param error  Log error messages.
+ * @return The available frame interleave list.
+ *
+ */
+OB_EXPORT ob_preset_resolution_config_list *ob_device_get_available_preset_resolution_config_list(ob_device *device, ob_error **error);
+
+/* @brief Get the number of preset resolution in the preset resolution list.
+ *
+ * @param ob_preset_resolution_config_list The available preset resolution list.
+ * @param error  Log error messages.
+ * @return  The number of preset resolution in the preset resolution list.
+ */
+OB_EXPORT uint32_t ob_device_preset_resolution_config_get_count(ob_preset_resolution_config_list *ob_preset_resolution_config_list, ob_error **error);
+
+/**
+ * @brief Get the preset resolution in the preset resolution list.
+ *
+ * @param ob_preset_resolution_config_list The available preset resolution list.
+ * @param index  The index of preset resolution in the preset resolution list.
+ * @param error  Log error messages.
+ * @return  The preset resolution in the preset resolution list.
+ */
+OB_EXPORT OBPresetResolutionConfig ob_device_preset_resolution_config_list_get_item(const ob_preset_resolution_config_list *ob_preset_resolution_config_lis,
+                                                                                    uint32_t index, ob_error **error);
+
+/**
+ * @brief Delete the available preset resolution list.
+ *
+ * @param frame_interleave_list The available preset resolution list.
+ * @param error  Log error messages.
+ */
+OB_EXPORT void ob_delete_preset_resolution_config_list(ob_preset_resolution_config_list *ob_preset_resolution_config_list, ob_error **error);
+
 // The following interfaces are deprecated and are retained here for compatibility purposes.
 #define ob_depth_work_mode_list_count ob_depth_work_mode_list_get_count
 #define ob_device_preset_list_count ob_device_preset_list_get_count

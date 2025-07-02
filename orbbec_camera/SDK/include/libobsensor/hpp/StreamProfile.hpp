@@ -405,6 +405,7 @@ template <typename T> bool StreamProfile::is() const {
     case OB_STREAM_COLOR:
     case OB_STREAM_DEPTH:
     case OB_STREAM_RAW_PHASE:
+    case OB_STREAM_CONFIDENCE:
         return typeid(T) == typeid(VideoStreamProfile);
     case OB_STREAM_ACCEL:
         return typeid(T) == typeid(AccelStreamProfile);
@@ -431,6 +432,7 @@ public:
         case OB_STREAM_DEPTH:
         case OB_STREAM_COLOR:
         case OB_STREAM_VIDEO:
+        case OB_STREAM_CONFIDENCE:
             return std::make_shared<VideoStreamProfile>(impl);
         case OB_STREAM_ACCEL:
             return std::make_shared<AccelStreamProfile>(impl);

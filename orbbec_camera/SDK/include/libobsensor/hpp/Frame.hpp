@@ -554,6 +554,28 @@ public:
 };
 
 /**
+ * @brief Define the ConfidenceFrame class, which inherits from the VideoFrame class
+ *
+ */
+class ConfidenceFrame : public VideoFrame {
+
+public:
+    /**
+     * @brief Construct a new ConfidenceFrame object with a given pointer to the internal frame object.
+     *
+     * @attention After calling this constructor, the frame object will own the internal frame object, and the internal frame object will be deleted when the
+     * frame object is destroyed.
+     * @attention The internal frame object should not be deleted by the caller.
+     * @attention Please use the FrameFactory to create a Frame object.
+     *
+     * @param impl The pointer to the internal frame object.
+     */
+    explicit ConfidenceFrame(const ob_frame *impl) : VideoFrame(impl){};
+
+    ~ConfidenceFrame() noexcept override = default;
+};
+
+/**
  * @brief Define the PointsFrame class, which inherits from the Frame class
  * @brief The PointsFrame class is used to obtain pointcloud data and point cloud information.
  *
@@ -1064,6 +1086,8 @@ template <typename T> bool Frame::is() const {
         return (typeid(T) == typeid(DepthFrame) || typeid(T) == typeid(VideoFrame));
     case OB_FRAME_COLOR:
         return (typeid(T) == typeid(ColorFrame) || typeid(T) == typeid(VideoFrame));
+    case OB_FRAME_CONFIDENCE:
+        return (typeid(T) == typeid(ConfidenceFrame) || typeid(T) == typeid(VideoFrame));
     case OB_FRAME_GYRO:
         return (typeid(T) == typeid(GyroFrame));
     case OB_FRAME_ACCEL:

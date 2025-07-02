@@ -516,6 +516,36 @@ typedef enum {
     OB_DEVICE_PTP_CLOCK_SYNC_ENABLE_BOOL = 223,
 
     /**
+     * @brief Depth with confidence stream enable
+     */
+    OB_PROP_DEPTH_WITH_CONFIDENCE_STREAM_ENABLE_BOOL = 224,
+
+    /**
+     * @brief Enable or disable confidence stream filter
+     */
+    OB_PROP_CONFIDENCE_STREAM_FILTER_BOOL = 226,
+
+    /**
+     * @brief Confidence stream filter threshold, range [0, 255]
+     */
+    OB_PROP_CONFIDENCE_STREAM_FILTER_THRESHOLD_INT = 227,
+
+    /**
+     * @brief Confidence stream mirror enable
+     */
+    OB_PROP_CONFIDENCE_MIRROR_BOOL = 229,
+
+    /**
+     * @brief Confidence stream flip enable
+     */
+    OB_PROP_CONFIDENCE_FLIP_BOOL = 230,
+
+    /**
+     * @brief Confidence stream rotate angle{0, 90, 180, 270}
+     */
+    OB_PROP_CONFIDENCE_ROTATE_INT = 231,
+
+    /**
      * @brief Baseline calibration parameters
      */
     OB_STRUCT_BASELINE_CALIBRATION_PARAM = 1002,
@@ -603,6 +633,11 @@ typedef enum {
      * @brief Disparity offset interleaving
      */
     OB_STRUCT_DISP_OFFSET_CONFIG = 1064,
+
+    /**
+     * @brief Preset resolution ratio configuration
+     */
+    OB_STRUCT_PRESET_RESOLUTION_CONFIG = 1069,
 
     /**
      * @brief Color camera auto exposure
@@ -998,6 +1033,11 @@ typedef enum {
      * @brief LiDAR: get/set specific mode
      */
     OB_PROP_LIDAR_SPECIFIC_MODE_INT = 8033,
+
+    /**
+     * @brief LiDAR: get/set repetitive scan mode
+     */
+    OB_PROP_LIDAR_REPETITIVE_SCAN_MODE_INT = 8034,
 } OBPropertyID,
     ob_property_id;
 

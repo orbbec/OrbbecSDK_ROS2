@@ -115,6 +115,9 @@ ros2 run orbbec_camera list_camera_profile_mode_node
 - **tf_publish_rate**：TF 发布频率。
 - **lidar_format**：雷达的数据格式。可选值：`LIDAR_POINT`、`LIDAR_SPHERE_POINT` 、`LIDAR_SCAN`
 - **lidar_rate**：雷达的扫描速率。
+- **repetitive_scan_mode**：重复扫描模式参数。
+- **filter_level**：添加过滤等级参数。
+- **vertical_fov**：垂直角度参数。
 - **min_angle**：雷达扫描范围的最小角度，以度为单位（例如 `-135.0`）。默认值：`-135.0`。
 - **max_angle**：雷达扫描范围的最大角度，以度为单位（例如 `135.0`）。默认值：`135.0`。
 - **min_range**：雷达可测量的最小距离，以米为单位。默认值：`0.05`。

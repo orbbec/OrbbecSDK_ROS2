@@ -60,6 +60,9 @@ def generate_launch_description():
         DeclareLaunchArgument('tf_publish_rate', default_value='0.0'),
         DeclareLaunchArgument('lidar_format', default_value='ANY'),#LIDAR_POINT, LIDAR_SPHERE_POINT, LIDAR_SCAN
         DeclareLaunchArgument('lidar_rate', default_value='20'),
+        DeclareLaunchArgument('repetitive_scan_mode', default_value='-1'),
+        DeclareLaunchArgument('filter_level', default_value='-1'),
+        DeclareLaunchArgument('vertical_fov', default_value='-1.0'),
         DeclareLaunchArgument('min_angle', default_value='-135.0'),
         DeclareLaunchArgument('max_angle', default_value='135.0'),
         DeclareLaunchArgument('min_range', default_value='0.05'),

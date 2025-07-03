@@ -244,6 +244,9 @@ class OBLidarNode {
   float max_angle_ = 135.0;
   float min_range_ = 0.05;
   float max_range_ = 30.0;
+  int repetitive_scan_mode_ = -1;
+  int filter_level_ = -1;
+  float vertical_fov_ = -1;
 };
 
 }  // namespace orbbec_lidar

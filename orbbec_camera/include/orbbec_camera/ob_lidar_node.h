@@ -171,6 +171,8 @@ class OBLidarNode {
 
   void publishScan(std::shared_ptr<ob::FrameSet> frame_set);
 
+  void publishScanToPoint(std::shared_ptr<ob::FrameSet> frame_set);
+
   void publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set);
 
   void publishSpherePointCloud(std::shared_ptr<ob::FrameSet> frame_set);
@@ -230,6 +232,7 @@ class OBLidarNode {
   // Only for Gemini2 device
 
   std::string time_domain_ = "device";  // device, system, global
+  bool enable_scan_to_point_ = false;
   bool enable_heartbeat_ = false;
   bool use_intra_process_ = false;
 

@@ -134,6 +134,7 @@ void OBLidarNode::getParameters() {
     param_name = stream_name_[stream_index] + "_optical_frame_id";
     setAndGetNodeParameter(optical_frame_id_[stream_index], param_name, default_optical_frame_id);
   }
+  setAndGetNodeParameter<bool>(enable_scan_to_point_, "enable_scan_to_point", false);
   setAndGetNodeParameter<bool>(publish_tf_, "publish_tf", true);
   setAndGetNodeParameter<double>(tf_publish_rate_, "tf_publish_rate", 0.0);
   setAndGetNodeParameter<std::string>(time_domain_, "time_domain", "global");
@@ -418,8 +419,10 @@ void OBLidarNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set)
       publishStaticTransforms();
       tf_published_ = true;
     }
-    if (format_[LIDAR] == OB_FORMAT_LIDAR_SCAN) {
+    if (format_[LIDAR] == OB_FORMAT_LIDAR_SCAN && !enable_scan_to_point_) {
       publishScan(frame_set);
+    } else if (format_[LIDAR] == OB_FORMAT_LIDAR_SCAN && enable_scan_to_point_) {
+      publishScanToPoint(frame_set);
     } else if (format_[LIDAR] == OB_FORMAT_LIDAR_POINT) {
       publishPointCloud(frame_set);
     } else if (format_[LIDAR] == OB_FORMAT_LIDAR_SPHERE_POINT) {
@@ -467,6 +470,13 @@ void OBLidarNode::publishScan(std::shared_ptr<ob::FrameSet> frame_set) {
   }
   filterScan(*scan_msg);
   scan_pub_->publish(std::move(scan_msg));
+}
+
+void OBLidarNode::publishScanToPoint(std::shared_ptr<ob::FrameSet> frame_set) {
+  (void)frame_set;
+  if (frame_set == nullptr) {
+    return;
+  }
 }
 
 void OBLidarNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {

@@ -59,7 +59,7 @@ def generate_launch_description():
         DeclareLaunchArgument('publish_tf', default_value='true'),
         DeclareLaunchArgument('tf_publish_rate', default_value='0.0'),
         DeclareLaunchArgument('lidar_format', default_value='ANY'),#LIDAR_POINT, LIDAR_SPHERE_POINT, LIDAR_SCAN
-        DeclareLaunchArgument('lidar_rate', default_value='20'),
+        DeclareLaunchArgument('lidar_rate', default_value='30'),
         DeclareLaunchArgument('enable_scan_to_point', default_value='false'),
         DeclareLaunchArgument('repetitive_scan_mode', default_value='-1'),
         DeclareLaunchArgument('filter_level', default_value='-1'),

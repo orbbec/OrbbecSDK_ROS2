@@ -460,7 +460,7 @@ void OBLidarNode::publishScan(std::shared_ptr<ob::FrameSet> frame_set) {
   scan_msg->range_max = max_range_;
   scan_msg->ranges.resize(scan_count);
   scan_msg->intensities.resize(scan_count);
-  for (size_t i = 0; i < scan_count; i++) {
+  for (size_t i = 0; i < scan_count; ++i) {
     if (scans_data->distance < min_range_ && scans_data->distance > max_range_) {
       scans_data++;
       continue;
@@ -477,6 +477,43 @@ void OBLidarNode::publishScanToPoint(std::shared_ptr<ob::FrameSet> frame_set) {
   if (frame_set == nullptr) {
     return;
   }
+  auto lidar_frame = frame_set->getFrame(OB_FRAME_LIDAR_POINTS);
+  auto *scans_data = reinterpret_cast<OBLiDARScanPoint *>(lidar_frame->getData());
+  auto scan_count = lidar_frame->getDataSize() / sizeof(OBLiDARScanPoint);
+  auto point_cloud_msg = std::make_unique<sensor_msgs::msg::PointCloud2>();
+  sensor_msgs::PointCloud2Modifier modifier(*point_cloud_msg);
+  modifier.setPointCloud2Fields(4, "x", 1, sensor_msgs::msg::PointField::FLOAT32, "y", 1,
+                                sensor_msgs::msg::PointField::FLOAT32, "z", 1,
+                                sensor_msgs::msg::PointField::FLOAT32, "reflectivity", 1,
+                                sensor_msgs::msg::PointField::UINT8);
+  modifier.resize(scan_count);
+  auto frame_timestamp = getFrameTimestampUs(lidar_frame);
+  auto timestamp = fromUsToROSTime(frame_timestamp);
+  point_cloud_msg->header.stamp = timestamp;
+  point_cloud_msg->header.frame_id = frame_id_[LIDAR];
+  point_cloud_msg->height = 1;
+  point_cloud_msg->width = scan_count;
+  point_cloud_msg->is_dense = true;
+  point_cloud_msg->is_bigendian = false;
+  point_cloud_msg->row_step = point_cloud_msg->width * point_cloud_msg->point_step;
+  point_cloud_msg->data.resize(point_cloud_msg->height * point_cloud_msg->row_step);
+  sensor_msgs::PointCloud2Iterator<float> iter_x(*point_cloud_msg, "x");
+  sensor_msgs::PointCloud2Iterator<float> iter_y(*point_cloud_msg, "y");
+  sensor_msgs::PointCloud2Iterator<float> iter_z(*point_cloud_msg, "z");
+  sensor_msgs::PointCloud2Iterator<uint8_t> iter_reflectivity(*point_cloud_msg, "reflectivity");
+  for (size_t i = 0; i < scan_count; ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_reflectivity) {
+    double rad = 0.7853981852531433 + 0.0026179938577115536 * i;
+    *iter_x = static_cast<float>(scans_data[i].distance * cos(rad) / 1000.0);
+    *iter_y = static_cast<float>(scans_data[i].distance * sin(rad) / -1000.0);
+    *iter_z = static_cast<float>(0.0);
+    *iter_reflectivity = static_cast<uint8_t>(scans_data[i].intensity);
+    // RCLCPP_INFO_STREAM(logger_, "*iter_x:"<<*iter_x);
+  }
+  RCLCPP_INFO(logger_, "point_step: %u", point_cloud_msg->point_step);
+  RCLCPP_INFO(logger_, "row_step: %u", point_cloud_msg->row_step);
+  RCLCPP_INFO(logger_, "data size: %zu", point_cloud_msg->data.size());
+  *point_cloud_msg = filterPointCloud(*point_cloud_msg);
+  point_cloud_pub_->publish(std::move(point_cloud_msg));
 }
 
 void OBLidarNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {

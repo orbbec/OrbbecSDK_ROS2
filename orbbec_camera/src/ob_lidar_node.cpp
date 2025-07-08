@@ -326,11 +326,11 @@ void OBLidarNode::setupPublishers() {
   if (use_intra_process_) {
     point_cloud_qos_profile = rmw_qos_profile_default;
   }
-  if (format_[LIDAR] == OB_FORMAT_LIDAR_SCAN) {
+  if (!enable_scan_to_point_ && format_[LIDAR] == OB_FORMAT_LIDAR_SCAN) {
     scan_pub_ = node_->create_publisher<sensor_msgs::msg::LaserScan>(
         "scan/points", rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(point_cloud_qos_profile),
                                    point_cloud_qos_profile));
-  } else if (format_[LIDAR] == OB_FORMAT_LIDAR_POINT ||
+  } else if (enable_scan_to_point_ || format_[LIDAR] == OB_FORMAT_LIDAR_POINT ||
              format_[LIDAR] == OB_FORMAT_LIDAR_SPHERE_POINT) {
     point_cloud_pub_ = node_->create_publisher<sensor_msgs::msg::PointCloud2>(
         "cloud/points", rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(point_cloud_qos_profile),
@@ -504,14 +504,10 @@ void OBLidarNode::publishScanToPoint(std::shared_ptr<ob::FrameSet> frame_set) {
   for (size_t i = 0; i < scan_count; ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_reflectivity) {
     double rad = 0.7853981852531433 + 0.0026179938577115536 * i;
     *iter_x = static_cast<float>(scans_data[i].distance * cos(rad) / 1000.0);
-    *iter_y = static_cast<float>(scans_data[i].distance * sin(rad) / -1000.0);
+    *iter_y = static_cast<float>(scans_data[i].distance * sin(rad) / 1000.0);
     *iter_z = static_cast<float>(0.0);
     *iter_reflectivity = static_cast<uint8_t>(scans_data[i].intensity);
-    // RCLCPP_INFO_STREAM(logger_, "*iter_x:"<<*iter_x);
   }
-  RCLCPP_INFO(logger_, "point_step: %u", point_cloud_msg->point_step);
-  RCLCPP_INFO(logger_, "row_step: %u", point_cloud_msg->row_step);
-  RCLCPP_INFO(logger_, "data size: %zu", point_cloud_msg->data.size());
   *point_cloud_msg = filterPointCloud(*point_cloud_msg);
   point_cloud_pub_->publish(std::move(point_cloud_msg));
 }
@@ -707,12 +703,10 @@ sensor_msgs::msg::PointCloud2 OBLidarNode::filterPointCloud(
   sensor_msgs::PointCloud2Iterator<float> iter_x(point_cloud, "x");
   sensor_msgs::PointCloud2Iterator<float> iter_y(point_cloud, "y");
   sensor_msgs::PointCloud2Iterator<float> iter_z(point_cloud, "z");
-  sensor_msgs::PointCloud2Iterator<uint8_t> iter_reflectivity(point_cloud, "reflectivity");
-  sensor_msgs::PointCloud2Iterator<uint8_t> iter_tag(point_cloud, "tag");
 
   // Process each point
   for (size_t i = 0; i < point_cloud.height * point_cloud.width;
-       ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_reflectivity, ++iter_tag) {
+       ++i, ++iter_x, ++iter_y, ++iter_z) {
     float x = *iter_x;
     float y = *iter_y;
     float z = *iter_z;

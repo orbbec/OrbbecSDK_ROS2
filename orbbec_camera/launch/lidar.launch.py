@@ -62,6 +62,8 @@ def generate_launch_description():
         DeclareLaunchArgument('lidar_rate', default_value='20'),
         DeclareLaunchArgument('enable_scan_to_point', default_value='false'),
         DeclareLaunchArgument('repetitive_scan_mode', default_value='-1'),
+        DeclareLaunchArgument('enable_cloud_accumulated', default_value='false'),
+        DeclareLaunchArgument('cloud_accumulation_count', default_value='-1'),
         DeclareLaunchArgument('filter_level', default_value='-1'),
         DeclareLaunchArgument('vertical_fov', default_value='-1.0'),
         DeclareLaunchArgument('min_angle', default_value='-135.0'),

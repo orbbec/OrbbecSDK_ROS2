@@ -251,6 +251,9 @@ class OBLidarNode {
   int filter_level_ = -1;
   float vertical_fov_ = -1;
   double angle_increment_ = 0.0;
+  bool enable_cloud_accumulated_ = false;
+  int cloud_accumulation_count_ = -1;
+  std::unique_ptr<CloudAccumulated> cloud_accumulated_ = nullptr;
 };
 
 }  // namespace orbbec_lidar

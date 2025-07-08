@@ -53,6 +53,10 @@ OBLidarNode::OBLidarNode(rclcpp::Node *node, std::shared_ptr<ob::Device> device,
   jpeg_decoder_ = std::make_unique<JetsonNvJPEGDecoder>(width_[COLOR], height_[COLOR]);
 #endif
   is_camera_node_initialized_ = true;
+  if (enable_cloud_accumulated_&&cloud_accumulation_count_>=1) {
+    auto point_cloud_qos_profile = getRMWQosProfileFromString(point_cloud_qos_);
+    cloud_accumulated_=std::make_unique<CloudAccumulated>(node_, point_cloud_qos_profile, cloud_accumulation_count_);
+  }
 }
 
 template <class T>
@@ -148,6 +152,8 @@ void OBLidarNode::getParameters() {
   setAndGetNodeParameter<int>(repetitive_scan_mode_, "repetitive_scan_mode", -1);
   setAndGetNodeParameter<int>(filter_level_, "filter_level", -1);
   setAndGetNodeParameter<float>(vertical_fov_, "vertical_fov", -1.0);
+  setAndGetNodeParameter<bool>(enable_cloud_accumulated_, "enable_cloud_accumulated", false);
+  setAndGetNodeParameter<bool>(cloud_accumulation_count_, "cloud_accumulation_count", -1);
 }
 
 void OBLidarNode::setupDevices() {

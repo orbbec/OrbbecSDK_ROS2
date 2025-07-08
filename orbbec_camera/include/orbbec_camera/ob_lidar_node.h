@@ -250,6 +250,7 @@ class OBLidarNode {
   int repetitive_scan_mode_ = -1;
   int filter_level_ = -1;
   float vertical_fov_ = -1;
+  double angle_increment_ = 0.0;
 };
 
 }  // namespace orbbec_lidar

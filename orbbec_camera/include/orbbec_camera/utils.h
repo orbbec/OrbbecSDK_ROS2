@@ -197,6 +197,8 @@ cv::Mat undistortImage(const cv::Mat& image, const OBCameraIntrinsic& intrinsic,
 
 std::string getDistortionModels(OBCameraDistortion distortion);
 
+double getScanAngleIncrement(OBLiDARScanRate fps);
+
 double deg2rad(double deg);
 
 double rad2deg(double rad);

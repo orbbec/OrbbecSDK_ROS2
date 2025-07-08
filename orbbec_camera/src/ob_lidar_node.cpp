@@ -439,6 +439,9 @@ void OBLidarNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set)
 
 void OBLidarNode::publishScan(std::shared_ptr<ob::FrameSet> frame_set) {
   (void)frame_set;
+  if (angle_increment_ == 0.0) {
+    angle_increment_ = getScanAngleIncrement(rate_[LIDAR]);
+  }
   if (frame_set == nullptr) {
     return;
   }
@@ -453,7 +456,7 @@ void OBLidarNode::publishScan(std::shared_ptr<ob::FrameSet> frame_set) {
   scan_msg->header.frame_id = frame_id_[LIDAR];
   scan_msg->angle_min = 0.7853981852531433;
   scan_msg->angle_max = 5.495169162750244;
-  scan_msg->angle_increment = 0.0026179938577115536;
+  scan_msg->angle_increment = angle_increment_;
   scan_msg->time_increment = 1.0 / rate_int_[LIDAR] / scan_count;
   scan_msg->scan_time = 1.0 / rate_int_[LIDAR];
   scan_msg->range_min = min_range_;

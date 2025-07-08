@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+<!-- based off of https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_description/urdf/gemini335L_336L.urdf.xarco -->
+
+<xacro:macro name="gemini_335L_336L" params="
+    parent
+    prefix:='camera'
+    *origin
+    sim_gazebo:=false
+    gz_fps:='5'
+    gz_image_width:='848'
+    gz_image_height:='530'
+    gz_horz_fov_deg:='94'
+    gz_vert_fov_deg:='68'
+    gz_min_depth:='0.5'
+    gz_max_depth:='6.0'">
+
+  <!-- The original link started with camera_link -->
+  <joint name="${prefix}_gemini_mount_fixed_joint" type="fixed">
+    <parent link="${parent}" />
+    <child link="${prefix}_link" />
+    <xacro:insert_block name="origin"/>
+  </joint>
+
+  <link
+    name="${prefix}_link">
+    <inertial>
+      <origin
+        xyz="0.00288 0.00062 0.01411"
+        rpy="0 0 0" />
+      <mass
+        value="0.03307" />
+      <inertia ixx="0.00004" ixy="0" ixz="0" iyy="0.000003" iyz="0" izz="0.00004" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="file://$(find orbbec_description)/meshes/gemini335L_336L/base_link_simplified.stl" />
+      </geometry>
+      <material
+        name="">
+        <color rgba="0.792 0.820 0.933 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.015" rpy="0 0 0" />
+      <geometry>
+        <box size="0.03 0.13 0.03"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="${prefix}_color_screw_frame" />
+  <joint
+    name="${prefix}_color_screw_frame_joint"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="${prefix}_link" />
+    <child
+      link="${prefix}_color_screw_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <link name="${prefix}_IMU_frame" />
+  <joint
+    name="${prefix}_IMU_frame_joint"
+    type="fixed">
+    <origin
+      xyz="-0.002535 0.039634 0.013243"
+      rpy="0 0 0" />
+    <parent
+      link="${prefix}_color_screw_frame" />
+    <child
+      link="${prefix}_IMU_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <link name="${prefix}_depth_frame" />
+  <joint
+    name="${prefix}_depth_frame_joint"
+    type="fixed">
+    <origin
+      xyz="0.011715 0.0475 0.014311"
+      rpy="0 0 0" />
+    <parent
+      link="${prefix}_color_screw_frame" />
+    <child
+      link="${prefix}_depth_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <link name="${prefix}_infra1_frame" />
+  <joint
+    name="${prefix}_infra1_frame_joint"
+    type="fixed">
+    <origin
+      xyz="0.011715 0.0475 0.014311"
+      rpy="0 0 0" />
+    <parent
+      link="${prefix}_color_screw_frame" />
+    <child
+      link="${prefix}_infra1_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <link name="${prefix}_infra1_optical_frame" />
+  <joint
+    name="${prefix}_infra1_optical_frame_joint"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="-1.5708 0 -1.5708" />
+    <parent
+      link="${prefix}_infra1_frame" />
+    <child
+      link="${prefix}_infra1_optical_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <link name="${prefix}_infra2_frame" />
+  <joint
+    name="${prefix}_infra2_frame_joint"
+    type="fixed">
+    <origin
+      xyz="0.011715 -0.0475 0.014311"
+      rpy="0 0 0" />
+    <parent
+      link="${prefix}_color_screw_frame" />
+    <child
+      link="${prefix}_infra2_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <link name="${prefix}_infra2_optical_frame" />
+  <joint
+    name="${prefix}_infra2_optical_frame_joint"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="-1.5708 0 -1.5708" />
+    <parent
+      link="${prefix}_infra2_frame" />
+    <child
+      link="${prefix}_infra2_optical_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <link name="${prefix}_color_frame" />
+  <joint
+    name="${prefix}_color_frame_joint"
+    type="fixed">
+    <origin
+      xyz="0.011715 0.02375 0.014311"
+      rpy="0.0010157 0 0" />
+    <parent
+      link="${prefix}_color_screw_frame" />
+    <child
+      link="${prefix}_color_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <link name="${prefix}_color_optical_frame" />
+  <joint
+    name="${prefix}_color_optical_frame_joint"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="-1.5708 0 -1.5708" />
+    <parent
+      link="${prefix}_color_frame" />
+    <child
+      link="${prefix}_color_optical_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <xacro:if value="${sim_gazebo}">
+    <!-- Use the realsense2_gz_description which can simulate a generic depth camera -->
+    <xacro:include filename="$(find realsense2_gz_description)/urdf/rgbd_camera.gazebo.xacro" />
+    <!-- TODO: Upstream changes required for a triggered RBGD camera -->
+    <xacro:gazebo_rgbd
+      name="${prefix}"
+      gz_topic_name="${prefix}"
+      fps="${gz_fps}"
+      image_width="${gz_image_width}"
+      image_height="${gz_image_height}"
+      h_fov="${gz_horz_fov_deg * pi/180}"
+      v_fov="${gz_vert_fov_deg * pi/180}"
+      min_depth="${gz_min_depth}"
+      max_depth="${gz_max_depth}" />
+  </xacro:if>
+
+</xacro:macro>
+</robot>

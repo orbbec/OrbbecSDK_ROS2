@@ -9,11 +9,7 @@
     sim_gazebo:=false
     gz_fps:='5'
     gz_image_width:='848'
-    gz_image_height:='530'
-    gz_horz_fov_deg:='94'
-    gz_vert_fov_deg:='68'
-    gz_min_depth:='0.5'
-    gz_max_depth:='6.0'">
+    gz_image_height:='530'">
 
   <!-- The original link started with camera_link -->
   <joint name="${prefix}_gemini_mount_fixed_joint" type="fixed">
@@ -198,10 +194,10 @@
       fps="${gz_fps}"
       image_width="${gz_image_width}"
       image_height="${gz_image_height}"
-      h_fov="${gz_horz_fov_deg * pi/180}"
-      v_fov="${gz_vert_fov_deg * pi/180}"
-      min_depth="${gz_min_depth}"
-      max_depth="${gz_max_depth}" />
+      h_fov="${94 * pi/180}"
+      v_fov="${68 * pi/180}"
+      min_depth="0.5"
+      max_depth="6.0" />
   </xacro:if>
 
 </xacro:macro>

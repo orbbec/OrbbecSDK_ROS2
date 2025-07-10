@@ -529,8 +529,8 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
     ob_camera_node_->startIMU();
     ob_camera_node_->startStreams();
   } else if (ob_lidar_node_) {
-    //   ob_lidar_node_->startIMU();
     ob_lidar_node_->startStreams();
+    ob_lidar_node_->startIMU();
   } else {
     RCLCPP_INFO_STREAM(logger_, "ob_camera_node_ is nullptr");
   }

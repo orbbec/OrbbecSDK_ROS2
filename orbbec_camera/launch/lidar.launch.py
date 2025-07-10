@@ -62,8 +62,6 @@ def generate_launch_description():
         DeclareLaunchArgument('lidar_rate', default_value='20'),
         DeclareLaunchArgument('enable_scan_to_point', default_value='false'),
         DeclareLaunchArgument('repetitive_scan_mode', default_value='-1'),
-        DeclareLaunchArgument('enable_cloud_accumulated', default_value='false'),
-        DeclareLaunchArgument('cloud_accumulation_count', default_value='-1'),
         DeclareLaunchArgument('filter_level', default_value='-1'),
         DeclareLaunchArgument('vertical_fov', default_value='-1.0'),
         DeclareLaunchArgument('min_angle', default_value='-135.0'),
@@ -79,6 +77,14 @@ def generate_launch_description():
         DeclareLaunchArgument('time_domain', default_value='device'),# global, device, system
         DeclareLaunchArgument('config_file_path', default_value=''),
         DeclareLaunchArgument('enable_heartbeat', default_value='false'),
+        DeclareLaunchArgument('enable_sync_output_accel_gyro', default_value='false'),
+        DeclareLaunchArgument('enable_accel', default_value='false'),
+        DeclareLaunchArgument('enable_accel_data_correction', default_value='true'),
+        DeclareLaunchArgument('accel_rate', default_value='200hz'),
+        DeclareLaunchArgument('accel_range', default_value='4g'),
+        DeclareLaunchArgument('enable_gyro', default_value='false'),
+        DeclareLaunchArgument('gyro_rate', default_value='200hz'),
+        DeclareLaunchArgument('gyro_range', default_value='1000dps'),
     ]
 
     def get_params(context, args):

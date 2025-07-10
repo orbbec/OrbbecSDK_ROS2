@@ -46,6 +46,8 @@ OBLidarNode::OBLidarNode(rclcpp::Node *node, std::shared_ptr<ob::Device> device,
                      "OBLidarNode: use_intra_process: " << (use_intra_process ? "ON" : "OFF"));
   is_running_.store(true);
   stream_name_[LIDAR] = "lidar";
+  stream_name_[ACCEL] = "accel";
+  stream_name_[GYRO] = "gyro";
   setupTopics();
 #if defined(USE_RK_HW_DECODER)
   jpeg_decoder_ = std::make_unique<RKJPEGDecoder>(width_[COLOR], height_[COLOR]);
@@ -53,11 +55,11 @@ OBLidarNode::OBLidarNode(rclcpp::Node *node, std::shared_ptr<ob::Device> device,
   jpeg_decoder_ = std::make_unique<JetsonNvJPEGDecoder>(width_[COLOR], height_[COLOR]);
 #endif
   is_camera_node_initialized_ = true;
-  if (enable_cloud_accumulated_ && cloud_accumulation_count_ >= 1) {
-    auto point_cloud_qos_profile = getRMWQosProfileFromString(point_cloud_qos_);
-    cloud_accumulated_ = std::make_unique<CloudAccumulated>(node_, point_cloud_qos_profile,
-                                                            cloud_accumulation_count_);
-  }
+  //   if (enable_cloud_accumulated_ && cloud_accumulation_count_ >= 1) {
+  //     auto point_cloud_qos_profile = getRMWQosProfileFromString(point_cloud_qos_);
+  //     cloud_accumulated_ = std::make_unique<CloudAccumulated>(node_, point_cloud_qos_profile,
+  //                                                             cloud_accumulation_count_);
+  //   }
 }
 
 template <class T>
@@ -97,6 +99,7 @@ void OBLidarNode::clean() noexcept {
   RCLCPP_WARN_STREAM(logger_, "Stop color frame thread");
   RCLCPP_WARN_STREAM(logger_, "stop streams");
   stopStreams();
+  stopIMU();
   RCLCPP_WARN_STREAM(logger_, "Destroy ~OBLidarNode DONE");
 }
 
@@ -154,7 +157,31 @@ void OBLidarNode::getParameters() {
   setAndGetNodeParameter<int>(filter_level_, "filter_level", -1);
   setAndGetNodeParameter<float>(vertical_fov_, "vertical_fov", -1.0);
   setAndGetNodeParameter<bool>(enable_cloud_accumulated_, "enable_cloud_accumulated", false);
-  setAndGetNodeParameter<bool>(cloud_accumulation_count_, "cloud_accumulation_count", -1);
+  setAndGetNodeParameter<int>(cloud_accumulation_count_, "cloud_accumulation_count", -1);
+  setAndGetNodeParameter<bool>(enable_sync_output_accel_gyro_, "enable_sync_output_accel_gyro",
+                               false);
+  setAndGetNodeParameter<double>(liner_accel_cov_, "linear_accel_cov", 0.0003);
+  setAndGetNodeParameter<double>(angular_vel_cov_, "angular_vel_cov", 0.02);
+  for (const auto &stream_index : HID_STREAMS) {
+    std::string param_name = stream_name_[stream_index] + "_qos";
+    setAndGetNodeParameter<std::string>(imu_qos_[stream_index], param_name, "default");
+    param_name = "enable_" + stream_name_[stream_index];
+    setAndGetNodeParameter<bool>(enable_stream_[stream_index], param_name, false);
+    if (enable_sync_output_accel_gyro_) {
+      enable_stream_[stream_index] = true;
+    }
+    param_name = stream_name_[stream_index] + "_rate";
+    setAndGetNodeParameter<std::string>(imu_rate_[stream_index], param_name, "");
+    param_name = stream_name_[stream_index] + "_range";
+    setAndGetNodeParameter<std::string>(imu_range_[stream_index], param_name, "");
+    param_name = camera_name_ + "_" + stream_name_[stream_index] + "_frame_id";
+    std::string default_frame_id = camera_name_ + "_" + stream_name_[stream_index] + "_frame";
+    setAndGetNodeParameter(frame_id_[stream_index], param_name, default_frame_id);
+    std::string default_optical_frame_id =
+        camera_name_ + "_" + stream_name_[stream_index] + "_optical_frame";
+    param_name = stream_name_[stream_index] + "_optical_frame_id";
+    setAndGetNodeParameter(optical_frame_id_[stream_index], param_name, default_optical_frame_id);
+  }
 }
 
 void OBLidarNode::setupDevices() {
@@ -164,11 +191,21 @@ void OBLidarNode::setupDevices() {
     auto profiles = sensor->getStreamProfileList();
     for (size_t j = 0; j < profiles->getCount(); j++) {
       auto profile = profiles->getProfile(j);
+      RCLCPP_INFO_STREAM(logger_,
+                         "profile->getType():" << magic_enum::enum_name((profile->getType())));
       stream_index_pair sip{profile->getType(), 0};
       if (sensors_.find(sip) != sensors_.end()) {
         continue;
       }
       sensors_[sip] = sensor;
+    }
+  }
+  for (const auto &[stream_index, enable] : enable_stream_) {
+    if (enable && sensors_.find(stream_index) == sensors_.end()) {
+      RCLCPP_INFO_STREAM(logger_,
+                         magic_enum::enum_name(stream_index.first)
+                             << "sensor isn't supported by current device! -- Skipping...");
+      enable_stream_[stream_index] = false;
     }
   }
   if (device_->isPropertySupported(OB_PROP_HEARTBEAT_BOOL, OB_PERMISSION_READ_WRITE)) {
@@ -305,6 +342,34 @@ void OBLidarNode::setupProfiles() {
                                       << magic_enum::enum_name(selected_profile->getFormat()));
     }
   }
+  // IMU
+  for (const auto &stream_index : HID_STREAMS) {
+    if (!enable_stream_[stream_index]) {
+      continue;
+    }
+    try {
+      auto profile_list = sensors_[stream_index]->getStreamProfileList();
+      if (stream_index == ACCEL) {
+        auto full_scale_range = fullAccelScaleRangeFromString(imu_range_[stream_index]);
+        auto sample_rate = sampleRateFromString(imu_rate_[stream_index]);
+        auto profile = profile_list->getAccelStreamProfile(full_scale_range, sample_rate);
+        stream_profile_[stream_index] = profile;
+      } else if (stream_index == GYRO) {
+        auto full_scale_range = fullGyroScaleRangeFromString(imu_range_[stream_index]);
+        auto sample_rate = sampleRateFromString(imu_rate_[stream_index]);
+        auto profile = profile_list->getGyroStreamProfile(full_scale_range, sample_rate);
+        stream_profile_[stream_index] = profile;
+      }
+      RCLCPP_INFO_STREAM(logger_, "stream " << stream_name_[stream_index] << " full scale range "
+                                            << imu_range_[stream_index] << " sample rate "
+                                            << imu_rate_[stream_index]);
+    } catch (const ob::Error &e) {
+      RCLCPP_INFO_STREAM(logger_, "Failed to setup << " << stream_name_[stream_index]
+                                                        << " profile: " << e.getMessage());
+      enable_stream_[stream_index] = false;
+      stream_profile_[stream_index] = nullptr;
+    }
+  }
 }
 
 void OBLidarNode::selectBaseStream() {
@@ -343,6 +408,39 @@ void OBLidarNode::setupPublishers() {
         "cloud/points", rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(point_cloud_qos_profile),
                                     point_cloud_qos_profile));
   }
+  if (enable_sync_output_accel_gyro_) {
+    std::string topic_name = stream_name_[GYRO] + "_" + stream_name_[ACCEL] + "/sample";
+    auto data_qos = getRMWQosProfileFromString(imu_qos_[GYRO]);
+    if (use_intra_process_) {
+      data_qos = rmw_qos_profile_default;
+    }
+    imu_gyro_accel_publisher_ = node_->create_publisher<sensor_msgs::msg::Imu>(
+        topic_name, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(data_qos), data_qos));
+    topic_name = stream_name_[GYRO] + "/imu_info";
+    imu_info_publishers_[GYRO] = node_->create_publisher<orbbec_camera_msgs::msg::IMUInfo>(
+        topic_name, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(data_qos), data_qos));
+    topic_name = stream_name_[ACCEL] + "/imu_info";
+    imu_info_publishers_[ACCEL] = node_->create_publisher<orbbec_camera_msgs::msg::IMUInfo>(
+        topic_name, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(data_qos), data_qos));
+  } else {
+    for (const auto &stream_index : HID_STREAMS) {
+      if (!enable_stream_[stream_index]) {
+        continue;
+      }
+      std::string data_topic_name = stream_name_[stream_index] + "/sample";
+      auto data_qos = getRMWQosProfileFromString(imu_qos_[stream_index]);
+      if (use_intra_process_) {
+        data_qos = rmw_qos_profile_default;
+      }
+      imu_publishers_[stream_index] = node_->create_publisher<sensor_msgs::msg::Imu>(
+          data_topic_name, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(data_qos), data_qos));
+      //   data_topic_name = stream_name_[stream_index] + "/imu_info";
+      //   imu_info_publishers_[stream_index] =
+      //       node_->create_publisher<orbbec_camera_msgs::msg::IMUInfo>(
+      //           data_topic_name,
+      //           rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(data_qos), data_qos));
+    }
+  }
 }
 
 void OBLidarNode::startStreams() {
@@ -369,6 +467,71 @@ void OBLidarNode::startStreams() {
   pipeline_started_.store(true);
 }
 
+void OBLidarNode::startIMUSyncStream() {
+  if (imuPipeline_ != nullptr) {
+    imuPipeline_.reset();
+  }
+
+  imuPipeline_ = std::make_unique<ob::Pipeline>(device_);
+  if (imu_sync_output_start_) {
+    return;
+  }
+
+  // ACCEL
+  auto accelProfiles = imuPipeline_->getStreamProfileList(OB_SENSOR_ACCEL);
+  auto accel_range = fullAccelScaleRangeFromString(imu_range_[ACCEL]);
+  auto accel_rate = sampleRateFromString(imu_rate_[ACCEL]);
+  auto accelProfile = accelProfiles->getAccelStreamProfile(accel_range, accel_rate);
+  // GYRO
+  auto gyroProfiles = imuPipeline_->getStreamProfileList(OB_SENSOR_GYRO);
+  auto gyro_range = fullGyroScaleRangeFromString(imu_range_[GYRO]);
+  auto gyro_rate = sampleRateFromString(imu_rate_[GYRO]);
+  auto gyroProfile = gyroProfiles->getGyroStreamProfile(gyro_range, gyro_rate);
+  std::shared_ptr<ob::Config> imuConfig = std::make_shared<ob::Config>();
+  imuConfig->enableStream(accelProfile);
+  imuConfig->enableStream(gyroProfile);
+  TRY_EXECUTE_BLOCK(imuPipeline_->enableFrameSync());
+  imuPipeline_->start(imuConfig, [&](std::shared_ptr<ob::Frame> frame) {
+    auto frameSet = frame->as<ob::FrameSet>();
+    auto aFrame = frameSet->getFrame(OB_FRAME_ACCEL);
+    auto gFrame = frameSet->getFrame(OB_FRAME_GYRO);
+    if (aFrame && gFrame) {
+      onNewIMUFrameSyncOutputCallback(aFrame, gFrame);
+    }
+  });
+
+  imu_sync_output_start_ = true;
+  if (!imu_sync_output_start_) {
+    RCLCPP_ERROR_STREAM(
+        logger_, "Failed to start IMU stream, please check the imu_rate and imu_range parameters.");
+  } else {
+    RCLCPP_INFO_STREAM(
+        logger_, "start accel stream with range: " << fullAccelScaleRangeToString(accel_range)
+                                                   << ",rate:" << sampleRateToString(accel_rate)
+                                                   << ", and start gyro stream with range:"
+                                                   << fullGyroScaleRangeToString(gyro_range)
+                                                   << ",rate:" << sampleRateToString(gyro_rate));
+  }
+}
+void OBLidarNode::startIMU() {
+  if (enable_sync_output_accel_gyro_) {
+    startIMUSyncStream();
+  } else {
+    for (const auto &stream_index : HID_STREAMS) {
+      if (enable_stream_[stream_index] && !imu_started_[stream_index]) {
+        auto imu_profile = stream_profile_[stream_index];
+        CHECK_NOTNULL(imu_profile);
+        RCLCPP_INFO_STREAM(logger_, "start " << stream_name_[stream_index] << " stream");
+        CHECK_NOTNULL(sensors_[stream_index]);
+        sensors_[stream_index]->start(
+            imu_profile, [this, stream_index](const std::shared_ptr<ob::Frame> &frame) {
+              onNewIMUFrameCallback(frame, stream_index);
+            });
+      }
+    }
+  }
+}
+
 void OBLidarNode::stopStreams() {
   if (!pipeline_started_ || !pipeline_) {
     RCLCPP_INFO_STREAM(logger_, "pipeline not started or not exist, skip stop pipeline");
@@ -380,6 +543,36 @@ void OBLidarNode::stopStreams() {
     RCLCPP_ERROR_STREAM(logger_, "Failed to stop pipeline: " << e.getMessage());
   } catch (...) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to stop pipeline");
+  }
+}
+
+void OBLidarNode::stopIMU() {
+  if (enable_sync_output_accel_gyro_) {
+    if (!imu_sync_output_start_ || !imuPipeline_) {
+      RCLCPP_INFO_STREAM(logger_, "imu pipeline not started or not exist, skip stop imu pipeline");
+      return;
+    }
+    try {
+      imuPipeline_->stop();
+    } catch (const ob::Error &e) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to stop imu pipeline: " << e.getMessage());
+    } catch (...) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to stop imu pipeline");
+    }
+  } else {
+    for (const auto &stream_index : HID_STREAMS) {
+      if (imu_started_[stream_index]) {
+        CHECK(sensors_.count(stream_index));
+        RCLCPP_INFO_STREAM(logger_, "stop " << stream_name_[stream_index] << " stream");
+        try {
+          sensors_[stream_index]->stop();
+        } catch (const ob::Error &e) {
+          RCLCPP_ERROR_STREAM(logger_, "Failed to stop " << stream_name_[stream_index]
+                                                         << " stream: " << e.getMessage());
+        }
+        imu_started_[stream_index] = false;
+      }
+    }
   }
 }
 
@@ -410,6 +603,100 @@ void OBLidarNode::setupPipelineConfig() {
   }
 }
 
+void OBLidarNode::onNewIMUFrameSyncOutputCallback(const std::shared_ptr<ob::Frame> &accelframe,
+                                                  const std::shared_ptr<ob::Frame> &gryoframe) {
+  if (!is_camera_node_initialized_) {
+    return;
+  }
+  if (!imu_gyro_accel_publisher_) {
+    RCLCPP_ERROR_STREAM(logger_, "stream Accel Gryo publisher not initialized");
+    return;
+  }
+  bool has_subscriber = imu_gyro_accel_publisher_->get_subscription_count() > 0;
+  //   has_subscriber = has_subscriber || imu_info_publishers_[GYRO]->get_subscription_count() > 0;
+  //   has_subscriber = has_subscriber || imu_info_publishers_[ACCEL]->get_subscription_count() > 0;
+  if (!has_subscriber) {
+    return;
+  }
+  auto imu_msg = sensor_msgs::msg::Imu();
+  setDefaultIMUMessage(imu_msg);
+
+  imu_msg.header.frame_id = optical_frame_id_[GYRO];
+  auto frame_timestamp = getFrameTimestampUs(accelframe);
+  auto timestamp = fromUsToROSTime(frame_timestamp);
+  imu_msg.header.stamp = timestamp;
+
+  //   auto gyro_info = createIMUInfo(GYRO);
+  //   gyro_info.header = imu_msg.header;
+  //   imu_info_publishers_[GYRO]->publish(gyro_info);
+
+  //   auto accel_info = createIMUInfo(ACCEL);
+  //   imu_msg.header.frame_id = optical_frame_id_[ACCEL];
+  //   accel_info.header = imu_msg.header;
+  //   imu_info_publishers_[ACCEL]->publish(accel_info);
+
+  imu_msg.header.frame_id = accel_gyro_frame_id_;
+
+  auto gyro_frame = gryoframe->as<ob::GyroFrame>();
+  auto gyroData = gyro_frame->getValue();
+  imu_msg.angular_velocity.x = gyroData.x;
+  imu_msg.angular_velocity.y = gyroData.y;
+  imu_msg.angular_velocity.z = gyroData.z;
+
+  auto accel_frame = accelframe->as<ob::AccelFrame>();
+  auto accelData = accel_frame->getValue();
+  imu_msg.linear_acceleration.x = accelData.x;
+  imu_msg.linear_acceleration.y = accelData.y;
+  imu_msg.linear_acceleration.z = accelData.z;
+
+  imu_gyro_accel_publisher_->publish(imu_msg);
+}
+
+void OBLidarNode::onNewIMUFrameCallback(const std::shared_ptr<ob::Frame> &frame,
+                                        const stream_index_pair &stream_index) {
+  if (!is_camera_node_initialized_) {
+    return;
+  }
+  if (!imu_publishers_.count(stream_index)) {
+    RCLCPP_ERROR_STREAM(logger_,
+                        "stream " << stream_name_[stream_index] << " publisher not initialized");
+    return;
+  }
+  bool has_subscriber = imu_publishers_[stream_index]->get_subscription_count() > 0;
+  //   has_subscriber =
+  //       has_subscriber || imu_info_publishers_[stream_index]->get_subscription_count() > 0;
+  if (!has_subscriber) {
+    return;
+  }
+  auto imu_msg = sensor_msgs::msg::Imu();
+  setDefaultIMUMessage(imu_msg);
+
+  imu_msg.header.frame_id = optical_frame_id_[stream_index];
+  auto timestamp = fromUsToROSTime(frame->getTimeStampUs());
+  imu_msg.header.stamp = timestamp;
+
+  //   auto imu_info = createIMUInfo(stream_index);
+  //   imu_info.header = imu_msg.header;
+  //   imu_info_publishers_[stream_index]->publish(imu_info);
+
+  if (frame->getType() == OB_FRAME_GYRO) {
+    auto gyro_frame = frame->as<ob::GyroFrame>();
+    auto data = gyro_frame->getValue();
+    imu_msg.angular_velocity.x = data.x;
+    imu_msg.angular_velocity.y = data.y;
+    imu_msg.angular_velocity.z = data.z;
+  } else if (frame->getType() == OB_FRAME_ACCEL) {
+    auto accel_frame = frame->as<ob::AccelFrame>();
+    auto data = accel_frame->getValue();
+    imu_msg.linear_acceleration.x = data.x;
+    imu_msg.linear_acceleration.y = data.y;
+    imu_msg.linear_acceleration.z = data.z;
+  } else {
+    RCLCPP_ERROR(logger_, "Unsupported IMU frame type");
+    return;
+  }
+  imu_publishers_[stream_index]->publish(imu_msg);
+}
 void OBLidarNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set) {
   if (!is_running_.load()) {
     return;
@@ -803,6 +1090,66 @@ void OBLidarNode::calcAndPublishStaticTransform() {
     RCLCPP_INFO_STREAM(logger_, "Rotation " << Q.getX() << ", " << Q.getY() << ", " << Q.getZ()
                                             << ", " << Q.getW());
   }
+}
+
+orbbec_camera_msgs::msg::IMUInfo OBLidarNode::createIMUInfo(const stream_index_pair &stream_index) {
+  orbbec_camera_msgs::msg::IMUInfo imu_info;
+  imu_info.header.frame_id = optical_frame_id_[stream_index];
+  imu_info.header.stamp = node_->now();
+
+  if (stream_index == GYRO) {
+    auto gyro_profile = stream_profile_[stream_index]->as<ob::GyroStreamProfile>();
+    auto gyro_intrinsics = gyro_profile->getIntrinsic();
+    imu_info.noise_density = gyro_intrinsics.noiseDensity;
+    imu_info.random_walk = gyro_intrinsics.randomWalk;
+    imu_info.reference_temperature = gyro_intrinsics.referenceTemp;
+    imu_info.bias = {gyro_intrinsics.bias[0], gyro_intrinsics.bias[1], gyro_intrinsics.bias[2]};
+    imu_info.scale_misalignment = {
+        gyro_intrinsics.scaleMisalignment[0], gyro_intrinsics.scaleMisalignment[1],
+        gyro_intrinsics.scaleMisalignment[2], gyro_intrinsics.scaleMisalignment[3],
+        gyro_intrinsics.scaleMisalignment[4], gyro_intrinsics.scaleMisalignment[5],
+        gyro_intrinsics.scaleMisalignment[6], gyro_intrinsics.scaleMisalignment[7],
+        gyro_intrinsics.scaleMisalignment[8]};
+    imu_info.temperature_slope = {
+        gyro_intrinsics.tempSlope[0], gyro_intrinsics.tempSlope[1], gyro_intrinsics.tempSlope[2],
+        gyro_intrinsics.tempSlope[3], gyro_intrinsics.tempSlope[4], gyro_intrinsics.tempSlope[5],
+        gyro_intrinsics.tempSlope[6], gyro_intrinsics.tempSlope[7], gyro_intrinsics.tempSlope[8]};
+  } else if (stream_index == ACCEL) {
+    auto accel_profile = stream_profile_[stream_index]->as<ob::AccelStreamProfile>();
+    auto accel_intrinsics = accel_profile->getIntrinsic();
+    imu_info.noise_density = accel_intrinsics.noiseDensity;
+    imu_info.random_walk = accel_intrinsics.randomWalk;
+    imu_info.reference_temperature = accel_intrinsics.referenceTemp;
+    imu_info.bias = {accel_intrinsics.bias[0], accel_intrinsics.bias[1], accel_intrinsics.bias[2]};
+    imu_info.gravity = {accel_intrinsics.gravity[0], accel_intrinsics.gravity[1],
+                        accel_intrinsics.gravity[2]};
+    imu_info.scale_misalignment = {
+        accel_intrinsics.scaleMisalignment[0], accel_intrinsics.scaleMisalignment[1],
+        accel_intrinsics.scaleMisalignment[2], accel_intrinsics.scaleMisalignment[3],
+        accel_intrinsics.scaleMisalignment[4], accel_intrinsics.scaleMisalignment[5],
+        accel_intrinsics.scaleMisalignment[6], accel_intrinsics.scaleMisalignment[7],
+        accel_intrinsics.scaleMisalignment[8]};
+    imu_info.temperature_slope = {accel_intrinsics.tempSlope[0], accel_intrinsics.tempSlope[1],
+                                  accel_intrinsics.tempSlope[2], accel_intrinsics.tempSlope[3],
+                                  accel_intrinsics.tempSlope[4], accel_intrinsics.tempSlope[5],
+                                  accel_intrinsics.tempSlope[6], accel_intrinsics.tempSlope[7],
+                                  accel_intrinsics.tempSlope[8]};
+  }
+
+  return imu_info;
+}
+void OBLidarNode::setDefaultIMUMessage(sensor_msgs::msg::Imu &imu_msg) {
+  imu_msg.header.frame_id = "imu_link";
+  imu_msg.orientation.x = 0.0;
+  imu_msg.orientation.y = 0.0;
+  imu_msg.orientation.z = 0.0;
+  imu_msg.orientation.w = 1.0;
+
+  imu_msg.orientation_covariance = {-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  imu_msg.linear_acceleration_covariance = {
+      liner_accel_cov_, 0.0, 0.0, 0.0, liner_accel_cov_, 0.0, 0.0, 0.0, liner_accel_cov_};
+  imu_msg.angular_velocity_covariance = {
+      angular_vel_cov_, 0.0, 0.0, 0.0, angular_vel_cov_, 0.0, 0.0, 0.0, angular_vel_cov_};
 }
 void OBLidarNode::publishStaticTF(const rclcpp::Time &t, const tf2::Vector3 &trans,
                                   const tf2::Quaternion &q, const std::string &from,

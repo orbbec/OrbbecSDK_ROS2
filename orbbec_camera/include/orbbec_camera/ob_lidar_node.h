@@ -145,6 +145,10 @@ class OBLidarNode {
 
   void startStreams();
 
+  void startIMUSyncStream();
+
+  void startIMU();
+
  private:
   void setupDevices();
 
@@ -164,7 +168,15 @@ class OBLidarNode {
 
   void stopStreams();
 
+  void stopIMU();
+
   void onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set);
+
+  void onNewIMUFrameSyncOutputCallback(const std::shared_ptr<ob::Frame>& accelframe,
+                                       const std::shared_ptr<ob::Frame>& gryoframe);
+
+  void onNewIMUFrameCallback(const std::shared_ptr<ob::Frame>& frame,
+                             const stream_index_pair& stream_index);
 
   std::vector<OBLiDARPoint> spherePointToPoint(OBLiDARSpherePoint* sphere_point,
                                                uint32_t point_count);
@@ -183,6 +195,10 @@ class OBLidarNode {
 
   sensor_msgs::msg::PointCloud2 filterPointCloud(sensor_msgs::msg::PointCloud2& point_cloud) const;
 
+  orbbec_camera_msgs::msg::IMUInfo createIMUInfo(const stream_index_pair& stream_index);
+
+  void setDefaultIMUMessage(sensor_msgs::msg::Imu& imu_msg);
+
   void publishStaticTransforms();
 
   void calcAndPublishStaticTransform();
@@ -199,6 +215,7 @@ class OBLidarNode {
   rclcpp::Logger logger_;
   std::atomic_bool is_running_{false};
   std::unique_ptr<ob::Pipeline> pipeline_ = nullptr;
+  std::unique_ptr<ob::Pipeline> imuPipeline_ = nullptr;
   std::atomic_bool pipeline_started_{false};
   std::string camera_name_ = "camera";
   std::shared_ptr<ob::Config> pipeline_config_ = nullptr;
@@ -253,7 +270,22 @@ class OBLidarNode {
   double angle_increment_ = 0.0;
   bool enable_cloud_accumulated_ = false;
   int cloud_accumulation_count_ = -1;
-  std::unique_ptr<CloudAccumulated> cloud_accumulated_ = nullptr;
+
+  // IMU
+  std::map<stream_index_pair, rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr> imu_publishers_;
+  rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_gyro_accel_publisher_;
+  std::map<stream_index_pair, rclcpp::Publisher<orbbec_camera_msgs::msg::IMUInfo>::SharedPtr>
+      imu_info_publishers_;
+  bool enable_sync_output_accel_gyro_ = false;
+  bool imu_sync_output_start_ = false;
+  std::map<stream_index_pair, std::string> imu_rate_;
+  std::map<stream_index_pair, std::string> imu_range_;
+  std::map<stream_index_pair, std::string> imu_qos_;
+  std::map<stream_index_pair, bool> imu_started_;
+  std::string accel_gyro_frame_id_ = "camera_accel_gyro_optical_frame";
+  double liner_accel_cov_ = 0.0001;
+  double angular_vel_cov_ = 0.0001;
+  //   std::unique_ptr<CloudAccumulated> cloud_accumulated_ = nullptr;
 };
 
 }  // namespace orbbec_lidar

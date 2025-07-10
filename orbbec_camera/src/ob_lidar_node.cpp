@@ -53,9 +53,10 @@ OBLidarNode::OBLidarNode(rclcpp::Node *node, std::shared_ptr<ob::Device> device,
   jpeg_decoder_ = std::make_unique<JetsonNvJPEGDecoder>(width_[COLOR], height_[COLOR]);
 #endif
   is_camera_node_initialized_ = true;
-  if (enable_cloud_accumulated_&&cloud_accumulation_count_>=1) {
+  if (enable_cloud_accumulated_ && cloud_accumulation_count_ >= 1) {
     auto point_cloud_qos_profile = getRMWQosProfileFromString(point_cloud_qos_);
-    cloud_accumulated_=std::make_unique<CloudAccumulated>(node_, point_cloud_qos_profile, cloud_accumulation_count_);
+    cloud_accumulated_ = std::make_unique<CloudAccumulated>(node_, point_cloud_qos_profile,
+                                                            cloud_accumulation_count_);
   }
 }
 
@@ -486,6 +487,9 @@ void OBLidarNode::publishScanToPoint(std::shared_ptr<ob::FrameSet> frame_set) {
   if (frame_set == nullptr) {
     return;
   }
+  if (angle_increment_ == 0.0) {
+    angle_increment_ = getScanAngleIncrement(rate_[LIDAR]);
+  }
   auto lidar_frame = frame_set->getFrame(OB_FRAME_LIDAR_POINTS);
   auto *scans_data = reinterpret_cast<OBLiDARScanPoint *>(lidar_frame->getData());
   auto scan_count = lidar_frame->getDataSize() / sizeof(OBLiDARScanPoint);
@@ -511,7 +515,7 @@ void OBLidarNode::publishScanToPoint(std::shared_ptr<ob::FrameSet> frame_set) {
   sensor_msgs::PointCloud2Iterator<float> iter_z(*point_cloud_msg, "z");
   sensor_msgs::PointCloud2Iterator<uint8_t> iter_reflectivity(*point_cloud_msg, "reflectivity");
   for (size_t i = 0; i < scan_count; ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_reflectivity) {
-    double rad = 0.7853981852531433 + 0.0026179938577115536 * i;
+    double rad = 0.7853981852531433 + angle_increment_ * i;
     *iter_x = static_cast<float>(scans_data[i].distance * cos(rad) / 1000.0);
     *iter_y = static_cast<float>(scans_data[i].distance * sin(rad) / 1000.0);
     *iter_z = static_cast<float>(0.0);

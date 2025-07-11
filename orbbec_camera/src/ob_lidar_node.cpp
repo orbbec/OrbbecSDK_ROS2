@@ -439,6 +439,20 @@ void OBLidarNode::setupPublishers() {
       //           rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(data_qos), data_qos));
     }
   }
+  auto extrinsics_qos = rclcpp::QoS(1).transient_local();
+  if (use_intra_process_) {
+    extrinsics_qos = rclcpp::QoS(1);
+  }
+  if (enable_stream_[LIDAR] && enable_stream_[ACCEL]) {
+    lidar_to_other_extrinsics_publishers_[ACCEL] =
+        node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
+            "/" + camera_name_ + "/lidar_to_accel", extrinsics_qos);
+  }
+  if (enable_stream_[LIDAR] && enable_stream_[GYRO]) {
+    lidar_to_other_extrinsics_publishers_[GYRO] =
+        node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
+            "/" + camera_name_ + "/lidar_to_gyro", extrinsics_qos);
+  }
 }
 
 void OBLidarNode::startStreams() {
@@ -1070,7 +1084,14 @@ void OBLidarNode::calcAndPublishStaticTransform() {
     if (!stream_profile) {
       continue;
     }
-    OBExtrinsic ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
+    OBExtrinsic ex;
+    try {
+      ex = stream_profile->getExtrinsicTo(base_stream_profile);
+    } catch (const ob::Error &e) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to get " << stream_name_[stream_index]
+                                                    << " extrinsic: " << e.getMessage());
+      ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
+    }
 
     auto Q = rotationMatrixToQuaternion(ex.rot);
     Q = quaternion_optical * Q * quaternion_optical.inverse();
@@ -1087,6 +1108,36 @@ void OBLidarNode::calcAndPublishStaticTransform() {
     RCLCPP_INFO_STREAM(logger_, "Translation " << trans[0] << ", " << trans[1] << ", " << trans[2]);
     RCLCPP_INFO_STREAM(logger_, "Rotation " << Q.getX() << ", " << Q.getY() << ", " << Q.getZ()
                                             << ", " << Q.getW());
+  }
+  if (enable_stream_[LIDAR] && enable_stream_[ACCEL]) {
+    static const char *frame_id = "lidar_to_accel_extrinsics";
+    OBExtrinsic ex;
+    try {
+      ex = base_stream_profile->getExtrinsicTo(stream_profile_[ACCEL]);
+    } catch (const ob::Error &e) {
+      RCLCPP_ERROR_STREAM(logger_,
+                          "Failed to get " << frame_id << " extrinsic: " << e.getMessage());
+      ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
+    }
+    lidar_to_other_extrinsics_[ACCEL] = ex;
+    auto ex_msg = obExtrinsicsToMsg(ex, frame_id);
+    CHECK_NOTNULL(lidar_to_other_extrinsics_publishers_[ACCEL]);
+    lidar_to_other_extrinsics_publishers_[ACCEL]->publish(ex_msg);
+  }
+  if (enable_stream_[LIDAR] && enable_stream_[GYRO]) {
+    static const char *frame_id = "lidar_to_gyro_extrinsics";
+    OBExtrinsic ex;
+    try {
+      ex = base_stream_profile->getExtrinsicTo(stream_profile_[GYRO]);
+    } catch (const ob::Error &e) {
+      RCLCPP_ERROR_STREAM(logger_,
+                          "Failed to get " << frame_id << " extrinsic: " << e.getMessage());
+      ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
+    }
+    lidar_to_other_extrinsics_[GYRO] = ex;
+    auto ex_msg = obExtrinsicsToMsg(ex, frame_id);
+    CHECK_NOTNULL(lidar_to_other_extrinsics_publishers_[GYRO]);
+    lidar_to_other_extrinsics_publishers_[GYRO]->publish(ex_msg);
   }
 }
 

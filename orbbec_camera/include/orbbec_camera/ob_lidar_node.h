@@ -226,6 +226,9 @@ class OBLidarNode {
   std::map<stream_index_pair, std::vector<std::shared_ptr<ob::LiDARStreamProfile>>>
       supported_profiles_;
   std::map<stream_index_pair, std::shared_ptr<ob::StreamProfile>> stream_profile_;
+  std::map<stream_index_pair, OBExtrinsic> lidar_to_other_extrinsics_;
+  std::map<stream_index_pair, rclcpp::Publisher<orbbec_camera_msgs::msg::Extrinsics>::SharedPtr>
+      lidar_to_other_extrinsics_publishers_;
   stream_index_pair base_stream_ = LIDAR;
 
   std::map<stream_index_pair, bool> enable_stream_;

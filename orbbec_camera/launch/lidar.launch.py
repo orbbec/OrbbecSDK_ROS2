@@ -79,11 +79,10 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_heartbeat', default_value='false'),
         DeclareLaunchArgument('enable_sync_output_accel_gyro', default_value='false'),
         DeclareLaunchArgument('enable_accel', default_value='false'),
-        DeclareLaunchArgument('enable_accel_data_correction', default_value='true'),
-        DeclareLaunchArgument('accel_rate', default_value='200hz'),
-        DeclareLaunchArgument('accel_range', default_value='4g'),
+        DeclareLaunchArgument('accel_rate', default_value='50hz'),
+        DeclareLaunchArgument('accel_range', default_value='2g'),
         DeclareLaunchArgument('enable_gyro', default_value='false'),
-        DeclareLaunchArgument('gyro_rate', default_value='200hz'),
+        DeclareLaunchArgument('gyro_rate', default_value='50hz'),
         DeclareLaunchArgument('gyro_range', default_value='1000dps'),
     ]
 

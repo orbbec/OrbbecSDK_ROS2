@@ -191,8 +191,6 @@ void OBLidarNode::setupDevices() {
     auto profiles = sensor->getStreamProfileList();
     for (size_t j = 0; j < profiles->getCount(); j++) {
       auto profile = profiles->getProfile(j);
-      RCLCPP_INFO_STREAM(logger_,
-                         "profile->getType():" << magic_enum::enum_name((profile->getType())));
       stream_index_pair sip{profile->getType(), 0};
       if (sensors_.find(sip) != sensors_.end()) {
         continue;
@@ -416,12 +414,12 @@ void OBLidarNode::setupPublishers() {
     }
     imu_gyro_accel_publisher_ = node_->create_publisher<sensor_msgs::msg::Imu>(
         topic_name, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(data_qos), data_qos));
-    topic_name = stream_name_[GYRO] + "/imu_info";
-    imu_info_publishers_[GYRO] = node_->create_publisher<orbbec_camera_msgs::msg::IMUInfo>(
-        topic_name, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(data_qos), data_qos));
-    topic_name = stream_name_[ACCEL] + "/imu_info";
-    imu_info_publishers_[ACCEL] = node_->create_publisher<orbbec_camera_msgs::msg::IMUInfo>(
-        topic_name, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(data_qos), data_qos));
+    // topic_name = stream_name_[GYRO] + "/imu_info";
+    // imu_info_publishers_[GYRO] = node_->create_publisher<orbbec_camera_msgs::msg::IMUInfo>(
+    //     topic_name, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(data_qos), data_qos));
+    // topic_name = stream_name_[ACCEL] + "/imu_info";
+    // imu_info_publishers_[ACCEL] = node_->create_publisher<orbbec_camera_msgs::msg::IMUInfo>(
+    //     topic_name, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(data_qos), data_qos));
   } else {
     for (const auto &stream_index : HID_STREAMS) {
       if (!enable_stream_[stream_index]) {

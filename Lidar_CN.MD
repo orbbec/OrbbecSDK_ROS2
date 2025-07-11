@@ -132,6 +132,13 @@ ros2 run orbbec_camera list_camera_profile_mode_node
 - **time_domain**：设备的时间戳类型。可选值为 `device`、`global`、`system`
 - **config_file_path**：YAML 配置文件的路径。默认值为“”。如果未指定配置文件，则将使用启动文件中的默认参数。
 - **enable_heartbeat**：启用心跳功能，默认为 `false`。如果设置为 `true`，摄像头节点将向固件发送心跳信号；如果需要硬件日志记录，也应设置为 `true`。
+- **enable_sync_output_accel_gyro：**开启同步 accel_gyro，输出 IMU 主题实时数据。
+- **enable_accel：**启用加速度计，并输出加速度计topic话题。
+- **accel_rate：**加速度计的频率。
+- **accel_range：**加速度计的范围。
+- **enable_gyro：**启用陀螺仪，并输出陀螺仪信息 topic 数据。
+- **gyro_rate：**陀螺仪的频率。
+- **gyro_range：**陀螺仪的范围。
 
 ## pointcloud data 详细说明
 

@@ -30,6 +30,7 @@ class DevicePresetList;
 class OBDepthWorkModeList;
 class CameraParamList;
 class DeviceFrameInterleaveList;
+class PresetResolutionConfigeList;
 
 class Device {
 public:
@@ -822,6 +823,18 @@ public:
         return std::make_shared<DeviceFrameInterleaveList>(list);
     }
 
+    /**
+     * @brief Get available frame interleave list
+     *
+     * @return DeviceFrameInterleaveList return the available frame interleave list.
+     */
+    std::shared_ptr<PresetResolutionConfigeList> getAvailablePresetResolutionConfigeList() const {
+        ob_error *error = nullptr;
+        auto      list  = ob_device_get_available_preset_resolution_config_list(impl_, &error);
+        Error::handle(&error);
+        return std::make_shared<PresetResolutionConfigeList>(list);
+    }
+
 private:
     static void firmwareUpdateCallback(ob_fw_update_state state, const char *message, uint8_t percent, void *userData) {
         auto device = static_cast<Device *>(userData);
@@ -1499,6 +1512,44 @@ public:
         auto      result = ob_device_frame_interleave_list_has_frame_interleave(impl_, name, &error);
         Error::handle(&error);
         return result;
+    }
+};
+
+/**
+ * @brief Class representing a list of device Frame Interleave
+ */
+class PresetResolutionConfigeList {
+private:
+    ob_preset_resolution_config_list_t *impl_ = nullptr;
+
+public:
+    explicit PresetResolutionConfigeList(ob_preset_resolution_config_list_t *impl) : impl_(impl) {}
+    ~PresetResolutionConfigeList() noexcept {
+        ob_error *error = nullptr;
+        ob_delete_preset_resolution_config_list(impl_, &error);
+        Error::handle(&error, false);
+    }
+
+    /**
+     * @brief Get the number of device preset resolution ratio in the list
+     */
+    uint32_t getCount() {
+        ob_error *error = nullptr;
+        auto      count = ob_device_preset_resolution_config_get_count(impl_, &error);
+        Error::handle(&error);
+        return count;
+    }
+
+    /*
+     *  @brief Get the device preset resolution ratio at the specified index
+     *  @param index the index of the device preset resolution ratio
+     *  @return OBPresetResolutionConfig the corresponding device preset resolution ratio
+     */
+    OBPresetResolutionConfig getPresetResolutionRatioConfig(uint32_t index) {
+        ob_error *error  = nullptr;
+        auto      config = ob_device_preset_resolution_config_list_get_item(impl_, index, &error);
+        Error::handle(&error);
+        return config;
     }
 };
 

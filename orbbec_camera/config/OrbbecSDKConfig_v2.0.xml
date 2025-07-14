@@ -129,7 +129,7 @@
                 <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
                 <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
             </Misc>
-
+            
             <Depth>
                 <!-- The width of the default resolution, int type -->
                 <Width>640</Width>
@@ -400,7 +400,7 @@
             </Misc>
 
             <!-- Whether to enable heartbeat by default -->
-            <DefaulHeartBeat>0</DefaulHeartBeat>
+            <DefaultHeartBeat>0</DefaultHeartBeat>
 
             <Depth>
                 <!-- The resolution width is enabled by default, int type -->
@@ -548,7 +548,7 @@
             </Misc>
 
             <!-- Whether to enable heartbeat by default -->
-            <DefaulHeartBeat>0</DefaulHeartBeat>
+            <DefaultHeartBeat>0</DefaultHeartBeat>
 
             <!-- TODO lumiaozi It is cumbersome to consider the recommended configuration in
             different camera depth modes -->
@@ -658,7 +658,7 @@
             </Misc>
 
             <!-- Whether to enable heartbeat by default -->
-            <DefaulHeartBeat>0</DefaulHeartBeat>
+            <DefaultHeartBeat>0</DefaultHeartBeat>
 
             <Depth>
                 <!-- The resolution width is enabled by default, int type -->
@@ -1200,7 +1200,7 @@
                 <Format>Y8</Format>
             </RightIR>
         </Gemini335Lg>
-
+		
 		<!-- Gemini335Le config -->
         <Gemini335Le>
             <!-- Whether to enable heartbeat by default -->
@@ -1217,12 +1217,12 @@
                 <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
                 <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
             </Misc>
-
+			
 			<DepthPostProcessing>
                 <HardwareNoiseRemoveFilter>false</HardwareNoiseRemoveFilter>
                 <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
             </DepthPostProcessing>
-
+			
 			<!-- Whether to enable heartbeat by default -->
             <DefaultHeartBeat>0</DefaultHeartBeat>
             <!-- Whether to enable firmware upgrade foolproof by default, only internal version
@@ -1791,7 +1791,7 @@
             </Misc>
 
             <!-- Whether to enable heartbeat by default -->
-            <DefaulHeartBeat>0</DefaulHeartBeat>
+            <DefaultHeartBeat>0</DefaultHeartBeat>
 
             <Depth>
                 <!-- The resolution width is enabled by default, int type -->
@@ -1839,7 +1839,7 @@
             </Misc>
 
             <!-- Whether to enable heartbeat by default -->
-            <DefaulHeartBeat>0</DefaulHeartBeat>
+            <DefaultHeartBeat>0</DefaultHeartBeat>
 
             <Depth>
                 <!-- The resolution width is enabled by default, int type -->
@@ -2047,7 +2047,7 @@
                 <Format>Y8</Format>
             </RightIR>
         </CAM-5530>
-
+        
                <!--  Gemini435Le config -->
         <Gemini435Le>
             <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
@@ -2055,10 +2055,19 @@
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
 
             <!-- Whether to enable heartbeat by default -->
-            <DefaulHeartBeat>0</DefaulHeartBeat>
+            <DefaultHeartBeat>0</DefaultHeartBeat>
 
             <!--Max frame delay-->
             <MaxFrameDelay>1.2</MaxFrameDelay>
+
+            <Misc>
+                <GlobalTimestampFitterEnable>true</GlobalTimestampFitterEnable>
+                <!-- Global timestamp fitter refresh interval, unit: milliseconds, default value: 1000,
+                minimum value: 100, it is recommended not to be greater than 1000 -->
+                <GlobalTimestampFitterInterval>1000</GlobalTimestampFitterInterval>
+                <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
+                <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
+            </Misc>
 
             <Depth>
                 <!-- Number of retries for open stream failures, 0 means no retries -->
@@ -2075,7 +2084,7 @@
                 <Height>800</Height>
                 <!-- The frame rate of the resolution enabled by default, int type -->
                 <FPS>10</FPS>
-                <Format>RVL</Format>
+                <Format>Y16</Format>
             </Depth>
             <Color>
                 <!-- The resolution width is enabled by default, int type -->

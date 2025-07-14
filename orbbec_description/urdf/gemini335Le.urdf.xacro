@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by
+Stephen Brawner (brawner@gmail.com)
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="gemini335Le">
+    <xacro:property name="mesh_path" value="package://orbbec_description/meshes/gemini335Le/" />
+
+   <link
+    name="camera_link">
+    <inertial>
+      <origin
+        xyz="0.01235 -0.0020872 0.013243"
+        rpy="0 0 0" />
+      <mass
+        value="0.043446" />
+      <inertia
+        ixx="6.3353E-05"
+        ixy="-1.7904E-06"
+        ixz="-8.8334E-08"
+        iyy="8.2334E-06"
+        iyz="3.3581E-07"
+        izz="6.2898E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}base_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.8 0.8 0.8 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}base_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+    <link
+    name="camera_botton_screw_frame">
+    <inertial>
+      <origin
+        xyz="0.0129595808229284 -0.00178367771212325 0.0132673694649094"
+        rpy="0 0 0" />
+      <mass
+        value="0.0448051589796488" />
+      <inertia
+        ixx="6.33661581989711E-05"
+        ixy="-1.79038624315989E-06"
+        ixz="-8.83359092708292E-08"
+        iyy="8.24796424379033E-06"
+        iyz="3.35812056060257E-07"
+        izz="6.29120336687906E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}camera_botton_screw_frame.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}camera_botton_screw_frame.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="base_Joint"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="camera_botton_screw_frame" />
+    <child
+      link="camera_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="canera_right_IR_ROS_frame">
+    <inertial>
+      <origin
+        xyz="-0.0015782 9.8699E-08 -1.6899E-07"
+        rpy="0 0 0" />
+      <mass
+        value="0.00045313" />
+      <inertia
+        ixx="4.3406E-09"
+        ixy="-5.1012E-13"
+        ixz="-6.3511E-13"
+        iyy="4.8388E-09"
+        iyz="1.081E-12"
+        izz="4.8408E-09" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}canera_right_IR_ROS_frame.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.3 0.3 0.3 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}canera_right_IR_ROS_frame.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="canera_right_IR_ROS_Joint"
+    type="fixed">
+    <origin
+      xyz="0.034005 -0.0475 0.014048"
+      rpy="0 0 0" />
+    <parent
+      link="camera_link" />
+    <child
+      link="canera_right_IR_ROS_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="canera_left_IR_ROS_frame">
+    <inertial>
+      <origin
+        xyz="-0.0015782 9.8699E-08 -1.6899E-07"
+        rpy="0 0 0" />
+      <mass
+        value="0.00045313" />
+      <inertia
+        ixx="4.3406E-09"
+        ixy="-5.1012E-13"
+        ixz="-6.3511E-13"
+        iyy="4.8388E-09"
+        iyz="1.081E-12"
+        izz="4.8408E-09" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}canera_left_IR_ROS_frame.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.5 0.5 0.5 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}canera_left_IR_ROS_frame.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="canera_left_IR_ROS_Joint"
+    type="fixed">
+    <origin
+      xyz="0.034005 0.0475 0.014048"
+      rpy="0 0 0" />
+    <parent
+      link="camera_link" />
+    <child
+      link="canera_left_IR_ROS_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="canera_RGB_ROS_frame">
+    <inertial>
+      <origin
+        xyz="-0.0015872 6.5366E-08 -8.8281E-08"
+        rpy="0 0 0" />
+      <mass
+        value="0.00045313" />
+      <inertia
+        ixx="4.3407E-09"
+        ixy="-5.7478E-13"
+        ixz="-4.8757E-13"
+        iyy="4.8388E-09"
+        iyz="1.3042E-12"
+        izz="4.8408E-09" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}canera_RGB_ROS_frame.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.7 0.7 0.7 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}canera_RGB_ROS_frame.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="canera_RGB_ROS_Joint"
+    type="fixed">
+    <origin
+      xyz="0.034014 0.02375 0.014048"
+      rpy="0 0 0" />
+    <parent
+      link="camera_link" />
+    <child
+      link="canera_RGB_ROS_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="canera_IMU_ROS_frame">
+    <inertial>
+      <origin
+        xyz="0.012945 -0.036548 0.00068975"
+        rpy="0 0 0" />
+      <mass
+        value="0.010604" />
+      <inertia
+        ixx="1.511E-05"
+        ixy="6.8413E-09"
+        ixz="-1.008E-09"
+        iyy="1.184E-06"
+        iyz="1.0258E-07"
+        izz="1.412E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}canera_IMU_ROS_frame.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.8 0.8 0.8 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="${mesh_path}canera_IMU_ROS_frame.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="canera_IMU_ROS_Joint"
+    type="fixed">
+    <origin
+      xyz="0.019757 0.03619 0.013358"
+      rpy="0 0 0" />
+    <parent
+      link="camera_link" />
+    <child
+      link="canera_IMU_ROS_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+</robot>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
-<!-- based off of https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_description/urdf/gemini335L_336L.urdf.xarco -->
+<!-- based off of orbbec_description/urdf/gemini335Le.urdf.xacro -->
 
-<xacro:macro name="gemini_335L_336L" params="
+<xacro:macro name="gemini_335Le" params="
     parent
     prefix:='camera'
     *origin
@@ -22,11 +22,17 @@
     name="${prefix}_link">
     <inertial>
       <origin
-        xyz="0.00288 0.00062 0.01411"
+        xyz="0.01235 -0.0020872 0.013243"
         rpy="0 0 0" />
       <mass
-        value="0.03307" />
-      <inertia ixx="0.00004" ixy="0" ixz="0" iyy="0.000003" iyz="0" izz="0.00004" />
+        value="0.043446" />
+      <inertia
+        ixx="6.3353E-05"
+        ixy="-1.7904E-06"
+        ixz="-8.8334E-08"
+        iyy="8.2334E-06"
+        iyz="3.3581E-07"
+        izz="6.2898E-05" />
     </inertial>
     <visual>
       <origin
@@ -34,24 +40,23 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file://$(find orbbec_description)/meshes/gemini335L_336L/base_link_simplified.stl" />
+          filename="file://$(find orbbec_description)/meshes/gemini335Le/base_link_simplified.stl" />
       </geometry>
-      <material
-        name="">
-        <color rgba="0.792 0.820 0.933 1" />
+      <material name="">
+        <color rgba="0.8 0.8 0.8 1" />
       </material>
     </visual>
     <collision>
-      <origin xyz="0 0 0.015" rpy="0 0 0" />
+      <origin xyz="0.013 0 0.015" rpy="0 0 0" />
       <geometry>
-        <box size="0.03 0.13 0.03"/>
+        <box size="0.055 0.125 0.03"/>
       </geometry>
     </collision>
   </link>
 
-  <link name="${prefix}_color_screw_frame" />
+  <link name="${prefix}_bottom_screw_frame" />
   <joint
-    name="${prefix}_color_screw_frame_joint"
+    name="${prefix}_bottom_screw_frame_joint"
     type="fixed">
     <origin
       xyz="0 0 0"
@@ -59,82 +64,7 @@
     <parent
       link="${prefix}_link" />
     <child
-      link="${prefix}_color_screw_frame" />
-    <axis
-      xyz="0 0 0" />
-  </joint>
-
-  <link name="${prefix}_IMU_frame" />
-  <joint
-    name="${prefix}_IMU_frame_joint"
-    type="fixed">
-    <origin
-      xyz="-0.002535 0.039634 0.013243"
-      rpy="0 0 0" />
-    <parent
-      link="${prefix}_color_screw_frame" />
-    <child
-      link="${prefix}_IMU_frame" />
-    <axis
-      xyz="0 0 0" />
-  </joint>
-
-  <link name="${prefix}_depth_frame" />
-  <joint
-    name="${prefix}_depth_frame_joint"
-    type="fixed">
-    <origin
-      xyz="0.011715 0.0475 0.014311"
-      rpy="0 0 0" />
-    <parent
-      link="${prefix}_color_screw_frame" />
-    <child
-      link="${prefix}_depth_frame" />
-    <axis
-      xyz="0 0 0" />
-  </joint>
-
-  <link name="${prefix}_depth_optical_frame" />
-  <joint
-    name="${prefix}_depth_optical_frame_joint"
-    type="fixed">
-    <origin
-      xyz="0 0 0"
-      rpy="-1.5708 0 -1.5708" />
-    <parent
-      link="${prefix}_depth_frame" />
-    <child
-      link="${prefix}_depth_optical_frame" />
-    <axis
-      xyz="0 0 0" />
-  </joint>
-
-  <link name="${prefix}_infra1_frame" />
-  <joint
-    name="${prefix}_infra1_frame_joint"
-    type="fixed">
-    <origin
-      xyz="0.011715 0.0475 0.014311"
-      rpy="0 0 0" />
-    <parent
-      link="${prefix}_color_screw_frame" />
-    <child
-      link="${prefix}_infra1_frame" />
-    <axis
-      xyz="0 0 0" />
-  </joint>
-
-  <link name="${prefix}_infra1_optical_frame" />
-  <joint
-    name="${prefix}_infra1_optical_frame_joint"
-    type="fixed">
-    <origin
-      xyz="0 0 0"
-      rpy="-1.5708 0 -1.5708" />
-    <parent
-      link="${prefix}_infra1_frame" />
-    <child
-      link="${prefix}_infra1_optical_frame" />
+      link="${prefix}_bottom_screw_frame" />
     <axis
       xyz="0 0 0" />
   </joint>
@@ -144,10 +74,10 @@
     name="${prefix}_infra2_frame_joint"
     type="fixed">
     <origin
-      xyz="0.011715 -0.0475 0.014311"
+      xyz="0.034005 -0.0475 0.014048"
       rpy="0 0 0" />
     <parent
-      link="${prefix}_color_screw_frame" />
+      link="${prefix}_link" />
     <child
       link="${prefix}_infra2_frame" />
     <axis
@@ -169,15 +99,70 @@
       xyz="0 0 0" />
   </joint>
 
-  <link name="${prefix}_color_frame" />
+
+  <link name="${prefix}_infra1_frame" />
   <joint
-    name="${prefix}_color_frame_joint"
+    name="${prefix}_infra1_frame_joint"
     type="fixed">
     <origin
-      xyz="0.011715 0.02375 0.014311"
-      rpy="0.0010157 0 0" />
+      xyz="0.034005 0.0475 0.014048"
+      rpy="0 0 0" />
     <parent
-      link="${prefix}_color_screw_frame" />
+      link="${prefix}_link" />
+    <child
+      link="${prefix}_infra1_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <link name="${prefix}_infra1_optical_frame" />
+  <joint
+    name="${prefix}_infra1_optical_frame_joint"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="-1.5708 0 -1.5708" />
+    <parent
+      link="${prefix}_infra1_frame" />
+    <child
+      link="${prefix}_infra1_optical_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <link name="${prefix}_depth_frame" />
+  <joint
+    name="${prefix}_depth_frame_joint"
+    type="fixed">
+    <parent
+      link="${prefix}_infra1_frame" />
+    <child
+      link="${prefix}_depth_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <link name="${prefix}_depth_optical_frame" />
+  <joint
+    name="${prefix}_depth_optical_frame_joint"
+    type="fixed">
+    <parent
+      link="${prefix}_infra1_optical_frame" />
+    <child
+      link="${prefix}_depth_optical_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <link name="${prefix}_color_frame" />
+  <joint
+    name="${prefix}_frame_frame_joint"
+    type="fixed">
+    <origin
+      xyz="0.034014 0.02375 0.014048"
+      rpy="0 0 0" />
+    <parent
+      link="${prefix}_link" />
     <child
       link="${prefix}_color_frame" />
     <axis
@@ -199,6 +184,21 @@
       xyz="0 0 0" />
   </joint>
 
+  <link name="${prefix}_imu_frame" />
+  <joint
+    name="${prefix}_imu_frame_joint"
+    type="fixed">
+    <origin
+      xyz="0.019757 0.03619 0.013358"
+      rpy="0 0 0" />
+    <parent
+      link="${prefix}_link" />
+    <child
+      link="${prefix}_imu_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
   <xacro:if value="${sim_gazebo}">
     <!-- Use the realsense2_gz_description which can simulate a generic depth camera -->
     <xacro:include filename="$(find realsense2_gz_description)/urdf/rgbd_camera.gazebo.xacro" />
@@ -211,7 +211,7 @@
       image_height="${gz_image_height}"
       h_fov="${94 * pi/180}"
       v_fov="${68 * pi/180}"
-      min_depth="0.17"
+      min_depth="0.25"
       max_depth="6.0" />
   </xacro:if>
 

@@ -63,6 +63,7 @@
 #include "orbbec_camera/d2c_viewer.h"
 #include "magic_enum/magic_enum.hpp"
 #include "orbbec_camera/image_publisher.h"
+#include "orbbec_camera/fps_counter.hpp"
 #include "jpeg_decoder.h"
 #include <std_msgs/msg/string.hpp>
 #include <fcntl.h>
@@ -734,5 +735,11 @@ class OBCameraNode {
   int offset_index1_ = -1;
 
   std::string frame_aggregate_mode_ = "ANY";  // # full_frame, color_frame, ANY or disable
+
+  bool show_fps_enable_ = false;
+  std::unique_ptr<FpsCounter> fps_counter_color_{nullptr};
+  std::unique_ptr<FpsCounter> fps_counter_depth_{nullptr};
+  std::unique_ptr<FpsCounter> fps_counter_left_ir_{nullptr};
+  std::unique_ptr<FpsCounter> fps_counter_right_ir_{nullptr};
 };
 }  // namespace orbbec_camera

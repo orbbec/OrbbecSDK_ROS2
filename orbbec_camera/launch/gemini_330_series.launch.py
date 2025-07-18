@@ -260,6 +260,8 @@ def generate_launch_description():
         DeclareLaunchArgument('laser_index0_depth_gain', default_value='16'),
         DeclareLaunchArgument('laser_index0_ir_brightness', default_value='60'),
         DeclareLaunchArgument('laser_index0_ir_ae_max_exposure', default_value='30000'),
+
+        DeclareLaunchArgument('show_fps_enable', default_value='true'),
     ]
 
     def get_params(context, args):

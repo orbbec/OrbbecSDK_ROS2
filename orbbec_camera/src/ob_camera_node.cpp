@@ -1139,12 +1139,11 @@ void OBCameraNode::setupProfiles() {
             cv::Mat(height_[elem], width_[elem], image_format_[elem], cv::Scalar(0, 0, 0));
       }
       RCLCPP_INFO_STREAM(logger_,
-                         " stream "
-                             << stream_name_[elem]
-                             << " is enabled - width: " << selected_profile->getWidth()
-                             << ", height: " << selected_profile->getHeight()
-                             << ", fps: " << selected_profile->getFps() << ", "
-                             << "Format: " << magic_enum::enum_name(selected_profile->getFormat()));
+                         " stream " << stream_name_[elem]
+                                    << " is enabled - width: " << selected_profile->getWidth()
+                                    << ", height: " << selected_profile->getHeight()
+                                    << ", fps: " << selected_profile->getFps() << ", " << "Format: "
+                                    << magic_enum::enum_name(selected_profile->getFormat()));
     }
   }
   // IMU
@@ -1961,12 +1960,13 @@ void OBCameraNode::setupPublishers() {
   auto device_info = device_->getDeviceInfo();
   CHECK_NOTNULL(device_info.get());
   auto pid = device_info->getPid();
+  std::string topic_prefix = std::string(node_->get_fully_qualified_name()) + "/";
   for (const auto &stream_index : IMAGE_STREAMS) {
     if (!enable_stream_[stream_index]) {
       continue;
     }
     std::string name = stream_name_[stream_index];
-    std::string topic = name + "/image_raw";
+    std::string topic = topic_prefix + name + "/image_raw";
     auto image_qos = image_qos_[stream_index];
     auto image_qos_profile = getRMWQosProfileFromString(image_qos);
     if (use_intra_process_) {
@@ -1980,7 +1980,7 @@ void OBCameraNode::setupPublishers() {
           std::make_shared<image_transport_publisher>(*node_, topic, image_qos_profile);
     }
 
-    topic = name + "/camera_info";
+    topic = topic_prefix + name + "/camera_info";
     auto camera_info_qos = camera_info_qos_[stream_index];
     auto camera_info_qos_profile = getRMWQosProfileFromString(camera_info_qos);
     if (use_intra_process_) {
@@ -1992,23 +1992,24 @@ void OBCameraNode::setupPublishers() {
     if (isGemini335PID(pid)) {
       metadata_publishers_[stream_index] =
           node_->create_publisher<orbbec_camera_msgs::msg::Metadata>(
-              name + "/metadata",
+              topic_prefix + name + "/metadata",
               rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(camera_info_qos_profile),
                           camera_info_qos_profile));
     }
     if (stream_index == COLOR && enable_color_undistortion_) {
       if (use_intra_process_) {
         color_undistortion_publisher_ = std::make_shared<image_rcl_publisher>(
-            *node_, "color/image_undistorted", image_qos_profile);
+            *node_, topic_prefix + "color/image_undistorted", image_qos_profile);
       } else {
         color_undistortion_publisher_ = std::make_shared<image_transport_publisher>(
-            *node_, "color/image_undistorted", image_qos_profile);
+            *node_, topic_prefix + "color/image_undistorted", image_qos_profile);
       }
     }
   }
 
   if (enable_sync_output_accel_gyro_) {
-    std::string topic_name = stream_name_[GYRO] + "_" + stream_name_[ACCEL] + "/sample";
+    std::string topic_name =
+        topic_prefix + stream_name_[GYRO] + "_" + stream_name_[ACCEL] + "/sample";
     auto data_qos = getRMWQosProfileFromString(imu_qos_[GYRO]);
     if (use_intra_process_) {
       data_qos = rmw_qos_profile_default;

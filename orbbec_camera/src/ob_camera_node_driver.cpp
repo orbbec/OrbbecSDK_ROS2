@@ -237,8 +237,10 @@ OBLogSeverity OBCameraNodeDriver::obLogSeverityFromString(const std::string_view
 
 void OBCameraNodeDriver::checkConnectTimer() {
   if (!device_connected_.load()) {
-    RCLCPP_DEBUG_STREAM(logger_,
-                        "checkConnectTimer: device " << serial_number_ << " not connected");
+    RCLCPP_DEBUG(
+        logger_,
+        "checkConnectTimer: device not connected. Serial number [%s], IP [%s], usb port [%s]",
+        serial_number_.c_str(), net_device_ip_.c_str(), usb_port_.c_str());
     return;
   } else if (!ob_camera_node_) {
     device_connected_.store(false);
@@ -316,8 +318,9 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDevice(
     return list->getDevice(0);
   }
   if (device == nullptr) {
-    RCLCPP_WARN_THROTTLE(logger_, *get_clock(), 1000, "Device with serial number %s not found",
-                         serial_number_.c_str());
+    RCLCPP_WARN_THROTTLE(logger_, *get_clock(), 1000,
+                         "Device not found. Serial number [%s], IP [%s], usb port [%s]",
+                         serial_number_.c_str(), net_device_ip_.c_str(), usb_port_.c_str());
     device_connected_ = false;
     return nullptr;
   }
@@ -330,9 +333,9 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceBySerialNumber(
   std::transform(serial_number.begin(), serial_number.end(), std::back_inserter(lower_sn),
                  [](auto ch) { return isalpha(ch) ? tolower(ch) : static_cast<int>(ch); });
   for (size_t i = 0; i < list->getCount(); i++) {
-    RCLCPP_INFO_STREAM(logger_, "Before lock: Select device serial number: " << serial_number);
+    RCLCPP_DEBUG_STREAM(logger_, "Before lock: Select device serial number: " << serial_number);
     std::lock_guard<decltype(device_lock_)> lock(device_lock_);
-    RCLCPP_INFO_STREAM(logger_, "After lock: Select device serial number: " << serial_number);
+    RCLCPP_DEBUG_STREAM(logger_, "After lock: Select device serial number: " << serial_number);
     try {
       auto pid = list->getPid(i);
       if (isOpenNIDevice(pid)) {
@@ -367,9 +370,9 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceBySerialNumber(
 std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByUSBPort(
     const std::shared_ptr<ob::DeviceList> &list, const std::string &usb_port) {
   try {
-    RCLCPP_INFO_STREAM(logger_, "Before lock: Select device usb port: " << usb_port);
+    RCLCPP_DEBUG_STREAM(logger_, "Before lock: Select device usb port: " << usb_port);
     std::lock_guard<decltype(device_lock_)> lock(device_lock_);
-    RCLCPP_INFO_STREAM(logger_, "After lock: Select device usb port: " << usb_port);
+    RCLCPP_DEBUG_STREAM(logger_, "After lock: Select device usb port: " << usb_port);
     auto device = list->getDeviceByUid(usb_port.c_str());
     if (device) {
       RCLCPP_INFO_STREAM(logger_, "getDeviceByUid device usb port " << usb_port << " done");
@@ -393,9 +396,9 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByUSBPort(
 
 std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByNetIP(
     const std::shared_ptr<ob::DeviceList> &list, const std::string &net_ip) {
-  RCLCPP_INFO_STREAM(logger_, "Before lock: Select device net ip: " << net_ip);
+  RCLCPP_DEBUG_STREAM(logger_, "Before lock: Select device net ip: " << net_ip);
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
-  RCLCPP_INFO_STREAM(logger_, "After lock: Select device net ip: " << net_ip);
+  RCLCPP_DEBUG_STREAM(logger_, "After lock: Select device net ip: " << net_ip);
   std::shared_ptr<ob::Device> device = nullptr;
   for (size_t i = 0; i < list->getCount(); i++) {
     try {
@@ -568,10 +571,11 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
     auto device = selectDevice(list);
     auto end_time = std::chrono::high_resolution_clock::now();
     auto time_cost = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-    RCLCPP_INFO_STREAM(logger_, "Select device cost " << time_cost.count() << " ms");
+    RCLCPP_DEBUG_STREAM(logger_, "Select device cost " << time_cost.count() << " ms");
     if (device == nullptr) {
-      RCLCPP_WARN_THROTTLE(logger_, *get_clock(), 1000, "Device with serial number %s not found",
-                           serial_number_.c_str());
+      RCLCPP_WARN_THROTTLE(logger_, *get_clock(), 1000,
+                           "Device not found. Serial number [%s], IP [%s], usb port [%s]",
+                           serial_number_.c_str(), net_device_ip_.c_str(), usb_port_.c_str());
       device_connected_ = false;
       return;
     }
@@ -579,7 +583,7 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
     initializeDevice(device);
     end_time = std::chrono::high_resolution_clock::now();
     time_cost = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-    RCLCPP_INFO_STREAM(logger_, "Initialize device cost " << time_cost.count() << " ms");
+    RCLCPP_DEBUG_STREAM(logger_, "Initialize device cost " << time_cost.count() << " ms");
 
     auto pid = device->getDeviceInfo()->getPid();
     if (GEMINI_335LG_PID == pid) {

@@ -1,0 +1,11 @@
+# Copyright (C) 2024, Locus Robotics. All rights reserved.
+# Unauthorized copying of this file, via any medium, is strictly prohibited
+# Proprietary and confidential
+
+---
+bool success
+string message
+sensor_msgs/Image rgb_image
+sensor_msgs/Image depth_image
+sensor_msgs/CameraInfo rgb_camera_info
+sensor_msgs/CameraInfo depth_camera_info

@@ -48,6 +48,7 @@
 
 #include "orbbec_camera_msgs/msg/device_info.hpp"
 #include "orbbec_camera_msgs/srv/get_device_info.hpp"
+#include "orbbec_camera_msgs/srv/camera_trigger.hpp"
 #include "orbbec_camera_msgs/msg/extrinsics.hpp"
 #include "orbbec_camera_msgs/msg/metadata.hpp"
 #include "orbbec_camera_msgs/msg/imu_info.hpp"
@@ -111,6 +112,7 @@ using SetBool = std_srvs::srv::SetBool;
 using GetBool = orbbec_camera_msgs::srv::GetBool;
 using SetFilter = orbbec_camera_msgs::srv::SetFilter;
 using SetArrays = orbbec_camera_msgs::srv::SetArrays;
+using CameraTrigger = orbbec_camera_msgs::srv::CameraTrigger;
 
 typedef std::pair<ob_stream_type, int> stream_index_pair;
 
@@ -313,8 +315,10 @@ class OBCameraNode {
                          std::shared_ptr<SetFilter ::Response>& response);
   void setSYNCHostimeCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
                               std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
-  void sendSoftwareTriggerCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
-                                   std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
+
+  void resetCaptureServiceVariables();
+  void sendSoftwareTriggerCallback(const std::shared_ptr<CameraTrigger::Request>& request,
+                                   std::shared_ptr<CameraTrigger::Response>& response);
 
   bool toggleSensor(const stream_index_pair& stream_index, bool enabled, std::string& msg);
 
@@ -495,8 +499,24 @@ class OBCameraNode {
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_reset_timestamp_srv_;
   rclcpp::Service<SetInt32>::SharedPtr set_interleaver_laser_sync_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_sync_host_time_srv_;
-  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr send_software_trigger_srv_;
+  rclcpp::Service<CameraTrigger>::SharedPtr send_service_trigger_srv_;
   rclcpp::Service<SetFilter>::SharedPtr set_filter_srv_;
+  rclcpp::Service<CameraTrigger>::SharedPtr capture_camera_images_srv_;
+
+
+  std::atomic_bool service_capture_started_{false};
+  std::atomic_int number_of_rgb_frames_captured_{0};
+  std::atomic_int number_of_depth_frames_captured_{0};
+  std::mutex service_capture_lock_;
+  std::condition_variable service_capture_cv_;
+  sensor_msgs::msg::CameraInfo color_image_camera_info_;
+  sensor_msgs::msg::CameraInfo depth_image_camera_info_;
+  sensor_msgs::msg::Image::UniquePtr color_image_;
+  sensor_msgs::msg::Image::UniquePtr depth_image_;
+  sensor_msgs::msg::Image::UniquePtr undistorted_color_images_;
+
+  // timeout in ms
+  float service_capture_time_out_ = 1000;
 
   bool enable_sync_output_accel_gyro_ = false;
   bool publish_tf_ = false;
@@ -585,6 +605,7 @@ class OBCameraNode {
   int trigger2image_delay_us_ = 0;
   int trigger_out_delay_us_ = 0;
   bool trigger_out_enabled_ = false;
+  bool service_trigger_enabled_ = false;
   bool software_trigger_enabled_ = false;
   int frames_per_trigger_ = 2;
   bool enable_ptp_config_ = false;

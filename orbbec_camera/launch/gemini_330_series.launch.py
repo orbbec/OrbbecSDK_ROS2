@@ -85,6 +85,7 @@ def generate_launch_description():
         DeclareLaunchArgument('color_ae_roi_top', default_value='-1'),
         DeclareLaunchArgument('color_ae_roi_bottom', default_value='-1'),
         DeclareLaunchArgument('color_exposure', default_value='-1'),
+        DeclareLaunchArgument('trigger_mode', default_value='false'),
         DeclareLaunchArgument('color_gain', default_value='-1'),
         DeclareLaunchArgument('enable_color_auto_white_balance', default_value='true'),
         DeclareLaunchArgument('color_white_balance', default_value='-1'),
@@ -180,7 +181,8 @@ def generate_launch_description():
         DeclareLaunchArgument('trigger2image_delay_us', default_value='0'),
         DeclareLaunchArgument('trigger_out_delay_us', default_value='0'),
         DeclareLaunchArgument('trigger_out_enabled', default_value='true'),
-        DeclareLaunchArgument('software_trigger_enabled', default_value='true'),
+        DeclareLaunchArgument('software_trigger_enabled', default_value='false'),
+        DeclareLaunchArgument('service_trigger_enabled', default_value='false'),
         DeclareLaunchArgument('frames_per_trigger', default_value='2'),
         DeclareLaunchArgument('software_trigger_period', default_value='33'),  # ms
         DeclareLaunchArgument('enable_ptp_config', default_value='false'),  # Only for Gemini 335Le

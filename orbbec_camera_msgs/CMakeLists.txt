@@ -21,6 +21,7 @@ rosidl_generate_interfaces(
     "msg/Metadata.msg"
     "msg/IMUInfo.msg"
     "msg/RGBD.msg"
+    "srv/CameraTrigger.srv"
     "srv/GetBool.srv"
     "srv/GetDeviceInfo.srv"
     "srv/GetCameraInfo.srv"

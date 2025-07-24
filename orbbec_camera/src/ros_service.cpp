@@ -206,9 +206,9 @@ void OBCameraNode::setupCameraCtrlServices() {
                                   std::shared_ptr<SetBool::Response> response) {
         setSYNCHostimeCallback(request, response);
       });
-  send_software_trigger_srv_ = node_->create_service<SetBool>(
-      "send_software_trigger", [this](const std::shared_ptr<SetBool::Request> request,
-                                      std::shared_ptr<SetBool::Response> response) {
+  send_service_trigger_srv_ = node_->create_service<CameraTrigger>(
+      "send_service_trigger", [this](const std::shared_ptr<CameraTrigger::Request> request,
+                                     std::shared_ptr<CameraTrigger::Response> response) {
         sendSoftwareTriggerCallback(request, response);
       });
   set_write_customerdata_srv_ = node_->create_service<SetString>(
@@ -1063,23 +1063,58 @@ void OBCameraNode::setSYNCHostimeCallback(
   }
 }
 
+void OBCameraNode::resetCaptureServiceVariables() {
+  service_capture_started_ = false;
+  number_of_rgb_frames_captured_ = 0;
+  number_of_depth_frames_captured_ = 0;
+}
+
 void OBCameraNode::sendSoftwareTriggerCallback(
-    const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
-    std::shared_ptr<std_srvs::srv::SetBool::Response>& response) {
-  try {
-    if (request->data) {
+    const std::shared_ptr<CameraTrigger::Request>& request,
+    std::shared_ptr<CameraTrigger::Response>& response) {
+  (void)request;
+  if (service_trigger_enabled_ and !software_trigger_enabled_) {
+    service_capture_started_ = true;
+    try {
+      RCLCPP_DEBUG_STREAM(logger_, "Triggering");
       device_->triggerCapture();
+
+      RCLCPP_DEBUG_STREAM(logger_, "Capturing images");
+      std::unique_lock<std::mutex> lock(service_capture_lock_);
+      service_capture_cv_.wait_until(
+          lock, std::chrono::system_clock::now() + std::chrono::seconds(1), [this]() {
+            return (number_of_rgb_frames_captured_ >= frames_per_trigger_ &&
+                    number_of_depth_frames_captured_ >= frames_per_trigger_);
+          });
+      RCLCPP_DEBUG_STREAM(logger_, "Captured " << number_of_rgb_frames_captured_ << " "
+                                               << number_of_depth_frames_captured_ << " "
+                                               << (color_image_ == nullptr) << " "
+                                               << (depth_image_ == nullptr));
+
+      if (number_of_rgb_frames_captured_ >= frames_per_trigger_ &&
+          number_of_depth_frames_captured_ >= frames_per_trigger_ && color_image_ && depth_image_) {
+        response->success = true;
+        response->rgb_image = *(color_image_);
+        response->depth_image = *(depth_image_);
+        response->rgb_camera_info = color_image_camera_info_;
+        response->depth_camera_info = depth_image_camera_info_;
+      } else {
+        response->success = false;
+        response->message = "Failed to capture images";
+      }
+    } catch (const ob::Error& e) {
+      response->message = e.getMessage();
+      response->success = false;
+    } catch (const std::exception& e) {
+      response->message = e.what();
+      response->success = false;
+    } catch (...) {
+      response->message = "unknown error";
+      response->success = false;
     }
-    response->success = true;
-  } catch (const ob::Error& e) {
-    response->message = e.getMessage();
-    response->success = false;
-  } catch (const std::exception& e) {
-    response->message = e.what();
-    response->success = false;
-  } catch (...) {
-    response->message = "unknown error";
-    response->success = false;
+    resetCaptureServiceVariables();
+  } else {
+    RCLCPP_INFO_STREAM(logger_, "Service not enabled");
   }
 }
 

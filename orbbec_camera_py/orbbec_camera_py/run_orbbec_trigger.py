@@ -22,6 +22,9 @@ class OrbbecTriggerNode(Node):
         self.img_publisher = self.create_publisher(
             Image, "~/trigger_rgb_image", 1
         )
+        self.depth_img_publisher = self.create_publisher(
+            Image, "~/trigger_depth_image", 1
+        )
         self.bridge = CvBridge()
 
         self.camera_name = cast(str, self.get_parameter("camera_name").value)
@@ -43,6 +46,7 @@ class OrbbecTriggerNode(Node):
             response = self.future.result()
 
             self.img_publisher.publish(self.future.result().rgb_image)
+            self.depth_img_publisher.publish(self.future.result().depth_image)
             self.get_logger().error("Received Images!")
         else:
             self.get_logger().error("Service call failed!")

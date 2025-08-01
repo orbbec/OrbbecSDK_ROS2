@@ -30,7 +30,7 @@ class DevicePresetList;
 class OBDepthWorkModeList;
 class CameraParamList;
 class DeviceFrameInterleaveList;
-class PresetResolutionConfigeList;
+class PresetResolutionConfigList;
 
 class Device {
 public:
@@ -824,15 +824,15 @@ public:
     }
 
     /**
-     * @brief Get available frame interleave list
+     * @brief Get the available preset resolution config list
      *
-     * @return DeviceFrameInterleaveList return the available frame interleave list.
+     * @return PresetResolutionConfigList return the available preset resolution config list.
      */
-    std::shared_ptr<PresetResolutionConfigeList> getAvailablePresetResolutionConfigeList() const {
+    std::shared_ptr<PresetResolutionConfigList> getAvailablePresetResolutionConfigList() const {
         ob_error *error = nullptr;
         auto      list  = ob_device_get_available_preset_resolution_config_list(impl_, &error);
         Error::handle(&error);
-        return std::make_shared<PresetResolutionConfigeList>(list);
+        return std::make_shared<PresetResolutionConfigList>(list);
     }
 
 private:
@@ -1516,15 +1516,15 @@ public:
 };
 
 /**
- * @brief Class representing a list of device Frame Interleave
+ * @brief Class representing a list of preset resolution config list
  */
-class PresetResolutionConfigeList {
+class PresetResolutionConfigList {
 private:
     ob_preset_resolution_config_list_t *impl_ = nullptr;
 
 public:
-    explicit PresetResolutionConfigeList(ob_preset_resolution_config_list_t *impl) : impl_(impl) {}
-    ~PresetResolutionConfigeList() noexcept {
+    explicit PresetResolutionConfigList(ob_preset_resolution_config_list_t *impl) : impl_(impl) {}
+    ~PresetResolutionConfigList() noexcept {
         ob_error *error = nullptr;
         ob_delete_preset_resolution_config_list(impl_, &error);
         Error::handle(&error, false);

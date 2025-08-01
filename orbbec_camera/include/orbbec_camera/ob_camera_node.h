@@ -566,7 +566,7 @@ class OBCameraNode {
   int depth_ae_roi_top_ = -1;
   int depth_ae_roi_right_ = -1;
   int depth_ae_roi_bottom_ = -1;
-  int depth_brightness_ = -1;
+  int mean_intensity_set_point_ = -1;
   int ir_exposure_ = -1;
   int ir_gain_ = -1;
   int ir_ae_max_exposure_ = -1;
@@ -631,6 +631,8 @@ class OBCameraNode {
   bool enable_spatial_filter_ = true;
   bool enable_temporal_filter_ = false;
   bool enable_hole_filling_filter_ = false;
+  bool enable_spatial_fast_filter_ = false;
+  bool enable_spatial_moderate_filter_ = false;
   // filter params
   int decimation_filter_scale_ = -1;
   int sequence_id_filter_id_ = -1;
@@ -653,7 +655,10 @@ class OBCameraNode {
   int gmsl_trigger_fd_ = -1;
   int gmsl_trigger_fps_ = -1;
   bool enable_gmsl_trigger_ = false;
-
+  int spatial_fast_filter_radius_ = -1;
+  int spatial_moderate_filter_radius_ = -1;
+  int spatial_moderate_filter_diff_threshold_ = -1;
+  int spatial_moderate_filter_magnitude_ = -1;
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr filter_status_pub_;
   nlohmann::json filter_status_;
   std::string align_mode_ = "HW";

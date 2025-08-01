@@ -573,15 +573,15 @@ void OBCameraNode::setupDevices() {
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_DEPTH_AUTO_EXPOSURE_PRIORITY_INT,
                         set_enable_depth_auto_exposure_priority);
   }
-  if (depth_brightness_ != -1 &&
+  if (mean_intensity_set_point_ != -1 &&
       device_->isPropertySupported(OB_PROP_IR_BRIGHTNESS_INT, OB_PERMISSION_WRITE)) {
     auto range = device_->getIntPropertyRange(OB_PROP_IR_BRIGHTNESS_INT);
-    if (depth_brightness_ < range.min || depth_brightness_ > range.max) {
+    if (mean_intensity_set_point_ < range.min || mean_intensity_set_point_ > range.max) {
       RCLCPP_ERROR(logger_, "depth brightness value is out of range[%d,%d], please check the value",
                    range.min, range.max);
     } else {
-      RCLCPP_INFO_STREAM(logger_, "Setting depth brightness to " << depth_brightness_);
-      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_BRIGHTNESS_INT, depth_brightness_);
+      RCLCPP_INFO_STREAM(logger_, "Setting depth brightness to " << mean_intensity_set_point_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_BRIGHTNESS_INT, mean_intensity_set_point_);
     }
   }
   // ir ae max
@@ -898,6 +898,8 @@ void OBCameraNode::setupDepthPostProcessFilter() {
         {"HoleFillingFilter", enable_hole_filling_filter_},
         {"DisparityTransform", enable_disaparity_to_depth_},
         {"ThresholdFilter", enable_threshold_filter_},
+        {"SpatialFastFilter", enable_spatial_fast_filter_},
+        {"SpatialModerateFilter", enable_spatial_moderate_filter_},
     };
     std::string filter_name = filter->type();
     RCLCPP_INFO_STREAM(logger_, "Setting " << filter_name << "......");
@@ -979,6 +981,29 @@ void OBCameraNode::setupDepthPostProcessFilter() {
         device_->setStructuredData(OB_STRUCT_DEPTH_HDR_CONFIG,
                                    reinterpret_cast<const uint8_t *>(&config), sizeof(config));
       }
+    } else if (filter_name == "SpatialFastFilter" && enable_spatial_fast_filter_) {
+      auto spatial_fast_filter = filter->as<ob::SpatialFastFilter>();
+      OBSpatialFastFilterParams params{};
+      if (spatial_fast_filter_radius_ != -1) {
+        params.radius = spatial_fast_filter_radius_;
+        RCLCPP_INFO_STREAM(logger_,
+                           "Set SpatialFastFilter radius to " << spatial_fast_filter_radius_);
+        spatial_fast_filter->setFilterParams(params);
+      }
+    } else if (filter_name == "SpatialModerateFilter" && enable_spatial_moderate_filter_) {
+      auto spatial_moderate_filter = filter->as<ob::SpatialModerateFilter>();
+      OBSpatialModerateFilterParams params{};
+      if (spatial_moderate_filter_diff_threshold_ != -1 &&
+          spatial_moderate_filter_magnitude_ != -1 && spatial_moderate_filter_radius_ != -1) {
+        params.magnitude = spatial_moderate_filter_magnitude_;
+        params.radius = spatial_moderate_filter_radius_;
+        params.disp_diff = spatial_moderate_filter_diff_threshold_;
+        RCLCPP_INFO_STREAM(logger_, "Set SpatialModerateFilter params: "
+                                        << "magnitude=" << params.magnitude << ", radius="
+                                        << params.radius << ", disp_diff=" << params.disp_diff);
+        spatial_moderate_filter->setFilterParams(params);
+      }
+
     } else {
       RCLCPP_INFO_STREAM(logger_, "Skip setting filter: " << filter_name);
     }
@@ -1648,7 +1673,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(depth_ae_roi_top_, "depth_ae_roi_top", -1);
   setAndGetNodeParameter<int>(depth_ae_roi_right_, "depth_ae_roi_right", -1);
   setAndGetNodeParameter<int>(depth_ae_roi_bottom_, "depth_ae_roi_bottom", -1);
-  setAndGetNodeParameter<int>(depth_brightness_, "depth_brightness", -1);
+  setAndGetNodeParameter<int>(mean_intensity_set_point_, "mean_intensity_set_point", -1);
   setAndGetNodeParameter<std::string>(depth_precision_str_, "depth_precision", "");
   setAndGetNodeParameter<bool>(enable_ir_auto_exposure_, "enable_ir_auto_exposure", true);
   setAndGetNodeParameter<int>(ir_exposure_, "ir_exposure", -1);
@@ -1699,6 +1724,9 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<bool>(enable_spatial_filter_, "enable_spatial_filter", false);
   setAndGetNodeParameter<bool>(enable_temporal_filter_, "enable_temporal_filter", false);
   setAndGetNodeParameter<bool>(enable_hole_filling_filter_, "enable_hole_filling_filter", false);
+  setAndGetNodeParameter<bool>(enable_spatial_fast_filter_, "enable_spatial_fast_filter", false);
+  setAndGetNodeParameter<bool>(enable_spatial_moderate_filter_, "enable_spatial_moderate_filter",
+                               false);
   setAndGetNodeParameter<int>(decimation_filter_scale_, "decimation_filter_scale", -1);
   setAndGetNodeParameter<int>(sequence_id_filter_id_, "sequence_id_filter_id", -1);
   setAndGetNodeParameter<int>(threshold_filter_max_, "threshold_filter_max", -1);
@@ -3688,26 +3716,56 @@ void OBCameraNode::setFilterCallback(const std::shared_ptr<SetFilter ::Request> 
             "The filter switch setting is successful, but the filter parameter setting fails";
         return;
       }
-    } else {
-      RCLCPP_INFO_STREAM(
-          logger_, request->filter_name
-                       << "Cannot be set\n"
-                       << "The filter_name value that can be set is "
-                          "DecimationFilter, HDRMerge, SequenceIdFilter, ThresholdFilter, Nois"
-                          "eRemovalFilter, SpatialAdvancedFilter and TemporalFilter");
-      return;
-    }
-    for (auto &filter : depth_filter_list_) {
-      std::cout << " - " << filter->getName() << ": "
-                << (filter->isEnabled() ? "enabled" : "disabled") << std::endl;
-      auto configSchemaVec = filter->getConfigSchemaVec();
-      for (auto &configSchema : configSchemaVec) {
-        std::cout << "    - {" << configSchema.name << ", " << configSchema.type << ", "
-                  << configSchema.min << ", " << configSchema.max << ", " << configSchema.step
-                  << ", " << configSchema.def << ", " << configSchema.desc << "}" << std::endl;
+    } else if (request->filter_name == "SpatialFastFilter") {
+      auto spatial_fast_filter = std::make_shared<ob::SpatialFastFilter>();
+      spatial_fast_filter->enable(request->filter_enable);
+      depth_filter_list_.push_back(spatial_fast_filter);
+      if (request->filter_param.size() > 0) {
+        OBSpatialFastFilterParams params{};
+        params.radius = request->filter_param[0];
+        spatial_fast_filter->setFilterParams(params);
+        RCLCPP_INFO_STREAM(logger_, "Set SpatialFastFilter radius to " << params.radius);
+      } else {
+        response->message =
+            "The filter switch setting is successful, but the filter parameter setting fails";
+        return;
       }
+
+    } else if (request->filter_name == "SpatialModerateFilter") {
+      auto spatial_moderate_filter = std::make_shared<ob::SpatialModerateFilter>();
+      spatial_moderate_filter->enable(request->filter_enable);
+      depth_filter_list_.push_back(spatial_moderate_filter);
+      if (request->filter_param.size() > 2) {
+        OBSpatialModerateFilterParams params{};
+        params.disp_diff = request->filter_param[0];
+        params.magnitude = request->filter_param[1];
+        params.radius = request->filter_param[2];
+        spatial_moderate_filter->setFilterParams(params);
+        RCLCPP_INFO_STREAM(logger_, "Set SpatialModerateFilter params: "
+                                        << "\ndisp_diff:" << params.disp_diff << "\nmagnitude:"
+                                        << params.magnitude << "\nradius:" << params.radius);
+      } else {
+        RCLCPP_INFO_STREAM(
+            logger_, request->filter_name
+                         << "Cannot be set\n"
+                         << "The filter_name value that can be set is "
+                            "DecimationFilter, HDRMerge, SequenceIdFilter, ThresholdFilter, "
+                            "NoiseRemovalFilter, HardwareNoiseRemoval, SpatialAdvancedFilter, "
+                            "SpatialFastFilter, SpatialModerateFilter and TemporalFilter");
+        return;
+      }
+      for (auto &filter : depth_filter_list_) {
+        std::cout << " - " << filter->getName() << ": "
+                  << (filter->isEnabled() ? "enabled" : "disabled") << std::endl;
+        auto configSchemaVec = filter->getConfigSchemaVec();
+        for (auto &configSchema : configSchemaVec) {
+          std::cout << "    - {" << configSchema.name << ", " << configSchema.type << ", "
+                    << configSchema.min << ", " << configSchema.max << ", " << configSchema.step
+                    << ", " << configSchema.def << ", " << configSchema.desc << "}" << std::endl;
+        }
+      }
+      response->success = true;
     }
-    response->success = true;
   } catch (const ob::Error &e) {
     response->message = e.getMessage();
     response->success = false;

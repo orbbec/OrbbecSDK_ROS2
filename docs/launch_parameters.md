@@ -78,8 +78,9 @@ The following are the launch parameters available:
   * Set the Color decimation filter scale
 * **enable_depth_auto_exposure_priority**
   * Enable the Depth auto exposure priority
-* **depth_brightness**
-  * Set the Depth brightness
+* **mean_intensity_set_point**
+  * Set the target mean intensity of the Depth image  
+  * **Note:** This parameter replaces the deprecated `depth_brightness`.  
 * **enable_ir_auto_exposure**
   * Enable the IR auto exposure
 * **ir_exposure**
@@ -185,6 +186,10 @@ The following are the launch parameters available:
   * Enable the Depth temporal filter.The Depth temporal filter setting parameter is `temporal_filter_diff_threshold`,`temporal_filter_weight`
 * **enable_hole_filling_filter**
   * Enable the Depth hole filling filter.The Depth hole filling filter setting parameter is `hole_filling_filter_mode`
+* **enable_spatial_fast_filter**
+  - Enable the Depth spatial fast filter. The Depth spatial fast filter setting parameter is `spatial_fast_filter_radius`.
+* **enable_spatial_moderate_filter**
+  - Enable the Depth spatial moderate filter. The Depth spatial moderate filter setting parameters are `spatial_moderate_filter_diff_threshold`, `spatial_moderate_filter_magnitude`, `spatial_moderate_filter_radius`.
 * **align_mode**
   * The alignment mode to be used. Options are `HW` for hardware alignment and `SW` for software alignment
 * **align_target_stream**

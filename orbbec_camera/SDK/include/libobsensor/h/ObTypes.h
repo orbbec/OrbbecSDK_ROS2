@@ -1011,6 +1011,16 @@ typedef enum {
     ob_hole_filling_mode;
 
 typedef struct {
+    uint8_t radius;  // window_size
+} OBSpatialFastFilterParams, ob_spatial_fast_filter_params;
+
+typedef struct {
+    uint8_t  radius;     // window_size
+    uint8_t  magnitude;  // magnitude
+    uint16_t disp_diff;  // smooth_delta
+} OBSpatialModerateFilterParams, ob_spatial_moderate_filter_params;
+
+typedef struct {
     uint8_t  magnitude;  // magnitude
     float    alpha;      // smooth_alpha
     uint16_t disp_diff;  // smooth_delta

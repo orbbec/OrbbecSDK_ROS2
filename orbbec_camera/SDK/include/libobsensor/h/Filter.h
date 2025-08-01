@@ -247,7 +247,7 @@ OB_EXPORT ob_filter_config_schema_item ob_filter_config_schema_list_get_item(con
 
 /**
  * @brief Set the align to stream profile for the align filter.
- * @breif It is useful when the align target stream dose not started (without any frame to get intrinsics and extrinsics).
+ * @brief It is useful when the align target stream dose not started (without any frame to get intrinsics and extrinsics).
  *
  * @param filter A filter object.
  * @param align_to_stream_profile The align target stream profile.

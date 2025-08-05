@@ -29,6 +29,7 @@
 
 #include <fstream>
 #include <iomanip>  // For std::put_time
+#include <malloc.h>
 
 std::string g_camera_name = "orbbec_camera";  // Assuming this is declared elsewhere
 std::string g_time_domain = "global";         // Assuming this is declared elsewhere
@@ -95,6 +96,11 @@ OBCameraNodeDriver::OBCameraNodeDriver(const std::string &node_name, const std::
 
 OBCameraNodeDriver::~OBCameraNodeDriver() {
   is_alive_.store(false);
+
+  if (check_connect_timer_) {
+    check_connect_timer_.reset();
+  }
+
   if (device_count_update_thread_ && device_count_update_thread_->joinable()) {
     device_count_update_thread_->join();
   }
@@ -114,6 +120,11 @@ OBCameraNodeDriver::~OBCameraNodeDriver() {
 }
 
 void OBCameraNodeDriver::init() {
+  // Set memory allocation parameters to reduce memory fragmentation
+  mallopt(M_TRIM_THRESHOLD, 1024*1024*10);
+  mallopt(M_TOP_PAD, 128*1024);
+
+  // Set signal handlers for crash reporting
   signal(SIGSEGV, signalHandler);  // segment fault
   signal(SIGABRT, signalHandler);  // abort
   signal(SIGFPE, signalHandler);   // float point exception
@@ -181,8 +192,8 @@ void OBCameraNodeDriver::init() {
   ctx_->enableNetDeviceEnumeration(enumerate_net_device_);
   ctx_->setDeviceChangedCallback([this](const std::shared_ptr<ob::DeviceList> &removed_list,
                                         const std::shared_ptr<ob::DeviceList> &added_list) {
-    onDeviceConnected(added_list);
     onDeviceDisconnected(removed_list);
+    onDeviceConnected(added_list);
   });
   check_connect_timer_ =
       this->create_wall_timer(std::chrono::milliseconds(1000), [this]() { checkConnectTimer(); });
@@ -193,6 +204,17 @@ void OBCameraNodeDriver::init() {
 
 void OBCameraNodeDriver::onDeviceConnected(const std::shared_ptr<ob::DeviceList> &device_list) {
   CHECK_NOTNULL(device_list);
+  {
+    std::unique_lock<decltype(reset_device_mutex_)> reset_lock(reset_device_mutex_);
+    if (reset_device_flag_) {
+      RCLCPP_INFO_STREAM(logger_, "onDeviceConnected : device reset in progress, waiting...");
+      reset_device_cond_.wait(reset_lock, [this]() { return !reset_device_flag_ || !is_alive_ || !rclcpp::ok(); });
+      if (!is_alive_) {
+        return;
+      }
+      RCLCPP_INFO_STREAM(logger_, "onDeviceConnected : device reset completed, continuing connection");
+    }
+  }
   if (device_list->getCount() == 0) {
     return;
   }
@@ -282,8 +304,10 @@ void OBCameraNodeDriver::resetDevice() {
       device_info_.reset();
       device_connected_ = false;
       device_unique_id_.clear();
-      reset_device_flag_ = false;
     }
+    reset_device_flag_ = false;
+    reset_device_cond_.notify_all();
+    malloc_trim(0);
     RCLCPP_INFO_STREAM(logger_, "Reset device uid: " << device_unique_id_ << " done");
   }
 }
@@ -293,14 +317,50 @@ void OBCameraNodeDriver::rebootDeviceCallback(
     std::shared_ptr<std_srvs::srv::Empty::Response> response) {
   (void)request;
   (void)response;
-  if (!device_connected_) {
-    RCLCPP_WARN(logger_, "Device not connected");
+
+  malloc_trim(0);
+  RCLCPP_INFO(logger_, "Reboot device service called");
+
+  struct timespec timeout;
+  clock_gettime(CLOCK_REALTIME, &timeout);
+  timeout.tv_sec += 15;
+
+  int lock_result = pthread_mutex_timedlock(orb_device_lock_, &timeout);
+  if (lock_result != 0) {
+    RCLCPP_WARN(logger_, "Failed to acquire process lock for reboot: %s", strerror(lock_result));
     return;
   }
-  RCLCPP_INFO(logger_, "Reboot device");
-  ob_camera_node_->rebootDevice();
-  device_connected_ = false;
-  device_ = nullptr;
+
+  std::shared_ptr<int> process_lock_guard(nullptr,
+                                        [this](int *) { pthread_mutex_unlock(orb_device_lock_); });
+
+  try {
+    std::unique_lock<decltype(reset_device_mutex_)> reset_lock(reset_device_mutex_);
+    {
+      std::lock_guard<decltype(device_lock_)> device_lock(device_lock_);
+
+      if (!device_connected_ || !ob_camera_node_) {
+        RCLCPP_INFO(logger_, "Device not connected");
+        return;
+      }
+
+      std::string current_device_uid = device_unique_id_;
+      RCLCPP_INFO_STREAM(logger_, "Rebooting device with UID: " << current_device_uid);
+
+      ob_camera_node_->rebootDevice();
+    }
+
+    RCLCPP_INFO(logger_, "Device reboot initiated, waiting for reconnection");
+    malloc_trim(0);
+    return;
+
+  } catch (std::exception &e) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to reboot device: " << e.what());
+    return;
+  } catch (...) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to reboot device: unknown error");
+    return;
+  }
 }
 
 std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDevice(

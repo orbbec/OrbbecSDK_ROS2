@@ -31,6 +31,8 @@
 #include "orbbec_camera/jetson_nv_decoder.h"
 #endif
 
+#include <malloc.h>
+
 namespace orbbec_camera {
 using namespace std::chrono_literals;
 
@@ -72,9 +74,7 @@ OBCameraNode::OBCameraNode(rclcpp::Node *node, std::shared_ptr<ob::Device> devic
   }
   if (enable_colored_point_cloud_ && enable_stream_[DEPTH] && enable_stream_[COLOR]) {
     rgb_point_cloud_buffer_size_ = width_[COLOR] * height_[COLOR] * sizeof(OBColorPoint);
-    rgb_point_cloud_buffer_ = new uint8_t[rgb_point_cloud_buffer_size_];
     xy_table_data_size_ = width_[DEPTH] * height_[DEPTH] * 2;
-    xy_table_data_ = new float[xy_table_data_size_];
   }
   is_camera_node_initialized_ = true;
 
@@ -111,12 +111,17 @@ void OBCameraNode::setAndGetNodeParameter(
 OBCameraNode::~OBCameraNode() noexcept { clean(); }
 
 void OBCameraNode::rebootDevice() {
-  RCLCPP_WARN_STREAM(logger_, "Reboot device");
+  RCLCPP_INFO_STREAM(logger_, "Do clean before rebooting device");
+  malloc_trim(0);
   clean();
+  malloc_trim(0);
+  std::lock_guard<decltype(device_lock_)> lock(device_lock_);
+  RCLCPP_INFO_STREAM(logger_, "Reboot device");
   if (device_) {
     device_->reboot();
-    RCLCPP_WARN_STREAM(logger_, "Reboot device DONE");
   }
+  malloc_trim(0);
+  RCLCPP_INFO_STREAM(logger_, "Reboot device DONE");
 }
 
 void OBCameraNode::clean() noexcept {
@@ -138,12 +143,6 @@ void OBCameraNode::clean() noexcept {
   stopIMU();
   delete[] rgb_buffer_;
   rgb_buffer_ = nullptr;
-
-  delete[] rgb_point_cloud_buffer_;
-  rgb_point_cloud_buffer_ = nullptr;
-
-  delete[] xy_table_data_;
-  xy_table_data_ = nullptr;
 
   delete[] depth_xy_table_data_;
   depth_xy_table_data_ = nullptr;

@@ -837,7 +837,7 @@ typedef struct {
     float   x;             ///< X coordinate, unit mm
     float   y;             ///< Y coordinate, unit mm
     float   z;             ///< Z coordinate, unit mm
-    uint8_t reflectivity;  ///< reflectivity
+    uint8_t intensity;  ///< intensity
     uint8_t tag;           ///< point state
 } OBLiDARPoint, ob_lidar_point;
 
@@ -848,7 +848,7 @@ typedef struct {
     float   distance;      ///< distance, unit: mm
     float   theta;         ///< azimuth angle, unit: degrees
     float   phi;           ///< zenith angle, unit: degrees
-    uint8_t reflectivity;  ///< reflectivity
+    uint8_t intensity;  ///< intensity
     uint8_t tag;           ///< tag
 } OBLiDARSpherePoint, ob_lidar_sphere_point;
 

@@ -148,6 +148,6 @@ Livox pointcloud2 （PointXYZRT） 点云格式，如下：
 float32 x               # X axis, unit:m
 float32 y               # Y axis, unit:m
 float32 z               # Z axis, unit:m
-uint8 reflectivity      # lidar reflectivity
+uint8 intensity      # lidar intensity
 uint8   tag             # lidar tag
 ```

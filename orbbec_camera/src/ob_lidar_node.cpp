@@ -796,7 +796,7 @@ void OBLidarNode::publishScanToPoint(std::shared_ptr<ob::FrameSet> frame_set) {
   sensor_msgs::PointCloud2Modifier modifier(*point_cloud_msg);
   modifier.setPointCloud2Fields(4, "x", 1, sensor_msgs::msg::PointField::FLOAT32, "y", 1,
                                 sensor_msgs::msg::PointField::FLOAT32, "z", 1,
-                                sensor_msgs::msg::PointField::FLOAT32, "reflectivity", 1,
+                                sensor_msgs::msg::PointField::FLOAT32, "intensity", 1,
                                 sensor_msgs::msg::PointField::UINT8);
   modifier.resize(scan_count);
   auto frame_timestamp = getFrameTimestampUs(lidar_frame);
@@ -812,13 +812,13 @@ void OBLidarNode::publishScanToPoint(std::shared_ptr<ob::FrameSet> frame_set) {
   sensor_msgs::PointCloud2Iterator<float> iter_x(*point_cloud_msg, "x");
   sensor_msgs::PointCloud2Iterator<float> iter_y(*point_cloud_msg, "y");
   sensor_msgs::PointCloud2Iterator<float> iter_z(*point_cloud_msg, "z");
-  sensor_msgs::PointCloud2Iterator<uint8_t> iter_reflectivity(*point_cloud_msg, "reflectivity");
-  for (size_t i = 0; i < scan_count; ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_reflectivity) {
+  sensor_msgs::PointCloud2Iterator<uint8_t> iter_intensity(*point_cloud_msg, "intensity");
+  for (size_t i = 0; i < scan_count; ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_intensity) {
     double rad = 0.7853981852531433 + angle_increment_ * i;
     *iter_x = static_cast<float>(scans_data[i].distance * cos(rad) / 1000.0);
     *iter_y = static_cast<float>(scans_data[i].distance * sin(rad) / 1000.0);
     *iter_z = static_cast<float>(0.0);
-    *iter_reflectivity = static_cast<uint8_t>(scans_data[i].intensity);
+    *iter_intensity = static_cast<uint8_t>(scans_data[i].intensity);
   }
   *point_cloud_msg = filterPointCloud(*point_cloud_msg);
   point_cloud_pub_->publish(std::move(point_cloud_msg));
@@ -838,7 +838,7 @@ void OBLidarNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
   sensor_msgs::PointCloud2Modifier modifier(*point_cloud_msg);
   modifier.setPointCloud2Fields(5, "x", 1, sensor_msgs::msg::PointField::FLOAT32, "y", 1,
                                 sensor_msgs::msg::PointField::FLOAT32, "z", 1,
-                                sensor_msgs::msg::PointField::FLOAT32, "reflectivity", 1,
+                                sensor_msgs::msg::PointField::FLOAT32, "intensity", 1,
                                 sensor_msgs::msg::PointField::UINT8, "tag", 1,
                                 sensor_msgs::msg::PointField::UINT8);
   modifier.resize(point_count);
@@ -853,14 +853,14 @@ void OBLidarNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
   sensor_msgs::PointCloud2Iterator<float> iter_x(*point_cloud_msg, "x");
   sensor_msgs::PointCloud2Iterator<float> iter_y(*point_cloud_msg, "y");
   sensor_msgs::PointCloud2Iterator<float> iter_z(*point_cloud_msg, "z");
-  sensor_msgs::PointCloud2Iterator<uint8_t> iter_reflectivity(*point_cloud_msg, "reflectivity");
+  sensor_msgs::PointCloud2Iterator<uint8_t> iter_intensity(*point_cloud_msg, "intensity");
   sensor_msgs::PointCloud2Iterator<uint8_t> iter_tag(*point_cloud_msg, "tag");
   for (size_t i = 0; i < point_count;
-       ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_reflectivity, ++iter_tag) {
+       ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_intensity, ++iter_tag) {
     *iter_x = static_cast<float>(point_data[i].x / 1000.0);
     *iter_y = static_cast<float>(point_data[i].y / -1000.0);
     *iter_z = static_cast<float>(point_data[i].z / 1000.0);
-    *iter_reflectivity = point_data[i].reflectivity;
+    *iter_intensity = point_data[i].intensity;
     *iter_tag = point_data[i].tag;
   }
   *point_cloud_msg = filterPointCloud(*point_cloud_msg);
@@ -882,7 +882,7 @@ void OBLidarNode::publishSpherePointCloud(std::shared_ptr<ob::FrameSet> frame_se
   sensor_msgs::PointCloud2Modifier modifier(*point_cloud_msg);
   modifier.setPointCloud2Fields(5, "x", 1, sensor_msgs::msg::PointField::FLOAT32, "y", 1,
                                 sensor_msgs::msg::PointField::FLOAT32, "z", 1,
-                                sensor_msgs::msg::PointField::FLOAT32, "reflectivity", 1,
+                                sensor_msgs::msg::PointField::FLOAT32, "intensity", 1,
                                 sensor_msgs::msg::PointField::UINT8, "tag", 1,
                                 sensor_msgs::msg::PointField::UINT8);
   modifier.resize(point_count);
@@ -897,14 +897,14 @@ void OBLidarNode::publishSpherePointCloud(std::shared_ptr<ob::FrameSet> frame_se
   sensor_msgs::PointCloud2Iterator<float> iter_x(*point_cloud_msg, "x");
   sensor_msgs::PointCloud2Iterator<float> iter_y(*point_cloud_msg, "y");
   sensor_msgs::PointCloud2Iterator<float> iter_z(*point_cloud_msg, "z");
-  sensor_msgs::PointCloud2Iterator<uint8_t> iter_reflectivity(*point_cloud_msg, "reflectivity");
+  sensor_msgs::PointCloud2Iterator<uint8_t> iter_intensity(*point_cloud_msg, "intensity");
   sensor_msgs::PointCloud2Iterator<uint8_t> iter_tag(*point_cloud_msg, "tag");
   for (size_t i = 0; i < point_count;
-       ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_reflectivity, ++iter_tag) {
+       ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_intensity, ++iter_tag) {
     *iter_x = static_cast<float>(result_point[i].x / 1000.0);
     *iter_y = static_cast<float>(result_point[i].y / -1000.0);
     *iter_z = static_cast<float>(result_point[i].z / 1000.0);
-    *iter_reflectivity = result_point[i].reflectivity;
+    *iter_intensity = result_point[i].intensity;
     *iter_tag = result_point[i].tag;
   }
   *point_cloud_msg = filterPointCloud(*point_cloud_msg);
@@ -942,7 +942,7 @@ std::vector<OBLiDARPoint> OBLidarNode::spherePointToPoint(OBLiDARSpherePoint *sp
       point_data->x = x;
       point_data->y = y;
       point_data->z = z;
-      point_data->reflectivity = sphere_point->reflectivity;
+      point_data->intensity = sphere_point->intensity;
       point_data->tag = sphere_point->tag;
       ++point_data;
     }

@@ -892,7 +892,7 @@ void OBCameraNode::getLdpStatusCallback(const std::shared_ptr<GetBool::Request>&
 }
 
 void OBCameraNode::setPtpConfigCallback(
-    const std::shared_ptr<rmw_request_id_t>& requst_header,
+    const std::shared_ptr<rmw_request_id_t>& request_header,
     const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
     std::shared_ptr<std_srvs::srv::SetBool::Response>& response) {
   (void)request_header;

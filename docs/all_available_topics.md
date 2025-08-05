@@ -17,9 +17,6 @@
 - `/camera/ir/camera_info`: The IR camera info.
 - `/camera/ir/image_raw`: The IR stream image.
 - `/camera/ir/metadata`: The IR stream firmware data.
-- `/camera/accel/sample`: Acceleration data stream `enable_sync_output_accel_gyro`turned off，`enable_accel`turned on
-- `/camera/gyro/sample`: Gyroscope data stream，enable_sync_output_accel_gyro `turned off，`enable_gyro`turned on
-- `camera/gyro_accel/sample`: Synchronized data stream of acceleration and gyroscope，`enable_sync_output_accel_gyro`
-  turned on
+- `/camera/imu/sample`: Synchronized IMU data stream (accelerometer and gyroscope), when `enable_imu` is turned on
 - `/diagnostics`: The diagnostic information of the camera, Currently, the diagnostic information only includes the
   temperature of the camera.

@@ -89,26 +89,15 @@ The following are the launch parameters available:
 * **ir_ae_max_exposure**
   * Set the maximum exposure value for IR auto exposure
 * **ir_brightness**
-  * Set the IR brightness
-* **enable_sync_output_accel_gyro**
-  * Enable the sync accel_gyro,and output IMU topic real-time data
-* **enable_accel**
-  * Enable the Accelerometer,and output Accelerometer info topic data
-* **enable_accel_data_correction**
-  * Enable the Accelerometer data correction
-* **accel_rate**
-  * The frequency of the accelerometer, the optional values are `1.5625hz`, `3.125hz`, `6.25hz`, `12.5hz`, `25hz`, `50hz`, `100hz`, `200hz`, `500hz`, `1khz`, `2khz`, `4khz`, `8khz`, `16khz`, `32khz`
+    * Set the IR brightness
+* **enable_imu**
+  * Enable the IMU (both accelerometer and gyroscope), and output IMU topic with synchronized data
+* **imu_rate**
+  * The frequency of the IMU, the optional values are `1.5625hz`, `3.125hz`, `6.25hz`, `12.5hz`, `25hz`, `50hz`, `100hz`, `200hz`, `500hz`, `1khz`, `2khz`, `4khz`, `8khz`, `16khz`, `32khz`. The specific value depends on the current camera
 * **accel_range**
   * The range of the accelerometer, the optional values are `2g`, `4g`, `8g`, `16g`. The specific value depends on the current camera
-* **enable_gyro**
-  * Enable the gyroscope,and output gyroscope info topic data
-* **enable_gyro_data_correction**
-  * Enable the gyroscope data correction
-* **gyro_rate**
-  * The frequency of the gyroscope, the optional values are `1.5625hz`, `3.125hz`, `6.25hz`, `12.5hz`, `25hz`, `50hz`, `100hz`, `200hz`, `500hz`, `1khz`, `2khz`, `4khz`, `8khz`, `16khz`, `32khz`.The specific value depends on the current camera
 * **gyro_range**
-  * The range of the gyroscope, the optional values are `16dps`, `31dps`, `62dps`, `125dps`, `250dps`, `500dps`, `1000dps`, `2000dps`. The specific value depends on the
-    current camera
+  * The range of the gyroscope, the optional values are `16dps`, `31dps`, `62dps`, `125dps`, `250dps`, `500dps`, `1000dps`, `2000dps`. The specific value depends on the current camera
 * **liner_accel_cov**
   * Covariance of the linear acceleration
 * **angular_vel_cov**

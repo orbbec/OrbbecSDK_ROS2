@@ -77,12 +77,9 @@ def generate_launch_description():
         DeclareLaunchArgument('time_domain', default_value='device'),# global, device, system
         DeclareLaunchArgument('config_file_path', default_value=''),
         DeclareLaunchArgument('enable_heartbeat', default_value='false'),
-        DeclareLaunchArgument('enable_sync_output_accel_gyro', default_value='false'),
-        DeclareLaunchArgument('enable_accel', default_value='false'),
-        DeclareLaunchArgument('accel_rate', default_value='50hz'),
+        DeclareLaunchArgument('enable_imu', default_value='true'),
+        DeclareLaunchArgument('imu_rate', default_value='50hz'),
         DeclareLaunchArgument('accel_range', default_value='2g'),
-        DeclareLaunchArgument('enable_gyro', default_value='false'),
-        DeclareLaunchArgument('gyro_rate', default_value='50hz'),
         DeclareLaunchArgument('gyro_range', default_value='1000dps'),
     ]
 

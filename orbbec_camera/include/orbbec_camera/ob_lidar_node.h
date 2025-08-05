@@ -145,8 +145,6 @@ class OBLidarNode {
 
   void startStreams();
 
-  void startIMUSyncStream();
-
   void startIMU();
 
  private:
@@ -172,11 +170,8 @@ class OBLidarNode {
 
   void onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set);
 
-  void onNewIMUFrameSyncOutputCallback(const std::shared_ptr<ob::Frame>& accelframe,
-                                       const std::shared_ptr<ob::Frame>& gryoframe);
-
-  void onNewIMUFrameCallback(const std::shared_ptr<ob::Frame>& frame,
-                             const stream_index_pair& stream_index);
+  void onNewIMUFrameCallback(const std::shared_ptr<ob::Frame>& accelframe,
+                             const std::shared_ptr<ob::Frame>& gyroframe);
 
   std::vector<OBLiDARPoint> spherePointToPoint(OBLiDARSpherePoint* sphere_point,
                                                uint32_t point_count);
@@ -226,9 +221,8 @@ class OBLidarNode {
   std::map<stream_index_pair, std::vector<std::shared_ptr<ob::LiDARStreamProfile>>>
       supported_profiles_;
   std::map<stream_index_pair, std::shared_ptr<ob::StreamProfile>> stream_profile_;
-  std::map<stream_index_pair, OBExtrinsic> lidar_to_other_extrinsics_;
-  std::map<stream_index_pair, rclcpp::Publisher<orbbec_camera_msgs::msg::Extrinsics>::SharedPtr>
-      lidar_to_other_extrinsics_publishers_;
+  OBExtrinsic lidar_to_imu_extrinsic_;
+  rclcpp::Publisher<orbbec_camera_msgs::msg::Extrinsics>::SharedPtr lidar_to_imu_extrinsics_publisher_;
   stream_index_pair base_stream_ = LIDAR;
 
   std::map<stream_index_pair, bool> enable_stream_;
@@ -275,17 +269,14 @@ class OBLidarNode {
   int cloud_accumulation_count_ = -1;
 
   // IMU
-  std::map<stream_index_pair, rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr> imu_publishers_;
-  rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_gyro_accel_publisher_;
-  std::map<stream_index_pair, rclcpp::Publisher<orbbec_camera_msgs::msg::IMUInfo>::SharedPtr>
-      imu_info_publishers_;
-  bool enable_sync_output_accel_gyro_ = false;
+  bool enable_imu_ = false;
+  std::string imu_rate_ = "50hz";
+  std::string accel_range_ = "2g";
+  std::string gyro_range_ = "1000dps";
+  std::string imu_qos_ = "default";
+  rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_publisher_;
   bool imu_sync_output_start_ = false;
-  std::map<stream_index_pair, std::string> imu_rate_;
-  std::map<stream_index_pair, std::string> imu_range_;
-  std::map<stream_index_pair, std::string> imu_qos_;
-  std::map<stream_index_pair, bool> imu_started_;
-  std::string accel_gyro_frame_id_ = "camera_accel_gyro_optical_frame";
+  std::string accel_gyro_frame_id_ = "camera_imu_frame";
   double liner_accel_cov_ = 0.0001;
   double angular_vel_cov_ = 0.0001;
   //   std::unique_ptr<CloudAccumulated> cloud_accumulated_ = nullptr;

@@ -570,7 +570,7 @@ public:
      *
      * @param impl The pointer to the internal frame object.
      */
-    explicit ConfidenceFrame(const ob_frame *impl) : VideoFrame(impl){};
+    explicit ConfidenceFrame(const ob_frame *impl) : VideoFrame(impl) {};
 
     ~ConfidenceFrame() noexcept override = default;
 };
@@ -997,6 +997,22 @@ public:
 
         auto frame = std::make_shared<Frame>(impl);
         return frame->as<VideoFrame>();
+    }
+
+    /**
+     * @brief Create a new FrameSet object.
+     *
+     * This function creates a new FrameSet instance by internally calling the native C API.
+     * The returned FrameSet is managed by a std::shared_ptr, and its lifetime will be
+     * automatically managed. When no references remain, the underlying native resources will be released.
+     *
+     * @return std::shared_ptr<FrameSet> The created FrameSet object.
+     */
+    static std::shared_ptr<FrameSet> createFrameSet() {
+        ob_error *error = nullptr;
+        auto      impl  = ob_create_frameset(&error);
+        Error::handle(&error);
+        return std::make_shared<FrameSet>(impl);
     }
 
 private:

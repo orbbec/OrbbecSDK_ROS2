@@ -572,15 +572,15 @@ void OBCameraNode::setupDevices() {
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_DEPTH_AUTO_EXPOSURE_PRIORITY_INT,
                         set_enable_depth_auto_exposure_priority);
   }
-  if (mean_intensity_set_point_ != -1 &&
+  if (depth_brightness_ != -1 &&
       device_->isPropertySupported(OB_PROP_IR_BRIGHTNESS_INT, OB_PERMISSION_WRITE)) {
     auto range = device_->getIntPropertyRange(OB_PROP_IR_BRIGHTNESS_INT);
-    if (mean_intensity_set_point_ < range.min || mean_intensity_set_point_ > range.max) {
+    if (depth_brightness_ < range.min || depth_brightness_ > range.max) {
       RCLCPP_ERROR(logger_, "depth brightness value is out of range[%d,%d], please check the value",
                    range.min, range.max);
     } else {
-      RCLCPP_INFO_STREAM(logger_, "Setting depth brightness to " << mean_intensity_set_point_);
-      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_BRIGHTNESS_INT, mean_intensity_set_point_);
+      RCLCPP_INFO_STREAM(logger_, "Setting depth brightness to " << depth_brightness_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_BRIGHTNESS_INT, depth_brightness_);
     }
   }
   // ir ae max
@@ -1672,7 +1672,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(depth_ae_roi_top_, "depth_ae_roi_top", -1);
   setAndGetNodeParameter<int>(depth_ae_roi_right_, "depth_ae_roi_right", -1);
   setAndGetNodeParameter<int>(depth_ae_roi_bottom_, "depth_ae_roi_bottom", -1);
-  setAndGetNodeParameter<int>(mean_intensity_set_point_, "mean_intensity_set_point", -1);
+  setAndGetNodeParameter<int>(depth_brightness_, "depth_brightness", -1);
   setAndGetNodeParameter<std::string>(depth_precision_str_, "depth_precision", "");
   setAndGetNodeParameter<bool>(enable_ir_auto_exposure_, "enable_ir_auto_exposure", true);
   setAndGetNodeParameter<int>(ir_exposure_, "ir_exposure", -1);

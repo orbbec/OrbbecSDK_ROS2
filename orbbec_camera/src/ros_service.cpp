@@ -135,6 +135,19 @@ void OBCameraNode::setupCameraCtrlServices() {
         (void)request_header;
         getLdpStatusCallback(request, response);
       });
+  set_ptp_config_srv_ = node_->create_service<SetBool>(
+      "set_ptp_config", [this](const std::shared_ptr<rmw_request_id_t> request_header,
+                               const std::shared_ptr<SetBool::Request> request,
+                               std::shared_ptr<SetBool::Response> response) {
+        setPtpConfigCallback(request_header, request, response);
+      });
+  get_ptp_config_srv_ = node_->create_service<GetBool>(
+      "get_ptp_config", [this](const std::shared_ptr<rmw_request_id_t> request_header,
+                               const std::shared_ptr<GetBool::Request> request,
+                               std::shared_ptr<GetBool::Response> response) {
+        (void)request_header;
+        getPtpConfigCallback(request, response);
+      });
 
   get_white_balance_srv_ = node_->create_service<GetInt32>(
       "get_white_balance", [this](const std::shared_ptr<GetInt32::Request> request,
@@ -378,10 +391,10 @@ void OBCameraNode::setAeRoiCallback(const std::shared_ptr<SetArrays ::Request>& 
                                    reinterpret_cast<const uint8_t*>(&config), sizeof(config));
         device_->getStructuredData(OB_STRUCT_DEPTH_AE_ROI, reinterpret_cast<uint8_t*>(&config),
                                    &data_size);
-        RCLCPP_INFO_STREAM(logger_,
-                           "set depth AE ROI : " << "[Left: " << config.x0_left << ", Right: "
-                                                 << config.x1_right << ", Top: " << config.y0_top
-                                                 << ", Bottom: " << config.y1_bottom << " ]");
+        RCLCPP_INFO_STREAM(
+            logger_, "set depth AE ROI : "
+                         << "[Left: " << config.x0_left << ", Right: " << config.x1_right
+                         << ", Top: " << config.y0_top << ", Bottom: " << config.y1_bottom << " ]");
         break;
       case OB_STREAM_COLOR:
         config.x0_left = (static_cast<short int>(request->data_param[0]) < 0)
@@ -412,10 +425,10 @@ void OBCameraNode::setAeRoiCallback(const std::shared_ptr<SetArrays ::Request>& 
                                    reinterpret_cast<const uint8_t*>(&config), sizeof(config));
         device_->getStructuredData(OB_STRUCT_COLOR_AE_ROI, reinterpret_cast<uint8_t*>(&config),
                                    &data_size);
-        RCLCPP_INFO_STREAM(logger_,
-                           "set color AE ROI : " << "[Left: " << config.x0_left << ", Right: "
-                                                 << config.x1_right << ", Top: " << config.y0_top
-                                                 << ", Bottom: " << config.y1_bottom << " ]");
+        RCLCPP_INFO_STREAM(
+            logger_, "set color AE ROI : "
+                         << "[Left: " << config.x0_left << ", Right: " << config.x1_right
+                         << ", Top: " << config.y0_top << ", Bottom: " << config.y1_bottom << " ]");
         break;
       default:
         RCLCPP_ERROR(logger_, "%s NOT a video stream", __FUNCTION__);
@@ -865,6 +878,51 @@ void OBCameraNode::getLdpStatusCallback(const std::shared_ptr<GetBool::Request>&
   (void)request;
   try {
     response->data = device_->getBoolProperty(OB_PROP_LDP_STATUS_BOOL);
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->message = e.getMessage();
+    response->success = false;
+  } catch (const std::exception& e) {
+    response->message = e.what();
+    response->success = false;
+  } catch (...) {
+    response->message = "unknown error";
+    response->success = false;
+  }
+}
+
+void OBCameraNode::setPtpConfigCallback(
+    const std::shared_ptr<rmw_request_id_t>& requst_header,
+    const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
+    std::shared_ptr<std_srvs::srv::SetBool::Response>& response) {
+  (void)request_header;
+
+  try {
+    if (!device_->isPropertySupported(OB_DEVICE_PTP_CLOCK_SYNC_ENABLE_BOOL,
+                                      OB_PERMISSION_READ_WRITE)) {
+      response->success = false;
+      RCLCPP_ERROR(logger_, "OB_DEVICE_PTP_CLOCK_SYNC_ENABLE_BOOL not supported or not writable");
+      return;
+    }
+    device_->setBoolProperty(OB_DEVICE_PTP_CLOCK_SYNC_ENABLE_BOOL, request->data);
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->success = false;
+    response->message = e.getMessage();
+  } catch (const std::exception& e) {
+    response->success = false;
+    response->message = e.what();
+  } catch (...) {
+    response->success = false;
+    response->message = "unknown error";
+  }
+}
+
+void OBCameraNode::getPtpConfigCallback(const std::shared_ptr<GetBool::Request>& request,
+                                        std::shared_ptr<GetBool::Response>& response) {
+  (void)request;
+  try {
+    response->data = device_->getBoolProperty(OB_DEVICE_PTP_CLOCK_SYNC_ENABLE_BOOL);
     response->success = true;
   } catch (const ob::Error& e) {
     response->message = e.getMessage();

@@ -235,6 +235,18 @@ ros2 service call /camera/set_ldp_enable std_srvs/srv/SetBool '{data: true}'
 ros2 service call /camera/get_ldp_status orbbec_camera_msgs/srv/GetBool '{}'
 ```
 
+* `/camera/set_ptp_config`
+
+```bash
+`ptp_config`ros2 service call /camera/set_ptp_config std_srvs/srv/SetBool '{data: true}'
+```
+
+* `/camera/get_ptp_config`
+
+```bash
+ros2 service call /camera/get_ptp_config` orbbec_camera_msgs/srv/GetBool '{}'
+```
+
 * `/camera/get_lrm_measure_distance`
 
 ```bash

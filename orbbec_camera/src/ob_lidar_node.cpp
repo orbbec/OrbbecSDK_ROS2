@@ -1007,11 +1007,46 @@ void OBLidarNode::calcAndPublishStaticTransform() {
     static const char *frame_id = "lidar_to_imu_extrinsics";
     OBExtrinsic ex;
     try {
+      // Try to get extrinsic from ACCEL first
       ex = base_stream_profile->getExtrinsicTo(stream_profile_[ACCEL]);
+
+      // Verify if GYRO has the same extrinsic (they should be identical for the same IMU)
+      try {
+        auto gyro_ex = base_stream_profile->getExtrinsicTo(stream_profile_[GYRO]);
+        // Check if ACCEL and GYRO extrinsics are identical
+        bool extrinsics_match = true;
+        for (int i = 0; i < 9; i++) {
+          if (std::abs(ex.rot[i] - gyro_ex.rot[i]) > 1e-6) {
+            extrinsics_match = false;
+            break;
+          }
+        }
+        for (int i = 0; i < 3; i++) {
+          if (std::abs(ex.trans[i] - gyro_ex.trans[i]) > 1e-6) {
+            extrinsics_match = false;
+            break;
+          }
+        }
+
+        if (!extrinsics_match) {
+          RCLCPP_WARN_STREAM(logger_, "ACCEL and GYRO have different extrinsics, using ACCEL");
+        } else {
+          RCLCPP_DEBUG_STREAM(logger_, "ACCEL and GYRO extrinsics are identical");
+        }
+      } catch (const ob::Error &e) {
+        RCLCPP_WARN_STREAM(logger_, "Could not get GYRO extrinsic for verification: " << e.getMessage());
+      }
+
     } catch (const ob::Error &e) {
-      RCLCPP_ERROR_STREAM(logger_,
-                          "Failed to get " << frame_id << " extrinsic: " << e.getMessage());
-      ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
+      RCLCPP_WARN_STREAM(logger_, "Failed to get ACCEL extrinsic, trying GYRO: " << e.getMessage());
+      try {
+        ex = base_stream_profile->getExtrinsicTo(stream_profile_[GYRO]);
+        RCLCPP_INFO_STREAM(logger_, "Using GYRO extrinsic for IMU");
+      } catch (const ob::Error &e2) {
+        RCLCPP_ERROR_STREAM(logger_,
+                            "Failed to get " << frame_id << " extrinsic from both ACCEL and GYRO: " << e2.getMessage());
+        ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
+      }
     }
     lidar_to_imu_extrinsic_ = ex;
     auto ex_msg = obExtrinsicsToMsg(ex, frame_id);

@@ -113,7 +113,7 @@ def generate_launch_description():
         DeclareLaunchArgument('depth_ae_roi_right', default_value='-1'),
         DeclareLaunchArgument('depth_ae_roi_top', default_value='-1'),
         DeclareLaunchArgument('depth_ae_roi_bottom', default_value='-1'),
-        DeclareLaunchArgument('depth_brightness', default_value='-1'),
+        DeclareLaunchArgument('mean_intensity_set_point', default_value='-1'),
         DeclareLaunchArgument('left_ir_width', default_value='0'),
         DeclareLaunchArgument('left_ir_height', default_value='0'),
         DeclareLaunchArgument('left_ir_fps', default_value='0'),

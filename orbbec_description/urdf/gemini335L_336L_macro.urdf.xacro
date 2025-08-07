@@ -5,11 +5,7 @@
 <xacro:macro name="gemini_335L_336L" params="
     parent
     prefix:='camera'
-    *origin
-    sim_gazebo:=false
-    gz_fps:='5'
-    gz_image_width:='848'
-    gz_image_height:='530'">
+    *origin">
 
   <!-- The original link started with camera_link -->
   <joint name="${prefix}_gemini_mount_fixed_joint" type="fixed">
@@ -51,7 +47,7 @@
 
   <link name="${prefix}_color_screw_frame" />
   <joint
-    name="${prefix}_color_screw_frame_joint"
+    name="${prefix}_color_screw_joint"
     type="fixed">
     <origin
       xyz="0 0 0"
@@ -66,7 +62,7 @@
 
   <link name="${prefix}_IMU_frame" />
   <joint
-    name="${prefix}_IMU_frame_joint"
+    name="${prefix}_IMU_joint"
     type="fixed">
     <origin
       xyz="-0.002535 0.039634 0.013243"
@@ -81,7 +77,7 @@
 
   <link name="${prefix}_depth_frame" />
   <joint
-    name="${prefix}_depth_frame_joint"
+    name="${prefix}_depth_joint"
     type="fixed">
     <origin
       xyz="0.011715 0.0475 0.014311"
@@ -96,7 +92,7 @@
 
   <link name="${prefix}_depth_optical_frame" />
   <joint
-    name="${prefix}_depth_optical_frame_joint"
+    name="${prefix}_depth_optical_joint"
     type="fixed">
     <origin
       xyz="0 0 0"
@@ -111,7 +107,7 @@
 
   <link name="${prefix}_infra1_frame" />
   <joint
-    name="${prefix}_infra1_frame_joint"
+    name="${prefix}_infra1_joint"
     type="fixed">
     <origin
       xyz="0.011715 0.0475 0.014311"
@@ -126,7 +122,7 @@
 
   <link name="${prefix}_infra1_optical_frame" />
   <joint
-    name="${prefix}_infra1_optical_frame_joint"
+    name="${prefix}_infra1_optical_joint"
     type="fixed">
     <origin
       xyz="0 0 0"
@@ -141,7 +137,7 @@
 
   <link name="${prefix}_infra2_frame" />
   <joint
-    name="${prefix}_infra2_frame_joint"
+    name="${prefix}_infra2_joint"
     type="fixed">
     <origin
       xyz="0.011715 -0.0475 0.014311"
@@ -156,7 +152,7 @@
 
   <link name="${prefix}_infra2_optical_frame" />
   <joint
-    name="${prefix}_infra2_optical_frame_joint"
+    name="${prefix}_infra2_optical_joint"
     type="fixed">
     <origin
       xyz="0 0 0"
@@ -169,9 +165,17 @@
       xyz="0 0 0" />
   </joint>
 
-  <link name="${prefix}_color_frame" />
+  <link name="${prefix}_color_frame" >
+    <inertial>
+        <mass value="0.01" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.001"  ixy="0" ixz="0"
+                 iyx="0" iyy="0.001" iyz="0"
+                 izx="0" izy="0" izz="0.001" />
+      </inertial>
+  </link>
   <joint
-    name="${prefix}_color_frame_joint"
+    name="${prefix}_color_joint"
     type="fixed">
     <origin
       xyz="0.011715 0.02375 0.014311"
@@ -186,7 +190,7 @@
 
   <link name="${prefix}_color_optical_frame" />
   <joint
-    name="${prefix}_color_optical_frame_joint"
+    name="${prefix}_color_optical_joint"
     type="fixed">
     <origin
       xyz="0 0 0"
@@ -198,22 +202,6 @@
     <axis
       xyz="0 0 0" />
   </joint>
-
-  <xacro:if value="${sim_gazebo}">
-    <!-- Use the realsense2_gz_description which can simulate a generic depth camera -->
-    <xacro:include filename="$(find realsense2_gz_description)/urdf/rgbd_camera.gazebo.xacro" />
-    <!-- TODO: Upstream changes required for a triggered RBGD camera -->
-    <xacro:gazebo_rgbd
-      name="${prefix}"
-      gz_topic_name="${prefix}"
-      fps="${gz_fps}"
-      image_width="${gz_image_width}"
-      image_height="${gz_image_height}"
-      h_fov="${94 * pi/180}"
-      v_fov="${68 * pi/180}"
-      min_depth="0.17"
-      max_depth="6.0" />
-  </xacro:if>
 
 </xacro:macro>
 </robot>

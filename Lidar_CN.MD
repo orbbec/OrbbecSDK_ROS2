@@ -1,20 +1,20 @@
-# OrbbecSDK ROS2 雷达驱动
+# OrbbecSDK ROS2 激光雷达驱动
 
-此 ROS2 驱动程序支持您使用Orbbec 单线/多线 LiDAR，本文档提供安装说明、使用指南以及其他重要信息，帮助您快速上手使用该驱动程序。
+本ROS2驱动支持您使用奥比中光单线/多线激光雷达。本文档提供安装说明、使用指南和其他重要信息，帮助您快速开始使用此驱动。
 
 ## 1. 安装
 
 ### 1.1 先决条件
 
-在使用 OrbbecSDK ROS2 LiDAR驱动程序之前，请确保您的系统上安装了以下依赖项：
+在使用OrbbecSDK ROS2激光雷达驱动之前，请确保您的系统已安装以下依赖项：
 
-- **ROS2**: 有效安装 ROS2（Humble、Foxy 或其他受支持的发行版）。
-  - 如果您需要帮助，请参阅 [ROS2 安装指南](https://docs.ros.org/en/foxy/Installation.html).
+- **ROS2**: 有效的ROS2安装（Humble、Foxy或其他支持的发行版）。
+  - 如果您需要帮助，请参考[ROS2安装指南](https://docs.ros.org/en/foxy/Installation.html)。
 
-### 1.2 安装 deb 依赖项
+### 1.2 安装deb依赖项
 
 ```bash
-# assume you have sourced ROS environment, same blow
+# 假设您已经配置了ROS环境，下同
 sudo apt install libgflags-dev nlohmann-json3-dev  \
 ros-$ROS_DISTRO-image-transport ros-${ROS_DISTRO}-image-transport-plugins ros-${ROS_DISTRO}-compressed-image-transport \
 ros-$ROS_DISTRO-image-publisher ros-$ROS_DISTRO-camera-info-manager \
@@ -22,7 +22,7 @@ ros-$ROS_DISTRO-diagnostic-updater ros-$ROS_DISTRO-diagnostic-msgs ros-$ROS_DIST
 ros-$ROS_DISTRO-backward-ros libdw-dev
 ```
 
-### 1.3 安装 udev 规则
+### 1.3 安装udev规则
 
 ```bash
 cd  ~/ros2_ws/src/OrbbecSDK_ROS2/orbbec_camera/scripts
@@ -30,15 +30,15 @@ sudo bash install_udev_rules.sh
 sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
 
-### 2. 入门
+### 2. 入门指南
 
 ```bash
 cd ~/ros2_ws/
-# build release, Default is Debug
+# 构建发布版本，默认为调试版本
 colcon build --event-handlers  console_direct+  --cmake-args  -DCMAKE_BUILD_TYPE=Release
 ```
 
-启动雷达节点
+启动激光雷达节点
 
 * 第一个终端
 
@@ -54,49 +54,50 @@ ros2 launch orbbec_camera lidar.launch.py
 rviz2
 ```
 
-1.打开Rviz2。
+1. 打开Rviz2。
+2. 添加 `PointCloud2`或 `LaserScan`显示。
+3. 对于 `PointCloud2`，选择 `/lidar/cloud/points`话题；对于 `LaserScan`，选择 `/lidar/scan/points`话题。
+4. 将 `Fixed Frame`设置为 `lidar_lidar_frame`以正确对齐数据。
 
-2.添加一个 `PointCloud2`或者 `LaserScan`显示。
+* `PointCloud2`可视化示例：
 
-3.`PointCloud2`选择 `/lidar/cloud/points`话题，`LaserScan`选择 `/lidar/scan/points`话题。
+![rviz2中的模块](./docs/images/lidar0.jpg)
 
-4.将 `Fixed Frame`设置为 `lidar_lidar_frame`，以正确对齐数据。
+* `LaserScan`可视化示例：
 
-* `PointCloud2`示例可视化：
+![rviz2中的模块](./docs/images/lidar1.png)
 
-![module in rviz2](./docs/images/lidar0.jpg)
+## 2. 使用方法
 
-* `LaserScan`示例可视化：
+### 2.1 运行驱动
 
-![module in rviz2](./docs/images/lidar1.png)
-
-## 2. 用法
-
-### 2.1 运行驱动程序
-
-要启动驱动程序，请启动提供的 ROS2 启动文件：
+要启动驱动，请启动提供的ROS2启动文件：
 
 ```bash
 source install/setup.bash
-# Launch the driver with point cloud data
+# 启动带有点云数据的驱动
 ros2 launch orbbec_camera lidar.launch.py lidar_format:=LIDAR_POINT
-# Launch the driver with sphere point cloud data
+# 启动带有球面点云数据的驱动
 ros2 launch orbbec_camera lidar.launch.py lidar_format:=LIDAR_SPHERE_POINT
-# Launch the driver with laser scan data
+# 启动带有激光扫描数据的驱动
 ros2 launch orbbec_camera lidar.launch.py lidar_format:=LIDAR_SCAN
+# 启动启用IMU的驱动
+ros2 launch orbbec_camera lidar.launch.py enable_imu:=true imu_rate:=50hz
+# 启动同时包含点云和IMU数据的驱动
+ros2 launch orbbec_camera lidar.launch.py lidar_format:=LIDAR_POINT enable_imu:=true imu_rate:=100hz
 ```
 
-此命令将启动与 Orbbec LiDAR 设备接口的节点。运行此命令前，请确保 LiDAR 硬件已正确连接。
+此命令将启动与奥比中光激光雷达设备接口的节点。请确保在运行此命令之前正确连接激光雷达硬件。
 
-### 2.2 获取已连接雷达的设备信息
+### 2.2 获取已连接激光雷达的设备信息
 
 ```bash
 ros2 run orbbec_camera list_devices_node
 ```
 
-此命令将列出已连接的 LiDAR 设备，并显示它们各自的 IP 地址和端口。您可以使用这些信息来配置驱动程序以连接到特定设备。
+此命令将列出已连接的激光雷达设备并显示其各自的IP地址和端口。您可以使用此信息配置驱动以连接到特定设备。
 
-### 2.3 检查雷达支持哪些配置
+### 2.3 检查激光雷达支持的配置
 
 ```bash
 ros2 run orbbec_camera list_camera_profile_mode_node
@@ -104,50 +105,77 @@ ros2 run orbbec_camera list_camera_profile_mode_node
 
 ### 2.4 参数和配置
 
-`lidar.launch.py`文件包含驱动程序的默认参数。您可以通过修改启动文件或创建自定义配置文件来自定义这些设置。关键参数包括：
+`lidar.launch.py`文件包含驱动的默认参数。您可以通过修改启动文件或创建自定义配置文件来自定义这些设置。关键参数包括：
 
-- **device_type**：启动的设备类型。可选的值：`lidar`、`camera`。该参数设置为 `lidar`则启动雷达设备，设置为 `camera`则启动相机设备。
-- **camera_name**：启动节点命名空间。
-- **device_num**：设备数量。如果需要启动多个设备，则必须填写此项。
-- **upgrade_firmware**：固件升级功能。输入参数是固件路径。
-- **connection_delay**：重新打开设备的延迟时间（以毫秒为单位）。并且在热插拔时立即重新打开设备可能会导致固件崩溃。
-- **publish_tf**：启用 TF 发布。
-- **tf_publish_rate**：TF 发布频率。
-- **lidar_format**：雷达的数据格式。可选值：`LIDAR_POINT`、`LIDAR_SPHERE_POINT` 、`LIDAR_SCAN`
-- **lidar_rate**：雷达的扫描速率。
-- **enable_scan_to_point**：启动scan数据转pointcloud数据，发布pointcloud2数据类型的话题。
-- **repetitive_scan_mode**：重复扫描模式参数。
-- **filter_level**：添加过滤等级参数。
-- **vertical_fov**：垂直角度参数。
-- **min_angle**：雷达扫描范围的最小角度，以度为单位（例如 `-135.0`）。默认值：`-135.0`。
-- **max_angle**：雷达扫描范围的最大角度，以度为单位（例如 `135.0`）。默认值：`135.0`。
-- **min_range**：雷达可测量的最小距离，以米为单位。默认值：`0.05`。
-- **max_range**：雷达可测量的最大距离，以米为单位。默认值：`30.0`。
-- **echo_mode**：雷达的回波模式。可选值：`Last Echo`，`First Echo`
-- **point_cloud_qos**：ROS 2 消息服务质量 (QoS) 设置。可能的值包括 `SYSTEM_DEFAULT`、`DEFAULT`、`PARAMETER_EVENTS`、`SERVICES_DEFAULT`、`PARAMETERS` 和 `SENSOR_DATA`，并且不区分大小写。这些值分别对应于 `rmw_qos_profile_system_default`、`rmw_qos_profile_default`、`rmw_qos_profile_parameter_events`、`rmw_qos_profile_services_default`、`rmw_qos_profile_parameters` 和 `SENSOR_DATA`。
-- **enumerate_net_device**：启用自动枚举网络设备。
-- **net_device_ip**：网络设备的IP地址。
-- **net_device_port**：网络这边的端口号。
-- **log_level**：SDK日志级别，默认值为 `none`，可选值为 `debug`、`info`、`warn`、`error`、`fatal`
-- **time_domain**：设备的时间戳类型。可选值为 `device`、`global`、`system`
-- **config_file_path**：YAML 配置文件的路径。默认值为“”。如果未指定配置文件，则将使用启动文件中的默认参数。
-- **enable_heartbeat**：启用心跳功能，默认为 `false`。如果设置为 `true`，摄像头节点将向固件发送心跳信号；如果需要硬件日志记录，也应设置为 `true`。
-- **enable_sync_output_accel_gyro：**开启同步 accel_gyro，输出 IMU 主题实时数据。
-- **enable_accel：**启用加速度计，并输出加速度计topic话题。
-- **accel_rate：**加速度计的频率。
-- **accel_range：**加速度计的范围。
-- **enable_gyro：**启用陀螺仪，并输出陀螺仪信息 topic 数据。
-- **gyro_rate：**陀螺仪的频率。
-- **gyro_range：**陀螺仪的范围。
+- **device_type**: 要启动的设备类型。可选值：`lidar`、`camera`。将此参数设置为 `lidar`启动激光雷达设备，设置为 `camera`启动摄像头设备。
+- **camera_name**: 启动节点命名空间。
+- **device_num**: 设备数量。如果需要启动多个设备，则必须填写此项。
+- **upgrade_firmware**: 固件升级功能。输入参数是固件路径。
+- **connection_delay**: 重新打开设备的延迟时间（毫秒）。在热插拔期间立即重新打开设备可能导致固件崩溃。
+- **publish_tf**: 启用TF发布。
+- **tf_publish_rate**: TF发布频率。
+- **lidar_format**: 激光雷达的数据格式。可选值：`LIDAR_POINT`、`LIDAR_SPHERE_POINT`、`LIDAR_SCAN`
+- **lidar_rate**: 激光雷达的扫描频率。
+- **enable_scan_to_point**: 启用扫描数据到点云数据的转换，发布PointCloud2数据类型话题。
+- **repetitive_scan_mode**: 重复扫描模式参数。
+- **filter_level**: 添加过滤级别参数。
+- **vertical_fov**: 垂直角度参数。
+- **min_angle**: 激光雷达扫描范围的最小角度（度）（例如，`-135.0`）。默认值：`-135.0`
+- **max_angle**: 激光雷达扫描范围的最大角度（度）（例如，`135.0`）。默认值：`135.0`
+- **min_range**: 激光雷达可测量的最小距离（米）。默认值：`0.05`
+- **max_range**: 激光雷达可测量的最大距离（米）。默认值：`30.0`
+- **echo_mode**: 激光雷达的回波模式。可选值：`Last Echo`、`First Echo`
+- **point_cloud_qos**: ROS 2消息服务质量（QoS）设置。可能的值包括 `SYSTEM_DEFAULT`、`DEFAULT`、`PARAMETER_EVENTS`、`SERVICES_DEFAULT`、`PARAMETERS`和 `SENSOR_DATA`，不区分大小写。这些值分别对应 `rmw_qos_profile_system_default`、`rmw_qos_profile_default`、`rmw_qos_profile_parameter_events`、`rmw_qos_profile_services_default`、`rmw_qos_profile_parameters`和 `SENSOR_DATA`。
+- **enumerate_net_device**: 启用网络设备的自动枚举。
+- **net_device_ip**: 网络设备的IP地址。
+- **net_device_port**: 网络端的端口号。
+- **log_level**: SDK日志级别，默认值为 `none`，可选值为 `debug`、`info`、`warn`、`error`、`fatal`
+- **time_domain**: 设备的时间戳类型。可选值为 `device`、`global`、`system`
+- **config_file_path**: YAML配置文件的路径。默认值为""。如果未指定配置文件，将使用启动文件中的默认参数。
+- **enable_heartbeat**: 启用心跳功能，默认为 `false`。如果设置为 `true`，相机节点将向固件发送心跳信号；如果需要硬件日志记录，也应将其设置为 `true`。
+- **enable_imu**: 启用IMU（加速度计+陀螺仪）并输出统一的IMU话题数据。
+- **imu_rate**: IMU的统一频率（加速度计和陀螺仪）。
+- **accel_range**: 加速度计的量程。
+- **gyro_range**: 陀螺仪的量程。
 
-## pointcloud data 详细说明
+## 点云数据详细说明
 
-Livox pointcloud2 （PointXYZRT） 点云格式，如下：
+Livox PointCloud2 (PointXYZRT) 点云格式如下：
 
 ```
-float32 x               # X axis, unit:m
-float32 y               # Y axis, unit:m
-float32 z               # Z axis, unit:m
-uint8 intensity      # lidar intensity
-uint8   tag             # lidar tag
+float32 x               # X轴，单位：米
+float32 y               # Y轴，单位：米
+float32 z               # Z轴，单位：米
+uint8 intensity      # 激光雷达强度
+uint8   tag             # 激光雷达标签
 ```
+
+## 3. IMU数据
+
+### 3.1 IMU话题
+
+启用IMU时，将发布以下话题：
+
+- **`/lidar/imu/sample`**: 统一的IMU话题，包含 `sensor_msgs/Imu`格式的同步加速度计和陀螺仪数据。
+- **`/lidar/lidar_to_imu`**: 从激光雷达坐标系到IMU坐标系的变换。
+
+### 3.2 使用IMU数据
+
+要启用IMU数据采集：
+
+```bash
+# 启动并启用IMU
+ros2 launch orbbec_camera lidar.launch.py enable_imu:=true imu_rate:=50hz
+
+# 检查IMU话题
+ros2 topic list | grep imu
+
+# 查看IMU数据
+ros2 topic echo /lidar/imu/sample
+```
+
+IMU数据包括：
+
+- **linear_acceleration**: 3D加速度数据（x、y、z），单位：m/s²
+- **angular_velocity**: 3D角速度数据（x、y、z），单位：rad/s
+- **orientation**: 四元数方向（硬件不提供，设置为零）

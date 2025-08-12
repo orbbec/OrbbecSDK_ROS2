@@ -91,4 +91,37 @@ public:
   int hdr_merge_gain_1_ = -1;
 	int hdr_merge_exposure_2_ = -1;
 	int hdr_merge_gain_2_ = -1;
+
+	double diagnostic_period_ = 1.0;
+	bool enable_laser_ = true;
+	int laser_on_off_mode_ = 0;
+	std::string align_target_stream_str_ = "COLOR";
+
+	bool retry_on_usb3_detection_failure_ = false;
+	int laser_energy_level_ = -1;
+
+	bool enable_3d_reconstruction_mode_ = false;
+	int min_depth_limit_ = 0;
+	int max_depth_limit_ = 0;
+	bool enable_heartbeat_ = false;
+
+	std::string industry_mode_ = "";
+	bool enable_color_undistortion_ = false;
+
+	int color_ae_roi_left_ = -1;
+	int color_ae_roi_top_ = -1;
+	int color_ae_roi_right_ = -1;
+	int color_ae_roi_bottom_ = -1;
+	int depth_ae_roi_left_ = -1;
+	int depth_ae_roi_top_ = -1;
+	int depth_ae_roi_right_ = -1;
+	int depth_ae_roi_bottom_ = -1;
+
+	std::string time_domain_ = "device";
+
+	int frames_per_trigger_ = 2;
+	long software_trigger_period_ = 33;
+
+	std::string frame_aggregate_mode_ = "ANY";
+
 };

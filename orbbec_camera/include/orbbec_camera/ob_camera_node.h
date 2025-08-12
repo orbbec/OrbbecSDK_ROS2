@@ -274,6 +274,12 @@ class OBCameraNode {
   void getLdpStatusCallback(const std::shared_ptr<GetBool::Request>& request,
                             std::shared_ptr<GetBool::Response>& response);
 
+  void getLaserStatusCallback(const std::shared_ptr<GetBool::Request>& request,
+                              std::shared_ptr<GetBool::Response>& response);
+
+  void getLdpProtectionStatusCallback(const std::shared_ptr<GetBool::Request>& request,
+                                      std::shared_ptr<GetBool::Response>& response);
+
   void getLdpMeasureDistanceCallback(const std::shared_ptr<GetInt32::Request>& request,
                                      std::shared_ptr<GetInt32::Response>& response);
 
@@ -417,6 +423,8 @@ class OBCameraNode {
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_laser_enable_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_ldp_enable_srv_;
   rclcpp::Service<orbbec_camera_msgs::srv::GetBool>::SharedPtr get_ldp_status_srv_;
+  rclcpp::Service<orbbec_camera_msgs::srv::GetBool>::SharedPtr get_ldp_protection_status_srv_;
+  rclcpp::Service<orbbec_camera_msgs::srv::GetBool>::SharedPtr get_laser_status_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_floor_enable_srv_;
   rclcpp::Service<SetInt32>::SharedPtr set_fan_work_mode_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr toggle_sensors_srv_;

@@ -61,6 +61,7 @@
 #include "orbbec_camera/d2c_viewer.h"
 #include "magic_enum/magic_enum.hpp"
 #include "orbbec_camera/image_publisher.h"
+#include "orbbec_camera/camera_config.hpp"
 #include "jpeg_decoder.h"
 #include <std_msgs/msg/string.hpp>
 
@@ -162,6 +163,8 @@ class OBCameraNode {
     Eigen::Vector3d data_{};
     double timestamp_ = -1;  // in nanoseconds
   };
+
+  CameraConfig camera_config_;
 
   void setupDevices();
 

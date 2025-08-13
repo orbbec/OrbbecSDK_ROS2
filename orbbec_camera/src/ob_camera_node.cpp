@@ -1115,54 +1115,15 @@ void OBCameraNode::getParameters() {
 
   accel_gyro_frame_id_ = camera_name_ + "_accel_gyro_optical_frame";
 
-  // setAndGetNodeParameter(camera_config_.publish_tf_, "publish_tf", true);
-  // setAndGetNodeParameter(camera_config_.tf_publish_rate, "tf_publish_rate", 0.0);
   setAndGetNodeParameter(depth_registration_, "depth_registration", false);
   setAndGetNodeParameter(enable_point_cloud_, "enable_point_cloud", false);
-  // setAndGetNodeParameter<std::string>(camera_config_.ir_info_url_, "ir_info_url", "");
-  // setAndGetNodeParameter<std::string>(camera_config_.color_info_url_, "color_info_url", "");
   setAndGetNodeParameter(enable_colored_point_cloud_, "enable_colored_point_cloud", false);
   setAndGetNodeParameter(enable_point_cloud_, "enable_point_cloud", false);
-  // setAndGetNodeParameter<std::string>(camera_config_.point_cloud_qos_, "point_cloud_qos", "default");
-  // setAndGetNodeParameter(camera_config_.enable_d2c_viewer_, "enable_d2c_viewer", false);
-  // setAndGetNodeParameter(camera_config_.enable_hardware_d2d_, "enable_hardware_d2d", true);
-  // setAndGetNodeParameter(camera_config_.enable_soft_filter_, "enable_soft_filter", false);
-  // setAndGetNodeParameter<std::string>(camera_config_.depth_filter_config_, "depth_filter_config", "");
   if (!camera_config_.depth_filter_config_.empty()) {
     enable_depth_filter_ = true;
   }
   setAndGetNodeParameter(enable_frame_sync_, "enable_frame_sync", false);
-  // setAndGetNodeParameter(camera_config_.enable_color_auto_exposure_, "enable_color_auto_exposure", true);
-  // setAndGetNodeParameter(camera_config_.enable_color_auto_white_balance_, "enable_color_auto_white_balance", true);
-  // setAndGetNodeParameter<int>(camera_config_.color_rotation_, "color_rotation", -1);
-  // setAndGetNodeParameter<int>(camera_config_.color_exposure_, "color_exposure", -1);
-  // setAndGetNodeParameter<int>(camera_config_.color_gain_, "color_gain", -1);
-  // setAndGetNodeParameter<int>(camera_config_.color_white_balance_, "color_white_balance", -1);
-  // setAndGetNodeParameter<int>(camera_config_.color_ae_max_exposure_, "color_ae_max_exposure", -1);
-  // setAndGetNodeParameter<int>(camera_config_.color_brightness_, "color_brightness", -1);
-  // setAndGetNodeParameter<int>(camera_config_.color_sharpness_, "color_sharpness", -1);
-  // setAndGetNodeParameter<int>(camera_config_.color_saturation_, "color_saturation", -1);
-  // setAndGetNodeParameter<int>(camera_config_.color_contrast_, "color_contrast", -1);
-  // setAndGetNodeParameter<int>(camera_config_.color_gamma_, "color_gamma", -1);
-  // setAndGetNodeParameter<int>(camera_config_.color_hue_, "color_hue", -1);
-  // setAndGetNodeParameter<int>(camera_config_.depth_rotation_, "depth_rotation", -1);
-  // setAndGetNodeParameter<int>(camera_config_.left_ir_rotation_, "left_ir_rotation", -1);
-  // setAndGetNodeParameter<int>(camera_config_.right_ir_rotation_, "right_ir_rotation", -1);
-  // setAndGetNodeParameter(camera_config_.enable_ir_auto_exposure_, "enable_ir_auto_exposure", true);
-  // setAndGetNodeParameter<int>(camera_config_.ir_exposure_, "ir_exposure", -1);
-  // setAndGetNodeParameter<int>(camera_config_.ir_gain_, "ir_gain", -1);
-  // setAndGetNodeParameter<int>(camera_config_.ir_ae_max_exposure_, "ir_ae_max_exposure", -1);
-  // setAndGetNodeParameter<int>(camera_config_.ir_brightness_, "ir_brightness", -1);
-  // setAndGetNodeParameter(camera_config_.enable_ir_long_exposure_, "enable_ir_long_exposure", true);
-  // setAndGetNodeParameter<std::string>(camera_config_.depth_work_mode_, "depth_work_mode", "");
-  // setAndGetNodeParameter<std::string>(camera_config_.sync_mode_str_, "sync_mode", "");
-  // setAndGetNodeParameter(camera_config_.depth_delay_us_, "depth_delay_us", 0);
-  // setAndGetNodeParameter(camera_config_.color_delay_us_, "color_delay_us", 0);
-  // setAndGetNodeParameter(camera_config_.trigger2image_delay_us_, "trigger2image_delay_us", 0);
-  // setAndGetNodeParameter(camera_config_.trigger_out_delay_us_, "trigger_out_delay_us", 0);
-  // setAndGetNodeParameter(camera_config_.trigger_out_enabled_, "trigger_out_enabled", false);
-  // setAndGetNodeParameter<std::string>(camera_config_.depth_precision_str_, "depth_precision", "");
-  // setAndGetNodeParameter<std::string>(camera_config_.cloud_frame_id_, "cloud_frame_id", "");
+
   if (!camera_config_.depth_precision_str_.empty()) {
     depth_precision_ = depthPrecisionLevelFromString(camera_config_.depth_precision_str_);
   }
@@ -1173,68 +1134,10 @@ void OBCameraNode::getParameters() {
     enable_colored_point_cloud_ = false;
     depth_registration_ = false;
   }
-  // setAndGetNodeParameter<bool>(camera_config_.enable_ldp_, "enable_ldp", true);
-  // setAndGetNodeParameter<int>(camera_config_.soft_filter_max_diff_, "soft_filter_max_diff", -1);
-  // setAndGetNodeParameter<int>(camera_config_.soft_filter_speckle_size_, "soft_filter_speckle_size", -1);
-  // setAndGetNodeParameter<double>(camera_config_.linear_accel_cov_, "linear_accel_cov", 0.0003);
-  // setAndGetNodeParameter<double>(camera_config_.angular_vel_cov_, "angular_vel_cov", 0.02);
-  // setAndGetNodeParameter<bool>(camera_config_.ordered_pc_, "ordered_pc", false);
-  // setAndGetNodeParameter<int>(max_save_images_count_, "max_save_images_count", 10);
-  // setAndGetNodeParameter<bool>(camera_config_.enable_depth_scale_, "enable_depth_scale", true);
-  // setAndGetNodeParameter<std::string>(camera_config_.device_preset_, "device_preset", "");
-  // setAndGetNodeParameter<bool>(camera_config_.enable_decimation_filter_, "enable_decimation_filter", false);
-  // setAndGetNodeParameter<bool>(camera_config_.enable_hdr_merge_, "enable_hdr_merge", false);
-  // setAndGetNodeParameter<bool>(camera_config_.enable_sequence_id_filter_, "enable_sequence_id_filter", false);
-  // setAndGetNodeParameter<bool>(camera_config_.enable_threshold_filter_, "enable_threshold_filter", false);
-  // setAndGetNodeParameter<bool>(camera_config_.enable_noise_removal_filter_, "enable_noise_removal_filter", true);
-  // setAndGetNodeParameter<bool>(camera_config_.enable_spatial_filter_, "enable_spatial_filter", false);
-  // setAndGetNodeParameter<bool>(camera_config_.enable_temporal_filter_, "enable_temporal_filter", false);
-  // setAndGetNodeParameter<bool>(camera_config_.enable_hole_filling_filter_, "enable_hole_filling_filter", false);
-  // setAndGetNodeParameter<int>(camera_config_.decimation_filter_scale_, "decimation_filter_scale", -1);
-  // setAndGetNodeParameter<int>(camera_config_.sequence_id_filter_id_, "sequence_id_filter_id", -1);
-  // setAndGetNodeParameter<int>(camera_config_.threshold_filter_max_, "threshold_filter_max", -1);
-  // setAndGetNodeParameter<int>(camera_config_.threshold_filter_min_, "threshold_filter_min", -1);
-  // setAndGetNodeParameter<int>(camera_config_.noise_removal_filter_min_diff_, "noise_removal_filter_min_diff", 256);
-  // setAndGetNodeParameter<int>(camera_config_.noise_removal_filter_max_size_, "noise_removal_filter_max_size", 80);
-  // setAndGetNodeParameter<float>(camera_config_.spatial_filter_alpha_, "spatial_filter_alpha", -1.0);
-  // setAndGetNodeParameter<int>(camera_config_.spatial_filter_diff_threshold_, "spatial_filter_diff_threshold", -1);
-  // setAndGetNodeParameter<int>(camera_config_.spatial_filter_magnitude_, "spatial_filter_magnitude", -1);
-  // setAndGetNodeParameter<int>(camera_config_.spatial_filter_radius_, "spatial_filter_radius", -1);
-  // setAndGetNodeParameter<float>(camera_config_.temporal_filter_diff_threshold_, "temporal_filter_diff_threshold",
-  //                               -1.0);
-  // setAndGetNodeParameter<float>(camera_config_.temporal_filter_weight_, "temporal_filter_weight", -1.0);
-  // setAndGetNodeParameter<std::string>(camera_config_.hole_filling_filter_mode_, "hole_filling_filter_mode", "");
-  // setAndGetNodeParameter<int>(camera_config_.hdr_merge_exposure_1_, "hdr_merge_exposure_1", -1);
-  // setAndGetNodeParameter<int>(camera_config_.hdr_merge_gain_1_, "hdr_merge_gain_1", -1);
-  // setAndGetNodeParameter<int>(camera_config_.hdr_merge_exposure_2_, "hdr_merge_exposure_2", -1);
-  // setAndGetNodeParameter<int>(camera_config_.hdr_merge_gain_2_, "hdr_merge_gain_2", -1);
-  setAndGetNodeParameter<std::string>(align_mode_, "align_mode", "HW");
-  // setAndGetNodeParameter<double>(camera_config_.diagnostic_period_, "diagnostic_period", 1.0);
-  // setAndGetNodeParameter<bool>(camera_config_.enable_laser_, "enable_laser", true);
-  // setAndGetNodeParameter<int>(camera_config_.laser_on_off_mode_, "laser_on_off_mode", 0);
-  // std::string camera_config_.align_target_stream_str_;
-  // setAndGetNodeParameter<std::string>(camera_config_.align_target_stream_str_, "align_target_stream", "COLOR");
-  align_target_stream_ = obStreamTypeFromString(camera_config_.align_target_stream_str_);
-  // setAndGetNodeParameter<bool>(camera_config_.retry_on_usb3_detection_failure_, "retry_on_usb3_detection_failure",
-  //                              false);
-  // setAndGetNodeParameter<int>(camera_config_.laser_energy_level_, "laser_energy_level", -1);
-  // setAndGetNodeParameter<bool>(camera_config_.enable_3d_reconstruction_mode_, "enable_3d_reconstruction_mode",
-  //                              false);
-  // setAndGetNodeParameter<int>(camera_config_.min_depth_limit_, "min_depth_limit", 0);
-  // setAndGetNodeParameter<int>(camera_config_.max_depth_limit_, "max_depth_limit", 0);
-  // setAndGetNodeParameter<bool>(camera_config_.enable_heartbeat_, "enable_heartbeat", false);
-  // setAndGetNodeParameter<std::string>(camera_config_.industry_mode_, "industry_mode", "");
-  // setAndGetNodeParameter<bool>(camera_config_.enable_color_undistortion_, "enable_color_undistortion", false);
-  // setAndGetNodeParameter<int>(camera_config_.color_ae_roi_left_, "color_ae_roi_left", -1);
-  // setAndGetNodeParameter<int>(camera_config_.color_ae_roi_top_, "color_ae_roi_top", -1);
-  // setAndGetNodeParameter<int>(camera_config_.color_ae_roi_right_, "color_ae_roi_right", -1);
-  // setAndGetNodeParameter<int>(camera_config_.color_ae_roi_bottom_, "color_ae_roi_bottom", -1);
-  // setAndGetNodeParameter<int>(camera_config_.depth_ae_roi_left_, "depth_ae_roi_left", -1);
-  // setAndGetNodeParameter<int>(camera_config_.depth_ae_roi_top_, "depth_ae_roi_top", -1);
-  // setAndGetNodeParameter<int>(camera_config_.depth_ae_roi_right_, "depth_ae_roi_right", -1);
-  // setAndGetNodeParameter<int>(camera_config_.depth_ae_roi_bottom_, "depth_ae_roi_bottom", -1);
 
-  // setAndGetNodeParameter<std::string>(time_domain_, "time_domain", "device");
+  setAndGetNodeParameter<std::string>(align_mode_, "align_mode", "HW");
+  align_target_stream_ = obStreamTypeFromString(camera_config_.align_target_stream_str_);
+
   auto device_info = device_->getDeviceInfo();
   CHECK_NOTNULL(device_info.get());
   auto pid = device_info->pid();
@@ -1242,12 +1145,6 @@ void OBCameraNode::getParameters() {
     time_domain_ = "system";
   }
   RCLCPP_INFO_STREAM(logger_, "current time domain: " << time_domain_);
-  // setAndGetNodeParameter<int>(frames_per_trigger_, "frames_per_trigger", 2);
-  // long software_trigger_period = 33;
-  // setAndGetNodeParameter<long>(software_trigger_period, "software_trigger_period", 33);
-  // camera_config_.software_trigger_period_ = std::chrono::milliseconds(software_trigger_period);
-
-  // setAndGetNodeParameter<std::string>(frame_aggregate_mode_, "frame_aggregate_mode", "ANY");
 }
 
 // check

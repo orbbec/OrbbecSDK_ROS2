@@ -557,13 +557,23 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   auto time_cost = std::chrono::duration_cast<std::chrono::milliseconds>(
       std::chrono::high_resolution_clock::now() - start_time_);
   RCLCPP_INFO_STREAM(logger_, "Start device cost " << time_cost.count() << " ms");
+
   if (!upgrade_firmware_.empty()) {
-    device_->updateFirmware(
-        upgrade_firmware_.c_str(),
-        std::bind(&OBCameraNodeDriver::firmwareUpdateCallback, this, std::placeholders::_1,
-                  std::placeholders::_2, std::placeholders::_3),
-        false);
+    firmware_update_success_ = false;
+
+    ob_camera_node_->withDeviceLock([&]() {
+      device_->updateFirmware(
+          upgrade_firmware_.c_str(),
+          std::bind(&OBCameraNodeDriver::firmwareUpdateCallback, this, std::placeholders::_1,
+                    std::placeholders::_2, std::placeholders::_3),
+          false);
+    });
+    if(firmware_update_success_)
+    {
+      return;
+    }
   }
+
   if (ob_camera_node_) {
     ob_camera_node_->startIMU();
     ob_camera_node_->startStreams();
@@ -805,9 +815,11 @@ void OBCameraNodeDriver::firmwareUpdateCallback(OBFwUpdateState state, const cha
   std::cout << "Message : " << message << std::endl << std::flush;
   if (state == STAT_DONE) {
     RCLCPP_INFO(logger_, "Reboot device");
-    ob_camera_node_->rebootDevice();
+    device_->reboot();
     device_connected_ = false;
     upgrade_firmware_ = "";
+
+    firmware_update_success_ = true;
   }
 }
 }  // namespace orbbec_camera

@@ -113,7 +113,7 @@ OBCameraNode::~OBCameraNode() noexcept { clean(); }
 void OBCameraNode::rebootDevice() {
   RCLCPP_INFO_STREAM(logger_, "Do clean before rebooting device");
   malloc_trim(0);
-  clean();
+  stopStreams();
   malloc_trim(0);
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
   RCLCPP_INFO_STREAM(logger_, "Reboot device");

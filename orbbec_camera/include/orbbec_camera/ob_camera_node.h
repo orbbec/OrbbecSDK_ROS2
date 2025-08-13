@@ -158,6 +158,13 @@ class OBCameraNode {
 
   void clean() noexcept;
 
+  // Safely expose the lock
+  template <typename Func>
+  auto withDeviceLock(Func &&func) -> decltype(func()) {
+    std::lock_guard<std::recursive_mutex> lock(device_lock_);
+    return func();
+  }
+
   void rebootDevice();
 
   void startStreams();
@@ -618,7 +625,7 @@ class OBCameraNode {
   std::shared_ptr<JPEGDecoder> jpeg_decoder_ = nullptr;
   uint8_t* rgb_buffer_ = nullptr;
   bool is_color_frame_decoded_ = false;
-  std::mutex device_lock_;
+  std::recursive_mutex device_lock_;
   // For color
   std::queue<std::shared_ptr<ob::FrameSet>> color_frame_queue_;
   std::shared_ptr<std::thread> colorFrameThread_ = nullptr;

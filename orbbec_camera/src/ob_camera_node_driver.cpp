@@ -36,39 +36,43 @@ std::string g_time_domain = "global";         // Assuming this is declared elsew
 
 void signalHandler(int sig) {
   std::cout << "Received signal: " << sig << std::endl;
+  if (sig == SIGINT || sig == SIGTERM) {
+    rclcpp::shutdown();
+  } else {
 
-  std::string log_dir = "Log/";
+    std::string log_dir = "Log/";
 
-  // get current time
-  std::time_t now = std::time(nullptr);
-  std::tm *local_time = std::localtime(&now);
+    // get current time
+    std::time_t now = std::time(nullptr);
+    std::tm *local_time = std::localtime(&now);
 
-  // format date and time to string, format as "2024_05_20_12_34_56"
-  std::ostringstream time_stream;
-  time_stream << std::put_time(local_time, "%Y_%m_%d_%H_%M_%S");
+    // format date and time to string, format as "2024_05_20_12_34_56"
+    std::ostringstream time_stream;
+    time_stream << std::put_time(local_time, "%Y_%m_%d_%H_%M_%S");
 
-  // generate log file name
-  std::string log_file_name = g_camera_name + "_crash_stack_trace_" + time_stream.str() + ".log";
-  std::string log_file_path = log_dir + log_file_name;
+    // generate log file name
+    std::string log_file_name = g_camera_name + "_crash_stack_trace_" + time_stream.str() + ".log";
+    std::string log_file_path = log_dir + log_file_name;
 
-  if (!std::filesystem::exists(log_dir)) {
-    std::filesystem::create_directories(log_dir);
+    if (!std::filesystem::exists(log_dir)) {
+      std::filesystem::create_directories(log_dir);
+    }
+
+    std::cout << "Log crash stack trace to " << log_file_path << std::endl;
+    std::ofstream log_file(log_file_path, std::ios::app);
+
+    if (log_file.is_open()) {
+      log_file << "Received signal: " << sig << std::endl;
+
+      backward::StackTrace st;
+      st.load_here(32);  // Capture stack
+      backward::Printer p;
+      p.print(st, log_file);  // Print stack to log file
+    }
+
+    log_file.close();
+    exit(sig);  // Exit program
   }
-
-  std::cout << "Log crash stack trace to " << log_file_path << std::endl;
-  std::ofstream log_file(log_file_path, std::ios::app);
-
-  if (log_file.is_open()) {
-    log_file << "Received signal: " << sig << std::endl;
-
-    backward::StackTrace st;
-    st.load_here(32);  // Capture stack
-    backward::Printer p;
-    p.print(st, log_file);  // Print stack to log file
-  }
-
-  log_file.close();
-  exit(sig);  // Exit program
 }
 
 namespace orbbec_camera {
@@ -97,10 +101,28 @@ OBCameraNodeDriver::OBCameraNodeDriver(const std::string &node_name, const std::
 OBCameraNodeDriver::~OBCameraNodeDriver() {
   is_alive_.store(false);
 
+  // First stop the camera node cleanly before stopping threads
+  if (ob_camera_node_) {
+    try {
+      ob_camera_node_->clean();
+    } catch (...) {
+      RCLCPP_WARN_STREAM(logger_, "Exception during camera node cleanup in destructor");
+    }
+    ob_camera_node_->stopGmslTrigger();
+  }
+
+  // Stop timers that might access the device
+  if (sync_host_time_timer_) {
+    sync_host_time_timer_->cancel();
+    sync_host_time_timer_.reset();
+  }
+
   if (check_connect_timer_) {
+    check_connect_timer_->cancel();
     check_connect_timer_.reset();
   }
 
+  // Now stop threads
   if (device_count_update_thread_ && device_count_update_thread_->joinable()) {
     device_count_update_thread_->join();
   }
@@ -111,9 +133,8 @@ OBCameraNodeDriver::~OBCameraNodeDriver() {
     reset_device_cond_.notify_all();
     reset_device_thread_->join();
   }
-  if (ob_camera_node_) {
-    ob_camera_node_->stopGmslTrigger();
-  }
+
+  // Clean up shared memory
   if (orb_device_lock_shm_fd_ != -1) {
     close(orb_device_lock_shm_fd_);
     orb_device_lock_shm_fd_ = -1;
@@ -131,6 +152,8 @@ void OBCameraNodeDriver::init() {
   signal(SIGABRT, signalHandler);  // abort
   signal(SIGFPE, signalHandler);   // float point exception
   signal(SIGILL, signalHandler);   // illegal instruction
+  signal(SIGINT, signalHandler);
+  signal(SIGTERM, signalHandler);
   ob::Context::setExtensionsDirectory(extension_path_.c_str());
   if (config_path_.empty()) {
     ctx_ = std::make_unique<ob::Context>();
@@ -301,6 +324,17 @@ void OBCameraNodeDriver::resetDevice() {
     RCLCPP_INFO_STREAM(logger_, "resetDevice : Reset device uid: " << device_unique_id_);
     std::lock_guard<decltype(device_lock_)> device_lock(device_lock_);
     {
+      // First stop the camera node cleanly to prevent timer/diagnostic access to device
+      if (ob_camera_node_) {
+        try {
+          // This will stop all timers and clean up properly
+          ob_camera_node_->clean();
+        } catch (...) {
+          RCLCPP_WARN_STREAM(logger_, "Exception during camera node cleanup during reset");
+        }
+      }
+
+      // Now reset the objects
       ob_camera_node_.reset();
       device_.reset();
       device_info_.reset();
@@ -817,6 +851,18 @@ void OBCameraNodeDriver::firmwareUpdateCallback(OBFwUpdateState state, const cha
   std::cout << "Message : " << message << std::endl << std::flush;
   if (state == STAT_DONE) {
     RCLCPP_INFO(logger_, "Reboot device");
+
+    // Don't call clean() here to avoid deadlock - just stop timers and reboot
+    // The resetDevice thread will handle proper cleanup when device disconnects
+    if (sync_host_time_timer_) {
+      try {
+        sync_host_time_timer_->cancel();
+        sync_host_time_timer_.reset();
+      } catch (...) {
+        // Ignore exceptions during timer cleanup
+      }
+    }
+
     device_->reboot();
     device_connected_ = false;
     upgrade_firmware_ = "";

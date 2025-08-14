@@ -1940,11 +1940,22 @@ void OBCameraNode::setupTopics() {
 
 void OBCameraNode::onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapper &status) {
   try {
-
-    //check to ensure we're not shutting down
+    // Check to ensure we're not shutting down and device is valid
     std::lock_guard<decltype(device_lock_)> lock(device_lock_);
-    if (!device_ || !is_running_.load()) {
-      status.summary(diagnostic_msgs::msg::DiagnosticStatus::STALE, "Device disconnected");
+    if (!device_ || !is_running_.load() || !is_camera_node_initialized_.load()) {
+      status.summary(diagnostic_msgs::msg::DiagnosticStatus::STALE, "Device disconnected or shutting down");
+      return;
+    }
+
+    // Additional safety check - verify device is actually accessible
+    try {
+      auto device_info = device_->getDeviceInfo();
+      if (!device_info) {
+        status.summary(diagnostic_msgs::msg::DiagnosticStatus::STALE, "Device info not available");
+        return;
+      }
+    } catch (...) {
+      status.summary(diagnostic_msgs::msg::DiagnosticStatus::STALE, "Device not accessible");
       return;
     }
 
@@ -1995,7 +2006,7 @@ void OBCameraNode::onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapp
     } catch (...) {
       // Ignore exceptions during cleanup
     }
-    RCLCPP_ERROR(logger_, "Failed to TemperatureUpdate");
+    RCLCPP_ERROR(logger_, "Failed to TemperatureUpdate: Device is deactivated/disconnected!");
     status.summary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, "Unknown error");
   }
 }

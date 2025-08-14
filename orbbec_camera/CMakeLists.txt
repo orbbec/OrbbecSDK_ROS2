@@ -228,7 +228,11 @@ install(DIRECTORY config DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY examples DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY ${ORBBEC_INCLUDE_DIR} DESTINATION include)
 install(DIRECTORY ${ORBBEC_LIBS_DIR}/ DESTINATION lib/ FILES_MATCHING PATTERN "*.so*")
-install(DIRECTORY ${ORBBEC_LIBS_DIR}/extensions DESTINATION lib/)
+# Install extensions directory with explicit file copying to avoid symlink issues
+file(GLOB_RECURSE EXTENSION_FILES "${ORBBEC_LIBS_DIR}/extensions/*")
+if(EXTENSION_FILES)
+    install(FILES ${EXTENSION_FILES} DESTINATION lib/extensions/)
+endif()
 if(DEFINED ENV{BUILDING_PACKAGE})
     # Install udev rules
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/99-obsensor-libusb.rules DESTINATION /etc/udev/rules.d)

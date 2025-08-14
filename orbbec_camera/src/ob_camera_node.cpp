@@ -128,27 +128,54 @@ void OBCameraNode::clean() noexcept {
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
   RCLCPP_WARN_STREAM(logger_, "Do destroy ~OBCameraNode");
   is_running_.store(false);
-  RCLCPP_WARN_STREAM(logger_, "Stop tf thread");
-  if (tf_thread_ && tf_thread_->joinable()) {
-    tf_thread_->join();
+
+  // Stop diagnostic timer and updater first to prevent access to disconnected device
+  try {
+    if (diagnostic_timer_) {
+      diagnostic_timer_->cancel();
+      diagnostic_timer_.reset();
+    }
+    if (diagnostic_updater_) {
+      diagnostic_updater_.reset();
+    }
+  } catch (...) {
+    // Ignore exceptions during diagnostic cleanup
   }
+
+  RCLCPP_WARN_STREAM(logger_, "Stop tf thread");
+  try {
+    if (tf_thread_ && tf_thread_->joinable()) {
+      tf_cv_.notify_all();  // Wake up tf thread if it's waiting
+      tf_thread_->join();
+    }
+  } catch (...) {
+    RCLCPP_WARN_STREAM(logger_, "Exception while stopping tf thread");
+  }
+
   RCLCPP_WARN_STREAM(logger_, "Stop color frame thread");
-  if (colorFrameThread_ && colorFrameThread_->joinable()) {
-    color_frame_queue_cv_.notify_all();
-    colorFrameThread_->join();
+  try {
+    if (colorFrameThread_ && colorFrameThread_->joinable()) {
+      color_frame_queue_cv_.notify_all();
+      colorFrameThread_->join();
+    }
+  } catch (...) {
+    RCLCPP_WARN_STREAM(logger_, "Exception while stopping color frame thread");
   }
 
   RCLCPP_WARN_STREAM(logger_, "stop streams");
-  stopStreams();
-  stopIMU();
-  delete[] rgb_buffer_;
-  rgb_buffer_ = nullptr;
+  try {
+    stopStreams();
+    stopIMU();
+  } catch (...) {
+    RCLCPP_WARN_STREAM(logger_, "Exception while stopping streams");
+  }
 
-  delete[] depth_xy_table_data_;
-  depth_xy_table_data_ = nullptr;
-
-  delete[] depth_point_cloud_buffer_;
-  depth_point_cloud_buffer_ = nullptr;
+  try {
+    delete[] rgb_buffer_;
+    rgb_buffer_ = nullptr;
+  } catch (...) {
+    RCLCPP_WARN_STREAM(logger_, "Exception while cleaning up buffers");
+  }
 
   RCLCPP_WARN_STREAM(logger_, "Destroy ~OBCameraNode DONE");
 }
@@ -1410,22 +1437,53 @@ void OBCameraNode::startIMU() {
 }
 
 void OBCameraNode::stopStreams() {
+  std::lock_guard<decltype(device_lock_)> lock(device_lock_);
+
   if (!pipeline_started_ || !pipeline_) {
     RCLCPP_INFO_STREAM(logger_, "pipeline not started or not exist, skip stop pipeline");
     return;
   }
+
+  // Stop diagnostic timer first to prevent crashes during shutdown
   try {
-    pipeline_->stop();
-    // disable interleave frame
-    if ((interleave_ae_mode_ == "hdr") || (interleave_ae_mode_ == "laser")) {
-      RCLCPP_INFO_STREAM(logger_, "current interleave_ae_mode_: " << interleave_ae_mode_);
-      if (device_->isPropertySupported(OB_PROP_FRAME_INTERLEAVE_ENABLE_BOOL, OB_PERMISSION_WRITE)) {
-        interleave_frame_enable_ = false;
-        RCLCPP_INFO_STREAM(logger_, "Enable enable_interleave_depth_frame to "
-                                        << (interleave_frame_enable_ ? "true" : "false"));
-        TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_FRAME_INTERLEAVE_ENABLE_BOOL,
-                            interleave_frame_enable_);
+    if (diagnostic_timer_) {
+      diagnostic_timer_->cancel();
+      diagnostic_timer_.reset();
+    }
+    if (diagnostic_updater_) {
+      diagnostic_updater_.reset();
+    }
+  } catch (...) {
+    // Ignore exceptions during diagnostic cleanup
+  }
+
+  // Mark pipeline as stopping to prevent new operations
+  pipeline_started_.store(false);
+
+  try {
+    // Check if device is still valid before stopping pipeline
+    if (device_ && pipeline_) {
+      pipeline_->stop();
+
+      // disable interleave frame only if device is still connected
+      if ((interleave_ae_mode_ == "hdr") || (interleave_ae_mode_ == "laser")) {
+        try {
+          RCLCPP_INFO_STREAM(logger_, "current interleave_ae_mode_: " << interleave_ae_mode_);
+          if (device_->isPropertySupported(OB_PROP_FRAME_INTERLEAVE_ENABLE_BOOL, OB_PERMISSION_WRITE)) {
+            interleave_frame_enable_ = false;
+            RCLCPP_INFO_STREAM(logger_, "Enable enable_interleave_depth_frame to "
+                                            << (interleave_frame_enable_ ? "true" : "false"));
+            TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_FRAME_INTERLEAVE_ENABLE_BOOL,
+                                interleave_frame_enable_);
+          }
+        } catch (const ob::Error &e) {
+          RCLCPP_WARN_STREAM(logger_, "Failed to disable interleave frame during shutdown: " << e.getMessage());
+        } catch (...) {
+          RCLCPP_WARN_STREAM(logger_, "Failed to disable interleave frame during shutdown");
+        }
       }
+    } else {
+      RCLCPP_WARN_STREAM(logger_, "Device or pipeline not available during stop - likely disconnected");
     }
   } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to stop pipeline: " << e.getMessage());
@@ -1435,6 +1493,8 @@ void OBCameraNode::stopStreams() {
 }
 
 void OBCameraNode::stopIMU() {
+  std::lock_guard<decltype(device_lock_)> lock(device_lock_);
+
   if (enable_sync_output_accel_gyro_) {
     if (!imu_sync_output_start_ || !imuPipeline_) {
       RCLCPP_INFO_STREAM(logger_, "imu pipeline not started or not exist, skip stop imu pipeline");
@@ -1880,6 +1940,14 @@ void OBCameraNode::setupTopics() {
 
 void OBCameraNode::onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapper &status) {
   try {
+
+    //check to ensure we're not shutting down
+    std::lock_guard<decltype(device_lock_)> lock(device_lock_);
+    if (!device_ || !is_running_.load()) {
+      status.summary(diagnostic_msgs::msg::DiagnosticStatus::STALE, "Device disconnected");
+      return;
+    }
+
     OBDeviceTemperature temperature;
     uint32_t data_size = sizeof(OBDeviceTemperature);
     device_->getStructuredData(OB_STRUCT_DEVICE_TEMPERATURE,
@@ -1897,17 +1965,38 @@ void OBCameraNode::onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapp
     status.add("Chip Bottom Temperature", temperature.chipBottomTemp);
     status.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, "Temperature is normal");
   } catch (const ob::Error &e) {
-    if (is_running_.load()) {
-      diagnostic_timer_->cancel();
-      diagnostic_timer_.reset();
+    try {
+      if (is_running_.load() && diagnostic_timer_) {
+        diagnostic_timer_->cancel();
+        diagnostic_timer_.reset();
+      }
+    } catch (...) {
+      // Ignore exceptions during cleanup
     }
     RCLCPP_ERROR_STREAM(logger_, "Failed to TemperatureUpdate: " << e.getMessage());
     status.summary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, e.getMessage());
   } catch (const std::exception &e) {
+    try {
+      if (is_running_.load() && diagnostic_timer_) {
+        diagnostic_timer_->cancel();
+        diagnostic_timer_.reset();
+      }
+    } catch (...) {
+      // Ignore exceptions during cleanup
+    }
     RCLCPP_ERROR_STREAM(logger_, "Failed to TemperatureUpdate: " << e.what());
     status.summary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, e.what());
   } catch (...) {
+    try {
+      if (is_running_.load() && diagnostic_timer_) {
+        diagnostic_timer_->cancel();
+        diagnostic_timer_.reset();
+      }
+    } catch (...) {
+      // Ignore exceptions during cleanup
+    }
     RCLCPP_ERROR(logger_, "Failed to TemperatureUpdate");
+    status.summary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, "Unknown error");
   }
 }
 

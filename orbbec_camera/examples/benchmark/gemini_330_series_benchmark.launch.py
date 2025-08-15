@@ -162,7 +162,7 @@ def generate_launch_description():
         DeclareLaunchArgument('color_info_url', default_value=''),
         # Network device settings: default enumerate_net_device is set to true, which will automatically enumerate network devices
         # If you do not want to automatically enumerate network devices,
-        # you can set enumerate_net_device to true, net_device_ip to the device's IP address, and net_device_port to the default value of 8090
+        # you can set enumerate_net_device to false, net_device_ip to the device's IP address, and net_device_port to the default value of 8090
         DeclareLaunchArgument('enumerate_net_device', default_value='false'),
         DeclareLaunchArgument('net_device_ip', default_value=''),
         DeclareLaunchArgument('net_device_port', default_value='0'),

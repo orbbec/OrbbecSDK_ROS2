@@ -143,10 +143,6 @@ OBCameraNodeDriver::~OBCameraNodeDriver() {
 }
 
 void OBCameraNodeDriver::init() {
-  // Set memory allocation parameters to reduce memory fragmentation
-  mallopt(M_TRIM_THRESHOLD, 1024*1024*10);
-  mallopt(M_TOP_PAD, 128*1024);
-
   // Set signal handlers for crash reporting
   signal(SIGSEGV, signalHandler);  // segment fault
   signal(SIGABRT, signalHandler);  // abort

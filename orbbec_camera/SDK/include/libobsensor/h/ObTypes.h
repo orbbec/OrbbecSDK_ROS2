@@ -19,26 +19,26 @@
 extern "C" {
 #endif
 
-typedef struct ob_context_t                      ob_context;
-typedef struct ob_device_t                       ob_device;
-typedef struct ob_device_info_t                  ob_device_info;
-typedef struct ob_device_list_t                  ob_device_list;
-typedef struct ob_record_device_t                ob_record_device;
-typedef struct ob_playback_device_t              ob_playback_device;
-typedef struct ob_camera_param_list_t            ob_camera_param_list;
-typedef struct ob_sensor_t                       ob_sensor;
-typedef struct ob_sensor_list_t                  ob_sensor_list;
-typedef struct ob_stream_profile_t               ob_stream_profile;
-typedef struct ob_stream_profile_list_t          ob_stream_profile_list;
-typedef struct ob_frame_t                        ob_frame;
-typedef struct ob_filter_t                       ob_filter;
-typedef struct ob_filter_list_t                  ob_filter_list;
-typedef struct ob_pipeline_t                     ob_pipeline;
-typedef struct ob_config_t                       ob_config;
-typedef struct ob_depth_work_mode_list_t         ob_depth_work_mode_list;
-typedef struct ob_device_preset_list_t           ob_device_preset_list;
-typedef struct ob_filter_config_schema_list_t    ob_filter_config_schema_list;
-typedef struct ob_device_frame_interleave_list_t ob_device_frame_interleave_list;
+typedef struct ob_context_t                       ob_context;
+typedef struct ob_device_t                        ob_device;
+typedef struct ob_device_info_t                   ob_device_info;
+typedef struct ob_device_list_t                   ob_device_list;
+typedef struct ob_record_device_t                 ob_record_device;
+typedef struct ob_playback_device_t               ob_playback_device;
+typedef struct ob_camera_param_list_t             ob_camera_param_list;
+typedef struct ob_sensor_t                        ob_sensor;
+typedef struct ob_sensor_list_t                   ob_sensor_list;
+typedef struct ob_stream_profile_t                ob_stream_profile;
+typedef struct ob_stream_profile_list_t           ob_stream_profile_list;
+typedef struct ob_frame_t                         ob_frame;
+typedef struct ob_filter_t                        ob_filter;
+typedef struct ob_filter_list_t                   ob_filter_list;
+typedef struct ob_pipeline_t                      ob_pipeline;
+typedef struct ob_config_t                        ob_config;
+typedef struct ob_depth_work_mode_list_t          ob_depth_work_mode_list;
+typedef struct ob_device_preset_list_t            ob_device_preset_list;
+typedef struct ob_filter_config_schema_list_t     ob_filter_config_schema_list;
+typedef struct ob_device_frame_interleave_list_t  ob_device_frame_interleave_list;
 typedef struct ob_preset_resolution_config_list_t ob_preset_resolution_config_list;
 
 #define OB_WIDTH_ANY 0
@@ -126,17 +126,17 @@ typedef struct ob_error {
  * @brief Enumeration value describing the sensor type
  */
 typedef enum {
-    OB_SENSOR_UNKNOWN   = 0, /**< Unknown type sensor */
-    OB_SENSOR_IR        = 1, /**< IR */
-    OB_SENSOR_COLOR     = 2, /**< Color */
-    OB_SENSOR_DEPTH     = 3, /**< Depth */
-    OB_SENSOR_ACCEL     = 4, /**< Accel */
-    OB_SENSOR_GYRO      = 5, /**< Gyro */
-    OB_SENSOR_IR_LEFT   = 6, /**< left IR for stereo camera*/
-    OB_SENSOR_IR_RIGHT  = 7, /**< Right IR for stereo camera*/
-    OB_SENSOR_RAW_PHASE = 8, /**< Raw Phase */
-    OB_SENSOR_CONFIDENCE = 9,/**< Confidence */
-    OB_SENSOR_TYPE_COUNT,    /**The total number of sensor types, is not a valid sensor type */
+    OB_SENSOR_UNKNOWN    = 0, /**< Unknown type sensor */
+    OB_SENSOR_IR         = 1, /**< IR */
+    OB_SENSOR_COLOR      = 2, /**< Color */
+    OB_SENSOR_DEPTH      = 3, /**< Depth */
+    OB_SENSOR_ACCEL      = 4, /**< Accel */
+    OB_SENSOR_GYRO       = 5, /**< Gyro */
+    OB_SENSOR_IR_LEFT    = 6, /**< left IR for stereo camera*/
+    OB_SENSOR_IR_RIGHT   = 7, /**< Right IR for stereo camera*/
+    OB_SENSOR_RAW_PHASE  = 8, /**< Raw Phase */
+    OB_SENSOR_CONFIDENCE = 9, /**< Confidence */
+    OB_SENSOR_TYPE_COUNT,     /**The total number of sensor types, is not a valid sensor type */
 } OBSensorType,
     ob_sensor_type;
 
@@ -144,18 +144,18 @@ typedef enum {
  * @brief Enumeration value describing the type of data stream
  */
 typedef enum {
-    OB_STREAM_UNKNOWN   = -1, /**< Unknown type stream */
-    OB_STREAM_VIDEO     = 0,  /**< Video stream (infrared, color, depth streams are all video streams) */
-    OB_STREAM_IR        = 1,  /**< IR stream */
-    OB_STREAM_COLOR     = 2,  /**< color stream */
-    OB_STREAM_DEPTH     = 3,  /**< depth stream */
-    OB_STREAM_ACCEL     = 4,  /**< Accelerometer data stream */
-    OB_STREAM_GYRO      = 5,  /**< Gyroscope data stream */
-    OB_STREAM_IR_LEFT   = 6,  /**< Left IR stream for stereo camera */
-    OB_STREAM_IR_RIGHT  = 7,  /**< Right IR stream for stereo camera */
-    OB_STREAM_RAW_PHASE = 8,  /**< RawPhase Stream */
-    OB_STREAM_CONFIDENCE = 9, /**< Confidence Stream*/
-    OB_STREAM_TYPE_COUNT,     /**< The total number of stream type,is not a valid stream type */
+    OB_STREAM_UNKNOWN    = -1, /**< Unknown type stream */
+    OB_STREAM_VIDEO      = 0,  /**< Video stream (infrared, color, depth streams are all video streams) */
+    OB_STREAM_IR         = 1,  /**< IR stream */
+    OB_STREAM_COLOR      = 2,  /**< color stream */
+    OB_STREAM_DEPTH      = 3,  /**< depth stream */
+    OB_STREAM_ACCEL      = 4,  /**< Accelerometer data stream */
+    OB_STREAM_GYRO       = 5,  /**< Gyroscope data stream */
+    OB_STREAM_IR_LEFT    = 6,  /**< Left IR stream for stereo camera */
+    OB_STREAM_IR_RIGHT   = 7,  /**< Right IR stream for stereo camera */
+    OB_STREAM_RAW_PHASE  = 8,  /**< RawPhase Stream */
+    OB_STREAM_CONFIDENCE = 9,  /**< Confidence Stream*/
+    OB_STREAM_TYPE_COUNT,      /**< The total number of stream type,is not a valid stream type */
 } OBStreamType,
     ob_stream_type;
 
@@ -163,20 +163,20 @@ typedef enum {
  * @brief Enumeration value describing the type of frame
  */
 typedef enum {
-    OB_FRAME_UNKNOWN   = -1, /**< Unknown frame type */
-    OB_FRAME_VIDEO     = 0,  /**< Video frame */
-    OB_FRAME_IR        = 1,  /**< IR frame */
-    OB_FRAME_COLOR     = 2,  /**< Color frame */
-    OB_FRAME_DEPTH     = 3,  /**< Depth frame */
-    OB_FRAME_ACCEL     = 4,  /**< Accelerometer data frame */
-    OB_FRAME_SET       = 5,  /**< Frame collection (internally contains a variety of data frames) */
-    OB_FRAME_POINTS    = 6,  /**< Point cloud frame */
-    OB_FRAME_GYRO      = 7,  /**< Gyroscope data frame */
-    OB_FRAME_IR_LEFT   = 8,  /**< Left IR frame for stereo camera */
-    OB_FRAME_IR_RIGHT  = 9,  /**< Right IR frame for stereo camera */
-    OB_FRAME_RAW_PHASE = 10, /**< Raw Phase frame*/
-    OB_FRAME_CONFIDENCE = 11,/**< Confidence frame*/
-    OB_FRAME_TYPE_COUNT,     /**< The total number of frame types, is not a valid frame type */
+    OB_FRAME_UNKNOWN    = -1, /**< Unknown frame type */
+    OB_FRAME_VIDEO      = 0,  /**< Video frame */
+    OB_FRAME_IR         = 1,  /**< IR frame */
+    OB_FRAME_COLOR      = 2,  /**< Color frame */
+    OB_FRAME_DEPTH      = 3,  /**< Depth frame */
+    OB_FRAME_ACCEL      = 4,  /**< Accelerometer data frame */
+    OB_FRAME_SET        = 5,  /**< Frame collection (internally contains a variety of data frames) */
+    OB_FRAME_POINTS     = 6,  /**< Point cloud frame */
+    OB_FRAME_GYRO       = 7,  /**< Gyroscope data frame */
+    OB_FRAME_IR_LEFT    = 8,  /**< Left IR frame for stereo camera */
+    OB_FRAME_IR_RIGHT   = 9,  /**< Right IR frame for stereo camera */
+    OB_FRAME_RAW_PHASE  = 10, /**< Raw Phase frame*/
+    OB_FRAME_CONFIDENCE = 11, /**< Confidence frame*/
+    OB_FRAME_TYPE_COUNT,      /**< The total number of frame types, is not a valid frame type */
 } OBFrameType,
     ob_frame_type;
 
@@ -1735,6 +1735,16 @@ typedef enum {
     OB_PLAYBACK_COUNT,
 } ob_playback_status,
     OBPlaybackStatus;
+
+/**
+ * @brief Intra-camera Sync Reference based on the exposure start time, the exposure middle time, or the exposure end time.
+ */
+typedef enum {
+    START_OF_EXPOSURE = 0, /**< start of exposure */
+    MIDDLE_OF_EXPOSURE,    /**< middle of exposure */
+    END_OF_EXPOSURE,       /**< end of exposure  */
+} ob_intra_camera_sync_reference,
+    OBIntraCameraSyncReference;
 
 // For compatibility
 #define OB_FRAME_METADATA_TYPE_LASER_POWER_MODE OB_FRAME_METADATA_TYPE_LASER_POWER_LEVEL

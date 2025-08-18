@@ -538,12 +538,18 @@ typedef enum {
     /**
      * @brief Confidence stream flip enable
      */
-    OB_PROP_CONFIDENCE_FLIP_BOOL   = 230,
+    OB_PROP_CONFIDENCE_FLIP_BOOL = 230,
 
     /**
      * @brief Confidence stream rotate angle{0, 90, 180, 270}
      */
-    OB_PROP_CONFIDENCE_ROTATE_INT  = 231,
+    OB_PROP_CONFIDENCE_ROTATE_INT = 231,
+
+    /**
+     * @brief Intra-camera Sync Reference based on the exposure start time, the exposure middle time, or the exposure end time. the definition in @ref
+     * OBIntraCameraSyncReference
+     */
+    OB_PROP_INTRA_CAMERA_SYNC_REFERENCE_INT = 236,
 
     /**
      * @brief Baseline calibration parameters

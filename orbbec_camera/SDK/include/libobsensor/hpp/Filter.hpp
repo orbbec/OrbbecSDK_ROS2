@@ -818,7 +818,7 @@ public:
      */
     OBSpatialFastFilterParams getFilterParams() {
         OBSpatialFastFilterParams params{};
-        params.radius    = static_cast<uint8_t>(getConfigValue("radius"));
+        params.radius = static_cast<uint8_t>(getConfigValue("radius"));
         return params;
     }
 
@@ -831,7 +831,6 @@ public:
         setConfigValue("radius", params.radius);
     }
 };
-
 
 /**
  * @brief The Spatial Moderate Filter utilizes an optimized average smoothing algorithm,
@@ -872,7 +871,7 @@ public:
      */
     OBIntPropertyRange getRadiusRange() {
         OBIntPropertyRange range{};
-        const auto &       schemaVec = getConfigSchemaVec();
+        const auto        &schemaVec = getConfigSchemaVec();
         for(const auto &item: schemaVec) {
             if(strcmp(item.name, "radius") == 0) {
                 range = getPropertyRange<OBIntPropertyRange>(item, getConfigValue("radius"));
@@ -923,7 +922,6 @@ public:
         setConfigValue("disp_diff", params.disp_diff);
     }
 };
-
 
 /**
  * @brief Hole filling filter,the processing performed depends on the selected hole filling mode.
@@ -1157,24 +1155,33 @@ public:
 };
 
 /**
- * @brief Define the Filter type map
+ * @brief Returns the mapping of filter type names to their corresponding type_index.
  */
-static const std::unordered_map<std::string, std::type_index> obFilterTypeMap = {
-    { "PointCloudFilter", typeid(PointCloudFilter) },   { "Align", typeid(Align) },
-    { "FormatConverter", typeid(FormatConvertFilter) }, { "HDRMerge", typeid(HdrMerge) },
-    { "SequenceIdFilter", typeid(SequenceIdFilter) },   { "DecimationFilter", typeid(DecimationFilter) },
-    { "ThresholdFilter", typeid(ThresholdFilter) },     { "SpatialAdvancedFilter", typeid(SpatialAdvancedFilter) },
-    { "HoleFillingFilter", typeid(HoleFillingFilter) }, { "NoiseRemovalFilter", typeid(NoiseRemovalFilter) },
-    { "TemporalFilter", typeid(TemporalFilter) },       { "DisparityTransform", typeid(DisparityTransform) }
-};
+inline const std::unordered_map<std::string, std::type_index> &getFilterTypeMap() {
+    static const std::unordered_map<std::string, std::type_index> filterTypeMap = {
+        { "PointCloudFilter", typeid(PointCloudFilter) },   { "Align", typeid(Align) },
+        { "FormatConverter", typeid(FormatConvertFilter) }, { "HDRMerge", typeid(HdrMerge) },
+        { "SequenceIdFilter", typeid(SequenceIdFilter) },   { "DecimationFilter", typeid(DecimationFilter) },
+        { "ThresholdFilter", typeid(ThresholdFilter) },     { "SpatialAdvancedFilter", typeid(SpatialAdvancedFilter) },
+        { "HoleFillingFilter", typeid(HoleFillingFilter) }, { "NoiseRemovalFilter", typeid(NoiseRemovalFilter) },
+        { "TemporalFilter", typeid(TemporalFilter) },       { "DisparityTransform", typeid(DisparityTransform) },
+        { "SpatialFastFilter", typeid(SpatialFastFilter) }, { "SpatialModerateFilter", typeid(SpatialModerateFilter) },
+    };
+    return filterTypeMap;
+}
 
 /**
  * @brief Define the is() template function for the Filter class
+ *
+ * @note When adding a new filter class, ensure the filter type map
+ *       (see getFilterTypeMap()) is updated accordingly to maintain correct type matching.
  */
 template <typename T> bool Filter::is() {
     std::string name = type();
-    auto        it   = obFilterTypeMap.find(name);
-    if(it != obFilterTypeMap.end()) {
+
+    const auto &filterTypeMap = getFilterTypeMap();
+    auto        it            = filterTypeMap.find(name);
+    if(it != filterTypeMap.end()) {
         return std::type_index(typeid(T)) == it->second;
     }
     return false;

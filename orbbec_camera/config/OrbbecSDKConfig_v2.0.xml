@@ -2337,5 +2337,356 @@
                 </RightIR>
             </In-sceneCalibration>
         </Gemini435Le>
+        <DaBaiMaxPro>
+            <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
+            will determine the device's speciality. Optional values: V4L2, LibUVC -->
+            <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
+
+            <DepthPostProcessing>
+                <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
+            </DepthPostProcessing>
+
+            <!-- Whether to enable firmware upgrade foolproof by default, only internal version
+            supports -->
+            <FirmwareUpgradeFoolproof>1</FirmwareUpgradeFoolproof>
+
+            <!--  Depth Filter Params -->
+            <Depth>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>400</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>10</FPS>
+                <Format>Y12</Format>
+            </Depth>
+            <Color>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>480</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>10</FPS>
+                <Format>MJPG</Format>
+            </Color>
+            <IR>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>400</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>10</FPS>
+                <Format>Y10</Format>
+            </IR>
+        </DaBaiMaxPro>
+        <DaBaiMax>
+            <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
+            will determine the device's speciality. Optional values: V4L2, LibUVC -->
+            <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
+
+            <DepthPostProcessing>
+                <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
+            </DepthPostProcessing>
+
+            <!-- Whether to enable firmware upgrade foolproof by default, only internal version
+            supports -->
+            <FirmwareUpgradeFoolproof>1</FirmwareUpgradeFoolproof>
+
+            <!--  Depth Filter Params -->
+            <Depth>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>400</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>10</FPS>
+                <Format>Y12</Format>
+            </Depth>
+            <IR>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>400</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>10</FPS>
+                <Format>Y10</Format>
+            </IR>
+        </DaBaiMax>
+		<AstraMiniPro>
+            <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
+            will determine the device's speciality. Optional values: V4L2, LibUVC -->
+            <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
+
+            <DepthPostProcessing>
+                <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
+            </DepthPostProcessing>
+
+            <!-- Whether to enable firmware upgrade foolproof by default, only internal version
+            supports -->
+            <FirmwareUpgradeFoolproof>1</FirmwareUpgradeFoolproof>
+
+            <!--  Depth Filter Params -->
+            <Depth>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>480</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>30</FPS>
+                <Format>Y12</Format>
+            </Depth>
+            <IR>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>480</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>30</FPS>
+                <Format>Y10</Format>
+            </IR>
+			<Color>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>480</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>30</FPS>
+                <Format>UYVY</Format>
+            </Color>
+        </AstraMiniPro>
+		<AstraMiniSPro>
+            <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
+            will determine the device's speciality. Optional values: V4L2, LibUVC -->
+            <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
+
+            <DepthPostProcessing>
+                <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
+            </DepthPostProcessing>
+
+            <!-- Whether to enable firmware upgrade foolproof by default, only internal version
+            supports -->
+            <FirmwareUpgradeFoolproof>1</FirmwareUpgradeFoolproof>
+
+            <!--  Depth Filter Params -->
+            <Depth>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>480</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>30</FPS>
+                <Format>Y12</Format>
+            </Depth>
+            <IR>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>480</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>30</FPS>
+                <Format>Y10</Format>
+            </IR>
+			<Color>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>480</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>30</FPS>
+                <Format>UYVY</Format>
+            </Color>
+        </AstraMiniSPro>
+		<AstraPro2>
+            <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
+            will determine the device's speciality. Optional values: V4L2, LibUVC -->
+            <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
+
+            <DepthPostProcessing>
+                <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
+            </DepthPostProcessing>
+
+            <!-- Whether to enable firmware upgrade foolproof by default, only internal version
+            supports -->
+            <FirmwareUpgradeFoolproof>1</FirmwareUpgradeFoolproof>
+
+            <!--  Depth Filter Params -->
+            <Depth>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>480</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>30</FPS>
+                <Format>Y12</Format>
+            </Depth>
+            <IR>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>480</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>30</FPS>
+                <Format>Y10</Format>
+            </IR>
+			<Color>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>480</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>30</FPS>
+                <Format>UYVY</Format>
+            </Color>
+        </AstraPro2>
+		<DaBaiDW2>
+            <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
+            will determine the device's speciality. Optional values: V4L2, LibUVC -->
+            <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
+
+            <DepthPostProcessing>
+                <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
+            </DepthPostProcessing>
+
+            <!-- Whether to enable firmware upgrade foolproof by default, only internal version
+            supports -->
+            <FirmwareUpgradeFoolproof>1</FirmwareUpgradeFoolproof>
+
+            <!--  Depth Filter Params -->
+            <Depth>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>400</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>15</FPS>
+                <Format>Y12</Format>
+            </Depth>
+            <IR>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>400</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>15</FPS>
+                <Format>Y10</Format>
+            </IR>
+        </DaBaiDW2>
+		<DaBaiDCW2>
+            <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
+            will determine the device's speciality. Optional values: V4L2, LibUVC -->
+            <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
+
+            <DepthPostProcessing>
+                <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
+            </DepthPostProcessing>
+
+            <!-- Whether to enable firmware upgrade foolproof by default, only internal version
+            supports -->
+            <FirmwareUpgradeFoolproof>1</FirmwareUpgradeFoolproof>
+
+            <!--  Depth Filter Params -->
+            <Depth>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>400</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>15</FPS>
+                <Format>Y12</Format>
+            </Depth>
+            <IR>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>400</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>15</FPS>
+                <Format>Y10</Format>
+            </IR>
+			<Color>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>480</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>15</FPS>
+                <Format>MJPG</Format>
+            </Color>
+        </DaBaiDCW2>
+		<GeminiEWLite>
+            <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
+            will determine the device's speciality. Optional values: V4L2, LibUVC -->
+            <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
+
+            <DepthPostProcessing>
+                <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
+            </DepthPostProcessing>
+
+            <!-- Whether to enable firmware upgrade foolproof by default, only internal version
+            supports -->
+            <FirmwareUpgradeFoolproof>1</FirmwareUpgradeFoolproof>
+
+            <!--  Depth Filter Params -->
+            <Depth>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>400</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>15</FPS>
+                <Format>Y12</Format>
+            </Depth>
+            <IR>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>400</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>15</FPS>
+                <Format>Y10</Format>
+            </IR>
+        </GeminiEWLite>
+		<GeminiEW>
+            <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
+            will determine the device's speciality. Optional values: V4L2, LibUVC -->
+            <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
+
+            <DepthPostProcessing>
+                <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
+            </DepthPostProcessing>
+
+            <!-- Whether to enable firmware upgrade foolproof by default, only internal version
+            supports -->
+            <FirmwareUpgradeFoolproof>1</FirmwareUpgradeFoolproof>
+
+            <!--  Depth Filter Params -->
+            <Depth>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>400</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>15</FPS>
+                <Format>Y12</Format>
+            </Depth>
+            <IR>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>400</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>15</FPS>
+                <Format>Y10</Format>
+            </IR>
+			<Color>
+                <!-- The resolution width is enabled by default, int type -->
+                <Width>640</Width>
+                <!-- High resolution is enabled by default, int type -->
+                <Height>480</Height>
+                <!-- The frame rate of the resolution enabled by default, int type -->
+                <FPS>15</FPS>
+                <Format>MJPG</Format>
+            </Color>
+        </GeminiEW>
     </Device>
 </Config>

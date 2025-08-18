@@ -582,6 +582,9 @@ class OBCameraNode {
   int depth_ae_roi_bottom_ = -1;
   int mean_intensity_set_point_ = -1;
   int depth_brightness_ = -1;
+  int depth_exposure_ = -1;
+  int depth_gain_ = -1;
+  int mean_intensity_set_point_ = -1;
   int ir_exposure_ = -1;
   int ir_gain_ = -1;
   int ir_ae_max_exposure_ = -1;

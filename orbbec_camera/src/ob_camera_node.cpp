@@ -605,6 +605,28 @@ void OBCameraNode::setupDevices() {
     }
     RCLCPP_INFO_STREAM(logger_, "Setting color powerline freq to " << color_powerline_freq_);
   }
+  if (depth_exposure_ != -1 &&
+      device_->isPropertySupported(OB_PROP_DEPTH_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
+    auto range = device_->getIntPropertyRange(OB_PROP_DEPTH_EXPOSURE_INT);
+    if (depth_exposure_ < range.min || depth_exposure_ > range.max) {
+      RCLCPP_ERROR(logger_, "depth exposure value is out of range[%d,%d], please check the value",
+                   range.min, range.max);
+    } else {
+      RCLCPP_INFO_STREAM(logger_, "Setting depth exposure to " << depth_exposure_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_DEPTH_EXPOSURE_INT, depth_exposure_);
+    }
+  }
+  if (depth_gain_ != -1 &&
+      device_->isPropertySupported(OB_PROP_DEPTH_GAIN_INT, OB_PERMISSION_WRITE)) {
+    auto range = device_->getIntPropertyRange(OB_PROP_DEPTH_GAIN_INT);
+    if (depth_gain_ < range.min || depth_gain_ > range.max) {
+      RCLCPP_ERROR(logger_, "depth gain value is out of range[%d,%d], please check the value",
+                   range.min, range.max);
+    } else {
+      RCLCPP_INFO_STREAM(logger_, "Setting depth gain to " << depth_gain_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_DEPTH_GAIN_INT, depth_gain_);
+    }
+  }
   if (device_->isPropertySupported(OB_PROP_DEPTH_AUTO_EXPOSURE_PRIORITY_INT, OB_PERMISSION_WRITE)) {
     int set_enable_depth_auto_exposure_priority = enable_depth_auto_exposure_priority_ ? 1 : 0;
     RCLCPP_INFO_STREAM(logger_, "Setting depth auto exposure priority to "
@@ -1748,6 +1770,8 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(depth_ae_roi_top_, "depth_ae_roi_top", -1);
   setAndGetNodeParameter<int>(depth_ae_roi_right_, "depth_ae_roi_right", -1);
   setAndGetNodeParameter<int>(depth_ae_roi_bottom_, "depth_ae_roi_bottom", -1);
+  setAndGetNodeParameter<int>(depth_exposure_, "depth_exposure", -1);
+  setAndGetNodeParameter<int>(depth_gain_, "depth_gain", -1);
   setAndGetNodeParameter<int>(depth_brightness_, "depth_brightness", -1);
   setAndGetNodeParameter<int>(mean_intensity_set_point_, "mean_intensity_set_point",
                               depth_brightness_);

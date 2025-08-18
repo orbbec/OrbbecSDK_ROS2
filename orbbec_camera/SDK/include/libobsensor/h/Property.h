@@ -845,6 +845,11 @@ typedef enum {
     OB_PROP_SDK_IR_RIGHT_FRAME_UNPACK_BOOL = 3012,
 
     /**
+     * @brief Depth Stream Industry Working Mode Settings, currently only supported by DCW2.
+     */
+    OB_PROP_DEPTH_INDUSTRY_MODE_INT = 3024,
+
+    /**
      * @brief Read the current network bandwidth type of the network device, whether it is Gigabit Ethernet or Fast Ethernet, such as G335LE.
      */
     OB_PROP_NETWORK_BANDWIDTH_TYPE_INT = 3027,

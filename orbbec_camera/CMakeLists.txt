@@ -102,17 +102,30 @@ set(COMMON_INCLUDE_DIRS
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
-  ${ORBBEC_INCLUDE_DIR}
+  $<BUILD_INTERFACE:${ORBBEC_INCLUDE_DIR}>
   ${OpenCV_INCLUDED_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}/tools
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/tools>
 )
 
+
+# Orbbec SDK의 경로를 변수로 설정
+set(ORBBEC_SDK_PATH ${CMAKE_CURRENT_SOURCE_DIR}/SDK)
+
+# OrbbecSDK를 위한 IMPORTED 타겟 생성
+add_library(OrbbecSDK UNKNOWN IMPORTED)
+set_target_properties(OrbbecSDK PROPERTIES
+  IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/SDK/lib/${HOST_PLATFORM}/libOrbbecSDK.so"
+  INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/SDK/include"
+)
+
+# 외부 패키지에서 사용할 수 있는 alias 생성
+add_library(orbbec_camera::OrbbecSDK ALIAS OrbbecSDK)
+
+
 set(COMMON_LIBRARIES
-  ${ORBBEC_SDK_LIBRARIES}
   ${OpenCV_LIBS}
   Eigen3::Eigen
-  -lOrbbecSDK
-  -L${ORBBEC_LIBS_DIR}
+  OrbbecSDK
   Threads::Threads
   -lrt
   -ldw
@@ -223,6 +236,7 @@ rclcpp_components_register_node(frame_latency
 )
 # Install rules
 install(TARGETS ${PROJECT_NAME} frame_latency
+  EXPORT export_${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
@@ -231,7 +245,7 @@ install(TARGETS ${PROJECT_NAME} frame_latency
 install(DIRECTORY include/ DESTINATION include)
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME}/)
-install(DIRECTORY ${ORBBEC_INCLUDE_DIR} DESTINATION include)
+install(DIRECTORY ${ORBBEC_INCLUDE_DIR} DESTINATION include/orbbec_sdk)
 install(DIRECTORY ${ORBBEC_LIBS_DIR}/ DESTINATION lib/ FILES_MATCHING PATTERN "*.so*")
 if (DEFINED ENV{BUILDING_PACKAGE})
   # Install udev rules
@@ -250,9 +264,8 @@ if (BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 endif ()
+ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
 
-ament_export_include_directories(include ${ORBBEC_INCLUDE_DIR})
 ament_export_libraries(${PROJECT_NAME})
-ament_export_dependencies(${dependencies} ${ORBBEC_LIBS})
 
 ament_package()

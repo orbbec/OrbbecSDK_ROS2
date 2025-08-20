@@ -1,6 +1,5 @@
 #include <string>
-
-
+// default setting?
 class CameraConfig
 {
 public:
@@ -15,7 +14,7 @@ public:
 	std::string color_info_url_ = "";
 	bool enable_d2c_viewer_ = false;
 	bool enable_hardware_d2d_ = true;
-	bool enable_soft_filter_ = false;
+	bool enable_soft_filter_ = true;
 	std::string depth_filter_config_ = "";
 
 	bool enable_color_auto_exposure_ = true;
@@ -49,7 +48,7 @@ public:
 
 	int trigger2image_delay_us_ = 0;
 	int trigger_out_delay_us_ = 0;
-	bool trigger_out_enabled_ = false;
+	bool trigger_out_enabled_ = true;
 	std::string depth_precision_str_ = "";
 	std::string cloud_frame_id = "/sensor/camera/gemini/pointcloud";
 
@@ -78,7 +77,7 @@ public:
 	int threshold_filter_min_ = -1;
 	int noise_removal_filter_min_diff_ = 256;
 	int noise_removal_filter_max_size_ = 80;
-	float spatial_filter_alpha_ = -1;
+	float spatial_filter_alpha_ = -1.0;
 	int spatial_filter_diff_threshold_ = -1;
 	int spatial_filter_magnitude_ = -1;
 	int spatial_filter_radius_ = -1;

@@ -566,7 +566,7 @@ class OBCameraNode {
   OBStreamType align_target_stream_ = OB_STREAM_COLOR;
   bool retry_on_usb3_detection_failure_ = false;
   std::atomic_bool is_camera_node_initialized_{false};
-  int laser_energy_level_ = -1;
+  // int camera_config_.laser_energy_level_ = -1;
   ob::PointCloudFilter depth_point_cloud_filter_;
   std::optional<OBCalibrationParam> calibration_param_;
   std::optional<OBXYTables> xy_tables_;
@@ -582,7 +582,7 @@ class OBCameraNode {
   rclcpp::TimerBase::SharedPtr software_trigger_timer_;
   std::chrono::milliseconds software_trigger_period_{33};
   bool enable_heartbeat_ = false;
-  std::string industry_mode_ = "";
+  // std::string camera_config_.industry_mode_ = "";
   bool enable_color_undistortion_ = false;
   std::shared_ptr<image_publisher> color_undistortion_publisher_;
   bool has_first_color_frame_ = false;

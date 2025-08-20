@@ -1028,7 +1028,7 @@ void OBCameraNode::setupTopics() {
     setupProfiles();
     setupCameraInfo();
     selectBaseStream();
-    setupCameraCtrlServices();
+    // setupCameraCtrlServices();
     setupPublishers();
     // setupDiagnosticUpdater();
   } catch (const ob::Error &e) {

@@ -52,7 +52,7 @@ OBCameraNode::OBCameraNode(rclcpp::Node *node, std::shared_ptr<ob::Device> devic
   stream_name_[ACCEL] = "accel";
   stream_name_[GYRO] = "gyro";
 
-  camera_config_ = CameraConfig();
+  default_config_ = DefaultConfig();
 
   compression_params_.push_back(cv::IMWRITE_PNG_COMPRESSION);
   compression_params_.push_back(0);
@@ -64,7 +64,7 @@ OBCameraNode::OBCameraNode(rclcpp::Node *node, std::shared_ptr<ob::Device> devic
 #if defined(USE_NV_HW_DECODER)
   jpeg_decoder_ = std::make_unique<JetsonNvJPEGDecoder>(width_[COLOR], height_[COLOR]);
 #endif
-  if (camera_config_.enable_d2c_viewer_) {
+  if (default_config_.enable_d2c_viewer_) {
     auto rgb_qos = getRMWQosProfileFromString(image_qos_[COLOR]);
     auto depth_qos = getRMWQosProfileFromString(image_qos_[DEPTH]);
     d2c_viewer_ = std::make_unique<D2CViewer>(node_, rgb_qos, depth_qos);
@@ -80,6 +80,53 @@ OBCameraNode::OBCameraNode(rclcpp::Node *node, std::shared_ptr<ob::Device> devic
   }
   is_camera_node_initialized_ = true;
 }
+
+// OBCameraNode::OBCameraNode(rclcpp::Node *node, std::shared_ptr<ob::Device> device,
+//                            GeminiConfig gemini_config, bool use_intra_process)
+//     : node_(node),
+//       device_(std::move(device)),
+//       gemini_config_(std::move(gemini_config)),
+//       logger_(node->get_logger()),
+//       use_intra_process_(use_intra_process) {
+//   RCLCPP_INFO_STREAM(logger_,
+//                      "OBCameraNode: use_intra_process: " << (use_intra_process ? "ON" : "OFF"));
+//   is_running_.store(true);
+//   stream_name_[COLOR] = "color";
+//   stream_name_[DEPTH] = "depth";
+//   stream_name_[INFRA0] = "ir";
+//   stream_name_[INFRA1] = "left_ir";
+//   stream_name_[INFRA2] = "right_ir";
+//   stream_name_[ACCEL] = "accel";
+//   stream_name_[GYRO] = "gyro";
+
+//   default_config_ = CameraConfig();
+
+//   compression_params_.push_back(cv::IMWRITE_PNG_COMPRESSION);
+//   compression_params_.push_back(0);
+//   compression_params_.push_back(cv::IMWRITE_PNG_STRATEGY);
+//   compression_params_.push_back(cv::IMWRITE_PNG_STRATEGY_DEFAULT);
+//   setupDefaultImageFormat();
+//   setupTopics();
+
+// #if defined(USE_NV_HW_DECODER)
+//   jpeg_decoder_ = std::make_unique<JetsonNvJPEGDecoder>(width_[COLOR], height_[COLOR]);
+// #endif
+//   if (default_config_.enable_d2c_viewer_) {
+//     auto rgb_qos = getRMWQosProfileFromString(image_qos_[COLOR]);
+//     auto depth_qos = getRMWQosProfileFromString(image_qos_[DEPTH]);
+//     d2c_viewer_ = std::make_unique<D2CViewer>(node_, rgb_qos, depth_qos);
+//   }
+//   if (enable_stream_[COLOR]) {
+//     rgb_buffer_ = new uint8_t[width_[COLOR] * height_[COLOR] * 3];
+//   }
+//   if (enable_colored_point_cloud_ && enable_stream_[DEPTH] && enable_stream_[COLOR]) {
+//     rgb_point_cloud_buffer_size_ = width_[COLOR] * height_[COLOR] * sizeof(OBColorPoint);
+//     rgb_point_cloud_buffer_ = new uint8_t[rgb_point_cloud_buffer_size_];
+//     xy_table_data_size_ = width_[DEPTH] * height_[DEPTH] * 2;
+//     xy_table_data_ = new float[xy_table_data_size_];
+//   }
+//   is_camera_node_initialized_ = true;
+// }
 
 template <class T>
 void OBCameraNode::setAndGetNodeParameter(
@@ -163,64 +210,64 @@ void OBCameraNode::setupDevices() {
     }
   }
   auto info = device_->getDeviceInfo();
-  if (camera_config_.retry_on_usb3_detection_failure_ &&
+  if (default_config_.retry_on_usb3_detection_failure_ &&
       device_->isPropertySupported(OB_PROP_DEVICE_USB3_REPEAT_IDENTIFY_BOOL,
                                    OB_PERMISSION_READ_WRITE)) {
     TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_DEVICE_USB3_REPEAT_IDENTIFY_BOOL,
-                        camera_config_.retry_on_usb3_detection_failure_);
+                        default_config_.retry_on_usb3_detection_failure_);
   }
   if (device_->isPropertySupported(OB_PROP_DEPTH_NOISE_REMOVAL_FILTER_BOOL,
                                    OB_PERMISSION_READ_WRITE)) {
     TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_DEPTH_NOISE_REMOVAL_FILTER_BOOL,
-                        camera_config_.enable_noise_removal_filter_);
+                        default_config_.enable_noise_removal_filter_);
   }
   if (device_->isPropertySupported(OB_PROP_HEARTBEAT_BOOL, OB_PERMISSION_READ_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting heartbeat to " << (camera_config_.enable_heartbeat_ ? "ON" : "OFF"));
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_HEARTBEAT_BOOL, camera_config_.enable_heartbeat_);
+    RCLCPP_INFO_STREAM(logger_, "Setting heartbeat to " << (default_config_.enable_heartbeat_ ? "ON" : "OFF"));
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_HEARTBEAT_BOOL, default_config_.enable_heartbeat_);
   }
-  if (!camera_config_.industry_mode_.empty() &&
+  if (!default_config_.industry_mode_.empty() &&
       device_->isPropertySupported(OB_PROP_DEPTH_INDUSTRY_MODE_INT, OB_PERMISSION_READ_WRITE)) {
-    if (camera_config_.industry_mode_ == "default") {
+    if (default_config_.industry_mode_ == "default") {
       OBDepthIndustryMode mode = OB_INDUSTRY_DEFAULT;
       device_->setIntProperty(OB_PROP_DEPTH_INDUSTRY_MODE_INT, (int32_t)mode);
-    } else if (camera_config_.industry_mode_ == "mode1") {
+    } else if (default_config_.industry_mode_ == "mode1") {
       OBDepthIndustryMode mode = OB_INDUSTRY_MODE1;
       device_->setIntProperty(OB_PROP_DEPTH_INDUSTRY_MODE_INT, (int32_t)mode);
-    } else if (camera_config_.industry_mode_ == "mode2") {
+    } else if (default_config_.industry_mode_ == "mode2") {
       OBDepthIndustryMode mode = OB_INDUSTRY_MODE2;
       device_->setIntProperty(OB_PROP_DEPTH_INDUSTRY_MODE_INT, (int32_t)mode);
-    } else if (camera_config_.industry_mode_ == "mode3") {
+    } else if (default_config_.industry_mode_ == "mode3") {
       OBDepthIndustryMode mode = OB_INDUSTRY_MODE3;
       device_->setIntProperty(OB_PROP_DEPTH_INDUSTRY_MODE_INT, (int32_t)mode);
-    } else if (camera_config_.industry_mode_ == "mode4") {
+    } else if (default_config_.industry_mode_ == "mode4") {
       OBDepthIndustryMode mode = OB_INDUSTRY_MODE4;
       device_->setIntProperty(OB_PROP_DEPTH_INDUSTRY_MODE_INT, (int32_t)mode);
-    } else if (camera_config_.industry_mode_ == "mode5") {
+    } else if (default_config_.industry_mode_ == "mode5") {
       OBDepthIndustryMode mode = OB_INDUSTRY_MODE5;
       device_->setIntProperty(OB_PROP_DEPTH_INDUSTRY_MODE_INT, (int32_t)mode);
     }
     RCLCPP_INFO_STREAM(logger_, "Setting industry mode to "
                                     << device_->getIntProperty(OB_PROP_DEPTH_INDUSTRY_MODE_INT));
   }
-  if (camera_config_.max_depth_limit_ > 0 &&
+  if (default_config_.max_depth_limit_ > 0 &&
       device_->isPropertySupported(OB_PROP_MAX_DEPTH_INT, OB_PERMISSION_READ_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting max depth limit to " << camera_config_.max_depth_limit_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_MAX_DEPTH_INT, camera_config_.max_depth_limit_);
+    RCLCPP_INFO_STREAM(logger_, "Setting max depth limit to " << default_config_.max_depth_limit_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_MAX_DEPTH_INT, default_config_.max_depth_limit_);
   }
-  if (camera_config_.min_depth_limit_ > 0 &&
+  if (default_config_.min_depth_limit_ > 0 &&
       device_->isPropertySupported(OB_PROP_MIN_DEPTH_INT, OB_PERMISSION_READ_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting min depth limit to " << camera_config_.min_depth_limit_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_MIN_DEPTH_INT, camera_config_.min_depth_limit_);
+    RCLCPP_INFO_STREAM(logger_, "Setting min depth limit to " << default_config_.min_depth_limit_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_MIN_DEPTH_INT, default_config_.min_depth_limit_);
   }
-  if (camera_config_.laser_energy_level_ != -1 &&
+  if (default_config_.laser_energy_level_ != -1 &&
       device_->isPropertySupported(OB_PROP_LASER_ENERGY_LEVEL_INT, OB_PERMISSION_READ_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting laser energy level to " << camera_config_.laser_energy_level_);
+    RCLCPP_INFO_STREAM(logger_, "Setting laser energy level to " << default_config_.laser_energy_level_);
     auto range = device_->getIntPropertyRange(OB_PROP_LASER_ENERGY_LEVEL_INT);
-    if (camera_config_.laser_energy_level_ < range.min || camera_config_.laser_energy_level_ > range.max) {
+    if (default_config_.laser_energy_level_ < range.min || default_config_.laser_energy_level_ > range.max) {
       RCLCPP_ERROR_STREAM(logger_,
                           "Laser energy level is out of range " << range.min << " - " << range.max);
     } else {
-      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_ENERGY_LEVEL_INT, camera_config_.laser_energy_level_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_ENERGY_LEVEL_INT, default_config_.laser_energy_level_);
       auto new_laser_energy_level = device_->getIntProperty(OB_PROP_LASER_ENERGY_LEVEL_INT);
       RCLCPP_INFO_STREAM(logger_,
                          "Laser energy level set to " << new_laser_energy_level << " (new value)");
@@ -231,32 +278,32 @@ void OBCameraNode::setupDevices() {
     align_filter_ = std::make_unique<ob::Align>(align_target_stream_);
   }
   if (device_->isPropertySupported(OB_PROP_DISPARITY_TO_DEPTH_BOOL, OB_PERMISSION_READ_WRITE)) {
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_DISPARITY_TO_DEPTH_BOOL, camera_config_.enable_hardware_d2d_);
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_DISPARITY_TO_DEPTH_BOOL, default_config_.enable_hardware_d2d_);
     bool is_hardware_d2d = device_->getBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL);
     std::string d2d_mode = is_hardware_d2d ? "HW D2D" : "SW D2D";
     RCLCPP_INFO_STREAM(logger_, "Depth process is " << d2d_mode);
   }
   if (device_->isPropertySupported(OB_PROP_LDP_BOOL, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting LDP to " << (camera_config_.enable_ldp_ ? "ON" : "OFF"));
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_LDP_BOOL, camera_config_.enable_ldp_);
+    RCLCPP_INFO_STREAM(logger_, "Setting LDP to " << (default_config_.enable_ldp_ ? "ON" : "OFF"));
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_LDP_BOOL, default_config_.enable_ldp_);
   }
   if (device_->isPropertySupported(OB_PROP_LASER_CONTROL_INT, OB_PERMISSION_READ_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting laser control to " << camera_config_.enable_laser_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_CONTROL_INT, camera_config_.enable_laser_);
+    RCLCPP_INFO_STREAM(logger_, "Setting laser control to " << default_config_.enable_laser_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_CONTROL_INT, default_config_.enable_laser_);
   }
   if (device_->isPropertySupported(OB_PROP_LASER_ON_OFF_MODE_INT, OB_PERMISSION_READ_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting laser on off mode to " << camera_config_.laser_on_off_mode_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_ON_OFF_MODE_INT, camera_config_.laser_on_off_mode_);
+    RCLCPP_INFO_STREAM(logger_, "Setting laser on off mode to " << default_config_.laser_on_off_mode_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_ON_OFF_MODE_INT, default_config_.laser_on_off_mode_);
   }
-  if (!camera_config_.device_preset_.empty()) {
+  if (!default_config_.device_preset_.empty()) {
     try {
       RCLCPP_INFO_STREAM(logger_, "Available presets:");
       auto preset_list = device_->getAvailablePresetList();
       for (uint32_t i = 0; i < preset_list->count(); i++) {
         RCLCPP_INFO_STREAM(logger_, "Preset " << i << ": " << preset_list->getName(i));
       }
-      RCLCPP_INFO_STREAM(logger_, "Load device preset: " << camera_config_.device_preset_);
-      TRY_EXECUTE_BLOCK(device_->loadPreset(camera_config_.device_preset_.c_str()));
+      RCLCPP_INFO_STREAM(logger_, "Load device preset: " << default_config_.device_preset_);
+      TRY_EXECUTE_BLOCK(device_->loadPreset(default_config_.device_preset_.c_str()));
       RCLCPP_INFO_STREAM(logger_, "Device preset " << device_->getCurrentPresetName() << " loaded");
     } catch (const ob::Error &e) {
       RCLCPP_ERROR_STREAM(logger_, "Failed to load device preset: " << e.getMessage());
@@ -266,22 +313,22 @@ void OBCameraNode::setupDevices() {
       RCLCPP_ERROR_STREAM(logger_, "Failed to load device preset");
     }
   }
-  if (!camera_config_.depth_work_mode_.empty()) {
-    RCLCPP_INFO_STREAM(logger_, "Set depth work mode: " << camera_config_.depth_work_mode_);
-    TRY_EXECUTE_BLOCK(device_->switchDepthWorkMode(camera_config_.depth_work_mode_.c_str()));
+  if (!default_config_.depth_work_mode_.empty()) {
+    RCLCPP_INFO_STREAM(logger_, "Set depth work mode: " << default_config_.depth_work_mode_);
+    TRY_EXECUTE_BLOCK(device_->switchDepthWorkMode(default_config_.depth_work_mode_.c_str()));
   }
 
   if (device_->isPropertySupported(OB_PROP_DEPTH_PRECISION_LEVEL_INT, OB_PERMISSION_READ_WRITE) &&
-      !camera_config_.depth_precision_str_.empty()) {
+      !default_config_.depth_precision_str_.empty()) {
     auto default_precision_level = device_->getIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT);
     if (default_precision_level != depth_precision_) {
       device_->setIntProperty(OB_PROP_DEPTH_PRECISION_LEVEL_INT, depth_precision_);
-      RCLCPP_INFO_STREAM(logger_, "set depth precision to " << camera_config_.depth_precision_str_);
+      RCLCPP_INFO_STREAM(logger_, "set depth precision to " << default_config_.depth_precision_str_);
     }
   } else if (device_->isPropertySupported(OB_PROP_DEPTH_UNIT_FLEXIBLE_ADJUSTMENT_FLOAT,
                                           OB_PERMISSION_READ_WRITE) &&
-             !camera_config_.depth_precision_str_.empty()) {
-    auto depth_unit_flexible_adjustment = depthPrecisionFromString(camera_config_.depth_precision_str_);
+             !default_config_.depth_precision_str_.empty()) {
+    auto depth_unit_flexible_adjustment = depthPrecisionFromString(default_config_.depth_precision_str_);
     auto range = device_->getFloatPropertyRange(OB_PROP_DEPTH_UNIT_FLEXIBLE_ADJUSTMENT_FLOAT);
     RCLCPP_INFO_STREAM(logger_,
                        "Depth unit flexible adjustment range: " << range.min << " - " << range.max);
@@ -308,137 +355,137 @@ void OBCameraNode::setupDevices() {
 
   if (device_->isPropertySupported(OB_PROP_COLOR_AUTO_WHITE_BALANCE_BOOL, OB_PERMISSION_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting color auto white balance to "
-                                    << (camera_config_.enable_color_auto_white_balance_ ? "ON" : "OFF"));
+                                    << (default_config_.enable_color_auto_white_balance_ ? "ON" : "OFF"));
     TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_COLOR_AUTO_WHITE_BALANCE_BOOL,
-                        camera_config_.enable_color_auto_white_balance_);
+                        default_config_.enable_color_auto_white_balance_);
   }
-  if (camera_config_.color_exposure_ != -1 &&
+  if (default_config_.color_exposure_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
     auto range = device_->getIntPropertyRange(OB_PROP_COLOR_EXPOSURE_INT);
-    if (camera_config_.color_exposure_ < range.min || camera_config_.color_exposure_ > range.max) {
+    if (default_config_.color_exposure_ < range.min || default_config_.color_exposure_ > range.max) {
       RCLCPP_ERROR(logger_, "color exposure value is out of range[%d,%d], please check the value",
                    range.min, range.max);
     } else {
-      RCLCPP_INFO_STREAM(logger_, "Setting color exposure to " << camera_config_.color_exposure_);
-      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_EXPOSURE_INT, camera_config_.color_exposure_);
+      RCLCPP_INFO_STREAM(logger_, "Setting color exposure to " << default_config_.color_exposure_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_EXPOSURE_INT, default_config_.color_exposure_);
     }
   }
-  if (camera_config_.color_gain_ != -1 &&
+  if (default_config_.color_gain_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_GAIN_INT, OB_PERMISSION_WRITE)) {
     auto range = device_->getIntPropertyRange(OB_PROP_COLOR_GAIN_INT);
-    if (camera_config_.color_gain_ < range.min || camera_config_.color_gain_ > range.max) {
+    if (default_config_.color_gain_ < range.min || default_config_.color_gain_ > range.max) {
       RCLCPP_ERROR(logger_, "color gain value is out of range[%d,%d], please check the value",
                    range.min, range.max);
     } else {
-      RCLCPP_INFO_STREAM(logger_, "Setting color gain to " << camera_config_.color_gain_);
-      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_GAIN_INT, camera_config_.color_gain_);
+      RCLCPP_INFO_STREAM(logger_, "Setting color gain to " << default_config_.color_gain_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_GAIN_INT, default_config_.color_gain_);
     }
   }
-  if (camera_config_.color_white_balance_ != -1 &&
+  if (default_config_.color_white_balance_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_WHITE_BALANCE_INT, OB_PERMISSION_WRITE)) {
     TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_COLOR_AUTO_WHITE_BALANCE_BOOL, false);
     auto range = device_->getIntPropertyRange(OB_PROP_COLOR_WHITE_BALANCE_INT);
-    if (camera_config_.color_white_balance_ < range.min || camera_config_.color_white_balance_ > range.max) {
+    if (default_config_.color_white_balance_ < range.min || default_config_.color_white_balance_ > range.max) {
       RCLCPP_ERROR(logger_,
                    "color white balance value is out of range[%d,%d], please check the value",
                    range.min, range.max);
     } else {
-      RCLCPP_INFO_STREAM(logger_, "Setting color white balance to " << camera_config_.color_white_balance_);
-      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_WHITE_BALANCE_INT, camera_config_.color_white_balance_);
+      RCLCPP_INFO_STREAM(logger_, "Setting color white balance to " << default_config_.color_white_balance_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_WHITE_BALANCE_INT, default_config_.color_white_balance_);
     }
   }
   if (device_->isPropertySupported(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
     RCLCPP_INFO_STREAM(
-        logger_, "Setting color auto exposure to " << (camera_config_.enable_color_auto_exposure_ ? "ON" : "OFF"));
+        logger_, "Setting color auto exposure to " << (default_config_.enable_color_auto_exposure_ ? "ON" : "OFF"));
     TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_COLOR_AUTO_EXPOSURE_BOOL,
-                        camera_config_.enable_color_auto_exposure_);
+                        default_config_.enable_color_auto_exposure_);
   }
-  if (camera_config_.color_ae_max_exposure_ != -1 &&
+  if (default_config_.color_ae_max_exposure_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_AE_MAX_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting color AE max exposure to " << camera_config_.color_ae_max_exposure_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_AE_MAX_EXPOSURE_INT, camera_config_.color_ae_max_exposure_);
+    RCLCPP_INFO_STREAM(logger_, "Setting color AE max exposure to " << default_config_.color_ae_max_exposure_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_AE_MAX_EXPOSURE_INT, default_config_.color_ae_max_exposure_);
   }
-  if (camera_config_.color_brightness_ != -1 &&
+  if (default_config_.color_brightness_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_BRIGHTNESS_INT, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting color brightness to " << camera_config_.color_brightness_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_BRIGHTNESS_INT, camera_config_.color_brightness_);
+    RCLCPP_INFO_STREAM(logger_, "Setting color brightness to " << default_config_.color_brightness_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_BRIGHTNESS_INT, default_config_.color_brightness_);
   }
-  if (camera_config_.color_sharpness_ != -1 &&
+  if (default_config_.color_sharpness_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_SHARPNESS_INT, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting color sharpness to " << camera_config_.color_sharpness_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_SHARPNESS_INT, camera_config_.color_sharpness_);
+    RCLCPP_INFO_STREAM(logger_, "Setting color sharpness to " << default_config_.color_sharpness_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_SHARPNESS_INT, default_config_.color_sharpness_);
   }
-  if (camera_config_.color_saturation_ != -1 &&
+  if (default_config_.color_saturation_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_SATURATION_INT, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting color saturation to " << camera_config_.color_saturation_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_SATURATION_INT, camera_config_.color_saturation_);
+    RCLCPP_INFO_STREAM(logger_, "Setting color saturation to " << default_config_.color_saturation_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_SATURATION_INT, default_config_.color_saturation_);
   }
-  if (camera_config_.color_contrast_ != -1 &&
+  if (default_config_.color_contrast_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_CONTRAST_INT, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting color contrast to " << camera_config_.color_contrast_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_CONTRAST_INT, camera_config_.color_contrast_);
+    RCLCPP_INFO_STREAM(logger_, "Setting color contrast to " << default_config_.color_contrast_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_CONTRAST_INT, default_config_.color_contrast_);
   }
-  if (camera_config_.color_gamma_ != -1 &&
+  if (default_config_.color_gamma_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_GAMMA_INT, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting color gamma to " << camera_config_.color_gamma_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_GAMMA_INT, camera_config_.color_gamma_);
+    RCLCPP_INFO_STREAM(logger_, "Setting color gamma to " << default_config_.color_gamma_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_GAMMA_INT, default_config_.color_gamma_);
   }
-  if (camera_config_.color_hue_ != -1 &&
+  if (default_config_.color_hue_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_HUE_INT, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting color hue to " << camera_config_.color_hue_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_HUE_INT, camera_config_.color_hue_);
+    RCLCPP_INFO_STREAM(logger_, "Setting color hue to " << default_config_.color_hue_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_HUE_INT, default_config_.color_hue_);
   }
 
   // ir ae max
-  if (camera_config_.ir_ae_max_exposure_ != -1 &&
+  if (default_config_.ir_ae_max_exposure_ != -1 &&
       device_->isPropertySupported(OB_PROP_IR_AE_MAX_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting IR AE max exposure to " << camera_config_.ir_ae_max_exposure_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_AE_MAX_EXPOSURE_INT, camera_config_.ir_ae_max_exposure_);
+    RCLCPP_INFO_STREAM(logger_, "Setting IR AE max exposure to " << default_config_.ir_ae_max_exposure_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_AE_MAX_EXPOSURE_INT, default_config_.ir_ae_max_exposure_);
   }
   // ir brightness
-  if (camera_config_.ir_brightness_ != -1 &&
+  if (default_config_.ir_brightness_ != -1 &&
       device_->isPropertySupported(OB_PROP_IR_BRIGHTNESS_INT, OB_PERMISSION_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting IR brightness to " << camera_config_.ir_brightness_);
-    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_BRIGHTNESS_INT, camera_config_.ir_brightness_);
+    RCLCPP_INFO_STREAM(logger_, "Setting IR brightness to " << default_config_.ir_brightness_);
+    TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_BRIGHTNESS_INT, default_config_.ir_brightness_);
   }
-  if (camera_config_.ir_exposure_ != -1 &&
+  if (default_config_.ir_exposure_ != -1 &&
       device_->isPropertySupported(OB_PROP_IR_EXPOSURE_INT, OB_PERMISSION_WRITE)) {
     auto range = device_->getIntPropertyRange(OB_PROP_IR_EXPOSURE_INT);
-    if (camera_config_.ir_exposure_ < range.min || camera_config_.ir_exposure_ > range.max) {
+    if (default_config_.ir_exposure_ < range.min || default_config_.ir_exposure_ > range.max) {
       RCLCPP_ERROR(logger_, "ir exposure value is out of range[%d,%d], please check the value",
                    range.min, range.max);
     } else {
-      RCLCPP_INFO_STREAM(logger_, "Setting IR exposure to " << camera_config_.ir_exposure_);
-      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_EXPOSURE_INT, camera_config_.ir_exposure_);
+      RCLCPP_INFO_STREAM(logger_, "Setting IR exposure to " << default_config_.ir_exposure_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_EXPOSURE_INT, default_config_.ir_exposure_);
     }
   }
-  if (camera_config_.ir_gain_ != -1 && device_->isPropertySupported(OB_PROP_IR_GAIN_INT, OB_PERMISSION_WRITE)) {
+  if (default_config_.ir_gain_ != -1 && device_->isPropertySupported(OB_PROP_IR_GAIN_INT, OB_PERMISSION_WRITE)) {
     auto range = device_->getIntPropertyRange(OB_PROP_IR_GAIN_INT);
-    if (camera_config_.ir_gain_ < range.min || camera_config_.ir_gain_ > range.max) {
+    if (default_config_.ir_gain_ < range.min || default_config_.ir_gain_ > range.max) {
       RCLCPP_ERROR(logger_, "ir gain value is out of range[%d,%d], please check the value",
                    range.min, range.max);
     } else {
-      RCLCPP_INFO_STREAM(logger_, "Setting IR gain to " << camera_config_.ir_gain_);
-      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_GAIN_INT, camera_config_.ir_gain_);
+      RCLCPP_INFO_STREAM(logger_, "Setting IR gain to " << default_config_.ir_gain_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_IR_GAIN_INT, default_config_.ir_gain_);
     }
   }
   // ir auto exposure
   if (device_->isPropertySupported(OB_PROP_IR_AUTO_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
     RCLCPP_INFO_STREAM(logger_,
-                       "Setting IR auto exposure to " << (camera_config_.enable_ir_auto_exposure_ ? "ON" : "OFF"));
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_IR_AUTO_EXPOSURE_BOOL, camera_config_.enable_ir_auto_exposure_);
+                       "Setting IR auto exposure to " << (default_config_.enable_ir_auto_exposure_ ? "ON" : "OFF"));
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_IR_AUTO_EXPOSURE_BOOL, default_config_.enable_ir_auto_exposure_);
   }
   if (device_->isPropertySupported(OB_PROP_IR_LONG_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
     RCLCPP_INFO_STREAM(logger_,
-                       "Setting IR long exposure to " << (camera_config_.enable_ir_long_exposure_ ? "ON" : "OFF"));
-    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_IR_LONG_EXPOSURE_BOOL, camera_config_.enable_ir_long_exposure_);
+                       "Setting IR long exposure to " << (default_config_.enable_ir_long_exposure_ ? "ON" : "OFF"));
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_IR_LONG_EXPOSURE_BOOL, default_config_.enable_ir_long_exposure_);
   }
 
   if (device_->isPropertySupported(OB_PROP_DEPTH_MAX_DIFF_INT, OB_PERMISSION_WRITE)) {
     auto default_soft_filter_max_diff = device_->getIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT);
     RCLCPP_INFO_STREAM(logger_, "default_soft_filter_max_diff: " << default_soft_filter_max_diff);
-    if (camera_config_.soft_filter_max_diff_ != -1 && default_soft_filter_max_diff != camera_config_.soft_filter_max_diff_) {
-      device_->setIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT, camera_config_.soft_filter_max_diff_);
+    if (default_config_.soft_filter_max_diff_ != -1 && default_soft_filter_max_diff != default_config_.soft_filter_max_diff_) {
+      device_->setIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT, default_config_.soft_filter_max_diff_);
       auto new_soft_filter_max_diff = device_->getIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT);
       RCLCPP_INFO_STREAM(logger_, "after set soft_filter_max_diff: " << new_soft_filter_max_diff);
     }
@@ -449,10 +496,10 @@ void OBCameraNode::setupDevices() {
         device_->getIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT);
     RCLCPP_INFO_STREAM(logger_,
                        "default_soft_filter_speckle_size: " << default_soft_filter_speckle_size);
-    if (camera_config_.soft_filter_speckle_size_ != -1 &&
-        default_soft_filter_speckle_size != camera_config_.soft_filter_speckle_size_) {
+    if (default_config_.soft_filter_speckle_size_ != -1 &&
+        default_soft_filter_speckle_size != default_config_.soft_filter_speckle_size_) {
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT,
-                          camera_config_.soft_filter_speckle_size_);
+                          default_config_.soft_filter_speckle_size_);
       auto new_soft_filter_speckle_size =
           device_->getIntProperty(OB_PROP_DEPTH_MAX_SPECKLE_SIZE_INT);
       RCLCPP_INFO_STREAM(logger_,
@@ -472,14 +519,14 @@ void OBCameraNode::setupDepthPostProcessFilter() {
   for (size_t i = 0; i < filter_list->count(); i++) {
     auto filter = filter_list->getFilter(i);
     std::map<std::string, bool> filter_params = {
-        {"DecimationFilter", camera_config_.enable_decimation_filter_},
-        {"HDRMerge", camera_config_.enable_hdr_merge_},
-        {"SequencedFilter", camera_config_.enable_sequence_id_filter_},
-        {"ThresholdFilter", camera_config_.enable_threshold_filter_},
-        {"NoiseRemovalFilter", camera_config_.enable_noise_removal_filter_},
-        {"SpatialAdvancedFilter", camera_config_.enable_spatial_filter_},
-        {"TemporalFilter", camera_config_.enable_temporal_filter_},
-        {"HoleFillingFilter", camera_config_.enable_hole_filling_filter_},
+        {"DecimationFilter", default_config_.enable_decimation_filter_},
+        {"HDRMerge", default_config_.enable_hdr_merge_},
+        {"SequencedFilter", default_config_.enable_sequence_id_filter_},
+        {"ThresholdFilter", default_config_.enable_threshold_filter_},
+        {"NoiseRemovalFilter", default_config_.enable_noise_removal_filter_},
+        {"SpatialAdvancedFilter", default_config_.enable_spatial_filter_},
+        {"TemporalFilter", default_config_.enable_temporal_filter_},
+        {"HoleFillingFilter", default_config_.enable_hole_filling_filter_},
 
     };
     std::string filter_name = filter->type();
@@ -491,36 +538,36 @@ void OBCameraNode::setupDepthPostProcessFilter() {
       filter_status_[filter_name] = filter_params[filter_name];
     }
 
-    if (filter_name == "NoiseRemovalFilter" && camera_config_.enable_noise_removal_filter_) {
+    if (filter_name == "NoiseRemovalFilter" && default_config_.enable_noise_removal_filter_) {
       auto noise_removal_filter = filter->as<ob::NoiseRemovalFilter>();
       OBNoiseRemovalFilterParams params = noise_removal_filter->getFilterParams();
       RCLCPP_INFO_STREAM(
           logger_, "Default noise removal filter params: " << "disp_diff: " << params.disp_diff
                                                            << ", max_size: " << params.max_size);
-      params.disp_diff = camera_config_.noise_removal_filter_min_diff_;
-      params.max_size = camera_config_.noise_removal_filter_max_size_;
+      params.disp_diff = default_config_.noise_removal_filter_min_diff_;
+      params.max_size = default_config_.noise_removal_filter_max_size_;
       RCLCPP_INFO_STREAM(logger_,
                          "Set noise removal filter params: " << "disp_diff: " << params.disp_diff
                                                              << ", max_size: " << params.max_size);
-      if (camera_config_.noise_removal_filter_min_diff_ != -1 && camera_config_.noise_removal_filter_max_size_ != -1) {
+      if (default_config_.noise_removal_filter_min_diff_ != -1 && default_config_.noise_removal_filter_max_size_ != -1) {
         noise_removal_filter->setFilterParams(params);
       }
-    } else if (filter_name == "HDRMerge" && camera_config_.enable_hdr_merge_) {
-      if (camera_config_.hdr_merge_exposure_1_ != -1 && camera_config_.hdr_merge_gain_1_ != -1 && camera_config_.hdr_merge_exposure_2_ != -1 &&
-          camera_config_.hdr_merge_gain_2_ != -1) {
+    } else if (filter_name == "HDRMerge" && default_config_.enable_hdr_merge_) {
+      if (default_config_.hdr_merge_exposure_1_ != -1 && default_config_.hdr_merge_gain_1_ != -1 && default_config_.hdr_merge_exposure_2_ != -1 &&
+          default_config_.hdr_merge_gain_2_ != -1) {
         auto hdr_merge_filter = filter->as<ob::HdrMerge>();
         hdr_merge_filter->enable(true);
         RCLCPP_INFO_STREAM(
-            logger_, "Set HDR merge filter params: " << "exposure_1: " << camera_config_.hdr_merge_exposure_1_
-                                                     << ", gain_1: " << camera_config_.hdr_merge_gain_1_
-                                                     << ", exposure_2: " << camera_config_.hdr_merge_exposure_2_
-                                                     << ", gain_2: " << camera_config_.hdr_merge_gain_2_);
+            logger_, "Set HDR merge filter params: " << "exposure_1: " << default_config_.hdr_merge_exposure_1_
+                                                     << ", gain_1: " << default_config_.hdr_merge_gain_1_
+                                                     << ", exposure_2: " << default_config_.hdr_merge_exposure_2_
+                                                     << ", gain_2: " << default_config_.hdr_merge_gain_2_);
         auto config = OBHdrConfig();
         config.enable = true;
-        config.exposure_1 = camera_config_.hdr_merge_exposure_1_;
-        config.gain_1 = camera_config_.hdr_merge_gain_1_;
-        config.exposure_2 = camera_config_.hdr_merge_exposure_2_;
-        config.gain_2 = camera_config_.hdr_merge_gain_2_;
+        config.exposure_1 = default_config_.hdr_merge_exposure_1_;
+        config.gain_1 = default_config_.hdr_merge_gain_1_;
+        config.exposure_2 = default_config_.hdr_merge_exposure_2_;
+        config.gain_2 = default_config_.hdr_merge_gain_2_;
         device_->setStructuredData(OB_STRUCT_DEPTH_HDR_CONFIG, &config, sizeof(config));
       }
     } else {
@@ -757,19 +804,19 @@ void OBCameraNode::startStreams() {
     TRY_EXECUTE_BLOCK(pipeline_->disableFrameSync());
   }
   if (device_->isPropertySupported(OB_PROP_LDP_BOOL, OB_PERMISSION_READ_WRITE)) {
-    RCLCPP_INFO_STREAM(logger_, "Setting LDP to " << (camera_config_.enable_ldp_ ? "ON" : "OFF"));
+    RCLCPP_INFO_STREAM(logger_, "Setting LDP to " << (default_config_.enable_ldp_ ? "ON" : "OFF"));
     if (device_->isPropertySupported(OB_PROP_LASER_CONTROL_INT, OB_PERMISSION_READ_WRITE)) {
       auto laser_enable = device_->getIntProperty(OB_PROP_LASER_CONTROL_INT);
-      TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_LDP_BOOL, camera_config_.enable_ldp_);
+      TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_LDP_BOOL, default_config_.enable_ldp_);
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_CONTROL_INT, laser_enable);
     } else if (device_->isPropertySupported(OB_PROP_LASER_BOOL, OB_PERMISSION_READ_WRITE)) {
-      if (!camera_config_.enable_ldp_) {
+      if (!default_config_.enable_ldp_) {
         auto laser_enable = device_->getIntProperty(OB_PROP_LASER_BOOL);
-        TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_LDP_BOOL, camera_config_.enable_ldp_);
+        TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_LDP_BOOL, default_config_.enable_ldp_);
         std::this_thread::sleep_for(std::chrono::milliseconds(3));
         TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_BOOL, laser_enable);
       } else {
-        TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_LDP_BOOL, camera_config_.enable_ldp_);
+        TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_LDP_BOOL, default_config_.enable_ldp_);
       }
     }
   }
@@ -991,15 +1038,15 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter(enable_point_cloud_, "enable_point_cloud", false);
   setAndGetNodeParameter(enable_colored_point_cloud_, "enable_colored_point_cloud", false);
   setAndGetNodeParameter(enable_point_cloud_, "enable_point_cloud", false);
-  if (!camera_config_.depth_filter_config_.empty()) {
+  if (!default_config_.depth_filter_config_.empty()) {
     enable_depth_filter_ = true;
   }
   setAndGetNodeParameter(enable_frame_sync_, "enable_frame_sync", false);
 
-  if (!camera_config_.depth_precision_str_.empty()) {
-    depth_precision_ = depthPrecisionLevelFromString(camera_config_.depth_precision_str_);
+  if (!default_config_.depth_precision_str_.empty()) {
+    depth_precision_ = depthPrecisionLevelFromString(default_config_.depth_precision_str_);
   }
-  if (enable_colored_point_cloud_ || camera_config_.enable_d2c_viewer_) {
+  if (enable_colored_point_cloud_ || default_config_.enable_d2c_viewer_) {
     depth_registration_ = true;
   }
   if (!enable_stream_[COLOR]) {
@@ -1008,7 +1055,7 @@ void OBCameraNode::getParameters() {
   }
 
   setAndGetNodeParameter<std::string>(align_mode_, "align_mode", "HW");
-  align_target_stream_ = obStreamTypeFromString(camera_config_.align_target_stream_str_);
+  align_target_stream_ = obStreamTypeFromString(default_config_.align_target_stream_str_);
 
   auto device_info = device_->getDeviceInfo();
   CHECK_NOTNULL(device_info.get());
@@ -1057,8 +1104,8 @@ void OBCameraNode::setupPipelineConfig() {
     OBAlignMode align_mode = align_mode_ == "HW" ? ALIGN_D2C_HW_MODE : ALIGN_D2C_SW_MODE;
     RCLCPP_INFO_STREAM(logger_, "set align mode to " << magic_enum::enum_name(align_mode));
     pipeline_config_->setAlignMode(align_mode);
-    RCLCPP_INFO_STREAM(logger_, "enable depth scale " << (camera_config_.enable_depth_scale_ ? "ON" : "OFF"));
-    pipeline_config_->setDepthScaleRequire(camera_config_.enable_depth_scale_);
+    RCLCPP_INFO_STREAM(logger_, "enable depth scale " << (default_config_.enable_depth_scale_ ? "ON" : "OFF"));
+    pipeline_config_->setDepthScaleRequire(default_config_.enable_depth_scale_);
   }
   for (const auto &stream_index : IMAGE_STREAMS) {
     if (enable_stream_[stream_index]) {
@@ -1086,14 +1133,14 @@ void OBCameraNode::setupPipelineConfig() {
 // check
 void OBCameraNode::setupCameraInfo() {
   std::string color_camera_name = camera_name_ + "_color";
-  if (!camera_config_.color_info_url_.empty()) {
+  if (!default_config_.color_info_url_.empty()) {
     color_info_manager_ = std::make_unique<camera_info_manager::CameraInfoManager>(
-        node_, color_camera_name, camera_config_.color_info_url_);
+        node_, color_camera_name, default_config_.color_info_url_);
   }
   // std::string ir_camera_name = camera_name_ + "_ir";
-  // if (!camera_config_.ir_info_url_.empty()) {
+  // if (!default_config_.ir_info_url_.empty()) {
   //   ir_info_manager_ = std::make_unique<camera_info_manager::CameraInfoManager>(
-  //       node_, ir_camera_name, camera_config_.ir_info_url_);
+  //       node_, ir_camera_name, default_config_.ir_info_url_);
   // }
 }
 
@@ -1103,7 +1150,7 @@ void OBCameraNode::setupPublishers() {
   using CameraInfo = sensor_msgs::msg::CameraInfo;
 
   // need to change
-  auto point_cloud_qos_profile = getRMWQosProfileFromString(camera_config_.point_cloud_qos_);
+  auto point_cloud_qos_profile = getRMWQosProfileFromString(default_config_.point_cloud_qos_);
   if (use_intra_process_) {
     point_cloud_qos_profile = rmw_qos_profile_default;
   }
@@ -1157,7 +1204,7 @@ void OBCameraNode::setupPublishers() {
               rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(camera_info_qos_profile),
                           camera_info_qos_profile));
     }
-    if (stream_index == COLOR && camera_config_.enable_color_undistortion_) {
+    if (stream_index == COLOR && default_config_.enable_color_undistortion_) {
       if (use_intra_process_) {
         color_undistortion_publisher_ = std::make_shared<image_rcl_publisher>(
             *node_, "color/image_undistorted", image_qos_profile);
@@ -1320,7 +1367,7 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
   size_t valid_count = 0;
   for (size_t i = 0; i < point_size; i++) {
     bool valid_point = points[i].z >= min_depth && points[i].z <= max_depth;
-    if (valid_point || camera_config_.ordered_pc_) {
+    if (valid_point || default_config_.ordered_pc_) {
       *iter_x = static_cast<float>(points[i].x / 1000.0);
       *iter_y = static_cast<float>(points[i].y / 1000.0);
       *iter_z = static_cast<float>(points[i].z / 1000.0);
@@ -1332,7 +1379,7 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
     RCLCPP_WARN(logger_, "No valid point in point cloud");
     return;
   }
-  if (!camera_config_.ordered_pc_) {
+  if (!default_config_.ordered_pc_) {
     point_cloud_msg->is_dense = true;
     point_cloud_msg->width = valid_count;
     point_cloud_msg->height = 1;
@@ -1429,7 +1476,7 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
   static float max_depth = MAX_DISTANCE / depth_scale;
   for (size_t i = 0; i < color_width * color_height; i++) {
     bool valid_point = point_cloud[i].z >= min_depth && point_cloud[i].z <= max_depth;
-    if (valid_point || camera_config_.ordered_pc_) {
+    if (valid_point || default_config_.ordered_pc_) {
       *iter_x = static_cast<float>(point_cloud[i].x / 1000.0);
       *iter_y = static_cast<float>(point_cloud[i].y / 1000.0);
       *iter_z = static_cast<float>(point_cloud[i].z / 1000.0);
@@ -1444,7 +1491,7 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
     RCLCPP_WARN(logger_, "No valid points in point cloud");
     return;
   }
-  if (!camera_config_.ordered_pc_) {
+  if (!default_config_.ordered_pc_) {
     point_cloud_msg->is_dense = true;
     point_cloud_msg->width = valid_count;
     point_cloud_msg->height = 1;
@@ -1730,7 +1777,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   if (depth_registration_ && stream_index == DEPTH) {
     frame_id = depth_aligned_frame_id_[stream_index];
   }
-  if (stream_index == COLOR && camera_config_.enable_color_undistortion_) {
+  if (stream_index == COLOR && default_config_.enable_color_undistortion_) {
     memset(&distortion, 0, sizeof(distortion));
   }
   sensor_msgs::msg::CameraInfo camera_info{};
@@ -1844,7 +1891,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   CHECK(image_publishers_.count(stream_index) > 0);
   // saveImageToFile(stream_index, image, *image_msg);
   image_publishers_[stream_index]->publish(std::move(image_msg));
-  if (stream_index == COLOR && camera_config_.enable_color_undistortion_ &&
+  if (stream_index == COLOR && default_config_.enable_color_undistortion_ &&
       color_undistortion_publisher_->get_subscription_count() > 0) {
     auto undistorted_image = undistortImage(image, intrinsic, distortion);
     sensor_msgs::msg::Image::UniquePtr undistorted_image_msg(new sensor_msgs::msg::Image());
@@ -1996,9 +2043,9 @@ void OBCameraNode::setDefaultIMUMessage(sensor_msgs::msg::Imu &imu_msg) {
 
   imu_msg.orientation_covariance = {-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   imu_msg.linear_acceleration_covariance = {
-      camera_config_.linear_accel_cov_, 0.0, 0.0, 0.0, camera_config_.linear_accel_cov_, 0.0, 0.0, 0.0, camera_config_.linear_accel_cov_};
+      default_config_.linear_accel_cov_, 0.0, 0.0, 0.0, default_config_.linear_accel_cov_, 0.0, 0.0, 0.0, default_config_.linear_accel_cov_};
   imu_msg.angular_velocity_covariance = {
-      camera_config_.angular_vel_cov_, 0.0, 0.0, 0.0, camera_config_.angular_vel_cov_, 0.0, 0.0, 0.0, camera_config_.angular_vel_cov_};
+      default_config_.angular_vel_cov_, 0.0, 0.0, 0.0, default_config_.angular_vel_cov_, 0.0, 0.0, 0.0, default_config_.angular_vel_cov_};
 }
 
 // check

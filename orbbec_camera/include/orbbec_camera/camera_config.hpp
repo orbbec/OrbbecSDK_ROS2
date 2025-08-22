@@ -1,9 +1,8 @@
 #include <string>
 // default setting?
-class CameraConfig
+struct DefaultConfig
 {
-public:
-	CameraConfig() = default;
+	DefaultConfig() = default;
 
 	// qos
 	std::string point_cloud_qos_ = "default";

@@ -135,6 +135,8 @@ class OBCameraNode {
   OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> device,
                std::shared_ptr<Parameters> parameters, bool use_intra_process = false);
 
+  // OBCameraNode::OBCameraNode(rclcpp::Node *node, std::shared_ptr<ob::Device> device,
+  //                           GeminiConfig gemini_config, bool use_intra_process = false);
   template <class T>
   void setAndGetNodeParameter(
       T& param, const std::string& param_name, const T& default_value,
@@ -164,7 +166,7 @@ class OBCameraNode {
     double timestamp_ = -1;  // in nanoseconds
   };
 
-  CameraConfig camera_config_;
+  DefaultConfig default_config_;
 
   void setupDevices();
 
@@ -350,6 +352,8 @@ class OBCameraNode {
   rclcpp::Node* node_ = nullptr;
   std::shared_ptr<ob::Device> device_ = nullptr;
   std::shared_ptr<Parameters> parameters_ = nullptr;
+  // GeminiConfig gemini_config_;
+
   rclcpp::Logger logger_;
   std::atomic_bool is_running_{false};
   std::unique_ptr<ob::Pipeline> pipeline_ = nullptr;
@@ -566,7 +570,7 @@ class OBCameraNode {
   OBStreamType align_target_stream_ = OB_STREAM_COLOR;
   bool retry_on_usb3_detection_failure_ = false;
   std::atomic_bool is_camera_node_initialized_{false};
-  // int camera_config_.laser_energy_level_ = -1;
+  // int default_config_.laser_energy_level_ = -1;
   ob::PointCloudFilter depth_point_cloud_filter_;
   std::optional<OBCalibrationParam> calibration_param_;
   std::optional<OBXYTables> xy_tables_;
@@ -582,7 +586,7 @@ class OBCameraNode {
   rclcpp::TimerBase::SharedPtr software_trigger_timer_;
   std::chrono::milliseconds software_trigger_period_{33};
   bool enable_heartbeat_ = false;
-  // std::string camera_config_.industry_mode_ = "";
+  // std::string default_config_.industry_mode_ = "";
   bool enable_color_undistortion_ = false;
   std::shared_ptr<image_publisher> color_undistortion_publisher_;
   bool has_first_color_frame_ = false;

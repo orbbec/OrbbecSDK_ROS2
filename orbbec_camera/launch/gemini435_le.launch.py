@@ -207,7 +207,7 @@ def generate_launch_description():
         DeclareLaunchArgument('hdr_merge_gain_1', default_value='-1'),
         DeclareLaunchArgument('hdr_merge_exposure_2', default_value='-1'),
         DeclareLaunchArgument('hdr_merge_gain_2', default_value='-1'),
-        DeclareLaunchArgument('align_mode', default_value='SW'),
+        DeclareLaunchArgument('align_mode', default_value='HW'),
         DeclareLaunchArgument('align_target_stream', default_value='COLOR'),# COLOR or DEPTH
         DeclareLaunchArgument('diagnostic_period', default_value='1.0'),
         DeclareLaunchArgument('enable_laser', default_value='true'),

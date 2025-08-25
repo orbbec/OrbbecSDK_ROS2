@@ -1573,22 +1573,22 @@ bool OBCameraNode::decodeColorFrameToBuffer(const std::shared_ptr<ob::Frame> &fr
   if (!rgb_buffer_) {
     return false;
   }
-  CHECK_NOTNULL(image_publishers_[COLOR], logger_);
-  bool has_subscriber = image_publishers_[COLOR]->get_subscription_count() > 0;
-  if (gemini_config_.enable_colored_point_cloud && depth_registration_cloud_pub_->get_subscription_count() > 0) {
-    has_subscriber = true;
-  }
-  if (!has_subscriber) {
-    return false;
-  }
-  if (metadata_publishers_.count(COLOR) &&
-      metadata_publishers_[COLOR]->get_subscription_count() > 0) {
-    has_subscriber = true;
-  }
-  if (camera_info_publishers_.count(COLOR) &&
-      camera_info_publishers_[COLOR]->get_subscription_count() > 0) {
-    has_subscriber = true;
-  }
+  // CHECK_NOTNULL(image_publishers_[COLOR], logger_);
+  // bool has_subscriber = image_publishers_[COLOR]->get_subscription_count() > 0;
+  // if (gemini_config_.enable_colored_point_cloud && depth_registration_cloud_pub_->get_subscription_count() > 0) {
+  //   has_subscriber = true;
+  // }
+  // if (!has_subscriber) {
+  //   return false;
+  // }
+  // if (metadata_publishers_.count(COLOR) &&
+  //     metadata_publishers_[COLOR]->get_subscription_count() > 0) {
+  //   has_subscriber = true;
+  // }
+  // if (camera_info_publishers_.count(COLOR) &&
+  //     camera_info_publishers_[COLOR]->get_subscription_count() > 0) {
+  //   has_subscriber = true;
+  // }
   bool is_decoded = false;
   if (!frame) {
     return false;
@@ -1718,44 +1718,44 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   //   camera_info.p.at(3) = -fx * ex.trans[0] / 1000.0 + 0.0;
   //   camera_info.p.at(7) = -fy * ex.trans[1] / 1000.0 + 0.0;
   // }
-  CHECK(camera_info_publishers_.count(stream_index) > 0);
-  if (flip_stream_[stream_index]) {
-    // We are performing a horizontal flip (left-right mirror) of the image.
-    //
-    // After flipping the image, the camera's principal point (cx) in the
-    // camera_info must be adjusted so that it still refers to the correct point
-    // in the flipped image.
+  // CHECK(camera_info_publishers_.count(stream_index) > 0);
+  // if (flip_stream_[stream_index]) {
+  //   // We are performing a horizontal flip (left-right mirror) of the image.
+  //   //
+  //   // After flipping the image, the camera's principal point (cx) in the
+  //   // camera_info must be adjusted so that it still refers to the correct point
+  //   // in the flipped image.
 
-    // Intrinsic matrix K:
-    // K = [ fx  0  cx
-    //       0   fy cy
-    //       0   0   1 ]
-    double &cx = camera_info.k[2];  // K[0,2]
+  //   // Intrinsic matrix K:
+  //   // K = [ fx  0  cx
+  //   //       0   fy cy
+  //   //       0   0   1 ]
+  //   double &cx = camera_info.k[2];  // K[0,2]
 
-    // Store the original principal point cx
-    double old_cx = cx;
+  //   // Store the original principal point cx
+  //   double old_cx = cx;
 
-    // For a horizontal flip, the new cx = (width - 1) - old_cx
-    // This effectively mirrors the cx value about the center of the image.
-    cx = (width - 1) - old_cx;
+  //   // For a horizontal flip, the new cx = (width - 1) - old_cx
+  //   // This effectively mirrors the cx value about the center of the image.
+  //   cx = (width - 1) - old_cx;
 
-    // Update the projection matrix P:
-    // P = [ fx  0   cx  Tx
-    //       0   fy  cy  Ty
-    //       0   0   1   0 ]
-    double &p_cx = camera_info.p[2];
+  //   // Update the projection matrix P:
+  //   // P = [ fx  0   cx  Tx
+  //   //       0   fy  cy  Ty
+  //   //       0   0   1   0 ]
+  //   double &p_cx = camera_info.p[2];
 
-    double old_p_cx = p_cx;
-    p_cx = (width - 1) - old_p_cx;
+  //   double old_p_cx = p_cx;
+  //   p_cx = (width - 1) - old_p_cx;
 
-    // fx, fy, cy remain the same for a simple horizontal flip.
-    // The only changes are cx and p_cx.
-  }
+  //   // fx, fy, cy remain the same for a simple horizontal flip.
+  //   // The only changes are cx and p_cx.
+  // }
 
   // camera_info_publishers_[stream_index]->publish(camera_info);
-  if (isGemini335PID(pid)) {
-    publishMetadata(frame, stream_index, camera_info.header);
-  }
+  // if (isGemini335PID(pid)) {
+  //   publishMetadata(frame, stream_index, camera_info.header);
+  // }
   // CHECK_NOTNULL(image_publishers_[stream_index], logger_);
   // if (image_publishers_[stream_index]->get_subscription_count() == 0) {
   //   return;
@@ -1779,35 +1779,35 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
     auto depth_scale = video_frame->as<ob::DepthFrame>()->getValueScale();
     image = image * depth_scale;
   }
-  if (flip_stream_[stream_index]) {
-    // flip image
-    cv::flip(image, image, 1);
-  }
-  sensor_msgs::msg::Image::UniquePtr image_msg(new sensor_msgs::msg::Image());
+  // if (flip_stream_[stream_index]) {
+  //   // flip image
+  //   cv::flip(image, image, 1);
+  // }
+  // sensor_msgs::msg::Image::UniquePtr image_msg(new sensor_msgs::msg::Image());
 
-  cv_bridge::CvImage(std_msgs::msg::Header(), encoding_[stream_index], image)
-      .toImageMsg(*image_msg);
-  CHECK_NOTNULL(image_msg.get());
-  image_msg->header.stamp = timestamp;
-  image_msg->is_bigendian = false;
-  image_msg->step = width * unit_step_size_[stream_index];
-  image_msg->header.frame_id = frame_id;
-  CHECK(image_publishers_.count(stream_index) > 0);
-  // saveImageToFile(stream_index, image, *image_msg);
-  image_publishers_[stream_index]->publish(std::move(image_msg));
-  if (stream_index == COLOR && default_config_.enable_color_undistortion_ &&
-      color_undistortion_publisher_->get_subscription_count() > 0) {
-    auto undistorted_image = undistortImage(image, intrinsic, distortion);
-    sensor_msgs::msg::Image::UniquePtr undistorted_image_msg(new sensor_msgs::msg::Image());
-    cv_bridge::CvImage(std_msgs::msg::Header(), encoding_[stream_index], undistorted_image)
-        .toImageMsg(*undistorted_image_msg);
-    CHECK_NOTNULL(undistorted_image_msg.get());
-    undistorted_image_msg->header.stamp = timestamp;
-    undistorted_image_msg->is_bigendian = false;
-    undistorted_image_msg->step = width * unit_step_size_[stream_index];
-    undistorted_image_msg->header.frame_id = frame_id;
-    color_undistortion_publisher_->publish(std::move(undistorted_image_msg));
-  }
+  // cv_bridge::CvImage(std_msgs::msg::Header(), encoding_[stream_index], image)
+  //     .toImageMsg(*image_msg);
+  // CHECK_NOTNULL(image_msg.get());
+  // image_msg->header.stamp = timestamp;
+  // image_msg->is_bigendian = false;
+  // image_msg->step = width * unit_step_size_[stream_index];
+  // image_msg->header.frame_id = frame_id;
+  // // CHECK(image_publishers_.count(stream_index) > 0);
+  // // saveImageToFile(stream_index, image, *image_msg);
+  // // image_publishers_[stream_index]->publish(std::move(image_msg));
+  // if (stream_index == COLOR && default_config_.enable_color_undistortion_ &&
+  //     color_undistortion_publisher_->get_subscription_count() > 0) {
+  //   auto undistorted_image = undistortImage(image, intrinsic, distortion);
+  //   sensor_msgs::msg::Image::UniquePtr undistorted_image_msg(new sensor_msgs::msg::Image());
+  //   cv_bridge::CvImage(std_msgs::msg::Header(), encoding_[stream_index], undistorted_image)
+  //       .toImageMsg(*undistorted_image_msg);
+  //   CHECK_NOTNULL(undistorted_image_msg.get());
+  //   undistorted_image_msg->header.stamp = timestamp;
+  //   undistorted_image_msg->is_bigendian = false;
+  //   undistorted_image_msg->step = width * unit_step_size_[stream_index];
+  //   undistorted_image_msg->header.frame_id = frame_id;
+  //   // color_undistortion_publisher_->publish(std::move(undistorted_image_msg));
+  // }
 }
 
 // check

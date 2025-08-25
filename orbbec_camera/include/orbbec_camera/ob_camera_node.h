@@ -151,6 +151,9 @@ class OBCameraNode {
 
   void startIMU();
 
+  cv::Mat getDepthImage();
+  cv::Mat getColorImage();
+
  private:
   struct IMUData {
     IMUData() = default;
@@ -520,6 +523,7 @@ class OBCameraNode {
   std::queue<std::shared_ptr<ob::FrameSet>> color_frame_queue_;
   std::shared_ptr<std::thread> colorFrameThread_ = nullptr;
   std::mutex color_frame_queue_lock_;
+  std::mutex img_lock_;
   std::condition_variable color_frame_queue_cv_;
 
   bool ordered_pc_ = false;
@@ -597,6 +601,9 @@ class OBCameraNode {
   int depth_ae_roi_top_ = -1;
   int depth_ae_roi_right_ = -1;
   int depth_ae_roi_bottom_ = -1;
+
+  cv::Mat depth_img_;
+  cv::Mat color_img_;
 
   std::string frame_aggregate_mode_ = "ANY";  // # full_frame、color_frame、ANY or disable
 };

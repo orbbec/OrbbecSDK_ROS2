@@ -1772,12 +1772,17 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   }
   if (frame->type() == OB_FRAME_COLOR) {
     memcpy(image.data, rgb_buffer_, video_frame->width() * video_frame->height() * 3);
+    std::lock_guard<std::mutex> lock(img_lock_);
+    color_img = image;
   } else {
     memcpy(image.data, video_frame->data(), video_frame->dataSize());
   }
   if (stream_index == DEPTH) {
+
     auto depth_scale = video_frame->as<ob::DepthFrame>()->getValueScale();
     image = image * depth_scale;
+    std::lock_guard<std::mutex> lock(img_lock_);
+    depth_img_ = image;
   }
   // if (flip_stream_[stream_index]) {
   //   // flip image
@@ -2106,6 +2111,18 @@ orbbec_camera_msgs::msg::IMUInfo OBCameraNode::createIMUInfo(
   }
 
   return imu_info;
+}
+
+cv::Mat getDepthImage()
+{
+  std::lock_guard<std::mutex> lock(img_lock_);
+  return depth_img_;
+}
+
+cv::Mat getColorImage()
+{
+  std::lock_guard<std::mutex> lock(img_lock_);
+  return color_img;
 }
 
 }  // namespace orbbec_camera

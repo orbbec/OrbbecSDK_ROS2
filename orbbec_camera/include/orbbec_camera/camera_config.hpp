@@ -137,6 +137,8 @@ struct GeminiConfig
   std::string usb_port{""};
   std::string serial_number{""};
   int device_num{3};
+	std::string net_device_ip{""};
+	int net_device_port{0};
 
   // Connection and timing settings
   int connection_delay{10};

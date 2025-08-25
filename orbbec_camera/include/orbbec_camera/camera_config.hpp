@@ -10,6 +10,7 @@ struct DefaultConfig
 	// qos
 	std::string point_cloud_qos_ = "default";
 
+
   bool publish_tf_ = false;
 	double tf_publish_rate_ = 0.0;
 	std::string ir_info_url_ = "";
@@ -135,10 +136,13 @@ struct GeminiConfig
   std::string camera_name{"camera"};
   std::string position{};
   std::string usb_port{""};
+  std::string device_unique_id{""};
   std::string serial_number{""};
+  std::string frame_id{""};
+
   int device_num{3};
-	std::string net_device_ip{""};
-	int net_device_port{0};
+  std::string net_device_ip{""};
+  int net_device_port{0};
 
   // Connection and timing settings
   int connection_delay{10};

@@ -36,6 +36,7 @@
   <depend>libgoogle-glog-dev</depend>
   <depend>libdw-dev</depend>
   <depend>opengl</depend>
+  <depend>gaemi_base_libs</depend>
   <export>
     <build_type>ament_cmake</build_type>
   </export>

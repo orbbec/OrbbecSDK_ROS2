@@ -1,3 +1,6 @@
+#ifndef ORBBEC_CAMERA_CONFIG_HPP
+#define ORBBEC_CAMERA_CONFIG_HPP
+
 #include <string>
 // default setting?
 struct DefaultConfig
@@ -123,3 +126,84 @@ struct DefaultConfig
 	std::string frame_aggregate_mode_ = "ANY";
 
 };
+
+struct GeminiConfig
+{
+  GeminiConfig() = default;
+
+  // Basic camera identification
+  std::string camera_name{"camera"};
+  std::string position{};
+  std::string usb_port{""};
+  std::string serial_number{""};
+  int device_num{3};
+
+  // Connection and timing settings
+  int connection_delay{10};
+  std::string sync_mode{"standalone"};
+  bool enable_frame_sync{true};
+  bool use_hardware_time{true};
+  bool enable_sync_host_time{true};
+  int fps{15};
+
+  // Color camera parameters
+  bool enable_color{true};
+  int color_width{640};
+  int color_height{480};
+  int color_fps{0};
+  std::string color_format{"MJPG"};
+  std::string color_info_url{""};
+
+  // Depth camera parameters
+  bool enable_depth{true};
+  bool depth_registration{true};
+  int depth_width{640};
+  int depth_height{480};
+  int depth_fps{0};
+  std::string depth_format{"Y16"};
+  std::string depth_precision{""};
+  bool enable_depth_filter = true;
+
+  // Left infrared camera parameters
+  bool enable_left_ir{false};
+  int left_ir_width{640};
+  int left_ir_height{480};
+  int left_ir_fps{0};
+  std::string left_ir_format{"Y8"};
+
+  // Right infrared camera parameters
+  bool enable_right_ir{false};
+  int right_ir_width{640};
+  int right_ir_height{480};
+  int right_ir_fps{0};
+  std::string right_ir_format{"Y8"};
+
+  // Infrared camera shared info
+  std::string ir_info_url{""};
+
+  // Point cloud settings
+  bool enable_point_cloud{false};
+  bool enable_colored_point_cloud{false};
+
+  // IMU (Inertial Measurement Unit) settings
+  bool enable_sync_output_accel_gyro{false};
+  bool enable_accel{false};
+  std::string accel_rate{"200hz"};
+  std::string accel_range{"4g"};
+  bool enable_gyro{false};
+  std::string gyro_rate{"200hz"};
+  std::string gyro_range{"1000dps"};
+  double liner_accel_cov{0.01};
+  double angular_vel_cov{0.01};
+
+  // Advanced settings
+  std::string log_level{"none"};
+  bool enable_publish_extrinsic{false};
+  std::string align_mode{"HW"};
+  std::string config_file_path{""};
+  bool enable_hardware_reset{false};
+
+  bool enumerate_net_device{false};
+};
+
+#endif // ORBBEC_CAMERA_CONFIG_HPP

@@ -16,6 +16,8 @@ if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Werror -Wno-pedantic -Wno-array-bounds)
 endif ()
 
+find_package(gaemi_base_libs REQUIRED)
+
 # find dependencies
 set(dependencies
   ament_cmake
@@ -43,6 +45,7 @@ set(dependencies
   diagnostic_msgs
   statistics_msgs
   backward_ros
+  gaemi_base_libs
 )
 
 foreach (dep IN LISTS dependencies)
@@ -148,10 +151,10 @@ set(SOURCE_FILES
   src/d2c_viewer.cpp
   src/dynamic_params.cpp
   src/image_publisher.cpp
-  src/ob_camera_node_driver.cpp
+  # src/ob_camera_node_driver.cpp
   src/ob_camera_node.cpp
-  src/ros_param_backend.cpp
-  src/ros_service.cpp
+  # src/ros_param_backend.cpp
+  # src/ros_service.cpp
   src/synced_imu_publisher.cpp
   src/utils.cpp
   src/jpeg_decoder.cpp
@@ -218,9 +221,9 @@ rclcpp_components_register_node(${PROJECT_NAME}
   EXECUTABLE orbbec_camera_node
 )
 # Add nodes using the macro
-add_orbbec_executable(list_devices_node tools/list_devices_node.cpp)
+# add_orbbec_executable(list_devices_node tools/list_devices_node.cpp)
 add_orbbec_executable(list_depth_work_mode_node tools/list_depth_work_mode.cpp)
-add_orbbec_executable(list_camera_profile_mode_node tools/list_camera_profile.cpp)
+# add_orbbec_executable(list_camera_profile_mode_node tools/list_camera_profile.cpp)
 
 add_orbbec_executable(topic_statistics_node tools/topic_statistics.cpp)
 
@@ -254,9 +257,10 @@ if (DEFINED ENV{BUILDING_PACKAGE})
   )
 endif ()
 
-install(TARGETS list_devices_node
+install(TARGETS
+  # list_devices_node
   list_depth_work_mode_node
-  list_camera_profile_mode_node
+  # list_camera_profile_mode_node
   topic_statistics_node
   DESTINATION lib/${PROJECT_NAME}/)
 

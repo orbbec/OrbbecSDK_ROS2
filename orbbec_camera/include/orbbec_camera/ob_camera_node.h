@@ -57,13 +57,14 @@
 #include "orbbec_camera_msgs/srv/get_bool.hpp"
 #include "orbbec_camera_msgs/srv/set_string.hpp"
 #include "orbbec_camera/constants.h"
-#include "orbbec_camera/dynamic_params.h"
+// #include "orbbec_camera/dynamic_params.h"
 #include "orbbec_camera/d2c_viewer.h"
 #include "magic_enum/magic_enum.hpp"
 #include "orbbec_camera/image_publisher.h"
 #include "orbbec_camera/camera_config.hpp"
 #include "jpeg_decoder.h"
 #include <std_msgs/msg/string.hpp>
+#include "gaemi_base_libs/logger.hpp"
 
 #if __has_include(<cv_bridge/cv_bridge.hpp>)
 #include <cv_bridge/cv_bridge.hpp>
@@ -132,16 +133,11 @@ const std::map<OBStreamType, OBFrameType> STREAM_TYPE_TO_FRAME_TYPE = {
 
 class OBCameraNode {
  public:
-  OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> device,
-               std::shared_ptr<Parameters> parameters, bool use_intra_process = false);
+  // OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> device,
+  //              bool use_intra_process = false);
 
-  // OBCameraNode::OBCameraNode(rclcpp::Node *node, std::shared_ptr<ob::Device> device,
-  //                           GeminiConfig gemini_config, bool use_intra_process = false);
-  template <class T>
-  void setAndGetNodeParameter(
-      T& param, const std::string& param_name, const T& default_value,
-      const rcl_interfaces::msg::ParameterDescriptor& parameter_descriptor =
-          rcl_interfaces::msg::ParameterDescriptor());  // set and get parameter
+  OBCameraNode(std::shared_ptr<ob::Device> device,
+                            GeminiConfig gemini_config, std::shared_ptr<gaemi::base_libs::Logger> logger, bool use_intra_process = false);
 
   ~OBCameraNode() noexcept;
 
@@ -165,8 +161,6 @@ class OBCameraNode {
     Eigen::Vector3d data_{};
     double timestamp_ = -1;  // in nanoseconds
   };
-
-  DefaultConfig default_config_;
 
   void setupDevices();
 
@@ -351,10 +345,11 @@ class OBCameraNode {
  private:
   rclcpp::Node* node_ = nullptr;
   std::shared_ptr<ob::Device> device_ = nullptr;
-  std::shared_ptr<Parameters> parameters_ = nullptr;
-  // GeminiConfig gemini_config_;
+  GeminiConfig gemini_config_;
+  DefaultConfig default_config_;
 
-  rclcpp::Logger logger_;
+  std::shared_ptr<gaemi::base_libs::Logger> logger_;
+
   std::atomic_bool is_running_{false};
   std::unique_ptr<ob::Pipeline> pipeline_ = nullptr;
   std::unique_ptr<ob::Pipeline> imuPipeline_ = nullptr;

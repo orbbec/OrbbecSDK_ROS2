@@ -16,6 +16,9 @@
 
 #pragma once
 #include <ostream>
+#include <memory>
+#include <sstream>
+#include <iostream>
 #include <Eigen/Dense>
 #include <tf2/LinearMath/Quaternion.h>
 #include <rclcpp/rclcpp.hpp>
@@ -27,92 +30,157 @@
 #include "magic_enum/magic_enum.hpp"
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <opencv2/opencv.hpp>
+#include "gaemi_base_libs/logger.hpp"
 
 namespace orbbec_camera {
-inline void LogFatal(const char* file, int line, const std::string& message) {
-  std::cerr << "Check failed at " << file << ":" << line << ": " << message << std::endl;
+
+// Logger-based fatal error function
+inline void LogFatal(const char* file, int line, const std::string& message,
+                     std::shared_ptr<gaemi::base_libs::Logger> logger = nullptr) {
+  if (logger) {
+    logger->get_spd_logger()->critical("Fatal error at {}:{}: {}", file, line, message);
+  } else {
+    std::cerr << "Fatal error at " << file << ":" << line << ": " << message << std::endl;
+  }
   std::abort();
 }
-}  // namespace orbbec_camera
 
-#define TRY_EXECUTE_BLOCK(block)                                                                 \
-  try {                                                                                          \
-    block;                                                                                       \
-  } catch (const ob::Error& e) {                                                                 \
-    RCLCPP_ERROR(logger_, "Error in %s at line %d: %s", __FUNCTION__, __LINE__, e.getMessage()); \
-  } catch (const std::exception& e) {                                                            \
-    RCLCPP_ERROR(logger_, "Exception in %s at line %d: %s", __FUNCTION__, __LINE__, e.what());   \
-  } catch (...) {                                                                                \
-    RCLCPP_ERROR(logger_, "Unknown exception in %s at line %d", __FUNCTION__, __LINE__);         \
-  }
-
-#define TRY_TO_SET_PROPERTY(func, property, value)                                             \
+// Macro for executing blocks with exception handling using spdlog
+#define TRY_EXECUTE_BLOCK(block, logger)                                                      \
   try {                                                                                        \
-    device_->func(property, value);                                                            \
-  } catch (const ob::Error& e) {                                                               \
-    RCLCPP_ERROR_STREAM(logger_, "Failed to set " << property << " to " << value << " in "     \
-                                                  << __FUNCTION__ << " at line " << __LINE__   \
-                                                  << ": " << e.getMessage());                  \
-  } catch (const std::exception& e) {                                                          \
-    RCLCPP_ERROR_STREAM(logger_, "Failed to set " << property << " to " << value << " in "     \
-                                                  << __FUNCTION__ << " at line " << __LINE__   \
-                                                  << ": " << e.what());                        \
-  } catch (...) {                                                                              \
-    RCLCPP_ERROR_STREAM(logger_, "Failed to set " << property << " to " << value << " in "     \
-                                                  << __FUNCTION__ << " at line " << __LINE__); \
+    block;                                                                                     \
+  } catch (const ob::Error& e) {                                                              \
+    if (logger) {                                                                             \
+      logger->get_spd_logger()->error("Error in {} at line {}: {}", __FUNCTION__, __LINE__, e.getMessage()); \
+    }                                                                                          \
+  } catch (const std::exception& e) {                                                         \
+    if (logger) {                                                                             \
+      logger->get_spd_logger()->error("Exception in {} at line {}: {}", __FUNCTION__, __LINE__, e.what()); \
+    }                                                                                          \
+  } catch (...) {                                                                             \
+    if (logger) {                                                                             \
+      logger->get_spd_logger()->error("Unknown exception in {} at line {}", __FUNCTION__, __LINE__); \
+    }                                                                                          \
   }
 
-// Macros for checking conditions and comparing values
-#define CHECK(condition) \
-  (!(condition) ? LogFatal(__FILE__, __LINE__, "Check failed: " #condition) : (void)0)
+// Macro for setting properties with exception handling using spdlog
+#define TRY_TO_SET_PROPERTY(func, property, value, device, logger)                           \
+  try {                                                                                       \
+    device->func(property, value);                                                           \
+  } catch (const ob::Error& e) {                                                             \
+    if (logger) {                                                                            \
+      logger->get_spd_logger()->error("Failed to set {} to {} in {} at line {}: {}",       \
+                                       property, value, __FUNCTION__, __LINE__, e.getMessage()); \
+    }                                                                                         \
+  } catch (const std::exception& e) {                                                        \
+    if (logger) {                                                                            \
+      logger->get_spd_logger()->error("Failed to set {} to {} in {} at line {}: {}",       \
+                                       property, value, __FUNCTION__, __LINE__, e.what());  \
+    }                                                                                         \
+  } catch (...) {                                                                            \
+    if (logger) {                                                                            \
+      logger->get_spd_logger()->error("Failed to set {} to {} in {} at line {}",           \
+                                       property, value, __FUNCTION__, __LINE__);            \
+    }                                                                                         \
+  }
 
+// Check condition macro with optional logger support
+#define CHECK_1(condition) \
+  (!(condition) ? LogFatal(__FILE__, __LINE__, "Check failed: " #condition, nullptr) : (void)0)
+#define CHECK_2(condition, logger) \
+  (!(condition) ? LogFatal(__FILE__, __LINE__, "Check failed: " #condition, logger) : (void)0)
+
+#define GET_CHECK_MACRO(_1, _2, NAME, ...) NAME
+#define CHECK(...) GET_CHECK_MACRO(__VA_ARGS__, CHECK_2, CHECK_1)(__VA_ARGS__)
+
+// Template for checking operations with logger support
 template <typename T1, typename T2>
-void CheckOp(const char* expr, const char* file, int line, T1 val1, T2 val2, bool result) {
+void CheckOp(const char* expr, const char* file, int line, T1 val1, T2 val2, bool result,
+             std::shared_ptr<gaemi::base_libs::Logger> logger = nullptr) {
   if (!result) {
     std::ostringstream os;
     os << "Check failed: " << expr << " (" << val1 << " vs. " << val2 << ")";
-    orbbec_camera::LogFatal(file, line, os.str());
+    LogFatal(file, line, os.str(), logger);
   }
 }
 
-#define CHECK_OP(opname, op, val1, val2) \
-  CheckOp(#val1 " " #op " " #val2, __FILE__, __LINE__, val1, val2, (val1)op(val2))
+// Comparison check macros with optional logger support
+#define CHECK_OP_2(opname, op, val1, val2) \
+  CheckOp(#val1 " " #op " " #val2, __FILE__, __LINE__, val1, val2, (val1)op(val2), nullptr)
+#define CHECK_OP_3(opname, op, val1, val2, logger) \
+  CheckOp(#val1 " " #op " " #val2, __FILE__, __LINE__, val1, val2, (val1)op(val2), logger)
 
-#define CHECK_EQ(val1, val2) CHECK_OP(_EQ, ==, val1, val2)
-#define CHECK_NE(val1, val2) CHECK_OP(_NE, !=, val1, val2)
-#define CHECK_LE(val1, val2) CHECK_OP(_LE, <=, val1, val2)
-#define CHECK_LT(val1, val2) CHECK_OP(_LT, <, val1, val2)
-#define CHECK_GE(val1, val2) CHECK_OP(_GE, >=, val1, val2)
-#define CHECK_GT(val1, val2) CHECK_OP(_GT, >, val1, val2)
+#define GET_CHECK_OP_MACRO(_1, _2, _3, _4, NAME, ...) NAME
+#define CHECK_OP(...) GET_CHECK_OP_MACRO(__VA_ARGS__, CHECK_OP_3, CHECK_OP_2)(__VA_ARGS__)
 
-// Overload for raw pointers
+#define CHECK_EQ_2(val1, val2) CHECK_OP_2(_EQ, ==, val1, val2)
+#define CHECK_EQ_3(val1, val2, logger) CHECK_OP_3(_EQ, ==, val1, val2, logger)
+#define GET_CHECK_EQ_MACRO(_1, _2, _3, NAME, ...) NAME
+#define CHECK_EQ(...) GET_CHECK_EQ_MACRO(__VA_ARGS__, CHECK_EQ_3, CHECK_EQ_2)(__VA_ARGS__)
+
+#define CHECK_NE_2(val1, val2) CHECK_OP_2(_NE, !=, val1, val2)
+#define CHECK_NE_3(val1, val2, logger) CHECK_OP_3(_NE, !=, val1, val2, logger)
+#define GET_CHECK_NE_MACRO(_1, _2, _3, NAME, ...) NAME
+#define CHECK_NE(...) GET_CHECK_NE_MACRO(__VA_ARGS__, CHECK_NE_3, CHECK_NE_2)(__VA_ARGS__)
+
+#define CHECK_LE_2(val1, val2) CHECK_OP_2(_LE, <=, val1, val2)
+#define CHECK_LE_3(val1, val2, logger) CHECK_OP_3(_LE, <=, val1, val2, logger)
+#define GET_CHECK_LE_MACRO(_1, _2, _3, NAME, ...) NAME
+#define CHECK_LE(...) GET_CHECK_LE_MACRO(__VA_ARGS__, CHECK_LE_3, CHECK_LE_2)(__VA_ARGS__)
+
+#define CHECK_LT_2(val1, val2) CHECK_OP_2(_LT, <, val1, val2)
+#define CHECK_LT_3(val1, val2, logger) CHECK_OP_3(_LT, <, val1, val2, logger)
+#define GET_CHECK_LT_MACRO(_1, _2, _3, NAME, ...) NAME
+#define CHECK_LT(...) GET_CHECK_LT_MACRO(__VA_ARGS__, CHECK_LT_3, CHECK_LT_2)(__VA_ARGS__)
+
+#define CHECK_GE_2(val1, val2) CHECK_OP_2(_GE, >=, val1, val2)
+#define CHECK_GE_3(val1, val2, logger) CHECK_OP_3(_GE, >=, val1, val2, logger)
+#define GET_CHECK_GE_MACRO(_1, _2, _3, NAME, ...) NAME
+#define CHECK_GE(...) GET_CHECK_GE_MACRO(__VA_ARGS__, CHECK_GE_3, CHECK_GE_2)(__VA_ARGS__)
+
+#define CHECK_GT_2(val1, val2) CHECK_OP_2(_GT, >, val1, val2)
+#define CHECK_GT_3(val1, val2, logger) CHECK_OP_3(_GT, >, val1, val2, logger)
+#define GET_CHECK_GT_MACRO(_1, _2, _3, NAME, ...) NAME
+#define CHECK_GT(...) GET_CHECK_GT_MACRO(__VA_ARGS__, CHECK_GT_3, CHECK_GT_2)(__VA_ARGS__)
+
+// Null pointer check for raw pointers with logger support
 template <typename T>
-T* CheckNotNull(T* ptr, const char* file, int line) {
+T* CheckNotNull(T* ptr, const char* file, int line,
+                std::shared_ptr<gaemi::base_libs::Logger> logger = nullptr) {
   if (ptr == nullptr) {
     std::ostringstream os;
     os << "Null pointer passed to CheckNotNull at " << file << ":" << line;
-    orbbec_camera::LogFatal(file, line, os.str());
+    LogFatal(file, line, os.str(), logger);
   }
   return ptr;
 }
 
-// Template for smart pointers like std::shared_ptr, std::unique_ptr
+// Null pointer check for smart pointers with logger support
 template <typename T>
-T& CheckNotNull(T& ptr, const char* file, int line) {
+T& CheckNotNull(T& ptr, const char* file, int line,
+                std::shared_ptr<gaemi::base_libs::Logger> logger = nullptr) {
   if (ptr == nullptr) {
     std::ostringstream os;
     os << "Null pointer passed to CheckNotNull at " << file << ":" << line;
-    orbbec_camera::LogFatal(file, line, os.str());
+    LogFatal(file, line, os.str(), logger);
   }
   return ptr;
 }
 
+// Null pointer check macro with optional logger support
 #if defined(CHECK_NOTNULL)
 #undef CHECK_NOTNULL
 #endif
-#define CHECK_NOTNULL(val) CheckNotNull(val, __FILE__, __LINE__)
 
-namespace orbbec_camera {
+// Overloaded versions to support both 1 and 2 parameters
+#define CHECK_NOTNULL_1(val) CheckNotNull(val, __FILE__, __LINE__, nullptr)
+#define CHECK_NOTNULL_2(val, logger) CheckNotNull(val, __FILE__, __LINE__, logger)
+
+// Macro dispatcher based on number of arguments
+#define GET_CHECK_NOTNULL_MACRO(_1, _2, NAME, ...) NAME
+#define CHECK_NOTNULL(...) GET_CHECK_NOTNULL_MACRO(__VA_ARGS__, CHECK_NOTNULL_2, CHECK_NOTNULL_1)(__VA_ARGS__)
+
+// Utility function declarations
 sensor_msgs::msg::CameraInfo convertToCameraInfo(OBCameraIntrinsic intrinsic,
                                                  OBCameraDistortion distortion, int width);
 

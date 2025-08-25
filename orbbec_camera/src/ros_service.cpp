@@ -721,6 +721,8 @@ void OBCameraNode::getDeviceInfoCallback(const std::shared_ptr<GetDeviceInfo::Re
     response->info.serial_number = device_info->getSerialNumber();
     response->info.firmware_version = device_info->getFirmwareVersion();
     response->info.supported_min_sdk_version = device_info->getSupportedMinSdkVersion();
+    response->info.current_sdk_version = getObSDKVersion();
+    response->info.hardware_version = device_info->getHardwareVersion();
     response->success = true;
   } catch (const ob::Error& e) {
     response->success = false;

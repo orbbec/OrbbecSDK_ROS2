@@ -113,7 +113,7 @@ OBCameraNode::~OBCameraNode() noexcept { clean(); }
 void OBCameraNode::rebootDevice() {
   RCLCPP_INFO_STREAM(logger_, "Do clean before rebooting device");
   malloc_trim(0);
-  stopStreams();
+  clean();
   malloc_trim(0);
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
   RCLCPP_INFO_STREAM(logger_, "Reboot device");
@@ -125,11 +125,10 @@ void OBCameraNode::rebootDevice() {
 }
 
 void OBCameraNode::clean() noexcept {
-  std::lock_guard<decltype(device_lock_)> lock(device_lock_);
-  RCLCPP_WARN_STREAM(logger_, "Do destroy ~OBCameraNode");
+  // Set running flag to false first to signal all operations to stop
   is_running_.store(false);
 
-  // Stop diagnostic timer and updater first to prevent access to disconnected device
+  // Stop diagnostic timer and updater first BEFORE acquiring device_lock to prevent deadlock
   try {
     if (diagnostic_timer_) {
       diagnostic_timer_->cancel();
@@ -141,6 +140,10 @@ void OBCameraNode::clean() noexcept {
   } catch (...) {
     // Ignore exceptions during diagnostic cleanup
   }
+
+  // Now acquire the device lock for the rest of the cleanup
+  std::lock_guard<decltype(device_lock_)> lock(device_lock_);
+  RCLCPP_WARN_STREAM(logger_, "Do destroy ~OBCameraNode");
 
   RCLCPP_WARN_STREAM(logger_, "Stop tf thread");
   try {

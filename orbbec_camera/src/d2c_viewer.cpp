@@ -28,7 +28,7 @@
 namespace orbbec_camera {
 D2CViewer::D2CViewer(rclcpp::Node* const node, rmw_qos_profile_t rgb_qos,
                      rmw_qos_profile_t depth_qos)
-    : node_(node), logger_(rclcpp::get_logger("d2c_viewer")) {
+    : node_(node), logger_(rclcpp::get_logger("d2c_viewer")), is_active_(true) {
   rgb_sub_ = std::make_shared<message_filters::Subscriber<sensor_msgs::msg::Image>>(
       node_, "color/image_raw", rgb_qos);
   depth_sub_ = std::make_shared<message_filters::Subscriber<sensor_msgs::msg::Image>>(
@@ -43,10 +43,36 @@ D2CViewer::D2CViewer(rclcpp::Node* const node, rmw_qos_profile_t rgb_qos,
   d2c_viewer_pub_ =
       node_->create_publisher<sensor_msgs::msg::Image>("depth_to_color/image_raw", rclcpp::QoS(1));
 }
-D2CViewer::~D2CViewer() = default;
+
+D2CViewer::~D2CViewer() {
+  is_active_.store(false);
+
+  // Safely shut down subscribers and synchronizer
+  {
+    std::lock_guard<std::mutex> lock(callback_mutex_);
+    if (sync_) {
+      sync_.reset();
+    }
+    if (rgb_sub_) {
+      rgb_sub_.reset();
+    }
+    if (depth_sub_) {
+      depth_sub_.reset();
+    }
+    if (d2c_viewer_pub_) {
+      d2c_viewer_pub_.reset();
+    }
+  }
+}
 
 void D2CViewer::messageCallback(const sensor_msgs::msg::Image::ConstSharedPtr& rgb_msg,
                                 const sensor_msgs::msg::Image::ConstSharedPtr& depth_msg) {
+
+  std::lock_guard<std::mutex> lock(callback_mutex_);
+  if (!is_active_.load()) {
+    return;
+  }
+
   if (rgb_msg->width != depth_msg->width || rgb_msg->height != depth_msg->height) {
     RCLCPP_ERROR(logger_, "rgb and depth image size not match(%d, %d) vs (%d, %d)", rgb_msg->width,
                  rgb_msg->height, depth_msg->width, depth_msg->height);

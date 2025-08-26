@@ -42,5 +42,9 @@ class D2CViewer {
                                                                        sensor_msgs::msg::Image>;
   std::shared_ptr<message_filters::Synchronizer<MySyncPolicy>> sync_;
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr d2c_viewer_pub_;
+
+  // Add thread safety
+  std::mutex callback_mutex_;
+  std::atomic<bool> is_active_{true};
 };
 }  // namespace orbbec_camera

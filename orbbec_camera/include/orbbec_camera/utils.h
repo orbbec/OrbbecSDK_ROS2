@@ -32,9 +32,7 @@
 #include <opencv2/opencv.hpp>
 #include "gaemi_base_libs/logger.hpp"
 
-namespace orbbec_camera {
 
-// Logger-based fatal error function
 inline void LogFatal(const char* file, int line, const std::string& message,
                      std::shared_ptr<gaemi::base_libs::Logger> logger = nullptr) {
   if (logger) {
@@ -179,6 +177,11 @@ T& CheckNotNull(T& ptr, const char* file, int line,
 // Macro dispatcher based on number of arguments
 #define GET_CHECK_NOTNULL_MACRO(_1, _2, NAME, ...) NAME
 #define CHECK_NOTNULL(...) GET_CHECK_NOTNULL_MACRO(__VA_ARGS__, CHECK_NOTNULL_2, CHECK_NOTNULL_1)(__VA_ARGS__)
+
+
+namespace orbbec_camera {
+
+// Logger-based fatal error function
 
 // Utility function declarations
 sensor_msgs::msg::CameraInfo convertToCameraInfo(OBCameraIntrinsic intrinsic,

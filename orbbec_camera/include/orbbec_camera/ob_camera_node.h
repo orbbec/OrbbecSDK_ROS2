@@ -154,6 +154,10 @@ class OBCameraNode {
   cv::Mat getDepthImage();
   cv::Mat getColorImage();
 
+  // Get camera info functions
+  sensor_msgs::msg::CameraInfo getColorCameraInfo();
+  sensor_msgs::msg::CameraInfo getDepthCameraInfo();
+
  private:
   struct IMUData {
     IMUData() = default;
@@ -342,6 +346,18 @@ class OBCameraNode {
   orbbec_camera_msgs::msg::IMUInfo createIMUInfo(const stream_index_pair& stream_index);
 
   static bool isGemini335PID(uint32_t pid);
+
+  // Helper functions for camera info conversion
+  sensor_msgs::msg::CameraInfo createCameraInfoFromIntrinsic(
+    const OBCameraIntrinsic& intrinsic,
+    const OBCameraDistortion& distortion,
+    int width,
+    int height,
+    const std::string& frame_id);
+
+  sensor_msgs::msg::CameraInfo getCameraInfoFromStreamProfile(const stream_index_pair& stream_index);
+
+  bool is_pipeline_started() const { return pipeline_started_; }
 
   void setupDepthPostProcessFilter();
 

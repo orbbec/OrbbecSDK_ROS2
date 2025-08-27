@@ -2115,13 +2115,147 @@ orbbec_camera_msgs::msg::IMUInfo OBCameraNode::createIMUInfo(
 cv::Mat OBCameraNode::getDepthImage()
 {
   std::lock_guard<std::mutex> lock(img_lock_);
-  return depth_img_;
+  return depth_img_.clone();
 }
 
 cv::Mat OBCameraNode::getColorImage()
 {
   std::lock_guard<std::mutex> lock(img_lock_);
-  return color_img_;
+  return color_img_.clone();
+}
+
+sensor_msgs::msg::CameraInfo OBCameraNode::getColorCameraInfo()
+{
+  try {
+    // Get current color stream profile and extract camera info
+    return getCameraInfoFromStreamProfile(COLOR);
+  } catch (const std::exception& e) {
+    logger_->get_spd_logger()->error("Failed to get current color camera info: {}", e.what());
+    return sensor_msgs::msg::CameraInfo();
+  }
+}
+
+sensor_msgs::msg::CameraInfo OBCameraNode::getDepthCameraInfo()
+{
+  try {
+    // Get current depth stream profile and extract camera info
+    return getCameraInfoFromStreamProfile(DEPTH);
+  } catch (const std::exception& e) {
+    logger_->get_spd_logger()->error("Failed to get current depth camera info: {}", e.what());
+    return sensor_msgs::msg::CameraInfo();
+  }
+}
+
+sensor_msgs::msg::CameraInfo OBCameraNode::createCameraInfoFromIntrinsic(
+  const OBCameraIntrinsic& intrinsic,
+  const OBCameraDistortion& distortion,
+  int width,
+  int height,
+  const std::string& frame_id)
+{
+  sensor_msgs::msg::CameraInfo camera_info;
+
+  // Set header
+  camera_info.header.frame_id = frame_id;
+  camera_info.header.stamp = rclcpp::Clock().now();
+
+  // Set image dimensions
+  camera_info.width = width;
+  camera_info.height = height;
+
+  // Set distortion model
+  camera_info.distortion_model = "plumb_bob";
+
+  // Set camera matrix K [fx 0 cx; 0 fy cy; 0 0 1]
+  camera_info.k[0] = intrinsic.fx;
+  camera_info.k[1] = 0.0;
+  camera_info.k[2] = intrinsic.cx;
+  camera_info.k[3] = 0.0;
+  camera_info.k[4] = intrinsic.fy;
+  camera_info.k[5] = intrinsic.cy;
+  camera_info.k[6] = 0.0;
+  camera_info.k[7] = 0.0;
+  camera_info.k[8] = 1.0;
+
+  // Set distortion coefficients [k1, k2, p1, p2, k3]
+  camera_info.d.resize(5);
+  camera_info.d[0] = distortion.k1;
+  camera_info.d[1] = distortion.k2;
+  camera_info.d[2] = distortion.p1;
+  camera_info.d[3] = distortion.p2;
+  camera_info.d[4] = distortion.k3;
+
+  // Set rectification matrix R (identity for monocular camera)
+  camera_info.r[0] = 1.0;
+  camera_info.r[1] = 0.0;
+  camera_info.r[2] = 0.0;
+  camera_info.r[3] = 0.0;
+  camera_info.r[4] = 1.0;
+  camera_info.r[5] = 0.0;
+  camera_info.r[6] = 0.0;
+  camera_info.r[7] = 0.0;
+  camera_info.r[8] = 1.0;
+
+  // Set projection matrix P [fx' 0 cx' Tx; 0 fy' cy' Ty; 0 0 1 0]
+  // For monocular camera, P = K with Tx = Ty = 0
+  camera_info.p[0] = intrinsic.fx;
+  camera_info.p[1] = 0.0;
+  camera_info.p[2] = intrinsic.cx;
+  camera_info.p[3] = 0.0;
+  camera_info.p[4] = 0.0;
+  camera_info.p[5] = intrinsic.fy;
+  camera_info.p[6] = intrinsic.cy;
+  camera_info.p[7] = 0.0;
+  camera_info.p[8] = 0.0;
+  camera_info.p[9] = 0.0;
+  camera_info.p[10] = 1.0;
+  camera_info.p[11] = 0.0;
+
+  return camera_info;
+}
+
+sensor_msgs::msg::CameraInfo OBCameraNode::getCameraInfoFromStreamProfile(const stream_index_pair& stream_index)
+{
+  // Check if stream profile exists
+  if (stream_profile_.find(stream_index) == stream_profile_.end()) {
+    logger_->get_spd_logger()->error("Stream profile not found for stream index");
+    return sensor_msgs::msg::CameraInfo();
+  }
+
+  auto device_info = device_->getDeviceInfo();
+  CHECK_NOTNULL(device_info, logger_);
+  auto pid = device_info->pid();
+
+  OBCameraIntrinsic intrinsic;
+  OBCameraDistortion distortion;
+  int width = width_[stream_index];
+  int height = height_[stream_index];
+  std::string frame_id = optical_frame_id_[stream_index];
+
+  if (isGemini335PID(pid)) {
+    // For Gemini335 series, get intrinsic from stream profile
+    auto stream_profile = stream_profile_[stream_index];
+    CHECK_NOTNULL(stream_profile, logger_);
+    auto video_stream_profile = stream_profile->as<ob::VideoStreamProfile>();
+    CHECK_NOTNULL(video_stream_profile, logger_);
+    intrinsic = video_stream_profile->getIntrinsic();
+    distortion = video_stream_profile->getDistortion();
+  } else {
+    // For other devices, get intrinsic from pipeline camera params
+    auto camera_params = pipeline_->getCameraParam();
+    intrinsic = stream_index.first == OB_STREAM_COLOR ? camera_params.rgbIntrinsic
+                                                      : camera_params.depthIntrinsic;
+    distortion = stream_index.first == OB_STREAM_COLOR ? camera_params.rgbDistortion
+                                                       : camera_params.depthDistortion;
+
+    // Special case for DABAI_MAX_PID
+    if (pid == DABAI_MAX_PID) {
+      intrinsic = camera_params.rgbIntrinsic;
+      distortion = camera_params.rgbDistortion;
+    }
+  }
+
+  return createCameraInfoFromIntrinsic(intrinsic, distortion, width, height, frame_id);
 }
 
 }  // namespace orbbec_camera

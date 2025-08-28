@@ -2805,8 +2805,8 @@ void OBCameraNode::onNewColorFrameCallback() {
     }
     std::shared_ptr<ob::FrameSet> frameSet = color_frame_queue_.front();
     is_color_frame_decoded_ = decodeColorFrameToBuffer(frameSet->colorFrame(), rgb_buffer_);
-    publishPointCloud(frameSet);
     onNewFrameCallback(frameSet->colorFrame(), COLOR);
+    publishPointCloud(frameSet);
     color_frame_queue_.pop();
   }
 

@@ -1882,9 +1882,12 @@ void OBCameraNode::getParameters() {
     device_->enableGlobalTimestamp(true);
   }
   setAndGetNodeParameter<int>(frames_per_trigger_, "frames_per_trigger", 2);
-  long software_trigger_period = 33;
-  setAndGetNodeParameter<long>(software_trigger_period, "software_trigger_period", 33);
+  int software_trigger_period = 33;
+  setAndGetNodeParameter<int>(software_trigger_period, "software_trigger_period", 33);
   software_trigger_period_ = std::chrono::milliseconds(software_trigger_period);
+  double time_sync_period = 6.0;
+  setAndGetNodeParameter<double>(time_sync_period, "time_sync_period", 6.0);
+  time_sync_period_ = std::chrono::milliseconds((int)(time_sync_period*1000));
   setAndGetNodeParameter<int>(gmsl_trigger_fps_, "gmsl_trigger_fps", 3000);
   setAndGetNodeParameter<bool>(enable_gmsl_trigger_, "enable_gmsl_trigger", false);
   setAndGetNodeParameter<std::string>(interleave_ae_mode_, "interleave_ae_mode", "hdr");
@@ -1971,6 +1974,7 @@ void OBCameraNode::setupTopics() {
     setupCameraCtrlServices();
     setupPublishers();
     setupDiagnosticUpdater();
+    setupPeriodicHostTimeSync();
   } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to setup topics: " << e.getMessage());
     throw std::runtime_error(e.getMessage());
@@ -2077,6 +2081,37 @@ void OBCameraNode::setupDiagnosticUpdater() {
   } catch (...) {
     RCLCPP_ERROR(logger_, "Failed to TemperatureUpdate");
   }
+}
+
+void OBCameraNode::setupPeriodicHostTimeSync() {
+    if (time_sync_period_.count() <= 0) {
+        RCLCPP_INFO(logger_, "Periodic host time sync disabled (time_sync_period <= 0)");
+        return;
+    }
+    try {
+        RCLCPP_INFO_STREAM(logger_, "Enable periodic host time sync every " << time_sync_period_.count() << " ms");
+        sync_timer_ = node_->create_wall_timer(
+            std::chrono::milliseconds(time_sync_period_),
+            [this]() {
+                try {
+                    device_->timerSyncWithHost();
+                    RCLCPP_DEBUG(logger_, "Camera time synchronized with host");
+                } catch (const ob::Error &e) {
+                    RCLCPP_WARN_STREAM(logger_, "Time sync failed: " << e.getMessage());
+                } catch (const std::exception &e) {
+                    RCLCPP_WARN_STREAM(logger_, "Time sync failed: " << e.what());
+                } catch (...) {
+                    RCLCPP_WARN(logger_, "Time sync failed due to unknown error");
+                }
+            }
+        );
+    } catch (const ob::Error &e) {
+        RCLCPP_ERROR_STREAM(logger_, "Failed to setup periodic host time sync: " << e.getMessage());
+    } catch (const std::exception &e) {
+        RCLCPP_ERROR_STREAM(logger_, "Failed to setup periodic host time sync: " << e.what());
+    } catch (...) {
+        RCLCPP_ERROR(logger_, "Failed to setup periodic host time sync due to unknown error");
+    }
 }
 
 void OBCameraNode::setupPipelineConfig() {

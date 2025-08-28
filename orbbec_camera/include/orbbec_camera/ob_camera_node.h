@@ -226,6 +226,8 @@ class OBCameraNode {
 
   void setupDiagnosticUpdater();
 
+  void setupPeriodicHostTimeSync();
+
   void onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapper& status);
 
   void setupCameraCtrlServices();
@@ -738,7 +740,9 @@ class OBCameraNode {
   // soft ware trigger
   rclcpp::TimerBase::SharedPtr software_trigger_timer_;
   rclcpp::TimerBase::SharedPtr diagnostic_timer_;
+  rclcpp::TimerBase::SharedPtr sync_timer_;
   std::chrono::milliseconds software_trigger_period_{33};
+  std::chrono::milliseconds time_sync_period_{6000};
   bool enable_heartbeat_ = false;
   bool enable_color_undistortion_ = false;
   std::shared_ptr<image_publisher> color_undistortion_publisher_;

@@ -239,7 +239,8 @@ def generate_launch_description():
         DeclareLaunchArgument('spatial_moderate_filter_radius', default_value='-1'),
         DeclareLaunchArgument('align_mode', default_value='SW'),
         DeclareLaunchArgument('align_target_stream', default_value='COLOR'),# COLOR or DEPTH
-        DeclareLaunchArgument('diagnostic_period', default_value='1.0'),
+        DeclareLaunchArgument('diagnostic_period', default_value='1.0'), # seconds
+        DeclareLaunchArgument('time_sync_period', default_value='6.0'), # seconds
         DeclareLaunchArgument('enable_laser', default_value='true'),
         DeclareLaunchArgument('depth_precision', default_value=''),
         DeclareLaunchArgument('device_preset', default_value='Default'),

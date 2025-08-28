@@ -1966,6 +1966,7 @@ void OBCameraNode::setupTopics() {
     setupRightIrPostProcessFilter();
     setupLeftIrPostProcessFilter();
     setupProfiles();
+    setupCameraInfo();
     selectBaseStream();
     setupCameraCtrlServices();
     setupPublishers();
@@ -2126,6 +2127,19 @@ void OBCameraNode::setupPipelineConfig() {
     pipeline_config_->setFrameAggregateOutputMode(OB_FRAME_AGGREGATE_OUTPUT_DISABLE);
   } else {
     pipeline_config_->setFrameAggregateOutputMode(OB_FRAME_AGGREGATE_OUTPUT_ANY_SITUATION);
+  }
+}
+
+void OBCameraNode::setupCameraInfo() {
+  std::string color_camera_name = camera_name_ + "_color";
+  if (!color_info_url_.empty()) {
+    color_info_manager_ = std::make_unique<camera_info_manager::CameraInfoManager>(
+        node_, color_camera_name, color_info_url_);
+  }
+  std::string ir_camera_name = camera_name_ + "_ir";
+  if (!ir_info_url_.empty()) {
+    ir_info_manager_ = std::make_unique<camera_info_manager::CameraInfoManager>(
+        node_, ir_camera_name, ir_info_url_);
   }
 }
 
@@ -3010,11 +3024,27 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   if (stream_index == COLOR && enable_color_undistortion_) {
     memset(&distortion, 0, sizeof(distortion));
   }
-  auto camera_info = convertToCameraInfo(intrinsic, distortion, width);
-  camera_info.header.stamp = timestamp;
-  camera_info.header.frame_id = frame_id;
-  camera_info.width = width;
-  camera_info.height = height;
+  sensor_msgs::msg::CameraInfo camera_info{};
+  if (color_info_manager_ && color_info_manager_->isCalibrated() && stream_index == COLOR) {
+    camera_info = color_info_manager_->getCameraInfo();
+    camera_info.header.stamp = timestamp;
+    camera_info.header.frame_id = frame_id;
+    camera_info.width = width;
+    camera_info.height = height;
+  } else if (ir_info_manager_ && ir_info_manager_->isCalibrated() &&
+             (stream_index == INFRA1 || stream_index == INFRA2 || stream_index == DEPTH)) {
+    camera_info = ir_info_manager_->getCameraInfo();
+    camera_info.header.stamp = timestamp;
+    camera_info.header.frame_id = frame_id;
+    camera_info.width = width;
+    camera_info.height = height;
+  } else {
+    camera_info = convertToCameraInfo(intrinsic, distortion, width);
+    camera_info.header.stamp = timestamp;
+    camera_info.header.frame_id = frame_id;
+    camera_info.width = width;
+    camera_info.height = height;
+  }
   if (frame->getType() == OB_FRAME_IR_RIGHT && enable_stream_[INFRA1]) {
     auto stream_profile = frame->getStreamProfile();
     CHECK_NOTNULL(stream_profile);

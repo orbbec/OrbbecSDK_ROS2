@@ -64,6 +64,7 @@
 #include "magic_enum/magic_enum.hpp"
 #include "orbbec_camera/image_publisher.h"
 #include "orbbec_camera/fps_counter.hpp"
+#include "orbbec_camera/fps_delay_status.hpp"
 #include "jpeg_decoder.h"
 #include <std_msgs/msg/string.hpp>
 #include <fcntl.h>
@@ -177,6 +178,24 @@ class OBCameraNode {
   int closeSocSyncPwmTrigger();
   void startGmslTrigger();
   void stopGmslTrigger();
+
+  bool isParamCalibrated() const{
+    return (color_info_manager_ && color_info_manager_->isCalibrated() &&
+            ir_info_manager_ && ir_info_manager_->isCalibrated());
+  }
+  void getColorStatus(orbbec_camera_msgs::msg::DeviceStatus &status_msg){
+    fps_delay_status_color_->fillColorStatus(status_msg);
+  }
+
+  void getDepthStatus(orbbec_camera_msgs::msg::DeviceStatus &status_msg){
+    fps_delay_status_depth_->fillDepthStatus(status_msg);
+  }
+
+  void publishDeviceStatus(const orbbec_camera_msgs::msg::DeviceStatus &msg) {
+    if (device_status_pub_) {
+      device_status_pub_->publish(msg);
+    }
+  }
 
  private:
   struct IMUData {
@@ -763,5 +782,9 @@ class OBCameraNode {
   std::unique_ptr<FpsCounter> fps_counter_depth_{nullptr};
   std::unique_ptr<FpsCounter> fps_counter_left_ir_{nullptr};
   std::unique_ptr<FpsCounter> fps_counter_right_ir_{nullptr};
+
+  std::unique_ptr<FpsDelayStatus> fps_delay_status_color_{nullptr};
+  std::unique_ptr<FpsDelayStatus> fps_delay_status_depth_{nullptr};
+  rclcpp::Publisher<orbbec_camera_msgs::msg::DeviceStatus>::SharedPtr device_status_pub_;
 };
 }  // namespace orbbec_camera

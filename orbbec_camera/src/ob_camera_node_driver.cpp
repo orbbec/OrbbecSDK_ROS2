@@ -231,6 +231,9 @@ void OBCameraNodeDriver::init() {
   CHECK_NOTNULL(check_connect_timer_);
   query_thread_ = std::make_shared<std::thread>([this]() { queryDevice(); });
   reset_device_thread_ = std::make_shared<std::thread>([this]() { resetDevice(); });
+
+  device_status_timer_ = this->create_wall_timer(
+      std::chrono::milliseconds(1000 / device_status_interval_hz), [this]() { deviceStatusTimer(); });
 }
 
 void OBCameraNodeDriver::onDeviceConnected(const std::shared_ptr<ob::DeviceList> &device_list) {
@@ -440,6 +443,28 @@ void OBCameraNodeDriver::resetDevice() {
     malloc_trim(0);
     RCLCPP_INFO_STREAM(logger_, "Reset device uid: " << device_unique_id_ << " done");
   }
+}
+
+void OBCameraNodeDriver::deviceStatusTimer() {
+  if (ob_camera_node_ == nullptr) {
+    return;
+  }
+  orbbec_camera_msgs::msg::DeviceStatus status_msg;
+  status_msg.header.stamp = this->now();
+  status_msg.device_online = device_connected_.load();
+
+  ob_camera_node_->getColorStatus(status_msg);
+  ob_camera_node_->getDepthStatus(status_msg);
+
+  status_msg.connection_type = device_info_->getConnectionType();
+
+  auto camera_params = device_->getCalibrationCameraParamList();
+  bool calibration_from_device = (camera_params != nullptr && camera_params->count() > 0);
+  status_msg.calibration_from_device = calibration_from_device;
+  status_msg.calibration_from_launch_param = ob_camera_node_->isParamCalibrated();
+  // status_msg.calibration_from_user_file = ob_camera_node_->isWriteCustomerDataSuccess();
+
+  ob_camera_node_->publishDeviceStatus(status_msg);
 }
 
 void OBCameraNodeDriver::rebootDeviceCallback(

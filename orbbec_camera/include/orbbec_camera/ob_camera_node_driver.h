@@ -27,6 +27,7 @@
 #include <pthread.h>
 #include <std_srvs/srv/empty.hpp>
 #include <backward_ros/backward.hpp>
+#include "libobsensor/hpp/Device.hpp"
 
 namespace orbbec_camera {
 
@@ -68,6 +69,8 @@ class OBCameraNodeDriver : public rclcpp::Node {
   void queryDevice();
 
   void resetDevice();
+
+  void deviceStatusTimer();
 
   void rebootDeviceCallback(const std::shared_ptr<std_srvs::srv::Empty::Request> request,
                             std::shared_ptr<std_srvs::srv::Empty::Response> response);
@@ -120,5 +123,7 @@ class OBCameraNodeDriver : public rclcpp::Node {
   static backward::SignalHandling sh;  // for stack trace
   std::string upgrade_firmware_;
   std::atomic<bool> firmware_update_success_{false};
+  rclcpp::TimerBase::SharedPtr device_status_timer_ = nullptr;
+  int device_status_interval_hz = 2;  // 2Hz
 };
 }  // namespace orbbec_camera

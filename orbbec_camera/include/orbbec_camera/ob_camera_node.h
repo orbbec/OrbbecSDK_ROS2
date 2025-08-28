@@ -255,6 +255,12 @@ class OBCameraNode {
 
   std::optional<OBCameraParam> getColorCameraParam();
 
+  void setStreamsEnableCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request> request,
+                                std::shared_ptr<std_srvs::srv::SetBool::Response> response);
+
+  void getStreamsEnableCallback(const std::shared_ptr<orbbec_camera_msgs::srv::GetBool::Request> request,
+                                std::shared_ptr<orbbec_camera_msgs::srv::GetBool::Response> response);
+
   void getExposureCallback(const std::shared_ptr<GetInt32::Request>& request,
                            std::shared_ptr<GetInt32::Response>& response,
                            const stream_index_pair& stream_index);
@@ -533,6 +539,8 @@ class OBCameraNode {
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_sync_host_time_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr send_software_trigger_srv_;
   rclcpp::Service<SetFilter>::SharedPtr set_filter_srv_;
+  rclcpp::Service<orbbec_camera_msgs::srv::GetBool>::SharedPtr get_streams_enable_srv_;
+  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_streams_enable_srv_;
 
   bool enable_sync_output_accel_gyro_ = false;
   bool publish_tf_ = false;

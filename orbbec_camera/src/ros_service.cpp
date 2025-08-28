@@ -234,6 +234,55 @@ void OBCameraNode::setupCameraCtrlServices() {
                                        std::shared_ptr<SetString::Response> response) {
         setReadCustomerData(request, response);
       });
+  set_streams_enable_srv_ = node_->create_service<SetBool>(
+      "set_streams_enable",
+      [this](const std::shared_ptr<SetBool::Request> request,
+            std::shared_ptr<SetBool::Response> response) {
+        setStreamsEnableCallback(request, response);
+      });
+  get_streams_enable_srv_ = node_->create_service<GetBool>(
+      "get_streams_enable",
+      [this](const std::shared_ptr<GetBool::Request> request,
+            std::shared_ptr<GetBool::Response> response) {
+        getStreamsEnableCallback(request, response);
+      });
+}
+void OBCameraNode::setStreamsEnableCallback(
+    const std::shared_ptr<std_srvs::srv::SetBool::Request> request,
+    std::shared_ptr<std_srvs::srv::SetBool::Response> response) {
+  try {
+    if (request->data) {
+      startStreams();
+      response->success = true;
+      response->message = "streams started";
+    } else {
+      stopStreams();
+      response->success = true;
+      response->message = "streams stopped";
+    }
+  } catch (const ob::Error& e) {
+    response->success = false;
+    response->message = e.getMessage();
+  } catch (const std::exception& e) {
+    response->success = false;
+    response->message = e.what();
+  } catch (...) {
+    response->success = false;
+    response->message = "unknown error";
+  }
+}
+
+void OBCameraNode::getStreamsEnableCallback(
+    const std::shared_ptr<orbbec_camera_msgs::srv::GetBool::Request> request,
+    std::shared_ptr<orbbec_camera_msgs::srv::GetBool::Response> response) {
+  (void)request;
+  try {
+    response->data = pipeline_started_.load();
+    response->success = true;
+  } catch (...) {
+    response->success = false;
+    response->message = "unknown error";
+  }
 }
 
 void OBCameraNode::setExposureCallback(const std::shared_ptr<SetInt32::Request>& request,

@@ -4003,5 +4003,7 @@ void OBCameraNode::setFilterCallback(const std::shared_ptr<SetFilter ::Request> 
     response->success = false;
   }
 }
-
+bool OBCameraNode::isWriteCustomerDataSuccess() const {
+    return write_customer_data_success_.load();
+}
 }  // namespace orbbec_camera

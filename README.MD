@@ -161,7 +161,7 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
     - [Efficient intra-process communication](#efficient-intra-process-communication)
     - [ROS2(Robot) vs Optical(Camera) Coordination Systems](#ros2robot-vs-opticalcamera-coordination-systems)
     - [Camera sensor structure](#camera-sensor-structure)
-    - [TF from coordinate A to coordinate B](#tf-from-coordinate-a-to-coordinate-b)
+    - [TF from coordinate A to coordinate B:](#tf-from-coordinate-a-to-coordinate-b)
     - [Compressed Image](#compressed-image)
     - [Building a Debian Package](#building-a-debian-package)
   - [Examples](#examples)
@@ -209,7 +209,7 @@ Install deb dependencies
 
 ```bash
 # assume you have sourced ROS environment, same blow
-sudo apt install libgflags-dev nlohmann-json3-dev libgoogle-glog-dev libgoogle-glog0v5 \
+sudo apt install libgflags-dev nlohmann-json3-dev libgoogle-glog-dev libgoogle-glog0v5 libssl-dev \
 ros-$ROS_DISTRO-image-transport ros-${ROS_DISTRO}-image-transport-plugins ros-${ROS_DISTRO}-compressed-image-transport \
 ros-$ROS_DISTRO-image-publisher ros-$ROS_DISTRO-camera-info-manager \
 ros-$ROS_DISTRO-diagnostic-updater ros-$ROS_DISTRO-diagnostic-msgs ros-$ROS_DISTRO-statistics-msgs \

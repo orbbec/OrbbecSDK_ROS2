@@ -27,6 +27,11 @@
 #include "magic_enum/magic_enum.hpp"
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <opencv2/opencv.hpp>
+#include <openssl/evp.h>
+#include <sstream>
+#include <iomanip>
+#include <arpa/inet.h>
+
 
 namespace orbbec_camera {
 inline void LogFatal(const char* file, int line, const std::string& message) {
@@ -194,4 +199,6 @@ cv::Mat undistortImage(const cv::Mat& image, const OBCameraIntrinsic& intrinsic,
                        const OBCameraDistortion& distortion);
 
 std::string getDistortionModels(OBCameraDistortion distortion);
+
+std::string calcMD5(const std::string &data);
 }  // namespace orbbec_camera

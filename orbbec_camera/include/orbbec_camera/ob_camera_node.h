@@ -58,6 +58,8 @@
 #include "orbbec_camera_msgs/srv/set_string.hpp"
 #include "orbbec_camera_msgs/srv/set_filter.hpp"
 #include "orbbec_camera_msgs/srv/set_arrays.hpp"
+#include "orbbec_camera_msgs/srv/get_camera_params.hpp"
+#include "orbbec_camera_msgs/srv/set_camera_params.hpp"
 #include "orbbec_camera/constants.h"
 #include "orbbec_camera/dynamic_params.h"
 #include "orbbec_camera/d2c_viewer.h"
@@ -113,6 +115,8 @@ using SetBool = std_srvs::srv::SetBool;
 using GetBool = orbbec_camera_msgs::srv::GetBool;
 using SetFilter = orbbec_camera_msgs::srv::SetFilter;
 using SetArrays = orbbec_camera_msgs::srv::SetArrays;
+using SetCameraParams = orbbec_camera_msgs::srv::SetCameraParams;
+using GetCameraParams = orbbec_camera_msgs::srv::GetCameraParams;
 
 typedef std::pair<ob_stream_type, int> stream_index_pair;
 
@@ -369,11 +373,21 @@ class OBCameraNode {
   void switchIRCameraCallback(const std::shared_ptr<SetString::Request>& request,
                               std::shared_ptr<SetString::Response>& response);
 
-  void setWriteCustomerData(const std::shared_ptr<SetString::Request>& request,
-                            std::shared_ptr<SetString::Response>& response);
+  bool writeCustomerData(const std::string &data);
 
-  void setReadCustomerData(const std::shared_ptr<SetString::Request>& request,
-                           std::shared_ptr<SetString::Response>& response);
+  bool readCustomerData(std::string &out_data);
+
+  void writeCustomerDataCallback(const std::shared_ptr<SetString::Request>& request,
+                                 std::shared_ptr<SetString::Response>& response);
+
+  void readCustomerDataCallback(const std::shared_ptr<GetString::Request>& request,
+                                std::shared_ptr<GetString::Response>& response);
+
+void getCameraParamsCallback(const std::shared_ptr<GetCameraParams::Request>& request,
+                                          std::shared_ptr<GetCameraParams::Response>& response);
+
+void setCameraParamsCallback(const std::shared_ptr<SetCameraParams::Request>& request,
+                                          std::shared_ptr<SetCameraParams::Response>& response);
 
   void setIRLongExposureCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
                                  std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
@@ -449,7 +463,10 @@ class OBCameraNode {
 
   void setDisparitySearchOffset();
 
+  bool isWriteCustomerDataSuccess() const;
+
  private:
+  std::atomic_bool write_customer_data_success_{false};
   rclcpp::Node* node_ = nullptr;
   std::shared_ptr<ob::Device> device_ = nullptr;
   std::shared_ptr<Parameters> parameters_ = nullptr;
@@ -520,8 +537,8 @@ class OBCameraNode {
   rclcpp::Service<SetBool>::SharedPtr set_auto_white_balance_srv_;
   rclcpp::Service<GetString>::SharedPtr get_sdk_version_srv_;
   rclcpp::Service<SetString>::SharedPtr switch_ir_camera_srv_;
-  rclcpp::Service<SetString>::SharedPtr set_write_customerdata_srv_;
-  rclcpp::Service<SetString>::SharedPtr set_read_customerdata_srv_;
+  rclcpp::Service<SetString>::SharedPtr write_customerdata_srv_;
+  rclcpp::Service<GetString>::SharedPtr read_customerdata_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_ir_long_exposure_srv_;
   std::map<stream_index_pair, rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr>
       set_auto_exposure_srv_;
@@ -543,6 +560,8 @@ class OBCameraNode {
   rclcpp::Service<SetFilter>::SharedPtr set_filter_srv_;
   rclcpp::Service<orbbec_camera_msgs::srv::GetBool>::SharedPtr get_streams_enable_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_streams_enable_srv_;
+  rclcpp::Service<GetCameraParams>::SharedPtr get_camera_params_srv_;
+  rclcpp::Service<SetCameraParams>::SharedPtr set_camera_params_srv_;
 
   bool enable_sync_output_accel_gyro_ = false;
   bool publish_tf_ = false;

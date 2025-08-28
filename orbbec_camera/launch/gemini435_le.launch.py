@@ -43,10 +43,28 @@ def load_parameters(context, args):
         yaml_params = load_yaml(config_file_path)
         default_params = merge_params(default_params, yaml_params)
     skip_convert = {'config_file_path', 'usb_port', 'serial_number'}
-    return {
-        key: (value if key in skip_convert else convert_value(value))
-        for key, value in default_params.items()
-    }
+
+    result = {}
+    for key, value in default_params.items():
+        if key in skip_convert:
+            result[key] = value
+        elif 'enable_pub_plugins' in key:
+            if isinstance(value, str):
+                if value.startswith('[') and value.endswith(']'):
+                    try:
+                        result[key] = yaml.safe_load(value)
+                    except:
+                        result[key] = [value]
+                else:
+                    result[key] = [value]
+            elif isinstance(value, list):
+                result[key] = value
+            else:
+                result[key] = [str(value)]
+        else:
+            result[key] = convert_value(value)
+
+    return result
 
 
 def generate_launch_description():
@@ -86,6 +104,7 @@ def generate_launch_description():
         DeclareLaunchArgument('color_gain', default_value='-1'),
         DeclareLaunchArgument('enable_color_auto_white_balance', default_value='true'),
         DeclareLaunchArgument('color_white_balance', default_value='-1'),
+        DeclareLaunchArgument('enable_color_auto_exposure', default_value='true'),
         DeclareLaunchArgument('color_ae_max_exposure', default_value='-1'),
         DeclareLaunchArgument('color_brightness', default_value='-1'),
         DeclareLaunchArgument('color_sharpness', default_value='-1'),
@@ -161,9 +180,10 @@ def generate_launch_description():
         # Network device settings: default enumerate_net_device is set to true, which will automatically enumerate network devices
         # If you do not want to automatically enumerate network devices,
         # you can set enumerate_net_device to false, net_device_ip to the device's IP address, and net_device_port to the default value of 8090
-        DeclareLaunchArgument("enumerate_net_device", default_value='true'),
-        DeclareLaunchArgument("net_device_ip", default_value=""),
-        DeclareLaunchArgument("net_device_port", default_value="0"),
+        DeclareLaunchArgument('enumerate_net_device', default_value='true'),
+        DeclareLaunchArgument('net_device_ip', default_value=''),
+        DeclareLaunchArgument('net_device_port', default_value='0'),
+        DeclareLaunchArgument('exposure_range_mode', default_value='default'),#default, ultimate or regular
         DeclareLaunchArgument('log_level', default_value='none'),
         DeclareLaunchArgument('enable_publish_extrinsic', default_value='false'),
         DeclareLaunchArgument('enable_d2c_viewer', default_value='false'),
@@ -176,8 +196,10 @@ def generate_launch_description():
         DeclareLaunchArgument('trigger2image_delay_us', default_value='0'),
         DeclareLaunchArgument('trigger_out_delay_us', default_value='0'),
         DeclareLaunchArgument('trigger_out_enabled', default_value='true'),
+        DeclareLaunchArgument('software_trigger_enabled', default_value='true'),
         DeclareLaunchArgument('frames_per_trigger', default_value='2'),
         DeclareLaunchArgument('software_trigger_period', default_value='33'),  # ms
+        DeclareLaunchArgument('enable_ptp_config', default_value='false'),#Only for Gemini 335Le
         DeclareLaunchArgument('enable_frame_sync', default_value='true'),
         DeclareLaunchArgument('ordered_pc', default_value='false'),
         DeclareLaunchArgument('enable_depth_scale', default_value='true'),
@@ -185,15 +207,19 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_hdr_merge', default_value='false'),
         DeclareLaunchArgument('enable_sequence_id_filter', default_value='false'),
         DeclareLaunchArgument('enable_threshold_filter', default_value='false'),
+        DeclareLaunchArgument('enable_hardware_noise_removal_filter', default_value='false'),
         DeclareLaunchArgument('enable_noise_removal_filter', default_value='true'),
         DeclareLaunchArgument('enable_spatial_filter', default_value='false'),
         DeclareLaunchArgument('enable_temporal_filter', default_value='false'),
         DeclareLaunchArgument('enable_disaparity_to_depth', default_value='true'),
         DeclareLaunchArgument('enable_hole_filling_filter', default_value='false'),
+        DeclareLaunchArgument('enable_spatial_fast_filter', default_value='false'),
+        DeclareLaunchArgument('enable_spatial_moderate_filter', default_value='false'),
         DeclareLaunchArgument('decimation_filter_scale', default_value='-1'),
         DeclareLaunchArgument('sequence_id_filter_id', default_value='-1'),
         DeclareLaunchArgument('threshold_filter_max', default_value='-1'),
         DeclareLaunchArgument('threshold_filter_min', default_value='-1'),
+        DeclareLaunchArgument('hardware_noise_removal_filter_threshold', default_value='-1.0'),
         DeclareLaunchArgument('noise_removal_filter_min_diff', default_value='256'),
         DeclareLaunchArgument('noise_removal_filter_max_size', default_value='80'),
         DeclareLaunchArgument('spatial_filter_alpha', default_value='-1.0'),
@@ -207,19 +233,32 @@ def generate_launch_description():
         DeclareLaunchArgument('hdr_merge_gain_1', default_value='-1'),
         DeclareLaunchArgument('hdr_merge_exposure_2', default_value='-1'),
         DeclareLaunchArgument('hdr_merge_gain_2', default_value='-1'),
+        DeclareLaunchArgument('spatial_fast_filter_radius', default_value='-1'),
+        DeclareLaunchArgument('spatial_moderate_filter_diff_threshold', default_value='-1'),
+        DeclareLaunchArgument('spatial_moderate_filter_magnitude', default_value='-1'),
+        DeclareLaunchArgument('spatial_moderate_filter_radius', default_value='-1'),
         DeclareLaunchArgument('align_mode', default_value='HW'),
         DeclareLaunchArgument('align_target_stream', default_value='COLOR'),# COLOR or DEPTH
-        DeclareLaunchArgument('diagnostic_period', default_value='1.0'),
+        DeclareLaunchArgument('diagnostic_period', default_value='1.0'), # seconds
+        DeclareLaunchArgument('time_sync_period', default_value='6.0'), # seconds
         DeclareLaunchArgument('enable_laser', default_value='true'),
         DeclareLaunchArgument('depth_precision', default_value=''),
         DeclareLaunchArgument('device_preset', default_value='Default'),
+        DeclareLaunchArgument('retry_on_usb3_detection_failure', default_value='false'),
         DeclareLaunchArgument('laser_energy_level', default_value='-1'),
         DeclareLaunchArgument('enable_sync_host_time', default_value='true'),
         DeclareLaunchArgument('time_domain', default_value='global'),# global, device, system
         DeclareLaunchArgument('enable_color_undistortion', default_value='false'),
         DeclareLaunchArgument('config_file_path', default_value=''),
         DeclareLaunchArgument('enable_heartbeat', default_value='false'),
-        DeclareLaunchArgument('frame_aggregate_mode', default_value='ANY'), # full_frame, olor_frame, ANY or disable
+        DeclareLaunchArgument('gmsl_trigger_fps', default_value='3000'),
+        DeclareLaunchArgument('enable_gmsl_trigger', default_value='false'),
+        DeclareLaunchArgument('disparity_range_mode', default_value='-1'),
+        DeclareLaunchArgument('disparity_search_offset', default_value='-1'),
+        DeclareLaunchArgument('disparity_offset_config', default_value='false'),
+        DeclareLaunchArgument('offset_index0', default_value='-1'),
+        DeclareLaunchArgument('offset_index1', default_value='-1'),
+        DeclareLaunchArgument('frame_aggregate_mode', default_value='ANY'), # full_frame, color_frame, ANY or disable
         DeclareLaunchArgument('interleave_ae_mode', default_value='laser'), # 'hdr' or 'laser'
         DeclareLaunchArgument('interleave_frame_enable', default_value='false'),
         DeclareLaunchArgument('interleave_skip_enable', default_value='false'),
@@ -246,6 +285,16 @@ def generate_launch_description():
         DeclareLaunchArgument('laser_index0_depth_gain', default_value='16'),
         DeclareLaunchArgument('laser_index0_ir_brightness', default_value='60'),
         DeclareLaunchArgument('laser_index0_ir_ae_max_exposure', default_value='30000'),
+        DeclareLaunchArgument('show_fps_enable', default_value='false'),
+
+        #color image transport plugins
+        DeclareLaunchArgument('color.image_raw.enable_pub_plugins',default_value='["image_transport/compressed", "image_transport/raw", "image_transport/theora"]'),
+        #depth image transport plugins
+        DeclareLaunchArgument('depth.image_raw.enable_pub_plugins',default_value='["image_transport/compressedDepth", "image_transport/raw", "image_transport/theora"]'),
+        #infra1
+        DeclareLaunchArgument('left_ir.image_raw.enable_pub_plugins',default_value='["image_transport/compressed", "image_transport/raw", "image_transport/theora"]'),
+        #infra2
+        DeclareLaunchArgument('right_ir.image_raw.enable_pub_plugins',default_value='["image_transport/compressed", "image_transport/raw", "image_transport/theora"]'),
     ]
 
     def get_params(context, args):

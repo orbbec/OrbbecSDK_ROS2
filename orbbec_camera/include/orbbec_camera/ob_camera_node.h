@@ -193,13 +193,6 @@ class OBCameraNode {
 
   void getDepthStatus(orbbec_camera_msgs::msg::DeviceStatus& status_msg) {
     fps_delay_status_depth_->fillDepthStatus(status_msg);
-    status_msg.header.frame_id = camera_link_frame_id_;
-  }
-
-  void publishDeviceStatus(const orbbec_camera_msgs::msg::DeviceStatus& msg) {
-    if (device_status_pub_) {
-      device_status_pub_->publish(msg);
-    }
   }
 
   bool checkUserCalibrationReady() {
@@ -244,8 +237,6 @@ class OBCameraNode {
   void setupPipelineConfig();
 
   void setupDiagnosticUpdater();
-
-  void setupPeriodicHostTimeSync();
 
   void onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapper& status);
 
@@ -776,9 +767,7 @@ class OBCameraNode {
   // soft ware trigger
   rclcpp::TimerBase::SharedPtr software_trigger_timer_;
   rclcpp::TimerBase::SharedPtr diagnostic_timer_;
-  rclcpp::TimerBase::SharedPtr sync_timer_;
   std::chrono::milliseconds software_trigger_period_{33};
-  std::chrono::milliseconds time_sync_period_{6000};
   bool enable_heartbeat_ = false;
   bool enable_color_undistortion_ = false;
   std::shared_ptr<image_publisher> color_undistortion_publisher_;
@@ -835,6 +824,5 @@ class OBCameraNode {
 
   std::unique_ptr<FpsDelayStatus> fps_delay_status_color_{nullptr};
   std::unique_ptr<FpsDelayStatus> fps_delay_status_depth_{nullptr};
-  rclcpp::Publisher<orbbec_camera_msgs::msg::DeviceStatus>::SharedPtr device_status_pub_;
 };
 }  // namespace orbbec_camera

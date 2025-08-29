@@ -22,6 +22,7 @@
 #include "ob_camera_node.h"
 #include "utils.h"
 #include "dynamic_params.h"
+#include <orbbec_camera_msgs/msg/device_status.hpp>
 
 #include "libobsensor/ObSensor.hpp"
 #include <pthread.h>
@@ -116,6 +117,7 @@ class OBCameraNodeDriver : public rclcpp::Node {
   int net_device_port_ = 0;
   int connection_delay_ = 100;
   bool enable_sync_host_time_ = true;
+  std::chrono::milliseconds time_sync_period_{6000};
   std::string preset_firmware_path_;
   rclcpp::Service<std_srvs::srv::Empty>::SharedPtr reboot_device_srv_ = nullptr;
   std::chrono::time_point<std::chrono::system_clock> start_time_;
@@ -125,5 +127,7 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::atomic<bool> firmware_update_success_{false};
   rclcpp::TimerBase::SharedPtr device_status_timer_ = nullptr;
   int device_status_interval_hz = 2;  // 2Hz
+  rclcpp::Publisher<orbbec_camera_msgs::msg::DeviceStatus>::SharedPtr device_status_pub_ = nullptr;
+  std::string node_name_;
 };
 }  // namespace orbbec_camera

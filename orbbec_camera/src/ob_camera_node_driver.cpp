@@ -94,6 +94,7 @@ OBCameraNodeDriver::OBCameraNodeDriver(const rclcpp::NodeOptions &node_options)
                    "/config/OrbbecSDKConfig_v2.0.xml"),
       logger_(this->get_logger()),
       extension_path_(ament_index_cpp::get_package_prefix("orbbec_camera") + "/lib/extensions") {
+  node_name_ = "orbbec_camera_node";
   init();
 }
 
@@ -105,6 +106,7 @@ OBCameraNodeDriver::OBCameraNodeDriver(const std::string &node_name, const std::
                    "/config/OrbbecSDKConfig_v2.0.xml"),
       logger_(this->get_logger()),
       extension_path_(ament_index_cpp::get_package_prefix("orbbec_camera") + "/lib/extensions") {
+  node_name_ = node_name;
   init();
 }
 
@@ -123,13 +125,30 @@ OBCameraNodeDriver::~OBCameraNodeDriver() {
 
   // Stop timers that might access the device
   if (sync_host_time_timer_) {
-    sync_host_time_timer_->cancel();
-    sync_host_time_timer_.reset();
+    try {
+      sync_host_time_timer_->cancel();
+      sync_host_time_timer_.reset();
+    } catch (...) {
+      RCLCPP_WARN_STREAM(logger_, "Exception during sync timer cleanup in destructor");
+    }
   }
 
   if (check_connect_timer_) {
-    check_connect_timer_->cancel();
-    check_connect_timer_.reset();
+    try {
+      check_connect_timer_->cancel();
+      check_connect_timer_.reset();
+    } catch (...) {
+      RCLCPP_WARN_STREAM(logger_, "Exception during check connect timer cleanup in destructor");
+    }
+  }
+
+  if (device_status_timer_) {
+    try {
+      device_status_timer_->cancel();
+      device_status_timer_.reset();
+    } catch (...) {
+      RCLCPP_WARN_STREAM(logger_, "Exception during device status timer cleanup in destructor");
+    }
   }
 
   // Now stop threads
@@ -171,6 +190,8 @@ void OBCameraNodeDriver::init() {
   auto log_level = obLogSeverityFromString(log_level_str);
   connection_delay_ = static_cast<int>(declare_parameter<int>("connection_delay", 100));
   enable_sync_host_time_ = declare_parameter<bool>("enable_sync_host_time", true);
+  double time_sync_period = declare_parameter<double>("time_sync_period", 60.0);
+  time_sync_period_ = std::chrono::milliseconds((int)(time_sync_period * 1000));
   upgrade_firmware_ = declare_parameter<std::string>("upgrade_firmware", "");
   g_camera_name = declare_parameter<std::string>("camera_name", g_camera_name);
   g_time_domain = declare_parameter<std::string>("time_domain", g_time_domain);
@@ -235,6 +256,10 @@ void OBCameraNodeDriver::init() {
   device_status_timer_ =
       this->create_wall_timer(std::chrono::milliseconds(1000 / device_status_interval_hz),
                               [this]() { deviceStatusTimer(); });
+
+  // Initialize device status publisher
+  device_status_pub_ = this->create_publisher<orbbec_camera_msgs::msg::DeviceStatus>(
+      "device_status", rclcpp::QoS(1).transient_local());
 }
 
 void OBCameraNodeDriver::onDeviceConnected(const std::shared_ptr<ob::DeviceList> &device_list) {
@@ -388,6 +413,16 @@ void OBCameraNodeDriver::resetDevice() {
         continue;
       }
 
+      // Stop sync timer to prevent it from accessing the device during reset
+      if (sync_host_time_timer_) {
+        try {
+          sync_host_time_timer_->cancel();
+          sync_host_time_timer_.reset();
+        } catch (...) {
+          RCLCPP_WARN_STREAM(logger_, "Exception during sync timer cleanup during reset");
+        }
+      }
+
       RCLCPP_INFO_STREAM(logger_, "resetDevice : Reset device uid: " << device_unique_id_);
       std::lock_guard<decltype(device_lock_)> device_lock(device_lock_);
       {
@@ -448,30 +483,165 @@ void OBCameraNodeDriver::resetDevice() {
 }
 
 void OBCameraNodeDriver::deviceStatusTimer() {
-  if (ob_camera_node_ == nullptr) {
-    return;
-  }
+  // Always publish device status regardless of device connection state
   orbbec_camera_msgs::msg::DeviceStatus status_msg;
   status_msg.header.stamp = this->now();
   status_msg.device_online = device_connected_.load();
+  status_msg.header.frame_id = node_name_;
 
-  ob_camera_node_->getColorStatus(status_msg);
-  ob_camera_node_->getDepthStatus(status_msg);
+  // Initialize default values for when device is not connected
+  status_msg.connection_type = "";
+  status_msg.calibration_from_factory = false;
+  status_msg.calibration_from_launch_param = false;
+  status_msg.customer_calibration_ready = false;
 
-  status_msg.connection_type = device_info_->getConnectionType();
+  // Flag to track if device communication error occurs
+  bool device_communication_error = false;
 
-  auto camera_params = device_->getCalibrationCameraParamList();
-  bool calibration_from_factory = (camera_params != nullptr && camera_params->count() > 0);
-  status_msg.calibration_from_factory = calibration_from_factory;
-  status_msg.calibration_from_launch_param = ob_camera_node_->isParamCalibrated();
+  // Only try to get device information if device is connected and stable
+  if (device_connected_.load() && !device_connecting_.load()) {
+    // Check if reset is in progress
+    std::unique_lock<decltype(reset_device_mutex_)> reset_lock(reset_device_mutex_,
+                                                               std::try_to_lock);
+    if (reset_lock.owns_lock() && !reset_device_flag_) {
+      // Only get device-specific info if we have a valid camera node and device
+      if (ob_camera_node_) {
+        // Safely get color and depth status - these may access device
+        try {
+          ob_camera_node_->getColorStatus(status_msg);
+          ob_camera_node_->getDepthStatus(status_msg);
+        } catch (const ob::Error &e) {
+          std::string error_msg = e.getMessage() ? e.getMessage() : "Unknown OB error";
+          if (error_msg.find("Device is deactivated") != std::string::npos ||
+              error_msg.find("disconnected") != std::string::npos ||
+              error_msg.find("Send control transfer failed") != std::string::npos) {
+            RCLCPP_WARN(
+                logger_,
+                "Device communication error in %s at line %d: %s - Device may be disconnected",
+                __FUNCTION__, __LINE__, error_msg.c_str());
+            device_communication_error = true;
+          } else {
+            RCLCPP_ERROR(logger_, "Error in %s at line %d: %s", __FUNCTION__, __LINE__,
+                         error_msg.c_str());
+          }
+        } catch (const std::exception &e) {
+          RCLCPP_ERROR(logger_, "Exception in %s at line %d: %s", __FUNCTION__, __LINE__, e.what());
+        } catch (...) {
+          RCLCPP_ERROR(logger_, "Unknown exception in %s at line %d", __FUNCTION__, __LINE__);
+        }
 
-  if (!ob_camera_node_->checkUserCalibrationReady()) {
-    status_msg.customer_calibration_ready = false;
-  } else {
-    status_msg.customer_calibration_ready = true;
+        // These should be safe as they don't directly access hardware
+        status_msg.calibration_from_launch_param = ob_camera_node_->isParamCalibrated();
+      }
+
+      // Safely get connection type
+      try {
+        if (device_info_) {
+          status_msg.connection_type = device_info_->getConnectionType();
+        }
+      } catch (const ob::Error &e) {
+        std::string error_msg = e.getMessage() ? e.getMessage() : "Unknown OB error";
+        if (error_msg.find("Device is deactivated") != std::string::npos ||
+            error_msg.find("disconnected") != std::string::npos ||
+            error_msg.find("Send control transfer failed") != std::string::npos) {
+          RCLCPP_WARN(
+              logger_,
+              "Device communication error in %s at line %d: %s - Device may be disconnected",
+              __FUNCTION__, __LINE__, error_msg.c_str());
+          device_communication_error = true;
+        } else {
+          RCLCPP_ERROR(logger_, "Error in %s at line %d: %s", __FUNCTION__, __LINE__,
+                       error_msg.c_str());
+        }
+      } catch (const std::exception &e) {
+        RCLCPP_ERROR(logger_, "Exception in %s at line %d: %s", __FUNCTION__, __LINE__, e.what());
+      } catch (...) {
+        RCLCPP_ERROR(logger_, "Unknown exception in %s at line %d", __FUNCTION__, __LINE__);
+      }
+
+      // Safely get calibration info
+      try {
+        if (device_) {
+          auto camera_params = device_->getCalibrationCameraParamList();
+          bool calibration_from_factory = (camera_params != nullptr && camera_params->count() > 0);
+          status_msg.calibration_from_factory = calibration_from_factory;
+        }
+      } catch (const ob::Error &e) {
+        std::string error_msg = e.getMessage() ? e.getMessage() : "Unknown OB error";
+        if (error_msg.find("Device is deactivated") != std::string::npos ||
+            error_msg.find("disconnected") != std::string::npos ||
+            error_msg.find("Send control transfer failed") != std::string::npos) {
+          RCLCPP_WARN(
+              logger_,
+              "Device communication error in %s at line %d: %s - Device may be disconnected",
+              __FUNCTION__, __LINE__, error_msg.c_str());
+          device_communication_error = true;
+        } else {
+          RCLCPP_ERROR(logger_, "Error in %s at line %d: %s", __FUNCTION__, __LINE__,
+                       error_msg.c_str());
+        }
+      } catch (const std::exception &e) {
+        RCLCPP_ERROR(logger_, "Exception in %s at line %d: %s", __FUNCTION__, __LINE__, e.what());
+      } catch (...) {
+        RCLCPP_ERROR(logger_, "Unknown exception in %s at line %d", __FUNCTION__, __LINE__);
+      }
+
+      // Safely check user calibration readiness - this may also access device
+      // Only execute for 435LE devices (check by device name for network devices)
+      try {
+        if (device_info_ && ob_camera_node_) {
+          std::string device_name = device_info_->getName();
+          if (device_name.find("435Le") != std::string::npos ||
+              device_name.find("435LE") != std::string::npos) {
+            if (!ob_camera_node_->checkUserCalibrationReady()) {
+              status_msg.customer_calibration_ready = false;
+            } else {
+              status_msg.customer_calibration_ready = true;
+            }
+          } else {
+            // For non-435LE devices, set a default value or skip this check
+            status_msg.customer_calibration_ready = false;
+          }
+        } else {
+          status_msg.customer_calibration_ready = false;
+        }
+      } catch (const ob::Error &e) {
+        std::string error_msg = e.getMessage() ? e.getMessage() : "Unknown OB error";
+        if (error_msg.find("Device is deactivated") != std::string::npos ||
+            error_msg.find("disconnected") != std::string::npos ||
+            error_msg.find("Send control transfer failed") != std::string::npos) {
+          RCLCPP_WARN(
+              logger_,
+              "Device communication error in %s at line %d: %s - Device may be disconnected",
+              __FUNCTION__, __LINE__, error_msg.c_str());
+          device_communication_error = true;
+        } else {
+          RCLCPP_ERROR(logger_, "Error in %s at line %d: %s", __FUNCTION__, __LINE__,
+                       error_msg.c_str());
+        }
+      } catch (const std::exception &e) {
+        RCLCPP_ERROR(logger_, "Exception in %s at line %d: %s", __FUNCTION__, __LINE__, e.what());
+      } catch (...) {
+        RCLCPP_ERROR(logger_, "Unknown exception in %s at line %d", __FUNCTION__, __LINE__);
+      }
+    }
   }
 
-  ob_camera_node_->publishDeviceStatus(status_msg);
+  // If device communication error occurred, set device_online to false
+  if (device_communication_error) {
+    status_msg.device_online = false;
+  }
+
+  // if status_msg.connection_type is empty, set it to "unknown"
+  if (status_msg.connection_type.empty()) {
+    status_msg.connection_type = "unknown";
+    status_msg.device_online = false;
+  }
+
+  // Always publish the status message, regardless of device state
+  if (device_status_pub_) {
+    device_status_pub_->publish(status_msg);
+  }
   // RCLCPP_INFO_STREAM(logger_, "deviceStatusTimer() ");
 }
 
@@ -705,21 +875,68 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   if (enable_sync_host_time_ && !isOpenNIDevice(device_info_->pid())) {
     TRY_EXECUTE_BLOCK(device_->timerSyncWithHost());
     if (g_time_domain != "global") {
-      sync_host_time_timer_ = this->create_wall_timer(std::chrono::milliseconds(60000), [this]() {
-        if (device_) {
-          TRY_EXECUTE_BLOCK(device_->timerSyncWithHost());
+      sync_host_time_timer_ = this->create_wall_timer(time_sync_period_, [this]() {
+        // Multiple safety checks before attempting time sync
+        if (!device_) {
+          RCLCPP_DEBUG_STREAM(logger_, "sync_host_time_timer_: device is null, skip time sync");
+          return;
         }
+
+        // Check device connection status
+        if (!device_connected_.load()) {
+          RCLCPP_DEBUG_STREAM(logger_,
+                              "sync_host_time_timer_: device not connected, skip time sync");
+          return;
+        }
+
+        // Check if device is in connecting state
+        if (device_connecting_.load()) {
+          RCLCPP_DEBUG_STREAM(logger_, "sync_host_time_timer_: device connecting, skip time sync");
+          return;
+        }
+
+        // Check if reset is in progress
+        {
+          std::unique_lock<decltype(reset_device_mutex_)> reset_lock(reset_device_mutex_,
+                                                                     std::try_to_lock);
+          if (!reset_lock.owns_lock() || reset_device_flag_) {
+            RCLCPP_DEBUG_STREAM(logger_,
+                                "sync_host_time_timer_: device reset in progress, skip time sync");
+            return;
+          }
+        }
+
+        // Additional safety check with device lock
+        std::unique_lock<decltype(device_lock_)> device_lock(device_lock_, std::try_to_lock);
+        if (!device_lock.owns_lock()) {
+          RCLCPP_DEBUG_STREAM(logger_,
+                              "sync_host_time_timer_: cannot acquire device lock, skip time sync");
+          return;
+        }
+
+        // Verify device is still valid after acquiring lock
+        if (!device_) {
+          RCLCPP_DEBUG_STREAM(
+              logger_, "sync_host_time_timer_: device became null after lock, skip time sync");
+          return;
+        }
+
+        RCLCPP_INFO_STREAM(logger_, "Sync device time with host");
+        TRY_EXECUTE_BLOCK(device_->timerSyncWithHost());
       });
     }
   }
 
-  RCLCPP_INFO_STREAM(logger_, "Device " << device_info_->getName() << " connected");
-  RCLCPP_INFO_STREAM(logger_, "Serial number: " << device_info_->getSerialNumber());
-  RCLCPP_INFO_STREAM(logger_, "Firmware version: " << device_info_->getFirmwareVersion());
-  RCLCPP_INFO_STREAM(logger_, "Hardware version: " << device_info_->getHardwareVersion());
+  // Safely log device information - these calls can throw if device disconnects
+  TRY_EXECUTE_BLOCK({
+    RCLCPP_INFO_STREAM(logger_, "Device " << device_info_->getName() << " connected");
+    RCLCPP_INFO_STREAM(logger_, "Serial number: " << device_info_->getSerialNumber());
+    RCLCPP_INFO_STREAM(logger_, "Firmware version: " << device_info_->getFirmwareVersion());
+    RCLCPP_INFO_STREAM(logger_, "Hardware version: " << device_info_->getHardwareVersion());
+    RCLCPP_INFO_STREAM(logger_, "usb connect type: " << device_info_->getConnectionType());
+  });
   RCLCPP_INFO_STREAM(logger_, "device unique id: " << device_unique_id_);
   RCLCPP_INFO_STREAM(logger_, "Current node pid: " << getpid());
-  RCLCPP_INFO_STREAM(logger_, "usb connect type: " << device_info_->getConnectionType());
   auto time_cost = std::chrono::duration_cast<std::chrono::milliseconds>(
       std::chrono::high_resolution_clock::now() - start_time_);
   RCLCPP_INFO_STREAM(logger_, "Start device cost " << time_cost.count() << " ms");
@@ -727,12 +944,14 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   if (!upgrade_firmware_.empty()) {
     firmware_update_success_ = false;
 
-    ob_camera_node_->withDeviceLock([&]() {
-      device_->updateFirmware(
-          upgrade_firmware_.c_str(),
-          std::bind(&OBCameraNodeDriver::firmwareUpdateCallback, this, std::placeholders::_1,
-                    std::placeholders::_2, std::placeholders::_3),
-          false);
+    TRY_EXECUTE_BLOCK({
+      ob_camera_node_->withDeviceLock([&]() {
+        device_->updateFirmware(
+            upgrade_firmware_.c_str(),
+            std::bind(&OBCameraNodeDriver::firmwareUpdateCallback, this, std::placeholders::_1,
+                      std::placeholders::_2, std::placeholders::_3),
+            false);
+      });
     });
     if (firmware_update_success_) {
       return;
@@ -1041,7 +1260,7 @@ void OBCameraNodeDriver::firmwareUpdateCallback(OBFwUpdateState state, const cha
         sync_host_time_timer_->cancel();
         sync_host_time_timer_.reset();
       } catch (...) {
-        // Ignore exceptions during timer cleanup
+        RCLCPP_WARN_STREAM(logger_, "Exception during sync timer cleanup in firmware update");
       }
     }
 

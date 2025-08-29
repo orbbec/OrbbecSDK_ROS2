@@ -1885,9 +1885,6 @@ void OBCameraNode::getParameters() {
   int software_trigger_period = 33;
   setAndGetNodeParameter<int>(software_trigger_period, "software_trigger_period", 33);
   software_trigger_period_ = std::chrono::milliseconds(software_trigger_period);
-  double time_sync_period = 6.0;
-  setAndGetNodeParameter<double>(time_sync_period, "time_sync_period", 6.0);
-  time_sync_period_ = std::chrono::milliseconds((int)(time_sync_period * 1000));
   setAndGetNodeParameter<int>(gmsl_trigger_fps_, "gmsl_trigger_fps", 3000);
   setAndGetNodeParameter<bool>(enable_gmsl_trigger_, "enable_gmsl_trigger", false);
   setAndGetNodeParameter<std::string>(interleave_ae_mode_, "interleave_ae_mode", "hdr");
@@ -1974,7 +1971,6 @@ void OBCameraNode::setupTopics() {
     setupCameraCtrlServices();
     setupPublishers();
     setupDiagnosticUpdater();
-    setupPeriodicHostTimeSync();
   } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to setup topics: " << e.getMessage());
     throw std::runtime_error(e.getMessage());
@@ -2034,7 +2030,7 @@ void OBCameraNode::onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapp
     } catch (...) {
       // Ignore exceptions during cleanup
     }
-    RCLCPP_ERROR_STREAM(logger_, "Failed to TemperatureUpdate: " << e.getMessage());
+    RCLCPP_ERROR_STREAM(logger_, "Failed to TemperatureUpdate1: " << e.getMessage());
     status.summary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, e.getMessage());
   } catch (const std::exception &e) {
     try {
@@ -2045,7 +2041,7 @@ void OBCameraNode::onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapp
     } catch (...) {
       // Ignore exceptions during cleanup
     }
-    RCLCPP_ERROR_STREAM(logger_, "Failed to TemperatureUpdate: " << e.what());
+    RCLCPP_ERROR_STREAM(logger_, "Failed to TemperatureUpdate2: " << e.what());
     status.summary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, e.what());
   } catch (...) {
     try {
@@ -2056,7 +2052,7 @@ void OBCameraNode::onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapp
     } catch (...) {
       // Ignore exceptions during cleanup
     }
-    RCLCPP_ERROR(logger_, "Failed to TemperatureUpdate: Device is deactivated/disconnected!");
+    RCLCPP_ERROR(logger_, "Failed to TemperatureUpdate3: Device is deactivated/disconnected!");
     status.summary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, "Unknown error");
   }
 }
@@ -2072,43 +2068,27 @@ void OBCameraNode::setupDiagnosticUpdater() {
     diagnostic_updater_ = std::make_unique<diagnostic_updater::Updater>(node_, 10000.0);
     diagnostic_updater_->setHardwareID(serial_number);
     diagnostic_updater_->add("Temperatures", this, &OBCameraNode::onTemperatureUpdate);
-    diagnostic_timer_ = node_->create_wall_timer(std::chrono::seconds(int(diagnostic_period_)),
-                                                 [this]() { diagnostic_updater_->force_update(); });
+    diagnostic_timer_ =
+        node_->create_wall_timer(std::chrono::seconds(int(diagnostic_period_)), [this]() {
+          try {
+            if (is_running_.load() && diagnostic_updater_) {
+              diagnostic_updater_->force_update();
+            }
+          } catch (const ob::Error &e) {
+            RCLCPP_WARN_STREAM(logger_, "Diagnostic update failed: "
+                                            << e.getMessage() << " - Device may be disconnected");
+          } catch (const std::exception &e) {
+            RCLCPP_WARN_STREAM(logger_, "Diagnostic update failed: " << e.what());
+          } catch (...) {
+            RCLCPP_WARN(logger_, "Diagnostic update failed: Unknown error");
+          }
+        });
   } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to setup diagnostic updater: " << e.getMessage());
   } catch (const std::exception &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to setup diagnostic updater: " << e.what());
   } catch (...) {
     RCLCPP_ERROR(logger_, "Failed to TemperatureUpdate");
-  }
-}
-
-void OBCameraNode::setupPeriodicHostTimeSync() {
-  if (time_sync_period_.count() <= 0) {
-    RCLCPP_INFO(logger_, "Periodic host time sync disabled (time_sync_period <= 0)");
-    return;
-  }
-  try {
-    RCLCPP_INFO_STREAM(
-        logger_, "Enable periodic host time sync every " << time_sync_period_.count() << " ms");
-    sync_timer_ = node_->create_wall_timer(std::chrono::milliseconds(time_sync_period_), [this]() {
-      try {
-        device_->timerSyncWithHost();
-        RCLCPP_DEBUG(logger_, "Camera time synchronized with host");
-      } catch (const ob::Error &e) {
-        RCLCPP_WARN_STREAM(logger_, "Time sync failed: " << e.getMessage());
-      } catch (const std::exception &e) {
-        RCLCPP_WARN_STREAM(logger_, "Time sync failed: " << e.what());
-      } catch (...) {
-        RCLCPP_WARN(logger_, "Time sync failed due to unknown error");
-      }
-    });
-  } catch (const ob::Error &e) {
-    RCLCPP_ERROR_STREAM(logger_, "Failed to setup periodic host time sync: " << e.getMessage());
-  } catch (const std::exception &e) {
-    RCLCPP_ERROR_STREAM(logger_, "Failed to setup periodic host time sync: " << e.what());
-  } catch (...) {
-    RCLCPP_ERROR(logger_, "Failed to setup periodic host time sync due to unknown error");
   }
 }
 
@@ -2315,9 +2295,6 @@ void OBCameraNode::setupPublishers() {
   std_msgs::msg::String msg;
   msg.data = filter_status_.dump(2);
   filter_status_pub_->publish(msg);
-
-  device_status_pub_ = node_->create_publisher<orbbec_camera_msgs::msg::DeviceStatus>(
-      "device_status", extrinsics_qos);
 }
 
 void OBCameraNode::publishPointCloud(const std::shared_ptr<ob::FrameSet> &frame_set) {

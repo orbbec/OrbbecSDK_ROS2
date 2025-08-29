@@ -31,8 +31,8 @@ rosidl_generate_interfaces(
     "srv/SetInt32.srv"
     "srv/SetString.srv"
     "srv/SetArrays.srv"
-    "srv/GetCameraParams.srv"
-    "srv/SetCameraParams.srv"
+    "srv/GetUserCalibParams.srv"
+    "srv/SetUserCalibParams.srv"
     DEPENDENCIES
     sensor_msgs
     std_msgs

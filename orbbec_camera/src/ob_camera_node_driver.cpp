@@ -461,10 +461,15 @@ void OBCameraNodeDriver::deviceStatusTimer() {
   status_msg.connection_type = device_info_->getConnectionType();
 
   auto camera_params = device_->getCalibrationCameraParamList();
-  bool calibration_from_device = (camera_params != nullptr && camera_params->count() > 0);
-  status_msg.calibration_from_device = calibration_from_device;
+  bool calibration_from_factory = (camera_params != nullptr && camera_params->count() > 0);
+  status_msg.calibration_from_factory = calibration_from_factory;
   status_msg.calibration_from_launch_param = ob_camera_node_->isParamCalibrated();
-  // status_msg.customer_calibration_ready = ob_camera_node_->isWriteCustomerDataSuccess();
+
+  if (!ob_camera_node_->checkUserCalibrationReady()) {
+    status_msg.customer_calibration_ready = false;
+  } else {
+    status_msg.customer_calibration_ready = true;
+  }
 
   ob_camera_node_->publishDeviceStatus(status_msg);
   // RCLCPP_INFO_STREAM(logger_, "deviceStatusTimer() ");

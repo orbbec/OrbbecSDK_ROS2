@@ -58,8 +58,8 @@
 #include "orbbec_camera_msgs/srv/set_string.hpp"
 #include "orbbec_camera_msgs/srv/set_filter.hpp"
 #include "orbbec_camera_msgs/srv/set_arrays.hpp"
-#include "orbbec_camera_msgs/srv/get_camera_params.hpp"
-#include "orbbec_camera_msgs/srv/set_camera_params.hpp"
+#include "orbbec_camera_msgs/srv/get_user_calib_params.hpp"
+#include "orbbec_camera_msgs/srv/set_user_calib_params.hpp"
 #include "orbbec_camera/constants.h"
 #include "orbbec_camera/dynamic_params.h"
 #include "orbbec_camera/d2c_viewer.h"
@@ -115,8 +115,8 @@ using SetBool = std_srvs::srv::SetBool;
 using GetBool = orbbec_camera_msgs::srv::GetBool;
 using SetFilter = orbbec_camera_msgs::srv::SetFilter;
 using SetArrays = orbbec_camera_msgs::srv::SetArrays;
-using SetCameraParams = orbbec_camera_msgs::srv::SetCameraParams;
-using GetCameraParams = orbbec_camera_msgs::srv::GetCameraParams;
+using SetUserCalibParams = orbbec_camera_msgs::srv::SetUserCalibParams;
+using GetUserCalibParams = orbbec_camera_msgs::srv::GetUserCalibParams;
 
 typedef std::pair<ob_stream_type, int> stream_index_pair;
 
@@ -200,6 +200,20 @@ class OBCameraNode {
     if (device_status_pub_) {
       device_status_pub_->publish(msg);
     }
+  }
+
+  bool checkUserCalibrationReady() {
+    static bool first_check = true;
+    if (first_check) {
+      first_check = false;
+      std::string data_read;
+      if (readCustomerData(data_read)) {
+        user_calibration_ready_ = true;
+      } else {
+        user_calibration_ready_ = false;
+      }
+    }
+    return user_calibration_ready_;
   }
 
  private:
@@ -385,11 +399,11 @@ class OBCameraNode {
   void readCustomerDataCallback(const std::shared_ptr<GetString::Request>& request,
                                 std::shared_ptr<GetString::Response>& response);
 
-  void getCameraParamsCallback(const std::shared_ptr<GetCameraParams::Request>& request,
-                               std::shared_ptr<GetCameraParams::Response>& response);
+  void getUserCalibParamsCallback(const std::shared_ptr<GetUserCalibParams::Request>& request,
+                                  std::shared_ptr<GetUserCalibParams::Response>& response);
 
-  void setCameraParamsCallback(const std::shared_ptr<SetCameraParams::Request>& request,
-                               std::shared_ptr<SetCameraParams::Response>& response);
+  void setUserCalibParamsCallback(const std::shared_ptr<SetUserCalibParams::Request>& request,
+                                  std::shared_ptr<SetUserCalibParams::Response>& response);
 
   void setIRLongExposureCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
                                  std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
@@ -469,6 +483,7 @@ class OBCameraNode {
 
  private:
   std::atomic_bool write_customer_data_success_{false};
+  std::atomic_bool user_calibration_ready_{false};
   rclcpp::Node* node_ = nullptr;
   std::shared_ptr<ob::Device> device_ = nullptr;
   std::shared_ptr<Parameters> parameters_ = nullptr;
@@ -562,8 +577,8 @@ class OBCameraNode {
   rclcpp::Service<SetFilter>::SharedPtr set_filter_srv_;
   rclcpp::Service<orbbec_camera_msgs::srv::GetBool>::SharedPtr get_streams_enable_srv_;
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr set_streams_enable_srv_;
-  rclcpp::Service<GetCameraParams>::SharedPtr get_camera_params_srv_;
-  rclcpp::Service<SetCameraParams>::SharedPtr set_camera_params_srv_;
+  rclcpp::Service<GetUserCalibParams>::SharedPtr get_user_calib_params_srv_;
+  rclcpp::Service<SetUserCalibParams>::SharedPtr set_user_calib_params_srv_;
 
   bool enable_sync_output_accel_gyro_ = false;
   bool publish_tf_ = false;

@@ -28,5 +28,5 @@ string connection_type   # e.g. "USB2.0", "USB3.0", "GigE"
 
 # --- Calibration status ---
 bool customer_calibration_ready
-bool calibration_from_device
+bool calibration_from_factory
 bool calibration_from_launch_param

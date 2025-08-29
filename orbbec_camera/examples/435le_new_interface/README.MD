@@ -23,6 +23,7 @@ Once successfully started, the following menu will appear. Enter the correspondi
 4. Disable camera streams
 5. Get device info
 6. Show device status
+7. Set Color AE ROI
 0. Exit
 ```
 
@@ -116,6 +117,15 @@ ros2 topic echo /camera/device_status
 ```
 
 ---
+
+### 2.5 Set Color AE ROI
+In data_param, the first value is the Left setting, the second value is the Right setting, the third value is the Top setting, and the fourth value is the Bottom setting.
+
+```bash
+ros2 service call /camera/set_color_ae_roi orbbec_camera_msgs/srv/SetArrays '{data_param: [0,1279,0,719]}'
+```
+---
+
 
 ## 3. Additional Features
 

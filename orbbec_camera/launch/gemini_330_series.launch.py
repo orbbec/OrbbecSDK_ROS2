@@ -175,8 +175,8 @@ def generate_launch_description():
         DeclareLaunchArgument('angular_vel_cov', default_value='0.01'),
         DeclareLaunchArgument('publish_tf', default_value='true'),
         DeclareLaunchArgument('tf_publish_rate', default_value='0.0'),
-        DeclareLaunchArgument('ir_info_url', default_value='file:///home/yalian/work/test.yaml'),
-        DeclareLaunchArgument('color_info_url', default_value='file:///home/yalian/work/test.yaml'),
+        DeclareLaunchArgument('ir_info_url', default_value=''),
+        DeclareLaunchArgument('color_info_url', default_value=''),
         # Network device settings: default enumerate_net_device is set to true, which will automatically enumerate network devices
         # If you do not want to automatically enumerate network devices,
         # you can set enumerate_net_device to false, net_device_ip to the device's IP address, and net_device_port to the default value of 8090

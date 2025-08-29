@@ -1,6 +1,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include "orbbec_camera_msgs/srv/get_user_calib_params.hpp"
 #include "orbbec_camera_msgs/srv/set_user_calib_params.hpp"
+#include "orbbec_camera_msgs/srv/set_arrays.hpp"
 #include "orbbec_camera_msgs/msg/device_status.hpp"
 #include <orbbec_camera_msgs/srv/get_device_info.hpp>
 #include <std_srvs/srv/set_bool.hpp>
@@ -16,11 +17,13 @@ class CameraExampleNode : public rclcpp::Node {
     get_params_client_ = this->create_client<orbbec_camera_msgs::srv::GetUserCalibParams>(
         "/camera/get_user_calib_params");
     set_streams_client_ = this->create_client<std_srvs::srv::SetBool>("/camera/set_streams_enable");
+    set_color_ae_roi_client_ = this->create_client<orbbec_camera_msgs::srv::SetArrays>(
+        "/camera/set_color_ae_roi");
     get_device_info_client_ =
         this->create_client<orbbec_camera_msgs::srv::GetDeviceInfo>("/camera/get_device_info");
   }
 
-  // Feature 1a: Write camera parameters
+  // Feature 1: Write camera parameters
   void exampleWriteParams() {
     if (!set_params_client_->wait_for_service(2s)) {
       RCLCPP_ERROR(this->get_logger(), "SetUserCalibParams service not available");
@@ -59,7 +62,7 @@ class CameraExampleNode : public rclcpp::Node {
     RCLCPP_INFO(this->get_logger(), "Set result: %s", result.get()->message.c_str());
   }
 
-  // Feature 1b: Read camera parameters
+  // Feature 2: Read camera parameters
   void exampleReadParams() {
     if (!get_params_client_->wait_for_service(2s)) {
       RCLCPP_ERROR(this->get_logger(), "GetUserCalibParams service not available");
@@ -94,13 +97,13 @@ class CameraExampleNode : public rclcpp::Node {
     std::cout << std::endl;
   }
 
-  // Feature 2a: Enable camera streams
+  // Feature 3: Enable camera streams
   void exampleEnableStreams() { exampleSetStreamsEnable(true); }
 
-  // Feature 2b: Disable camera streams
+  // Feature 4: Disable camera streams
   void exampleDisableStreams() { exampleSetStreamsEnable(false); }
 
-  // Feature 3: Get device info
+  // Feature 5: Get device info
   void exampleGetDeviceInfo() {
     if (!get_device_info_client_->wait_for_service(2s)) {
       RCLCPP_ERROR(this->get_logger(), "GetDeviceInfo service not available");
@@ -130,7 +133,7 @@ class CameraExampleNode : public rclcpp::Node {
     std::cout << "Hardware Version: " << res->info.hardware_version << std::endl;
   }
 
-  // Feature 4: Show device status
+  // Feature 6: Show device status
   void exampleShowdeviceStatus() {
     device_status_sub_ = this->create_subscription<orbbec_camera_msgs::msg::DeviceStatus>(
         "/camera/device_status", 10,
@@ -138,6 +141,31 @@ class CameraExampleNode : public rclcpp::Node {
 
     while (rclcpp::ok()) {
       rclcpp::spin_some(shared_from_this());
+    }
+  }
+
+  // Feature 7: Set Color AE ROI
+  void exampleSetColorAERoi(float left, float right, float top, float bottom) {
+    if (!set_color_ae_roi_client_->wait_for_service(2s)) {
+      RCLCPP_ERROR(this->get_logger(), "SetColorAERoi service not available");
+      return;
+    }
+
+    auto req = std::make_shared<orbbec_camera_msgs::srv::SetArrays::Request>();
+    req->data_param = {left, right, top, bottom};
+
+    auto result = set_color_ae_roi_client_->async_send_request(req);
+    if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), result) !=
+        rclcpp::FutureReturnCode::SUCCESS) {
+      RCLCPP_ERROR(this->get_logger(), "Failed to call SetColorAERoi");
+      return;
+    }
+
+    auto res = result.get();
+    if (res->success) {
+      RCLCPP_INFO(this->get_logger(), "SetColorAERoi success: %s", res->message.c_str());
+    } else {
+      RCLCPP_ERROR(this->get_logger(), "SetColorAERoi failed: %s", res->message.c_str());
     }
   }
 
@@ -189,7 +217,7 @@ class CameraExampleNode : public rclcpp::Node {
   rclcpp::Client<orbbec_camera_msgs::srv::GetUserCalibParams>::SharedPtr get_params_client_;
   rclcpp::Client<std_srvs::srv::SetBool>::SharedPtr set_streams_client_;
   rclcpp::Client<orbbec_camera_msgs::srv::GetDeviceInfo>::SharedPtr get_device_info_client_;
-
+  rclcpp::Client<orbbec_camera_msgs::srv::SetArrays>::SharedPtr set_color_ae_roi_client_;
   rclcpp::Subscription<orbbec_camera_msgs::msg::DeviceStatus>::SharedPtr device_status_sub_;
 };
 
@@ -205,6 +233,7 @@ int main(int argc, char **argv) {
     std::cout << "4. Disable camera streams\n";
     std::cout << "5. Get device info\n";
     std::cout << "6. Show device status\n";
+    std::cout << "7. Set Color AE ROI\n";
     std::cout << "0. Exit\n";
     std::cout << "Choose option: ";
 
@@ -229,6 +258,12 @@ int main(int argc, char **argv) {
         break;
       case 6:
         node->exampleShowdeviceStatus();
+        break;
+      case 7:
+        float l, r, t, b;
+        std::cout << "Enter ROI (left right top bottom): ";
+        std::cin >> l >> r >> t >> b;
+        node->exampleSetColorAERoi(l, r, t, b);
         break;
       case 0:
         rclcpp::shutdown();

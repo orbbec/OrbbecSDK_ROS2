@@ -1,0 +1,7 @@
+---
+float64[9] k            #Intrinsic camera matrix for the raw (distorted) images
+float64[8] d            #The distortion parameters
+float64[9] rotation     #Extrinsic rotation matrix
+float64[3] translation  #Extrinsic translation vector
+bool success
+string message

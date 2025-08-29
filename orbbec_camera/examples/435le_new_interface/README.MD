@@ -35,7 +35,7 @@ Once successfully started, the following menu will appear. Enter the correspondi
 Used to manage camera calibration parameters, including:
 
 * **k**: Camera intrinsic matrix (3×3)
-* **d**: Distortion coefficients (radial/tangential)
+* **d**: Distortion coefficients (1x8)
 * **rotation**: Extrinsic rotation matrix (3×3)
 * **translation**: Extrinsic translation vector (3×1)
 
@@ -51,7 +51,8 @@ ros2 service call /camera/set_user_calib_params orbbec_camera_msgs/srv/SetUserCa
        0.032955970615148544,
        9.096559369936585e-05,
       -0.0003368517500348389,
-      -0.01115430984646082],
+      -0.01115430984646082,
+      0.0, 0.0, 0.0],
   rotation: [0.9999880790710449,  0.0003024190664291382, -0.004874417092651129,
             -0.0002965621242765337, 0.9999992251396179,   0.001202247804030776,
              0.004874777048826218, -0.0012007878394797444, 0.9999874234199524],
@@ -121,16 +122,19 @@ ros2 topic echo /camera/device_status
 ### 3.1 Optimized Color Stream Latency
 
 In the previous version, enabling the color point cloud caused noticeable latency in color image publishing.
-This version optimizes data synchronization and publishing, allowing color images and point clouds to correspond more in real time and eliminating visual delays.
+In this version, data synchronization and publishing have been optimized so that enabling the color point cloud no longer affects the depth stream publishing latency.
 
 ---
 
+
 ### 3.2 Added `time_sync_period`
 
-A new parameter **time\_sync\_period** is added to set the time synchronization interval between the camera module and the host.
+A new parameter **time_sync_period** is introduced to configure the time synchronization interval between the camera module and the host.
 
 * Unit: **seconds**
 * Function: The camera aligns its internal timestamp with the host at the specified interval, ensuring consistent timestamps.
+
+>  **Note** : This parameter only needs to be set when **`enable_sync_host_time = true`** and  **`time_domain = device`** .
 
 ---
 

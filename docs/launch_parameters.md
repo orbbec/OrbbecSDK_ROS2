@@ -57,9 +57,9 @@ The following are the launch parameters available:
   * The delay time in milliseconds for reopening the device. Some devices, such as Astra mini, require a longer time to initialize and reopening the device immediately can cause firmware crashes when hot plugging
 
 * **[color|depth|left_ir|right_ir|ir]_width,[color|depth|left_ir|right_ir|ir]_height,[color|depth|left_ir|right_ir|ir]_fps,[color|depth|left_ir|right_ir|ir]_format**
-  
+
   * The resolution and frame rate of the sensor stream
-  
+
 * **enable_color_auto_exposure_priority**
   * Enable the Color auto exposure priority
 
@@ -70,9 +70,9 @@ The following are the launch parameters available:
   * Set the Color exposure
 
 * **color_gain**
-  
+
   * Set the Color gain
-  
+
 * **enable_color_auto_white_balance**
   * Enable the Color auto white balance
 
@@ -296,14 +296,17 @@ The following are the launch parameters available:
   * `DEPTH`:Align color to depth
 
 * **diagnostic_period**
-  
+
   * Diagnostic period in seconds
-  
+
 * **time_sync_period**
-  
+
   * Interval for synchronizing the camera time with the host system.
   * Unit: seconds.
-  
+
+
+>  **Note** : This parameter only needs to be set when **`enable_sync_host_time = true`** and  **`time_domain = device`** .
+
 * **enable_laser**
   * Enable the laser. The default value is `true`
 

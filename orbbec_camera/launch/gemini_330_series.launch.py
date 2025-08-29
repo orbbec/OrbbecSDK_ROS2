@@ -175,8 +175,8 @@ def generate_launch_description():
         DeclareLaunchArgument('angular_vel_cov', default_value='0.01'),
         DeclareLaunchArgument('publish_tf', default_value='true'),
         DeclareLaunchArgument('tf_publish_rate', default_value='0.0'),
-        DeclareLaunchArgument('ir_info_url', default_value=''),
-        DeclareLaunchArgument('color_info_url', default_value=''),
+        DeclareLaunchArgument('ir_info_url', default_value='file:///home/yalian/work/test.yaml'),
+        DeclareLaunchArgument('color_info_url', default_value='file:///home/yalian/work/test.yaml'),
         # Network device settings: default enumerate_net_device is set to true, which will automatically enumerate network devices
         # If you do not want to automatically enumerate network devices,
         # you can set enumerate_net_device to false, net_device_ip to the device's IP address, and net_device_port to the default value of 8090
@@ -240,13 +240,13 @@ def generate_launch_description():
         DeclareLaunchArgument('align_mode', default_value='SW'),
         DeclareLaunchArgument('align_target_stream', default_value='COLOR'),# COLOR or DEPTH
         DeclareLaunchArgument('diagnostic_period', default_value='1.0'), # seconds
-        DeclareLaunchArgument('time_sync_period', default_value='6.0'), # seconds
         DeclareLaunchArgument('enable_laser', default_value='true'),
         DeclareLaunchArgument('depth_precision', default_value=''),
         DeclareLaunchArgument('device_preset', default_value='Default'),
         DeclareLaunchArgument('retry_on_usb3_detection_failure', default_value='false'),
         DeclareLaunchArgument('laser_energy_level', default_value='-1'),
         DeclareLaunchArgument('enable_sync_host_time', default_value='true'),
+        DeclareLaunchArgument('time_sync_period', default_value='6.0'), # seconds
         DeclareLaunchArgument('time_domain', default_value='global'),# global, device, system
         DeclareLaunchArgument('enable_color_undistortion', default_value='false'),
         DeclareLaunchArgument('config_file_path', default_value=''),

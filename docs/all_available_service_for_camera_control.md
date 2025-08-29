@@ -388,7 +388,8 @@ ros2 service call /camera/set_user_calib_params orbbec_camera_msgs/srv/SetUserCa
        0.032955970615148544,
        9.096559369936585e-05,
       -0.0003368517500348389,
-      -0.01115430984646082],
+      -0.01115430984646082,
+       0.0, 0.0, 0.0],
   rotation: [0.9999880790710449,  0.0003024190664291382, -0.004874417092651129,
             -0.0002965621242765337, 0.9999992251396179,   0.001202247804030776,
              0.004874777048826218, -0.0012007878394797444, 0.9999874234199524],
@@ -404,5 +405,5 @@ ros2 service call /camera/get_user_calib_params orbbec_camera_msgs/srv/GetUserCa
 ```
 
 > **Note**:
->  The following four services (`/camera/write_customer_data`, `/camera/read_customer_data`, `/camera/set_user_calib_params`, `/camera/get_user_calib_params`) are currently supported only on the 435Le module.
->  Each service can store only one set of data or string at a time.
+> The following four services (`/camera/write_customer_data`, `/camera/read_customer_data`, `/camera/set_user_calib_params`, `/camera/get_user_calib_params`) are currently supported only on the 435Le module.
+> Each service can store only one set of data or string at a time.

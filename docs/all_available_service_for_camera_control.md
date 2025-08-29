@@ -352,3 +352,57 @@ ros2 service call /camera/set_sync_hosttime std_srvs/srv/SetBool '{data: true}'
 ```
 ros2 service call /camera/send_software_trigger std_srvs/srv/SetBool '{data: true}'
 ```
+
+- `/camera/set_streams_enable`
+
+```bash
+ros2 service call /camera/set_streams_enable std_srvs/srv/SetBool '{data: false}'
+```
+
+- `/camera/get_streams_enable`
+
+```bash
+ros2 service call /camera/get_streams_enable std_srvs/srv/GetBool '{}'
+```
+
+- `/camera/write_customer_data`
+
+```bash
+ros2 service call /camera/write_customer_data orbbec_camera_msgs/srv/SetString '{data: "string"}'
+```
+
+- `/camera/read_customer_data`
+
+```bash
+ros2 service call /camera/read_customer_data orbbec_camera_msgs/srv/GetString '{}'
+```
+
+- `/camera/set_user_calib_params`
+
+```bash
+ros2 service call /camera/set_user_calib_params orbbec_camera_msgs/srv/SetUserCalibParams \
+'{k: [614.9613647460938, 0.0, 634.91552734375,
+      0.0, 614.65771484375, 391.407470703125,
+      0.0, 0.0, 1.0],
+  d: [-0.03131488710641861,
+       0.032955970615148544,
+       9.096559369936585e-05,
+      -0.0003368517500348389,
+      -0.01115430984646082],
+  rotation: [0.9999880790710449,  0.0003024190664291382, -0.004874417092651129,
+            -0.0002965621242765337, 0.9999992251396179,   0.001202247804030776,
+             0.004874777048826218, -0.0012007878394797444, 0.9999874234199524],
+  translation: [-0.023897956848144532,
+                -9.439220279455185e-05,
+                -6.804073229432106e-06]}'
+```
+
+- `/camera/get_user_calib_params`
+
+```bash
+ros2 service call /camera/get_user_calib_params orbbec_camera_msgs/srv/GetUserCalibParams '{}'
+```
+
+> **Note**:
+>  The following four services (`/camera/write_customer_data`, `/camera/read_customer_data`, `/camera/set_user_calib_params`, `/camera/get_user_calib_params`) are currently supported only on the 435Le module.
+>  Each service can store only one set of data or string at a time.

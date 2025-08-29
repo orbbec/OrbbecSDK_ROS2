@@ -232,8 +232,9 @@ void OBCameraNodeDriver::init() {
   query_thread_ = std::make_shared<std::thread>([this]() { queryDevice(); });
   reset_device_thread_ = std::make_shared<std::thread>([this]() { resetDevice(); });
 
-  device_status_timer_ = this->create_wall_timer(
-      std::chrono::milliseconds(1000 / device_status_interval_hz), [this]() { deviceStatusTimer(); });
+  device_status_timer_ =
+      this->create_wall_timer(std::chrono::milliseconds(1000 / device_status_interval_hz),
+                              [this]() { deviceStatusTimer(); });
 }
 
 void OBCameraNodeDriver::onDeviceConnected(const std::shared_ptr<ob::DeviceList> &device_list) {
@@ -346,8 +347,9 @@ void OBCameraNodeDriver::queryDevice() {
 
     // Check if connection is already in progress
     if (device_connecting_.load()) {
-      RCLCPP_INFO_STREAM(logger_, "queryDevice: device connection already in progress, waiting...");
-      std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+      RCLCPP_DEBUG_STREAM(logger_,
+                          "queryDevice: device connection already in progress, waiting...");
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
       continue;
     }
 
@@ -462,9 +464,10 @@ void OBCameraNodeDriver::deviceStatusTimer() {
   bool calibration_from_device = (camera_params != nullptr && camera_params->count() > 0);
   status_msg.calibration_from_device = calibration_from_device;
   status_msg.calibration_from_launch_param = ob_camera_node_->isParamCalibrated();
-  // status_msg.calibration_from_user_file = ob_camera_node_->isWriteCustomerDataSuccess();
+  // status_msg.customer_calibration_ready = ob_camera_node_->isWriteCustomerDataSuccess();
 
   ob_camera_node_->publishDeviceStatus(status_msg);
+  // RCLCPP_INFO_STREAM(logger_, "deviceStatusTimer() ");
 }
 
 void OBCameraNodeDriver::rebootDeviceCallback(

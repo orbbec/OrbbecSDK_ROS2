@@ -92,8 +92,8 @@ OBCameraNode::OBCameraNode(rclcpp::Node *node, std::shared_ptr<ob::Device> devic
   fps_counter_left_ir_->setLogLevel(log_level);
   fps_counter_right_ir_->setLogLevel(log_level);
 
-  fps_delay_status_color_ = std::make_unique<FpsDelayStatus>();
-  fps_delay_status_depth_ = std::make_unique<FpsDelayStatus>();
+  fps_delay_status_color_ = std::make_unique<FpsDelayStatus>(logger_);
+  fps_delay_status_depth_ = std::make_unique<FpsDelayStatus>(logger_);
 }
 
 template <class T>
@@ -1887,7 +1887,7 @@ void OBCameraNode::getParameters() {
   software_trigger_period_ = std::chrono::milliseconds(software_trigger_period);
   double time_sync_period = 6.0;
   setAndGetNodeParameter<double>(time_sync_period, "time_sync_period", 6.0);
-  time_sync_period_ = std::chrono::milliseconds((int)(time_sync_period*1000));
+  time_sync_period_ = std::chrono::milliseconds((int)(time_sync_period * 1000));
   setAndGetNodeParameter<int>(gmsl_trigger_fps_, "gmsl_trigger_fps", 3000);
   setAndGetNodeParameter<bool>(enable_gmsl_trigger_, "enable_gmsl_trigger", false);
   setAndGetNodeParameter<std::string>(interleave_ae_mode_, "interleave_ae_mode", "hdr");
@@ -2084,34 +2084,32 @@ void OBCameraNode::setupDiagnosticUpdater() {
 }
 
 void OBCameraNode::setupPeriodicHostTimeSync() {
-    if (time_sync_period_.count() <= 0) {
-        RCLCPP_INFO(logger_, "Periodic host time sync disabled (time_sync_period <= 0)");
-        return;
-    }
-    try {
-        RCLCPP_INFO_STREAM(logger_, "Enable periodic host time sync every " << time_sync_period_.count() << " ms");
-        sync_timer_ = node_->create_wall_timer(
-            std::chrono::milliseconds(time_sync_period_),
-            [this]() {
-                try {
-                    device_->timerSyncWithHost();
-                    RCLCPP_DEBUG(logger_, "Camera time synchronized with host");
-                } catch (const ob::Error &e) {
-                    RCLCPP_WARN_STREAM(logger_, "Time sync failed: " << e.getMessage());
-                } catch (const std::exception &e) {
-                    RCLCPP_WARN_STREAM(logger_, "Time sync failed: " << e.what());
-                } catch (...) {
-                    RCLCPP_WARN(logger_, "Time sync failed due to unknown error");
-                }
-            }
-        );
-    } catch (const ob::Error &e) {
-        RCLCPP_ERROR_STREAM(logger_, "Failed to setup periodic host time sync: " << e.getMessage());
-    } catch (const std::exception &e) {
-        RCLCPP_ERROR_STREAM(logger_, "Failed to setup periodic host time sync: " << e.what());
-    } catch (...) {
-        RCLCPP_ERROR(logger_, "Failed to setup periodic host time sync due to unknown error");
-    }
+  if (time_sync_period_.count() <= 0) {
+    RCLCPP_INFO(logger_, "Periodic host time sync disabled (time_sync_period <= 0)");
+    return;
+  }
+  try {
+    RCLCPP_INFO_STREAM(
+        logger_, "Enable periodic host time sync every " << time_sync_period_.count() << " ms");
+    sync_timer_ = node_->create_wall_timer(std::chrono::milliseconds(time_sync_period_), [this]() {
+      try {
+        device_->timerSyncWithHost();
+        RCLCPP_DEBUG(logger_, "Camera time synchronized with host");
+      } catch (const ob::Error &e) {
+        RCLCPP_WARN_STREAM(logger_, "Time sync failed: " << e.getMessage());
+      } catch (const std::exception &e) {
+        RCLCPP_WARN_STREAM(logger_, "Time sync failed: " << e.what());
+      } catch (...) {
+        RCLCPP_WARN(logger_, "Time sync failed due to unknown error");
+      }
+    });
+  } catch (const ob::Error &e) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to setup periodic host time sync: " << e.getMessage());
+  } catch (const std::exception &e) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to setup periodic host time sync: " << e.what());
+  } catch (...) {
+    RCLCPP_ERROR(logger_, "Failed to setup periodic host time sync due to unknown error");
+  }
 }
 
 void OBCameraNode::setupPipelineConfig() {
@@ -2318,8 +2316,8 @@ void OBCameraNode::setupPublishers() {
   msg.data = filter_status_.dump(2);
   filter_status_pub_->publish(msg);
 
-  device_status_pub_ =
-      node_->create_publisher<orbbec_camera_msgs::msg::DeviceStatus>("device_status", extrinsics_qos);
+  device_status_pub_ = node_->create_publisher<orbbec_camera_msgs::msg::DeviceStatus>(
+      "device_status", extrinsics_qos);
 }
 
 void OBCameraNode::publishPointCloud(const std::shared_ptr<ob::FrameSet> &frame_set) {
@@ -3134,10 +3132,9 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   CHECK(image_publishers_.count(stream_index) > 0);
   saveImageToFile(stream_index, image, *image_msg);
   if (stream_index == COLOR) {
-      fps_delay_status_color_->tick();
-  }
-  else if (stream_index == DEPTH) {
-      fps_delay_status_depth_->tick();
+    fps_delay_status_color_->tick(frame_timestamp);
+  } else if (stream_index == DEPTH) {
+    fps_delay_status_depth_->tick(frame_timestamp);
   }
   image_publishers_[stream_index]->publish(std::move(image_msg));
   if (stream_index == COLOR && enable_color_undistortion_ &&
@@ -4004,6 +4001,6 @@ void OBCameraNode::setFilterCallback(const std::shared_ptr<SetFilter ::Request> 
   }
 }
 bool OBCameraNode::isWriteCustomerDataSuccess() const {
-    return write_customer_data_success_.load();
+  return write_customer_data_success_.load();
 }
 }  // namespace orbbec_camera

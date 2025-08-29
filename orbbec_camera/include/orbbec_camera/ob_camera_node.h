@@ -165,7 +165,7 @@ class OBCameraNode {
 
   // Safely expose the lock
   template <typename Func>
-  auto withDeviceLock(Func &&func) -> decltype(func()) {
+  auto withDeviceLock(Func&& func) -> decltype(func()) {
     std::lock_guard<std::recursive_mutex> lock(device_lock_);
     return func();
   }
@@ -183,19 +183,20 @@ class OBCameraNode {
   void startGmslTrigger();
   void stopGmslTrigger();
 
-  bool isParamCalibrated() const{
-    return (color_info_manager_ && color_info_manager_->isCalibrated() &&
-            ir_info_manager_ && ir_info_manager_->isCalibrated());
+  bool isParamCalibrated() const {
+    return (color_info_manager_ && color_info_manager_->isCalibrated() && ir_info_manager_ &&
+            ir_info_manager_->isCalibrated());
   }
-  void getColorStatus(orbbec_camera_msgs::msg::DeviceStatus &status_msg){
+  void getColorStatus(orbbec_camera_msgs::msg::DeviceStatus& status_msg) {
     fps_delay_status_color_->fillColorStatus(status_msg);
   }
 
-  void getDepthStatus(orbbec_camera_msgs::msg::DeviceStatus &status_msg){
+  void getDepthStatus(orbbec_camera_msgs::msg::DeviceStatus& status_msg) {
     fps_delay_status_depth_->fillDepthStatus(status_msg);
+    status_msg.header.frame_id = camera_link_frame_id_;
   }
 
-  void publishDeviceStatus(const orbbec_camera_msgs::msg::DeviceStatus &msg) {
+  void publishDeviceStatus(const orbbec_camera_msgs::msg::DeviceStatus& msg) {
     if (device_status_pub_) {
       device_status_pub_->publish(msg);
     }
@@ -264,8 +265,9 @@ class OBCameraNode {
   void setStreamsEnableCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request> request,
                                 std::shared_ptr<std_srvs::srv::SetBool::Response> response);
 
-  void getStreamsEnableCallback(const std::shared_ptr<orbbec_camera_msgs::srv::GetBool::Request> request,
-                                std::shared_ptr<orbbec_camera_msgs::srv::GetBool::Response> response);
+  void getStreamsEnableCallback(
+      const std::shared_ptr<orbbec_camera_msgs::srv::GetBool::Request> request,
+      std::shared_ptr<orbbec_camera_msgs::srv::GetBool::Response> response);
 
   void getExposureCallback(const std::shared_ptr<GetInt32::Request>& request,
                            std::shared_ptr<GetInt32::Response>& response,
@@ -373,9 +375,9 @@ class OBCameraNode {
   void switchIRCameraCallback(const std::shared_ptr<SetString::Request>& request,
                               std::shared_ptr<SetString::Response>& response);
 
-  bool writeCustomerData(const std::string &data);
+  bool writeCustomerData(const std::string& data);
 
-  bool readCustomerData(std::string &out_data);
+  bool readCustomerData(std::string& out_data);
 
   void writeCustomerDataCallback(const std::shared_ptr<SetString::Request>& request,
                                  std::shared_ptr<SetString::Response>& response);
@@ -383,11 +385,11 @@ class OBCameraNode {
   void readCustomerDataCallback(const std::shared_ptr<GetString::Request>& request,
                                 std::shared_ptr<GetString::Response>& response);
 
-void getCameraParamsCallback(const std::shared_ptr<GetCameraParams::Request>& request,
-                                          std::shared_ptr<GetCameraParams::Response>& response);
+  void getCameraParamsCallback(const std::shared_ptr<GetCameraParams::Request>& request,
+                               std::shared_ptr<GetCameraParams::Response>& response);
 
-void setCameraParamsCallback(const std::shared_ptr<SetCameraParams::Request>& request,
-                                          std::shared_ptr<SetCameraParams::Response>& response);
+  void setCameraParamsCallback(const std::shared_ptr<SetCameraParams::Request>& request,
+                               std::shared_ptr<SetCameraParams::Response>& response);
 
   void setIRLongExposureCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
                                  std::shared_ptr<std_srvs::srv::SetBool::Response>& response);

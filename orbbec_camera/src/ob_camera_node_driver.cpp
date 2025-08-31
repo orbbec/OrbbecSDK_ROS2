@@ -39,7 +39,6 @@ void signalHandler(int sig) {
   if (sig == SIGINT || sig == SIGTERM) {
     rclcpp::shutdown();
   } else {
-
     std::string log_dir = "Log/";
 
     // get current time
@@ -226,14 +225,17 @@ void OBCameraNodeDriver::init() {
 void OBCameraNodeDriver::onDeviceConnected(const std::shared_ptr<ob::DeviceList> &device_list) {
   CHECK_NOTNULL(device_list);
   {
+    RCLCPP_INFO_STREAM(logger_, "onDeviceConnected called");
     std::unique_lock<decltype(reset_device_mutex_)> reset_lock(reset_device_mutex_);
     if (reset_device_flag_) {
       RCLCPP_INFO_STREAM(logger_, "onDeviceConnected : device reset in progress, waiting...");
-      reset_device_cond_.wait(reset_lock, [this]() { return !reset_device_flag_ || !is_alive_ || !rclcpp::ok(); });
+      reset_device_cond_.wait(
+          reset_lock, [this]() { return !reset_device_flag_ || !is_alive_ || !rclcpp::ok(); });
       if (!is_alive_) {
         return;
       }
-      RCLCPP_INFO_STREAM(logger_, "onDeviceConnected : device reset completed, continuing connection");
+      RCLCPP_INFO_STREAM(logger_,
+                         "onDeviceConnected : device reset completed, continuing connection");
     }
   }
   if (device_list->getCount() == 0) {
@@ -256,11 +258,13 @@ void OBCameraNodeDriver::onDeviceDisconnected(const std::shared_ptr<ob::DeviceLi
   if (device_list->getCount() == 0) {
     return;
   }
-  RCLCPP_INFO_STREAM(logger_, "onDeviceDisconnected");
+  RCLCPP_INFO_STREAM(logger_, "onDeviceDisconnected called");
 
   // Check if device connection/initialization is in progress
   if (device_connecting_.load()) {
-    RCLCPP_INFO_STREAM(logger_, "onDeviceDisconnected: device connection/initialization in progress, ignoring disconnect event");
+    RCLCPP_INFO_STREAM(logger_,
+                       "onDeviceDisconnected: device connection/initialization in progress, "
+                       "ignoring disconnect event");
     return;
   }
 
@@ -311,13 +315,14 @@ void OBCameraNodeDriver::checkConnectTimer() {
 }
 
 void OBCameraNodeDriver::queryDevice() {
-  while (is_alive_ && rclcpp::ok() && !device_connected_.load()) {
+  while (is_alive_ && rclcpp::ok()) {
     // Check if device reset is in progress before attempting to connect
     {
       std::unique_lock<decltype(reset_device_mutex_)> reset_lock(reset_device_mutex_);
       if (reset_device_flag_) {
         RCLCPP_INFO_STREAM(logger_, "queryDevice: device reset in progress, waiting...");
-        reset_device_cond_.wait(reset_lock, [this]() { return !reset_device_flag_ || !is_alive_ || !rclcpp::ok(); });
+        reset_device_cond_.wait(
+            reset_lock, [this]() { return !reset_device_flag_ || !is_alive_ || !rclcpp::ok(); });
         if (!is_alive_ || !rclcpp::ok()) {
           return;
         }
@@ -327,26 +332,24 @@ void OBCameraNodeDriver::queryDevice() {
 
     // Check if connection is already in progress
     if (device_connecting_.load()) {
-      RCLCPP_DEBUG_STREAM(logger_, "queryDevice: device connection already in progress, waiting...");
+      RCLCPP_INFO_STREAM(logger_, "queryDevice: device connection already in progress, waiting...");
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
       continue;
     }
 
-    if (!enumerate_net_device_ && !net_device_ip_.empty() && net_device_port_ != 0) {
-      connectNetDevice(net_device_ip_, net_device_port_);
-    } else {
-      auto device_list = ctx_->queryDeviceList();
-      if (device_list->getCount() == 0) {
-        RCLCPP_INFO_STREAM(logger_,
-                           "queryDevice :No Device found, using usb event to trigger  "
-                           "OBCameraNodeDriver::onDeviceConnected");
-        return;
+    // If device is already connected, skip connection attempt
+    if (!device_connected_.load()) {
+      if (!enumerate_net_device_ && !net_device_ip_.empty() && net_device_port_ != 0) {
+        connectNetDevice(net_device_ip_, net_device_port_);
+      } else {
+        auto device_list = ctx_->queryDeviceList();
+        if (device_list->getCount() != 0) {
+          startDevice(device_list);
+        }
       }
-      startDevice(device_list);
     }
-
-    // Add a small delay to prevent tight loop
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    // Add a delay to prevent tight loop
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   }
 }
 
@@ -445,8 +448,8 @@ void OBCameraNodeDriver::rebootDeviceCallback(
     return;
   }
 
-  std::shared_ptr<int> process_lock_guard(nullptr,
-                                        [this](int *) { pthread_mutex_unlock(orb_device_lock_); });
+  std::shared_ptr<int> process_lock_guard(
+      nullptr, [this](int *) { pthread_mutex_unlock(orb_device_lock_); });
 
   try {
     std::unique_lock<decltype(reset_device_mutex_)> reset_lock(reset_device_mutex_);
@@ -465,6 +468,8 @@ void OBCameraNodeDriver::rebootDeviceCallback(
     }
 
     RCLCPP_INFO(logger_, "Device reboot initiated, waiting for reconnection");
+    reset_device_flag_ = true;
+    reset_device_cond_.notify_all();
     malloc_trim(0);
     return;
 
@@ -682,8 +687,7 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
                     std::placeholders::_2, std::placeholders::_3),
           false);
     });
-    if(firmware_update_success_)
-    {
+    if (firmware_update_success_) {
       return;
     }
   }
@@ -711,9 +715,8 @@ void OBCameraNodeDriver::connectNetDevice(const std::string &net_device_ip, int 
   }
 
   // Use RAII to ensure connecting flag is cleared
-  std::shared_ptr<int> connecting_guard(nullptr, [this](int *) {
-    device_connecting_.store(false);
-  });
+  std::shared_ptr<int> connecting_guard(nullptr,
+                                        [this](int *) { device_connecting_.store(false); });
 
   std::this_thread::sleep_for(std::chrono::milliseconds(connection_delay_));
   auto device = ctx_->createNetDevice(net_device_ip.c_str(), net_device_port);
@@ -807,8 +810,7 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
     time_cost = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
     RCLCPP_INFO_STREAM(logger_, "Initialize device cost " << time_cost.count() << " ms");
 
-    if(firmware_update_success_)
-    {
+    if (firmware_update_success_) {
       firmware_update_success_ = false;
       device_connected_ = false;
       std::unique_lock<decltype(reset_device_mutex_)> reset_device_lock(reset_device_mutex_);
@@ -853,7 +855,7 @@ void OBCameraNodeDriver::updatePresetFirmware(std::string path) {
     }
     uint8_t index = 0;
     uint8_t count = static_cast<uint8_t>(paths.size());
-    char (*filePaths)[OB_PATH_MAX] = new char[count][OB_PATH_MAX];
+    char(*filePaths)[OB_PATH_MAX] = new char[count][OB_PATH_MAX];
     RCLCPP_INFO_STREAM(this->get_logger(), "paths.cout : " << (uint32_t)count);
     for (const auto &p : paths) {
       strcpy(filePaths[index], p.c_str());

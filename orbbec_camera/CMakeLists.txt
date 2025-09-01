@@ -1,24 +1,25 @@
 cmake_minimum_required(VERSION 3.8)
 project(orbbec_camera)
 
+# 표준/빌드 옵션
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -O3")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -fPIC -g3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O3")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fPIC -g3")
 set(CMAKE_BUILD_TYPE "Release")
+
 option(USE_RK_HW_DECODER "Use Rockchip hardware decoder" OFF)
 option(USE_NV_HW_DECODER "Use Nvidia hardware decoder" OFF)
 
-
 if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Werror -Wno-pedantic -Wno-array-bounds)
-endif ()
+endif()
 
+# ament & deps
+find_package(ament_cmake REQUIRED)
 find_package(gaemi_base_libs REQUIRED)
 
-# find dependencies
 set(dependencies
   ament_cmake
   ament_index_cpp
@@ -47,29 +48,27 @@ set(dependencies
   backward_ros
   gaemi_base_libs
 )
-
-foreach (dep IN LISTS dependencies)
+foreach(dep IN LISTS dependencies)
   find_package(${dep} REQUIRED)
-endforeach ()
-
+endforeach()
 find_package(PkgConfig REQUIRED)
 
-
+# HW decoder (선택)
 if (USE_RK_HW_DECODER)
   pkg_search_module(RK_MPP REQUIRED rockchip_mpp)
   if (NOT RK_MPP_FOUND)
     message(FATAL_ERROR "rockchip_mpp is not found")
-  endif ()
+  endif()
   pkg_search_module(RGA librga)
   if (NOT RGA_FOUND)
     add_definitions(-DUSE_LIBYUV)
     message("librga is not found, use libyuv instead")
-  endif ()
-endif ()
+  endif()
+endif()
 
-
-execute_process(COMMAND uname -m OUTPUT_VARIABLE MACHINES)
-execute_process(COMMAND getconf LONG_BIT OUTPUT_VARIABLE MACHINES_BIT)
+# 플랫폼 감지
+execute_process(COMMAND uname -m OUTPUT_VARIABLE MACHINES OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND getconf LONG_BIT OUTPUT_VARIABLE MACHINES_BIT OUTPUT_STRIP_TRAILING_WHITESPACE)
 message(STATUS "ORRBEC Machine : ${MACHINES}")
 message(STATUS "ORRBEC Machine Bits : ${MACHINES_BIT}")
 
@@ -79,13 +78,23 @@ elseif (${MACHINES} MATCHES "arm" OR (${MACHINES} MATCHES "aarch64" AND ${MACHIN
   set(HOST_PLATFORM "arm32")
 elseif ((${MACHINES} MATCHES "aarch64") AND (${MACHINES_BIT} MATCHES "64"))
   set(HOST_PLATFORM "arm64")
-endif ()
+else()
+  message(FATAL_ERROR "Unsupported platform: ${MACHINES} ${MACHINES_BIT}")
+endif()
 
-set(ORBBEC_LIBS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/SDK/lib/${HOST_PLATFORM})
-set(ORBBEC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/SDK/include/)
+# SDK 경로
+set(ORBBEC_SDK_PATH ${CMAKE_CURRENT_SOURCE_DIR}/SDK)
+set(ORBBEC_INCLUDE_DIR ${ORBBEC_SDK_PATH}/include)
+set(ORBBEC_LIBS_DIR ${ORBBEC_SDK_PATH}/lib/${HOST_PLATFORM})
 
-set(CMAKE_BUILD_RPATH "${CMAKE_BUILD_RPATH}:${ORBBEC_LIBS_DIR}")
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:${ORBBEC_LIBS_DIR}")
+# RPATH: 설치 후 실행 시 같은 lib/에서 .so 탐색
+# set(CMAKE_INSTALL_RPATH "$ORIGIN")
+set(CMAKE_INSTALL_RPATH
+    "${CMAKE_INSTALL_PREFIX}/lib"    # /opt/ros/humble/lib
+    "$ORIGIN/../"                    # 실행파일 기준 상위 디렉토리
+)
+
+# NV decoder (선택)
 if (USE_NV_HW_DECODER)
   set(JETSON_MULTI_MEDIA_API_DIR /usr/src/jetson_multimedia_api)
   set(JETSON_MULTI_MEDIA_API_CLASS_DIR ${JETSON_MULTI_MEDIA_API_DIR}/samples/common/classes)
@@ -94,96 +103,37 @@ if (USE_NV_HW_DECODER)
   set(TEGRA_ARMABI /usr/lib/aarch64-linux-gnu/)
   add_definitions(-DUSE_NV_HW_DECODER)
   add_compile_options(-Wno-missing-field-initializers -Wno-unused-parameter)
-  set(NV_LIBRARIES
-    -lnvjpeg -lnvbufsurface -lnvbufsurftransform -lyuv -lv4l2
-  )
-  list(APPEND NV_LIBRARIES
-    -L${TEGRA_ARMABI} -L${TEGRA_ARMABI}/tegra)
-endif ()
+  set(NV_LIBRARIES -lnvjpeg -lnvbufsurface -lnvbufsurftransform -lyuv -lv4l2
+      -L${TEGRA_ARMABI} -L${TEGRA_ARMABI}/tegra)
+endif()
 
+# include 경로
 set(COMMON_INCLUDE_DIRS
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
   $<BUILD_INTERFACE:${ORBBEC_INCLUDE_DIR}>
-  ${OpenCV_INCLUDED_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/tools>
 )
 
-
-# Orbbec SDK의 경로를 변수로 설정
-set(ORBBEC_SDK_PATH ${CMAKE_CURRENT_SOURCE_DIR}/SDK)
-
-# OrbbecSDK를 위한 IMPORTED 타겟 생성
-add_library(OrbbecSDK UNKNOWN IMPORTED)
-set_target_properties(OrbbecSDK PROPERTIES
-  IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/SDK/lib/${HOST_PLATFORM}/libOrbbecSDK.so"
-  INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/SDK/include"
-)
-
-# 외부 패키지에서 사용할 수 있는 alias 생성
-add_library(orbbec_camera::OrbbecSDK ALIAS OrbbecSDK)
-
-
-set(COMMON_LIBRARIES
-  ${OpenCV_LIBS}
-  Eigen3::Eigen
-  OrbbecSDK
-  Threads::Threads
-  -lrt
-  -ldw
-)
-if (USE_RK_HW_DECODER)
-  list(APPEND COMMON_LIBRARIES
-    ${RK_MPP_LIBRARIES}
-    ${RGA_LIBRARIES}
-  )
-
-endif ()
-
-if (USE_NV_HW_DECODER)
-  list(APPEND COMMON_LIBRARIES
-    ${NV_LIBRARIES})
-endif ()
-
-
+# 소스
 set(SOURCE_FILES
-  src/d2c_viewer.cpp
-  src/dynamic_params.cpp
-  src/image_publisher.cpp
-  # src/ob_camera_node_driver.cpp
+  # src/d2c_viewer.cpp
+  # src/dynamic_params.cpp
+  # src/image_publisher.cpp
   src/ob_camera_node.cpp
-  # src/ros_param_backend.cpp
-  # src/ros_service.cpp
-  src/synced_imu_publisher.cpp
+  # src/synced_imu_publisher.cpp
   src/utils.cpp
   src/jpeg_decoder.cpp
 )
-
 if (USE_RK_HW_DECODER)
   add_definitions(-DUSE_RK_HW_DECODER)
   list(APPEND SOURCE_FILES src/rk_mpp_decoder.cpp)
-  list(APPEND COMMON_INCLUDE_DIRS
-    ${RK_MPP_INCLUDE_DIRS}
-    ${RGA_INCLUDE_DIRS}
-  )
-  list(APPEND COMMON_LIBRARIES
-    ${RGA_LIBRARIES}
-    ${RK_MPP_LIBRARIES}
-  )
-  if (NOT RGA_FOUND)
-    list(APPEND COMMON_LIBRARIES
-      -lyuv
-    )
-  endif ()
-endif ()
-
+endif()
 if (USE_NV_HW_DECODER)
-  list(APPEND SOURCE_FILES src/jetson_nv_decoder.cpp)
-  list(APPEND COMMON_INCLUDE_DIRS ${JETSON_MULTI_MEDIA_API_INCLUDE_DIR}
-    ${LIBJPEG8B_INCLUDE_DIR})
-  # append jetson_multimedia_api source files
   list(APPEND SOURCE_FILES
+    src/jetson_nv_decoder.cpp
     ${JETSON_MULTI_MEDIA_API_CLASS_DIR}/NvBuffer.cpp
     ${JETSON_MULTI_MEDIA_API_CLASS_DIR}/NvElement.cpp
     ${JETSON_MULTI_MEDIA_API_CLASS_DIR}/NvElementProfiler.cpp
@@ -197,81 +147,89 @@ if (USE_NV_HW_DECODER)
     ${JETSON_MULTI_MEDIA_API_CLASS_DIR}/NvVideoEncoder.cpp
     ${JETSON_MULTI_MEDIA_API_CLASS_DIR}/NvBufSurface.cpp
   )
-endif ()
+endif()
 
-macro(add_orbbec_executable TARGET SOURCE)
-  add_executable(${TARGET} ${SOURCE})
-  target_include_directories(${TARGET} PUBLIC ${COMMON_INCLUDE_DIRS})
-  target_link_libraries(${TARGET} ${COMMON_LIBRARIES} ${PROJECT_NAME})
-  ament_target_dependencies(${TARGET} ${dependencies})
-endmacro()
-
-# Define library and nodes
-add_library(${PROJECT_NAME} SHARED
-  ${SOURCE_FILES}
-)
-
+# 메인 라이브러리
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 ament_target_dependencies(${PROJECT_NAME} ${dependencies})
 target_include_directories(${PROJECT_NAME} PUBLIC ${COMMON_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} ${COMMON_LIBRARIES})
 
+# # 공통 라이브러리 링크 (SDK는 PRIVATE로 링크해 소비자에 경로 노출 방지)
+# target_link_libraries(${PROJECT_NAME}
+#   PUBLIC
+#     ${OpenCV_LIBS}
+#     Eigen3::Eigen
+#     Threads::Threads
+#     -lrt
+#     -ldw
+#   PRIVATE
+#     "${ORBBEC_LIBS_DIR}/libOrbbecSDK.so"
+# )
 
+target_link_libraries(${PROJECT_NAME}
+  ${OpenCV_LIBS}
+  Eigen3::Eigen
+  Threads::Threads
+  -lrt
+  -ldw
+  "${ORBBEC_LIBS_DIR}/libOrbbecSDK.so"
+)
+
+# # SDK는 별도 비키워드 호출로 추가
+# target_link_libraries(${PROJECT_NAME}
+# )
+
+# 컴포넌트 등록
 rclcpp_components_register_node(${PROJECT_NAME}
   PLUGIN "orbbec_camera::OBCameraNodeDriver"
   EXECUTABLE orbbec_camera_node
 )
-# Add nodes using the macro
-# add_orbbec_executable(list_devices_node tools/list_devices_node.cpp)
-add_orbbec_executable(list_depth_work_mode_node tools/list_depth_work_mode.cpp)
-# add_orbbec_executable(list_camera_profile_mode_node tools/list_camera_profile.cpp)
 
-add_orbbec_executable(topic_statistics_node tools/topic_statistics.cpp)
-
+# 도구/부가 노드
+# function(add_orbbec_executable TARGET SOURCE)
+#   add_executable(${TARGET} ${SOURCE})
+#   target_include_directories(${TARGET} PUBLIC ${COMMON_INCLUDE_DIRS})
+#   target_link_libraries(${TARGET} ${PROJECT_NAME})
+#   ament_target_dependencies(${TARGET} ${dependencies})
+# endfunction()
+# add_orbbec_executable(list_depth_work_mode_node tools/list_depth_work_mode.cpp)
+# add_orbbec_executable(topic_statistics_node tools/topic_statistics.cpp)
 
 add_library(frame_latency SHARED tools/frame_latency.cpp)
 target_include_directories(frame_latency PUBLIC ${COMMON_INCLUDE_DIRS})
-target_link_libraries(frame_latency ${COMMON_LIBRARIES})
+target_link_libraries(frame_latency ${PROJECT_NAME})
 ament_target_dependencies(frame_latency ${dependencies})
-
 rclcpp_components_register_node(frame_latency
-        PLUGIN "orbbec_camera::FrameLatencyNode"
-        EXECUTABLE frame_latency_node
+  PLUGIN "orbbec_camera::FrameLatencyNode"
+  EXECUTABLE frame_latency_node
 )
-# Install rules
+
+# 설치
 install(TARGETS ${PROJECT_NAME} frame_latency
   EXPORT export_${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
 )
-
 install(DIRECTORY include/ DESTINATION include)
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME}/)
-install(DIRECTORY ${ORBBEC_INCLUDE_DIR} DESTINATION include/orbbec_sdk)
+
+# SDK 헤더/라이브러리 동봉 설치
+install(DIRECTORY ${ORBBEC_INCLUDE_DIR}/ DESTINATION include)
 install(DIRECTORY ${ORBBEC_LIBS_DIR}/ DESTINATION lib/ FILES_MATCHING PATTERN "*.so*")
-if (DEFINED ENV{BUILDING_PACKAGE})
-  # Install udev rules
-  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/99-obsensor-libusb.rules
-    DESTINATION /etc/udev/rules.d
-  )
-endif ()
 
-install(TARGETS
-  # list_devices_node
-  list_depth_work_mode_node
-  # list_camera_profile_mode_node
-  topic_statistics_node
-  DESTINATION lib/${PROJECT_NAME}/)
+# 툴 실행파일 설치
+# install(TARGETS
+#   list_depth_work_mode_node
+#   topic_statistics_node
+#   DESTINATION lib/${PROJECT_NAME}/
+# )
 
-if (BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  ament_lint_auto_find_test_dependencies()
-endif ()
+# 내보내기
 ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
-ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})
-
+ament_export_include_directories(include)
 ament_export_dependencies(${dependencies})
-
 ament_package()

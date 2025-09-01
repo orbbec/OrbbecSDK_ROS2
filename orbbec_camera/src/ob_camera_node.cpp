@@ -1472,7 +1472,8 @@ void OBCameraNode::stopStreams() {
       if ((interleave_ae_mode_ == "hdr") || (interleave_ae_mode_ == "laser")) {
         try {
           RCLCPP_INFO_STREAM(logger_, "current interleave_ae_mode_: " << interleave_ae_mode_);
-          if (device_->isPropertySupported(OB_PROP_FRAME_INTERLEAVE_ENABLE_BOOL, OB_PERMISSION_WRITE)) {
+          if (device_->isPropertySupported(OB_PROP_FRAME_INTERLEAVE_ENABLE_BOOL,
+                                           OB_PERMISSION_WRITE)) {
             interleave_frame_enable_ = false;
             RCLCPP_INFO_STREAM(logger_, "Enable enable_interleave_depth_frame to "
                                             << (interleave_frame_enable_ ? "true" : "false"));
@@ -1480,13 +1481,15 @@ void OBCameraNode::stopStreams() {
                                 interleave_frame_enable_);
           }
         } catch (const ob::Error &e) {
-          RCLCPP_WARN_STREAM(logger_, "Failed to disable interleave frame during shutdown: " << e.getMessage());
+          RCLCPP_WARN_STREAM(
+              logger_, "Failed to disable interleave frame during shutdown: " << e.getMessage());
         } catch (...) {
           RCLCPP_WARN_STREAM(logger_, "Failed to disable interleave frame during shutdown");
         }
       }
     } else {
-      RCLCPP_WARN_STREAM(logger_, "Device or pipeline not available during stop - likely disconnected");
+      RCLCPP_WARN_STREAM(logger_,
+                         "Device or pipeline not available during stop - likely disconnected");
     }
   } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to stop pipeline: " << e.getMessage());
@@ -1736,7 +1739,8 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(depth_ae_roi_right_, "depth_ae_roi_right", -1);
   setAndGetNodeParameter<int>(depth_ae_roi_bottom_, "depth_ae_roi_bottom", -1);
   setAndGetNodeParameter<int>(depth_brightness_, "depth_brightness", -1);
-  setAndGetNodeParameter<int>(mean_intensity_set_point_, "mean_intensity_set_point", depth_brightness_);
+  setAndGetNodeParameter<int>(mean_intensity_set_point_, "mean_intensity_set_point",
+                              depth_brightness_);
   setAndGetNodeParameter<std::string>(depth_precision_str_, "depth_precision", "");
   setAndGetNodeParameter<bool>(enable_ir_auto_exposure_, "enable_ir_auto_exposure", true);
   setAndGetNodeParameter<int>(ir_exposure_, "ir_exposure", -1);
@@ -1946,7 +1950,8 @@ void OBCameraNode::onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapp
     // Check to ensure we're not shutting down and device is valid
     std::lock_guard<decltype(device_lock_)> lock(device_lock_);
     if (!device_ || !is_running_.load() || !is_camera_node_initialized_.load()) {
-      status.summary(diagnostic_msgs::msg::DiagnosticStatus::STALE, "Device disconnected or shutting down");
+      status.summary(diagnostic_msgs::msg::DiagnosticStatus::STALE,
+                     "Device disconnected or shutting down");
       return;
     }
 
@@ -3479,6 +3484,13 @@ void OBCameraNode::calcAndPublishStaticTransform() {
     auto ex_msg = obExtrinsicsToMsg(ex, frame_id);
     CHECK_NOTNULL(depth_to_other_extrinsics_publishers_[GYRO]);
     depth_to_other_extrinsics_publishers_[GYRO]->publish(ex_msg);
+  }
+  if (enable_sync_output_accel_gyro_) {
+    tf2::Quaternion zero_rot;
+    zero_rot.setRPY(0.0, 0.0, 0.0);
+    tf2::Vector3 zero_trans(0, 0, 0);
+    publishStaticTF(node_->now(), zero_trans, zero_rot, optical_frame_id_[GYRO],
+                    accel_gyro_frame_id_);
   }
 }
 

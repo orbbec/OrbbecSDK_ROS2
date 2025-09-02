@@ -209,7 +209,7 @@ Install deb dependencies
 
 ```bash
 # assume you have sourced ROS environment, same blow
-sudo apt install libgflags-dev nlohmann-json3-dev  \
+sudo apt install libgflags-dev nlohmann-json3-dev libgoogle-glog-dev libgoogle-glog0v5 \
 ros-$ROS_DISTRO-image-transport ros-${ROS_DISTRO}-image-transport-plugins ros-${ROS_DISTRO}-compressed-image-transport \
 ros-$ROS_DISTRO-image-publisher ros-$ROS_DISTRO-camera-info-manager \
 ros-$ROS_DISTRO-diagnostic-updater ros-$ROS_DISTRO-diagnostic-msgs ros-$ROS_DISTRO-statistics-msgs \
@@ -362,33 +362,39 @@ ros2 launch orbbec_camera gemini_330_series.launch.py enable_color:=true color_w
 ```
 
 * **[color|depth|left_ir|right_ir|ir]_width,[color|depth|left_ir|right_ir|ir]_height,[color|depth|left_ir|right_ir|ir]_fps,[color|depth|left_ir|right_ir|ir]_format**
+
   * The resolution and frame rate of the sensor stream
   * Run `ros2 run orbbec_camera list_camera_profile_mode_node` to get the list of supported profiles
   * For example:`color_width:=640 color_height:=480 color_fps:=30 color_format:=MJPG depth_width:=640 depth_height:=480 depth_fps:=30 depth_format:=Y16 ir_width:=640 ir_height:=480 ir_fps:=30 ir_format:=Y8`
 * **enable_color_auto_exposure_priority**
+
   * Enable the Color auto exposure priority
   * For example:`enable_color_auto_exposure_priority:=true`
 * **enable_color_auto_exposure**
+
   * Enable the Color auto exposure
   * For example:`enable_color_auto_exposure:=true`
 * **color_exposure**
+
   * Set the Color exposure
   * For example:`color_exposure:=30`
   * Note:To ensure that the `color_exposure` setting takes effect, make sure to set `enable_color_auto_exposure:=false`.
 * **color_gain**
+
   * Set the Color gain
   * For example:`color_gain:=16`
   * Note:To ensure that the `color_gain` setting takes effect, make sure to set `enable_color_auto_exposure:=false`.
 * **enable_depth_auto_exposure_priority**
+
   * Enable the Depth auto exposure priority
   * For example:`enable_depth_auto_exposure_priority:=true`
 * **mean_intensity_set_point**
 
   - Set the target mean intensity of the Depth image
-
   - For example: `mean_intensity_set_point:=100`
 
   > **Note:** This replaces the deprecated `depth_brightness`, which is still supported for backward compatibility.
+  >
 
 [......](./docs/launch_parameters.md)
 

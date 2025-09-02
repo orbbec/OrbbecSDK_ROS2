@@ -199,7 +199,7 @@ git checkout v2-main
 
 ```bash
 # assume you have sourced ROS environment, same blow
-sudo apt install libgflags-dev nlohmann-json3-dev  \
+sudo apt install libgflags-dev nlohmann-json3-dev libgoogle-glog-dev libgoogle-glog0v5 \
 ros-$ROS_DISTRO-image-transport ros-${ROS_DISTRO}-image-transport-plugins ros-${ROS_DISTRO}-compressed-image-transport \
 ros-$ROS_DISTRO-image-publisher ros-$ROS_DISTRO-camera-info-manager \
 ros-$ROS_DISTRO-diagnostic-updater ros-$ROS_DISTRO-diagnostic-msgs ros-$ROS_DISTRO-statistics-msgs \

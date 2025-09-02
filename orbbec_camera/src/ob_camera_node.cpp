@@ -143,7 +143,7 @@ void OBCameraNode::clean() noexcept {
 
   // Now acquire the device lock for the rest of the cleanup
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
-  RCLCPP_WARN_STREAM(logger_, "Do destroy ~OBCameraNode");
+  RCLCPP_WARN_STREAM(logger_, "Do OBCameraNode clean");
 
   RCLCPP_WARN_STREAM(logger_, "Stop tf thread");
   try {
@@ -173,6 +173,16 @@ void OBCameraNode::clean() noexcept {
     RCLCPP_WARN_STREAM(logger_, "Exception while stopping streams");
   }
 
+  // Clean up d2c_viewer_ before cleaning buffers
+  RCLCPP_WARN_STREAM(logger_, "Clean d2c_viewer");
+  try {
+    if (d2c_viewer_) {
+      d2c_viewer_.reset();
+    }
+  } catch (...) {
+    RCLCPP_WARN_STREAM(logger_, "Exception while cleaning up d2c_viewer");
+  }
+
   try {
     delete[] rgb_buffer_;
     rgb_buffer_ = nullptr;
@@ -180,7 +190,7 @@ void OBCameraNode::clean() noexcept {
     RCLCPP_WARN_STREAM(logger_, "Exception while cleaning up buffers");
   }
 
-  RCLCPP_WARN_STREAM(logger_, "Destroy ~OBCameraNode DONE");
+  RCLCPP_WARN_STREAM(logger_, "Do OBCameraNode clean DONE");
 }
 
 void OBCameraNode::setupDevices() {

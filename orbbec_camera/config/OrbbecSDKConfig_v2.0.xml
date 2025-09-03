@@ -1440,8 +1440,8 @@
             </Misc>
 
             <DepthPostProcessing>
-                <HardwareNoiseRemoveFilter>false</HardwareNoiseRemoveFilter>
-                <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
+                <HardwareNoiseRemoveFilter>true</HardwareNoiseRemoveFilter>
+                <SoftwareNoiseRemoveFilter>false</SoftwareNoiseRemoveFilter>
             </DepthPostProcessing>
 
             <!-- Whether to enable heartbeat by default -->

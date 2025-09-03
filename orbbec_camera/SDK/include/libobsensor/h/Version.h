@@ -19,28 +19,28 @@ extern "C" {
  *
  * @return int The SDK version number.
  */
-OB_EXPORT int ob_get_version();
+OB_EXPORT int ob_get_version(void);
 
 /**
  * @brief Get the SDK major version number.
  *
  * @return int The SDK major version number.
  */
-OB_EXPORT int ob_get_major_version();
+OB_EXPORT int ob_get_major_version(void);
 
 /**
  * @brief Get the SDK minor version number.
  *
  * @return int The SDK minor version number.
  */
-OB_EXPORT int ob_get_minor_version();
+OB_EXPORT int ob_get_minor_version(void);
 
 /**
  * @brief Get the SDK patch version number.
  *
  * @return int The SDK patch version number.
  */
-OB_EXPORT int ob_get_patch_version();
+OB_EXPORT int ob_get_patch_version(void);
 
 /**
  * @brief Get the SDK stage version.
@@ -48,7 +48,7 @@ OB_EXPORT int ob_get_patch_version();
  *
  * @return const char* The SDK stage version.
  */
-OB_EXPORT const char *ob_get_stage_version();
+OB_EXPORT const char *ob_get_stage_version(void);
 
 #ifdef __cplusplus
 }

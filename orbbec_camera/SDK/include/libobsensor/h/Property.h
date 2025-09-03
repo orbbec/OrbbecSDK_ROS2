@@ -874,6 +874,12 @@ typedef enum {
      * @brief Confidence degree
      */
     OB_PROP_DEBUG_ESGM_CONFIDENCE_FLOAT = 5013,
+
+    /**
+     * @brief Color camera CCI denoising level. 0: Auto; 1-8: higher values indicate stronger denoising.
+     * @note This setting has no effect when AE (Auto Exposure) is disabled.
+     */
+    OB_PROP_COLOR_DENOISING_LEVEL_INT = 5525,
 } OBPropertyID,
     ob_property_id;
 

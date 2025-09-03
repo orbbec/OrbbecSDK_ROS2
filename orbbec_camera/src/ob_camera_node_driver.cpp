@@ -312,6 +312,11 @@ void OBCameraNodeDriver::onDeviceDisconnected(const std::shared_ptr<ob::DeviceLi
 
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
 
+  if (!device_connected_.load()) {
+    RCLCPP_DEBUG_STREAM(logger_, "onDeviceDisconnected: device already disconnected");
+    return;
+  }
+
   for (size_t i = 0; i < device_list->getCount(); i++) {
     std::string uid = device_list->getUid(i);
     std::string serial_number = device_list->getSerialNumber(i);

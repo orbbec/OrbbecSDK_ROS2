@@ -139,6 +139,17 @@ void OBCameraNode::clean() noexcept {
 }
 
 void OBCameraNode::setupDevices() {
+  if (!depth_filter_config_.empty() && enable_depth_filter_) {
+    RCLCPP_INFO_STREAM(logger_, "Load depth filter config: " << depth_filter_config_);
+    TRY_EXECUTE_BLOCK(device_->loadDepthFilterConfig(depth_filter_config_.c_str()));
+  } else {
+    if (device_->isPropertySupported(OB_PROP_DEPTH_SOFT_FILTER_BOOL, OB_PERMISSION_READ_WRITE)) {
+      TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_DEPTH_SOFT_FILTER_BOOL, enable_soft_filter_);
+    }
+    else{
+      RCLCPP_WARN_STREAM(logger_, "Depth filter config is empty and soft filter is not supported");
+    }
+  }
   auto sensor_list = device_->getSensorList();
   for (size_t i = 0; i < sensor_list->count(); i++) {
     auto sensor = sensor_list->getSensor(i);
@@ -168,8 +179,11 @@ void OBCameraNode::setupDevices() {
     TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_DEVICE_USB3_REPEAT_IDENTIFY_BOOL,
                         retry_on_usb3_detection_failure_);
   }
-  if (device_->isPropertySupported(OB_PROP_DEPTH_NOISE_REMOVAL_FILTER_BOOL,
+  auto device_info = device_->getDeviceInfo();
+  auto pid = device_info->pid();
+  if (isGemini335PID(pid) &&device_->isPropertySupported(OB_PROP_DEPTH_NOISE_REMOVAL_FILTER_BOOL,
                                    OB_PERMISSION_READ_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_,"------------- Setting depth noise removal----------");
     TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_DEPTH_NOISE_REMOVAL_FILTER_BOOL,
                         enable_noise_removal_filter_);
   }
@@ -369,16 +383,7 @@ void OBCameraNode::setupDevices() {
     }
   }
 
-  if (!depth_filter_config_.empty() && enable_depth_filter_) {
-    RCLCPP_INFO_STREAM(logger_, "Load depth filter config: " << depth_filter_config_);
-    TRY_EXECUTE_BLOCK(device_->loadDepthFilterConfig(depth_filter_config_.c_str()));
-  } else {
-    if (device_->isPropertySupported(OB_PROP_DEPTH_SOFT_FILTER_BOOL, OB_PERMISSION_READ_WRITE)) {
-      RCLCPP_INFO_STREAM(logger_,
-                         "Setting depth soft filter to " << (enable_soft_filter_ ? "ON" : "OFF"));
-      TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_DEPTH_SOFT_FILTER_BOOL, enable_soft_filter_);
-    }
-  }
+
 
   if (device_->isPropertySupported(OB_PROP_COLOR_AUTO_WHITE_BALANCE_BOOL, OB_PERMISSION_WRITE)) {
     RCLCPP_INFO_STREAM(logger_, "Setting color auto white balance to "

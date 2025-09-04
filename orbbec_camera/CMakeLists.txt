@@ -32,6 +32,7 @@ set(dependencies
     camera_info_manager
     image_transport
     image_publisher
+    lifecycle_msgs
     OpenCV
     orbbec_camera_msgs
     rclcpp

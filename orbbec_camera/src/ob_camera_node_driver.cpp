@@ -163,6 +163,7 @@ void OBCameraNodeDriver::init() {
   net_device_ip_ = declare_parameter<std::string>("net_device_ip", "");
   net_device_port_ = static_cast<int>(declare_parameter<int>("net_device_port", 0));
   enumerate_net_device_ = declare_parameter<bool>("enumerate_net_device", false);
+  enable_streams_on_startup_ = declare_parameter<bool>("enable_streams_on_startup", true);
   uvc_backend_ = declare_parameter<std::string>("uvc_backend", "libuvc");
   if (uvc_backend_ == "libuvc") {
     ctx_->setUvcBackendType(OB_UVC_BACKEND_TYPE_LIBUVC);
@@ -505,7 +506,9 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   }
   if (ob_camera_node_) {
     ob_camera_node_->startIMU();
-    ob_camera_node_->startStreams();
+    if (enable_streams_on_startup_) {
+      ob_camera_node_->startStreams();
+    }
   } else {
     RCLCPP_INFO_STREAM(logger_, "ob_camera_node_ is nullptr");
   }

@@ -37,6 +37,7 @@
 #include <std_srvs/srv/set_bool.hpp>
 #include <std_srvs/srv/empty.hpp>
 #include <diagnostic_updater/diagnostic_updater.hpp>
+#include <lifecycle_msgs/srv/change_state.hpp>
 
 #include <sensor_msgs/msg/camera_info.hpp>
 #include <camera_info_manager/camera_info_manager.hpp>
@@ -315,7 +316,6 @@ class OBCameraNode {
                          std::shared_ptr<SetFilter ::Response>& response);
   void setSYNCHostimeCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
                               std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
-
   void resetCaptureServiceVariables();
   void sendSoftwareTriggerCallback(const std::shared_ptr<CameraTrigger::Request>& request,
                                    std::shared_ptr<CameraTrigger::Response>& response);
@@ -339,6 +339,10 @@ class OBCameraNode {
 
   void setIRLongExposureCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request>& request,
                                  std::shared_ptr<std_srvs::srv::SetBool::Response>& response);
+  
+  void handleChangeStateRequest(
+      const std::shared_ptr<lifecycle_msgs::srv::ChangeState::Request> request,
+      std::shared_ptr<lifecycle_msgs::srv::ChangeState::Response> response);  
 
   void publishPointCloud(const std::shared_ptr<ob::FrameSet>& frame_set);
 
@@ -502,6 +506,8 @@ class OBCameraNode {
   rclcpp::Service<CameraTrigger>::SharedPtr send_service_trigger_srv_;
   rclcpp::Service<SetFilter>::SharedPtr set_filter_srv_;
   rclcpp::Service<CameraTrigger>::SharedPtr capture_camera_images_srv_;
+  // Lifecycle Service
+  rclcpp::Service<lifecycle_msgs::srv::ChangeState>::SharedPtr change_state_srv_;
 
 
   std::atomic_bool service_capture_started_{false};

@@ -118,5 +118,6 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::string extension_path_;
   static backward::SignalHandling sh;  // for stack trace
   std::string upgrade_firmware_;
+  bool enable_streams_on_startup_ {true};
 };
 }  // namespace orbbec_camera

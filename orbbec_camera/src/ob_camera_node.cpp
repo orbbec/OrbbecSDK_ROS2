@@ -1387,6 +1387,7 @@ void OBCameraNode::stopStreams() {
         TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_FRAME_INTERLEAVE_ENABLE_BOOL,
                             interleave_frame_enable_);
       }
+      pipeline_started_.store(false);
     }
   } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to stop pipeline: " << e.getMessage());

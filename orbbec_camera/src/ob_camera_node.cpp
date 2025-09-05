@@ -186,6 +186,7 @@ void OBCameraNode::clean() noexcept {
     RCLCPP_WARN_STREAM(logger_, "Exception while cleaning up d2c_viewer");
   }
 
+  RCLCPP_WARN_STREAM(logger_, "Clean up buffers");
   try {
     delete[] rgb_buffer_;
     rgb_buffer_ = nullptr;
@@ -1432,26 +1433,31 @@ void OBCameraNode::startIMUSyncStream() {
   imuConfig->enableStream(accelProfile);
   imuConfig->enableStream(gyroProfile);
   TRY_EXECUTE_BLOCK(imuPipeline_->enableFrameSync());
-  imuPipeline_->start(imuConfig, [&](std::shared_ptr<ob::Frame> frame) {
-    auto frameSet = frame->as<ob::FrameSet>();
-    auto aFrame = frameSet->getFrame(OB_FRAME_ACCEL);
-    auto gFrame = frameSet->getFrame(OB_FRAME_GYRO);
-    if (aFrame && gFrame) {
-      onNewIMUFrameSyncOutputCallback(aFrame, gFrame);
-    }
-  });
 
-  imu_sync_output_start_ = true;
-  if (!imu_sync_output_start_) {
-    RCLCPP_ERROR_STREAM(
-        logger_, "Failed to start IMU stream, please check the imu_rate and imu_range parameters.");
-  } else {
+  try {
+    imuPipeline_->start(imuConfig, [&](std::shared_ptr<ob::Frame> frame) {
+      auto frameSet = frame->as<ob::FrameSet>();
+      auto aFrame = frameSet->getFrame(OB_FRAME_ACCEL);
+      auto gFrame = frameSet->getFrame(OB_FRAME_GYRO);
+      if (aFrame && gFrame) {
+        onNewIMUFrameSyncOutputCallback(aFrame, gFrame);
+      }
+    });
+
+    imu_sync_output_start_ = true;
     RCLCPP_INFO_STREAM(
         logger_, "start accel stream with range: " << fullAccelScaleRangeToString(accel_range)
                                                    << ",rate:" << sampleRateToString(accel_rate)
                                                    << ", and start gyro stream with range:"
                                                    << fullGyroScaleRangeToString(gyro_range)
                                                    << ",rate:" << sampleRateToString(gyro_rate));
+  } catch (const ob::Error &e) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to start IMU sync stream: " << e.getMessage());
+    imu_sync_output_start_ = false;
+  } catch (...) {
+    RCLCPP_ERROR_STREAM(
+        logger_, "Failed to start IMU stream, please check the imu_rate and imu_range parameters.");
+    imu_sync_output_start_ = false;
   }
 }
 
@@ -1548,6 +1554,7 @@ void OBCameraNode::stopIMU() {
     } catch (...) {
       RCLCPP_ERROR_STREAM(logger_, "Failed to stop imu pipeline");
     }
+    imu_sync_output_start_.store(false);
   } else {
     for (const auto &stream_index : HID_STREAMS) {
       if (imu_started_[stream_index]) {

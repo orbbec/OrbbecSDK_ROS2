@@ -670,7 +670,7 @@ class OBCameraNode {
   // IMU
   std::map<stream_index_pair, rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr> imu_publishers_;
   rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_gyro_accel_publisher_;
-  bool imu_sync_output_start_ = false;
+  std::atomic_bool imu_sync_output_start_{false};
   std::map<stream_index_pair, std::string> imu_rate_;
   std::map<stream_index_pair, std::string> imu_range_;
   std::map<stream_index_pair, std::string> imu_qos_;

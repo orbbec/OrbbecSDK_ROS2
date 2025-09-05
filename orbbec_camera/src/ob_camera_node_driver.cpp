@@ -223,6 +223,8 @@ void OBCameraNodeDriver::init() {
   orb_device_lock_ = (pthread_mutex_t *)orb_device_lock_shm_addr_;
   pthread_mutex_init(orb_device_lock_, &orb_device_lock_attr_);
   is_alive_.store(true);
+  // Initialize the reset device completion time to allow immediate device connection on startup
+  last_reset_device_completion_time_ = std::chrono::steady_clock::now() - std::chrono::seconds(10);
   parameters_ = std::make_shared<Parameters>(this);
   serial_number_ = declare_parameter<std::string>("serial_number", "");
   device_num_ = static_cast<int>(declare_parameter<int>("device_num", 1));
@@ -385,6 +387,18 @@ void OBCameraNodeDriver::queryDevice() {
 
     // If device is already connected, skip connection attempt
     if (!device_connected_.load()) {
+      // Check if sufficient time has passed since last reset device completion
+      auto now = std::chrono::steady_clock::now();
+      auto time_since_last_reset = std::chrono::duration_cast<std::chrono::seconds>(
+          now - last_reset_device_completion_time_);
+
+      if (time_since_last_reset.count() < 10) {
+        RCLCPP_DEBUG_STREAM(logger_, "queryDevice: Only " << time_since_last_reset.count()
+                           << " seconds since last reset completion, waiting before starting device...");
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        continue;
+      }
+
       if (!enumerate_net_device_ && !net_device_ip_.empty() && net_device_port_ != 0) {
         connectNetDevice(net_device_ip_, net_device_port_);
       } else {
@@ -462,8 +476,12 @@ void OBCameraNodeDriver::resetDevice() {
             }
             device_.reset();
             RCLCPP_INFO_STREAM(logger_, "device_ reset completed");
+          } catch (const ob::Error& e) {
+            RCLCPP_WARN_STREAM(logger_, "OB Exception during device reset: " << e.getMessage());
+          } catch (const std::exception& e) {
+            RCLCPP_WARN_STREAM(logger_, "Standard exception during device reset: " << e.what());
           } catch (...) {
-            RCLCPP_WARN_STREAM(logger_, "Exception during device reset");
+            RCLCPP_WARN_STREAM(logger_, "Unknown exception during device reset");
           }
         }
 
@@ -480,6 +498,7 @@ void OBCameraNodeDriver::resetDevice() {
         device_unique_id_.clear();
       }
       reset_device_flag_ = false;
+      last_reset_device_completion_time_ = std::chrono::steady_clock::now();
     }
     reset_device_cond_.notify_all();
     malloc_trim(0);

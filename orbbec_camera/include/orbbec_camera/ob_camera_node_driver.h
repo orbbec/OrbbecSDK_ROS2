@@ -16,6 +16,7 @@
 #pragma once
 #include <atomic>
 #include <thread>
+#include <chrono>
 
 #include <rclcpp/rclcpp.hpp>
 #include <semaphore.h>
@@ -108,6 +109,7 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::mutex reset_device_mutex_;
   std::condition_variable reset_device_cond_;
   std::atomic_bool reset_device_flag_{false};
+  std::chrono::steady_clock::time_point last_reset_device_completion_time_;
   pthread_mutex_t* orb_device_lock_ = nullptr;
   pthread_mutexattr_t orb_device_lock_attr_;
   uint8_t* orb_device_lock_shm_addr_ = nullptr;

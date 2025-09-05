@@ -475,6 +475,8 @@ class OBCameraNode {
  private:
   std::atomic_bool write_customer_data_success_{false};
   std::atomic_bool user_calibration_ready_{false};
+  // New state flags to make clean() and rebootDevice() idempotent and thread-safe
+  std::atomic_bool cleaning_{false};
   rclcpp::Node* node_ = nullptr;
   std::shared_ptr<ob::Device> device_ = nullptr;
   std::shared_ptr<Parameters> parameters_ = nullptr;

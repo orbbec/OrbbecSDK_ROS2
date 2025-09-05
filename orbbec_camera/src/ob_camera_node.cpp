@@ -128,6 +128,10 @@ void OBCameraNode::rebootDevice() {
 }
 
 void OBCameraNode::clean() noexcept {
+  if (cleaning_.exchange(true)) {
+    RCLCPP_DEBUG(logger_, "clean() already running, skip re-entry");
+    return;
+  }
   // Set running flag to false first to signal all operations to stop
   is_running_.store(false);
 
@@ -135,7 +139,13 @@ void OBCameraNode::clean() noexcept {
   try {
     if (diagnostic_timer_) {
       diagnostic_timer_->cancel();
+      // Wait for any currently executing timer callbacks to complete
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
       diagnostic_timer_.reset();
+    }
+    if (software_trigger_timer_) {
+      software_trigger_timer_->cancel();
+      software_trigger_timer_.reset();
     }
     if (diagnostic_updater_) {
       diagnostic_updater_.reset();
@@ -195,6 +205,7 @@ void OBCameraNode::clean() noexcept {
   }
 
   RCLCPP_WARN_STREAM(logger_, "Do OBCameraNode clean DONE");
+  cleaning_.store(false);
 }
 
 void OBCameraNode::setupDevices() {
@@ -1993,10 +2004,23 @@ void OBCameraNode::setupTopics() {
 void OBCameraNode::onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapper &status) {
   try {
     // Check to ensure we're not shutting down and device is valid
-    std::lock_guard<decltype(device_lock_)> lock(device_lock_);
-    if (!device_ || !is_running_.load() || !is_camera_node_initialized_.load()) {
+    if (!is_running_.load() || !is_camera_node_initialized_.load()) {
       status.summary(diagnostic_msgs::msg::DiagnosticStatus::STALE,
                      "Device disconnected or shutting down");
+      return;
+    }
+
+    // Try to acquire device lock with timeout to avoid blocking during shutdown
+    std::unique_lock<decltype(device_lock_)> lock(device_lock_, std::try_to_lock);
+    if (!lock.owns_lock()) {
+      status.summary(diagnostic_msgs::msg::DiagnosticStatus::STALE,
+                     "Device busy or shutting down");
+      return;
+    }
+
+    if (!device_) {
+      status.summary(diagnostic_msgs::msg::DiagnosticStatus::STALE,
+                     "Device not available");
       return;
     }
 
@@ -2029,36 +2053,12 @@ void OBCameraNode::onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapp
     status.add("Chip Bottom Temperature", temperature.chipBottomTemp);
     status.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, "Temperature is normal");
   } catch (const ob::Error &e) {
-    try {
-      if (is_running_.load() && diagnostic_timer_) {
-        diagnostic_timer_->cancel();
-        diagnostic_timer_.reset();
-      }
-    } catch (...) {
-      // Ignore exceptions during cleanup
-    }
     RCLCPP_ERROR_STREAM(logger_, "Failed to TemperatureUpdate1: " << e.getMessage());
     status.summary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, e.getMessage());
   } catch (const std::exception &e) {
-    try {
-      if (is_running_.load() && diagnostic_timer_) {
-        diagnostic_timer_->cancel();
-        diagnostic_timer_.reset();
-      }
-    } catch (...) {
-      // Ignore exceptions during cleanup
-    }
     RCLCPP_ERROR_STREAM(logger_, "Failed to TemperatureUpdate2: " << e.what());
     status.summary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, e.what());
   } catch (...) {
-    try {
-      if (is_running_.load() && diagnostic_timer_) {
-        diagnostic_timer_->cancel();
-        diagnostic_timer_.reset();
-      }
-    } catch (...) {
-      // Ignore exceptions during cleanup
-    }
     RCLCPP_ERROR(logger_, "Failed to TemperatureUpdate3: Device is deactivated/disconnected!");
     status.summary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, "Unknown error");
   }
@@ -2078,12 +2078,32 @@ void OBCameraNode::setupDiagnosticUpdater() {
     diagnostic_timer_ =
         node_->create_wall_timer(std::chrono::seconds(int(diagnostic_period_)), [this]() {
           try {
-            if (is_running_.load() && diagnostic_updater_) {
-              diagnostic_updater_->force_update();
+            // Check if we're still running and all components are valid
+            if (!is_running_.load() || !diagnostic_updater_ ||
+                !is_camera_node_initialized_.load() || !device_) {
+              return;
             }
+
+            // Try to acquire device lock with timeout to avoid blocking during shutdown
+            std::unique_lock<decltype(device_lock_)> lock(device_lock_, std::try_to_lock);
+            if (!lock.owns_lock()) {
+              // Device is busy or shutting down, skip this update
+              return;
+            }
+
+            diagnostic_updater_->force_update();
           } catch (const ob::Error &e) {
             RCLCPP_WARN_STREAM(logger_, "Diagnostic update failed: "
                                             << e.getMessage() << " - Device may be disconnected");
+            // Stop the diagnostic timer if device is having issues
+            try {
+              if (diagnostic_timer_) {
+                diagnostic_timer_->cancel();
+                diagnostic_timer_.reset();
+              }
+            } catch (...) {
+              // Ignore cleanup exceptions
+            }
           } catch (const std::exception &e) {
             RCLCPP_WARN_STREAM(logger_, "Diagnostic update failed: " << e.what());
           } catch (...) {

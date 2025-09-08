@@ -22,8 +22,8 @@
 #define THREAD_NUM 4
 
 #define OB_ROS_MAJOR_VERSION 2
-#define OB_ROS_MINOR_VERSION 4
-#define OB_ROS_PATCH_VERSION 5
+#define OB_ROS_MINOR_VERSION 5
+#define OB_ROS_PATCH_VERSION 1
 
 #ifndef STRINGIFY
 #define STRINGIFY(arg) #arg
@@ -133,5 +133,6 @@ const int32_t GEMINI_336LE_PID = 0x0810;                  // Gemini 335Le
 const int32_t CUSTOM_ADVANTECH_GEMINI_336_PID = 0x0816;   // Custom Advantech Gemini 336
 const int32_t CUSTOM_ADVANTECH_GEMINI_336L_PID = 0x0817;  // Custom Advantech Gemini 336L
 const int32_t DABAI_MAX_PID = 0x069a;                     // dabai max
+const int32_t GEMINI_338_PID = 0x0818;                    // Gemini 338
 
 }  // namespace orbbec_camera

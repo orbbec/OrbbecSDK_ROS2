@@ -2842,7 +2842,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
     image.create(height, width, image_format_[stream_index]);
   }
   if (frame->getType() == OB_FRAME_COLOR && !is_color_frame_decoded_) {
-    RCLCPP_ERROR(logger_, "color frame is not decoded");
+    RCLCPP_DEBUG(logger_, "color frame is not decoded");
     return;
   }
   if (frame->getType() == OB_FRAME_COLOR && frame->format() != OB_FORMAT_Y8 &&

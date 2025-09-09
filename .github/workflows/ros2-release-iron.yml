@@ -1,0 +1,55 @@
+name: ROS2 Publish Release Iron
+
+on:
+  workflow_dispatch:
+  workflow_call:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  pre-commit:
+    name: Format
+    runs-on: 'ubuntu-22.04'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install system hooks
+        run: sudo apt install -qq cppcheck
+      - uses: pre-commit/action@v3.0.0
+        with:
+          extra_args: --all-files --hook-stage manual
+  unit-tests:
+    name: Unit Tests
+    uses: locusrobotics/locus_ci/.github/workflows/reusable-ros2-pkg-build.yml@0.3
+    with:
+      ros_distro: 'iron'
+      docker_image: 'ros:iron-ros-base'
+    secrets:
+      jf_url: ${{ secrets.JF_URL }}
+      jf_user: ${{ secrets.JF_USER }}
+      jf_token: ${{ secrets.JF_TOKEN }}
+  release:
+    name: Release
+    needs: [unit-tests, pre-commit]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runs-on: 'APG-2-Core-ARM'
+            docker_image: 'arm64v8/ros:iron-ros-base'
+          - runs-on: 'ubuntu-22.04'
+            docker_image: 'ros:iron-ros-base'
+    uses: locusrobotics/locus_ci/.github/workflows/reusable-ros2-publish-jfrog.yml@0.3
+    with:
+      ros_distro: 'iron'
+      docker_image: ${{ matrix.docker_image }}
+      os: ${{ matrix.runs-on }}
+      build: true
+      version_tag: ${{ github.ref_name }}
+    secrets:
+      jf_url: ${{ secrets.JF_URL }}
+      jf_user: ${{ secrets.JF_USER }}
+      jf_token: ${{ secrets.JF_TOKEN }}

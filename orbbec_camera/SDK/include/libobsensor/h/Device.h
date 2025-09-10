@@ -423,6 +423,24 @@ OB_EXPORT const char *ob_device_info_get_connection_type(const ob_device_info *i
 OB_EXPORT const char *ob_device_info_get_ip_address(const ob_device_info *info, ob_error **error);
 
 /**
+ * @brief Get the network device subnet mask
+ *
+ * @param[in] info Device information
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
+ * @return const char* The subnet mask, such as "255.255.255.0"
+ */
+OB_EXPORT const char *ob_device_info_get_subnet_mask(const ob_device_info *info, ob_error **error);
+
+/**
+ * @brief Get the network device gateway address
+ *
+ * @param[in] info Device information
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
+ * @return const char* The gateway address, such as "192.168.1.1"
+ */
+OB_EXPORT const char *ob_device_info_get_gateway(const ob_device_info *info, ob_error **error);
+
+/**
  * @brief Get the hardware version number
  *
  * @param[in] info Device Information
@@ -570,16 +588,76 @@ OB_EXPORT const char *ob_device_list_get_device_connection_type(const ob_device_
 OB_EXPORT const char *ob_device_list_get_device_ip_address(const ob_device_list *list, uint32_t index, ob_error **error);
 
 /**
- * @brief Get device local mac address
+ * @brief Get device subnet mask
  *
- * @attention Only valid for network devices, otherwise it will return "0:0:0:0:0:0".
+ * @attention Only valid for network devices, otherwise it will return "0.0.0.0".
+ *
+ * @param[in] list Device list object
+ * @param[in] index Device index
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
+ * @return const char* returns the device subnet mask, such as "255.255.255.0"
+ */
+OB_EXPORT const char *ob_device_list_get_device_subnet_mask(const ob_device_list *list, uint32_t index, ob_error **error);
+
+/**
+ * @brief Get device gateway
+ *
+ * @attention Only valid for network devices, otherwise it will return "0.0.0.0".
+ *
+ * @param[in] list Device list object
+ * @param[in] index Device index
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
+ * @return const char* returns the device gateway, such as "192.168.1.1"
+ */
+OB_EXPORT const char *ob_device_list_get_device_gateway(const ob_device_list *list, uint32_t index, ob_error **error);
+
+/**
+ * @brief Get the MAC address of the host network interface corresponding to the network device.
+ *
+ * @attention Only valid for network devices. Returns "0:0:0:0:0:0" for non-network devices.
  *
  * @param list Device list object
  * @param index Device index
  * @param error Pointer to an error object that will be set if an error occurs.
- * @return const char* returns the device mac address
+ * @return const char* The MAC address of the host network interface associated with the device.
  */
 OB_EXPORT const char *ob_device_list_get_device_local_mac(const ob_device_list *list, uint32_t index, ob_error **error);
+
+/**
+ * @brief Get the IP address of the host network interface corresponding to the network device.
+ *
+ * @attention Only valid for network devices. Returns "0.0.0.0" for non-network devices.
+ *
+ * @param[in] list Device list object
+ * @param[in] index Device index
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
+ * @return const char* The IP address of the host network interface associated with the device.
+ */
+OB_EXPORT const char *ob_device_list_get_device_local_ip(const ob_device_list *list, uint32_t index, ob_error **error);
+
+/**
+ * @brief Get the subnet length of the host network interface corresponding to the network device.
+ *
+ * @attention Only valid for network devices. Returns 0 for non-network devices.
+ *
+ * @param[in] list Device list object
+ * @param[in] index Device index
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
+ * @return const uint8_t The subnet length (0~32) of the host network interface associated with the device.
+ */
+OB_EXPORT uint8_t ob_device_list_get_device_local_subnet_length(const ob_device_list *list, uint32_t index, ob_error **error);
+
+/**
+ * @brief Get the gateway of the host network interface corresponding to the network device.
+ *
+ * @attention Only valid for network devices. Returns "0.0.0.0" for non-network devices.
+ *
+ * @param[in] list Device list object
+ * @param[in] index Device index
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
+ * @return const char* The gateway of the host network interface associated with the device.
+ */
+OB_EXPORT const char *ob_device_list_get_device_local_gateway(const ob_device_list *list, uint32_t index, ob_error **error);
 
 /**
  * @brief Create a device.
@@ -688,4 +766,3 @@ OB_EXPORT void ob_delete_camera_param_list(ob_camera_param_list *param_list, ob_
 #ifdef __cplusplus
 }
 #endif
-

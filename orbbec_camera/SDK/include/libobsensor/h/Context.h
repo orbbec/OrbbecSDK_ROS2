@@ -64,6 +64,16 @@ OB_EXPORT ob_device_list *ob_query_device_list(ob_context *context, ob_error **e
 OB_EXPORT void ob_enable_net_device_enumeration(ob_context *context, bool enable, ob_error **error);
 
 /**
+ * @brief Changes the IP configuration of a network device.
+ *
+ * @param[in] deviceUid The unique device ID (MAC address). obtained via @ref ob_device_info_get_uid.
+ * @param[in] config The new IP configuration to apply.
+ * @param[out] error Pointer to an error object that will be populated if an error occurs.
+ * @return bool true if the configuration command was processed successfully, false otherwise.
+ */
+OB_EXPORT bool ob_change_net_device_ip_config(const char *deviceUid, ob_net_ip_config config, ob_error **error);
+
+/**
  * @brief Create a network device object
  *
  * @param[in] context Pointer to the context object

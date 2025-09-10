@@ -1028,6 +1028,30 @@ public:
         return type;
     }
 
+    /**
+     * @brief Get the subnet mask of the device
+     *
+     * @return const char* the subnet mask of the device, such as "255.255.255.0"
+     */
+    const char *getDeviceSubnetMask() const {
+        ob_error   *error      = nullptr;
+        const char *subnetMask = ob_device_info_get_subnet_mask(impl_, &error);
+        Error::handle(&error);
+        return subnetMask;
+    }
+
+    /**
+     * @brief Get the gateway address of the device
+     *
+     * @return const char* the gateway address of the device, such as "192.168.1.1"
+     */
+    const char *getDevicegateway() const {
+        ob_error   *error      = nullptr;
+        const char *subnetMask = ob_device_info_get_gateway(impl_, &error);
+        Error::handle(&error);
+        return subnetMask;
+    }
+
 public:
     // The following interfaces are deprecated and are retained here for compatibility purposes.
     const char *name() const {
@@ -1203,18 +1227,93 @@ public:
     }
 
     /**
-     * @brief get the local mac address of the device at the specified index
+     * @brief get the subnet mask of the device at the specified index
+     *
+     * @attention Only valid for network devices, otherwise it will return "0.0.0.0".
+     *
+     * @param index the index of the device
+     * @return const char* the subnet mask of the device
+     */
+    const char *getSubnetMask(uint32_t index) const {
+        ob_error *error      = nullptr;
+        auto      subnetMask = ob_device_list_get_device_subnet_mask(impl_, index, &error);
+        Error::handle(&error);
+        return subnetMask;
+    }
+
+    /**
+     * @brief get the gateway of the device at the specified index
+     *
+     * @attention Only valid for network devices, otherwise it will return "0.0.0.0".
+     *
+     * @param index the index of the device
+     * @return const char* the gateway of the device
+     */
+    const char *getGateway(uint32_t index) const {
+        ob_error *error   = nullptr;
+        auto      gateway = ob_device_list_get_device_gateway(impl_, index, &error);
+        Error::handle(&error);
+        return gateway;
+    }
+
+    /**
+     * @brief Get the MAC address of the host network interface corresponding to the device at the specified index
      *
      * @attention Only valid for network devices, otherwise it will return "0:0:0:0:0:0".
      *
      * @param index the index of the device
-     * @return const char* the local mac address of the device
+     * @return const char* The MAC address of the host network interface associated with the device.
      */
     const char *getLocalMacAddress(uint32_t index) const {
         ob_error *error = nullptr;
-        auto      mac    = ob_device_list_get_device_local_mac(impl_, index, &error);
+        auto      mac   = ob_device_list_get_device_local_mac(impl_, index, &error);
         Error::handle(&error);
         return mac;
+    }
+
+    /**
+     * @brief Get the IP address of the host network interface corresponding to the device at the specified index
+     *
+     * @attention Only valid for network devices, otherwise it will return "0.0.0.0".
+     *
+     * @param index The index of the device
+     * @return const char* The IP address of the host network interface associated with the device.
+     */
+    const char *getLocalIP(uint32_t index) const {
+        ob_error *error = nullptr;
+        auto      ip    = ob_device_list_get_device_local_ip(impl_, index, &error);
+        Error::handle(&error);
+        return ip;
+    }
+
+    /**
+     * @brief Get the subnet length of the host network interface corresponding to the device at the specified index
+     *
+     * @attention Only valid for network devices, otherwise it will return 0.
+     *
+     * @param index The index of the device
+     * @return uint8_t The subnet length (0~32) of the host network interface associated with the device.
+     */
+    uint8_t getLocalSubnetLength(uint32_t index) const {
+        ob_error *error      = nullptr;
+        auto      subnetMask = ob_device_list_get_device_local_subnet_length(impl_, index, &error);
+        Error::handle(&error);
+        return subnetMask;
+    }
+
+    /**
+     * @brief Get the gateway of the host network interface corresponding to the device at the specified index
+     *
+     * @attention Only valid for network devices, otherwise it will return "0.0.0.0".
+     *
+     * @param index The index of the device
+     * @return const char* The gateway of the host network interface associated with the device.
+     */
+    const char *getLocalGateway(uint32_t index) const {
+        ob_error *error   = nullptr;
+        auto      gateway = ob_device_list_get_device_local_gateway(impl_, index, &error);
+        Error::handle(&error);
+        return gateway;
     }
 
     /**

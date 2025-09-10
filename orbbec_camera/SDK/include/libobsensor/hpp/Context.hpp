@@ -98,6 +98,20 @@ public:
     }
 
     /**
+     * @brief Changes the IP configuration of a network device.
+     *
+     * @param[in] deviceUid The device unique ID, which is the network device MAC address. It can be obtained through the @ref DeviceList::uid() function.
+     * @param[in] config The new IP configuration.
+     * @return bool true if the configuration command was processed successfully, false otherwise.
+     */
+    bool changeNetDeviceIpConfig(const char *deviceUid, const OBNetIpConfig &config) {
+        ob_error *error = nullptr;
+        auto      res   = ob_change_net_device_ip_config(deviceUid, config, &error);
+        Error::handle(&error);
+        return res;
+    }
+
+    /**
      * @brief Creates a network device with the specified IP address and port.
      *
      * @param[in] address The IP address, ipv4 only. such as "192.168.1.10"

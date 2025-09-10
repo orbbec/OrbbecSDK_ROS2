@@ -3972,27 +3972,31 @@ void OBCameraNode::setFilterCallback(const std::shared_ptr<SetFilter ::Request> 
                                         << "\ndisp_diff:" << params.disp_diff << "\nmagnitude:"
                                         << params.magnitude << "\nradius:" << params.radius);
       } else {
-        RCLCPP_INFO_STREAM(
-            logger_, request->filter_name
-                         << "Cannot be set\n"
-                         << "The filter_name value that can be set is "
-                            "DecimationFilter, HDRMerge, SequenceIdFilter, ThresholdFilter, "
-                            "NoiseRemovalFilter, HardwareNoiseRemoval, SpatialAdvancedFilter, "
-                            "SpatialFastFilter, SpatialModerateFilter and TemporalFilter");
+        response->message =
+            "The filter switch setting is successful, but the filter parameter setting fails";
         return;
       }
-      for (auto &filter : depth_filter_list_) {
-        std::cout << " - " << filter->getName() << ": "
-                  << (filter->isEnabled() ? "enabled" : "disabled") << std::endl;
-        auto configSchemaVec = filter->getConfigSchemaVec();
-        for (auto &configSchema : configSchemaVec) {
-          std::cout << "    - {" << configSchema.name << ", " << configSchema.type << ", "
-                    << configSchema.min << ", " << configSchema.max << ", " << configSchema.step
-                    << ", " << configSchema.def << ", " << configSchema.desc << "}" << std::endl;
-        }
-      }
-      response->success = true;
+    } else {
+      RCLCPP_INFO_STREAM(logger_,
+                         request->filter_name
+                             << "Cannot be set\n"
+                             << "The filter_name value that can be set is "
+                                "DecimationFilter, HDRMerge, SequenceIdFilter, ThresholdFilter, "
+                                "NoiseRemovalFilter, HardwareNoiseRemoval, SpatialAdvancedFilter, "
+                                "SpatialFastFilter, SpatialModerateFilter and TemporalFilter");
+      return;
     }
+    for (auto &filter : depth_filter_list_) {
+      std::cout << " - " << filter->getName() << ": "
+                << (filter->isEnabled() ? "enabled" : "disabled") << std::endl;
+      auto configSchemaVec = filter->getConfigSchemaVec();
+      for (auto &configSchema : configSchemaVec) {
+        std::cout << "    - {" << configSchema.name << ", " << configSchema.type << ", "
+                  << configSchema.min << ", " << configSchema.max << ", " << configSchema.step
+                  << ", " << configSchema.def << ", " << configSchema.desc << "}" << std::endl;
+      }
+    }
+    response->success = true;
   } catch (const ob::Error &e) {
     response->message = e.getMessage();
     response->success = false;

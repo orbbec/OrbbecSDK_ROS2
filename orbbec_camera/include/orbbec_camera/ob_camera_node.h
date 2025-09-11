@@ -819,6 +819,7 @@ class OBCameraNode {
   std::string frame_aggregate_mode_ = "ANY";  // # full_frame, color_frame, ANY or disable
 
   bool show_fps_enable_ = false;
+  bool enable_publish_extrinsic_ = false;
   std::unique_ptr<FpsCounter> fps_counter_color_{nullptr};
   std::unique_ptr<FpsCounter> fps_counter_depth_{nullptr};
   std::unique_ptr<FpsCounter> fps_counter_left_ir_{nullptr};

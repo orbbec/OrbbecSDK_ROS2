@@ -1945,6 +1945,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<std::string>(frame_aggregate_mode_, "frame_aggregate_mode", "ANY");
 
   setAndGetNodeParameter<bool>(show_fps_enable_, "show_fps_enable", false);
+  setAndGetNodeParameter<bool>(enable_publish_extrinsic_, "enable_publish_extrinsic", false);
 
   RCLCPP_INFO_STREAM(logger_, "current time domain: " << time_domain_);
   RCLCPP_INFO_STREAM(logger_, "hdr_index1_laser_control_ "
@@ -2013,14 +2014,12 @@ void OBCameraNode::onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapp
     // Try to acquire device lock with timeout to avoid blocking during shutdown
     std::unique_lock<decltype(device_lock_)> lock(device_lock_, std::try_to_lock);
     if (!lock.owns_lock()) {
-      status.summary(diagnostic_msgs::msg::DiagnosticStatus::STALE,
-                     "Device busy or shutting down");
+      status.summary(diagnostic_msgs::msg::DiagnosticStatus::STALE, "Device busy or shutting down");
       return;
     }
 
     if (!device_) {
-      status.summary(diagnostic_msgs::msg::DiagnosticStatus::STALE,
-                     "Device not available");
+      status.summary(diagnostic_msgs::msg::DiagnosticStatus::STALE, "Device not available");
       return;
     }
 
@@ -2287,32 +2286,32 @@ void OBCameraNode::setupPublishers() {
   if (use_intra_process_) {
     extrinsics_qos = rclcpp::QoS(1);
   }
-  if (enable_stream_[DEPTH] && enable_stream_[INFRA0]) {
+  if (enable_stream_[DEPTH] && enable_stream_[INFRA0] && enable_publish_extrinsic_) {
     depth_to_other_extrinsics_publishers_[INFRA0] =
         node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
             "/" + camera_name_ + "/depth_to_ir", extrinsics_qos);
   }
-  if (enable_stream_[DEPTH] && enable_stream_[COLOR]) {
+  if (enable_stream_[DEPTH] && enable_stream_[COLOR] && enable_publish_extrinsic_) {
     depth_to_other_extrinsics_publishers_[COLOR] =
         node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
             "/" + camera_name_ + "/depth_to_color", extrinsics_qos);
   }
-  if (enable_stream_[DEPTH] && enable_stream_[INFRA1]) {
+  if (enable_stream_[DEPTH] && enable_stream_[INFRA1] && enable_publish_extrinsic_) {
     depth_to_other_extrinsics_publishers_[INFRA1] =
         node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
             "/" + camera_name_ + "/depth_to_left_ir", extrinsics_qos);
   }
-  if (enable_stream_[DEPTH] && enable_stream_[INFRA2]) {
+  if (enable_stream_[DEPTH] && enable_stream_[INFRA2] && enable_publish_extrinsic_) {
     depth_to_other_extrinsics_publishers_[INFRA2] =
         node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
             "/" + camera_name_ + "/depth_to_right_ir", extrinsics_qos);
   }
-  if (enable_stream_[DEPTH] && enable_stream_[ACCEL]) {
+  if (enable_stream_[DEPTH] && enable_stream_[ACCEL] && enable_publish_extrinsic_) {
     depth_to_other_extrinsics_publishers_[ACCEL] =
         node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
             "/" + camera_name_ + "/depth_to_accel", extrinsics_qos);
   }
-  if (enable_stream_[DEPTH] && enable_stream_[GYRO]) {
+  if (enable_stream_[DEPTH] && enable_stream_[GYRO] && enable_publish_extrinsic_) {
     depth_to_other_extrinsics_publishers_[GYRO] =
         node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
             "/" + camera_name_ + "/depth_to_gyro", extrinsics_qos);
@@ -3492,7 +3491,7 @@ void OBCameraNode::calcAndPublishStaticTransform() {
   }
 
   if ((pid == FEMTO_BOLT_PID || pid == FEMTO_MEGA_PID) && enable_stream_[DEPTH] &&
-      enable_stream_[COLOR]) {
+      enable_stream_[COLOR] && enable_publish_extrinsic_) {
     // calc depth to color
 
     CHECK_NOTNULL(stream_profile_[COLOR]);
@@ -3505,7 +3504,7 @@ void OBCameraNode::calcAndPublishStaticTransform() {
                     frame_id_[base_stream_]);
   }
 
-  if (enable_stream_[DEPTH] && enable_stream_[COLOR]) {
+  if (enable_stream_[DEPTH] && enable_stream_[COLOR] && enable_publish_extrinsic_) {
     static const char *frame_id = "depth_to_color_extrinsics";
     OBExtrinsic ex;
     try {
@@ -3521,7 +3520,7 @@ void OBCameraNode::calcAndPublishStaticTransform() {
     depth_to_other_extrinsics_publishers_[COLOR]->publish(ex_msg);
   }
 
-  if (enable_stream_[DEPTH] && enable_stream_[INFRA0]) {
+  if (enable_stream_[DEPTH] && enable_stream_[INFRA0] && enable_publish_extrinsic_) {
     static const char *frame_id = "depth_to_ir_extrinsics";
     OBExtrinsic ex;
     try {
@@ -3536,7 +3535,7 @@ void OBCameraNode::calcAndPublishStaticTransform() {
     CHECK_NOTNULL(depth_to_other_extrinsics_publishers_[INFRA0]);
     depth_to_other_extrinsics_publishers_[INFRA0]->publish(ex_msg);
   }
-  if (enable_stream_[DEPTH] && enable_stream_[INFRA1]) {
+  if (enable_stream_[DEPTH] && enable_stream_[INFRA1] && enable_publish_extrinsic_) {
     static const char *frame_id = "depth_to_left_ir_extrinsics";
     OBExtrinsic ex;
     try {
@@ -3551,7 +3550,7 @@ void OBCameraNode::calcAndPublishStaticTransform() {
     CHECK_NOTNULL(depth_to_other_extrinsics_publishers_[INFRA1]);
     depth_to_other_extrinsics_publishers_[INFRA1]->publish(ex_msg);
   }
-  if (enable_stream_[DEPTH] && enable_stream_[INFRA2]) {
+  if (enable_stream_[DEPTH] && enable_stream_[INFRA2] && enable_publish_extrinsic_) {
     static const char *frame_id = "depth_to_right_ir_extrinsics";
     OBExtrinsic ex;
     try {
@@ -3567,7 +3566,7 @@ void OBCameraNode::calcAndPublishStaticTransform() {
     CHECK_NOTNULL(depth_to_other_extrinsics_publishers_[INFRA2]);
     depth_to_other_extrinsics_publishers_[INFRA2]->publish(ex_msg);
   }
-  if (enable_stream_[DEPTH] && enable_stream_[ACCEL]) {
+  if (enable_stream_[DEPTH] && enable_stream_[ACCEL] && enable_publish_extrinsic_) {
     static const char *frame_id = "depth_to_accel_extrinsics";
     OBExtrinsic ex;
     try {
@@ -3582,7 +3581,7 @@ void OBCameraNode::calcAndPublishStaticTransform() {
     CHECK_NOTNULL(depth_to_other_extrinsics_publishers_[ACCEL]);
     depth_to_other_extrinsics_publishers_[ACCEL]->publish(ex_msg);
   }
-  if (enable_stream_[DEPTH] && enable_stream_[GYRO]) {
+  if (enable_stream_[DEPTH] && enable_stream_[GYRO] && enable_publish_extrinsic_) {
     static const char *frame_id = "depth_to_gyro_extrinsics";
     OBExtrinsic ex;
     try {

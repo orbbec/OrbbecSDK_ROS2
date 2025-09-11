@@ -359,7 +359,7 @@ orbbec_ros:
       # Publish D2C superimposed image (only for testing).
       enable_d2c_viewer: false
       # false: switch to software disparity convert to depth, true: switch to hardware disparity convert to depth
-      disaparity_to_depth_mode: 'HW'
+      disparity_to_depth_mode: 'HW'
       # If false, the host time will not be synchronized with the device time
       enable_sync_host_time: true
       # URL of the IR image info

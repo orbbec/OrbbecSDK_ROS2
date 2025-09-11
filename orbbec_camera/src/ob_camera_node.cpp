@@ -273,15 +273,15 @@ void OBCameraNode::setupDevices() {
   }
   if (device_->isPropertySupported(OB_PROP_DISPARITY_TO_DEPTH_BOOL, OB_PERMISSION_READ_WRITE) &&
       device_->isPropertySupported(OB_PROP_SDK_DISPARITY_TO_DEPTH_BOOL, OB_PERMISSION_READ_WRITE)) {
-    if (disaparity_to_depth_mode_ == "HW") {
+    if (disparity_to_depth_mode_ == "HW") {
       device_->setBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL, 1);
       device_->setBoolProperty(OB_PROP_SDK_DISPARITY_TO_DEPTH_BOOL, 0);
       RCLCPP_INFO_STREAM(logger_, "Depth process is HW");
-    } else if (disaparity_to_depth_mode_ == "SW") {
+    } else if (disparity_to_depth_mode_ == "SW") {
       device_->setBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL, 0);
       device_->setBoolProperty(OB_PROP_SDK_DISPARITY_TO_DEPTH_BOOL, 1);
       RCLCPP_INFO_STREAM(logger_, "Depth process is SW");
-    } else if (disaparity_to_depth_mode_ == "disable") {
+    } else if (disparity_to_depth_mode_ == "disable") {
       device_->setBoolProperty(OB_PROP_DISPARITY_TO_DEPTH_BOOL, 0);
       device_->setBoolProperty(OB_PROP_SDK_DISPARITY_TO_DEPTH_BOOL, 0);
       RCLCPP_INFO_STREAM(logger_, "Depth process is disable");
@@ -1754,7 +1754,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<bool>(enable_point_cloud_, "enable_point_cloud", false);
   setAndGetNodeParameter<std::string>(point_cloud_qos_, "point_cloud_qos", "default");
   setAndGetNodeParameter<bool>(enable_d2c_viewer_, "enable_d2c_viewer", false);
-  setAndGetNodeParameter<std::string>(disaparity_to_depth_mode_, "disaparity_to_depth_mode", "HW");
+  setAndGetNodeParameter<std::string>(disparity_to_depth_mode_, "disparity_to_depth_mode", "HW");
   setAndGetNodeParameter<std::string>(depth_filter_config_, "depth_filter_config", "");
   if (!depth_filter_config_.empty()) {
     enable_depth_filter_ = true;

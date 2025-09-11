@@ -654,7 +654,7 @@ class OBCameraNode {
   int left_ir_sequence_id_filter_id_ = -1;
   bool enable_frame_sync_ = false;
   // Only for Gemini2 device
-  std::string disaparity_to_depth_mode_ = "HW";
+  std::string disparity_to_depth_mode_ = "HW";
   std::string depth_work_mode_;
   OBMultiDeviceSyncMode sync_mode_ = OBMultiDeviceSyncMode::OB_MULTI_DEVICE_SYNC_MODE_FREE_RUN;
   std::string sync_mode_str_;

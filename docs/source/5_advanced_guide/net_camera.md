@@ -20,13 +20,13 @@ If you do not want to automatically enumerate network devices,you can set `enume
 
 For [femto_mega.launch.py](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/launch/femto_mega.launch.py) as an example:
 
-#### automatically enumerate network devices:
+- **automatically enumerate network devices:**
 
 ```bash
 ros2 launch orbbec_camera femto_mega.launch.py enumerate_net_device:=true
 ```
 
-#### Specify IP address to start the device:
+- **Specify IP address to start the device:**
 
 Note: `net_device_ip` needs to be changed to the IP address of the device, here it is 192.168.1.10
 

@@ -106,7 +106,7 @@ def getDeviceCount():
     deviceInfoPath = f"{sourceRootPath}/DevicesInfo.txt"
     if not os.path.exists(deviceInfoPath):
         print(f"Get device count failed. {deviceInfoPath} not exists")
-        return 0
+        return 0 
 
     with open(deviceInfoPath, 'r') as f:
         data = json.load(f)
@@ -157,22 +157,22 @@ def isFrameFile(fileName):
     frameExts = {".jpeg", ".jpg", ".png", ".raw", "bmp"}
     return fileExt[1] in frameExts
 
-def extract_d_number(filename):
+def extract_number(filename): 
+    """提取文件名中以'g'开头的数字部分"""
+    match_g = re.search(r'g(\d+)', filename)
+    if match_g:
+        return int(match_g.group(1))
+    
     """提取文件名中以'd'开头的数字部分"""
     match_d = re.search(r'd(\d+)', filename)
     if match_d:
         return int(match_d.group(1))
-
-    match_g = re.search(r'g(\d+)', filename)
-    if match_g:
-        return int(match_g.group(1))
-
     return float('inf')
 
 def initPictureInfoDictionary(rootFilePath, pictureInfoDict):
     frameFileCount = 0
     for dirpath, dirnames, filenames in os.walk(rootFilePath):
-        filenames.sort(key=extract_d_number) # 排序，按文件名中的'd'后面的数字从小到大排序
+        filenames.sort(key=extract_number) # 排序，按文件名中的'd'和'g'后面的数字从小到大排序
         for fileName in filenames:
             filePath = os.path.join(dirpath, fileName)
             if not isFrameFile(fileName):
@@ -191,7 +191,7 @@ def initPictureInfoDictionary(rootFilePath, pictureInfoDict):
 
             # 格式化字典一个key对应一个数组
             pictureInfoDict.setdefault(deviceId, []).append(info)
-
+    
     if 0 == frameFileCount:
         print("initialize pictureInfoDict failed. Not found frame file")
 
@@ -205,7 +205,7 @@ def matchFrame(pictureInfoDict):
     for key in pictureInfoDict:
         listTmp = list(pictureInfoDict[key])
         for info in listTmp:
-            if info.deviceId == primaryId and info.sensorType == 'ir_left':
+            if info.deviceId == primaryId and info.sensorType == 'color':
                 compareList.append(info)
 
     # 根据开流情况动态分析，减少循环次数
@@ -250,7 +250,6 @@ def matchFrame(pictureInfoDict):
                     if info.sensorType == 'depth' and abs(info.syncTimeStamp - comparePic.syncTimeStamp) < frameTspHalfGap:
                         resultDict.setdefault(dictIndex, []).append(info)
                         consumedList.append(info)
-                        print("=====================result value : jjjjjjjjjjjjjjj:%s" % (info.syncTimeStamp))
                         break
 
             # IR
@@ -360,8 +359,6 @@ def handleSyncFrames():
 
     for key in resultDict:
         listTmp = list(resultDict[key])
-        # print("***********")
-        # print(listTmp)
         if (len(listTmp) == (deviceCount * streamProfileCount)):
             haveAbnormalData = False
             for info in listTmp:
@@ -371,20 +368,16 @@ def handleSyncFrames():
                     shutil.copy(info.picturePath, path)
                     haveAbnormalData = True
                 else:
-                    # print("***********")
-                    # print(info.picturePath)
-                    # print("###########")
                     path = matchPath + str(key) + "_" + info.sensorType + "_" + info.deviceIdFull + "_" + str(
                         info.syncTimeStamp) + "_[" + str(info.tspDiff) + "]" + info.fileExt
                     shutil.copy(info.picturePath, path)
-                    # print(path)
 
             if haveAbnormalData:
                 safe_make_dir(abnormalPath)
                 for info in listTmp:
                     if info.tspDiff >= tspRangeThreshold:
                         path = abnormalPath + str(key) + "_" + info.sensorType + "_" + info.deviceIdFull + "_" + str(
-                            info.syncTimeStamp) + "_[" + str(info.tspDiff) + "]" + "_xxxxxx" + info.fileExt
+                            info.syncTimeStamp) + "_[" + str(info.tspDiff) + "]" + "_xxxxxx" + info.fileExt 
                         shutil.copy(info.picturePath, path)
                     else:
                         path = abnormalPath + str(key) + "_" + info.sensorType + "_" + info.deviceIdFull + "_" + str(

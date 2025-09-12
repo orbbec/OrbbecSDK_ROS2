@@ -8,6 +8,9 @@ import configparser
 from pathlib import Path
 from datetime import datetime
 
+import os
+import re
+
 ## Config.ini中配置
 # 单位：FPS,请依据数据集实际帧率填写，否则会导致匹配不准确
 frameRate = -1
@@ -156,10 +159,21 @@ def isFrameFile(fileName):
     frameExts = {".jpeg", ".jpg", ".png", ".raw", "bmp"}
     return fileExt[1] in frameExts
 
+def extract_number(filename): 
+    match_d = re.search(r'_d(\d+)', filename)
+    if match_d:
+        return int(match_d.group(1))
+
+    match_g = re.search(r'_g(\d+)', filename)
+    if match_g:
+        return int(match_g.group(1))
+    
+    return float('inf')
+
 def initPictureInfoDictionary(rootFilePath, pictureInfoDict):
     frameFileCount = 0
     for dirpath, dirnames, filenames in os.walk(rootFilePath):
-        # print(f"dirpath={dirpath}, dirpath.basename=" + os.path.basename(dirpath))
+        filenames.sort(key=extract_number) # 排序，按文件名中的'_d'和'_g'后面的数字从小到大排序
         for fileName in filenames:
             filePath = os.path.join(dirpath, fileName)
             if not isFrameFile(fileName):

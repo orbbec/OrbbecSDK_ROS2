@@ -33,7 +33,7 @@ def execute_sync_width_pid(frames_dir, pid):
         sync_script_file="script/config_frameMatch-systemTimestamp.py"
     elif pid.lower() == "0x0660":
         sync_script_file="script/config_frameMatch-Astra2_new.py"
-    elif pid.lower() == "0x0803" or pid.lower() == "0x0807" or pid.lower() == "0x0801" or pid.lower() == "0x0805" or pid.lower() == "0x080b" or pid.lower() == "0x080e":
+    elif pid.lower() == "0x0800" or pid.lower() == "0x0804" or pid.lower() == "0x0803" or pid.lower() == "0x0807" or pid.lower() == "0x0801" or pid.lower() == "0x0805" or pid.lower() == "0x080b" or pid.lower() == "0x080e" or pid.lower() == "0x080f" or pid.lower() == "0x0A13":
         sync_script_file="script/config_frameMatch_g330.py"
     else:
         sync_script_file="script/config_frameMatch.py"

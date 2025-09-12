@@ -1,4 +1,4 @@
-## 2.1. Registration script (required)
+## Registration script (required)
 
 To allow the Orbbec cameras to be recognized correctly on Linux, install the udev rules:
 

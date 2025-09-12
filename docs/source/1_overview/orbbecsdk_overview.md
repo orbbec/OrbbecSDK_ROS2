@@ -23,7 +23,6 @@ This section introduces the Orbbec SDK in C++. Its architecture and concepts are
 |  15  |  MetaData  |  Frame metadata is a set of parameters (or attributes) that provide a snapshot of the sensor configuration and/or system state present during the frame’s generation.   |
 |  16  |  HDR  |  High Dynamic Range (HDR) imaging allows imaging systems to capture images in extremely dark and bright scenes alike. We propose a software solution running on the host CPU to implement this feature. It utilizes data from two consecutive frames and directly synthesizes these two depth images, thereby enhances the dynamic range of 16-bit depth images.  |
 |  17  |  LDP  |  Laser close-range protection  |
-|   |   |   |
 
 ## Orbbec SDK v2 Architecture Overview
 
@@ -57,47 +56,47 @@ The driver implementation of each platform.
 ## SDK Concept Overview
 
 - Context
-    
+  
 
 Context which provides a set of settings includes settings such as device state change callbacks, log levels, and more. The Context can access multiple devices.
 
 - Device
-    
+  
 
 One actual hardware device corresponds to one Device object, which is used to obtain relevant information of the device and control its attributes.
 
 - Pipeline
-    
+  
 
 The HighLevel corresponding object encapsulates the interface for quick access to the SDK. It has simple functions that allow users to quickly get started and use the SDK.
 
 - Config
-    
+  
 
 Provides configuration for enabling data streams, alignment modes, and frame aggregation modes,  It is used to control the behavior of the data output. 
 
 - StreamProfile 
-    
+  
 
 Stream configuration that defines parameters such as resolution, frame rate, and encoding format, It also provides management of camera parameters.
 
 - Frame
-    
+  
 
 Represents a frame of data in the Stream, and also contains relevant information about that frame of data, such as timestamp, type, etc.
 
 - Filter
-    
+  
 
 It mainly refers to some algorithmic processing modules for the composite stream FrameSet, such as point cloud algorithm processing.
 
 - Record
-    
+  
 
 Recording functionality that captures data streams and saves them as files for later analysis or playback.
 
 - Playback
-    
+  
 
 Playback functionality that plays recorded files and supports control over playback speed and other related parameters.
 

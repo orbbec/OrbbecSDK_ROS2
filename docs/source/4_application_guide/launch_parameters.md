@@ -139,21 +139,23 @@ The following are the launch parameters available:
 
 #### Network Cameras
 *   **`enumerate_net_device`**
-    *   Enable automatically enumerate network devices. Used for [net camera](../orbbec_camera/examples/net_camera/README.MD).
+    *   Enable automatically enumerate network devices. 
 *   **`net_device_ip`** / **`net_device_port`**
-    *   Set net device's IP address and port (Usually `8090`). Used for [net camera](../orbbec_camera/examples/net_camera/README.MD).
+    *   Set net device's IP address and port (Usually `8090`). 
+
+> Used for [net camera](../5_advanced_guide/net_camera.md).
 
 #### Device-Specific
 *   **`device_preset`**
-    *   The default value is `Default`. Only the G330 series is supported. For more information, refer to the [G330 documentation](https://www.orbbec.com/docs/g330-use-depth-presets/). The value should be one of the preset names listed [in the table](./predefined_presets.md).
+    *   The default value is `Default`. Only the G330 series is supported. For more information, refer to the [G330 documentation](https://www.orbbec.com/docs/g330-use-depth-presets/). The value should be one of the preset names listed [in the table](../5_advanced_guide/predefined_presets.md).
 *   **`enable_gmsl_trigger`** / **`gmsl_trigger_fps`**
-    *   Enable the gmsl trigger out signal / set gmsl trigger fps. Used for [gmsl camera](../orbbec_camera/examples/gmsl_camera/README.MD).
+    *   Enable the gmsl trigger out signal / set gmsl trigger fps. Used for [gmsl camera](../5_advanced_guide/gmsl_camera.md).
 
 #### Disparity
 *   **`disparity_to_depth_mode`**
     *   `HW`: use hardware disparity to depth conversion. `SW`: use software disparity to depth conversion.
 *   **`disparity_range_mode`**, **`disparity_search_offset`**, **`disparity_offset_config`**
-    *   Parameters for disparity search offset. Used for [disparity search offset](../orbbec_camera/examples/disparity_search_offset/README.MD).
+    *   Parameters for disparity search offset. Used for [disparity search offset](../5_advanced_guide/disparity_search_offset.md).
 
 #### Interleave AE Mode
 *   **`interleave_ae_mode`**
@@ -162,7 +164,7 @@ The following are the launch parameters available:
     *   Parameters to control interleave frame mode.
 *   **`[hdr|laser]_index[0|1]_[...]`**
     *   In interleave frame mode, set the 0th and 1st frame parameters of hdr or laser interleaving frames.
-*   *All interleave parameters are used for [interleave ae mode](../orbbec_camera/examples/interleave_ae_mode/README.MD).*
+*   *All interleave parameters are used for [interleave ae mode](../5_advanced_guide/interleave_ae_mode.md).*
 
 ### Basic & General Parameters
 

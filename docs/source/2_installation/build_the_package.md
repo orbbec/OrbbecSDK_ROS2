@@ -1,6 +1,6 @@
-### 2.2. Build from Source
+### Build from Source
 
-#### 2.2.1. Environment
+#### Environment
 
 Install ROS 2 according to the official guide:
 
@@ -19,7 +19,7 @@ Create a `colcon` workspace:
 mkdir -p ~/ros2_ws/src
 ```
 
-#### 2.2.2. Linux ROS2 Wrapper Compilation
+#### Linux ROS2 Wrapper Compilation
 
 Clone source and checkout `v2-main` branch:
 

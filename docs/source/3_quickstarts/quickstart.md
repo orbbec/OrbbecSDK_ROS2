@@ -1,6 +1,6 @@
 ## QuickStarts
 
-### 3.1. Introduction
+### Introduction
 
 This section provides a quick start to using the Orbbec ROS 2 wrapper.
 You will learn how to:
@@ -11,7 +11,7 @@ You will learn how to:
 
 ---
 
-### 3.2. Build your First Camera Application
+### Build your First Camera Application
 
 #### Step 1: Source ROS 2 and Workspace
 
@@ -56,11 +56,11 @@ You should now see the color stream, depth stream, and 3D point cloud in RViz2.
 
 ---
 
-### 3.3. Sample Features
+### Sample Features
 
 After the node is running, try some ROS 2 CLI commands:
 
-#### 3.3.1. List available topics / services/ parameters
+#### List available topics / services/ parameters
 
 ```bash
 ros2 topic list
@@ -68,7 +68,7 @@ ros2 service list
 ros2 param list
 ```
 
-#### 3.3.2. Echo a topic
+#### Echo a topic
 
 View depth camera data:
 
@@ -76,7 +76,7 @@ View depth camera data:
 ros2 topic echo /camera/depth/camera_info
 ```
 
-#### 3.3.3. Call a service
+#### Call a service
 
 For example, get device Information:
 
@@ -84,7 +84,7 @@ For example, get device Information:
 ros2 service call /camera/get_device_info orbbec_camera_msgs/srv/GetDeviceInfo '{}'
 ```
 
-#### 3.3.4. Record with rosbag2
+#### Record with rosbag2
 
 ```bash
 ros2 bag record /camera/color/image_raw /camera/depth/image_raw

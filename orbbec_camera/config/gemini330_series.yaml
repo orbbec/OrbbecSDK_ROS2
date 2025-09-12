@@ -85,7 +85,7 @@ orbbec_ros:
             gyro_rate: "200hz"
             gyro_range: "1000dps"
             enable_sync_output_accel_gyro: false
-            liner_accel_cov: 0.01
+            linear_accel_cov: 0.01
             angular_vel_cov: 0.01
 
         point_cloud:

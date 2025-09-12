@@ -578,15 +578,15 @@ void OBCameraNode::setupDevices() {
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_SATURATION_INT, color_saturation_);
     }
   }
-  if (color_constrast_ != -1 &&
+  if (color_contrast_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_CONTRAST_INT, OB_PERMISSION_WRITE)) {
     auto range = device_->getIntPropertyRange(OB_PROP_COLOR_CONTRAST_INT);
-    if (color_constrast_ < range.min || color_constrast_ > range.max) {
-      RCLCPP_ERROR(logger_, "color constrast value is out of range[%d,%d], please check the value",
+    if (color_contrast_ < range.min || color_contrast_ > range.max) {
+      RCLCPP_ERROR(logger_, "color contrast value is out of range[%d,%d], please check the value",
                    range.min, range.max);
     } else {
-      RCLCPP_INFO_STREAM(logger_, "Setting color constrast to " << color_constrast_);
-      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_CONTRAST_INT, color_constrast_);
+      RCLCPP_INFO_STREAM(logger_, "Setting color contrast to " << color_contrast_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_CONTRAST_INT, color_contrast_);
     }
   }
   if (color_hue_ != -1 &&
@@ -601,11 +601,11 @@ void OBCameraNode::setupDevices() {
     }
   }
   if (device_->isPropertySupported(OB_PROP_COLOR_BACKLIGHT_COMPENSATION_INT, OB_PERMISSION_WRITE)) {
-    int set_enable_color_backlight_compenstation = enable_color_backlight_compenstation_ ? 1 : 0;
-    RCLCPP_INFO_STREAM(logger_, "Setting color backlight compenstation to "
-                                    << (set_enable_color_backlight_compenstation ? "ON" : "OFF"));
+    int set_enable_color_backlight_compensation = enable_color_backlight_compensation_ ? 1 : 0;
+    RCLCPP_INFO_STREAM(logger_, "Setting color backlight compensation to "
+                                    << (set_enable_color_backlight_compensation ? "ON" : "OFF"));
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_BACKLIGHT_COMPENSATION_INT,
-                        set_enable_color_backlight_compenstation);
+                        set_enable_color_backlight_compensation);
   }
   if (!color_powerline_freq_.empty() &&
       device_->isPropertySupported(OB_PROP_COLOR_POWER_LINE_FREQUENCY_INT, OB_PERMISSION_WRITE)) {
@@ -972,7 +972,7 @@ void OBCameraNode::setupDepthPostProcessFilter() {
         {"SpatialAdvancedFilter", enable_spatial_filter_},
         {"TemporalFilter", enable_temporal_filter_},
         {"HoleFillingFilter", enable_hole_filling_filter_},
-        {"DisparityTransform", enable_disaparity_to_depth_},
+        {"DisparityTransform", enable_disparity_to_depth_},
         {"ThresholdFilter", enable_threshold_filter_},
         {"SpatialFastFilter", enable_spatial_fast_filter_},
         {"SpatialModerateFilter", enable_spatial_moderate_filter_},
@@ -1777,10 +1777,10 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(color_sharpness_, "color_sharpness", -1);
   setAndGetNodeParameter<int>(color_gamma_, "color_gamma", -1);
   setAndGetNodeParameter<int>(color_saturation_, "color_saturation", -1);
-  setAndGetNodeParameter<int>(color_constrast_, "color_constrast", -1);
+  setAndGetNodeParameter<int>(color_contrast_, "color_contrast", -1);
   setAndGetNodeParameter<int>(color_hue_, "color_hue", -1);
-  setAndGetNodeParameter<bool>(enable_color_backlight_compenstation_,
-                               "enable_color_backlight_compenstation", false);
+  setAndGetNodeParameter<bool>(enable_color_backlight_compensation_,
+                               "enable_color_backlight_compensation", false);
   setAndGetNodeParameter<std::string>(color_powerline_freq_, "color_powerline_freq", "");
   setAndGetNodeParameter<bool>(enable_color_decimation_filter_, "enable_color_decimation_filter",
                                false);
@@ -1829,7 +1829,7 @@ void OBCameraNode::getParameters() {
   }
   setAndGetNodeParameter<bool>(enable_ldp_, "enable_ldp", true);
   setAndGetNodeParameter<int>(ldp_power_level_, "ldp_power_level", -1);
-  setAndGetNodeParameter<double>(liner_accel_cov_, "linear_accel_cov", 0.0003);
+  setAndGetNodeParameter<double>(linear_accel_cov_, "linear_accel_cov", 0.0003);
   setAndGetNodeParameter<double>(angular_vel_cov_, "angular_vel_cov", 0.02);
   setAndGetNodeParameter<bool>(ordered_pc_, "ordered_pc", false);
   setAndGetNodeParameter<int>(max_save_images_count_, "max_save_images_count", 10);
@@ -1838,7 +1838,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<bool>(enable_decimation_filter_, "enable_decimation_filter", false);
   setAndGetNodeParameter<bool>(enable_hdr_merge_, "enable_hdr_merge", false);
   setAndGetNodeParameter<bool>(enable_sequence_id_filter_, "enable_sequence_id_filter", false);
-  setAndGetNodeParameter<bool>(enable_disaparity_to_depth_, "enable_disaparity_to_depth", true);
+  setAndGetNodeParameter<bool>(enable_disparity_to_depth_, "enable_disparity_to_depth", true);
   setAndGetNodeParameter<bool>(enable_threshold_filter_, "enable_threshold_filter", false);
   setAndGetNodeParameter<bool>(enable_hardware_noise_removal_filter_,
                                "enable_hardware_noise_removal_filter", true);
@@ -3339,7 +3339,7 @@ void OBCameraNode::setDefaultIMUMessage(sensor_msgs::msg::Imu &imu_msg) {
 
   imu_msg.orientation_covariance = {-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   imu_msg.linear_acceleration_covariance = {
-      liner_accel_cov_, 0.0, 0.0, 0.0, liner_accel_cov_, 0.0, 0.0, 0.0, liner_accel_cov_};
+      linear_accel_cov_, 0.0, 0.0, 0.0, linear_accel_cov_, 0.0, 0.0, 0.0, linear_accel_cov_};
   imu_msg.angular_velocity_covariance = {
       angular_vel_cov_, 0.0, 0.0, 0.0, angular_vel_cov_, 0.0, 0.0, 0.0, angular_vel_cov_};
 }

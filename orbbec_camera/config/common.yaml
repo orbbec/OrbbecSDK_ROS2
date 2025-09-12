@@ -329,7 +329,7 @@ orbbec_ros:
       # enable_sync_output_accel_gyro
       enable_sync_output_accel_gyro: false
       # Covariance of the linear acceleration
-      liner_accel_cov: 0.01
+      linear_accel_cov: 0.01
       # Covariance of the angular velocity
       angular_vel_cov: 0.01
 

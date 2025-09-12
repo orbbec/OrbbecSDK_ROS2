@@ -629,9 +629,9 @@ class OBCameraNode {
   int color_sharpness_ = -1;
   int color_gamma_ = -1;
   int color_saturation_ = -1;
-  int color_constrast_ = -1;
+  int color_contrast_ = -1;
   int color_hue_ = -1;
-  bool enable_color_backlight_compenstation_ = false;
+  bool enable_color_backlight_compensation_ = false;
   std::string color_powerline_freq_;
   bool enable_color_decimation_filter_ = false;
   int color_decimation_filter_scale_ = -1;
@@ -677,7 +677,7 @@ class OBCameraNode {
   std::map<stream_index_pair, std::string> imu_range_;
   std::map<stream_index_pair, std::string> imu_qos_;
   std::map<stream_index_pair, bool> imu_started_;
-  double liner_accel_cov_ = 0.0001;
+  double linear_accel_cov_ = 0.0001;
   double angular_vel_cov_ = 0.0001;
   std::deque<IMUData> imu_history_;
   IMUData accel_data_{ACCEL, {0, 0, 0}, -1.0};
@@ -701,7 +701,7 @@ class OBCameraNode {
   bool enable_decimation_filter_ = false;
   bool enable_hdr_merge_ = false;
   bool enable_sequence_id_filter_ = false;
-  bool enable_disaparity_to_depth_ = true;
+  bool enable_disparity_to_depth_ = true;
   bool enable_threshold_filter_ = false;
   bool enable_hardware_noise_removal_filter_ = true;
   bool enable_noise_removal_filter_ = true;

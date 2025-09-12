@@ -110,7 +110,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_gyro', default_value='false'),
         DeclareLaunchArgument('gyro_rate', default_value='200hz'),
         DeclareLaunchArgument('gyro_range', default_value='1000dps'),
-        DeclareLaunchArgument('liner_accel_cov', default_value='0.01'),
+        DeclareLaunchArgument('linear_accel_cov', default_value='0.01'),
         DeclareLaunchArgument('angular_vel_cov', default_value='0.01'),
         DeclareLaunchArgument('publish_tf', default_value='true'),
         DeclareLaunchArgument('tf_publish_rate', default_value='0.0'),

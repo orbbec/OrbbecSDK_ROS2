@@ -35,5 +35,5 @@ for different models within the same series. Differences in USB standards, such 
 
 ## Support Platforms
 
-- Linux x64: tested on Ubuntu 20.04
+- Linux x64: tested on Ubuntu 22.04
 - Linux ARM64: tested on NVIDIA Jetson AGX Orin , NVIDIA Jetson Orin NX , NVIDIA Jetson Orin Nano , NVIDIA Jetson AGX Xavier , NVIDIA Jetson Xavier NX

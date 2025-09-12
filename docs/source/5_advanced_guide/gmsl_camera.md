@@ -20,17 +20,17 @@ ros2 run orbbec_camera list_devices_node
 
 For example, the obtained gmsl camera `usb_port`: `gmsl2-1`
 
-Go to the [multi_gmsl_camera.launch.py](./multi_gmsl_camera.launch.py) file and change the `usb_port`.
+Go to the [multi_gmsl_camera.launch.py](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/examples/gmsl_camera/multi_gmsl_camera.launch.py) file and change the `usb_port`.
 
 ```bash
 ros2 launch orbbec_camera multi_gmsl_camera.launch.py
 ```
 
-> Note: By default, multi_gmsl_camera.launch.py only starts color and left_ir. If you want to start other sensors, please go to [camera_secondary_params.yaml](../../config/camera_secondary_params.yaml) to modify them.
+> Note: By default, multi_gmsl_camera.launch.py only starts color and left_ir. If you want to start other sensors, please go to [camera_secondary_params.yaml](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_secondary_params.yaml) to modify them.
 
 ## Multi GMSL camera synced
 
-First, please see how to use [multi_camera_synced](../multi_camera_synced/README.MD).
+First, please see how to use [multi_camera_synced](./multi_camera_synced.md).
 
 In addition, GMSL multi-camera synced does not require Multi-Camera Sync Hub Pro, so there is no need to set the `primary` mode. Each GMSL camera is `secondary`.
 
@@ -41,10 +41,10 @@ In addition, GMSL multi-camera synced does not require Multi-Camera Sync Hub Pro
 
 ### Run the launch
 
-Please refer to the configuration in [multi_gmsl_camera_synced.launch.py.](multi_gmsl_camera_synced.launch.py)
+Please refer to the configuration in [multi_gmsl_camera_synced.launch.py.](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/examples/gmsl_camera/multi_gmsl_camera_synced.launch.py)
 
 ```bash
 ros2 launch orbbec_camera multi_gmsl_camera_synced.launch.py
 ```
 
-> Note: By default, multi_gmsl_camera_synced.launch.py only starts color and left_ir. If you want to start other sensors, please go to [camera_secondary_params.yaml](../../config/camera_secondary_params.yaml) and [camera_params.yaml](../../config/camera_params.yaml) to modify them.
+> Note: By default, multi_gmsl_camera_synced.launch.py only starts color and left_ir. If you want to start other sensors, please go to [camera_secondary_params.yaml](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_secondary_params.yaml) and [camera_params.yaml](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_params.yaml) to modify them.

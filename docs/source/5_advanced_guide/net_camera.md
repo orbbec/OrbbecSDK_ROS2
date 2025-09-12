@@ -16,9 +16,9 @@ If you do not want to automatically enumerate network devices,you can set `enume
 
 ### Single Net camera
 
-> If you need to run Gemini 435Le, you only need to replace [femto_mega.launch.py ](../../launch/femto_mega.launch.py)in the run command with [gemini435_le.launch.py](../../launch/gemini435_le.launch.py)
+> If you need to run Gemini 435Le, you only need to replace [femto_mega.launch.py ](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/launch/femto_mega.launch.py)in the run command with [gemini435_le.launch.py](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/launch/gemini435_le.launch.py)
 
-For [femto_mega.launch.py](../../launch/femto_mega.launch.py) as an example:
+For [femto_mega.launch.py](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/launch/femto_mega.launch.py) as an example:
 
 #### automatically enumerate network devices:
 
@@ -44,7 +44,7 @@ Network device settings: `enumerate_net_device` must be set to true, set `net_de
 
 ### Single Net camera
 
-For [gemini_330_series.launch.py](../../launch/gemini_330_series.launch.py) as an example:
+For [gemini_330_series.launch.py](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/launch/gemini_330_series.launch.py) as an example:
 
 - **automatically enumerate network devices:**
 
@@ -62,7 +62,7 @@ ros2 launch orbbec_camera gemini_330_series.launch.py enumerate_net_device:=true
 
 ## Multi Net camera
 
-For [multi_net_camera.launch.py](./multi_net_camera.launch.py) as an example:
+For [multi_net_camera.launch.py](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/examples/net_camera/multi_net_camera.launch.py) as an example:
 
 ```bash
 ros2 launch orbbec_camera multi_net_camera.launch.py

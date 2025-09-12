@@ -4,7 +4,7 @@
 
 ## Parameter Introduction
 
-The interleave_ae related parameters are set in [gemini_330_series.launch.py](../../launch/gemini_330_series.launch.py)
+The interleave_ae related parameters are set in [gemini_330_series.launch.py](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/launch/gemini_330_series.launch.py)
 
 * `interleave_ae_mode` : Set laser or hdr interleave.
 
@@ -78,4 +78,4 @@ ros2 launch orbbec_camera gemini_330_series.launch.py
 
 ## Multi_camera_synced + Interleave_ae
 
-Please refer to [multi_camera_synced](../multi_camera_synced/README.MD) and [Parameter Introduction](#parameter-introduction)
+Please refer to [multi_camera_synced](./multi_camera_synced.md) and [Parameter Introduction](#parameter-introduction)

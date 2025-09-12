@@ -4,7 +4,7 @@
 
 ## Usage Instructions
 
-### Tool Configuration ([start_benchmark_params.json](../../config/tools/startbenchmark/start_benchmark_params.json))
+### Tool Configuration ([start_benchmark_params.json](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/tools/startbenchmark/start_benchmark_params.json))
 
 ```json
 {

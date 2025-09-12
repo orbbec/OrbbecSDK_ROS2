@@ -2,7 +2,7 @@
 
 > This article will introduce how to verify the synchronization accuracy of multi-camera synchronization.
 >
-> First, please see how to use [multi_camera_synced](../multi_camera_synced/README.MD).
+> First, please see how to use [multi_camera_synced](./multi_camera_synced.md).
 
 ## Directory Structure
 
@@ -90,7 +90,7 @@ save_rgbir is a tool for saving images. The configuration file of this tool is i
 
 ### DevicesInfo.txt
 
-Edit DevicesInfo.txt. Only the `primarySerialNumber`, `index` and `serialNumber` parameters need to be changed. Other parameters do not need to be changed.Refer to the example of [20250218102900](./multicamera_sync/output/20250218102900).
+Edit DevicesInfo.txt. Only the `primarySerialNumber`, `index` and `serialNumber` parameters need to be changed. Other parameters do not need to be changed.Refer to the example of [20250218102900](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/multi_camera_synced_verification_tool/multicamera_sync/output/20250218102900).
 
 * `primarySerialNumber` : The SN serial number of the primary camera
 * `index` : Camera index
@@ -120,7 +120,7 @@ When the terminal displays "over", the image is saved.A new multicamera_sync fol
 
 ### Camera pictures naming format
 
-Take [color_SNCP1E5420006D_Index0_g1739874543227_f0_s1739874543327_e50_d16_.jpg](./multicamera_sync/output/20250218102900/TotalModeFrames/SNCP1E5420006D_Index0/color_SNCP1E5420006D_Index0_g1739874543227_f0_s1739874543327_e50_d16_.jpg) as an example
+Take [color_SNCP1E5420006D_Index0_g1739874543227_f0_s1739874543327_e50_d16_.jpg](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/multi_camera_synced_verification_tool/multicamera_sync/output/20250218102900/TotalModeFrames/SNCP1E5420006D_Index0/color_SNCP1E5420006D_Index0_g1739874543227_f0_s1739874543327_e50_d16_.jpg) as an example
 
 * `color` : This image is a snapshot of the color stream.
 * `SNCP1E5420006D` : The camera's SN serial number is CP1E5420006D.
@@ -133,7 +133,7 @@ Take [color_SNCP1E5420006D_Index0_g1739874543227_f0_s1739874543327_e50_d16_.jpg]
 
 ### Analyzing camera image data
 
-You need to copy the modified [Python folder](./multicamera_sync/Python) to the new multi_camera_synced subdirectory, and copy the modified [DevicesInfo.txt ](./multicamera_sync/output/20250218102900/DevicesInfo.txt)and [StreamProfileInfo.txt](./multicamera_sync/output/20250218102900/StreamProfileInfo.txt) to the same level directory as the TotalModeFrames folder.
+You need to copy the modified [Python folder](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/multi_camera_synced_verification_tool//multicamera_sync/Python) to the new multi_camera_synced subdirectory, and copy the modified [DevicesInfo.txt ](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/multi_camera_synced_verification_tool/multicamera_sync/output/20250218102900/DevicesInfo.txt)and [StreamProfileInfo.txt](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/multi_camera_synced_verification_tool//multicamera_sync/output/20250218102900/StreamProfileInfo.txt) to the same level directory as the TotalModeFrames folder.
 
 * Finally everything is ready, run the python script
 
@@ -148,12 +148,12 @@ After the operation is successful, you can view the synchronization effect in th
 
 ### Analysis tools
 
-* [multi_save_rgbir_params.json](../../config/tools/multisavergbir/multi_save_rgbir_params.json)
-* [DevicesInfo.txt ](./multicamera_sync/output/20250218102900/DevicesInfo.txt)
-* [Config.ini](./multicamera_sync/Python/Config.ini)
+* [multi_save_rgbir_params.json](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/config/tools/multisavergbir/multi_save_rgbir_params.json)
+* [DevicesInfo.txt ](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/multi_camera_synced_verification_tool//multicamera_sync/output/20250218102900/DevicesInfo.txt)
+* [Config.ini](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/multi_camera_synced_verification_tool//multicamera_sync/Python/Config.ini)
 
 ### Camera Configuration
 
-[camera_params.yaml](../../config/camera_params.yaml)(Camera startup parameter settings)
+[camera_params.yaml](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/config/camera_params.yaml)(Camera startup parameter settings)
 
-[multi_camera_synced_verify.launch.py](./multi_camera_synced_verify.launch.py)
+[multi_camera_synced_verify.launch.py](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/multi_camera_synced_verification_tool//multi_camera_synced_verify.launch.py)

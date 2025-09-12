@@ -1,6 +1,6 @@
 ## Enabling and Visualizing Point Cloud in ROS 2
 
-This section demonstrates how to enable point cloud data output from the camera node and visualize it using RViz2, similarly to the initial camera node setup discussed in the [Starting Camera Node](../start_camera_node/start_camera_node.MD) document.
+This section demonstrates how to enable point cloud data output from the camera node and visualize it using RViz2.
 
 ### Enabling Depth Point Cloud
 

@@ -8,59 +8,30 @@ If you are a user in China, it is recommended to use [gitee Repo](https://gitee.
 
 ## Support Hardware Products
 
-This document is based on the v2-main branch code, which is a Python Wrapper built on Orbbec SDK v2. It supports the following devices.
-If your device is included in this supported list, we recommend using the v2-main branch. If not, you can use the main branch instead.
+The following devices are supported by the OrbbecSDK ROS2 Wrapper v2-main branch.  More devices support will be added in the near future. If you can not find your device in the table below, try the [main](https://github.com/orbbec/OrbbecSDK_ROS2)  branch.
 
-| **Products List** | **Minimal Firmware Version** |
-|-------------------|------------------------------|
-| Gemini 435Le        | 1.2.04                       |
-| Gemini 335Le        | 1.5.31                       |
-| Gemini 330        | 1.2.20                       |
-| Gemini 330L       | 1.2.20                       |
-| Gemini 335        | 1.2.20                       |
-| Gemini 335L       | 1.2.20                       |
-| Gemini 336        | 1.2.20                       |
-| Gemini 336L       | 1.2.20                       |
-| Gemini 335Lg      | 1.3.46                       |
-| Femto Bolt        | 1.1.2                  |
-| Femto Mega        | 1.3.0                  |
-| Femto Mega I        | 2.0.4                  |
-| Astra 2           | 2.8.20                       |
-| Gemini 2 L        | 1.4.53                       |
-| Gemini 2          | 1.4.92               |
-| Gemini 215        | 1.0.9                        |
-| Gemini 210        | 1.0.9                        |
+For optimal performance, we strongly recommend updating to the latest firmware version. This ensures that you benefit from the most recent enhancements and bug fixes.
 
-the main branch supports the following devices:
+| Product List   | Minimal Firmware Version | **Launch File**             |
+| :------------- | :----------------------- | :-------------------------- |
+| Gemini 435Le   | 1.2.04                   | gemini435_le.launch.py      |
+| Gemini 335     | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 336     | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 335L    | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 336L    | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 335Lg   | 1.3.46                   | gemini_330_series.launch.py |
+| Gemini 335Le   | 1.5.31                   | gemini_330_series.launch.py |
+| Gemini 330     | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 330L    | 1.2.20                   | gemini_330_series.launch.py |
+| Gemini 2       | 1.4.92                   | gemini2.launch.py           |
+| Gemini 2 L     | 1.4.53                   | gemini2L.launch.py          |
+| Femto Bolt     | 1.1.2                    | femto_bolt.launch.py        |
+| Femto Mega     | 1.3.0                    | femto_mega.launch.py        |
+| Astra 2        | 2.8.20                   | astra2.launch.py            |
+| Astra Mini Pro | 2.0.01                   | astra.launch.py             |
 
-
-| **Products List** | **Minimal Firmware Version**        |
-|-------------------|-----------------------------|
-| Gemini 330        | 1.2.20                   |
-| Gemini 330L        | 1.2.20                    |
-| Gemini 335        | 1.2.20                   |
-| Gemini 335L        | 1.2.20                    |
-| Gemini 336        | 1.2.20                      |
-| Gemini 336L        | 1.2.20                    |
-| Femto Bolt        | 1.0.6                |
-| Femto Mega        | 1.1.7                 |
-| Femto Mega I      | 2.0.2                       |
-| Gemini 2 XL       | Obox: V1.2.5  VL:1.4.54     |
-| Astra 2           | 2.8.20                      |
-| Gemini 2 L        | 1.4.32                      |
-| Gemini 2          | 1.4.60               |
-| Astra+            | 1.0.19 |
-| Femto             | 1.6.7                       |
-| Femto W           | 1.1.8                       |
-| DaBai             | 2436                        |
-| DaBai DCW         | 2460                        |
-| DaBai DW          | 2606                        |
-| Astra Mini Pro    | 1007                        |
-| Gemini E          | 3460                        |
-| Gemini E Lite     | 3606                        |
-| Gemini            | 3018                      |
-| Astra Mini S Pro  | 1005                      |
-
+All launch files are essentially similar, with the primary difference being the default values of the parameters set
+for different models within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution settings in the launch file, as well as other parameters, to ensure compatibility and optimal performance.
 
 ## Support Platforms
 

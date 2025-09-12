@@ -1,7 +1,5 @@
 ### 2.2. Build from Source
 
-If no wheel package is available, or if you want to build with the latest source code, follow these steps:
-
 #### 2.2.1. Environment
 
 Install ROS 2 according to the official guide:
@@ -48,5 +46,4 @@ Build:
 cd ~/ros2_ws
 colcon build --event-handlers console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
-
 

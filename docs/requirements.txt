@@ -1,0 +1,20 @@
+# markdown suport
+recommonmark
+# markdown table suport
+sphinx-markdown-tables
+
+# theme default rtd
+
+# crate-docs-theme
+sphinx-rtd-theme
+
+doc8
+docutils
+pip
+sphinx
+sphinx-copybutton
+sphinx-lint
+sphinx-multiversion
+sphinx-rtd-theme
+sphinx-tabs
+sphinxcontrib-mermaid

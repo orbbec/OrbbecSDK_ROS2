@@ -48,6 +48,7 @@ set(dependencies
     diagnostic_updater
     diagnostic_msgs
     statistics_msgs
+    yaml-cpp
 )
 
 foreach(dep IN LISTS dependencies)
@@ -113,6 +114,7 @@ set(COMMON_LIBRARIES
     Threads::Threads
     -lrt
     -ldw
+    yaml-cpp
 )
 if(USE_RK_HW_DECODER)
     list(APPEND COMMON_LIBRARIES ${RK_MPP_LIBRARIES} ${RGA_LIBRARIES})
@@ -192,6 +194,14 @@ add_orbbec_executable(list_camera_profile_mode_node tools/list_camera_profile.cp
 add_orbbec_executable(topic_statistics_node tools/topic_statistics.cpp)
 add_orbbec_executable(ob_benchmark_node tools/ob_benchmark.cpp)
 add_orbbec_executable(435le_example_node examples/435le_new_interface/camera_example_node.cpp)
+add_orbbec_executable(service_benchmark_node scripts/service_benchmark_node.cpp)
+
+install(
+  PROGRAMS
+    scripts/common_benchmark_node.py
+    scripts/service_benchmark_node.py
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 add_library(frame_latency SHARED tools/frame_latency.cpp)
 target_include_directories(frame_latency PUBLIC ${COMMON_INCLUDE_DIRS})
@@ -239,7 +249,7 @@ if(DEFINED ENV{BUILDING_PACKAGE})
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/99-obsensor-libusb.rules DESTINATION /etc/udev/rules.d)
 endif()
 
-install(TARGETS list_devices_node list_depth_work_mode_node list_camera_profile_mode_node topic_statistics_node ob_benchmark_node 435le_example_node DESTINATION lib/${PROJECT_NAME}/
+install(TARGETS list_devices_node list_depth_work_mode_node list_camera_profile_mode_node topic_statistics_node  service_benchmark_node ob_benchmark_node 435le_example_node DESTINATION lib/${PROJECT_NAME}/
 )
 
 if(BUILD_TESTING)

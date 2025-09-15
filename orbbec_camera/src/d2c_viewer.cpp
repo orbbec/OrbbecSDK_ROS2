@@ -67,7 +67,6 @@ D2CViewer::~D2CViewer() {
 
 void D2CViewer::messageCallback(const sensor_msgs::msg::Image::ConstSharedPtr& rgb_msg,
                                 const sensor_msgs::msg::Image::ConstSharedPtr& depth_msg) {
-
   std::lock_guard<std::mutex> lock(callback_mutex_);
   if (!is_active_.load()) {
     return;
@@ -93,8 +92,8 @@ void D2CViewer::messageCallback(const sensor_msgs::msg::Image::ConstSharedPtr& r
   if (d2c_msg != nullptr) {
     d2c_msg->header = rgb_msg->header;
     d2c_viewer_pub_->publish(*d2c_msg);
-  }else{
-    RCLCPP_ERROR(logger_, "-----------------------d2c_viewer publishing failed-----------------------");
+  } else {
+    RCLCPP_ERROR(logger_, "d2c_viewer publishing failed");
   }
 }
 }  // namespace orbbec_camera

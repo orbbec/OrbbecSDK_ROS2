@@ -8,8 +8,17 @@
  *   - Optionally save results to a CSV file
  *
  * Usage:
- *   ros2 run orbbec_camera service_benchmark_node --ros-args -p
- *   yaml_file:=/path/to/default_service_cpp.yaml
+ *  1.Benchmark a single service:
+ *    ros2 run orbbec_camera service_benchmark_node \
+          --ros-args \
+          -p service_name:=/camera/get_depth_gain \
+          -p service_type:=orbbec_camera_msgs/srv/GetInt32 \
+          -p count:=10
+ *
+    2.Benchmark multiple services from a YAML config file:
+ *   ros2 run orbbec_camera service_benchmark_node \
+          --ros-args \
+          -p yaml_file:=/path/to/default_service_cpp.yaml
  */
 #include "orbbec_camera/ob_camera_node_driver.h"
 #include <algorithm>
@@ -49,7 +58,7 @@ class SingleServiceBenchmark {
                                                              int &success) {
       runTyped<orbbec_camera::GetInt32>(durations, success);
     };
-    service_map_["std_srvs/Empty"] = [this](std::vector<double> &durations, int &success) {
+    service_map_["std_srvs/srv/Empty"] = [this](std::vector<double> &durations, int &success) {
       runTyped<std_srvs::srv::Empty>(durations, success);
     };
     service_map_["orbbec_camera_msgs/srv/SetInt32"] = [this](std::vector<double> &durations,
@@ -60,7 +69,7 @@ class SingleServiceBenchmark {
                                                               int &success) {
       runTyped<orbbec_camera::SetArrays>(durations, success);
     };
-    service_map_["std_srvs/SetBool"] = [this](std::vector<double> &durations, int &success) {
+    service_map_["std_srvs/srv/SetBool"] = [this](std::vector<double> &durations, int &success) {
       runTyped<std_srvs::srv::SetBool>(durations, success);
     };
     service_map_["orbbec_camera_msgs/srv/SetFilter"] = [this](std::vector<double> &durations,
@@ -93,6 +102,31 @@ class SingleServiceBenchmark {
       RCLCPP_ERROR(nh_->get_logger(), "Unsupported service type: %s", service_type_.c_str());
     }
     return success;
+  }
+
+  void printSummary(const std::vector<double> &durations, int success) {
+    if (durations.empty()) {
+      RCLCPP_WARN(nh_->get_logger(), "No successful calls!");
+      return;
+    }
+
+    double avg = std::accumulate(durations.begin(), durations.end(), 0.0) / durations.size();
+    double minv = *std::min_element(durations.begin(), durations.end());
+    double maxv = *std::max_element(durations.begin(), durations.end());
+    double success_rate = 100.0 * success / count_;
+
+    std::cout << std::string(64, '=') << std::endl;
+    std::cout << std::setw(7) << "Calls" << std::setw(10) << "Success" << std::setw(11) << "Rate(%)"
+              << std::setw(12) << "Avg(ms)" << std::setw(12) << "Min(ms)" << std::setw(12)
+              << "Max(ms)" << std::endl;
+    std::cout << std::string(64, '-') << std::endl;
+
+    std::cout << std::setw(5) << count_ << std::setw(10) << success << std::setw(12) << std::fixed
+              << std::setprecision(2) << success_rate << std::setw(11) << std::fixed
+              << std::setprecision(2) << avg << std::setw(12) << std::fixed << std::setprecision(2)
+              << minv << std::setw(12) << std::fixed << std::setprecision(2) << maxv << std::endl;
+
+    std::cout << std::string(64, '=') << std::endl;
   }
 
  private:
@@ -143,17 +177,18 @@ class SingleServiceBenchmark {
           durations.push_back(dt);
 
           if constexpr (has_success<ServiceT>::value) {
-            if (result_future.get()->success) {
+            auto response = result_future.get();
+            if (response->success) {
               success++;
+              RCLCPP_INFO(nh_->get_logger(), "Call %s %d/%d succeeded (cost: %.2f ms)",
+                      service_name_.c_str(), i + 1, count_, dt);
             } else {
-              RCLCPP_WARN(nh_->get_logger(), "Call %s %d/%d responded with success=false",
-                          service_name_.c_str(), i + 1, count_);
+              RCLCPP_WARN(nh_->get_logger(), "Call %s %d/%d (cost: %.2f ms) responded with success=false, message='%s'",
+                          service_name_.c_str(), i + 1, count_, dt,response->message.c_str());
             }
           } else {
             success++;
           }
-          RCLCPP_INFO(nh_->get_logger(), "Call %s %d/%d succeeded (cost: %.2f ms)",
-                      service_name_.c_str(), i + 1, count_, dt);
         }
       } catch (const std::exception &e) {
         RCLCPP_ERROR(nh_->get_logger(), "Exception calling service %s: %s", service_name_.c_str(),
@@ -187,33 +222,6 @@ class SingleServiceBenchmark {
 
     durations_out = durations;
     success_out = success;
-
-    printSummary(durations, success);
-  }
-
-  void printSummary(const std::vector<double> &durations, int success) {
-    if (durations.empty()) {
-      RCLCPP_WARN(nh_->get_logger(), "No successful calls!");
-      return;
-    }
-
-    double avg = std::accumulate(durations.begin(), durations.end(), 0.0) / durations.size();
-    double minv = *std::min_element(durations.begin(), durations.end());
-    double maxv = *std::max_element(durations.begin(), durations.end());
-    double success_rate = 100.0 * success / count_;
-
-    std::cout << std::string(64, '=') << std::endl;
-    std::cout << std::setw(7) << "Calls" << std::setw(10) << "Success" << std::setw(11) << "Rate(%)"
-              << std::setw(12) << "Avg(ms)" << std::setw(12) << "Min(ms)" << std::setw(12)
-              << "Max(ms)" << std::endl;
-    std::cout << std::string(64, '-') << std::endl;
-
-    std::cout << std::setw(5) << count_ << std::setw(10) << success << std::setw(12) << std::fixed
-              << std::setprecision(2) << success_rate << std::setw(11) << std::fixed
-              << std::setprecision(2) << avg << std::setw(12) << std::fixed << std::setprecision(2)
-              << minv << std::setw(12) << std::fixed << std::setprecision(2) << maxv << std::endl;
-
-    std::cout << std::string(64, '=') << std::endl;
   }
 };
 
@@ -228,6 +236,15 @@ void SingleServiceBenchmark::fillRequest<orbbec_camera::SetInt32>(
     orbbec_camera::SetInt32::Request &request) {
   if (request_data_ && request_data_["data"] && request_data_["data"].IsScalar()) {
     request.data = request_data_["data"].as<int>();
+  }
+}
+
+// SetBool
+template <>
+void SingleServiceBenchmark::fillRequest<std_srvs::srv::SetBool>(
+    std_srvs::srv::SetBool::Request &request) {
+  if (request_data_ && request_data_["data"] && request_data_["data"].IsScalar()) {
+    request.data = request_data_["data"].as<bool>();
   }
 }
 
@@ -339,8 +356,8 @@ int main(int argc, char **argv) {
 
   nh->declare_parameter("yaml_file", "");
   nh->declare_parameter("csv_file", "multi_service_results_log_cpp.csv");
-  nh->declare_parameter("service_name", "/camera/get_sdk_version");
-  nh->declare_parameter("service_type", "orbbec_camera/GetString");
+  nh->declare_parameter("service_name", "");
+  nh->declare_parameter("service_type", "");
   nh->declare_parameter("request_data", "");
   nh->declare_parameter("count", 10);
 
@@ -352,12 +369,25 @@ int main(int argc, char **argv) {
   nh->get_parameter("count", count);
 
   if (yaml_file.empty()) {
+    if (service_name.empty() || service_type.empty()) {
+      RCLCPP_ERROR(nh->get_logger(),
+                   "service_name or service_type is empty! Please set parameters.");
+      rclcpp::shutdown();
+      return 1;
+    }
     if (!request_str.empty()) {
-      request_data = YAML::Load(request_str);
+      try {
+        request_data = YAML::Load(request_str);
+      } catch (const YAML::Exception &e) {
+        RCLCPP_ERROR(nh->get_logger(), "Failed to parse request_data: %s", e.what());
+        rclcpp::shutdown();
+        return 1;
+      }
     }
     SingleServiceBenchmark bench(nh, service_name, service_type, count, request_data);
     std::vector<double> durations_out;
-    bench.run(durations_out);
+    int success = bench.run(durations_out);
+    bench.printSummary(durations_out, success);
   } else {
     YAML::Node config = YAML::LoadFile(yaml_file);
     YAML::Node services = config["services"];

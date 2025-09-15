@@ -8,8 +8,10 @@ Features:
   Benchmark multiple services defined in a YAML configuration file
 
 Usage:
-  ros2 run orbbec_camera service_benchmark_node.py \
-    --ros-args --params-file /path/to/default_service.yaml
+  1. Benchmark a single service:
+    ros2 run orbbec_camera service_benchmark_node.py --service /camera/get_depth_gain --count 10
+  2.Benchmark multiple services from a YAML config file:
+    ros2 run orbbec_camera service_benchmark_node.py --yaml_file /path/to/default_service.yaml
 """
 
 import rclpy
@@ -86,7 +88,7 @@ class ServiceBenchmark:
                     if response.success:
                         success += 1
                     else:
-                        self.node.get_logger().warn(f"Service {self.service_name} Call {i+1}/{self.count} failed, success=False")
+                        self.node.get_logger().warn(f"Service {self.service_name} Call {i+1}/{self.count} failed, success=False, message='{response.message}'")
                 else:
                     success += 1
             except Exception as e:

@@ -6,7 +6,7 @@ name: common_benchmark_node.py
 function: A ROS2 node to monitor and log the performance of an Orbbec camera node:
           frame rates, delays, CPU and RAM usage, packet/frame loss statistics.
 usage:
-  python3 common_benchmark_node.py --run_time 20 --csv_file /tmp/cam_log.csv
+  ros2 run orbbec_camera common_benchmark_node.py --run_time 20 --csv_file /tmp/cam_log.csv
 """
 
 import argparse

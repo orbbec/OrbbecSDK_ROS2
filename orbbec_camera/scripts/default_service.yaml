@@ -1,188 +1,203 @@
 default_count: 50
 
 services:
-# - name: /camera/set_filter
-#   type: orbbec_camera_msgs/srv/SetFilter
-#   request: {filter_name: DecimationFilter,filter_enable: false,filter_param: [5]}
-
-- name: /camera/set_depth_exposure
-  type: orbbec_camera_msgs/srv/SetInt32
-  request: {data: 3000}
-
-- name: /camera/get_depth_exposure
+- name: /camera/get_auto_white_balance
   type: orbbec_camera_msgs/srv/GetInt32
-
-- name: /camera/set_depth_ae_roi
-  type: orbbec_camera_msgs/srv/SetArrays
-  request: {data_param: [0,1279,0,719]}
-
-# - name: /camera/reset_depth_exposure
-#   type: std_srvs/Empty
-
-- name: /camera/get_depth_gain
-  type: orbbec_camera_msgs/srv/GetInt32
-
-- name: /camera/set_depth_gain
-  type: orbbec_camera_msgs/srv/SetInt32
-  request: {data: 200}
-
-# - name: /camera/reset_depth_gain
-#   type: std_srvs/Empty
-
-- name: /camera/set_depth_mirror
-  type: std_srvs/SetBool
-  request: {data: false}
-
-- name: /camera/set_depth_flip
-  type: std_srvs/SetBool
-  request: {data: false}
-
-- name: /camera/set_depth_rotation
-  type: orbbec_camera_msgs/srv/SetInt32
-  request: {data: 90}
-
-- name: /camera/set_depth_auto_exposure
-  type: std_srvs/SetBool
-  request: {data: false}
-
-# - name: /camera/get_depth_auto_exposure
-#   type: orbbec_camera_msgs/srv/GetBool
-
-# - name: /camera/toggle_depth
-#   type: std_srvs/SetBool
-#   request: {data: true}
-
-# - name: /camera/get_depth_camera_info
-#   type: orbbec_camera_msgs/srv/GetCameraInfo
-
 - name: /camera/get_color_exposure
   type: orbbec_camera_msgs/srv/GetInt32
+- name: /camera/get_color_gain
+  type: orbbec_camera_msgs/srv/GetInt32
+- name: /camera/get_depth_exposure
+  type: orbbec_camera_msgs/srv/GetInt32
+- name: /camera/get_depth_gain
+  type: orbbec_camera_msgs/srv/GetInt32
+- name: /camera/get_device_info
+  type: orbbec_camera_msgs/srv/GetDeviceInfo
+- name: /camera/get_ldp_status
+  type: orbbec_camera_msgs/srv/GetBool
+- name: /camera/get_lrm_measure_distance
+  type: orbbec_camera_msgs/srv/GetInt32
+- name: /camera/get_sdk_version
+  type: orbbec_camera_msgs/srv/GetString
+- name: /camera/get_streams_enable
+  type: orbbec_camera_msgs/srv/GetBool
+- name: /camera/get_white_balance
+  type: orbbec_camera_msgs/srv/GetInt32
+- name: /camera/save_images
+  type: std_srvs/srv/Empty
+- name: /camera/save_point_cloud
+  type: std_srvs/srv/Empty
 
-- name: /camera/set_color_exposure
-  type: orbbec_camera_msgs/srv/SetInt32
-  request: {data: 30}
 
+
+- name: /camera/send_software_trigger
+  type: std_srvs/srv/SetBool
+  request: {data: false}
+- name: /camera/set_auto_white_balance
+  type: std_srvs/srv/SetBool
+  request: {data: false}
 - name: /camera/set_color_ae_roi
   type: orbbec_camera_msgs/srv/SetArrays
   request: {data_param: [0,1279,0,719]}
-
-# - name: /camera/reset_color_exposure
-#   type: std_srvs/Empty
-
-- name: /camera/get_color_gain
-  type: orbbec_camera_msgs/srv/GetInt32
-
+- name: /camera/set_color_auto_exposure
+  type: std_srvs/srv/SetBool
+  request: {data: false}
+- name: /camera/set_color_exposure
+  type: orbbec_camera_msgs/srv/SetInt32
+  request: {data: 30}
+- name: /camera/set_color_flip
+  type: std_srvs/srv/SetBool
+  request: {data: false}
 - name: /camera/set_color_gain
   type: orbbec_camera_msgs/srv/SetInt32
   request: {data: 20}
-
-# - name: /camera/reset_color_gain
-#   type: std_srvs/Empty
-
 - name: /camera/set_color_mirror
-  type: std_srvs/SetBool
+  type: std_srvs/srv/SetBool
   request: {data: false}
-
-- name: /camera/set_color_flip
-  type: std_srvs/SetBool
-  request: {data: false}
-
 - name: /camera/set_color_rotation
   type: orbbec_camera_msgs/srv/SetInt32
   request: {data: 90}
-
-- name: /camera/set_color_auto_exposure
-  type: std_srvs/SetBool
+- name: /camera/set_depth_ae_roi
+  type: orbbec_camera_msgs/srv/SetArrays
+  request: {data_param: [0,1279,0,719]}
+- name: /camera/set_depth_auto_exposure
+  type: std_srvs/srv/SetBool
+  request: {data: false}
+- name: /camera/set_depth_exposure
+  type: orbbec_camera_msgs/srv/SetInt32
+  request: {data: 3000}
+- name: /camera/set_depth_flip
+  type: std_srvs/srv/SetBool
+  request: {data: false}
+- name: /camera/set_depth_gain
+  type: orbbec_camera_msgs/srv/SetInt32
+  request: {data: 200}
+- name: /camera/set_depth_mirror
+  type: std_srvs/srv/SetBool
+  request: {data: false}
+- name: /camera/set_depth_rotation
+  type: orbbec_camera_msgs/srv/SetInt32
+  request: {data: 90}
+- name: /camera/set_filter
+  type: orbbec_camera_msgs/srv/SetFilter
+  request: {filter_name: DecimationFilter,filter_enable: false,filter_param: [5]}
+- name: /camera/set_laser_enable
+  type: std_srvs/srv/SetBool
+  request: {data: false}
+- name: /camera/set_ldp_enable
+  type: std_srvs/srv/SetBool
+  request: {data: false}
+- name: /camera/set_reset_timestamp
+  type: std_srvs/srv/SetBool
+  request: {data: false}
+- name: /camera/set_streams_enable
+  type: std_srvs/srv/SetBool
+  request: {data: false}
+- name: /camera/set_sync_hosttime
+  type: std_srvs/srv/SetBool
+  request: {data: false}
+- name: /camera/set_sync_interleaverlaser
+  type: orbbec_camera_msgs/srv/SetInt32
+  request: {data: 1}
+- name: /camera/set_white_balance
+  type: orbbec_camera_msgs/srv/SetInt32
+  request: {data: 3000}
+- name: /camera/toggle_color
+  type: std_srvs/srv/SetBool
+  request: {data: false}
+- name: /camera/toggle_depth
+  type: std_srvs/srv/SetBool
   request: {data: false}
 
-# - name: /camera/get_color_auto_exposure
-#   type: orbbec_camera_msgs/srv/GetBool
-
-# - name: /camera/toggle_color
-#   type: std_srvs/SetBool
-#   request: {data: true}
-
-# - name: /camera/get_color_camera_info
-#   type: orbbec_camera_msgs/srv/GetCameraInfo
-
-- name: /camera/get_auto_white_balance
-  type: orbbec_camera_msgs/srv/GetInt32
-
-# - name: /camera/set_auto_white_balance
-#   type: orbbec_camera_msgs/srv/SetInt32
-#   request: {data: 0}
-
-- name: /camera/get_white_balance
-  type: orbbec_camera_msgs/srv/GetInt32
-
-# - name: /camera/set_white_balance
-#   type: orbbec_camera_msgs/srv/SetInt32
-#   request: {data: 3000}
-
-# - name: /camera/reset_white_balance
-#   type: std_srvs/Empty
-
-# - name: /camera/set_laser
-#   type: std_srvs/SetBool
-#   request: {data: true}
-
-# - name: /camera/set_ldp
-#   type: std_srvs/SetBool
-#   request: {data: false}
-
-- name: /camera/get_ldp_status
-  type: orbbec_camera_msgs/srv/GetBool
-
-- name: /camera/get_device_info
-  type: orbbec_camera_msgs/srv/GetDeviceInfo
-
-# - name: /camera/get_camera_params
-#   type: orbbec_camera_msgs/srv/GetCameraParams
-
-- name: /camera/get_sdk_version
-  type: orbbec_camera_msgs/srv/GetString
-
-- name: /camera/save_point_cloud
-  type: std_srvs/Empty
-
-- name: /camera/save_images
-  type: std_srvs/Empty
-
-- name: /camera/get_lrm_measure_distance
-  type: orbbec_camera_msgs/srv/GetInt32
-
 # - name: /camera/reboot_device
-#   type: std_srvs/Empty
+#   type: std_srvs/srv/Empty
 
-# - name: /camera/color/set_camera_info
-#   type: sensor_msgs/SetCameraInfo
 
-# - name: /camera/ir/set_camera_info
-#   type: sensor_msgs/SetCameraInfo
 
-# - name: /camera/set_ptp_config
-#   type: std_srvs/SetBool
-#   request: {data: false}
+# open according to your camera type
 
 # - name: /camera/get_ptp_config
 #   type: orbbec_camera_msgs/srv/GetBool
-
+# - name: /camera/set_ptp_config
+#   type: std_srvs/srv/SetBool
+#   request: {data: false}
+# - name: /camera/set_floor_enable
+#   type: std_srvs/srv/SetBool
+#   request: {data: false}
 # - name: /camera/set_fan_work_mode
-#   type: std_srvs/SetBool
-#   request: {data: false}
-
-# - name: /camera/set_flood
-#   type: std_srvs/SetBool
-#   request: {data: false}
-
-# - name: /camera/switch_ir_mode
 #   type: orbbec_camera_msgs/srv/SetInt32
-
+#   request: {data: 0}
+# - name: /camera/set_ir_long_exposure
+#   type: std_srvs/srv/SetBool
+#   request: {data: false}
 # - name: /camera/switch_ir
 #   type: orbbec_camera_msgs/srv/SetString
+#   request: {data: left}
 
-# - name: /camera/set_write_customer_data
+# 435Le support
+# - name: /camera/get_user_calib_params
+#   type: orbbec_camera_msgs/srv/GetUserCalibParams
+# - name: /camera/set_user_calib_params
+#   type: orbbec_camera_msgs/srv/SetUserCalibParams
+# - name: /camera/write_customer_data
 #   type: orbbec_camera_msgs/srv/SetString
-
-# - name: /camera/set_read_customer_data
+# - name: /camera/read_customer_data
 #   type: orbbec_camera_msgs/srv/GetString
+
+# 335 support
+- name: /camera/get_left_ir_exposure
+  type: orbbec_camera_msgs/srv/GetInt32
+- name: /camera/get_left_ir_gain
+  type: orbbec_camera_msgs/srv/GetInt32
+- name: /camera/get_right_ir_exposure
+  type: orbbec_camera_msgs/srv/GetInt32
+- name: /camera/get_right_ir_gain
+  type: orbbec_camera_msgs/srv/GetInt32
+- name: /camera/set_left_ir_ae_roi
+  type: orbbec_camera_msgs/srv/SetArrays
+  request: {data_param: [0,1279,0,719]}
+- name: /camera/set_left_ir_auto_exposure
+  type: std_srvs/srv/SetBool
+  request: {data: false}
+- name: /camera/set_left_ir_exposure
+  type: orbbec_camera_msgs/srv/SetInt32
+  request: {data: 30}
+- name: /camera/set_left_ir_flip
+  type: std_srvs/srv/SetBool
+  request: {data: false}
+- name: /camera/set_left_ir_gain
+  type: orbbec_camera_msgs/srv/SetInt32
+  request: {data: 20}
+- name: /camera/set_left_ir_mirror
+  type: std_srvs/srv/SetBool
+  request: {data: false}
+- name: /camera/set_left_ir_rotation
+  type: orbbec_camera_msgs/srv/SetInt32
+  request: {data: 90}
+- name: /camera/set_right_ir_ae_roi
+  type: orbbec_camera_msgs/srv/SetArrays
+  request: {data_param: [0,1279,0,719]}
+- name: /camera/set_right_ir_auto_exposure
+  type: std_srvs/srv/SetBool
+  request: {data: false}
+- name: /camera/set_right_ir_exposure
+  type: orbbec_camera_msgs/srv/SetInt32
+  request: {data: 30}
+- name: /camera/set_right_ir_flip
+  type: std_srvs/srv/SetBool
+  request: {data: false}
+- name: /camera/set_right_ir_gain
+  type: orbbec_camera_msgs/srv/SetInt32
+  request: {data: 20}
+- name: /camera/set_right_ir_mirror
+  type: std_srvs/srv/SetBool
+  request: {data: false}
+- name: /camera/set_right_ir_rotation
+  type: orbbec_camera_msgs/srv/SetInt32
+  request: {data: 90}
+- name: /camera/toggle_left_ir
+  type: std_srvs/srv/SetBool
+  request: {data: false}
+- name: /camera/toggle_right_ir
+  type: std_srvs/srv/SetBool
+  request: {data: false}

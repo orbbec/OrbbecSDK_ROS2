@@ -328,7 +328,6 @@ class MultiServiceBenchmark {
   std::ofstream csv_stream_;
 };
 
-// ------------------- main -------------------
 int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
   auto nh = std::make_shared<rclcpp::Node>("service_benchmark_node");

@@ -30,7 +30,6 @@ class ServiceBenchmark:
         self.count = count
         self.request_dict = request_dict or {}
 
-        # 动态导入服务类型
         self.service_type = self.get_service_type(service_name)
         if not self.service_type:
             raise RuntimeError(f"Service {service_name} type not found")
@@ -42,7 +41,6 @@ class ServiceBenchmark:
             raise RuntimeError(f"Service {self.service_name} not available")
 
     def get_service_type(self, service_name):
-        """获取服务类型 (用 CLI 方式调用 ros2 service type)"""
         import subprocess
         try:
             output = subprocess.check_output(["ros2", "service", "type", service_name])
@@ -56,7 +54,6 @@ class ServiceBenchmark:
         return getattr(module, srv)
 
     def service_class(self, service_type):
-      # ROS2 service type is like "orbbec_camera/srv/GetString"
       package, _, srv = service_type.split('/')
       module = importlib.import_module(f"{package}.srv")
       return getattr(module, srv)

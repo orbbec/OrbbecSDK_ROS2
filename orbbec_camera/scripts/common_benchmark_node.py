@@ -62,23 +62,15 @@ def format_duration(seconds):
 # ----------------------------------------------
 
 class TopicTracker:
-    """
-    Tracks sequence/packet loss and frame-drop estimates for a topic stream.
-    Works when header.seq exists (ROS1 style) or when only timestamps exist (ROS2 common case).
-    """
     def __init__(self, logger=None):
         self.received = 0
 
-        self.last_time = None    # last seen stamp in seconds (float)
+        self.last_time = None
         self.drop_frames = 0
 
         self.logger = logger
 
     def on_msg(self, header, avg_fps):
-        """
-        header: std_msgs/Header (ROS2)
-        avg_fps: float (the expected average FPS for determining drop frames)
-        """
         stamp = header.stamp.sec + header.stamp.nanosec * 1e-9
         self.received += 1
 
@@ -121,7 +113,6 @@ class CameraMonitorNode(Node):
         self.cpu_stats = {"cur": 0.0, "avg": 0.0, "min": float("inf"), "max": float("-inf"), "count": 0, "sum": 0.0}
         self.ram_stats = {"cur": 0.0, "avg": 0.0, "min": float("inf"), "max": float("-inf"), "count": 0, "sum": 0.0}
 
-        # pass node logger into trackers for helpful warnings
         self.trackers = {
             "color": TopicTracker(logger=self.get_logger()),
             "depth": TopicTracker(logger=self.get_logger())

@@ -1,0 +1,393 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>5.4. Configuration of depth NFOV and WFOV modes &mdash; OrbbecSDK V2 ROS2 Wrapper  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=a2eacb60" />
+
+  
+    <link rel="shortcut icon" href="../../_static/orbbec_footerlogo_3d_world.svg"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="5.5. Depth work mode switch" href="depth_work_mode_switch.html" />
+    <link rel="prev" title="5.3. Building a Debian Package" href="building_a_Debian_Package.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            OrbbecSDK V2 ROS2 Wrapper
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../1_overview/overview.html">1. Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../1_overview/introduction.html">1.1. Introduction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../1_overview/introduction.html#support-hardware-products">1.1.1. Support Hardware Products</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../1_overview/introduction.html#support-platforms">1.1.2. Support Platforms</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../1_overview/orbbecsdk_overview.html">1.2. Orbbec SDK Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../1_overview/orbbecsdk_overview.html#terms">1.2.1. Terms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../1_overview/orbbecsdk_overview.html#orbbec-sdk-v2-architecture-overview">1.2.2. Orbbec SDK v2 Architecture Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../1_overview/orbbecsdk_overview.html#sdk-concept-overview">1.2.3. SDK Concept Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../1_overview/orbbecsdk_overview.html#sdk-programming-model">1.2.4. SDK Programming Model</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../2_installation/installation.html">2. Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../2_installation/build_the_package.html">2.1. Build from Source</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../2_installation/build_the_package.html#environment">2.1.1. Environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../2_installation/build_the_package.html#linux-ros2-wrapper-compilation">2.1.2. Linux ROS2 Wrapper Compilation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../2_installation/registration_script.html">2.2. Registration script (required)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../3_quickstarts/quickstarts.html">3. Quickstarts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../3_quickstarts/quickstart.html">3.1. QuickStarts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../3_quickstarts/quickstart.html#introduction">3.1.1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../3_quickstarts/quickstart.html#build-your-first-camera-application">3.1.2. Build your First Camera Application</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../3_quickstarts/quickstart.html#step-1-source-ros-2-and-workspace">3.1.2.1. Step 1: Source ROS 2 and Workspace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../3_quickstarts/quickstart.html#step-2-launch-the-camera-node">3.1.2.2. Step 2: Launch the Camera Node</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../3_quickstarts/quickstart.html#step-3-visualize-in-rviz2">3.1.2.3. Step 3: Visualize in RViz2</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../3_quickstarts/quickstart.html#sample-features">3.1.3. Sample Features</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../3_quickstarts/quickstart.html#list-available-topics-services-parameters">3.1.3.1. List available topics / services/ parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../3_quickstarts/quickstart.html#echo-a-topic">3.1.3.2. Echo a topic</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../3_quickstarts/quickstart.html#call-a-service">3.1.3.3. Call a service</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../3_quickstarts/quickstart.html#record-with-rosbag2">3.1.3.4. Record with rosbag2</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../4_application_guide/application_guide.html">4. Application Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/launch_parameters.html">4.1. Launch parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/launch_parameters.html#core-stream-configuration">4.1.1. Core &amp; Stream Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/launch_parameters.html#sensor-controls">4.1.2. Sensor Controls</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#color-stream">4.1.2.1. Color Stream</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#depth-stream">4.1.2.2. Depth Stream</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#ir-stream">4.1.2.3. IR Stream</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#laser-ldp">4.1.2.4. Laser / LDP</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/launch_parameters.html#device-sync-advanced-features">4.1.3. Device, Sync &amp; Advanced Features</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#multi-camera-synchronization">4.1.3.1. Multi-Camera Synchronization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#network-cameras">4.1.3.2. Network Cameras</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#device-specific">4.1.3.3. Device-Specific</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#disparity">4.1.3.4. Disparity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#interleave-ae-mode">4.1.3.5. Interleave AE Mode</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/launch_parameters.html#basic-general-parameters">4.1.4. Basic &amp; General Parameters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#firmware-backend">4.1.4.1. Firmware &amp; Backend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#tf-extrinsics-calibration">4.1.4.2. TF, Extrinsics &amp; Calibration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#time-synchronization">4.1.4.3. Time Synchronization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#logging-diagnostics">4.1.4.4. Logging &amp; Diagnostics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#miscellaneous">4.1.4.5. Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/launch_parameters.html#imu">4.1.5. IMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/launch_parameters.html#depth-filters">4.1.6. Depth Filters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/services.html">4.2. All available services for camera control</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/services.html#stream-control">4.2.1. Stream Control</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/services.html#color-stream">4.2.1.1. Color Stream</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/services.html#depth-stream">4.2.1.2. Depth Stream</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/services.html#ir-stream">4.2.1.3. IR Stream</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/services.html#all-streams">4.2.1.4. All Streams</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/services.html#sensor-emitter-control">4.2.2. Sensor &amp; Emitter Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/services.html#device-information-management">4.2.3. Device Information &amp; Management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/services.html#synchronization-triggering">4.2.4. Synchronization &amp; Triggering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/services.html#depth-filter-configuration">4.2.5. Depth Filter Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/services.html#data-capture-calibration-management">4.2.6. Data Capture &amp; Calibration Management</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/topics.html">4.3. Available Topics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/topics.html#image-streams">4.3.1. Image Streams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/topics.html#point-cloud-topics">4.3.2. Point Cloud Topics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/topics.html#imu-topics">4.3.3. IMU Topics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/topics.html#device-status-diagnostics">4.3.4. Device Status &amp; Diagnostics</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="advanced_guide.html">5. Advanced Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="align_depth_color.html">5.1. Aligning Depth to Color in ROS 2</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="align_depth_color.html#commands-to-align-and-view-depth-and-color-images">5.1.1. Commands to Align and View Depth and Color Images</a></li>
+<li class="toctree-l3"><a class="reference internal" href="align_depth_color.html#selecting-topics-in-rviz2">5.1.2. Selecting Topics in RViz2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="align_depth_color.html#example-of-depth-to-color-overlay">5.1.3. Example of Depth to Color Overlay</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="benchmark.html">5.2. Ob_benchmark tool</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="benchmark.html#usage-instructions">5.2.1. Usage Instructions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="benchmark.html#tool-configuration-start-benchmark-params-json">5.2.1.1. Tool Configuration (start_benchmark_params.json)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="benchmark.html#camera-configuration-launch-files">5.2.1.2. Camera configuration (launch files)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="benchmark.html#running-the-ob-benchmark-tool">5.2.1.3. Running the ob_benchmark tool</a></li>
+<li class="toctree-l4"><a class="reference internal" href="benchmark.html#output-data-files">5.2.1.4. Output Data Files</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="building_a_Debian_Package.html">5.3. Building a Debian Package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="building_a_Debian_Package.html#preparing-the-environment">5.3.1. Preparing the Environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="building_a_Debian_Package.html#configuring-ros-dependencies">5.3.2. Configuring ROS Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="building_a_Debian_Package.html#building-the-package">5.3.3. Building the Package</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">5.4. Configuration of depth NFOV and WFOV modes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="depth_work_mode_switch.html">5.5. Depth work mode switch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="disparity_search_offset.html">5.6. Disparity_search_offset</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="disparity_search_offset.html#function-introduction">5.6.1. Function Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="disparity_search_offset.html#parameter-introduction">5.6.2. Parameter Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="disparity_search_offset.html#run-the-launch">5.6.3. Run the launch</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="efficient_intra_process_communication.html">5.7. Efficient intra-process communication:</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="efficient_intra_process_communication.html#example">5.7.1. Example</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="efficient_intra_process_communication.html#manually-loading-multiple-components-into-the-same-process">5.7.1.1. Manually loading multiple components into the same process</a></li>
+<li class="toctree-l4"><a class="reference internal" href="efficient_intra_process_communication.html#using-a-launch-file">5.7.1.2. Using a launch file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="efficient_intra_process_communication.html#limitations">5.7.1.3. Limitations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="fastdds_tuning.html">5.8. Fast DDS Optimization for Orbbec Camera with ROS2</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="fastdds_tuning.html#adjusting-system-parameters">5.8.1. Adjusting System Parameters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fastdds_tuning.html#ip-fragmentation-time">5.8.1.1. IP Fragmentation Time</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fastdds_tuning.html#ip-fragmentation-memory-threshold">5.8.1.2. IP Fragmentation Memory Threshold</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fastdds_tuning.html#maximum-buffer-sizes">5.8.1.3. Maximum Buffer Sizes</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fastdds_tuning.html#fast-dds-configuration">5.8.2. Fast DDS Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fastdds_tuning.html#configuration-file-shm-fastdds-xml">5.8.2.1. Configuration File: <code class="docutils literal notranslate"><span class="pre">shm_fastdds.xml</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="fastdds_tuning.html#environment-variables">5.8.2.2. Environment Variables</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gmsl_camera.html">5.9. GMSL_camera</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gmsl_camera.html#single-gmsl-camera">5.9.1. Single GMSL camera</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gmsl_camera.html#multi-gmsl-camera">5.9.2. Multi GMSL camera</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gmsl_camera.html#multi-gmsl-camera-synced">5.9.3. Multi GMSL camera synced</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="gmsl_camera.html#additional-parameter-settings">5.9.3.1. Additional Parameter Settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gmsl_camera.html#run-the-launch">5.9.3.2. Run the launch</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="interleave_ae_mode.html">5.10. Using interleave_ae with Gemini330 series cameras</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="interleave_ae_mode.html#parameter-introduction">5.10.1. Parameter Introduction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="interleave_ae_mode.html#interleave-hdr">5.10.1.1. interleave hdr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="interleave_ae_mode.html#interleave-laser">5.10.1.2. interleave laser</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="interleave_ae_mode.html#run-the-launch">5.10.2. Run the launch</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="interleave_ae_mode.html#example-visualization">5.10.2.1. Example Visualization</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="interleave_ae_mode.html#multi-camera-synced-interleave-ae">5.10.3. Multi_camera_synced + Interleave_ae</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lower_cpu_usage.html">5.11. Reducing CPU Usage with Orbbec ROS Package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lower_cpu_usage.html#recommended-settings-for-lower-cpu-usage">5.11.1. Recommended Settings for Lower CPU Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lower_cpu_usage.html#launch-files-used-for-testing">5.11.2. Launch Files Used for Testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lower_cpu_usage.html#test-environment">5.11.3. Test environment</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lower_cpu_usage.html#hardware-configuration">5.11.3.1. Hardware Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lower_cpu_usage.html#ros-configuration">5.11.3.2. ROS Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lower_cpu_usage.html#camera-setup">5.11.3.3. Camera Setup</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lower_cpu_usage.html#test-setup">5.11.4. Test Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lower_cpu_usage.html#test-results">5.11.5. Test Results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lower_cpu_usage.html#uvc-backend-comparison-rgb-format">5.11.5.1. <code class="docutils literal notranslate"><span class="pre">uvc_backend</span></code> Comparison (RGB format)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lower_cpu_usage.html#color-format-comparison-mjpg-vs-rgb">5.11.5.2. <code class="docutils literal notranslate"><span class="pre">color_format</span></code> Comparison (MJPG vs RGB)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lower_cpu_usage.html#filter-configuration-impact">5.11.5.3. Filter Configuration Impact</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lower_cpu_usage.html#further-optimizationa">5.11.6. Further Optimizationa</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="multi_camera.html">5.12. Multi-Camera</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="multi_camera.html#no-data-stream-from-multiple-cameras">5.12.1. No Data Stream from Multiple Cameras</a></li>
+<li class="toctree-l3"><a class="reference internal" href="multi_camera.html#image-topic-frame-rate-too-low-from-multiple-cameras">5.12.2. Image topic frame rate too low from Multiple Cameras</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="multi_camera_synced.html">5.13. Multi_camera synced Instructions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="multi_camera_synced.html#setup-instructions">5.13.1. Setup instructions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="multi_camera_synced.html#checking-camera-port-with-orbbecsdk-ros2">5.13.1.1. Checking camera port with OrbbecSDK_ROS2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multi_camera_synced.html#orbbecsdk-ros2-multi-camera-synced-configuration">5.13.1.2. OrbbecSDK_ROS2 multi-camera synced configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multi_camera_synced.html#run-the-following-command-to-start-the-multi-camera-synced">5.13.1.3. Run the following command to start the multi-camera synced</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="multi_camera_synced_verification_tool.html">5.14. Multi_camera_synced_verification_tool</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="multi_camera_synced_verification_tool.html#directory-structure">5.14.1. Directory Structure</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="multi_camera_synced_verification_tool.html#multicamera-sync">5.14.1.1. multicamera_sync</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="multi_camera_synced_verification_tool.html#output">5.14.1.1.1. output</a></li>
+<li class="toctree-l5"><a class="reference internal" href="multi_camera_synced_verification_tool.html#python">5.14.1.1.2. Python</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="multi_camera_synced_verification_tool.html#preparation-for-operation">5.14.2. Preparation for operation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="multi_camera_synced_verification_tool.html#save-rgbir-node">5.14.2.1. save_rgbir node</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multi_camera_synced_verification_tool.html#devicesinfo-txt">5.14.2.2. DevicesInfo.txt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multi_camera_synced_verification_tool.html#config-ini">5.14.2.3. Config.ini</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="multi_camera_synced_verification_tool.html#run-this-example">5.14.3. Run this example</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="multi_camera_synced_verification_tool.html#run-launch-and-save-camera-pictures">5.14.3.1. Run launch and save camera pictures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multi_camera_synced_verification_tool.html#camera-pictures-naming-format">5.14.3.2. Camera pictures naming format</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multi_camera_synced_verification_tool.html#analyzing-camera-image-data">5.14.3.3. Analyzing camera image data</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="multi_camera_synced_verification_tool.html#files-that-need-to-be-changed">5.14.4. Files that need to be changed</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="multi_camera_synced_verification_tool.html#analysis-tools">5.14.4.1. Analysis tools</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multi_camera_synced_verification_tool.html#camera-configuration">5.14.4.2. Camera Configuration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="net_camera.html">5.15. Net_camera</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="net_camera.html#femto-mega-gemini-435le">5.15.1. Femto Mega &amp; Gemini 435Le</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="net_camera.html#parameter-introduction">5.15.1.1. Parameter Introduction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="net_camera.html#single-net-camera">5.15.1.2. Single Net camera</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="net_camera.html#gemini-335le">5.15.2. Gemini 335Le</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="net_camera.html#id1">5.15.2.1. Single Net camera</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="net_camera.html#multi-net-camera">5.15.3. Multi Net camera</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="point_cloud.html">5.16. Enabling and Visualizing Point Cloud in ROS 2</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#enabling-depth-point-cloud">5.16.1. Enabling Depth Point Cloud</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#command-to-enable-depth-point-cloud">5.16.1.1. Command to Enable Depth Point Cloud</a></li>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#visualizing-depth-point-cloud-in-rviz2">5.16.1.2. Visualizing Depth Point Cloud in RViz2</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#enabling-colored-point-cloud">5.16.2. Enabling Colored Point Cloud</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#command-to-enable-colored-point-cloud">5.16.2.1. Command to Enable Colored Point Cloud</a></li>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#visualizing-colored-point-cloud-in-rviz2">5.16.2.2. Visualizing Colored Point Cloud in RViz2</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="predefined_presets.html">5.17. Predefined presets</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../6_FAQ/FAQ.html">6. Frequently Asked Questions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../6_FAQ/FAQ.html#unexpected-crash">6.1. Unexpected Crash</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../6_FAQ/FAQ.html#no-data-stream-from-multiple-cameras">6.2. No Data Stream from Multiple Cameras</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../6_FAQ/FAQ.html#additional-troubleshooting">6.3. Additional Troubleshooting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../6_FAQ/FAQ.html#why-are-there-so-many-launch-files">6.4. Why Are There So Many Launch Files?</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OrbbecSDK V2 ROS2 Wrapper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="advanced_guide.html"><span class="section-number">5. </span>Advanced Guide</a></li>
+      <li class="breadcrumb-item active"><span class="section-number">5.4. </span>Configuration of depth NFOV and WFOV modes</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/source/5_advanced_guide/configuration_of_depth_NFOV_and_WFOV_modes.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="configuration-of-depth-nfov-and-wfov-modes">
+<h1><span class="section-number">5.4. </span>Configuration of depth NFOV and WFOV modes<a class="headerlink" href="#configuration-of-depth-nfov-and-wfov-modes" title="Link to this heading"></a></h1>
+<p>For the Femto Mega and Femto Bolt devices, the NFOV and WFOV modes are implemented by configuring the resolution of
+Depth and IR in the launch file.
+In launch file, depth_width, depth_height, ir_width, ir_height represents the resolution of the depth and the resolution of
+the IR.
+The frame fps and resolution of IR must be consistent with the depth. The correspondence between different modes and
+resolutions is as follows:</p>
+<ul class="simple">
+<li><p>NFOV unbinned: 640 x 576.</p></li>
+<li><p>NFOV binned: 320 x 288.</p></li>
+<li><p>WFOV unbinned: 1024 x 1024.</p></li>
+<li><p>WFOV binned: 512 x 512.</p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="building_a_Debian_Package.html" class="btn btn-neutral float-left" title="5.3. Building a Debian Package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="depth_work_mode_switch.html" class="btn btn-neutral float-right" title="5.5. Depth work mode switch" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, ORBBEC INC. www.orbbec.com..
+      <span class="lastupdated">Last updated on 2025-09-15 06:27:18.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -28,9 +28,9 @@ jobs:
         run: sphinx-build -b html docs docs/_build/html
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          personal_token: ${{ secrets.PERSONAL_TOKEN }}
+          deploy_key: ${{ secrets.DEPLOY_KEY }}
           external_repository: orbbec/OrbbecSDK_ROS2
           publish_branch: gh-pages
           publish_dir: docs/_build/html

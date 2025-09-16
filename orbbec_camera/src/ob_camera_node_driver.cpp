@@ -243,6 +243,12 @@ void OBCameraNodeDriver::init() {
     ctx_->setUvcBackendType(OB_UVC_BACKEND_TYPE_LIBUVC);
     RCLCPP_INFO_STREAM(logger_, "setUvcBackendType:" << uvc_backend_);
   }
+  // Force IP
+  force_ip_enable_ = declare_parameter<bool>("force_ip_enable", false);
+  force_ip_dhcp_ = declare_parameter<bool>("force_ip_dhcp", false);
+  force_ip_address_ = declare_parameter<std::string>("force_ip_address", "192.168.1.10");
+  force_ip_subnet_mask_ = declare_parameter<std::string>("force_ip_subnet_mask", "255.255.255.0");
+  force_ip_gateway_ = declare_parameter<std::string>("force_ip_gateway", "192.168.1.1");
   ctx_->enableNetDeviceEnumeration(enumerate_net_device_);
   ctx_->setDeviceChangedCallback([this](const std::shared_ptr<ob::DeviceList> &removed_list,
                                         const std::shared_ptr<ob::DeviceList> &added_list) {
@@ -393,8 +399,11 @@ void OBCameraNodeDriver::queryDevice() {
           now - last_reset_device_completion_time_);
 
       if (time_since_last_reset.count() < 10) {
-        RCLCPP_DEBUG_STREAM(logger_, "queryDevice: Only " << time_since_last_reset.count()
-                           << " seconds since last reset completion, waiting before starting device...");
+        RCLCPP_DEBUG_STREAM(
+            logger_,
+            "queryDevice: Only "
+                << time_since_last_reset.count()
+                << " seconds since last reset completion, waiting before starting device...");
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         continue;
       }
@@ -476,9 +485,9 @@ void OBCameraNodeDriver::resetDevice() {
             }
             device_.reset();
             RCLCPP_INFO_STREAM(logger_, "device_ reset completed");
-          } catch (const ob::Error& e) {
+          } catch (const ob::Error &e) {
             RCLCPP_WARN_STREAM(logger_, "OB Exception during device reset: " << e.getMessage());
-          } catch (const std::exception& e) {
+          } catch (const std::exception &e) {
             RCLCPP_WARN_STREAM(logger_, "Standard exception during device reset: " << e.what());
           } catch (...) {
             RCLCPP_WARN_STREAM(logger_, "Unknown exception during device reset");
@@ -991,6 +1000,66 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
 
 }  // namespace orbbec_camera
 
+bool OBCameraNodeDriver::applyForceIpConfig() {
+  if (!force_ip_enable_) {
+    return false;
+  }
+  if (force_ip_success_) {
+    return false;
+  }
+
+  OBNetIpConfig config{};
+  config.dhcp = force_ip_dhcp_ ? 1 : 0;
+
+  if (config.dhcp == 0) {
+    if (force_ip_address_.empty() || force_ip_subnet_mask_.empty() || force_ip_gateway_.empty()) {
+      RCLCPP_WARN(logger_, "Force IP enabled but parameters are incomplete");
+      return false;
+    }
+    auto parseIp = [](const std::string &ip, uint8_t out[4]) {
+      std::stringstream ss(ip);
+      std::string item;
+      int i = 0;
+      while (std::getline(ss, item, '.') && i < 4) {
+        out[i++] = static_cast<uint8_t>(std::stoi(item));
+      }
+    };
+    parseIp(force_ip_address_, config.address);
+    parseIp(force_ip_subnet_mask_, config.mask);
+    parseIp(force_ip_gateway_, config.gateway);
+  }
+
+  force_ip_success_ = false;
+  try {
+    auto device_list = ctx_->queryDeviceList();
+    uint32_t index = 0;
+    const char *mac = device_list->getUid(index);
+    if (ctx_->changeNetDeviceIpConfig(mac, config)) {
+      RCLCPP_INFO(logger_,
+                  "Force IP config applied. force_ip_dhcp=%d ip=%s mask=%s force_ip_gateway=%s",
+                  config.dhcp, force_ip_address_.c_str(), force_ip_subnet_mask_.c_str(),
+                  force_ip_gateway_.c_str());
+      RCLCPP_INFO(logger_, "Reboot device after Force IP");
+      device_connected_ = false;
+      force_ip_success_ = true;
+      {
+        std::unique_lock<decltype(reset_device_mutex_)> reset_device_lock(reset_device_mutex_);
+        reset_device_flag_ = true;
+      }
+      reset_device_cond_.notify_all();
+    } else {
+      RCLCPP_ERROR(logger_, "Failed to apply Force IP config (SDK returned false)");
+    }
+  } catch (const ob::Error &e) {
+    RCLCPP_ERROR(logger_, "Force IP config failed with ob::Error: %s", e.getMessage());
+  } catch (const std::exception &e) {
+    RCLCPP_ERROR(logger_, "Force IP config failed with std::exception: %s", e.what());
+  } catch (...) {
+    RCLCPP_ERROR(logger_, "Force IP config failed with unknown error");
+  }
+  return force_ip_success_;
+}
+
 void OBCameraNodeDriver::connectNetDevice(const std::string &net_device_ip, int net_device_port) {
   if (net_device_ip.empty() || net_device_port == 0) {
     RCLCPP_ERROR_STREAM(logger_, "Invalid net device ip or port");
@@ -1032,7 +1101,9 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
   if (device_connected_.load()) {
     return;
   }
-
+  if (applyForceIpConfig()) {
+    return;
+  }
   // Try to set connecting flag atomically
   bool expected = false;
   if (!device_connecting_.compare_exchange_strong(expected, true)) {

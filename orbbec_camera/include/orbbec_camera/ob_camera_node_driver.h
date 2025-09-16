@@ -82,6 +82,8 @@ class OBCameraNodeDriver : public rclcpp::Node {
 
   void firmwareUpdateCallback(OBFwUpdateState state, const char* message, uint8_t percent);
 
+  bool applyForceIpConfig();
+
  private:
   const rclcpp::NodeOptions node_options_;
   std::string config_path_;
@@ -131,5 +133,11 @@ class OBCameraNodeDriver : public rclcpp::Node {
   int device_status_interval_hz = 2;  // 2Hz
   rclcpp::Publisher<orbbec_camera_msgs::msg::DeviceStatus>::SharedPtr device_status_pub_ = nullptr;
   std::string node_name_;
+  bool force_ip_enable_{false};
+  bool force_ip_dhcp_{false};
+  std::string force_ip_address_;      // e.g. "192.168.1.10"
+  std::string force_ip_subnet_mask_;  // e.g. "255.255.255.0"
+  std::string force_ip_gateway_;      // e.g. "192.168.1.1"
+  std::atomic<bool> force_ip_success_{false};
 };
 }  // namespace orbbec_camera

@@ -184,6 +184,10 @@ class OBLidarNode {
 
   void publishSpherePointCloud(std::shared_ptr<ob::FrameSet> frame_set);
 
+  void publishMergedPointCloud();
+
+  void publishMergedSpherePointCloud();
+
   uint64_t getFrameTimestampUs(const std::shared_ptr<ob::Frame>& frame);
 
   void filterScan(sensor_msgs::msg::LaserScan& scan);
@@ -267,6 +271,12 @@ class OBLidarNode {
   double angle_increment_ = 0.0;
   bool enable_cloud_accumulated_ = false;
   int cloud_accumulation_count_ = -1;
+
+  // Multi-frame publishing parameters
+  int publish_n_pkts_ = 1;
+  std::mutex frame_buffer_mutex_;
+  std::vector<std::shared_ptr<ob::FrameSet>> frame_buffer_;
+  rclcpp::Time last_frame_timestamp_;
 
   // IMU
   bool enable_imu_ = false;

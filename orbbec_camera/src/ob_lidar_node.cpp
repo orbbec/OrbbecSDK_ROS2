@@ -166,6 +166,28 @@ void OBLidarNode::getParameters() {
   setAndGetNodeParameter<double>(liner_accel_cov_, "linear_accel_cov", 0.0003);
   setAndGetNodeParameter<double>(angular_vel_cov_, "angular_vel_cov", 0.02);
 
+  // Multi-frame publishing parameter - only for LIDAR_POINT and LIDAR_SPHERE_POINT formats
+  bool use_multi_frame = false;
+  for (auto stream_index : LIDAR_STREAMS) {
+    if (format_[stream_index] == OB_FORMAT_LIDAR_POINT || format_[stream_index] == OB_FORMAT_LIDAR_SPHERE_POINT) {
+      use_multi_frame = true;
+      break;
+    }
+  }
+
+  if (use_multi_frame) {
+    setAndGetNodeParameter<int>(publish_n_pkts_, "publish_n_pkts", 1);
+    if (publish_n_pkts_ < 1 || publish_n_pkts_ > 12000) {
+      RCLCPP_WARN_STREAM(logger_, "publish_n_pkts value " << publish_n_pkts_
+                                  << " is out of range [1, 12000], setting to 1");
+      publish_n_pkts_ = 1;
+    }
+    RCLCPP_INFO_STREAM(logger_, "Multi-frame publishing enabled: " << publish_n_pkts_ << " frames will be merged");
+  } else {
+    publish_n_pkts_ = 1;
+    RCLCPP_INFO_STREAM(logger_, "Multi-frame publishing disabled for current lidar format");
+  }
+
   // Setup IMU streams if enabled
   if (enable_imu_) {
     enable_stream_[ACCEL] = true;
@@ -619,14 +641,29 @@ void OBLidarNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set)
       publishStaticTransforms();
       tf_published_ = true;
     }
-    if (format_[LIDAR] == OB_FORMAT_LIDAR_SCAN && !enable_scan_to_point_) {
-      publishScan(frame_set);
-    } else if (format_[LIDAR] == OB_FORMAT_LIDAR_SCAN && enable_scan_to_point_) {
-      publishScanToPoint(frame_set);
-    } else if (format_[LIDAR] == OB_FORMAT_LIDAR_POINT) {
-      publishPointCloud(frame_set);
-    } else if (format_[LIDAR] == OB_FORMAT_LIDAR_SPHERE_POINT) {
-      publishSpherePointCloud(frame_set);
+
+    // Handle multi-frame publishing for LIDAR_POINT and LIDAR_SPHERE_POINT formats
+    if ((format_[LIDAR] == OB_FORMAT_LIDAR_POINT || format_[LIDAR] == OB_FORMAT_LIDAR_SPHERE_POINT)) {
+      std::lock_guard<std::mutex> lock(frame_buffer_mutex_);
+      frame_buffer_.push_back(frame_set);
+
+      // If we have enough frames, publish merged point cloud
+      if (frame_buffer_.size() >= static_cast<size_t>(publish_n_pkts_)) {
+        if (format_[LIDAR] == OB_FORMAT_LIDAR_POINT) {
+          publishMergedPointCloud();
+        } else if (format_[LIDAR] == OB_FORMAT_LIDAR_SPHERE_POINT) {
+          publishMergedSpherePointCloud();
+        }
+        frame_buffer_.clear();
+      }
+    }
+    else {
+      // Original single frame publishing logic
+      if (format_[LIDAR] == OB_FORMAT_LIDAR_SCAN && !enable_scan_to_point_) {
+        publishScan(frame_set);
+      } else if (format_[LIDAR] == OB_FORMAT_LIDAR_SCAN && enable_scan_to_point_) {
+        publishScanToPoint(frame_set);
+      }
     }
   } catch (const ob::Error &e) {
     RCLCPP_ERROR_STREAM(logger_, "onNewFrameSetCallback error: " << e.getMessage());
@@ -801,6 +838,181 @@ void OBLidarNode::publishSpherePointCloud(std::shared_ptr<ob::FrameSet> frame_se
     *iter_intensity = result_point[i].intensity;
     *iter_tag = result_point[i].tag;
   }
+  *point_cloud_msg = filterPointCloud(*point_cloud_msg);
+  point_cloud_pub_->publish(std::move(point_cloud_msg));
+}
+
+void OBLidarNode::publishMergedPointCloud() {
+  if (frame_buffer_.empty()) {
+    return;
+  }
+
+  // Calculate total point count across all frames
+  size_t total_point_count = 0;
+  std::vector<std::pair<OBLiDARPoint*, size_t>> frame_data;
+  std::vector<uint64_t> frame_timestamps;
+
+  for (const auto& fs : frame_buffer_) {
+    auto lidar_frame = fs->getFrame(OB_FRAME_LIDAR_POINTS);
+    if (lidar_frame) {
+      auto* point_data = reinterpret_cast<OBLiDARPoint*>(lidar_frame->getData());
+      auto point_count = lidar_frame->getDataSize() / sizeof(OBLiDARPoint);
+      frame_data.emplace_back(point_data, point_count);
+      frame_timestamps.push_back(getFrameTimestampUs(lidar_frame));
+      total_point_count += point_count;
+    }
+  }
+
+  if (total_point_count == 0) {
+    return;
+  }
+
+  // Create merged point cloud message with offset_time field
+  auto point_cloud_msg = std::make_unique<sensor_msgs::msg::PointCloud2>();
+  sensor_msgs::PointCloud2Modifier modifier(*point_cloud_msg);
+  modifier.setPointCloud2Fields(6,
+                                "x", 1, sensor_msgs::msg::PointField::FLOAT32,
+                                "y", 1, sensor_msgs::msg::PointField::FLOAT32,
+                                "z", 1, sensor_msgs::msg::PointField::FLOAT32,
+                                "intensity", 1, sensor_msgs::msg::PointField::UINT8,
+                                "tag", 1, sensor_msgs::msg::PointField::UINT8,
+                                "offset_time", 1, sensor_msgs::msg::PointField::UINT32);
+  modifier.resize(total_point_count);
+
+  // Use the timestamp of the latest frame as the header timestamp
+  auto timestamp = fromUsToROSTime(frame_timestamps.front());
+  point_cloud_msg->header.stamp = timestamp;
+  point_cloud_msg->header.frame_id = frame_id_[LIDAR];
+  point_cloud_msg->height = 1;
+  point_cloud_msg->width = total_point_count;
+  point_cloud_msg->is_dense = true;
+  point_cloud_msg->is_bigendian = false;
+  point_cloud_msg->row_step = point_cloud_msg->width * point_cloud_msg->point_step;
+  point_cloud_msg->data.resize(point_cloud_msg->height * point_cloud_msg->row_step);
+
+  // Create iterators
+  sensor_msgs::PointCloud2Iterator<float> iter_x(*point_cloud_msg, "x");
+  sensor_msgs::PointCloud2Iterator<float> iter_y(*point_cloud_msg, "y");
+  sensor_msgs::PointCloud2Iterator<float> iter_z(*point_cloud_msg, "z");
+  sensor_msgs::PointCloud2Iterator<uint8_t> iter_intensity(*point_cloud_msg, "intensity");
+  sensor_msgs::PointCloud2Iterator<uint8_t> iter_tag(*point_cloud_msg, "tag");
+  sensor_msgs::PointCloud2Iterator<uint32_t> iter_offset_time(*point_cloud_msg, "offset_time");
+
+  // Calculate frame time interval based on lidar rate
+  double frame_interval_us = 1000000.0 / static_cast<double>(rate_int_[LIDAR]);
+
+  // Merge all frames with per-point timestamps
+  for (size_t frame_idx = 0; frame_idx < frame_data.size(); ++frame_idx) {
+    auto [point_data, point_count] = frame_data[frame_idx];
+    uint64_t frame_timestamp_us = frame_timestamps[frame_idx];
+
+    // Calculate time increment per point within this frame (uniform sampling)
+    double point_time_increment_us = frame_interval_us / static_cast<double>(point_count);
+
+    for (size_t i = 0; i < point_count;
+         ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_intensity, ++iter_tag, ++iter_offset_time) {
+      *iter_x = static_cast<float>(point_data[i].x / 1000.0);
+      *iter_y = static_cast<float>(point_data[i].y / -1000.0);
+      *iter_z = static_cast<float>(point_data[i].z / 1000.0);
+      *iter_intensity = point_data[i].intensity;
+      *iter_tag = point_data[i].tag;
+
+      // Calculate per-point offset time in nanoseconds relative to point cloud header timestamp
+      double point_timestamp_us = static_cast<double>(frame_timestamp_us) + (i * point_time_increment_us);
+      uint64_t header_timestamp_us = frame_timestamps[0]; // First frame timestamp
+      *iter_offset_time = static_cast<uint32_t>((point_timestamp_us - static_cast<double>(header_timestamp_us)) * 1000.0); // Convert to nanoseconds
+    }
+  }
+
+  *point_cloud_msg = filterPointCloud(*point_cloud_msg);
+  point_cloud_pub_->publish(std::move(point_cloud_msg));
+}
+
+void OBLidarNode::publishMergedSpherePointCloud() {
+  if (frame_buffer_.empty()) {
+    return;
+  }
+
+  // Calculate total point count across all frames
+  size_t total_point_count = 0;
+  std::vector<std::pair<OBLiDARSpherePoint*, size_t>> frame_data;
+  std::vector<uint64_t> frame_timestamps;
+
+  for (const auto& fs : frame_buffer_) {
+    auto lidar_frame = fs->getFrame(OB_FRAME_LIDAR_POINTS);
+    if (lidar_frame) {
+      auto* point_data = reinterpret_cast<OBLiDARSpherePoint*>(lidar_frame->getData());
+      auto point_count = lidar_frame->getDataSize() / sizeof(OBLiDARSpherePoint);
+      frame_data.emplace_back(point_data, point_count);
+      frame_timestamps.push_back(getFrameTimestampUs(lidar_frame));
+      total_point_count += point_count;
+    }
+  }
+
+  if (total_point_count == 0) {
+    return;
+  }
+
+  // Create merged point cloud message with timestamp field
+  auto point_cloud_msg = std::make_unique<sensor_msgs::msg::PointCloud2>();
+  sensor_msgs::PointCloud2Modifier modifier(*point_cloud_msg);
+  modifier.setPointCloud2Fields(6,
+                                "x", 1, sensor_msgs::msg::PointField::FLOAT32,
+                                "y", 1, sensor_msgs::msg::PointField::FLOAT32,
+                                "z", 1, sensor_msgs::msg::PointField::FLOAT32,
+                                "intensity", 1, sensor_msgs::msg::PointField::UINT8,
+                                "tag", 1, sensor_msgs::msg::PointField::UINT8,
+                                "offset_time", 1, sensor_msgs::msg::PointField::UINT32);
+  modifier.resize(total_point_count);
+
+  // Use the timestamp of the latest frame as the header timestamp
+  auto timestamp = fromUsToROSTime(frame_timestamps.front());
+  point_cloud_msg->header.stamp = timestamp;
+  point_cloud_msg->header.frame_id = frame_id_[LIDAR];
+  point_cloud_msg->height = 1;
+  point_cloud_msg->width = total_point_count;
+  point_cloud_msg->is_dense = true;
+  point_cloud_msg->is_bigendian = false;
+  point_cloud_msg->row_step = point_cloud_msg->width * point_cloud_msg->point_step;
+  point_cloud_msg->data.resize(point_cloud_msg->height * point_cloud_msg->row_step);
+
+  // Create iterators
+  sensor_msgs::PointCloud2Iterator<float> iter_x(*point_cloud_msg, "x");
+  sensor_msgs::PointCloud2Iterator<float> iter_y(*point_cloud_msg, "y");
+  sensor_msgs::PointCloud2Iterator<float> iter_z(*point_cloud_msg, "z");
+  sensor_msgs::PointCloud2Iterator<uint8_t> iter_intensity(*point_cloud_msg, "intensity");
+  sensor_msgs::PointCloud2Iterator<uint8_t> iter_tag(*point_cloud_msg, "tag");
+  sensor_msgs::PointCloud2Iterator<uint32_t> iter_offset_time(*point_cloud_msg, "offset_time");
+
+  // Calculate frame time interval based on lidar rate
+  double frame_interval_us = 1000000.0 / static_cast<double>(rate_int_[LIDAR]);
+
+  // Merge all frames with per-point timestamps
+  for (size_t frame_idx = 0; frame_idx < frame_data.size(); ++frame_idx) {
+    auto [sphere_point_data, point_count] = frame_data[frame_idx];
+    uint64_t frame_timestamp_us = frame_timestamps[frame_idx];
+
+    // Convert sphere points to cartesian points
+    auto result_point = spherePointToPoint(sphere_point_data, point_count);
+
+    // Calculate time increment per point within this frame (uniform sampling)
+    double point_time_increment_us = frame_interval_us / static_cast<double>(point_count);
+
+    for (size_t i = 0; i < point_count;
+         ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_intensity, ++iter_tag, ++iter_offset_time) {
+      *iter_x = static_cast<float>(result_point[i].x / 1000.0);
+      *iter_y = static_cast<float>(result_point[i].y / -1000.0);
+      *iter_z = static_cast<float>(result_point[i].z / 1000.0);
+      *iter_intensity = result_point[i].intensity;
+      *iter_tag = result_point[i].tag;
+
+      // Calculate per-point offset time in nanoseconds relative to point cloud header timestamp
+      double point_timestamp_us = static_cast<double>(frame_timestamp_us) + (i * point_time_increment_us);
+      uint64_t header_timestamp_us = frame_timestamps[0]; // First frame timestamp
+      *iter_offset_time = static_cast<uint32_t>((point_timestamp_us - static_cast<double>(header_timestamp_us)) * 1000.0); // Convert to nanoseconds
+    }
+  }
+
   *point_cloud_msg = filterPointCloud(*point_cloud_msg);
   point_cloud_pub_->publish(std::move(point_cloud_msg));
 }

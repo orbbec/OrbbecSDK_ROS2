@@ -97,6 +97,11 @@ def generate_launch_description():
             description='LiDAR scan/publish rate in Hz. Supported range depends on device model.'
         ),
         DeclareLaunchArgument(
+            'publish_n_pkts',
+            default_value='1',
+            description='Number of frames to accumulate before publishing. Range: 1-12000. Used for multi-frame data merging.'
+        ),
+        DeclareLaunchArgument(
             'enable_scan_to_point',
             default_value='false',
             description='Convert LaserScan to PointCloud2 and publish. true to enable, false to disable.'

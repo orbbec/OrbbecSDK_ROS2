@@ -116,6 +116,7 @@ ros2 run orbbec_camera list_camera_profile_mode_node
 - **tf_publish_rate**: TF发布频率。
 - **lidar_format**: 激光雷达的数据格式。可选值：`LIDAR_POINT`、`LIDAR_SPHERE_POINT`、`LIDAR_SCAN`
 - **lidar_rate**: 激光雷达的扫描频率。
+- **publish_n_pkts**: 多帧数据合并发布的帧数量。范围：1-12000。仅在激光雷达格式为 `LIDAR_POINT` 或 `LIDAR_SPHERE_POINT` 时生效，用于累积指定数量的帧后再发布合并的点云数据。默认值：`1`
 - **enable_scan_to_point**: 启用扫描数据到点云数据的转换，发布PointCloud2数据类型话题。
 - **repetitive_scan_mode**: 重复扫描模式参数。
 - **filter_level**: 添加过滤级别参数。
@@ -140,14 +141,15 @@ ros2 run orbbec_camera list_camera_profile_mode_node
 
 ## 点云数据详细说明
 
-Livox PointCloud2 (PointXYZRT) 点云格式如下：
+PointCloud2 (PointXYZITO) 点云格式如下：
 
 ```
 float32 x               # X轴，单位：米
 float32 y               # Y轴，单位：米
 float32 z               # Z轴，单位：米
-uint8 intensity      # 激光雷达强度
+uint8   intensity       # 激光雷达强度
 uint8   tag             # 激光雷达标签
+uint32  offset_time     # 点云相对话题时间的偏移量，单位纳秒
 ```
 
 ## 3. IMU数据

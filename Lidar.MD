@@ -55,11 +55,8 @@ rviz2
 ```
 
 1. Open Rviz2.
-
 2. Add a `PointCloud2` or `LaserScan` display.
-
 3. For `PointCloud2`, select the `/lidar/cloud/points` topic; for `LaserScan`, select the `/lidar/scan/points` topic.
-
 4. Set the `Fixed Frame` to `lidar_lidar_frame` to properly align the data.
 
 * `PointCloud2` visualization example:
@@ -119,6 +116,7 @@ The `lidar.launch.py` file contains default parameters for the driver. You can c
 - **tf_publish_rate**: TF publishing frequency.
 - **lidar_format**: Data format for the LiDAR. Optional values: `LIDAR_POINT`, `LIDAR_SPHERE_POINT`, `LIDAR_SCAN`
 - **lidar_rate**: Scan rate of the LiDAR.
+- **publish_n_pkts**: Number of frames to accumulate before publishing merged point cloud. Range: 1-12000. Only effective when lidar_format is `LIDAR_POINT` or `LIDAR_SPHERE_POINT`, used to merge specified number of frames before publishing. Default value: `1`
 - **enable_scan_to_point**: Enable conversion of scan data to point cloud data, publishing PointCloud2 data type topics.
 - **repetitive_scan_mode**: Repetitive scan mode parameter.
 - **filter_level**: Add filter level parameter.
@@ -143,14 +141,15 @@ The `lidar.launch.py` file contains default parameters for the driver. You can c
 
 ## Point Cloud Data Detailed Description
 
-Livox PointCloud2 (PointXYZRT) point cloud format is as follows:
+PointCloud2 (PointXYZITO) point cloud format is as follows:
 
 ```
 float32 x               # X axis, unit:m
 float32 y               # Y axis, unit:m
 float32 z               # Z axis, unit:m
-uint8 intensity      # lidar intensity
+uint8   intensity       # lidar intensity
 uint8   tag             # lidar tag
+uint32  offset_time     # Point cloud offset time relative to topic time, in nanoseconds
 ```
 
 ## 3. IMU Data
@@ -178,6 +177,7 @@ ros2 topic echo /lidar/imu/sample
 ```
 
 The IMU data includes:
+
 - **linear_acceleration**: 3D acceleration data (x, y, z) in m/s²
 - **angular_velocity**: 3D angular velocity data (x, y, z) in rad/s
 - **orientation**: Quaternion orientation (not provided by hardware, set to zero)

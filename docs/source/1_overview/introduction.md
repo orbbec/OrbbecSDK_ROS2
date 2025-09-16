@@ -6,6 +6,133 @@ By default, we recommend using the **v2-main** branch. For older OpenNI devices 
 
 If you are a user in China, it is recommended to use [gitee Repo](https://gitee.com/orbbecdeveloper/OrbbecSDK_ROS2).
 
+Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
+
+<table border="1" style="border-collapse: collapse; text-align: left; width: 100%;">
+  <thead>
+    <tr style="background-color: #1f4e78; color: white; text-align: center;">
+      <th>Product Series</th>
+      <th>Product</th>
+      <th><a href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/main" style="color: black; text-decoration: none;">Branch main</a></th>
+      <th><a href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main" style="color: black; text-decoration: none;">Branch v2-main</a></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center; font-weight: bold;">Gemini 435Le</td>
+      <td>Gemini 435Le</td>
+      <td>Not supported</td>
+      <td>Recommended for new designs</td>
+    </tr>
+    <tr>
+      <td rowspan="8" style="text-align: center; font-weight: bold;">Gemini 330</td>
+      <td>Gemini 335</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 336</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 335L</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 336L</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 335Lg</td>
+      <td>Not supported</td>
+      <td>Recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 335Le</td>
+      <td>Not supported</td>
+      <td>Recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 330</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 330L</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
+    </tr>
+    <tr>
+      <td rowspan="3" style="text-align: center; font-weight: bold;">Gemini 2</td>
+      <td>Gemini 2</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 2 L</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 2 XL</td>
+      <td>Recommended for new designs</td>
+      <td>To be supported</td>
+    </tr>
+    <tr>
+      <td rowspan="3" style="text-align: center; font-weight: bold;">Femto</td>
+      <td>Femto Bolt</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Femto Mega</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Femto Mega I</td>
+      <td>Full maintenance</td>
+      <td>To be supported</td>
+    </tr>
+    <tr>
+      <td rowspan="3" style="text-align: center; font-weight: bold;">Astra</td>
+      <td>Astra 2</td>
+      <td>Full maintenance</td>
+      <td>Recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Astra+</td>
+      <td>Limited maintenance</td>
+      <td>Not supported</td>
+    </tr>
+    <tr>
+      <td>Astra Pro Plus</td>
+      <td>Limited maintenance</td>
+      <td>Not supported</td>
+    </tr>
+    <tr>
+      <td style="text-align: center; font-weight: bold;">Astra Mini</td>
+      <td>Astra Mini Pro</td>
+      <td>Full maintenance</td>
+      <td>Full maintenance</td>
+    </tr>
+  </tbody>
+</table>
+
+
+**Note**: If you do not find your device, please contact our FAE or sales representative for help.
+
+**Definition**:
+
+1. Recommended for new designs: we will provide full supports with new features,  bug fix and performance optimization;
+2. Full maintenance: we will provide bug fix support;
+3. Limited maintenance: we will provide critical bug fix support;
+4. Not supported: we will not support specific device in this version;
+5. To be supported: we will add support in the near future.
+
 ## Support Hardware Products
 
 The following devices are supported by the OrbbecSDK ROS2 Wrapper v2-main branch.  More devices support will be added in the near future. If you can not find your device in the table below, try the [main](https://github.com/orbbec/OrbbecSDK_ROS2)  branch.

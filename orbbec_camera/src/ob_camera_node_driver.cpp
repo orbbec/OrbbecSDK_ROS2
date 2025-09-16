@@ -1033,8 +1033,23 @@ bool OBCameraNodeDriver::applyForceIpConfig() {
   try {
     auto device_list = ctx_->queryDeviceList();
     uint32_t index = 0;
-    const char *mac = device_list->getUid(index);
-    if (ctx_->changeNetDeviceIpConfig(mac, config)) {
+    std::string mac;
+    if (!serial_number_.empty() && device_list->getCount() > 1) {
+      RCLCPP_INFO(logger_, "Multiple devices detected, selecting by serial number: %s",
+                  serial_number_.c_str());
+      auto device = selectDeviceBySerialNumber(device_list, serial_number_);
+      if (device == nullptr) {
+        RCLCPP_ERROR(logger_, "Device with serial number %s not found for Force IP",
+                     serial_number_.c_str());
+        return false;
+      }
+      mac = device->getDeviceInfo()->getUid();
+      std::cout << "Selected device MAC for Force IP: " << mac << std::endl;
+    } else {
+      mac = device_list->getUid(index);
+      std::cout << "Default selected device MAC: " << mac << std::endl;
+    }
+    if (ctx_->changeNetDeviceIpConfig(mac.c_str(), config)) {
       RCLCPP_INFO(logger_,
                   "Force IP config applied. force_ip_dhcp=%d ip=%s mask=%s force_ip_gateway=%s",
                   config.dhcp, force_ip_address_.c_str(), force_ip_subnet_mask_.c_str(),

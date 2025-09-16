@@ -88,4 +88,4 @@ ros2 launch orbbec_camera multi_camera.launch.py
 
 ## Image topic frame rate too low from Multiple Cameras
 
-Refer to the [Fast DDS Configuration](./fastdds_tuning.md) file.
+Refer to the [Fast DDS Configuration](../performance/fastdds_tuning.md) file.

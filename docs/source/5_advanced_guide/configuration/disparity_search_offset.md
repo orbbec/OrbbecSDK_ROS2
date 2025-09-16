@@ -6,7 +6,7 @@
 
 The definition of disparity search range: For any pixel *(u_l, v)* in the left image, by default, the corresponding disparity search range in the right image is *[ (u_l - 255, v)*, *(u_l, v) ]*, where the disparity search length is 256 and the maximum integer disparity is 255. If the starting point of the search is adjusted to *[ (u_l - 255 - offset, v)*, *(u_l - offset, v) ]*, the offset is defined as the disparity shift. Therefore, our disparity search range configuration includes both the disparity search length and the search position offset (which can also be referred to as the disparity shift).
 
-![Depth Point Cloud Visualization](../image/disparity_search_offset/search_offset0.png)
+![Depth Point Cloud Visualization](../../image/disparity_search_offset/search_offset0.png)
 
 ## Parameter Introduction
 

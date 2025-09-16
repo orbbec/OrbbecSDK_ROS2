@@ -2,7 +2,7 @@
 
 OrbbecSDK ROS2 Wrapper provides seamless integration of Orbbec cameras with ROS 2 environment. It supports ROS2 Foxy, Humble, and Jazzy distributions.
 
-With a major update in October 2024, we release the [OrbbecSDK ROS2 Wrapper v2](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main) connected to the open source [OrbbecSDK v2](https://github.com/orbbec/OrbbecSDK_v2/releases) with enhanced flexibility and extensibility. This update ensures compatibility with all Orbbec USB products adhering to UVC standard. However, it no longer supports Orbbec's traditional OpenNI protocol devices. We strongly encourage you to use the v2-main branch if your device is supported.
+By default, we recommend using the **v2-main** branch. For older OpenNI devices not supported by v2-main, please use the **main** branch. Device models that are only supported by the main branch are listed in the table below.
 
 If you are a user in China, it is recommended to use [gitee Repo](https://gitee.com/orbbecdeveloper/OrbbecSDK_ROS2).
 
@@ -12,7 +12,7 @@ The following devices are supported by the OrbbecSDK ROS2 Wrapper v2-main branch
 
 For optimal performance, we strongly recommend updating to the latest firmware version. This ensures that you benefit from the most recent enhancements and bug fixes.
 
-| Product List   | Minimal Firmware Version | **Launch File**             |
+| Product List   | Minimal Firmware Version | **Launch File**       |
 | :------------- | :----------------------- | :-------------------------- |
 | Gemini 435Le   | 1.2.04                   | gemini435_le.launch.py      |
 | Gemini 335     | 1.2.20                   | gemini_330_series.launch.py |

@@ -34,12 +34,12 @@ First, please see how to use [multi_camera_synced](./multi_camera_synced.md).
 
 In addition, GMSL multi-camera synced does not require Multi-Camera Sync Hub Pro, so there is no need to set the `primary` mode. Each GMSL camera is `secondary`.
 
-### Additional Parameter Settings
+**Additional Parameter Settings**
 
 * `gmsl_trigger_fps` : set hardware soc trigger source frame rate.
 * `enable_gmsl_trigger` : enable hardware soc trigger.
 
-### Run the launch
+**Run the launch**
 
 Please refer to the configuration in [multi_gmsl_camera_synced.launch.py.](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/examples/gmsl_camera/multi_gmsl_camera_synced.launch.py)
 

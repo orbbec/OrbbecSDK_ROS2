@@ -4,7 +4,7 @@
 
 ## Femto Mega & Gemini 435Le
 
-### Parameter Introduction
+**Parameter Introduction**
 
 Network device settings: `enumerate_net_device` is set to true, which will automatically enumerate network devices.
 
@@ -14,7 +14,7 @@ If you do not want to automatically enumerate network devices,you can set `enume
 * `net_device_ip` : Setting net device's IP address.
 * `net_device_port` : Setting net device's port.Usually, you can set it to 8090.
 
-### Single Net camera
+**Single Net camera**
 
 > If you need to run Gemini 435Le, you only need to replace [femto_mega.launch.py ](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/launch/femto_mega.launch.py)in the run command with [gemini435_le.launch.py](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/launch/gemini435_le.launch.py)
 
@@ -42,7 +42,7 @@ Network device settings: `enumerate_net_device` must be set to true, set `net_de
 * `net_device_ip` : Setting net device's IP address.
 * `net_device_port` : Setting net device's port.Usually, you can set it to 8090.
 
-### Single Net camera
+**Single Net camera**
 
 For [gemini_330_series.launch.py](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/launch/gemini_330_series.launch.py) as an example:
 

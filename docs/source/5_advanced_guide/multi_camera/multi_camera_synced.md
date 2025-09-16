@@ -2,12 +2,12 @@
 
 > The purpose of this document is to explain how to use multi-camera synced with OrbbecSDK_ROS2
 
-## Setup instructions
+### Setup instructions
 
 * Please read the Multi-Camera Synchronization Setup Guide:[Multi-Camera Synchronization Setup](https://www.orbbec.com/docs/set-up-cameras-for-external-synchronization_v1-2/)
 * Make sure the camera is correctly connected to the multi-camera synchronizer.
 
-![Depth Point Cloud Visualization](../image/multi_camera_synced/multi_camera_synced1.png)
+![Depth Point Cloud Visualization](../../image/multi_camera_synced/multi_camera_synced1.png)
 
 ### Checking camera port with OrbbecSDK_ROS2
 
@@ -19,7 +19,7 @@ ros2 run orbbec_camera list_devices_node
 
 Open multi_camera_synced.launch.py, and configure the camera settings as shown below:
 
-![Depth Point Cloud Visualization](../image/multi_camera_synced/multi_camera_synced2.png)
+![Depth Point Cloud Visualization](../../image/multi_camera_synced/multi_camera_synced2.png)
 
 1. `gemini_330_series.launch.py` is the launch file for starting the camera.
 

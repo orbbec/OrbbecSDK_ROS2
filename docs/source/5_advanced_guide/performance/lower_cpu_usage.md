@@ -19,35 +19,43 @@ To achieve the lowest possible CPU usage in OrbbecSDK_ROS2, it is recommended to
 
 ### Test environment
 
-#### Hardware Configuration
+**Hardware Configuration**
 
 * **CPU**: Intel i7-8700 @ 3.20GHz
+
 * **Memory**: 24 GB
+
 * **Storage**: Micron 2200S NVMe 256GB
+
 * **GPU**: NVIDIA GeForce GTX 1660Ti
+
 * **OS**: Ubuntu22.04
 
-#### ROS Configuration
+**ROS Configuration**
 
 * **ROS Version**: ROS2 Humble
+
 * **SDK Version**: OrbbecSDK_ROS2 v2.2.1
 
-#### Camera Setup
+**Camera Setup**
 
 * Devices: 2x Gemini 335, 1x Gemini 336, 1x Gemini 336L
+
 * Firmware Version: 1.4.10
+
 
 ### Test Setup
 
-* **Stream Settings:**
-  * Depth / IR Left / IR Right: 848×480 @ 30fps
-  * Color: 848×480 @ 30fps
+**Stream Settings:**
+
+* Depth / IR Left / IR Right: 848×480 @ 30fps
+* Color: 848×480 @ 30fps
 
 Note: The following CPU usage data focuses on `uvc_backend`, `color_format` and various filter combinations.
 
 ### Test Results
 
-#### `uvc_backend` Comparison (RGB format)
+**`uvc_backend` Comparison (RGB format)**
 
 | libuvc CPU Usage | v4l2 CPU Usage | Absolute Change |
 | :--------------: | :------------: | :-------------: |
@@ -55,7 +63,7 @@ Note: The following CPU usage data focuses on `uvc_backend`, `color_format` and 
 
 The CPU usage can be significantly reduced with v4l2 backend. In our implementation, v4l2 works without requiring any patches to the Linux kernel, allowing users to easily switch between v4l2 and libuvc and maintaining full compatibility with standard Linux distributions.
 
-#### `color_format` Comparison (MJPG vs RGB)
+**`color_format` Comparison (MJPG vs RGB)**
 
 | Backend | MJPG CPU Usage | RGB CPU Usage | Absolute Change |
 | :-----: | :------------: | :-----------: | :-------------: |
@@ -64,7 +72,7 @@ The CPU usage can be significantly reduced with v4l2 backend. In our implementat
 
 The CPU usage can be reduced if the RGB format is selected instead of MJPG, since the decoding of MJPG image will consume the host CPU resource.
 
-#### Filter Configuration Impact
+**Filter Configuration Impact**
 
 | Filters Applied                                       | libuvc CPU Usage | CPU Usage Increase | v4l2 CPU Usage | CPU Usage Increase |
 | ----------------------------------------------------- | ---------------- | ------------------ | -------------- | ------------------ |

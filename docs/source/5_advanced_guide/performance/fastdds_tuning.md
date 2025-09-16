@@ -6,7 +6,7 @@ optimizing Fast DDS to enhance image transfer efficiency.
 
 ## Adjusting System Parameters
 
-### IP Fragmentation Time
+**IP Fragmentation Time**
 
 - **Path**: `/proc/sys/net/ipv4/ipfrag_time` (default: 30 seconds)
 - **Purpose**: Defines the duration that IP fragments are kept in memory.
@@ -19,7 +19,7 @@ optimizing Fast DDS to enhance image transfer efficiency.
   sudo sysctl net.ipv4.ipfrag_time=3
   ```
 
-### IP Fragmentation Memory Threshold
+**IP Fragmentation Memory Threshold**
 
 - **Path**: `/proc/sys/net/ipv4/ipfrag_high_thresh` (default: 262144 bytes)
 - **Purpose**: Sets the maximum memory used to reassemble IP fragments.
@@ -32,7 +32,7 @@ optimizing Fast DDS to enhance image transfer efficiency.
   sudo sysctl net.ipv4.ipfrag_high_thresh=134217728
   ```
 
-### Maximum Buffer Sizes
+**Maximum Buffer Sizes**
 
 - **Purpose**: Configures the maximum buffer sizes for receiving and sending data, which is critical for high-throughput
   data transmission.
@@ -72,7 +72,7 @@ to [ROS 2 DDS Tuning Documentation](https://docs.ros.org/en/foxy/How-To-Guides/D
 Below is an example of a Fast DDS configuration file optimized for ROS2 usage with the Orbbec camera. This configuration
 enhances the overall data transmission by adjusting buffer sizes and transport settings.
 
-### Configuration File: `shm_fastdds.xml`
+**Configuration File:** `shm_fastdds.xml`
 
 Place this file in the `$HOME` directory.
 
@@ -140,7 +140,7 @@ Place this file in the `$HOME` directory.
 </profiles>
 ```
 
-### Environment Variables
+**Environment Variables**
 
 Set the following environment variables to use the custom Fast DDS profile:
 

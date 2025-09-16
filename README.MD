@@ -6,7 +6,7 @@
 
 OrbbecSDK ROS2 Wrapper provides seamless integration of Orbbec cameras with ROS 2 environment. It supports ROS2 Foxy, Humble, and Jazzy distributions.
 
-With a major update in October 2024, we release the [OrbbecSDK ROS2 Wrapper v2](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main) connected to the open source [OrbbecSDK v2](https://github.com/orbbec/OrbbecSDK_v2/releases) with enhanced flexibility and extensibility. This update ensures compatibility with all Orbbec USB products adhering to UVC standard. However, it no longer supports Orbbec's traditional OpenNI protocol devices. We strongly encourage you to use the v2-main branch if your device is supported.
+By default, we recommend using the **v2-main** branch. For older OpenNI devices not supported by v2-main, please use the **main** branch. Device models that are only supported by the main branch are listed in the table below.
 
 If you are a user in China, it is recommended to use [gitee Repo](https://gitee.com/orbbecdeveloper/OrbbecSDK_ROS2).
 
@@ -209,11 +209,18 @@ Install deb dependencies
 
 ```bash
 # assume you have sourced ROS environment, same blow
-sudo apt install libgflags-dev nlohmann-json3-dev libgoogle-glog-dev libgoogle-glog0v5 libssl-dev \
+sudo apt install libgflags-dev nlohmann-json3-dev \
 ros-$ROS_DISTRO-image-transport ros-${ROS_DISTRO}-image-transport-plugins ros-${ROS_DISTRO}-compressed-image-transport \
 ros-$ROS_DISTRO-image-publisher ros-$ROS_DISTRO-camera-info-manager \
 ros-$ROS_DISTRO-diagnostic-updater ros-$ROS_DISTRO-diagnostic-msgs ros-$ROS_DISTRO-statistics-msgs \
 ros-$ROS_DISTRO-backward-ros libdw-dev
+```
+
+Optional dependencies:
+
+```bash
+# 435Le writeCustomerDate feature:
+sudo apt install libssl-dev
 ```
 
 Install udev rules.

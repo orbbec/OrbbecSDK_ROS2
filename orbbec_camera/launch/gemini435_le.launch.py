@@ -285,10 +285,8 @@ def generate_launch_description():
         DeclareLaunchArgument('laser_index0_ir_brightness', default_value='60'),
         DeclareLaunchArgument('laser_index0_ir_ae_max_exposure', default_value='30000'),
         DeclareLaunchArgument('show_fps_enable', default_value='false'),
-        # If only one camera (network device) is currently connected, you do not need to specify the MAC address.
-        # Otherwise, you need to specify it yourself. For example, "54:14:FD:06:07:DA"
         DeclareLaunchArgument("force_ip_enable", default_value="false"),
-        DeclareLaunchArgument("force_ip_mac", default_value=""),
+        DeclareLaunchArgument("force_ip_mac", default_value=""),# you need to specify it yourself. For example, "54:14:FD:06:07:DA"
         DeclareLaunchArgument("force_ip_dhcp", default_value="false"),
         DeclareLaunchArgument("force_ip_address", default_value="192.168.1.10"),
         DeclareLaunchArgument("force_ip_subnet_mask", default_value="255.255.255.0"),

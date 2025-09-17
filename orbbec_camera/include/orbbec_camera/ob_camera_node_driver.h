@@ -135,6 +135,7 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::string node_name_;
   bool force_ip_enable_{false};
   bool force_ip_dhcp_{false};
+  std::string force_ip_mac_;          // e.g. "54:14:FD:06:07:DA"
   std::string force_ip_address_;      // e.g. "192.168.1.10"
   std::string force_ip_subnet_mask_;  // e.g. "255.255.255.0"
   std::string force_ip_gateway_;      // e.g. "192.168.1.1"

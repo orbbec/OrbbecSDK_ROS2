@@ -185,7 +185,14 @@ void OBCameraNodeDriver::init() {
   } else {
     ctx_ = std::make_unique<ob::Context>(config_path_.c_str());
   }
-
+  // Force IP
+  force_ip_enable_ = declare_parameter<bool>("force_ip_enable", false);
+  force_ip_mac_ = declare_parameter<std::string>("force_ip_mac", "");
+  force_ip_dhcp_ = declare_parameter<bool>("force_ip_dhcp", false);
+  force_ip_address_ = declare_parameter<std::string>("force_ip_address", "192.168.1.10");
+  force_ip_subnet_mask_ = declare_parameter<std::string>("force_ip_subnet_mask", "255.255.255.0");
+  force_ip_gateway_ = declare_parameter<std::string>("force_ip_gateway", "192.168.1.1");
+  applyForceIpConfig();
   auto log_level_str = declare_parameter<std::string>("log_level", "none");
   auto log_level = obLogSeverityFromString(log_level_str);
   connection_delay_ = static_cast<int>(declare_parameter<int>("connection_delay", 100));
@@ -243,12 +250,6 @@ void OBCameraNodeDriver::init() {
     ctx_->setUvcBackendType(OB_UVC_BACKEND_TYPE_LIBUVC);
     RCLCPP_INFO_STREAM(logger_, "setUvcBackendType:" << uvc_backend_);
   }
-  // Force IP
-  force_ip_enable_ = declare_parameter<bool>("force_ip_enable", false);
-  force_ip_dhcp_ = declare_parameter<bool>("force_ip_dhcp", false);
-  force_ip_address_ = declare_parameter<std::string>("force_ip_address", "192.168.1.10");
-  force_ip_subnet_mask_ = declare_parameter<std::string>("force_ip_subnet_mask", "255.255.255.0");
-  force_ip_gateway_ = declare_parameter<std::string>("force_ip_gateway", "192.168.1.1");
   ctx_->enableNetDeviceEnumeration(enumerate_net_device_);
   ctx_->setDeviceChangedCallback([this](const std::shared_ptr<ob::DeviceList> &removed_list,
                                         const std::shared_ptr<ob::DeviceList> &added_list) {
@@ -1034,34 +1035,20 @@ bool OBCameraNodeDriver::applyForceIpConfig() {
     auto device_list = ctx_->queryDeviceList();
     uint32_t index = 0;
     std::string mac;
-    if (!serial_number_.empty() && device_list->getCount() > 1) {
-      RCLCPP_INFO(logger_, "Multiple devices detected, selecting by serial number: %s",
-                  serial_number_.c_str());
-      auto device = selectDeviceBySerialNumber(device_list, serial_number_);
-      if (device == nullptr) {
-        RCLCPP_ERROR(logger_, "Device with serial number %s not found for Force IP",
-                     serial_number_.c_str());
-        return false;
-      }
-      mac = device->getDeviceInfo()->getUid();
-      std::cout << "Selected device MAC for Force IP: " << mac << std::endl;
-    } else {
+    if (!force_ip_mac_.empty()) {
+      mac = force_ip_mac_;
+    } else if (device_list->getCount() == 1) {
       mac = device_list->getUid(index);
-      std::cout << "Default selected device MAC: " << mac << std::endl;
+    } else {
+      RCLCPP_ERROR(logger_, "MAC address is empty");
+      return false;
     }
     if (ctx_->changeNetDeviceIpConfig(mac.c_str(), config)) {
       RCLCPP_INFO(logger_,
                   "Force IP config applied. force_ip_dhcp=%d ip=%s mask=%s force_ip_gateway=%s",
                   config.dhcp, force_ip_address_.c_str(), force_ip_subnet_mask_.c_str(),
                   force_ip_gateway_.c_str());
-      RCLCPP_INFO(logger_, "Reboot device after Force IP");
-      device_connected_ = false;
       force_ip_success_ = true;
-      {
-        std::unique_lock<decltype(reset_device_mutex_)> reset_device_lock(reset_device_mutex_);
-        reset_device_flag_ = true;
-      }
-      reset_device_cond_.notify_all();
     } else {
       RCLCPP_ERROR(logger_, "Failed to apply Force IP config (SDK returned false)");
     }
@@ -1116,9 +1103,7 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
   if (device_connected_.load()) {
     return;
   }
-  if (applyForceIpConfig()) {
-    return;
-  }
+
   // Try to set connecting flag atomically
   bool expected = false;
   if (!device_connecting_.compare_exchange_strong(expected, true)) {

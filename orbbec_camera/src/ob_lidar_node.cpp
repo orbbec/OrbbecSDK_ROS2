@@ -55,11 +55,6 @@ OBLidarNode::OBLidarNode(rclcpp::Node *node, std::shared_ptr<ob::Device> device,
   jpeg_decoder_ = std::make_unique<JetsonNvJPEGDecoder>(width_[COLOR], height_[COLOR]);
 #endif
   is_camera_node_initialized_ = true;
-  //   if (enable_cloud_accumulated_ && cloud_accumulation_count_ >= 1) {
-  //     auto point_cloud_qos_profile = getRMWQosProfileFromString(point_cloud_qos_);
-  //     cloud_accumulated_ = std::make_unique<CloudAccumulated>(node_, point_cloud_qos_profile,
-  //                                                             cloud_accumulation_count_);
-  //   }
 }
 
 template <class T>
@@ -156,8 +151,6 @@ void OBLidarNode::getParameters() {
   setAndGetNodeParameter<int>(repetitive_scan_mode_, "repetitive_scan_mode", -1);
   setAndGetNodeParameter<int>(filter_level_, "filter_level", -1);
   setAndGetNodeParameter<float>(vertical_fov_, "vertical_fov", -1.0);
-  setAndGetNodeParameter<bool>(enable_cloud_accumulated_, "enable_cloud_accumulated", false);
-  setAndGetNodeParameter<int>(cloud_accumulation_count_, "cloud_accumulation_count", -1);
   setAndGetNodeParameter<bool>(enable_imu_, "enable_imu", false);
   setAndGetNodeParameter<std::string>(imu_rate_, "imu_rate", "50hz");
   setAndGetNodeParameter<std::string>(accel_range_, "accel_range", "2g");
@@ -1264,6 +1257,19 @@ void OBLidarNode::calcAndPublishStaticTransform() {
     auto ex_msg = obExtrinsicsToMsg(ex, frame_id);
     CHECK_NOTNULL(lidar_to_imu_extrinsics_publisher_);
     lidar_to_imu_extrinsics_publisher_->publish(ex_msg);
+    
+    // Publish static TF from lidar to IMU
+    auto Q = rotationMatrixToQuaternion(ex.rot);
+    Q = quaternion_optical * Q * quaternion_optical.inverse();
+    tf2::Vector3 trans(ex.trans[0], ex.trans[1], ex.trans[2]);
+    auto timestamp = node_->now();
+    publishStaticTF(timestamp, trans, Q, frame_id_[base_stream_], accel_gyro_frame_id_);
+    
+    RCLCPP_INFO_STREAM(logger_, "Publishing static transform from " << frame_id_[base_stream_] 
+                                                                    << " to " << accel_gyro_frame_id_);
+    RCLCPP_INFO_STREAM(logger_, "Translation " << trans[0] << ", " << trans[1] << ", " << trans[2]);
+    RCLCPP_INFO_STREAM(logger_, "Rotation " << Q.getX() << ", " << Q.getY() << ", " << Q.getZ() 
+                                            << ", " << Q.getW());
   }
 }
 

@@ -252,9 +252,9 @@ class CameraMonitorNode(Node):
         color_tracker = self.trackers["color"]
         depth_tracker = self.trackers["depth"]
         color_frames_loss = color_tracker.drop_frames
-        color_frames_loss_rate = round(color_tracker.frames_loss_rate() * 100.0, 2)
+        color_frames_loss_rate = round(color_tracker.frames_loss_rate() * 100.0, 3)
         depth_frames_loss = depth_tracker.drop_frames
-        depth_frames_loss_rate = round(depth_tracker.frames_loss_rate() * 100.0, 2)
+        depth_frames_loss_rate = round(depth_tracker.frames_loss_rate() * 100.0, 3)
 
         # guard: if stats keys missing, use 0
         def safe(k):
@@ -295,7 +295,7 @@ class CameraMonitorNode(Node):
                 tracker = self.trackers[stream]
 
                 frames_loss = tracker.drop_frames
-                frames_loss_rate = round(tracker.frames_loss_rate() * 100.0, 2)
+                frames_loss_rate = round(tracker.frames_loss_rate() * 100.0, 3)
                 rows.append([topic_name, *fps_vals, *delay_vals, frames_loss, frames_loss_rate])
 
         header_bottom = ["Option", "fps_cur", "fps_avg", "fps_min", "fps_max", "delay_cur(ms)", "delay_avg(ms)", "delay_min(ms)", "delay_max(ms)", "Pub_lost_count", "Pub_lost_rate(%)"]

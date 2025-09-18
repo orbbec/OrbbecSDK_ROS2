@@ -36,9 +36,6 @@ services:
 - name: /camera/set_auto_white_balance
   type: std_srvs/srv/SetBool
   request: {data: false}
-- name: /camera/set_color_ae_roi
-  type: orbbec_camera_msgs/srv/SetArrays
-  request: {data_param: [0,1279,0,719]}
 - name: /camera/set_color_auto_exposure
   type: std_srvs/srv/SetBool
   request: {data: false}
@@ -57,9 +54,6 @@ services:
 - name: /camera/set_color_rotation
   type: orbbec_camera_msgs/srv/SetInt32
   request: {data: 90}
-- name: /camera/set_depth_ae_roi
-  type: orbbec_camera_msgs/srv/SetArrays
-  request: {data_param: [0,1279,0,719]}
 - name: /camera/set_depth_auto_exposure
   type: std_srvs/srv/SetBool
   request: {data: false}
@@ -71,7 +65,7 @@ services:
   request: {data: false}
 - name: /camera/set_depth_gain
   type: orbbec_camera_msgs/srv/SetInt32
-  request: {data: 200}
+  request: {data: 1000} # for Gemini 2L range is 1000-15000
 - name: /camera/set_depth_mirror
   type: std_srvs/srv/SetBool
   request: {data: false}
@@ -96,9 +90,6 @@ services:
 - name: /camera/set_sync_hosttime
   type: std_srvs/srv/SetBool
   request: {data: false}
-- name: /camera/set_sync_interleaverlaser
-  type: orbbec_camera_msgs/srv/SetInt32
-  request: {data: 1}
 - name: /camera/set_white_balance
   type: orbbec_camera_msgs/srv/SetInt32
   request: {data: 3000}
@@ -116,11 +107,7 @@ services:
 
 # open according to your camera type
 
-# - name: /camera/get_ptp_config
-#   type: orbbec_camera_msgs/srv/GetBool
-# - name: /camera/set_ptp_config
-#   type: std_srvs/srv/SetBool
-#   request: {data: false}
+
 # - name: /camera/set_floor_enable
 #   type: std_srvs/srv/SetBool
 #   request: {data: false}
@@ -144,60 +131,114 @@ services:
 # - name: /camera/read_customer_data
 #   type: orbbec_camera_msgs/srv/GetString
 
-# 335 support
-- name: /camera/get_left_ir_exposure
+
+# 335/336/336L/335Le support
+# - name: /camera/set_sync_interleaverlaser
+#   type: orbbec_camera_msgs/srv/SetInt32
+#   request: {data: 1}
+
+
+# 335/336/336L/335Le support
+# - name: /camera/set_color_ae_roi
+#   type: orbbec_camera_msgs/srv/SetArrays
+#   request: {data_param: [0,1279,0,719]}
+# - name: /camera/set_depth_ae_roi
+#   type: orbbec_camera_msgs/srv/SetArrays
+#   request: {data_param: [0,1279,0,719]}
+
+
+# 335Le support
+# - name: /camera/get_ptp_config
+#   type: orbbec_camera_msgs/srv/GetBool
+# - name: /camera/set_ptp_config
+#   type: std_srvs/srv/SetBool
+#   request: {data: false}
+
+# 335/336/336L/335Le support left and right ir services
+# - name: /camera/get_left_ir_exposure
+#   type: orbbec_camera_msgs/srv/GetInt32
+# - name: /camera/get_left_ir_gain
+#   type: orbbec_camera_msgs/srv/GetInt32
+# - name: /camera/get_right_ir_exposure
+#   type: orbbec_camera_msgs/srv/GetInt32
+# - name: /camera/get_right_ir_gain
+#   type: orbbec_camera_msgs/srv/GetInt32
+# - name: /camera/set_left_ir_ae_roi
+#   type: orbbec_camera_msgs/srv/SetArrays
+#   request: {data_param: [0,1279,0,719]}
+# - name: /camera/set_left_ir_auto_exposure
+#   type: std_srvs/srv/SetBool
+#   request: {data: false}
+# - name: /camera/set_left_ir_exposure
+#   type: orbbec_camera_msgs/srv/SetInt32
+#   request: {data: 30}
+# - name: /camera/set_left_ir_flip
+#   type: std_srvs/srv/SetBool
+#   request: {data: false}
+# - name: /camera/set_left_ir_gain
+#   type: orbbec_camera_msgs/srv/SetInt32
+#   request: {data: 20}
+# - name: /camera/set_left_ir_mirror
+#   type: std_srvs/srv/SetBool
+#   request: {data: false}
+# - name: /camera/set_left_ir_rotation
+#   type: orbbec_camera_msgs/srv/SetInt32
+#   request: {data: 90}
+# - name: /camera/set_right_ir_ae_roi
+#   type: orbbec_camera_msgs/srv/SetArrays
+#   request: {data_param: [0,1279,0,719]}
+# - name: /camera/set_right_ir_auto_exposure
+#   type: std_srvs/srv/SetBool
+#   request: {data: false}
+# - name: /camera/set_right_ir_exposure
+#   type: orbbec_camera_msgs/srv/SetInt32
+#   request: {data: 30}
+# - name: /camera/set_right_ir_flip
+#   type: std_srvs/srv/SetBool
+#   request: {data: false}
+# - name: /camera/set_right_ir_gain
+#   type: orbbec_camera_msgs/srv/SetInt32
+#   request: {data: 20}
+# - name: /camera/set_right_ir_mirror
+#   type: std_srvs/srv/SetBool
+#   request: {data: false}
+# - name: /camera/set_right_ir_rotation
+#   type: orbbec_camera_msgs/srv/SetInt32
+#   request: {data: 90}
+# - name: /camera/toggle_left_ir
+#   type: std_srvs/srv/SetBool
+#   request: {data: false}
+# - name: /camera/toggle_right_ir
+#   type: std_srvs/srv/SetBool
+#   request: {data: false}
+
+
+# Gemini 215/Gemini 2L  support
+- name: /camera/get_ir_exposure
   type: orbbec_camera_msgs/srv/GetInt32
-- name: /camera/get_left_ir_gain
+- name: /camera/get_ir_gain
   type: orbbec_camera_msgs/srv/GetInt32
-- name: /camera/get_right_ir_exposure
-  type: orbbec_camera_msgs/srv/GetInt32
-- name: /camera/get_right_ir_gain
-  type: orbbec_camera_msgs/srv/GetInt32
-- name: /camera/set_left_ir_ae_roi
-  type: orbbec_camera_msgs/srv/SetArrays
-  request: {data_param: [0,1279,0,719]}
-- name: /camera/set_left_ir_auto_exposure
+# - name: /camera/set_ir_ae_roi
+#   type: orbbec_camera_msgs/srv/SetArrays
+#   request: {data_param: [0,1279,0,719]}
+- name: /camera/set_ir_auto_exposure
   type: std_srvs/srv/SetBool
   request: {data: false}
-- name: /camera/set_left_ir_exposure
+- name: /camera/set_ir_exposure
   type: orbbec_camera_msgs/srv/SetInt32
   request: {data: 30}
-- name: /camera/set_left_ir_flip
+- name: /camera/set_ir_flip
   type: std_srvs/srv/SetBool
   request: {data: false}
-- name: /camera/set_left_ir_gain
+- name: /camera/set_ir_gain
   type: orbbec_camera_msgs/srv/SetInt32
-  request: {data: 20}
-- name: /camera/set_left_ir_mirror
+  request: {data: 2000}
+# - name: /camera/set_ir_long_exposure
+#   type: std_srvs/srv/SetBool
+#   request: {data: false}
+- name: /camera/set_ir_mirror
   type: std_srvs/srv/SetBool
   request: {data: false}
-- name: /camera/set_left_ir_rotation
-  type: orbbec_camera_msgs/srv/SetInt32
-  request: {data: 90}
-- name: /camera/set_right_ir_ae_roi
-  type: orbbec_camera_msgs/srv/SetArrays
-  request: {data_param: [0,1279,0,719]}
-- name: /camera/set_right_ir_auto_exposure
-  type: std_srvs/srv/SetBool
-  request: {data: false}
-- name: /camera/set_right_ir_exposure
-  type: orbbec_camera_msgs/srv/SetInt32
-  request: {data: 30}
-- name: /camera/set_right_ir_flip
-  type: std_srvs/srv/SetBool
-  request: {data: false}
-- name: /camera/set_right_ir_gain
-  type: orbbec_camera_msgs/srv/SetInt32
-  request: {data: 20}
-- name: /camera/set_right_ir_mirror
-  type: std_srvs/srv/SetBool
-  request: {data: false}
-- name: /camera/set_right_ir_rotation
+- name: /camera/set_ir_rotation
   type: orbbec_camera_msgs/srv/SetInt32
   request: {data: 90}
-- name: /camera/toggle_left_ir
-  type: std_srvs/srv/SetBool
-  request: {data: false}
-- name: /camera/toggle_right_ir
-  type: std_srvs/srv/SetBool
-  request: {data: false}

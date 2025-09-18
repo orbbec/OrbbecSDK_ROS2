@@ -1093,7 +1093,7 @@ bool OBCameraNodeDriver::applyForceIpConfig() {
       return false;
     }
 
-    if (ctx_->changeNetDeviceIpConfig(mac.c_str(), config)) {
+    if (ctx_->forceIp(mac.c_str(), config)) {
       RCLCPP_INFO(logger_, "[ForceIP] Config applied. dhcp=%d ip=%s mask=%s gw=%s", config.dhcp,
                   force_ip_address_.c_str(), force_ip_subnet_mask_.c_str(),
                   force_ip_gateway_.c_str());

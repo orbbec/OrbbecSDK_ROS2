@@ -64,14 +64,18 @@ OB_EXPORT ob_device_list *ob_query_device_list(ob_context *context, ob_error **e
 OB_EXPORT void ob_enable_net_device_enumeration(ob_context *context, bool enable, ob_error **error);
 
 /**
- * @brief Changes the IP configuration of a network device.
+ * @brief "Force" a static IP address configuration in a device identified by its MAC Address.
  *
- * @param[in] deviceUid The unique device ID (MAC address). obtained via @ref ob_device_info_get_uid.
- * @param[in] config The new IP configuration to apply.
+ * @param[in] macAddress MAC address of the network device.
+ *                       You can obtain it from @ref DeviceList::uid(), or specify it manually
+ *                       in the format xx:xx:xx:xx:xx:xx, where each xx is a two-digit hexadecimal value.
+ * @param[in] config The new IP configuration.
  * @param[out] error Pointer to an error object that will be populated if an error occurs.
  * @return bool true if the configuration command was processed successfully, false otherwise.
+ *
+ * @note This applies to all Orbbec GigE Vision devices
  */
-OB_EXPORT bool ob_change_net_device_ip_config(const char *deviceUid, ob_net_ip_config config, ob_error **error);
+OB_EXPORT bool ob_force_ip_config(const char *deviceUid, ob_net_ip_config config, ob_error **error);
 
 /**
  * @brief Create a network device object

@@ -98,15 +98,19 @@ public:
     }
 
     /**
-     * @brief Changes the IP configuration of a network device.
+     * @brief "Force" a static IP address configuration in a device identified by its MAC Address.
      *
-     * @param[in] deviceUid The device unique ID, which is the network device MAC address. It can be obtained through the @ref DeviceList::uid() function.
+     * @param[in] macAddress MAC address of the network device.
+     *                       You can obtain it from @ref DeviceList::uid(), or specify it manually
+     *                       in the format xx:xx:xx:xx:xx:xx, where each xx is a two-digit hexadecimal value.
      * @param[in] config The new IP configuration.
      * @return bool true if the configuration command was processed successfully, false otherwise.
+     *
+     * @note This applies to all Orbbec GigE Vision devices
      */
-    bool changeNetDeviceIpConfig(const char *deviceUid, const OBNetIpConfig &config) {
+    bool forceIp(const char *macAddress, const OBNetIpConfig &config) {
         ob_error *error = nullptr;
-        auto      res   = ob_change_net_device_ip_config(deviceUid, config, &error);
+        auto      res   = ob_force_ip_config(macAddress, config, &error);
         Error::handle(&error);
         return res;
     }

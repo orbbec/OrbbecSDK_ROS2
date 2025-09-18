@@ -8,19 +8,21 @@ import configparser
 from pathlib import Path
 from datetime import datetime
 
-## Config.ini中配置
-# 单位：FPS,请依据数据集实际帧率填写，否则会导致匹配不准确
+## Config.ini configuration
+# Unit: FPS. Please fill in according to the actual dataset frame rate,
+# otherwise it will cause inaccurate matching.
 frameRate = -1
-# 单位：ms，当匹配后某组数据帧的时间戳极差大于等于tspRangeThreshold，文件名会增加标注
+# Unit: ms. When the timestamp range difference of a matched frame group
+# is greater than or equal to tspRangeThreshold, the file name will be marked.
 tspRangeThreshold = -1
 
-## Python脚本自动解析, 不要修改
-primaryId = '-1' #主机ID
-mainPythonWorkPath = "" # SyncFramesMain.py的工作目录
-sourceFramesPath = ""  # 请勿修改，固定值,TotalMode目录路径
-sourceRootPath = "" # 存放TotalMode的根目录
-resultPath = "" # 保存sync分析结果
-streamProfileDict = dict() # 保存Python结果
+## Parsed automatically by Python script, DO NOT modify
+primaryId = '-1' # Host ID
+mainPythonWorkPath = "" # Working directory of SyncFramesMain.py
+sourceFramesPath = ""  # DO NOT modify, fixed value, path to TotalMode directory
+sourceRootPath = "" # Root directory containing TotalMode
+resultPath = "" # Path to save sync analysis results
+streamProfileDict = dict() # Store Python results
 
 class PictureInfo(object):
     class Struct(object):
@@ -73,10 +75,10 @@ def initSyncConfigParams():
         print(f"Initliaze synchronized config parameter failed. {configPath} not exists.")
         return False
 
-    # 创建ConfigParser对象
+    # Create ConfigParser object
     config = configparser.ConfigParser()
 
-    # 读取ini文件
+    # Read ini file
     config.read(configPath, 'utf-8')
 
     if not config.has_option('Parameter', 'frameRate'):
@@ -103,7 +105,7 @@ def getDeviceCount():
     deviceInfoPath = f"{sourceRootPath}/DevicesInfo.txt"
     if not os.path.exists(deviceInfoPath):
         print(f"Get device count failed. {deviceInfoPath} not exists")
-        return 0 
+        return 0
 
     with open(deviceInfoPath, 'r') as f:
         data = json.load(f)
@@ -170,13 +172,13 @@ def initPictureInfoDictionary(rootFilePath, pictureInfoDict):
             sensorType = pictureNameList[0].replace('#', '_')
             syncTimeStamp = int(pictureNameList[3][1:])
 
-            # 创建结构体
+            # Create structure
             pictureInfo = PictureInfo()
             info = pictureInfo.make_struct(deviceId, sensorType, syncTimeStamp, filePath, os.path.basename(dirpath), os.path.splitext(fileName)[1])
 
-            # 格式化字典一个key对应一个数组
+            # Format dictionary: one key corresponds to one array
             pictureInfoDict.setdefault(deviceId, []).append(info)
-    
+
     if 0 == frameFileCount:
         print("initialize pictureInfoDict failed. Not found frame file")
 
@@ -185,7 +187,7 @@ def matchFrame(pictureInfoDict):
     global primaryId, frameRate
     global streamProfileDict
 
-    # 获取比较图像数组,取第一个设备的Color数组来进行比较
+    # Get comparison image array, take the Color array of the first device for comparison
     compareList = []
     for key in pictureInfoDict:
         listTmp = list(pictureInfoDict[key])
@@ -193,14 +195,14 @@ def matchFrame(pictureInfoDict):
             if info.deviceId == primaryId and info.sensorType == 'color':
                 compareList.append(info)
 
-    # 根据开流情况动态分析，减少循环次数
+    # Dynamically analyze based on stream status to reduce loop iterations
     hasColorProfile = 'OB_SENSOR_COLOR' in streamProfileDict
     hasDepthProfile = 'OB_SENSOR_DEPTH' in streamProfileDict
     hasIRProfile = 'OB_SENSOR_IR' in streamProfileDict
     hasIRLeftProfile = 'OB_SENSOR_IR_LEFT' in streamProfileDict
     hasIRRightProfile = 'OB_SENSOR_IR_RIGHT' in streamProfileDict
 
-    # 匹配相邻帧
+    # Match adjacent frames
     resultDict = {}
     consumedList = []
     dictIndex = 0
@@ -209,7 +211,7 @@ def matchFrame(pictureInfoDict):
         resultDict.setdefault(dictIndex, []).append(comparePic)
         for key in pictureInfoDict:
             listTmp = list(pictureInfoDict[key])
-            # 对比彩色
+            # Compare color
             if hasColorProfile:
                 for info in listTmp:
                     if info.deviceId == primaryId and info.sensorType == comparePic.sensorType:
@@ -223,7 +225,7 @@ def matchFrame(pictureInfoDict):
                         consumedList.append(info)
                         break
 
-            # 对Depth
+            # Compare depth
             if hasDepthProfile:
                 for info in listTmp:
                     if info.deviceId == primaryId and info.sensorType == comparePic.sensorType:
@@ -237,7 +239,7 @@ def matchFrame(pictureInfoDict):
                         consumedList.append(info)
                         break
 
-            # IR
+            # Compare IR
             if hasIRProfile:
                 for info in listTmp:
                     if info.deviceId == primaryId and info.sensorType == comparePic.sensorType:
@@ -251,7 +253,7 @@ def matchFrame(pictureInfoDict):
                         consumedList.append(info)
                         break
 
-            # 对左IR
+            # Compare left IR
             if hasIRLeftProfile:
                 for info in listTmp:
                     if info.deviceId == primaryId and info.sensorType == comparePic.sensorType:
@@ -265,7 +267,7 @@ def matchFrame(pictureInfoDict):
                         consumedList.append(info)
                         break
 
-            # 对右IR
+            # Compare right IR
             if hasIRRightProfile:
                 for info in listTmp:
                     if info.deviceId == primaryId and info.sensorType == comparePic.sensorType:
@@ -279,7 +281,7 @@ def matchFrame(pictureInfoDict):
                         consumedList.append(info)
                         break
 
-        # 计算偏差
+        # Calculate deviation
         minTsp = min(resultDict[dictIndex], key=lambda x: x.syncTimeStamp)
         for info in resultDict[dictIndex]:
             info.tspDiff = info.syncTimeStamp - minTsp.syncTimeStamp
@@ -362,7 +364,7 @@ def handleSyncFrames():
                 for info in listTmp:
                     if info.tspDiff >= tspRangeThreshold:
                         path = abnormalPath + str(key) + "_" + info.sensorType + "_" + info.deviceIdFull + "_" + str(
-                            info.syncTimeStamp) + "_[" + str(info.tspDiff) + "]" + "_xxxxxx" + info.fileExt 
+                            info.syncTimeStamp) + "_[" + str(info.tspDiff) + "]" + "_xxxxxx" + info.fileExt
                         shutil.copy(info.picturePath, path)
                     else:
                         path = abnormalPath + str(key) + "_" + info.sensorType + "_" + info.deviceIdFull + "_" + str(

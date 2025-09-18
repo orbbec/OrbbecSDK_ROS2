@@ -8,19 +8,22 @@ import configparser
 from pathlib import Path
 from datetime import datetime
 
-## Config.ini中配置
-# 单位：FPS,请依据数据集实际帧率填写，否则会导致匹配不准确
+## Config.ini configuration
+# Unit: FPS. Please fill in according to the actual dataset frame rate,
+# otherwise it will cause inaccurate matching.
 frameRate = -1
-# 单位：ms，当匹配后某组数据帧的时间戳极差大于等于tspRangeThreshold，文件名会增加标注
+# Unit: ms. When the timestamp range difference of a matched frame group
+# is greater than or equal to tspRangeThreshold, the file name will be marked.
 tspRangeThreshold = -1
 
-## Python脚本自动解析, 不要修改
-primaryId = '-1' #主机ID
-mainPythonWorkPath = "" # SyncFramesMain.py的工作目录
-sourceFramesPath = ""  # 请勿修改，固定值,TotalMode目录路径
-sourceRootPath = "" # 存放TotalMode的根目录
-resultPath = "" # 保存sync分析结果
-streamProfileDict = dict() # 保存Python结果
+## Parsed automatically by Python script, DO NOT modify
+primaryId = '-1' # Host ID
+mainPythonWorkPath = "" # Working directory of SyncFramesMain.py
+sourceFramesPath = ""  # DO NOT modify, fixed value, path to TotalMode directory
+sourceRootPath = "" # Root directory containing TotalMode
+resultPath = "" # Path to save sync analysis results
+streamProfileDict = dict() # Store Python results
+
 
 class PictureInfo(object):
     class Struct(object):
@@ -35,6 +38,7 @@ class PictureInfo(object):
     def make_struct(self, deviceId, sensorType, syncTimeStamp, picturePath, deviceIdFull, fileExt):
         return self.Struct(deviceId, sensorType, syncTimeStamp, picturePath, deviceIdFull, fileExt)
 
+
 class StreamProfileInfo:
     def __init__(self, sensorType, width, height, format, fps):
         self.sensorType = sensorType
@@ -42,6 +46,7 @@ class StreamProfileInfo:
         self.height = height
         self.format = format
         self.fps = fps
+
 
 def initPrimaryId():
     global primaryId
@@ -59,11 +64,12 @@ def initPrimaryId():
         return False
 
     for item in data['devices']:
-        if 'isPrimaryDevice'  in item and 'index' in item and item['isPrimaryDevice']:
+        if 'isPrimaryDevice' in item and 'index' in item and item['isPrimaryDevice']:
             primaryId = str(item['index'])
             return True
 
     return False
+
 
 def initSyncConfigParams():
     global frameRate, tspRangeThreshold
@@ -73,10 +79,10 @@ def initSyncConfigParams():
         print(f"Initliaze synchronized config parameter failed. {configPath} not exists.")
         return False
 
-    # 创建ConfigParser对象
+    # Create ConfigParser object
     config = configparser.ConfigParser()
 
-    # 读取ini文件
+    # Read ini file
     config.read(configPath, 'utf-8')
 
     if not config.has_option('Parameter', 'frameRate'):
@@ -99,11 +105,12 @@ def initSyncConfigParams():
 
     return True
 
+
 def getDeviceCount():
     deviceInfoPath = f"{sourceRootPath}/DevicesInfo.txt"
     if not os.path.exists(deviceInfoPath):
         print(f"Get device count failed. {deviceInfoPath} not exists")
-        return 0 
+        return 0
 
     with open(deviceInfoPath, 'r') as f:
         data = json.load(f)
@@ -113,6 +120,7 @@ def getDeviceCount():
         return 0
 
     return len(data['devices'])
+
 
 def initProfileInfoDict():
     global streamProfileDict
@@ -139,12 +147,14 @@ def initProfileInfoDict():
 
     return len(streamProfileDict.items()) > 0
 
+
 def initResultDir():
     global resultPath
     timeText = datetime.now().strftime("%Y-%m-%d_%H%M%S")
     resultPath = f"{sourceRootPath}/results-{timeText}"
     if not os.path.exists(resultPath):
         os.makedirs(resultPath)
+
 
 def isFrameFile(fileName):
     fileExt = os.path.splitext(fileName)
@@ -153,6 +163,7 @@ def isFrameFile(fileName):
 
     frameExts = {".jpeg", ".jpg", ".png", ".raw", "bmp"}
     return fileExt[1] in frameExts
+
 
 def initPictureInfoDictionary(rootFilePath, pictureInfoDict):
     frameFileCount = 0
@@ -170,21 +181,22 @@ def initPictureInfoDictionary(rootFilePath, pictureInfoDict):
             sensorType = pictureNameList[0].replace('#', '_')
             syncTimeStamp = int(pictureNameList[3][1:])
 
-            # 创建结构体
+            # Create struct
             pictureInfo = PictureInfo()
             info = pictureInfo.make_struct(deviceId, sensorType, syncTimeStamp, filePath, os.path.basename(dirpath), os.path.splitext(fileName)[1])
 
-            # 格式化字典一个key对应一个数组
+            # Format dictionary: one key corresponds to one array
             pictureInfoDict.setdefault(deviceId, []).append(info)
-    
+
     if 0 == frameFileCount:
         print("initialize pictureInfoDict failed. Not found frame file")
+
 
 def matchFrame(pictureInfoDict):
     global primaryId, frameRate
     global streamProfileDict
 
-    # 获取比较图像数组,取第一个设备的Color数组来进行比较
+    # Get comparison image array, take the Color array of the first device for comparison
     compareList = []
     for key in pictureInfoDict:
         listTmp = list(pictureInfoDict[key])
@@ -195,12 +207,12 @@ def matchFrame(pictureInfoDict):
     sorted_dict = dict(sorted(pictureInfoDict.items(), key=lambda x: x[1], reverse=False))
     pictureInfoDict = sorted_dict
 
-    # 根据开流情况动态分析，减少循环次数
+    # Dynamically analyze based on stream opening status to reduce loop iterations
     hasColorProfile = 'OB_SENSOR_COLOR' in streamProfileDict
     hasDepthProfile = 'OB_SENSOR_DEPTH' in streamProfileDict
     hasIRProfile = 'OB_SENSOR_IR' in streamProfileDict
 
-    # 匹配相邻帧
+    # Match adjacent frames
     resultDict = {}
     consumedList = []
     dictIndex = 0
@@ -209,7 +221,7 @@ def matchFrame(pictureInfoDict):
         resultDict.setdefault(dictIndex, []).append(comparePic)
         for key in pictureInfoDict:
             listTmp = list(pictureInfoDict[key])
-            # 对比彩色
+            # Compare Color
             if hasColorProfile:
                 for info in listTmp:
                     if info.deviceId == primaryId and info.sensorType == comparePic.sensorType:
@@ -223,7 +235,7 @@ def matchFrame(pictureInfoDict):
                         consumedList.append(info)
                         break
 
-            # 对Depth
+            # Compare Depth
             if hasDepthProfile:
                 for info in listTmp:
                     if info.deviceId == primaryId and info.sensorType == comparePic.sensorType:
@@ -237,7 +249,7 @@ def matchFrame(pictureInfoDict):
                         consumedList.append(info)
                         break
 
-            # IR
+            # Compare IR
             if hasIRProfile:
                 for info in listTmp:
                     if info.deviceId == primaryId and info.sensorType == comparePic.sensorType:
@@ -251,7 +263,7 @@ def matchFrame(pictureInfoDict):
                         consumedList.append(info)
                         break
 
-        # 计算偏差
+        # Calculate deviation
         for info in resultDict[dictIndex]:
             info.tspDiff = info.syncTimeStamp - comparePic.syncTimeStamp
 
@@ -333,7 +345,7 @@ def handleSyncFrames():
                 for info in listTmp:
                     if info.tspDiff >= tspRangeThreshold:
                         path = abnormalPath + str(key) + "_" + info.sensorType + "_" + info.deviceIdFull + "_" + str(
-                            info.syncTimeStamp) + "_[" + str(info.tspDiff) + "]" + "_xxxxxx" + info.fileExt 
+                            info.syncTimeStamp) + "_[" + str(info.tspDiff) + "]" + "_xxxxxx" + info.fileExt
                         shutil.copy(info.picturePath, path)
                     else:
                         path = abnormalPath + str(key) + "_" + info.sensorType + "_" + info.deviceIdFull + "_" + str(
@@ -345,6 +357,7 @@ def handleSyncFrames():
                 newFilePath = notMatchPath + str(key) + "_" + info.sensorType + "_" + info.deviceIdFull + "_" + str(
                     info.syncTimeStamp) + "_[" + str(info.tspDiff) + "]" + info.fileExt
                 shutil.copy(info.picturePath, newFilePath)
+
 
 def main():
     if not initPrimaryId():
@@ -377,9 +390,3 @@ if __name__ == '__main__':
     main()
 
     print("Finish of Astra2 synchronize frame.")
-
-
-
-
-
-

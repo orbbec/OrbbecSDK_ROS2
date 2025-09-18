@@ -4,6 +4,8 @@
 >
 > Welcome to the OrbbecSDK ROS2 Wrapper v2. Before you begin using this version of ROS2 wrapper, it's crucial to check the following [device support list](#supported-devices) to verify the compatibility.
 
+[English](./README.MD) | [中文](./README_CN.MD)
+
 OrbbecSDK ROS2 Wrapper provides seamless integration of Orbbec cameras with ROS 2 environment. It supports ROS2 Foxy, Humble, and Jazzy distributions.
 
 By default, we recommend using the **v2-main** branch. For older OpenNI devices not supported by v2-main, please use the **main** branch. Device models that are only supported by the main branch are listed in the table below.
@@ -311,6 +313,7 @@ To explore practical examples and gain insight into how to use the camera in ROS
 
 ## Other useful links
 
+-  [OrbbecSDK ROS2 documentation](https://orbbec.github.io/OrbbecSDK_ROS2/index.html)
 - [OrbbecSDK_v2](https://github.com/orbbec/OrbbecSDK_v2/releases)
 - [Gemini 330 depth presets](https://www.orbbec.com/docs/g330-use-depth-presets/)
 

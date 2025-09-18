@@ -72,7 +72,7 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
       <td>Recommended for new designs</td>
     </tr>
     <tr>
-      <td rowspan="3" style="text-align: center; font-weight: bold;">Gemini 2</td>
+      <td rowspan="5" style="text-align: center; font-weight: bold;">Gemini 2</td>
       <td>Gemini 2</td>
       <td>Full maintenance</td>
       <td>Recommended for new designs</td>
@@ -86,6 +86,16 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
       <td>Gemini 2 XL</td>
       <td>Recommended for new designs</td>
       <td>To be supported</td>
+    </tr>
+    <tr>
+      <td>Gemini 215</td>
+      <td>not supported</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 210</td>
+      <td>not supported</td>
+      <td>recommended for new designs</td>
     </tr>
     <tr>
       <td rowspan="3" style="text-align: center; font-weight: bold;">Femto</td>
@@ -120,13 +130,20 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
       <td>Not supported</td>
     </tr>
     <tr>
-      <td style="text-align: center; font-weight: bold;">Astra Mini</td>
+      <td rowspan="3" style="text-align: center; font-weight: bold;">Astra Mini</td>
       <td>Astra Mini Pro</td>
+      <td>Full maintenance</td>
+      <td>Full maintenance</td>
+    </tr>
+    <tr>
+      <td>Astra Mini s Pro</td>
       <td>Full maintenance</td>
       <td>Full maintenance</td>
     </tr>
   </tbody>
 </table>
+
+
 
 **Note**: If you do not find your device, please contact our FAE or sales representative for help.
 

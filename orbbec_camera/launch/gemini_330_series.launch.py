@@ -96,7 +96,6 @@ def generate_launch_description():
         DeclareLaunchArgument('color_flip', default_value='false'),
         DeclareLaunchArgument('color_mirror', default_value='false'),
         DeclareLaunchArgument('color_ae_roi_left', default_value='-1'),
-        DeclareLaunchArgument('color_ae_roi_left', default_value='-1'),
         DeclareLaunchArgument('color_ae_roi_right', default_value='-1'),
         DeclareLaunchArgument('color_ae_roi_top', default_value='-1'),
         DeclareLaunchArgument('color_ae_roi_bottom', default_value='-1'),

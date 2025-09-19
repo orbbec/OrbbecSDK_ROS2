@@ -32,6 +32,12 @@
 std::string g_camera_name = "orbbec_camera";  // Assuming this is declared elsewhere
 
 void signalHandler(int sig) {
+  if (sig == SIGINT) {
+    std::cout << "Received SIGINT (Ctrl+C), shutting down ROS2..." << std::endl;
+    rclcpp::shutdown();
+    // Do not call exit here, let ROS2 clean up
+    return;
+  }
   std::cout << "Received signal: " << sig << std::endl;
 
   std::string log_dir = "Log/";
@@ -105,6 +111,7 @@ OBCameraNodeDriver::~OBCameraNodeDriver() {
 }
 
 void OBCameraNodeDriver::init() {
+  signal(SIGINT, signalHandler);   // Ctrl+C
   signal(SIGSEGV, signalHandler);  // segment fault
   signal(SIGABRT, signalHandler);  // abort
   signal(SIGFPE, signalHandler);   // float point exception
@@ -495,6 +502,12 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
 
   std::shared_ptr<int> lock_holder(nullptr,
                                    [this](int *) { pthread_mutex_unlock(orb_device_lock_); });
+
+  //check device connected flag again after get lock
+  if (device_connected_) {
+    return;
+  }
+
   bool start_device_failed = false;
   try {
     auto start_time = std::chrono::high_resolution_clock::now();

@@ -122,7 +122,6 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
   </tbody>
 </table>
 
-
 **Note**: If you do not find your device, please contact our FAE or sales representative for help.
 
 **Definition**:
@@ -139,8 +138,8 @@ The following devices are supported by the OrbbecSDK ROS2 Wrapper v2-main branch
 
 For optimal performance, we strongly recommend updating to the latest firmware version. This ensures that you benefit from the most recent enhancements and bug fixes.
 
-| Product List   | Minimal Firmware Version | **Launch File**       |
-| :------------- | :----------------------- | :-------------------------- |
+| Product List   | Minimal Firmware Version | **Launch File**             |
+|:-------------- |:------------------------ |:--------------------------- |
 | Gemini 435Le   | 1.2.04                   | gemini435_le.launch.py      |
 | Gemini 335     | 1.2.20                   | gemini_330_series.launch.py |
 | Gemini 336     | 1.2.20                   | gemini_330_series.launch.py |
@@ -159,6 +158,102 @@ For optimal performance, we strongly recommend updating to the latest firmware v
 
 All launch files are essentially similar, with the primary difference being the default values of the parameters set
 for different models within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution settings in the launch file, as well as other parameters, to ensure compatibility and optimal performance.
+
+## Orbbec camera datasheet
+
+Refer to the camera datasheet for more information.
+
+<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+  vertical-align: middle;
+}
+thead th {
+  background-color: #1f4e78;
+  color: white;
+  text-align: center;
+  vertical-align: middle;
+}
+</style>
+
+<table>
+  <thead>
+    <tr>
+      <th>Product Series</th>
+      <th>Product</th>
+      <th>Datasheet</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center;">Gemini 435Le</td>
+      <td>Gemini 435Le</td>
+      <td><a href="https://new-orbbec3d-s3.s3.amazonaws.com/wp-content/uploads/2025/06/04011158/Orbbec-Gemini-435Le-Datasheet-V1.pdf">Orbbec Gemini 435Le Datasheet</a></td>
+    </tr>
+    <tr>
+      <td style="text-align: center;" rowspan="6">Gemini 330</td>
+      <td>Gemini 335</td>
+      <td rowspan="4"><a href="https://new-orbbec3d-s3.s3.amazonaws.com/wp-content/uploads/2025/04/22062452/Gemini-330-series-Datasheet-V1.6.pdf">Gemini 330 Series Datasheet for USB Devices</a></td>
+    </tr>
+    <tr><td>Gemini 336</td></tr>
+    <tr><td>Gemini 335L</td></tr>
+    <tr><td>Gemini 336L</td></tr>
+    <tr>
+      <td>Gemini 335Lg</td>
+      <td><a href="https://new-orbbec3d-s3.s3.amazonaws.com/wp-content/uploads/2024/10/22030914/Gemini-335Lg-Datasheet-V1.0-241022.pdf">Gemini 330 Series Datasheet for GMSL Devices</a></td>
+    </tr>
+    <tr>
+      <td>Gemini 335Le</td>
+      <td><a href="https://new-orbbec3d-s3.s3.amazonaws.com/wp-content/uploads/2025/03/24023151/Orbbec-Gemini-335Le-Datasheet-V1-2.pdf">Gemini 330 Series Datasheet for Ethernet Devices</a></td>
+    </tr>
+    <tr>
+      <td style="text-align: center;" rowspan="3">Gemini 2</td>
+      <td>Gemini 2</td>
+      <td rowspan="2"><a href="https://xm917ch2uk.feishu.cn/file/Khxfb2vdioUghexIMqJcAyL3nXf">Orbbec Gemini 2 Series Datasheet</a></td>
+    </tr>
+    <tr><td>Gemini 2 L</td></tr>
+    <tr>
+      <td>Gemini 2 XL</td>
+      <td><a href="https://xm917ch2uk.feishu.cn/file/QW2vbNvwxoocRIxSL6Zcvut2npS">Orbbec Gemini 2 XL Datasheet</a></td>
+    </tr>
+    <tr>
+      <td style="text-align: center;" rowspan="3">Femto</td>
+      <td>Femto Bolt</td>
+      <td><a href="https://d1cd332k3pgc17.cloudfront.net/wp-content/uploads/2024/08/ORBBEC_Datasheet_Femto-Bolt-v1.0.pdf">Orbbec Femto Bolt Datasheet</a></td>
+    </tr>
+    <tr>
+      <td>Femto Mega</td>
+      <td><a href="https://d1cd332k3pgc17.cloudfront.net/wp-content/uploads/2023/04/ORBBEC_Datasheet_Femto-Mega1.pdf">Orbbec Femto Mega Datasheet</a></td>
+    </tr>
+    <tr>
+      <td>Femto Mega I</td>
+      <td><a href="https://d1cd332k3pgc17.cloudfront.net/wp-content/uploads/2023/08/ORBBEC_Datasheet_Femto-Mega-I.pdf">Orbbec Femto Mega I Datasheet</a></td>
+    </tr>
+    <tr>
+      <td style="text-align: center;" rowspan="3">Astra</td>
+      <td>Astra 2</td>
+      <td><a href="https://d1cd332k3pgc17.cloudfront.net/wp-content/uploads/2023/04/ORBBEC_Datasheet_Astra-2_V1.2.pdf">Orbbec Astra 2 Datasheet</a></td>
+    </tr>
+    <tr>
+      <td>Astra+</td>
+      <td><a href="https://xm917ch2uk.feishu.cn/file/Qk0zbx26Doh8XMxw0rIcOgQYnff">Orbbec Astra+ Datasheet</a></td>
+    </tr>
+    <tr>
+      <td>Astra Mini Pro</td>
+      <td><a href="https://d1cd332k3pgc17.cloudfront.net/wp-content/uploads/2023/04/ORBBEC_Datasheet_Astra-Mini-Pro-1.pdf">Orbbec Astra Mini Pro Datasheet</a></td>
+    </tr>
+  </tbody>
+</table>
+
+  ---
+
+
 
 ## Support Platforms
 

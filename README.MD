@@ -130,20 +130,13 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
       <td>Not supported</td>
     </tr>
     <tr>
-      <td rowspan="3" style="text-align: center; font-weight: bold;">Astra Mini</td>
+      <td rowspan="1" style="text-align: center; font-weight: bold;">Astra Mini</td>
       <td>Astra Mini Pro</td>
-      <td>Full maintenance</td>
-      <td>Full maintenance</td>
-    </tr>
-    <tr>
-      <td>Astra Mini s Pro</td>
       <td>Full maintenance</td>
       <td>Full maintenance</td>
     </tr>
   </tbody>
 </table>
-
-
 
 **Note**: If you do not find your device, please contact our FAE or sales representative for help.
 
@@ -330,7 +323,7 @@ To explore practical examples and gain insight into how to use the camera in ROS
 
 ## Other useful links
 
--  [OrbbecSDK ROS2 documentation](https://orbbec.github.io/OrbbecSDK_ROS2/index.html)
+- [OrbbecSDK ROS2 documentation](https://orbbec.github.io/OrbbecSDK_ROS2/index.html)
 - [OrbbecSDK_v2](https://github.com/orbbec/OrbbecSDK_v2/releases)
 - [Gemini 330 depth presets](https://www.orbbec.com/docs/g330-use-depth-presets/)
 

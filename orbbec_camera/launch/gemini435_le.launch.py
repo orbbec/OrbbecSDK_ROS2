@@ -285,12 +285,14 @@ def generate_launch_description():
         DeclareLaunchArgument('laser_index0_ir_brightness', default_value='60'),
         DeclareLaunchArgument('laser_index0_ir_ae_max_exposure', default_value='30000'),
         DeclareLaunchArgument('show_fps_enable', default_value='false'),
-        DeclareLaunchArgument("force_ip_enable", default_value="false"),
-        DeclareLaunchArgument("force_ip_mac", default_value=""),# you need to specify it yourself. For example, "54:14:FD:06:07:DA"
-        DeclareLaunchArgument("force_ip_dhcp", default_value="false"),
-        DeclareLaunchArgument("force_ip_address", default_value="192.168.1.10"),
-        DeclareLaunchArgument("force_ip_subnet_mask", default_value="255.255.255.0"),
-        DeclareLaunchArgument("force_ip_gateway", default_value="192.168.1.1"),
+        # Force IP parameters
+        DeclareLaunchArgument("force_ip_enable", default_value="false"),  # Whether to enable Force IP function
+        DeclareLaunchArgument("force_ip_mac", default_value=""),  # If multiple cameras are connected, specify target MAC (e.g. "54:14:FD:06:07:DA")
+        DeclareLaunchArgument("force_ip_dhcp", default_value="false"),  # Use DHCP to obtain IP automatically if set to true
+        DeclareLaunchArgument("force_ip_address", default_value="192.168.1.10"),  # Static IP address to assign when DHCP is disabled
+        DeclareLaunchArgument("force_ip_subnet_mask", default_value="255.255.255.0"),  # Subnet mask used for static IP
+        DeclareLaunchArgument("force_ip_gateway", default_value="192.168.1.1"),  # Gateway address used for static IP
+
 
         #color image transport plugins
         DeclareLaunchArgument('color.image_raw.enable_pub_plugins',default_value='["image_transport/compressed", "image_transport/raw", "image_transport/theora"]'),

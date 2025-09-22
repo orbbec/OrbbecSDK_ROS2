@@ -160,26 +160,13 @@ void OBLidarNode::getParameters() {
   setAndGetNodeParameter<double>(angular_vel_cov_, "angular_vel_cov", 0.02);
 
   // Multi-frame publishing parameter - only for LIDAR_POINT and LIDAR_SPHERE_POINT formats
-  bool use_multi_frame = false;
-  for (auto stream_index : LIDAR_STREAMS) {
-    if (format_[stream_index] == OB_FORMAT_LIDAR_POINT || format_[stream_index] == OB_FORMAT_LIDAR_SPHERE_POINT) {
-      use_multi_frame = true;
-      break;
-    }
-  }
-
-  if (use_multi_frame) {
-    setAndGetNodeParameter<int>(publish_n_pkts_, "publish_n_pkts", 1);
-    if (publish_n_pkts_ < 1 || publish_n_pkts_ > 12000) {
-      RCLCPP_WARN_STREAM(logger_, "publish_n_pkts value " << publish_n_pkts_
-                                  << " is out of range [1, 12000], setting to 1");
-      publish_n_pkts_ = 1;
-    }
-    RCLCPP_INFO_STREAM(logger_, "Multi-frame publishing enabled: " << publish_n_pkts_ << " frames will be merged");
-  } else {
+  setAndGetNodeParameter<int>(publish_n_pkts_, "publish_n_pkts", 1);
+  if (publish_n_pkts_ < 1 || publish_n_pkts_ > 12000) {
+    RCLCPP_WARN_STREAM(logger_, "publish_n_pkts value " << publish_n_pkts_
+                                << " is out of range [1, 12000], setting to 1");
     publish_n_pkts_ = 1;
-    RCLCPP_INFO_STREAM(logger_, "Multi-frame publishing disabled for current lidar format");
   }
+  if(publish_n_pkts_ >1) RCLCPP_INFO_STREAM(logger_, "Multi-frame publishing enabled: " << publish_n_pkts_ << " frames will be merged");
 
   // Setup IMU streams if enabled
   if (enable_imu_) {
@@ -604,15 +591,19 @@ void OBLidarNode::onNewIMUFrameCallback(const std::shared_ptr<ob::Frame> &accelf
 
   auto gyro_frame = gryoframe->as<ob::GyroFrame>();
   auto gyroData = gyro_frame->getValue();
-  imu_msg.angular_velocity.x = gyroData.x;
-  imu_msg.angular_velocity.y = gyroData.y;
-  imu_msg.angular_velocity.z = gyroData.z;
+
+  const double G = 9.81;
+  const double DEG2RAD = M_PI / 180.0;
+
+  imu_msg.angular_velocity.x = -gyroData.x * DEG2RAD;
+  imu_msg.angular_velocity.y = gyroData.y * DEG2RAD;
+  imu_msg.angular_velocity.z = -gyroData.z * DEG2RAD;
 
   auto accel_frame = accelframe->as<ob::AccelFrame>();
   auto accelData = accel_frame->getValue();
-  imu_msg.linear_acceleration.x = accelData.x;
-  imu_msg.linear_acceleration.y = accelData.y;
-  imu_msg.linear_acceleration.z = accelData.z;
+  imu_msg.linear_acceleration.x = -accelData.x * G;
+  imu_msg.linear_acceleration.y = accelData.y * G;
+  imu_msg.linear_acceleration.z = -accelData.z * G;
 
   imu_publisher_->publish(imu_msg);
 }
@@ -639,7 +630,6 @@ void OBLidarNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set)
     if ((format_[LIDAR] == OB_FORMAT_LIDAR_POINT || format_[LIDAR] == OB_FORMAT_LIDAR_SPHERE_POINT)) {
       std::lock_guard<std::mutex> lock(frame_buffer_mutex_);
       frame_buffer_.push_back(frame_set);
-
       // If we have enough frames, publish merged point cloud
       if (frame_buffer_.size() >= static_cast<size_t>(publish_n_pkts_)) {
         if (format_[LIDAR] == OB_FORMAT_LIDAR_POINT) {
@@ -902,6 +892,9 @@ void OBLidarNode::publishMergedPointCloud() {
     // Calculate time increment per point within this frame (uniform sampling)
     double point_time_increment_us = frame_interval_us / static_cast<double>(point_count);
 
+    // RCLCPP_INFO_STREAM(logger_, "Frame1 " << frame_idx << ": point_count = " << point_count
+    //                                     << ", frame_timestamp_us = " << frame_timestamp_us
+    //                                     << ", point_time_increment_us = " << point_time_increment_us);
     for (size_t i = 0; i < point_count;
          ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_intensity, ++iter_tag, ++iter_offset_time) {
       *iter_x = static_cast<float>(point_data[i].x / 1000.0);
@@ -990,6 +983,10 @@ void OBLidarNode::publishMergedSpherePointCloud() {
 
     // Calculate time increment per point within this frame (uniform sampling)
     double point_time_increment_us = frame_interval_us / static_cast<double>(point_count);
+
+    // RCLCPP_INFO_STREAM(logger_, "Frame " << frame_idx << ": point_count = " << point_count
+    //                                     << ", frame_timestamp_us = " << frame_timestamp_us
+    //                                     << ", point_time_increment_us = " << point_time_increment_us);
 
     for (size_t i = 0; i < point_count;
          ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_intensity, ++iter_tag, ++iter_offset_time) {
@@ -1176,38 +1173,38 @@ void OBLidarNode::calcAndPublishStaticTransform() {
     return;
   }
   CHECK_NOTNULL(base_stream_profile.get());
-  for (const auto &item : stream_profile_) {
-    auto stream_index = item.first;
+  // for (const auto &item : stream_profile_) {
+  //   auto stream_index = item.first;
 
-    auto stream_profile = item.second;
-    if (!stream_profile) {
-      continue;
-    }
-    OBExtrinsic ex;
-    try {
-      ex = stream_profile->getExtrinsicTo(base_stream_profile);
-    } catch (const ob::Error &e) {
-      RCLCPP_ERROR_STREAM(logger_, "Failed to get " << stream_name_[stream_index]
-                                                    << " extrinsic: " << e.getMessage());
-      ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
-    }
+  //   auto stream_profile = item.second;
+  //   if (!stream_profile) {
+  //     continue;
+  //   }
+  //   OBExtrinsic ex;
+  //   try {
+  //     ex = stream_profile->getExtrinsicTo(base_stream_profile);
+  //   } catch (const ob::Error &e) {
+  //     RCLCPP_ERROR_STREAM(logger_, "Failed to get " << stream_name_[stream_index]
+  //                                                   << " extrinsic: " << e.getMessage());
+  //     ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
+  //   }
 
-    auto Q = rotationMatrixToQuaternion(ex.rot);
-    Q = quaternion_optical * Q * quaternion_optical.inverse();
-    tf2::Vector3 trans(ex.trans[0], ex.trans[1], ex.trans[2]);
-    auto timestamp = node_->now();
-    if (stream_index.first != base_stream_.first) {
-      publishStaticTF(timestamp, trans, Q, frame_id_[base_stream_], frame_id_[stream_index]);
-    }
-    publishStaticTF(timestamp, zero_trans, quaternion_optical, frame_id_[stream_index],
-                    optical_frame_id_[stream_index]);
-    RCLCPP_INFO_STREAM(logger_, "Publishing static transform from " << stream_name_[stream_index]
-                                                                    << " to "
-                                                                    << stream_name_[base_stream_]);
-    RCLCPP_INFO_STREAM(logger_, "Translation " << trans[0] << ", " << trans[1] << ", " << trans[2]);
-    RCLCPP_INFO_STREAM(logger_, "Rotation " << Q.getX() << ", " << Q.getY() << ", " << Q.getZ()
-                                            << ", " << Q.getW());
-  }
+  //   auto Q = rotationMatrixToQuaternion(ex.rot);
+  //   Q = quaternion_optical * Q * quaternion_optical.inverse();
+  //   tf2::Vector3 trans(ex.trans[0], ex.trans[1], ex.trans[2]);
+  //   auto timestamp = node_->now();
+  //   if (stream_index.first != base_stream_.first) {
+  //     publishStaticTF(timestamp, trans, Q, frame_id_[base_stream_], frame_id_[stream_index]);
+  //   }
+  //   publishStaticTF(timestamp, zero_trans, quaternion_optical, frame_id_[stream_index],
+  //                   optical_frame_id_[stream_index]);
+  //   RCLCPP_INFO_STREAM(logger_, "Publishing static transform from " << stream_name_[stream_index]
+  //                                                                   << " to "
+  //                                                                   << stream_name_[base_stream_]);
+  //   RCLCPP_INFO_STREAM(logger_, "Translation " << trans[0] << ", " << trans[1] << ", " << trans[2]);
+  //   RCLCPP_INFO_STREAM(logger_, "Rotation " << Q.getX() << ", " << Q.getY() << ", " << Q.getZ()
+  //                                           << ", " << Q.getW());
+  // }
   if (enable_imu_) {
     static const char *frame_id = "lidar_to_imu_extrinsics";
     OBExtrinsic ex;
@@ -1257,18 +1254,18 @@ void OBLidarNode::calcAndPublishStaticTransform() {
     auto ex_msg = obExtrinsicsToMsg(ex, frame_id);
     CHECK_NOTNULL(lidar_to_imu_extrinsics_publisher_);
     lidar_to_imu_extrinsics_publisher_->publish(ex_msg);
-    
+
     // Publish static TF from lidar to IMU
     auto Q = rotationMatrixToQuaternion(ex.rot);
     Q = quaternion_optical * Q * quaternion_optical.inverse();
     tf2::Vector3 trans(ex.trans[0], ex.trans[1], ex.trans[2]);
     auto timestamp = node_->now();
     publishStaticTF(timestamp, trans, Q, frame_id_[base_stream_], accel_gyro_frame_id_);
-    
-    RCLCPP_INFO_STREAM(logger_, "Publishing static transform from " << frame_id_[base_stream_] 
+
+    RCLCPP_INFO_STREAM(logger_, "Publishing static transform from " << frame_id_[base_stream_]
                                                                     << " to " << accel_gyro_frame_id_);
     RCLCPP_INFO_STREAM(logger_, "Translation " << trans[0] << ", " << trans[1] << ", " << trans[2]);
-    RCLCPP_INFO_STREAM(logger_, "Rotation " << Q.getX() << ", " << Q.getY() << ", " << Q.getZ() 
+    RCLCPP_INFO_STREAM(logger_, "Rotation " << Q.getX() << ", " << Q.getY() << ", " << Q.getZ()
                                             << ", " << Q.getW());
   }
 }

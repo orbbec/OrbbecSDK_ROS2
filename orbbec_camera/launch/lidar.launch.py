@@ -188,7 +188,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             'enable_imu',
-            default_value='true',
+            default_value='false',
             description='Enable IMU (accelerometer and gyroscope) data publishing.'
         ),
         DeclareLaunchArgument(

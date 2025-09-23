@@ -576,6 +576,11 @@ void OBLidarNode::onNewIMUFrameCallback(const std::shared_ptr<ob::Frame> &accelf
     return;
   }
 
+  if (!tf_published_) {
+    publishStaticTransforms();
+    tf_published_ = true;
+  }
+
   bool has_subscriber = imu_publisher_->get_subscription_count() > 0;
   if (!has_subscriber) {
     return;
@@ -621,7 +626,7 @@ void OBLidarNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set)
   }
   try {
     RCLCPP_INFO_ONCE(logger_, "New frame received");
-    if (!tf_published_) {
+    if (!tf_published_ && !enable_imu_) {
       publishStaticTransforms();
       tf_published_ = true;
     }

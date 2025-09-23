@@ -248,6 +248,20 @@ void SingleServiceBenchmark::fillRequest<std_srvs::srv::SetBool>(
   }
 }
 
+// SetString
+template <>
+void SingleServiceBenchmark::fillRequest<orbbec_camera_msgs::srv::SetString>(
+    orbbec_camera_msgs::srv::SetString::Request &request) {
+  if (!request_data_) {
+    return;
+  }
+  if (request_data_.IsScalar()) {
+    request.data = request_data_.as<std::string>();
+  } else if (request_data_["data"]) {
+    request.data = request_data_["data"].as<std::string>();
+  }
+}
+
 // SetArrays
 template <>
 void SingleServiceBenchmark::fillRequest<orbbec_camera::SetArrays>(

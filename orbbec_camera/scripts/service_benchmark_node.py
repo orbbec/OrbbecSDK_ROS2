@@ -34,7 +34,9 @@ class ServiceBenchmark:
 
         self.service_type = self.get_service_type(service_name)
         if not self.service_type:
-            raise RuntimeError(f"Service {service_name} type not found")
+            self.node.get_logger().warn(f"Service {service_name} type not found, skipping...")
+            self.ServiceClass = None
+            return
 
         self.ServiceClass = self.service_class(self.service_type)
         self.client = self.node.create_client(self.ServiceClass, self.service_name)
@@ -62,6 +64,18 @@ class ServiceBenchmark:
 
 
     def run(self):
+        if self.ServiceClass is None:
+          return {
+            "Service": self.service_name,
+            "Type": "N/A",
+            "Calls": "N/A",
+            "Success": "N/A",
+            "Rate": "N/A",
+            "Avg(ms)": "N/A",
+            "Min(ms)": "N/A",
+            "Max(ms)": "N/A",
+          }
+
         durations = []
         success = 0
 
@@ -108,7 +122,7 @@ class ServiceBenchmark:
             "Type": self.service_type,
             "Calls": self.count,
             "Success": success,
-            "Success Rate": f"{success_rate:.2f}%",
+            "Rate": f"{success_rate:.2f}%",
             "Avg(ms)": f"{avg_time:.2f}",
             "Min(ms)": f"{min_time:.2f}",
             "Max(ms)": f"{max_time:.2f}"

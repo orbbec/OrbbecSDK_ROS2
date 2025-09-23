@@ -1031,7 +1031,7 @@ void OBCameraNode::toggleSensorCallback(const std::shared_ptr<SetBool::Request>&
   }
   if (!msg.empty()) {
     RCLCPP_ERROR_STREAM(logger_, msg);
-    response->success = false;
+    response->success = true;
     response->message = msg;
     return;
   }

@@ -1,16 +1,16 @@
 # OrbbecSDK ROS2 Wrapper v2
 
-> [!IMPORTANT]
->
-> 欢迎使用 OrbbecSDK ROS2 Wrapper v2。在开始使用此版本的 ROS2 wrapper 之前，请务必查看以下 [设备支持列表](#supported-devices)，以确认兼容性。
-
 [English](./README.MD) | [中文](./README_CN.MD)
 
-OrbbecSDK ROS2 Wrapper 提供 Orbbec 相机与 ROS 2 环境的无缝集成。它支持 ROS2 Foxy、Humble 和 Jazzy 发行版。
+## 简介
 
-默认情况下，我们推荐使用 **v2-main** 分支。对于旧的 OpenNI 设备（v2-main 分支不支持），请使用 **main** 分支。仅由 main 分支支持的设备型号在下表中列出。
+OrbbecSDK ROS2 Wrapper 提供 Orbbec 相机与 ROS 2 环境的无缝集成，支持 **ROS2 Foxy、Humble 和 Jazzy** 发行版。
 
-如果您在中国使用，建议使用 [gitee 仓库](https://gitee.com/orbbecdeveloper/OrbbecSDK_ROS2)。
+- 默认推荐使用 **v2-main** 分支。
+- 对于旧的 **OpenNI** 设备（v2-main 不支持），请使用 **main** 分支。
+- 如果您在中国使用，建议使用 [gitee 仓库](https://gitee.com/orbbecdeveloper/OrbbecSDK_ROS2)。
+
+## 分支选择
 
 以下是 main 分支 (v1.x) 和 v2-main 分支 (v2.x) 的设备支持列表：
 
@@ -157,29 +157,78 @@ git branch  #检查分支是否切换成功
 
 安装依赖包
 
-```
+```bash
 # 假设您已经 source ROS 环境，下同
 sudo apt install libgflags-dev nlohmann-json3-dev \
 ros-$ROS_DISTRO-image-transport ros-${ROS_DISTRO}-image-transport-plugins ros-${ROS_DISTRO}-compressed-image-transport \
 ros-$ROS_DISTRO-image-publisher ros-$ROS_DISTRO-camera-info-manager \
 ros-$ROS_DISTRO-diagnostic-updater ros-$ROS_DISTRO-diagnostic-msgs ros-$ROS_DISTRO-statistics-msgs \
 ros-$ROS_DISTRO-backward-ros libdw-dev
-```
 
-可选依赖：
-
-```
+# 可选依赖
 # 435Le writeCustomerDate 功能需要：
 sudo apt install libssl-dev
 ```
 
 安装 udev 规则
 
-```
+```bash
 cd  ~/ros2_ws/src/OrbbecSDK_ROS2/orbbec_camera/scripts
 sudo bash install_udev_rules.sh
 sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
+
+编译
+
+```bash
+cd ~/ros2_ws/
+source /opt/ros/$ROS_DISTRO/setup.bash
+# 编译 release，默认是 Debug
+colcon build --event-handlers  console_direct+  --cmake-args  -DCMAKE_BUILD_TYPE=Release
+```
+
+## 快速开始
+
+启动相机节点
+
+- 终端 1
+
+```bash
+source ~/ros2_ws/install/setup.bash
+ros2 run orbbec_camera list_devices_node #检查相机是否已连接
+ros2 launch orbbec_camera gemini_330_series.launch.py # 或其他启动文件，见下表
+```
+
+- 终端 2
+
+```bash
+source ~/ros2_ws/install/setup.bash
+rviz2
+```
+
+选择需要显示的 topic
+
+- 列出 topics / services / parameters (终端 3)
+
+```bash
+ros2 topic list
+ros2 service list
+ros2 param list
+```
+
+- 查看 topic
+
+```
+ros2 topic echo /camera/depth/camera_info
+```
+
+- 调用服务
+
+```
+ros2 service call /camera/get_sdk_version orbbec_camera_msgs/srv/GetString '{}'
+```
+
+更多使用详情，请参考官方 [OrbbecSDK ROS2 文档](https://orbbec.github.io/OrbbecSDK_ROS2/source/4_application_guide/application_guide.html)
 
 ## 支持的设备
 
@@ -207,89 +256,9 @@ sudo udevadm control --reload-rules && sudo udevadm trigger
 
 所有启动文件基本相似，主要区别在于针对不同型号的默认参数设置。不同的 USB 标准（如 USB 2.0 和 USB 3.0）可能需要调整这些参数。如果遇到启动失败，请仔细查看规格说明书，特别是启动文件中的分辨率设置以及其他参数，以确保兼容性和最佳性能。
 
-## 快速开始
+## 教程
 
-```
-cd ~/ros2_ws/
-source /opt/ros/$ROS_DISTRO/setup.bash
-# 编译 release，默认是 Debug
-colcon build --event-handlers  console_direct+  --cmake-args  -DCMAKE_BUILD_TYPE=Release
-```
-
-启动相机节点
-
-- 终端 1
-
-```
-source ~/ros2_ws/install/setup.bash
-ros2 run orbbec_camera list_devices_node #检查相机是否已连接
-ros2 launch orbbec_camera gemini_330_series.launch.py # 或其他启动文件，见下表
-```
-
-- 终端 2
-
-```
-source ~/ros2_ws/install/setup.bash
-rviz2
-```
-
-选择需要显示的 topic
-
-- 列出 topics / services / parameters (终端 3)
-
-```
-ros2 topic list
-ros2 service list
-ros2 param list
-```
-
-- 查看某个 topic
-
-```
-ros2 topic echo /camera/depth/camera_info
-```
-
-- 调用某个服务
-
-```
-ros2 service call /camera/get_sdk_version orbbec_camera_msgs/srv/GetString '{}'
-```
-
-- 使用 rosbag2 录制
-
-```
-ros2 bag record /camera/color/image_raw /camera/depth/image_raw
-```
-
-更多使用详情，请参考官方 [OrbbecSDK ROS2 文档](https://orbbec.github.io/OrbbecSDK_ROS2/source/4_application_guide/application_guide.html)
-
-## 使用方法
-
-### 检查相机支持的 profile
-
-```
-ros2 run orbbec_camera list_camera_profile_mode_node
-```
-
-### 可选深度预设
-
-> 您可以将可选预设的固件路径传入 `preset_firmware_path` 启动参数。用户可以从 Orbbec 提供的 [Depth Preset Release](https://www.orbbec.com/docs/depth-preset-release/) 页面下载合适的预设，并将其更新到相机中，以在对应场景下获得更好的深度性能。
-
-```
-ros2 launch orbbec_camera gemini_330_series.launch.py preset_firmware_path:=/home/orbbec/G336X_AMR_Default_v0.0.5.bin
-```
-
-### 使用 V4L2 backend
-
-注意：V4L2 backend 默认未启用。
-
-- 示例：
-
-```
-ros2 launch orbbec_camera gemini_330_series.launch.py uvc_backend:=v4l2
-```
-
-更多使用详情，请参考官方 [OrbbecSDK ROS2 文档](https://orbbec.github.io/OrbbecSDK_ROS2/source/5_advanced_guide/advanced_guide.html)
+请参考官方 [OrbbecSDK ROS2 文档](https://orbbec.github.io/OrbbecSDK_ROS2/source/5_advanced_guide/advanced_guide.html)
 
 ## 示例
 

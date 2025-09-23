@@ -142,8 +142,6 @@ def generate_launch_description():
         DeclareLaunchArgument('left_ir_rotation', default_value='-1'),#left_ir rotation degree : 0, 90, 180, 270
         DeclareLaunchArgument('left_ir_flip', default_value='false'),
         DeclareLaunchArgument('left_ir_mirror', default_value='false'),
-        DeclareLaunchArgument('enable_left_ir_sequence_id_filter', default_value='false'),
-        DeclareLaunchArgument('left_ir_sequence_id_filter_id', default_value='-1'),
         DeclareLaunchArgument('right_ir_width', default_value='0'),
         DeclareLaunchArgument('right_ir_height', default_value='0'),
         DeclareLaunchArgument('right_ir_fps', default_value='0'),
@@ -154,8 +152,6 @@ def generate_launch_description():
         DeclareLaunchArgument('right_ir_rotation', default_value='-1'),#right_ir rotation degree : 0, 90, 180, 270
         DeclareLaunchArgument('right_ir_flip', default_value='false'),
         DeclareLaunchArgument('right_ir_mirror', default_value='false'),
-        DeclareLaunchArgument('enable_right_ir_sequence_id_filter', default_value='false'),
-        DeclareLaunchArgument('right_ir_sequence_id_filter_id', default_value='-1'),
         DeclareLaunchArgument('enable_ir_auto_exposure', default_value='true'),
         DeclareLaunchArgument('ir_exposure', default_value='-1'),
         DeclareLaunchArgument('ir_gain', default_value='-1'),
@@ -203,8 +199,6 @@ def generate_launch_description():
         DeclareLaunchArgument('ordered_pc', default_value='false'),
         DeclareLaunchArgument('enable_depth_scale', default_value='true'),
         DeclareLaunchArgument('enable_decimation_filter', default_value='false'),
-        DeclareLaunchArgument('enable_hdr_merge', default_value='false'),
-        DeclareLaunchArgument('enable_sequence_id_filter', default_value='false'),
         DeclareLaunchArgument('enable_threshold_filter', default_value='false'),
         DeclareLaunchArgument('enable_hardware_noise_removal_filter', default_value='false'),
         DeclareLaunchArgument('enable_noise_removal_filter', default_value='true'),
@@ -215,7 +209,6 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_spatial_fast_filter', default_value='false'),
         DeclareLaunchArgument('enable_spatial_moderate_filter', default_value='false'),
         DeclareLaunchArgument('decimation_filter_scale', default_value='-1'),
-        DeclareLaunchArgument('sequence_id_filter_id', default_value='-1'),
         DeclareLaunchArgument('threshold_filter_max', default_value='-1'),
         DeclareLaunchArgument('threshold_filter_min', default_value='-1'),
         DeclareLaunchArgument('hardware_noise_removal_filter_threshold', default_value='-1.0'),
@@ -228,10 +221,6 @@ def generate_launch_description():
         DeclareLaunchArgument('temporal_filter_diff_threshold', default_value='-1.0'),
         DeclareLaunchArgument('temporal_filter_weight', default_value='-1.0'),
         DeclareLaunchArgument('hole_filling_filter_mode', default_value=''),
-        DeclareLaunchArgument('hdr_merge_exposure_1', default_value='-1'),
-        DeclareLaunchArgument('hdr_merge_gain_1', default_value='-1'),
-        DeclareLaunchArgument('hdr_merge_exposure_2', default_value='-1'),
-        DeclareLaunchArgument('hdr_merge_gain_2', default_value='-1'),
         DeclareLaunchArgument('spatial_fast_filter_radius', default_value='-1'),
         DeclareLaunchArgument('spatial_moderate_filter_diff_threshold', default_value='-1'),
         DeclareLaunchArgument('spatial_moderate_filter_magnitude', default_value='-1'),
@@ -258,21 +247,6 @@ def generate_launch_description():
         DeclareLaunchArgument('offset_index0', default_value='-1'),
         DeclareLaunchArgument('offset_index1', default_value='-1'),
         DeclareLaunchArgument('frame_aggregate_mode', default_value='ANY'), # full_frame, color_frame, ANY or disable
-        DeclareLaunchArgument('interleave_ae_mode', default_value='laser'), # 'hdr' or 'laser'
-        DeclareLaunchArgument('interleave_frame_enable', default_value='false'),
-        DeclareLaunchArgument('interleave_skip_enable', default_value='false'),
-        DeclareLaunchArgument('interleave_skip_index', default_value='1'), # 0:skip pattern ir  1: skip flood ir
-
-        DeclareLaunchArgument('hdr_index1_laser_control', default_value='1'),#interleave_hdr_param
-        DeclareLaunchArgument('hdr_index1_depth_exposure', default_value='1'),
-        DeclareLaunchArgument('hdr_index1_depth_gain', default_value='16'),
-        DeclareLaunchArgument('hdr_index1_ir_brightness', default_value='20'),
-        DeclareLaunchArgument('hdr_index1_ir_ae_max_exposure', default_value='2000'),
-        DeclareLaunchArgument('hdr_index0_laser_control', default_value='1'),
-        DeclareLaunchArgument('hdr_index0_depth_exposure', default_value='7500'),
-        DeclareLaunchArgument('hdr_index0_depth_gain', default_value='16'),
-        DeclareLaunchArgument('hdr_index0_ir_brightness', default_value='60'),
-        DeclareLaunchArgument('hdr_index0_ir_ae_max_exposure', default_value='10000'),
 
         DeclareLaunchArgument('laser_index1_laser_control', default_value='0'),#interleave_laser_param
         DeclareLaunchArgument('laser_index1_depth_exposure', default_value='3000'),

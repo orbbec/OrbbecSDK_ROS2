@@ -9,3 +9,4 @@ This chapter introduces how to use the benchmark tool and provides test results 
     introduction.md
     benchmark_usage.md
     benchmark_data.md
+    performance.md

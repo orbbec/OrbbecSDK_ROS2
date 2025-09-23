@@ -635,6 +635,7 @@ class OBCameraNode {
   std::string color_powerline_freq_;
   bool enable_color_decimation_filter_ = false;
   int color_decimation_filter_scale_ = -1;
+  int color_denoising_level_ = -1;
   // depth ae roi
   int depth_ae_roi_left_ = -1;
   int depth_ae_roi_top_ = -1;

@@ -115,6 +115,9 @@ def generate_launch_description():
         DeclareLaunchArgument('color_powerline_freq', default_value=''),#disable ,50hz ,60hz ,auto
         DeclareLaunchArgument('enable_color_decimation_filter', default_value='false'),
         DeclareLaunchArgument('color_decimation_filter_scale', default_value='-1'),
+        DeclareLaunchArgument('color_denoising_level', default_value='-1'),#0: Auto; 1-8: higher values indicate stronger denoising.
+        #Note: The color_denoising_level configuration is supported only when AE is enabled, and requires new firmware support.
+
         DeclareLaunchArgument('depth_width', default_value='0'),
         DeclareLaunchArgument('depth_height', default_value='0'),
         DeclareLaunchArgument('depth_fps', default_value='0'),
@@ -176,6 +179,7 @@ def generate_launch_description():
         DeclareLaunchArgument('tf_publish_rate', default_value='0.0'),
         DeclareLaunchArgument('ir_info_url', default_value=''),
         DeclareLaunchArgument('color_info_url', default_value=''),
+
         # Network device settings: default enumerate_net_device is set to true, which will automatically enumerate network devices
         # If you do not want to automatically enumerate network devices,
         # you can set enumerate_net_device to false, net_device_ip to the device's IP address, and net_device_port to the default value of 8090

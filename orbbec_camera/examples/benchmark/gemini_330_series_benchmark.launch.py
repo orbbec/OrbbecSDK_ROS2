@@ -95,7 +95,7 @@ def generate_launch_description():
         DeclareLaunchArgument('color_saturation', default_value='-1'),
         DeclareLaunchArgument('color_contrast', default_value='-1'),
         DeclareLaunchArgument('color_hue', default_value='-1'),
-        DeclareLaunchArgument('enable_color_backlight_compensation', default_value='false'),
+        DeclareLaunchArgument('color_backlight_compensation', default_value='-1'),
         DeclareLaunchArgument('color_powerline_freq', default_value=''),#disable ,50hz ,60hz ,auto
         DeclareLaunchArgument('enable_color_decimation_filter', default_value='false'),
         DeclareLaunchArgument('color_decimation_filter_scale', default_value='-1'),

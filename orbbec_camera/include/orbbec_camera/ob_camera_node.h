@@ -631,7 +631,7 @@ class OBCameraNode {
   int color_saturation_ = -1;
   int color_contrast_ = -1;
   int color_hue_ = -1;
-  bool enable_color_backlight_compensation_ = false;
+  int color_backlight_compensation_ = -1;
   std::string color_powerline_freq_;
   bool enable_color_decimation_filter_ = false;
   int color_decimation_filter_scale_ = -1;

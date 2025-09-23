@@ -600,12 +600,12 @@ void OBCameraNode::setupDevices() {
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_HUE_INT, color_hue_);
     }
   }
-  if (device_->isPropertySupported(OB_PROP_COLOR_BACKLIGHT_COMPENSATION_INT, OB_PERMISSION_WRITE)) {
-    int set_enable_color_backlight_compensation = enable_color_backlight_compensation_ ? 1 : 0;
-    RCLCPP_INFO_STREAM(logger_, "Setting color backlight compensation to "
-                                    << (set_enable_color_backlight_compensation ? "ON" : "OFF"));
+  if (color_backlight_compensation_ != -1 &&
+      device_->isPropertySupported(OB_PROP_COLOR_BACKLIGHT_COMPENSATION_INT, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_,
+                       "Setting color backlight compensation to " << color_backlight_compensation_);
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_BACKLIGHT_COMPENSATION_INT,
-                        set_enable_color_backlight_compensation);
+                        color_backlight_compensation_);
   }
   if (!color_powerline_freq_.empty() &&
       device_->isPropertySupported(OB_PROP_COLOR_POWER_LINE_FREQUENCY_INT, OB_PERMISSION_WRITE)) {
@@ -1779,8 +1779,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(color_saturation_, "color_saturation", -1);
   setAndGetNodeParameter<int>(color_contrast_, "color_contrast", -1);
   setAndGetNodeParameter<int>(color_hue_, "color_hue", -1);
-  setAndGetNodeParameter<bool>(enable_color_backlight_compensation_,
-                               "enable_color_backlight_compensation", false);
+  setAndGetNodeParameter<int>(color_backlight_compensation_, "color_backlight_compensation", -1);
   setAndGetNodeParameter<std::string>(color_powerline_freq_, "color_powerline_freq", "");
   setAndGetNodeParameter<bool>(enable_color_decimation_filter_, "enable_color_decimation_filter",
                                false);

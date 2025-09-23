@@ -138,6 +138,8 @@ The following devices are supported by the OrbbecSDK ROS2 Wrapper v2-main branch
 
 For optimal performance, we strongly recommend updating to the latest firmware version. This ensures that you benefit from the most recent enhancements and bug fixes.
 
+To learn how to obtain and upgrade the latest firmware, [please click here](../3_quickstarts/orbbecviewer.md).
+
 | Product List   | Minimal Firmware Version | **Launch File**             |
 |:-------------- |:------------------------ |:--------------------------- |
 | Gemini 435Le   | 1.2.04                   | gemini435_le.launch.py      |
@@ -252,8 +254,6 @@ thead th {
 </table>
 
   ---
-
-
 
 ## Support Platforms
 

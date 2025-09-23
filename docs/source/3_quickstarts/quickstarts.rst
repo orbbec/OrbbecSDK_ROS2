@@ -7,4 +7,5 @@ This chapter provides quick start guides for the SDK, allowing users to run basi
     :maxdepth: 2
 
     quickstart.md
+    orbbecviewer.md
 

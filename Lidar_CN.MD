@@ -6,9 +6,16 @@
 
 ### 1.1 先决条件
 
-在使用OrbbecSDK ROS2激光雷达驱动之前，请确保您的系统已安装以下依赖项：
+在使用OrbbecSDK ROS2激光雷达驱动之前，请确保您的系统已安装以下依赖项：## 4. IMU数据
 
-- **ROS2**: 有效的ROS2安装（Humble、Foxy或其他支持的发行版）。
+### 4.1 IMU话题
+
+启用IMU时，将发布以下话题：
+
+- **`/lidar/imu/sample`**: 统一的IMU话题，包含 `sensor_msgs/Imu`格式的同步加速度计和陀螺仪数据。
+- **`/lidar/lidar_to_imu`**: 从激光雷达坐标系到IMU坐标系的变换。
+
+### 4.2 使用IMU数据**: 有效的ROS2安装（Humble、Foxy或其他支持的发行版）。
   - 如果您需要帮助，请参考[ROS2安装指南](https://docs.ros.org/en/foxy/Installation.html)。
 
 ### 1.2 安装deb依赖项
@@ -30,7 +37,7 @@ sudo bash install_udev_rules.sh
 sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
 
-### 2. 入门指南
+### 1.4 构建包
 
 ```bash
 cd ~/ros2_ws/
@@ -38,7 +45,7 @@ cd ~/ros2_ws/
 colcon build --event-handlers  console_direct+  --cmake-args  -DCMAKE_BUILD_TYPE=Release
 ```
 
-启动激光雷达节点
+### 1.5 启动激光雷达节点
 
 * 第一个终端
 
@@ -138,8 +145,12 @@ ros2 run orbbec_camera list_camera_profile_mode_node
 - **imu_rate**: IMU的统一频率（加速度计和陀螺仪）。
 - **accel_range**: 加速度计的量程。
 - **gyro_range**: 陀螺仪的量程。
+- **linear_accel_cov**: 线性加速度协方差值，默认为 `0.0001`。
+- **angular_vel_cov**: 角速度协方差值，默认为 `0.0001`。
 
-## 点云数据详细说明
+## 3. 点云数据详细说明
+
+### 3.1 点云格式
 
 PointCloud2 (PointXYZITO) 点云格式如下：
 
@@ -152,16 +163,39 @@ uint8   tag             # 激光雷达标签
 uint32  offset_time     # 点云相对话题时间的偏移量，单位纳秒
 ```
 
-## 3. IMU数据
+### 3.2 点云聚合功能
 
-### 3.1 IMU话题
+通过 `publish_n_pkts` 参数可以开启点云聚合功能，该功能允许激光雷达在发布数据前累积指定数量的帧，然后将这些帧合并为一个更大的点云数据包进行发布。
+
+#### 功能特点：
+
+- **参数范围**: 1-12000 帧
+- **适用格式**: 仅在激光雷达格式为 `LIDAR_POINT` 或 `LIDAR_SPHERE_POINT` 时有效
+- **默认值**: 1（即不聚合，每帧单独发布）
+- **用途**: 提高点云密度，适用于需要更密集点云数据的应用场景
+
+#### 使用示例：
+
+```bash
+# 聚合10帧数据后发布
+ros2 launch orbbec_camera lidar.launch.py lidar_format:=LIDAR_POINT publish_n_pkts:=10
+
+# 聚合100帧数据后发布
+ros2 launch orbbec_camera lidar.launch.py lidar_format:=LIDAR_SPHERE_POINT publish_n_pkts:=100
+```
+
+**注意**: 增加 `publish_n_pkts` 值会提高点云密度，但同时会增加延迟和内存使用量，请根据实际应用需求进行调整。
+
+## 4. IMU数据
+
+### 4.1 IMU话题
 
 启用IMU时，将发布以下话题：
 
 - **`/lidar/imu/sample`**: 统一的IMU话题，包含 `sensor_msgs/Imu`格式的同步加速度计和陀螺仪数据。
 - **`/lidar/lidar_to_imu`**: 从激光雷达坐标系到IMU坐标系的变换。
 
-### 3.2 使用IMU数据
+### 4.2 使用IMU数据
 
 要启用IMU数据采集：
 

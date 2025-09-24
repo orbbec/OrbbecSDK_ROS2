@@ -1,6 +1,15 @@
 # OrbbecSDK ROS2 LiDAR Driver
 
-This ROS2 driver supports your use of Orbbec single-line/multi-line LiDAR. This document provides installation instructions, usage guides, and other important information to help you quickly get started using this driver.
+This ROS2 driver supports your use of Orbbec single-line/multi-line LiDAR. This document provides installation instructions## 4. IMU Data
+
+### 4.1 IMU Topics
+
+When IMU is enabled, the following topics will be published:
+
+- **`/lidar/imu/sample`**: Unified IMU topic containing synchronized accelerometer and gyroscope data in `sensor_msgs/Imu` format.
+- **`/lidar/lidar_to_imu`**: Transform from LiDAR frame to IMU frame.
+
+### 4.2 Using IMU Dataides, and other important information to help you quickly get started using this driver.
 
 ## 1. Installation
 
@@ -30,15 +39,15 @@ sudo bash install_udev_rules.sh
 sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
 
-### 2. Getting Started
+### 1.4 Build the Package
 
 ```bash
 cd ~/ros2_ws/
-# build release, Default is Debug
+# Build release version, default is Debug
 colcon build --event-handlers  console_direct+  --cmake-args  -DCMAKE_BUILD_TYPE=Release
 ```
 
-Launch the LiDAR node
+### 1.5 Launch the LiDAR Node
 
 * First terminal
 
@@ -138,30 +147,57 @@ The `lidar.launch.py` file contains default parameters for the driver. You can c
 - **imu_rate**: Unified frequency of the IMU (both accelerometer and gyroscope).
 - **accel_range**: Range of the accelerometer.
 - **gyro_range**: Range of the gyroscope.
+- **linear_accel_cov**: Linear acceleration covariance value, default is `0.0001`.
+- **angular_vel_cov**: Angular velocity covariance value, default is `0.0001`.
 
-## Point Cloud Data Detailed Description
+## 3. Point Cloud Data Details
+
+### 3.1 Point Cloud Format
 
 PointCloud2 (PointXYZITO) point cloud format is as follows:
 
 ```
-float32 x               # X axis, unit:m
-float32 y               # Y axis, unit:m
-float32 z               # Z axis, unit:m
-uint8   intensity       # lidar intensity
-uint8   tag             # lidar tag
-uint32  offset_time     # Point cloud offset time relative to topic time, in nanoseconds
+float32 x               # X axis, unit: meters
+float32 y               # Y axis, unit: meters
+float32 z               # Z axis, unit: meters
+uint8   intensity       # LiDAR intensity
+uint8   tag             # LiDAR tag
+uint32  offset_time     # Point cloud offset relative to topic time, unit nanoseconds
 ```
 
-## 3. IMU Data
+### 3.2 Point Cloud Aggregation Functionality
 
-### 3.1 IMU Topics
+The `publish_n_pkts` parameter enables point cloud aggregation functionality, which allows the LiDAR to accumulate a specified number of frames before publishing, then merge these frames into a larger point cloud data package for publishing.
+
+#### Features:
+
+- **Parameter Range**: 1-12000 frames
+- **Applicable Formats**: Only effective when lidar format is `LIDAR_POINT` or `LIDAR_SPHERE_POINT`
+- **Default Value**: 1 (no aggregation, each frame published individually)
+- **Purpose**: Improve point cloud density, suitable for applications requiring denser point cloud data
+
+#### Usage Examples:
+
+```bash
+# Aggregate 10 frames before publishing
+ros2 launch orbbec_camera lidar.launch.py lidar_format:=LIDAR_POINT publish_n_pkts:=10
+
+# Aggregate 100 frames before publishing
+ros2 launch orbbec_camera lidar.launch.py lidar_format:=LIDAR_SPHERE_POINT publish_n_pkts:=100
+```
+
+**Note**: Increasing the `publish_n_pkts` value will improve point cloud density but will also increase latency and memory usage. Please adjust according to actual application requirements.
+
+## 4. IMU Data
+
+### 4.1 IMU Topics
 
 When IMU is enabled, the following topics will be published:
 
 - **`/lidar/imu/sample`**: Unified IMU topic containing synchronized accelerometer and gyroscope data in `sensor_msgs/Imu` format.
 - **`/lidar/lidar_to_imu`**: Transform from LiDAR frame to IMU frame.
 
-### 3.2 Using IMU Data
+### 4.2 Using IMU Data
 
 To enable IMU data collection:
 

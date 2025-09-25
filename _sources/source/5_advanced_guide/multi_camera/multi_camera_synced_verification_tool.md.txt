@@ -4,6 +4,8 @@
 >
 > First, please see how to use [multi_camera_synced](./multi_camera_synced.md).
 
+You can find example usage code in the [example](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples).
+
 ## Directory Structure
 
 ```plaintext

@@ -2164,6 +2164,13 @@ void OBCameraNode::setupPipelineConfig() {
       pipeline_config_->enableStream(stream_profile_[stream_index]);
     }
   }
+  if (enable_stream_[DEPTH] && depth_registration_) {
+    auto profile = stream_profile_[COLOR]->as<ob::VideoStreamProfile>();
+    RCLCPP_INFO_STREAM(logger_, "depth_registration is enabled. "
+                                    << "Depth stream will be aligned to COLOR stream resolution:"
+                                    << " width: " << profile->getWidth() << " height: "
+                                    << profile->getHeight() << " fps: " << profile->getFps());
+  }
 
   if (frame_aggregate_mode_ == "full_frame") {
     pipeline_config_->setFrameAggregateOutputMode(OB_FRAME_AGGREGATE_OUTPUT_FULL_FRAME_REQUIRE);

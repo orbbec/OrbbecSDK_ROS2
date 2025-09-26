@@ -179,11 +179,9 @@ def generate_launch_description():
         DeclareLaunchArgument('align_mode', default_value='HW'),
         DeclareLaunchArgument('align_target_stream', default_value='COLOR'),# COLOR or DEPTH
         DeclareLaunchArgument('diagnostic_period', default_value='1.0'),
-        DeclareLaunchArgument('enable_laser', default_value='true'),
         DeclareLaunchArgument('depth_precision', default_value=''),
         DeclareLaunchArgument('device_preset', default_value='Default'),
         DeclareLaunchArgument('retry_on_usb3_detection_failure', default_value='false'),
-        DeclareLaunchArgument('laser_energy_level', default_value='-1'),
         DeclareLaunchArgument('enable_sync_host_time', default_value='true'),
         DeclareLaunchArgument('time_domain', default_value='global'),# global, device, system
         DeclareLaunchArgument('enable_color_undistortion', default_value='false'),

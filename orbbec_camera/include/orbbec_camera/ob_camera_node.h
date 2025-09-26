@@ -792,13 +792,13 @@ class OBCameraNode {
   int hdr_index1_laser_control_ = 1;
   int hdr_index1_depth_exposure_ = 1;
   int hdr_index1_depth_gain_ = 16;
-  int hdr_index1_ir_brightness_ = 20;
-  int hdr_index1_ir_ae_max_exposure_ = 2000;
+  int hdr_index1_ir_brightness_ = 30;
+  int hdr_index1_ir_ae_max_exposure_ = 30458;
   int hdr_index0_laser_control_ = 1;
   int hdr_index0_depth_exposure_ = 7500;
   int hdr_index0_depth_gain_ = 16;
-  int hdr_index0_ir_brightness_ = 60;
-  int hdr_index0_ir_ae_max_exposure_ = 10000;
+  int hdr_index0_ir_brightness_ = 90;
+  int hdr_index0_ir_ae_max_exposure_ = 30458;
 
   int laser_index1_laser_control_ = 0;
   int laser_index1_depth_exposure_ = 3000;

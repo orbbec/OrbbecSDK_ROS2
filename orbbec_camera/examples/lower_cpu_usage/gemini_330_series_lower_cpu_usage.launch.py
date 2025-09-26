@@ -186,13 +186,13 @@ def generate_launch_description():
         DeclareLaunchArgument('hdr_index1_laser_control', default_value='1'),#interleave_hdr_param
         DeclareLaunchArgument('hdr_index1_depth_exposure', default_value='1'),
         DeclareLaunchArgument('hdr_index1_depth_gain', default_value='16'),
-        DeclareLaunchArgument('hdr_index1_ir_brightness', default_value='20'),
-        DeclareLaunchArgument('hdr_index1_ir_ae_max_exposure', default_value='2000'),
+        DeclareLaunchArgument('hdr_index1_ir_brightness', default_value='30'),
+        DeclareLaunchArgument('hdr_index1_ir_ae_max_exposure', default_value='30458'),
         DeclareLaunchArgument('hdr_index0_laser_control', default_value='1'),
         DeclareLaunchArgument('hdr_index0_depth_exposure', default_value='7500'),
         DeclareLaunchArgument('hdr_index0_depth_gain', default_value='16'),
-        DeclareLaunchArgument('hdr_index0_ir_brightness', default_value='60'),
-        DeclareLaunchArgument('hdr_index0_ir_ae_max_exposure', default_value='10000'),
+        DeclareLaunchArgument('hdr_index0_ir_brightness', default_value='90'),
+        DeclareLaunchArgument('hdr_index0_ir_ae_max_exposure', default_value='30458'),
 
         DeclareLaunchArgument('laser_index1_laser_control', default_value='0'),#interleave_laser_param
         DeclareLaunchArgument('laser_index1_depth_exposure', default_value='3000'),

@@ -1921,15 +1921,15 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(hdr_index1_laser_control_, "hdr_index1_laser_control", 1);
   setAndGetNodeParameter<int>(hdr_index1_depth_exposure_, "hdr_index1_depth_exposure", 1);
   setAndGetNodeParameter<int>(hdr_index1_depth_gain_, "hdr_index1_depth_gain", 16);
-  setAndGetNodeParameter<int>(hdr_index1_ir_brightness_, "hdr_index1_ir_brightness", 20);
+  setAndGetNodeParameter<int>(hdr_index1_ir_brightness_, "hdr_index1_ir_brightness", 30);
   setAndGetNodeParameter<int>(hdr_index1_ir_ae_max_exposure_, "hdr_index1_ir_ae_max_exposure",
-                              2000);
+                              30458);
   setAndGetNodeParameter<int>(hdr_index0_laser_control_, "hdr_index0_laser_control", 1);
   setAndGetNodeParameter<int>(hdr_index0_depth_exposure_, "hdr_index0_depth_exposure", 7500);
   setAndGetNodeParameter<int>(hdr_index0_depth_gain_, "hdr_index0_depth_gain", 16);
-  setAndGetNodeParameter<int>(hdr_index0_ir_brightness_, "hdr_index0_ir_brightness", 60);
+  setAndGetNodeParameter<int>(hdr_index0_ir_brightness_, "hdr_index0_ir_brightness", 90);
   setAndGetNodeParameter<int>(hdr_index0_ir_ae_max_exposure_, "hdr_index0_ir_ae_max_exposure",
-                              10000);
+                              30458);
 
   setAndGetNodeParameter<int>(laser_index1_laser_control_, "laser_index1_laser_control", 0);
   setAndGetNodeParameter<int>(laser_index1_depth_exposure_, "laser_index1_depth_exposure", 3000);

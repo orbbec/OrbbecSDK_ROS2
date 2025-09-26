@@ -1,4 +1,4 @@
-### ROS2(Robot) vs Optical(Camera) Coordination Systems
+### ROS2 Robot vs Camera Optical Coordination Systems
 
 * Point Of View:
   * Imagine we are standing behind of the camera, and looking forward.

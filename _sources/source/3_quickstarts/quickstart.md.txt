@@ -1,4 +1,4 @@
-## QuickStarts
+## ROS Package QuickStarts
 
 ### Introduction
 
@@ -89,4 +89,3 @@ ros2 service call /camera/get_device_info orbbec_camera_msgs/srv/GetDeviceInfo '
 ```bash
 ros2 bag record /camera/color/image_raw /camera/depth/image_raw
 ```
-

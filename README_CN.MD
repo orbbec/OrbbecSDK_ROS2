@@ -90,7 +90,7 @@ OrbbecSDK ROS2 Wrapper 提供 Orbbec 相机与 ROS 2 环境的无缝集成，支
     <tr>
       <td>Femto Mega I</td>
       <td>全面维护</td>
-      <td>即将支持</td>
+      <td>推荐用于新设计</td>
     </tr>
     <tr>
       <td rowspan="3" style="text-align: center; font-weight: bold;">Astra</td>

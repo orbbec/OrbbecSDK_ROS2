@@ -80,6 +80,7 @@ def generate_launch_description():
         DeclareLaunchArgument("laser_energy_level", default_value="-1"),
         DeclareLaunchArgument("enable_heartbeat", default_value="false"),
         DeclareLaunchArgument("time_domain", default_value="device"),
+        DeclareLaunchArgument('device_preset', default_value='Default'),
     ]
 
     # Node configuration

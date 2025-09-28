@@ -405,21 +405,6 @@ void OBCameraNode::setAutoExposureCallback(
         response->message = "NOT a video stream";
         return;
     }
-    auto range = device_->getIntPropertyRange(prop_id);
-    if (range.min > range.max) {
-      response->success = false;
-      response->message = "Property is not supported!";
-      RCLCPP_WARN_STREAM(logger_, "Property " << prop_id << " is not supported (min > max)");
-      return;
-    }
-    std::cout << range.min << " " << range.max << std::endl;
-    std::cout << request->data << std::endl;
-    if (request->data < range.min || request->data > range.max) {
-      response->success = false;
-      RCLCPP_INFO_STREAM(logger_, "set auto exposure value out of range");
-      response->message = "value out of range";
-      return;
-    }
     device_->setIntProperty(prop_id, request->data);
     response->success = true;
   } catch (const ob::Error& e) {

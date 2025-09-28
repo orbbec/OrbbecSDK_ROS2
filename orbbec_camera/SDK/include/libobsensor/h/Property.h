@@ -687,6 +687,12 @@ typedef enum {
     OB_PROP_COLOR_FOCUS_INT = 2038,
 
     /**
+     * @brief Depth camera priority
+     *
+     */
+    OB_PROP_DEPTH_AUTO_EXPOSURE_PRIORITY_INT = 2052,
+
+    /**
      * @brief Software disparity to depth
      */
     OB_PROP_SDK_DISPARITY_TO_DEPTH_BOOL = 3004,

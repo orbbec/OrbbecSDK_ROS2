@@ -972,7 +972,7 @@ void OBCameraNode::stopStreams() {
   try {
     pipeline_->stop();
   } catch (const ob::Error &e) {
-    RCLCPP_ERROR_STREAM(logger_, "Failed to stop pipeline: " << e.getMessage());
+    RCLCPP_WARN_STREAM(logger_, "Failed to stop pipeline: " << e.getMessage());
   } catch (...) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to stop pipeline");
   }

@@ -275,9 +275,17 @@ void OBCameraNodeDriver::rebootDeviceCallback(
     return;
   }
   RCLCPP_INFO(logger_, "Reboot device");
-  ob_camera_node_->rebootDevice();
-  device_connected_ = false;
-  device_ = nullptr;
+  try {
+    ob_camera_node_->rebootDevice();
+    device_connected_ = false;
+    device_ = nullptr;
+  } catch (const ob::Error &e) {
+    RCLCPP_WARN(logger_, "Failed to reboot device: %s", e.getMessage());
+  } catch (const std::exception &e) {
+    RCLCPP_ERROR(logger_, "Exception during reboot: %s", e.what());
+  } catch (...) {
+    RCLCPP_ERROR(logger_, "Unknown error occurred during reboot");
+  }
 }
 
 std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDevice(
@@ -503,7 +511,7 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
   std::shared_ptr<int> lock_holder(nullptr,
                                    [this](int *) { pthread_mutex_unlock(orb_device_lock_); });
 
-  //check device connected flag again after get lock
+  // check device connected flag again after get lock
   if (device_connected_) {
     return;
   }

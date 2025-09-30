@@ -2,8 +2,8 @@
 Changelog for package orbbec_camera_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.5.14 (2025-09-30)
+-------------------
 * add RGBD.msg
 * Contributors: Joe Dong
 

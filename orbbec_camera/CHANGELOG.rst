@@ -2,8 +2,8 @@
 Changelog for package orbbec_camera
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.5.14 (2025-09-30)
+-------------------
 * Bump version to 1.5.14
 * Update OrbbecSDK (v1.10.9 → v1.10.27)
 * Add new params (color/IR settings, rotations, filters, etc.)

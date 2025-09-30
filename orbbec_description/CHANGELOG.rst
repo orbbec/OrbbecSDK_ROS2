@@ -2,8 +2,8 @@
 Changelog for package orbbec_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.5.14 (2025-09-30)
+-------------------
 * chore: Add rviz config
 * Merge pull request #54 from Danilrivero/main
   Implement the femto_bolt.urdf.xacro description

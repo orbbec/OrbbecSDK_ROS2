@@ -3,9 +3,24 @@
 #include <orbbec_camera/ob_camera_node_driver.h>
 #include <orbbec_camera/utils.h>
 #include "orbbec_camera_msgs/msg/metadata.hpp"
+#if __has_include(<message_filters/subscriber.hpp>)
+#include <message_filters/subscriber.hpp>
+#else
 #include <message_filters/subscriber.h>
+#endif
+
+#if __has_include(<message_filters/sync_policies/approximate_time.hpp>)
+#include <message_filters/sync_policies/approximate_time.hpp>
+#else
 #include <message_filters/sync_policies/approximate_time.h>
+#endif
+
+#if __has_include(<message_filters/synchronizer.hpp>)
+#include <message_filters/synchronizer.hpp>
+#else
 #include <message_filters/synchronizer.h>
+#endif
+
 #include <filesystem>
 
 namespace orbbec_camera {

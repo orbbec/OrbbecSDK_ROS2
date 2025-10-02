@@ -14,10 +14,30 @@
 * limitations under the License.
 *******************************************************************************/
 #pragma once
+#if __has_include(<message_filters/subscriber.hpp>)
+#include <message_filters/subscriber.hpp>
+#else
 #include <message_filters/subscriber.h>
+#endif
+
+#if __has_include(<message_filters/sync_policies/approximate_time.hpp>)
+#include <message_filters/sync_policies/approximate_time.hpp>
+#else
 #include <message_filters/sync_policies/approximate_time.h>
+#endif
+
+#if __has_include(<message_filters/synchronizer.hpp>)
+#include <message_filters/synchronizer.hpp>
+#else
 #include <message_filters/synchronizer.h>
+#endif
+
+#if __has_include(<message_filters/time_synchronizer.hpp>)
+#include <message_filters/time_synchronizer.hpp>
+#else
 #include <message_filters/time_synchronizer.h>
+#endif
+
 #include <sensor_msgs/msg/image.hpp>
 #include <rclcpp/rclcpp.hpp>
 

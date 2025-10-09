@@ -188,7 +188,6 @@ void OBCameraNodeDriver::init() {
   // Force IP
   force_ip_enable_ = declare_parameter<bool>("force_ip_enable", false);
   force_ip_mac_ = declare_parameter<std::string>("force_ip_mac", "");
-  force_ip_dhcp_ = declare_parameter<bool>("force_ip_dhcp", false);
   force_ip_address_ = declare_parameter<std::string>("force_ip_address", "192.168.1.10");
   force_ip_subnet_mask_ = declare_parameter<std::string>("force_ip_subnet_mask", "255.255.255.0");
   force_ip_gateway_ = declare_parameter<std::string>("force_ip_gateway", "192.168.1.1");

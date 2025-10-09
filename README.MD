@@ -91,7 +91,7 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
     <tr>
       <td>Femto Mega I</td>
       <td>full maintenance</td>
-      <td>to be supported</td>
+      <td>recommended for new designs</td>
     </tr>
     <tr>
       <td rowspan="3" style="text-align: center; font-weight: bold;">Astra</td>

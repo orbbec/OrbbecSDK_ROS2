@@ -93,7 +93,7 @@ OrbbecSDK ROS2 封装包为 Orbbec 相机与 ROS 2 环境之间提供了无缝�
     <tr>
       <td>Femto Mega I</td>
       <td>全面维护</td>
-      <td>即将支持</td>
+      <td>推荐用于新设计</td>
     </tr>
     <tr>
       <td rowspan="3" style="text-align: center; font-weight: bold;">Astra</td>
@@ -132,11 +132,11 @@ OrbbecSDK ROS2 封装包为 Orbbec 相机与 ROS 2 环境之间提供了无缝�
 
 ## 目录
 
-- [OrbbecSDK ROS2 Wrapper v2](#orbbecsdk-ros2-wrapper-v2)
+- [OrbbecSDK ROS2 Wrapper](#orbbecsdk-ros2-wrapper)
   - [目录](#目录)
   - [安装说明](#安装说明)
   - [入门](#入门)
-  - [高效的进程内通信](#高效的进程内通信)
+  - [高效的进程内通信:](#高效的进程内通信)
     - [例子](#例子)
       - [手动将多个组件加载到同一进程中](#手动将多个组件加载到同一进程中)
       - [使用launch文件启动](#使用launch文件启动)

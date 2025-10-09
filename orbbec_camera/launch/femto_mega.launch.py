@@ -115,7 +115,7 @@ def generate_launch_description():
         DeclareLaunchArgument("laser_energy_level", default_value="-1"),
         DeclareLaunchArgument("enable_heartbeat", default_value="false"),
         DeclareLaunchArgument("time_domain", default_value="global"),
-        DeclareLaunchArgument('device_preset', default_value='Default'),
+        DeclareLaunchArgument('device_preset', default_value='Custom'),
 
         # Force IP parameters
         DeclareLaunchArgument("force_ip_enable", default_value="false"),  # Whether to enable Force IP function

@@ -1026,12 +1026,6 @@ bool OBCameraNodeDriver::applyForceIpConfig() {
       }
       return i == 4;
     };
-
-    auto ipArrayToUint = [&](const uint8_t ip[4]) -> uint32_t {
-      return (static_cast<uint32_t>(ip[0]) << 24) | (static_cast<uint32_t>(ip[1]) << 16) |
-             (static_cast<uint32_t>(ip[2]) << 8) | (static_cast<uint32_t>(ip[3]));
-    };
-
     uint8_t ip[4], mask[4], gw[4];
     if (!strToIp(force_ip_address_, ip)) {
       RCLCPP_ERROR(logger_, "[ForceIP] Invalid IP: %s", force_ip_address_.c_str());
@@ -1043,34 +1037,6 @@ bool OBCameraNodeDriver::applyForceIpConfig() {
     }
     if (!strToIp(force_ip_gateway_, gw)) {
       RCLCPP_ERROR(logger_, "[ForceIP] Invalid Gateway: %s", force_ip_gateway_.c_str());
-      return false;
-    }
-    uint32_t ipVal = ipArrayToUint(ip);
-    uint32_t maskVal = ipArrayToUint(mask);
-    uint32_t gwVal = ipArrayToUint(gw);
-    if (ipVal == 0 || ipVal == 0xFFFFFFFF) {
-      RCLCPP_ERROR(logger_, "[ForceIP] Illegal IP: %s", force_ip_address_.c_str());
-      return false;
-    }
-    if (maskVal == 0 || maskVal == 0xFFFFFFFF) {
-      RCLCPP_ERROR(logger_, "[ForceIP] Illegal Mask (all 0 or all 1): %s",
-                   force_ip_subnet_mask_.c_str());
-      return false;
-    }
-    uint32_t inverted = ~maskVal + 1;
-    if ((inverted & (inverted - 1)) != 0) {
-      RCLCPP_ERROR(logger_, "[ForceIP] Illegal Mask (non-contiguous bits): %s",
-                   force_ip_subnet_mask_.c_str());
-      return false;
-    }
-    if ((ipVal & ~maskVal) == 0 || (ipVal & ~maskVal) == ~maskVal) {
-      RCLCPP_ERROR(logger_, "[ForceIP] Illegal host IP (network/broadcast addr): %s",
-                   force_ip_address_.c_str());
-      return false;
-    }
-    if ((ipVal & maskVal) != (gwVal & maskVal)) {
-      RCLCPP_ERROR(logger_, "[ForceIP] Gateway %s not in same subnet as IP %s",
-                   force_ip_gateway_.c_str(), force_ip_address_.c_str());
       return false;
     }
     std::memcpy(config.address, ip, 4);

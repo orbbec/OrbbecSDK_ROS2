@@ -111,6 +111,7 @@ def generate_launch_description():
         DeclareLaunchArgument("ordered_pc", default_value="false"),
         DeclareLaunchArgument("enable_depth_scale", default_value="true"),
         DeclareLaunchArgument("align_mode", default_value="HW"),
+        DeclareLaunchArgument('align_target_stream', default_value='COLOR'),# COLOR or DEPTH
         DeclareLaunchArgument("laser_energy_level", default_value="-1"),
         DeclareLaunchArgument("enable_heartbeat", default_value="false"),
         DeclareLaunchArgument("time_domain", default_value="global"),

@@ -247,17 +247,6 @@ def generate_launch_description():
         DeclareLaunchArgument('offset_index0', default_value='-1'),
         DeclareLaunchArgument('offset_index1', default_value='-1'),
         DeclareLaunchArgument('frame_aggregate_mode', default_value='ANY'), # full_frame, color_frame, ANY or disable
-
-        DeclareLaunchArgument('laser_index1_laser_control', default_value='0'),#interleave_laser_param
-        DeclareLaunchArgument('laser_index1_depth_exposure', default_value='3000'),
-        DeclareLaunchArgument('laser_index1_depth_gain', default_value='16'),
-        DeclareLaunchArgument('laser_index1_ir_brightness', default_value='60'),
-        DeclareLaunchArgument('laser_index1_ir_ae_max_exposure', default_value='17000'),
-        DeclareLaunchArgument('laser_index0_laser_control', default_value='1'),
-        DeclareLaunchArgument('laser_index0_depth_exposure', default_value='3000'),
-        DeclareLaunchArgument('laser_index0_depth_gain', default_value='16'),
-        DeclareLaunchArgument('laser_index0_ir_brightness', default_value='60'),
-        DeclareLaunchArgument('laser_index0_ir_ae_max_exposure', default_value='30000'),
         DeclareLaunchArgument('show_fps_enable', default_value='false'),
         # Force IP parameters
         DeclareLaunchArgument("force_ip_enable", default_value="false"),  # Whether to enable Force IP function

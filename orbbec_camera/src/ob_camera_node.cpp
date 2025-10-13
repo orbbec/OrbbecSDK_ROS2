@@ -834,6 +834,22 @@ void OBCameraNode::setupDevices() {
     TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_SDK_GYRO_FRAME_TRANSFORMED_BOOL,
                         enable_gyro_data_correction_);
   }
+  if (isGemini335PID(pid) &&
+      (sync_mode_ == OB_MULTI_DEVICE_SYNC_MODE_SOFTWARE_TRIGGERING ||
+       sync_mode_ == OB_MULTI_DEVICE_SYNC_MODE_HARDWARE_TRIGGERING) &&
+      device_->isPropertySupported(OB_PROP_INTRA_CAMERA_SYNC_REFERENCE_INT, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_,
+                       "Setting intra camera sync reference to " << intra_camera_sync_reference_);
+    if (intra_camera_sync_reference_ == "Start") {
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_INTRA_CAMERA_SYNC_REFERENCE_INT, 0);
+    } else if (intra_camera_sync_reference_ == "Middle") {
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_INTRA_CAMERA_SYNC_REFERENCE_INT, 1);
+    } else if (intra_camera_sync_reference_ == "End") {
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_INTRA_CAMERA_SYNC_REFERENCE_INT, 2);
+    } else {
+      RCLCPP_ERROR(logger_, "intra camera sync reference does not support this setting");
+    }
+  }
 }
 void OBCameraNode::setupColorPostProcessFilter() {
   auto color_sensor = device_->getSensor(OB_SENSOR_COLOR);
@@ -1953,6 +1969,8 @@ void OBCameraNode::getParameters() {
 
   setAndGetNodeParameter<bool>(show_fps_enable_, "show_fps_enable", false);
   setAndGetNodeParameter<bool>(enable_publish_extrinsic_, "enable_publish_extrinsic", false);
+  setAndGetNodeParameter<std::string>(intra_camera_sync_reference_, "intra_camera_sync_reference",
+                                      "Middle");
 
   RCLCPP_INFO_STREAM(logger_, "current time domain: " << time_domain_);
   RCLCPP_INFO_STREAM(logger_, "hdr_index1_laser_control_ "

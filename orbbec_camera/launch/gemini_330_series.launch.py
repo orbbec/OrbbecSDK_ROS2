@@ -306,6 +306,8 @@ def generate_launch_description():
         DeclareLaunchArgument("force_ip_subnet_mask", default_value="255.255.255.0"),  # Subnet mask used for static IP
         DeclareLaunchArgument("force_ip_gateway", default_value="192.168.1.1"),  # Gateway address used for static IP
 
+        DeclareLaunchArgument('intra_camera_sync_reference', default_value='Middle'),#Start, Middle or End
+
     ]
 
     def get_params(context, args):

@@ -2245,7 +2245,9 @@ void OBCameraNode::setupPublishers() {
     camera_info_publishers_[stream_index] = node_->create_publisher<CameraInfo>(
         topic, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(camera_info_qos_profile),
                            camera_info_qos_profile));
-    if (isGemini335PID(pid)) {
+    if (isGemini335PID(pid) ||
+        (isGemini435LePID(pid) && stream_index == COLOR &&
+         (format_[stream_index] == OB_FORMAT_MJPG || format_[stream_index] == OB_FORMAT_UNKNOWN))) {
       metadata_publishers_[stream_index] =
           node_->create_publisher<orbbec_camera_msgs::msg::Metadata>(
               name + "/metadata",
@@ -3735,6 +3737,8 @@ bool OBCameraNode::isGemini335PID(uint32_t pid) {
          pid == GEMINI_336LE_PID || pid == CUSTOM_ADVANTECH_GEMINI_336_PID ||
          pid == CUSTOM_ADVANTECH_GEMINI_336L_PID || pid == GEMINI_338_PID;
 }
+
+bool OBCameraNode::isGemini435LePID(uint32_t pid) { return pid == GEMINI_435Le_PID; }
 
 orbbec_camera_msgs::msg::IMUInfo OBCameraNode::createIMUInfo(
     const stream_index_pair &stream_index) {

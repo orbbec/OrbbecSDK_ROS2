@@ -455,6 +455,8 @@ class OBCameraNode {
 
   static bool isGemini335PID(uint32_t pid);
 
+  static bool isGemini435LePID(uint32_t pid);
+
   void setupDepthPostProcessFilter();
   void setupColorPostProcessFilter();
   void setupRightIrPostProcessFilter();

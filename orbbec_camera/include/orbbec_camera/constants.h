@@ -134,5 +134,6 @@ const int32_t CUSTOM_ADVANTECH_GEMINI_336_PID = 0x0816;   // Custom Advantech Ge
 const int32_t CUSTOM_ADVANTECH_GEMINI_336L_PID = 0x0817;  // Custom Advantech Gemini 336L
 const int32_t DABAI_MAX_PID = 0x069a;                     // dabai max
 const int32_t GEMINI_338_PID = 0x0818;                    // Gemini 338
+const uint16_t GEMINI_435Le_PID = 0x815;                  // Gemini 435Le
 
 }  // namespace orbbec_camera

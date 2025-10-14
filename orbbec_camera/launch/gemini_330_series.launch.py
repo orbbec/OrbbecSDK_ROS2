@@ -302,7 +302,7 @@ def generate_launch_description():
         # Force IP parameters
         DeclareLaunchArgument("force_ip_enable", default_value="false"),  # Whether to enable Force IP function
         DeclareLaunchArgument("force_ip_mac", default_value=""),  # If multiple cameras are connected, specify target MAC (e.g. "54:14:FD:06:07:DA")
-        DeclareLaunchArgument("force_ip_address", default_value="192.168.1.10"),  # Static IP address to assign when DHCP is disabled
+        DeclareLaunchArgument("force_ip_address", default_value="192.168.1.10"),  # Static IP address to assign
         DeclareLaunchArgument("force_ip_subnet_mask", default_value="255.255.255.0"),  # Subnet mask used for static IP
         DeclareLaunchArgument("force_ip_gateway", default_value="192.168.1.1"),  # Gateway address used for static IP
 

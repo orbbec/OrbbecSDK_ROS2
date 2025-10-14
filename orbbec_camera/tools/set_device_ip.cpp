@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
   auto node = std::make_shared<rclcpp::Node>("set_device_ip");
   auto logger = node->get_logger();
 
-  std::string device_ip_str = node->declare_parameter<std::string>("device_ip", "192.168.1.10");
+  std::string device_ip_str = node->declare_parameter<std::string>("old_ip", "192.168.1.10");
   int port = node->declare_parameter<int>("port", 8090);
   bool dhcp = node->declare_parameter<bool>("dhcp", false);
   std::string new_ip_str = node->declare_parameter<std::string>("new_ip", "192.168.1.200");

@@ -137,7 +137,7 @@ The following are the launch parameters available:
     *   Target device MAC address when multiple cameras are connected (e.g., `"54:14:FD:06:07:DA"`). You can use the `list_devices_node` to find the MAC of each device. **Default:** `""`
 
 *   **`force_ip_address`** 
-    *   Static IP address to assign when DHCP is disabled. **Default:** `192.168.1.10`
+    *   Static IP address to assign. **Default:** `192.168.1.10`
 
 *   **`force_ip_subnet_mask`**
     *   Subnet mask for the static IP. **Default:** `255.255.255.0`

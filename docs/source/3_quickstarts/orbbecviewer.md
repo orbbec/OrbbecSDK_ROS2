@@ -1,5 +1,7 @@
 # OrbbecViewer QuickStarts
 
+> **Note:** This ROS package aligns its parameters and functionality with **Orbbec Viewer**; for any questions regarding parameter usage or device model support, please refer to Orbbec Viewer.
+
 ## Download
 
 **Repository link：**[OrbbecViewer Download](https://github.com/orbbec/OrbbecSDK_v2/releases)

@@ -8,53 +8,29 @@ The following are the launch parameters available:
 
 *   **`camera_name`**
     *   Start the node namespace.
-
-*   **`depth_registration`**
-    *   Enable alignment of the depth frame to the color frame. This field is required when the `enable_colored_point_cloud` is set to `true`.
-
 *   **`serial_number`**
     *   The serial number of the camera. This is required when multiple cameras are used.
-
 *   **`usb_port`**
     *   The USB port of the camera. This is required when multiple cameras are used.
-
 *   **`device_num`**
     *   The number of devices. This must be filled in if multiple cameras are required.
-
 *   **`[color|depth|left_ir|right_ir|ir]_[width|height|fps|format]`**
     *   The resolution and frame rate of the sensor stream.
-
 *   **`[color|depth|left_ir|right_ir|ir]_rotation`**
     *   Set stream image rotation.
     *   The possible values are `0`, `90`, `180`, `270`.
-
 *   **`[color|depth|left_ir|right_ir|ir]_flip`**
     *   Enable the stream image flip.
-
 *   **`[color|depth|left_ir|right_ir|ir]_mirror`**
     *   Enable the stream image mirror.
-
 *   **`enable_point_cloud`**
     *   Enable the point cloud.
-
 *   **`enable_colored_point_cloud`**
     *   Enable the RGB point cloud.
-
 *   **`cloud_frame_id`**
     *   Modify the `frame_id` name within the ros message.
-
 *   **`ordered_pc`**
     *   Enable filtering of invalid point clouds.
-
-*   **`align_mode`**
-    *   The alignment mode to be used. Options are `HW` for hardware alignment and `SW` for software alignment.
-
-*   **`align_target_stream`**
-    *   Set align target stream mode.
-    *   The possible values are `COLOR`, `DEPTH`.
-    *   `COLOR`: Align depth to color.
-    *   `DEPTH`: Align color to depth.
-
 *   **`point_cloud_qos`, `[stream]_qos`, `[stream]_camera_info_qos`**
     *   ROS 2 Message Quality of Service (QoS) settings. The possible values are `SYSTEM_DEFAULT`, `DEFAULT`, `PARAMETER_EVENTS`, `SERVICES_DEFAULT`, `PARAMETERS`, `SENSOR_DATA` and are case-insensitive. These correspond to `rmw_qos_profile_system_default`, `rmw_qos_profile_default`, `rmw_qos_profile_parameter_events`, `rmw_qos_profile_services_default`, `rmw_qos_profile_parameters`, and `SENSOR_DATA`, respectively.
 
@@ -78,16 +54,20 @@ The following are the launch parameters available:
 *   **`color_brightness`**, **`color_sharpness`**, **`color_gamma`**, **`color_saturation`**, **`color_contrast`**, **`color_hue`**
     *   Set the Color brightness, sharpness, gamma, saturation, contrast, and hue.
 *   **`color_backlight_compensation`**
-    *    Enables the color camera’s backlight compensation feature. Range: `0–6`, Default: `3`.
+    *    Enables the color camera’s backlight compensation feature. **Range**: `0–6`, **Default**: `3`.
 *   **`color_powerline_freq`**
     *   Set the power line freq. The possible values are `disable`, `50hz`, `60hz`, `auto`.
 *   **`enable_color_decimation_filter`** / **`color_decimation_filter_scale`**
     *   Enable the Color decimation filter and set its scale.
 *   **`color_ae_roi_[left|right|top|bottom]`**
     *   Set Color auto exposure ROI.
+*   **`color_denoising_level`**
+    *   Enables the ISP denoising feature for Gemini 330 series devices. **Range:** `0–8`, **Default:** `0` (auto).
+
 
 #### Depth Stream
 *   **`enable_depth_auto_exposure_priority`**
+    
     *   Enable the Depth auto exposure priority.
 *   **`mean_intensity_set_point`**
     *   Set the target mean intensity of the Depth image. For example: `mean_intensity_set_point:=100`.
@@ -150,6 +130,21 @@ The following are the launch parameters available:
     *   The default value is `Default`. Only the G330 series is supported. For more information, refer to the [G330 documentation](https://www.orbbec.com/docs/g330-use-depth-presets/). The value should be one of the preset names listed [in the table](../5_advanced_guide/configuration/predefined_presets.md).
 *   **`enable_gmsl_trigger`** / **`gmsl_trigger_fps`**
     *   Enable the gmsl trigger out signal / set gmsl trigger fps. Used for [gmsl camera](../5_advanced_guide/multi_camera/gmsl_camera.md).
+*   **`force_ip_enable`** 
+    *   Enable the Force IP function. **Default:** `false`
+
+*   **`force_ip_mac`**
+    *   Target device MAC address when multiple cameras are connected (e.g., `"54:14:FD:06:07:DA"`). You can use the `list_devices_node` to find the MAC of each device. **Default:** `""`
+
+*   **`force_ip_address`** 
+    *   Static IP address to assign when DHCP is disabled. **Default:** `192.168.1.10`
+
+*   **`force_ip_subnet_mask`**
+    *   Subnet mask for the static IP. **Default:** `255.255.255.0`
+
+*   **`force_ip_gateway`**
+    *   Gateway address for the static IP. **Default:** `192.168.1.1`
+
 
 #### Disparity
 *   **`disparity_to_depth_mode`**
@@ -165,6 +160,20 @@ The following are the launch parameters available:
 *   **`[hdr|laser]_index[0|1]_[...]`**
     *   In interleave frame mode, set the 0th and 1st frame parameters of hdr or laser interleaving frames.
 *   *All interleave parameters are used for [interleave ae mode](../5_advanced_guide/configuration/interleave_ae_mode.md).*
+
+#### Intra-Camera Synchronization
+
+- **`depth_registration`**
+  *   Enable alignment of the depth frame to the color frame. This field is required when the `enable_colored_point_cloud` is set to `true`.
+- **`align_mode`**
+  *   The alignment mode to be used. Options are `HW` for hardware alignment and `SW` for software alignment.
+- **`align_target_stream`**
+  *   Set align target stream mode.
+  *   The possible values are `COLOR`, `DEPTH`.
+  *   `COLOR`: Align depth to color.
+  *   `DEPTH`: Align color to depth.
+- **`intra_camera_sync_reference`**
+  - Sets the reference point for intra-camera synchronization. Applicable for Gemini 330 series devices when `sync_mode` is set to **software** or **hardware trigger** mode. **Options:** `Start`, `Middle`, `End`. **Default:** `Middle`
 
 ### Basic & General Parameters
 
@@ -196,6 +205,7 @@ The following are the launch parameters available:
 *   **`time_domain`**
     *   Select timestamp type: `device`, `global`, and `system`.
 *   **`time_sync_period`**
+    
     *   Interval (in seconds) for synchronizing the camera time with the host system.
     > **Note**: This parameter only needs to be set when **`enable_sync_host_time = true`** and **`time_domain = device`**.
 *   **`enable_ptp_config`**

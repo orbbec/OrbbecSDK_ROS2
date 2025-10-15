@@ -52,7 +52,7 @@ The **`set_device_ip`** executable allows you to configure the IP settings of a 
 
 **Example Usage**
 
-```
+```bash
 ros2 run orbbec_camera set_device_ip --ros-args \
 -p old_ip:=192.168.1.10 \
 -p dhcp:=false \
@@ -87,8 +87,15 @@ The **Force IP** feature allows you to assign a **static IP address** to a netwo
 
 - **Enable Force IP for a specific device:**
 
-```
-ros2 launch orbbec_camera gemini_330_series.launch.py force_ip_enable:=true force_ip_mac:=54:14:FD:06:07:DA force_ip_address:=192.168.1.50 force_ip_subnet_mask:=255.255.255.0 force_ip_gateway:=192.168.1.1 net_device_ip:=192.168.1.50 net_device_port:=8090
+```bash
+ros2 launch orbbec_camera gemini_330_series.launch.py \
+force_ip_enable:=true \
+force_ip_mac:=54:14:FD:06:07:DA \
+force_ip_address:=192.168.1.50 \
+force_ip_subnet_mask:=255.255.255.0 \
+force_ip_gateway:=192.168.1.1 \
+net_device_ip:=192.168.1.50 \
+net_device_port:=8090
 ```
 
 > Tip: Make sure the camera is connected and its MAC address is correct before enabling Force IP. Use `list_devices_node` to check the MAC address of all connected cameras.

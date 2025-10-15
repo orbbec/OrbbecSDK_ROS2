@@ -4,7 +4,7 @@
 
 You can find example usage code in the [example](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples).
 
-## Femto Mega & Gemini 435Le
+## Femto Mega & Gemini 435Le & Gemini 335Le
 
 **Parameter Introduction**
 
@@ -18,7 +18,7 @@ If you do not want to automatically enumerate network devices,you can set `enume
 
 **Single Net camera**
 
-> If you need to run Gemini 435Le, you only need to replace [femto_mega.launch.py ](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/launch/femto_mega.launch.py)in the run command with [gemini435_le.launch.py](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/launch/gemini435_le.launch.py)
+> If you need to run Gemini 435Le/Gemini 335Le, you only need to replace [femto_mega.launch.py ](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/launch/femto_mega.launch.py)in the run command with [gemini435_le.launch.py](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/launch/gemini435_le.launch.py)/[gemini_330_series.launch.py](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/launch/gemini_330_series.launch.py)
 
 For [femto_mega.launch.py](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/launch/femto_mega.launch.py) as an example:
 
@@ -36,30 +36,12 @@ Note: `net_device_ip` needs to be changed to the IP address of the device, here 
 ros2 launch orbbec_camera femto_mega.launch.py enumerate_net_device:=false net_device_ip:=192.168.1.10 net_device_port:=8090
 ```
 
-## Gemini 335Le
+**Multi Net camera**
 
-Network device settings: `enumerate_net_device` must be set to true, set `net_device_ip` to the IP address of the device, and set `net_device_port` to the default value of 8090.
-
-* `enumerate_net_device` : Enable automatically enumerate network devices.
-* `net_device_ip` : Setting net device's IP address.
-* `net_device_port` : Setting net device's port.Usually, you can set it to 8090.
-
-**Single Net camera**
-
-For [gemini_330_series.launch.py](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/launch/gemini_330_series.launch.py) as an example:
-
-- **automatically enumerate network devices:**
+For [multi_net_camera.launch.py](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/examples/net_camera/multi_net_camera.launch.py) as an example:
 
 ```bash
-ros2 launch orbbec_camera gemini_330_series.launch.py enumerate_net_device:=true
-```
-
-- **Specify IP address to start the device:**
-
-Note: `net_device_ip` needs to be changed to the IP address of the device, here it is 192.168.1.10
-
-```bash
-ros2 launch orbbec_camera gemini_330_series.launch.py enumerate_net_device:=true net_device_ip:=192.168.1.10 net_device_port:=8090
+ros2 launch orbbec_camera multi_net_camera.launch.py
 ```
 
 ## set_device_ip Utility
@@ -110,13 +92,3 @@ ros2 launch orbbec_camera gemini_330_series.launch.py force_ip_enable:=true forc
 ```
 
 > Tip: Make sure the camera is connected and its MAC address is correct before enabling Force IP. Use `list_devices_node` to check the MAC address of all connected cameras.
-
-
-
-## Multi Net camera
-
-For [multi_net_camera.launch.py](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/examples/net_camera/multi_net_camera.launch.py) as an example:
-
-```bash
-ros2 launch orbbec_camera multi_net_camera.launch.py
-```

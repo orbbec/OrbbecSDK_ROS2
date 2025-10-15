@@ -67,7 +67,7 @@ The following are the launch parameters available:
 
 #### Depth Stream
 *   **`enable_depth_auto_exposure_priority`**
-    
+
     *   Enable the Depth auto exposure priority.
 *   **`mean_intensity_set_point`**
     *   Set the target mean intensity of the Depth image. For example: `mean_intensity_set_point:=100`.
@@ -101,27 +101,41 @@ The following are the launch parameters available:
 
 #### Multi-Camera Synchronization
 *   **`sync_mode`**
-    *   Set sync mode. The default value is `standalone`. 
+    *   Set sync mode. The default value is `standalone`.
 *   **`depth_delay_us`** / **`color_delay_us`**
-    *   The delay time (microseconds) of the depth/color image capture after receiving the capture command or trigger signal. 
+    *   The delay time (microseconds) of the depth/color image capture after receiving the capture command or trigger signal.
 *   **`trigger2image_delay_us`**
     *   The delay time (microseconds) of the image capture after receiving the capture command or trigger signal. Us
 *   **`trigger_out_delay_us`**
-    *   The delay time (microseconds) of the trigger signal output after receiving the capture command or trigger signal. 
+    *   The delay time (microseconds) of the trigger signal output after receiving the capture command or trigger signal.
 *   **`trigger_out_enabled`**
     *   Enable the trigger out signal.
 *   **`software_trigger_enabled`** / **`software_trigger_period`**
-    *   Enable the software trigger out signal / set the software trigger period in ms. 
+    *   Enable the software trigger out signal / set the software trigger period in ms.
 *   **`frames_per_trigger`**
-    *   The frame number of each stream after each trigger in triggering mode. 
+    *   The frame number of each stream after each trigger in triggering mode.
 
 > Used for [multi camera synced](../5_advanced_guide/multi_camera/multi_camera_synced.md).
 
 #### Network Cameras
 *   **`enumerate_net_device`**
-    *   Enable automatically enumerate network devices. 
+    *   Enable automatically enumerate network devices.
 *   **`net_device_ip`** / **`net_device_port`**
-    *   Set net device's IP address and port (Usually `8090`). 
+    *   Set net device's IP address and port (Usually `8090`).
+*   **`force_ip_enable`**
+    *   Enable the Force IP function. **Default:** `false`
+
+*   **`force_ip_mac`**
+    *   Target device MAC address when multiple cameras are connected (e.g., `"54:14:FD:06:07:DA"`). You can use the `list_devices_node` to find the MAC of each device. **Default:** `""`
+
+*   **`force_ip_address`**
+    *   Static IP address to assign. **Default:** `192.168.1.10`
+
+*   **`force_ip_subnet_mask`**
+    *   Subnet mask for the static IP. **Default:** `255.255.255.0`
+
+*   **`force_ip_gateway`**
+    *   Gateway address for the static IP. **Default:** `192.168.1.1`
 
 > Used for [net camera](../5_advanced_guide/configuration/net_camera.md).
 
@@ -130,20 +144,6 @@ The following are the launch parameters available:
     *   The default value is `Default`. Only the G330 series is supported. For more information, refer to the [G330 documentation](https://www.orbbec.com/docs/g330-use-depth-presets/). The value should be one of the preset names listed [in the table](../5_advanced_guide/configuration/predefined_presets.md).
 *   **`enable_gmsl_trigger`** / **`gmsl_trigger_fps`**
     *   Enable the gmsl trigger out signal / set gmsl trigger fps. Used for [gmsl camera](../5_advanced_guide/multi_camera/gmsl_camera.md).
-*   **`force_ip_enable`** 
-    *   Enable the Force IP function. **Default:** `false`
-
-*   **`force_ip_mac`**
-    *   Target device MAC address when multiple cameras are connected (e.g., `"54:14:FD:06:07:DA"`). You can use the `list_devices_node` to find the MAC of each device. **Default:** `""`
-
-*   **`force_ip_address`** 
-    *   Static IP address to assign. **Default:** `192.168.1.10`
-
-*   **`force_ip_subnet_mask`**
-    *   Subnet mask for the static IP. **Default:** `255.255.255.0`
-
-*   **`force_ip_gateway`**
-    *   Gateway address for the static IP. **Default:** `192.168.1.1`
 
 
 #### Disparity
@@ -205,7 +205,7 @@ The following are the launch parameters available:
 *   **`time_domain`**
     *   Select timestamp type: `device`, `global`, and `system`.
 *   **`time_sync_period`**
-    
+
     *   Interval (in seconds) for synchronizing the camera time with the host system.
     > **Note**: This parameter only needs to be set when **`enable_sync_host_time = true`** and **`time_domain = device`**.
 *   **`enable_ptp_config`**

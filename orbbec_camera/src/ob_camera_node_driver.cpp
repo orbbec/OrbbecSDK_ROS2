@@ -808,25 +808,31 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceBySerialNumber(
 std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByUSBPort(
     const std::shared_ptr<ob::DeviceList> &list, const std::string &usb_port) {
   try {
-    RCLCPP_INFO_STREAM(logger_, "Before lock: Select device usb port: " << usb_port);
+    RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 5000,
+                                "Before lock: Select device usb port: " << usb_port);
     std::lock_guard<decltype(device_lock_)> lock(device_lock_);
-    RCLCPP_INFO_STREAM(logger_, "After lock: Select device usb port: " << usb_port);
+    RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 5000,
+                                "After lock: Select device usb port: " << usb_port);
     auto device = list->getDeviceByUid(usb_port.c_str());
     if (device) {
-      RCLCPP_INFO_STREAM(logger_, "getDeviceByUid device usb port " << usb_port << " done");
+      RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 5000,
+                                  "getDeviceByUid device usb port " << usb_port << " done");
     } else {
-      RCLCPP_ERROR_STREAM(logger_, "getDeviceByUid device usb port " << usb_port << " failed");
-      RCLCPP_ERROR_STREAM(logger_,
-                          "Please use script to get usb port: "
-                          "ros2 run orbbec_camera list_devices_node");
+      RCLCPP_ERROR_STREAM_THROTTLE(logger_, *get_clock(), 5000,
+                                   "getDeviceByUid device usb port " << usb_port << " failed");
+      RCLCPP_ERROR_STREAM_THROTTLE(
+          logger_, *get_clock(), 5000,
+          "Please use script to get usb port: ros2 run orbbec_camera list_devices_node");
     }
     return device;
   } catch (ob::Error &e) {
-    RCLCPP_ERROR_STREAM(logger_, "Failed to get device info " << e.getMessage());
+    RCLCPP_ERROR_STREAM_THROTTLE(logger_, *get_clock(), 5000,
+                                 "Failed to get device info " << e.getMessage());
   } catch (std::exception &e) {
-    RCLCPP_ERROR_STREAM(logger_, "Failed to get device info " << e.what());
+    RCLCPP_ERROR_STREAM_THROTTLE(logger_, *get_clock(), 5000,
+                                 "Failed to get device info " << e.what());
   } catch (...) {
-    RCLCPP_ERROR_STREAM(logger_, "Failed to get device info");
+    RCLCPP_ERROR_STREAM_THROTTLE(logger_, *get_clock(), 5000, "Failed to get device info");
   }
 
   return nullptr;
@@ -834,9 +840,11 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByUSBPort(
 
 std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByNetIP(
     const std::shared_ptr<ob::DeviceList> &list, const std::string &net_ip) {
-  RCLCPP_INFO_STREAM(logger_, "Before lock: Select device net ip: " << net_ip);
+  RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 5000,
+                              "Before lock: Select device net ip: " << net_ip);
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
-  RCLCPP_INFO_STREAM(logger_, "After lock: Select device net ip: " << net_ip);
+  RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 5000,
+                              "After lock: Select device net ip: " << net_ip);
   std::shared_ptr<ob::Device> device = nullptr;
   for (size_t i = 0; i < list->getCount(); i++) {
     try {
@@ -846,19 +854,23 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByNetIP(
       if (list->getIpAddress(i) == nullptr) {
         continue;
       }
-      RCLCPP_INFO_STREAM(logger_, "FindDeviceByNetIP device net ip " << list->getIpAddress(i));
+      RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 5000,
+                                  "FindDeviceByNetIP device net ip " << list->getIpAddress(i));
       if (std::string(list->getIpAddress(i)) == net_ip) {
-        RCLCPP_INFO_STREAM(logger_, "getDeviceByNetIP device net ip " << net_ip << " done");
+        RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 5000,
+                                    "getDeviceByNetIP device net ip " << net_ip << " done");
         return list->getDevice(i);
       }
     } catch (ob::Error &e) {
-      RCLCPP_ERROR_STREAM(logger_, "Failed to get device info " << e.getMessage());
+      RCLCPP_ERROR_STREAM_THROTTLE(logger_, *get_clock(), 5000,
+                                   "Failed to get device info " << e.getMessage());
       continue;
     } catch (std::exception &e) {
-      RCLCPP_ERROR_STREAM(logger_, "Failed to get device info " << e.what());
+      RCLCPP_ERROR_STREAM_THROTTLE(logger_, *get_clock(), 5000,
+                                   "Failed to get device info " << e.what());
       continue;
     } catch (...) {
-      RCLCPP_ERROR_STREAM(logger_, "Failed to get device info");
+      RCLCPP_ERROR_STREAM_THROTTLE(logger_, *get_clock(), 5000, "Failed to get device info");
       continue;
     }
   }
@@ -1145,7 +1157,7 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
     return;
   }
 
-  RCLCPP_INFO_THROTTLE(logger_, *get_clock(), 1000, "startDevice called");
+  RCLCPP_INFO_THROTTLE(logger_, *get_clock(), 5000, "startDevice called");
 
   start_time_ = std::chrono::high_resolution_clock::now();
   if (device_) {

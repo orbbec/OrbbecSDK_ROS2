@@ -2263,9 +2263,7 @@ void OBCameraNode::setupPublishers() {
     camera_info_publishers_[stream_index] = node_->create_publisher<CameraInfo>(
         topic, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(camera_info_qos_profile),
                            camera_info_qos_profile));
-    if (isGemini335PID(pid) ||
-        (isGemini435LePID(pid) && stream_index == COLOR &&
-         (format_[stream_index] == OB_FORMAT_MJPG || format_[stream_index] == OB_FORMAT_UNKNOWN))) {
+    if (isGemini335PID(pid) || isGemini435LePID(pid)) {
       metadata_publishers_[stream_index] =
           node_->create_publisher<orbbec_camera_msgs::msg::Metadata>(
               name + "/metadata",

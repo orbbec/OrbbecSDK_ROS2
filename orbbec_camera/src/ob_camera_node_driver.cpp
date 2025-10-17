@@ -736,20 +736,23 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDevice(
     const std::shared_ptr<ob::DeviceList> &list) {
   std::shared_ptr<ob::Device> device = nullptr;
   if (!net_device_ip_.empty() && net_device_port_ != 0) {
-    RCLCPP_INFO_STREAM(logger_, "Connecting to device with net ip: " << net_device_ip_);
+    RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 5000,
+                                "Connecting to device with net ip: " << net_device_ip_);
     device = selectDeviceByNetIP(list, net_device_ip_);
   } else if (!serial_number_.empty()) {
-    RCLCPP_INFO_STREAM(logger_, "Connecting to device with serial number: " << serial_number_);
+    RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 5000,
+                                "Connecting to device with serial number: " << serial_number_);
     device = selectDeviceBySerialNumber(list, serial_number_);
   } else if (!usb_port_.empty()) {
-    RCLCPP_INFO_STREAM(logger_, "Connecting to device with usb port: " << usb_port_);
+    RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 5000,
+                                "Connecting to device with usb port: " << usb_port_);
     device = selectDeviceByUSBPort(list, usb_port_);
   } else if (device_num_ == 1) {
-    RCLCPP_INFO_STREAM(logger_, "Connecting to the default device");
+    RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 5000, "Connecting to the default device");
     return list->getDevice(0);
   }
   if (device == nullptr) {
-    RCLCPP_WARN_THROTTLE(logger_, *get_clock(), 1000, "Device with serial number %s not found",
+    RCLCPP_WARN_THROTTLE(logger_, *get_clock(), 5000, "Device with serial number %s not found",
                          serial_number_.c_str());
     device_connected_ = false;
     return nullptr;
@@ -763,9 +766,11 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceBySerialNumber(
   std::transform(serial_number.begin(), serial_number.end(), std::back_inserter(lower_sn),
                  [](auto ch) { return isalpha(ch) ? tolower(ch) : static_cast<int>(ch); });
   for (size_t i = 0; i < list->getCount(); i++) {
-    RCLCPP_INFO_STREAM(logger_, "Before lock: Select device serial number: " << serial_number);
+    RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 5000,
+                                "Before lock: Select device serial number: " << serial_number);
     std::lock_guard<decltype(device_lock_)> lock(device_lock_);
-    RCLCPP_INFO_STREAM(logger_, "After lock: Select device serial number: " << serial_number);
+    RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 5000,
+                                "After lock: Select device serial number: " << serial_number);
     try {
       auto pid = list->getPid(i);
       if (isOpenNIDevice(pid)) {
@@ -773,25 +778,28 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceBySerialNumber(
         auto device = list->getDevice(i);
         auto device_info = device->getDeviceInfo();
         if (device_info->getSerialNumber() == serial_number) {
-          RCLCPP_INFO_STREAM(
-              logger_, "Device serial number " << device_info->getSerialNumber() << " matched");
+          RCLCPP_INFO_STREAM_THROTTLE(
+              logger_, *get_clock(), 5000,
+              "Device serial number " << device_info->getSerialNumber() << " matched");
           return device;
         }
       } else {
         std::string sn = list->getSerialNumber(i);
-        RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 1000, "Device serial number: " << sn);
+        RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 5000, "Device serial number: " << sn);
         if (sn == serial_number) {
-          RCLCPP_INFO_STREAM(logger_, "Device serial number " << sn << " matched");
+          RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 5000,
+                                      "Device serial number " << sn << " matched");
           return list->getDevice(i);
         }
       }
     } catch (ob::Error &e) {
-      RCLCPP_ERROR_STREAM_THROTTLE(logger_, *get_clock(), 1000,
+      RCLCPP_ERROR_STREAM_THROTTLE(logger_, *get_clock(), 5000,
                                    "Failed to get device info " << e.getMessage());
     } catch (std::exception &e) {
-      RCLCPP_ERROR_STREAM(logger_, "Failed to get device info " << e.what());
+      RCLCPP_ERROR_STREAM_THROTTLE(logger_, *get_clock(), 5000,
+                                   "Failed to get device info " << e.what());
     } catch (...) {
-      RCLCPP_ERROR_STREAM(logger_, "Failed to get device info");
+      RCLCPP_ERROR_STREAM_THROTTLE(logger_, *get_clock(), 5000, "Failed to get device info");
     }
   }
   return nullptr;
@@ -1137,7 +1145,7 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
     return;
   }
 
-  RCLCPP_INFO_STREAM(logger_, "startDevice called");
+  RCLCPP_INFO_THROTTLE(logger_, *get_clock(), 1000, "startDevice called");
 
   start_time_ = std::chrono::high_resolution_clock::now();
   if (device_) {
@@ -1174,15 +1182,13 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
   try {
     auto start_time = std::chrono::high_resolution_clock::now();
     auto device = selectDevice(list);
-    auto end_time = std::chrono::high_resolution_clock::now();
-    auto time_cost = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-    RCLCPP_INFO_STREAM(logger_, "Select device cost " << time_cost.count() << " ms");
     if (device == nullptr) {
-      RCLCPP_WARN_THROTTLE(logger_, *get_clock(), 1000, "Device with serial number %s not found",
-                           serial_number_.c_str());
       device_connected_ = false;
       return;
     }
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto time_cost = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+    RCLCPP_INFO_STREAM(logger_, "Select device cost " << time_cost.count() << " ms");
     start_time = std::chrono::high_resolution_clock::now();
     initializeDevice(device);
     end_time = std::chrono::high_resolution_clock::now();

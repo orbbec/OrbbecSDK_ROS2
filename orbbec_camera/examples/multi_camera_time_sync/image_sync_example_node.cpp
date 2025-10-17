@@ -4,7 +4,11 @@
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
 
+#if defined(ROS_JAZZY) || defined(ROS_IRON)
+#include <cv_bridge/cv_bridge.hpp>
+#else
 #include <cv_bridge/cv_bridge.h>
+#endif
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <vector>

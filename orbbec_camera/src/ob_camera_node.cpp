@@ -3128,7 +3128,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   }
   CHECK(camera_info_publishers_.count(stream_index) > 0);
   camera_info_publishers_[stream_index]->publish(camera_info);
-  if (isGemini335PID(pid)) {
+  if (isGemini335PID(pid) || isGemini435LePID(pid)) {
     publishMetadata(frame, stream_index, camera_info.header);
   }
   CHECK_NOTNULL(image_publishers_[stream_index]);

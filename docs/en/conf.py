@@ -18,6 +18,10 @@ import os
 import shutil
 import sphinx
 
+# Add extension path
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '_ext'))
+
 import recommonmark
 from recommonmark.transform import AutoStructify
 
@@ -50,9 +54,8 @@ master_doc = 'index'
 # ones.
 extensions = ['recommonmark',
   'sphinx_markdown_tables',
-
   'sphinx.ext.autosectionlabel',
-
+  'language_switch',
 #   'myst_parser',
 ]
 

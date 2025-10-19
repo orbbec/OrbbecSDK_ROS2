@@ -3,47 +3,49 @@ name: Deploy Docs
 on:
   push:
     branches:
+      - main
       - Document
   workflow_dispatch:
+
+concurrency:
+  group: docs-deploy
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: '3.11'
+          cache: 'pip'
 
-      - name: Install dependencies
+      - name: Install dependencies (EN + ZH)
         run: |
           python -m pip install --upgrade pip
-          pip install -r docs/en/requirements.txt
+          pip install -r docs/en/requirements.txt -r docs/zh/requirements.txt
 
-      - name: Build English Docs
-        run: |
-          cd docs/en
-          sphinx-build -b html . _build/html
+      - name: Build English docs (root)
+        run: sphinx-build -b html docs/en _site
 
-      - name: Build Chinese Docs
-        run: |
-          cd docs/zh
-          sphinx-build -b html . _build/html
+      - name: Build Chinese docs (zh subdir)
+        run: sphinx-build -b html docs/zh _site/zh
 
-      - name: Prepare deployment directory
+      - name: Create 404 redirect (optional)
         run: |
-          mkdir -p _deploy
-          cp -r docs/en/_build/html/* _deploy/
-          cp -r docs/zh/_build/html _deploy/zh
+          echo '<meta http-equiv="refresh" content="0; url=index.html" />' > _site/404.html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          deploy_key: ${{ secrets.DEPLOY_KEY }}
-          external_repository: orbbec/OrbbecSDK_ROS2
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: _deploy
+          publish_dir: _site
+          keep_files: false
+          force_orphan: false
+
+# Root will serve English index.html by default; Chinese docs under /zh/.

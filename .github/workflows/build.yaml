@@ -22,10 +22,23 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install sphinx recommonmark sphinx-rtd-theme sphinx-markdown-tables
+          pip install -r docs/en/requirements.txt
 
-      - name: Build HTML
-        run: sphinx-build -b html docs docs/_build/html
+      - name: Build English Docs
+        run: |
+          cd docs/en
+          sphinx-build -b html . _build/html
+
+      - name: Build Chinese Docs
+        run: |
+          cd docs/zh
+          sphinx-build -b html . _build/html
+
+      - name: Prepare deployment directory
+        run: |
+          mkdir -p _deploy
+          cp -r docs/en/_build/html/* _deploy/
+          cp -r docs/zh/_build/html _deploy/zh
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
@@ -33,4 +46,4 @@ jobs:
           deploy_key: ${{ secrets.DEPLOY_KEY }}
           external_repository: orbbec/OrbbecSDK_ROS2
           publish_branch: gh-pages
-          publish_dir: docs/_build/html
+          publish_dir: _deploy

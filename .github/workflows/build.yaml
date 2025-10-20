@@ -3,49 +3,49 @@ name: Deploy Docs
 on:
   push:
     branches:
-      - main
       - Document
   workflow_dispatch:
 
-concurrency:
-  group: docs-deploy
-  cancel-in-progress: true
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
-          cache: 'pip'
+          python-version: "3.12"
 
-      - name: Install dependencies (EN + ZH)
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r docs/en/requirements.txt -r docs/zh/requirements.txt
+          pip install sphinx recommonmark sphinx-rtd-theme sphinx-markdown-tables
+          # 可选: 使用 myst-parser 代替 recommonmark
+          # pip install myst-parser
 
-      - name: Build English docs (root)
-        run: sphinx-build -b html docs/en _site
-
-      - name: Build Chinese docs (zh subdir)
-        run: sphinx-build -b html docs/zh _site/zh
-
-      - name: Create 404 redirect (optional)
+      - name: Build multilingual HTML
         run: |
-          echo '<meta http-equiv="refresh" content="0; url=index.html" />' > _site/404.html
+          # Build English
+          sphinx-build -b html docs/en docs/en/_build/html
+          # Build Chinese
+          sphinx-build -b html docs/zh docs/zh/_build/html
+          # Merge outputs to unified publish directory
+          mkdir -p docs/_build/html
+          cp -r docs/en/_build/html docs/_build/html/en
+          cp -r docs/zh/_build/html docs/_build/html/zh
+          # Root redirect to English (可根据需要改成 zh)
+          echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=en/index.html"></head><body>Redirecting...</body></html>' > docs/_build/html/index.html
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: _site
-          keep_files: false
-          force_orphan: false
+          publish_dir: docs/_build/html
 
-# Root will serve English index.html by default; Chinese docs under /zh/.

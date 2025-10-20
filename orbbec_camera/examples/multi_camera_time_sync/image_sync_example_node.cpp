@@ -27,12 +27,32 @@ using std::placeholders::_8;
 
 class ImageSyncNode : public rclcpp::Node {
  public:
-  ImageSyncNode()
+  ImageSyncNode(const double hz)
       : Node("image_sync_node"),
         diff_sum_(0.0),
         count_(0),
         max_diff_(0.0),
-        min_diff_(std::numeric_limits<double>::max()) {
+        min_diff_(std::numeric_limits<double>::max()),
+        last_time_(0.0),
+        frame_interval_(1.0 / hz),
+        stop_display_thread_(false) {
+    auto topics = this->get_topic_names_and_types();
+    std::vector<std::string> color_topics;
+    std::vector<std::string> depth_topics;
+
+    auto has_suffix = [](const std::string &str, const std::string &suffix) {
+      return str.size() >= suffix.size() &&
+             str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+    };
+
+    for (const auto &entry : topics) {
+      const std::string &topic = entry.first;
+      if (has_suffix(topic, "/color/image_raw")) {
+        color_topics.push_back(topic);
+      } else if (has_suffix(topic, "/depth/image_raw")) {
+        depth_topics.push_back(topic);
+      }
+    }
     rclcpp::QoS qos(rclcpp::KeepLast(10));
     qos.reliable();
 
@@ -51,10 +71,25 @@ class ImageSyncNode : public rclcpp::Node {
                                camera_03_depth_sub_, camera_04_color_sub_, camera_04_depth_sub_);
 
     // sync_->setAgePenalty(0.5);
+    sync_->setMaxIntervalDuration(rclcpp::Duration::from_seconds(frame_interval_ / 2));
     sync_->registerCallback(
         std::bind(&ImageSyncNode::sync_callback, this, _1, _2, _3, _4, _5, _6, _7, _8));
 
     RCLCPP_INFO(this->get_logger(), "image sync node started.");
+
+    // start display thread
+    display_thread_ = std::thread(&ImageSyncNode::display_thread_func, this);
+  }
+
+  ~ImageSyncNode() {
+    {
+      std::lock_guard<std::mutex> lk(queue_mutex_);
+      stop_display_thread_ = true;
+    }
+    queue_cv_.notify_all();
+    if (display_thread_.joinable()) {
+      display_thread_.join();
+    }
   }
 
  private:
@@ -62,6 +97,26 @@ class ImageSyncNode : public rclcpp::Node {
   size_t count_;
   double max_diff_;
   double min_diff_;
+  double last_time_;  // FPS
+  uint64_t frame_count_ = 0;
+  uint64_t drop_count_ = 0;
+  double frame_interval_;
+  double fps_cur_ = 0.0;
+  double fps_sum_ = 0.0;
+  double fps_max_ = 0.0;
+  double fps_min_ = std::numeric_limits<double>::max();
+
+  std::thread display_thread_;
+  struct FrameBundle {
+    std::vector<cv::Mat> images;
+    std::vector<double> timestamps;
+    std::vector<std::string> camera_names;
+    std::vector<std::string> image_types;
+  };
+  std::deque<FrameBundle> frame_queue_;
+  std::mutex queue_mutex_;
+  std::condition_variable queue_cv_;
+  bool stop_display_thread_;
 
   using SyncPolicy = message_filters::sync_policies::ApproximateTime<
       sensor_msgs::msg::Image, sensor_msgs::msg::Image, sensor_msgs::msg::Image,
@@ -118,6 +173,49 @@ class ImageSyncNode : public rclcpp::Node {
       return;
     }
 
+    // push to display queue (avoid blocking sync callback)
+    {
+      std::lock_guard<std::mutex> lk(queue_mutex_);
+      // keep queue bounded to avoid memory blowup, drop oldest if full
+      const size_t max_queue = 3;
+      if (frame_queue_.size() >= max_queue) {
+        frame_queue_.pop_front();
+      }
+      frame_queue_.push_back(
+          FrameBundle{std::move(images), std::move(timestamps), camera_names, image_types});
+    }
+    queue_cv_.notify_one();
+
+    // retrieve copy of timestamps from back of queue
+    {
+      std::lock_guard<std::mutex> lk(queue_mutex_);
+      if (!frame_queue_.empty()) {
+        std::vector<double> ts_copy = frame_queue_.back().timestamps;
+        print_stats(ts_copy);
+      }
+    }
+  }
+
+  void display_thread_func() {
+    while (true) {
+      FrameBundle bundle;
+      {
+        std::unique_lock<std::mutex> lk(queue_mutex_);
+        queue_cv_.wait(lk, [this] { return stop_display_thread_ || !frame_queue_.empty(); });
+        if (stop_display_thread_ && frame_queue_.empty()) {
+          return;
+        }
+        // take the latest frame (drop older if several)
+        bundle = std::move(frame_queue_.back());
+        frame_queue_.clear();
+      }
+      // call image_show in this thread
+      image_show(bundle.images, bundle.timestamps, bundle.camera_names, bundle.image_types);
+    }
+  }
+
+  void image_show(std::vector<cv::Mat> &images, std::vector<double> &timestamps,
+                  std::vector<std::string> &camera_names, std::vector<std::string> &image_types) {
     for (size_t i = 0; i < images.size(); i++) {
       if (images[i].channels() == 1) {
         cv::Mat tmp;
@@ -174,41 +272,20 @@ class ImageSyncNode : public rclcpp::Node {
     }
     cv::imshow("Time Synced Cameras", display);
     cv::waitKey(1);
+  }
 
+  void print_stats(std::vector<double> &timestamps) {
     std::cout << std::fixed;
     std::cout << "===========================================================" << std::endl;
+    for (int i = 0; i < 4; i++) {
+      std::cout << "Camera0" << i + 1 << " stamp: color= " << std::setprecision(6)
+                << timestamps[i * 2] << "  depth= " << std::setprecision(6) << timestamps[i * 2 + 1]
+                << "  Delay relative to camera01(color): color= " << std::setprecision(3)
+                << (timestamps[i * 2] - timestamps[0]) * 1000.0 << " ms"
+                << "  depth= " << std::setprecision(3)
+                << (timestamps[i * 2 + 1] - timestamps[0]) * 1000.0 << " ms" << std::endl;
+    }
 
-    // Camera01
-    std::cout << "Camera01 stamp: color= " << std::setprecision(6) << timestamps[0]
-              << "  depth= " << std::setprecision(6) << timestamps[1]
-              << "  Delay relative to camera01(color): color= " << std::setprecision(3)
-              << (timestamps[0] - timestamps[0]) * 1000.0 << " ms"
-              << "  depth= " << std::setprecision(3) << (timestamps[1] - timestamps[0]) * 1000.0
-              << " ms" << std::endl;
-
-    // Camera02
-    std::cout << "Camera02 stamp: color= " << std::setprecision(6) << timestamps[2]
-              << "  depth= " << std::setprecision(6) << timestamps[3]
-              << "  Delay relative to camera01(color): color= " << std::setprecision(3)
-              << (timestamps[2] - timestamps[0]) * 1000.0 << " ms"
-              << "  depth= " << std::setprecision(3) << (timestamps[3] - timestamps[0]) * 1000.0
-              << " ms" << std::endl;
-
-    // Camera03
-    std::cout << "Camera03 stamp: color= " << std::setprecision(6) << timestamps[4]
-              << "  depth= " << std::setprecision(6) << timestamps[5]
-              << "  Delay relative to camera01(color): color= " << std::setprecision(3)
-              << (timestamps[4] - timestamps[0]) * 1000.0 << " ms"
-              << "  depth= " << std::setprecision(3) << (timestamps[5] - timestamps[0]) * 1000.0
-              << " ms" << std::endl;
-
-    // Camera04
-    std::cout << "Camera04 stamp: color= " << std::setprecision(6) << timestamps[6]
-              << "  depth= " << std::setprecision(6) << timestamps[7]
-              << "  Delay relative to camera01(color): color= " << std::setprecision(3)
-              << (timestamps[6] - timestamps[0]) * 1000.0 << " ms"
-              << "  depth= " << std::setprecision(3) << (timestamps[7] - timestamps[0]) * 1000.0
-              << " ms" << std::endl;
     double cur = 0.0;
     double base_t = timestamps[0];  // Camera01 color
     for (size_t i = 0; i < timestamps.size(); ++i) {
@@ -225,12 +302,42 @@ class ImageSyncNode : public rclcpp::Node {
               << " avg: " << avg_diff << " ms"
               << " max: " << max_diff_ << " ms"
               << " min: " << min_diff_ << " ms" << std::endl;
+
+    // Calculate and display FPS
+    if (last_time_ == 0.0) {
+      last_time_ = base_t;
+    } else {
+      double dt = base_t - last_time_;
+      // if (dt > frame_interval_ * 1.5) {
+      //   std::cout << "base_t: " << base_t << " last_time_: " << last_time_ << std::endl;
+      //   std::cout << "Frame drop detected! dt: " << dt << " s" << std::endl;
+      //   drop_count_ +=
+      //       static_cast<uint64_t>(dt / 0.0333) - 1;  // Assuming 30 FPS, so frame interval
+      //       ~33.3ms
+      //   std::cout << "Total dropped frames: " << drop_count_ << std::endl;
+      // }
+      fps_cur_ = dt > 0.0 ? 1.0 / dt : fps_cur_;
+      last_time_ = base_t;
+      frame_count_++;
+      fps_sum_ += fps_cur_;
+      fps_max_ = std::max(fps_max_, fps_cur_);
+      fps_min_ = std::min(fps_min_, fps_cur_);
+      double fps_avg = fps_sum_ / frame_count_;
+      std::cout << "\nFPS Statistics" << std::endl;
+      std::cout << "cur: " << std::setprecision(2) << fps_cur_ << " avg: " << std::setprecision(2)
+                << fps_avg << " max: " << std::setprecision(2) << fps_max_
+                << " min: " << std::setprecision(2) << fps_min_ << std::endl;
+    }
   }
 };
 
 int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<ImageSyncNode>());
+  // rclcpp::spin(std::make_shared<ImageSyncNode>(30.0));
+  rclcpp::executors::MultiThreadedExecutor executor;
+  auto node = std::make_shared<ImageSyncNode>(30.0);  // Modify according to your actual frame rate
+  executor.add_node(node);
+  executor.spin();
   rclcpp::shutdown();
   return 0;
 }

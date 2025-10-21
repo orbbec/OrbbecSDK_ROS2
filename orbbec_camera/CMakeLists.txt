@@ -252,6 +252,10 @@ if(INSTALL_UDEV_RULES)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/99-obsensor-libusb.rules
             DESTINATION share/${PROJECT_NAME}/udev)
 endif()
+if(DEFINED ENV{BUILDING_PACKAGE})
+    # Install udev rules
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/99-obsensor-libusb.rules DESTINATION /etc/udev/rules.d)
+endif()
 
 install(TARGETS list_devices_node list_depth_work_mode_node list_camera_profile_mode_node topic_statistics_node  service_benchmark_node ob_benchmark_node 435le_example_node set_device_ip image_sync_example_node DESTINATION lib/${PROJECT_NAME}/
 )

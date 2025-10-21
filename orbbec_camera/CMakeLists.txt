@@ -10,6 +10,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fPIC -g3")
 set(CMAKE_BUILD_TYPE "Release")
 option(USE_RK_HW_DECODER "Use Rockchip hardware decoder" OFF)
 option(USE_NV_HW_DECODER "Use Nvidia hardware decoder" OFF)
+option(INSTALL_UDEV_RULES "Install udev rule for Orbbec cameras" ON)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_compile_options(-Wall -Wextra -Werror -Wno-pedantic -Wno-array-bounds)
@@ -246,9 +247,10 @@ file(GLOB_RECURSE EXTENSION_FILES "${ORBBEC_LIBS_DIR}/extensions/*")
 if(EXTENSION_FILES)
     install(FILES ${EXTENSION_FILES} DESTINATION lib/extensions/)
 endif()
-if(DEFINED ENV{BUILDING_PACKAGE})
-    # Install udev rules
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/99-obsensor-libusb.rules DESTINATION /etc/udev/rules.d)
+if(INSTALL_UDEV_RULES)
+    # Install udev rule into package share so user can manually copy with sudo if desired
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/99-obsensor-libusb.rules
+            DESTINATION share/${PROJECT_NAME}/udev)
 endif()
 
 install(TARGETS list_devices_node list_depth_work_mode_node list_camera_profile_mode_node topic_statistics_node  service_benchmark_node ob_benchmark_node 435le_example_node set_device_ip image_sync_example_node DESTINATION lib/${PROJECT_NAME}/

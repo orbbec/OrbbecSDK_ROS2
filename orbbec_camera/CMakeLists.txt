@@ -251,7 +251,7 @@ if (BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif ()
 
-ament_export_include_directories(include ${ORBBEC_INCLUDE_DIR})
+ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})
 ament_export_dependencies(${dependencies} ${ORBBEC_LIBS})
 

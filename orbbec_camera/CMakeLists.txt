@@ -10,6 +10,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fPIC -g3")
 set(CMAKE_BUILD_TYPE "Release")
 option(USE_RK_HW_DECODER "Use Rockchip hardware decoder" OFF)
 option(USE_NV_HW_DECODER "Use Nvidia hardware decoder" OFF)
+option(INSTALL_UDEV_RULES "Install udev rule for Orbbec cameras" ON)
 
 
 if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -239,6 +240,11 @@ if (DEFINED ENV{BUILDING_PACKAGE})
     DESTINATION /etc/udev/rules.d
   )
 endif ()
+if(INSTALL_UDEV_RULES)
+    # Install udev rule into package share so user can manually copy with sudo if desired
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/99-obsensor-libusb.rules
+            DESTINATION share/${PROJECT_NAME}/udev)
+endif()
 
 install(TARGETS list_devices_node
   list_depth_work_mode_node

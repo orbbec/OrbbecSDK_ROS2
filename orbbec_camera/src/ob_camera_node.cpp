@@ -422,6 +422,15 @@ void OBCameraNode::setupDevices() {
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_WHITE_BALANCE_INT, color_white_balance_);
     }
   }
+  if (device_->isPropertySupported(OB_PROP_COLOR_AUTO_EXPOSURE_PRIORITY_INT, OB_PERMISSION_WRITE)) {
+    RCLCPP_INFO_STREAM(logger_, "Setting color auto exposure priority to "
+                                    << (enable_color_auto_exposure_priority_ ? "true" : "false"));
+    TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_COLOR_AUTO_EXPOSURE_PRIORITY_INT,
+                        enable_color_auto_exposure_priority_);
+    RCLCPP_INFO_STREAM(logger_,
+                       "color auto exposure priority is set to "
+                           << device_->getBoolProperty(OB_PROP_COLOR_AUTO_EXPOSURE_PRIORITY_INT));
+  }
   if (device_->isPropertySupported(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {
     RCLCPP_INFO_STREAM(
         logger_, "Setting color auto exposure to " << (enable_color_auto_exposure_ ? "ON" : "OFF"));
@@ -1119,6 +1128,8 @@ void OBCameraNode::getParameters() {
     enable_depth_filter_ = true;
   }
   setAndGetNodeParameter(enable_frame_sync_, "enable_frame_sync", false);
+  setAndGetNodeParameter<bool>(enable_color_auto_exposure_priority_,
+                               "enable_color_auto_exposure_priority", false);
   setAndGetNodeParameter(enable_color_auto_exposure_, "enable_color_auto_exposure", true);
   setAndGetNodeParameter(enable_color_auto_white_balance_, "enable_color_auto_white_balance", true);
   setAndGetNodeParameter<int>(color_rotation_, "color_rotation", -1);

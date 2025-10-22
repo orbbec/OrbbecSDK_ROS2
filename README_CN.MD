@@ -126,6 +126,10 @@ OrbbecSDK ROS2 Wrapper 提供 Orbbec 相机与 ROS 2 环境的无缝集成，支
 4. 不支持：此版本不会支持该设备；
 5. 即将支持：我们将在近期添加支持。
 
+**迁移指南**
+
+如果您需要将现有项目从 main (v1.x) 分支迁移到 v2-main (v2.x) 分支，请参考官方[迁移指南](https://orbbec.github.io/OrbbecSDK_ROS2/zh/source/7_developer_guide/migration_guide.html)
+
 ## 安装说明
 
 安装 ROS 2

@@ -149,6 +149,10 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
 4. Not supported: we will not support specific device in this version;
 5. To be supported: we will add support in the near future.
 
+**Migration Guide**
+
+If you need to migrate existing projects from the main (v1.x) branch to the v2-main (v2.x) branch, please refer to the official [migration guide](https://orbbec.github.io/OrbbecSDK_ROS2/en/source/7_developer_guide/migration_guide.html)
+
 ## Installation Instructions
 
 Install ROS 2

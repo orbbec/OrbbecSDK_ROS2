@@ -1,109 +1,49 @@
-/* 让表格自动拉伸到满宽度 */
-table {
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
+
+.lang-switch {
+    position: fixed !important;
+    top: 60px !important;
+    right: 20px !important;
+    z-index: 1000 !important;
+    background: rgba(255,255,255,0.95) !important;
+    border: 1px solid #ddd !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+    font-size: 0.9em !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+    backdrop-filter: blur(5px) !important;
+    transition: all 0.3s ease !important;
 }
 
-/* 让表格中的每个 <th> 和 <td> 也自动拉伸 */
-th,
-td {
-    width: auto;
+.lang-switch:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+    transform: translateY(-1px) !important;
 }
 
-ul {
-    width: 100%;
-    /* 列表宽度占满整个容器 */
-    }
-
-
-/* 修改 Sphinx  Theme 项目标题的字体大小  Book和rtd 均OK */
-.wy-side-nav-search>a {
-    font-size: 16px;
-    /* 你可以根据需要调整这个值 */
+.lang-switch a {
+    text-decoration: none !important;
+    transition: color 0.2s ease !important;
 }
 
-/* 修改项目标题的字体大小 Book和rtd 均OK*/
-.wy-side-nav-search>div.version {
-    font-size: 16px;
-    /* 你可以根据需要调整这个值 */
+.lang-switch .lang-other {
+    color: #0078d4 !important;
+    margin-right: 8px !important;
 }
 
-
-.sidebar-logo {
-    width: 500px;
-    /* 或者使用百分比 */
-    height: auto;
-    max-width: 90%;
-        max-height: 90%;
+.lang-switch .lang-other:hover {
+    color: #106ebe !important;
 }
 
-
-.sidebar-content {
-    line-height: 1.0;
-    /* 行间距是字体大小的1.5倍 */
-}
-
-.sidebar {
-    padding: 20px;
-    /* 内边距 */
-    margin-bottom: 20px;
-    /* 外边距 */
-}
-
-.sidebar-text {
-    font-size: 30px;
-}
-/* 修改侧边栏的背景颜色 */
-.wy-nav-side {
-    background-color: #cecece !important;
-}
-
-/* 针对导航栏链接的选择器 */
-.wy-nav-side a {
-    color: #000000;
-    /* 修改为您需要的颜色 */
-}
-
-/* 如果需要，您可以添加 hover 和 active 状态的样式 */
-.wy-nav-side a:hover {
-    color: #fffcfc;
-}
-
-.wy-nav-side .current>a {
-    color: #108bf0 !important;
+.lang-switch .lang-current {
+    color: #333 !important;
     font-weight: bold !important;
-    /* 设置为粗体 */
-    /* 当前活动项的颜色 */
+    margin-left: 8px !important;
 }
 
-/* 提示：不同版本的 Sphinx 主题生成的 HTML 结构可能有所不同，请根据实际情况调整选择器 */
-h1.wy-banner-title {
-    color: #0267da !important;
-    /* 将此处的颜色替换为您希望的颜色 */
+@media (max-width: 768px) {
+    .lang-switch {
+        top: 10px !important;
+        right: 10px !important;
+        font-size: 0.8em !important;
+        padding: 6px 8px !important;
+    }
 }
-
-/* 如果也需要修改小标题 */
-h2.wy-banner-subtitle {
-    color: #7b7b7b !important;
-    /* 替换为希望的颜色 */
-}
-
-.wy-side-nav-search>a {
-    color: #ffffff !important;
-    /* 将 #your-color 替换为你想要颜色的十六进制代码 */
-}
-
-
-/* 调整最大宽度  OK */
-.wy-nav-content {
-    max-width: 960px;
-
-}
-
-
-/* 可选：调整侧边栏宽度 */
-/* .wy-side-scroll {
-    width: 300px;
-
-} */

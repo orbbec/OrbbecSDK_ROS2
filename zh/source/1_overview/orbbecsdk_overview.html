@@ -1,0 +1,564 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1.2. Orbbec SDK 概述 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=63de077d" />
+
+  
+    <link rel="shortcut icon" href="../../_static/orbbec_footerlogo_3d_world.svg"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=7d86a446"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/translations.js?v=beaddf03"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" />
+    <link rel="next" title="2. 安装" href="../2_installation/installation.html" />
+    <link rel="prev" title="1.1. 引言" href="introduction.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            OrbbecSDK V2 ROS2 封装
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="overview.html">1. 概述</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">1.1. 引言</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="introduction.html#id2">1.1.1. 支持的硬件产品</a></li>
+<li class="toctree-l3"><a class="reference internal" href="introduction.html#orbbec">1.1.2. Orbbec 相机规格书</a></li>
+<li class="toctree-l3"><a class="reference internal" href="introduction.html#id3">1.1.3. 支持的平台</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">1.2. Orbbec SDK 概述</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">1.2.1. 术语</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#orbbec-sdk-v2">1.2.2. Orbbec SDK v2 架构概述</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sdk">1.2.3. SDK 概念概述</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">1.2.4. SDK 编程模型</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../2_installation/installation.html">2. 安装</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../2_installation/build_the_package.html">2.1. 从源码构建</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../2_installation/build_the_package.html#id2">2.1.1. 环境配置</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../2_installation/build_the_package.html#linux-ros2">2.1.2. Linux ROS2 包装器编译</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../2_installation/registration_script.html">2.2. 注册脚本（必需）</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../3_quickstarts/quickstarts.html">3. 快速开始</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../3_quickstarts/quickstart.html">3.1. ROS 包快速入门</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../3_quickstarts/quickstart.html#id1">3.1.1. 简介</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../3_quickstarts/quickstart.html#id2">3.1.2. 构建您的第一个相机应用</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../3_quickstarts/quickstart.html#ros-2">3.1.2.1. 步骤 1：配置 ROS 2 和工作空间环境</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../3_quickstarts/quickstart.html#id3">3.1.2.2. 步骤 2：启动相机节点</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../3_quickstarts/quickstart.html#rviz2">3.1.2.3. 步骤 3：在 RViz2 中可视化</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../3_quickstarts/quickstart.html#id4">3.1.3. 示例功能</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../3_quickstarts/quickstart.html#id5">3.1.3.1. 列出可用的话题/服务/参数</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../3_quickstarts/quickstart.html#id6">3.1.3.2. 回显话题</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../3_quickstarts/quickstart.html#id7">3.1.3.3. 调用服务</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../3_quickstarts/quickstart.html#rosbag2">3.1.3.4. 使用 rosbag2 录制</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../3_quickstarts/orbbecviewer.html">3.2. OrbbecViewer 快速入门</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../3_quickstarts/orbbecviewer.html#id1">3.2.1. 下载</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../3_quickstarts/orbbecviewer.html#id2">3.2.2. 连接设备</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../3_quickstarts/orbbecviewer.html#id3">3.2.3. 相机控制</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../3_quickstarts/orbbecviewer.html#id4">3.2.4. 设备信息和固件升级</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../4_application_guide/application_guide.html">4. 应用指南</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/launch_parameters.html">4.1. 启动参数</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/launch_parameters.html#id2">4.1.1. 核心与数据流配置</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/launch_parameters.html#id3">4.1.2. 传感器控制</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#id4">4.1.2.1. 彩色流</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#id5">4.1.2.2. 深度流</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#id6">4.1.2.3. 红外流</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#ldp">4.1.2.4. 激光 / LDP</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/launch_parameters.html#id7">4.1.3. 设备、同步与高级功能</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#id8">4.1.3.1. 多相机同步</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#id9">4.1.3.2. 网络相机</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#id10">4.1.3.3. 设备特定</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#id11">4.1.3.4. 视差</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#ae">4.1.3.5. 交错AE模式</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#id12">4.1.3.6. 相机内同步</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/launch_parameters.html#id13">4.1.4. 基础与通用参数</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#id14">4.1.4.1. 固件与后端</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#tf">4.1.4.2. TF、外参与校准</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#id15">4.1.4.3. 时间同步</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#id16">4.1.4.4. 日志与诊断</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#id17">4.1.4.5. 其他</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/launch_parameters.html#imu">4.1.5. IMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/launch_parameters.html#id18">4.1.6. 深度滤波器</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/services.html">4.2. 所有可用的相机控制服务</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/services.html#id2">4.2.1. 数据流控制</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/services.html#id3">4.2.1.1. 彩色流</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/services.html#id4">4.2.1.2. 深度流</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/services.html#id5">4.2.1.3. 红外流</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/services.html#id6">4.2.1.4. 所有数据流</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/services.html#id7">4.2.2. 传感器与发射器控制</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/services.html#id8">4.2.3. 设备信息与管理</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/services.html#id9">4.2.4. 同步与触发</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/services.html#id10">4.2.5. 深度滤波器配置</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/services.html#id11">4.2.6. 数据捕获与校准管理</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/topics.html">4.3. 可用话题</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/topics.html#id2">4.3.1. 图像流</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/topics.html#id3">4.3.2. 点云话题</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/topics.html#imu">4.3.3. IMU话题</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/topics.html#id4">4.3.4. 设备状态与诊断</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/coordinate_systems.html">4.4. ROS2机器人坐标系 vs 相机光学坐标系</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/camera_sensor_structure.html">4.5. 相机传感器结构</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/tf_transformations.html">4.6. 从坐标系A到坐标系B的TF变换：</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/compressed_image.html">4.7. 压缩图像</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/point_cloud.html">4.8. 在ROS 2中启用和可视化点云</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/point_cloud.html#id1">4.8.1. 启用深度点云</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/point_cloud.html#id2">4.8.1.1. 启用深度点云的命令</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/point_cloud.html#rviz2">4.8.1.2. 在RViz2中可视化深度点云</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/point_cloud.html#id3">4.8.2. 启用彩色点云</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/point_cloud.html#id4">4.8.2.1. 启用彩色点云的命令</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/point_cloud.html#id5">4.8.2.2. 在RViz2中可视化彩色点云</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../5_advanced_guide/advanced_guide.html">5. 高级指南</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../5_advanced_guide/advanced_guide.html#id2">5.1. 性能与优化</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../5_advanced_guide/performance/lower_cpu_usage.html">5.1.1. 使用Orbbec ROS包降低CPU使用率</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/performance/lower_cpu_usage.html#cpu">5.1.1.1. 降低CPU使用率的推荐设置</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/performance/lower_cpu_usage.html#id1">5.1.1.2. 用于测试的启动文件</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/performance/lower_cpu_usage.html#id2">5.1.1.3. 测试环境</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/performance/lower_cpu_usage.html#id3">5.1.1.4. 测试设置</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/performance/lower_cpu_usage.html#id4">5.1.1.5. 测试结果</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/performance/lower_cpu_usage.html#id5">5.1.1.6. 进一步优化</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../5_advanced_guide/performance/efficient_intra_process_communication.html">5.1.2. 高效的进程内通信：</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/performance/efficient_intra_process_communication.html#id2">5.1.2.1. 简介</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/performance/efficient_intra_process_communication.html#id3">5.1.2.2. 示例</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../5_advanced_guide/performance/fastdds_tuning.html">5.1.3. 针对Orbbec相机与ROS2的Fast DDS优化</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/performance/fastdds_tuning.html#id1">5.1.3.1. 调整系统参数</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/performance/fastdds_tuning.html#fast-dds">5.1.3.2. Fast DDS配置</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../5_advanced_guide/advanced_guide.html#id3">5.2. 多相机</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../5_advanced_guide/multi_camera/multi_camera.html">5.2.1. 多相机</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/multi_camera/multi_camera.html#id2">5.2.1.1. 多相机无数据流</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/multi_camera/multi_camera.html#id3">5.2.1.2. 多相机图像话题帧率过低</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../5_advanced_guide/multi_camera/multi_camera_synced.html">5.2.2. 多相机同步说明</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/multi_camera/multi_camera_synced.html#id2">5.2.2.1. 设置说明</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/multi_camera/multi_camera_synced.html#orbbecsdk-ros2">5.2.2.2. 使用 OrbbecSDK_ROS2 检查相机端口</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/multi_camera/multi_camera_synced.html#id3">5.2.2.3. OrbbecSDK_ROS2 多相机同步配置</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/multi_camera/multi_camera_synced.html#id4">5.2.2.4. 运行以下命令启动多相机同步</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../5_advanced_guide/multi_camera/multi_camera_synced_verification_tool.html">5.2.3. 多相机同步验证工具</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/multi_camera/multi_camera_synced_verification_tool.html#id2">5.2.3.1. 目录结构</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/multi_camera/multi_camera_synced_verification_tool.html#id3">5.2.3.2. 运行准备</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/multi_camera/multi_camera_synced_verification_tool.html#id4">5.2.3.3. 运行此示例</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/multi_camera/multi_camera_synced_verification_tool.html#id5">5.2.3.4. 需要更改的文件</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../5_advanced_guide/multi_camera/gmsl_camera.html">5.2.4. GMSL 相机</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/multi_camera/gmsl_camera.html#id1">5.2.4.1. 单个 GMSL 相机</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/multi_camera/gmsl_camera.html#id2">5.2.4.2. 多个 GMSL 相机</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/multi_camera/gmsl_camera.html#id3">5.2.4.3. 多个 GMSL 相机同步</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/multi_camera/gmsl_camera.html#id4">5.2.4.4. GMSL 相机的使用限制</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../5_advanced_guide/advanced_guide.html#id4">5.3. 配置与模式</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../5_advanced_guide/configuration/align_depth_color.html">5.3.1. 在 ROS 2 中对齐深度到彩色</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/configuration/align_depth_color.html#id1">5.3.1.1. 对齐和查看深度和彩色图像的命令</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/configuration/align_depth_color.html#rviz2">5.3.1.2. 在 RViz2 中选择话题</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/configuration/align_depth_color.html#id2">5.3.1.3. 深度到彩色叠加示例</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../5_advanced_guide/configuration/configuration_of_depth_NFOV_and_WFOV_modes.html">5.3.2. 深度 NFOV 和 WFOV 模式配置</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../5_advanced_guide/configuration/depth_work_mode_switch.html">5.3.3. 深度工作模式切换</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../5_advanced_guide/configuration/disparity_search_offset.html">5.3.4. 视差搜索偏移</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/configuration/disparity_search_offset.html#id2">5.3.4.1. 功能介绍</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/configuration/disparity_search_offset.html#id3">5.3.4.2. 参数介绍</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/configuration/disparity_search_offset.html#id4">5.3.4.3. 运行启动文件</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../5_advanced_guide/configuration/interleave_ae_mode.html">5.3.5. 在 Gemini330 系列相机中使用 interleave_ae</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/configuration/interleave_ae_mode.html#id1">5.3.5.1. 参数介绍</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/configuration/interleave_ae_mode.html#id2">5.3.5.2. 运行启动文件</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/configuration/interleave_ae_mode.html#multi-camera-synced-interleave-ae">5.3.5.3. Multi_camera_synced + Interleave_ae</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../5_advanced_guide/configuration/predefined_presets.html">5.3.6. 预定义预设</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../5_advanced_guide/configuration/net_camera.html">5.3.7. 网络相机</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/configuration/net_camera.html#femto-mega-gemini-435le-gemini-335le">5.3.7.1. Femto Mega &amp; Gemini 435Le &amp; Gemini 335Le</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/configuration/net_camera.html#set-device-ip">5.3.7.2. set_device_ip 工具</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../5_advanced_guide/configuration/net_camera.html#ip">5.3.7.3. 强制 IP 功能</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../6_benchmark/benchmark.html">6. 性能基准测试</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../6_benchmark/introduction.html">6.1. 介绍</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../6_benchmark/introduction.html#id2">6.1.1. 通用基准测试节点</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../6_benchmark/introduction.html#id3">6.1.2. 服务基准测试节点</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../6_benchmark/benchmark_usage.html">6.2. 性能基准测试使用</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../6_benchmark/benchmark_usage.html#id2">6.2.1. 使用通用基准测试节点</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../6_benchmark/benchmark_usage.html#id3">6.2.2. 使用服务基准测试节点</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../6_benchmark/benchmark_usage.html#ros2-c">6.2.2.1. ROS2 C++</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../6_benchmark/benchmark_usage.html#ros2-python">6.2.2.2. ROS2 Python</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../6_benchmark/benchmark_usage.html#yaml">6.2.2.3. <strong>示例 YAML 配置</strong></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../6_benchmark/benchmark_data.html">6.3. 性能基准测试数据</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../6_benchmark/benchmark_data.html#id2">6.3.1. 通用基准测试数据</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../6_benchmark/benchmark_data.html#id3">6.3.2. 服务基准测试数据</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../6_benchmark/othertools.html">6.4. 其他工具</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../6_benchmark/othertools.html#ob-benchmark">6.4.1. Ob_benchmark 工具</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../6_benchmark/othertools.html#start-benchmark-params-json">6.4.1.1. 工具配置 (start_benchmark_params.json)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../6_benchmark/othertools.html#id2">6.4.1.2. 相机配置（启动文件）</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../6_benchmark/othertools.html#id3">6.4.1.3. 运行 ob_benchmark 工具</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../6_benchmark/othertools.html#id4">6.4.1.4. 输出数据文件</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../7_developer_guide/developer_guide.html">7. 开发者指南</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../7_developer_guide/migration_guide.html">7.1. 从 main 分支迁移到开源 v2-main 分支</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../7_developer_guide/migration_guide.html#id1">7.1.1. <strong>引言</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../7_developer_guide/migration_guide.html#id2">7.1.2. <strong>从 main 迁移到 v2-main 的优势</strong></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../7_developer_guide/migration_guide.html#id3">7.1.2.1. <strong>全面的设备支持</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../7_developer_guide/migration_guide.html#id4">7.1.2.2. <strong>透明性和可扩展性</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../7_developer_guide/migration_guide.html#id5">7.1.2.3. 维护和更新优势</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../7_developer_guide/migration_guide.html#id6">7.1.2.4. <strong>社区和生态系统支持</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../7_developer_guide/migration_guide.html#id7">7.1.3. main 和 v2-main 分支的比较</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../7_developer_guide/migration_guide.html#id8">7.1.3.1. <strong>启动文件差异</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../7_developer_guide/migration_guide.html#id9">7.1.3.2. <strong>参数差异</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../7_developer_guide/migration_guide.html#id10">7.1.3.3. <strong>话题差异</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../7_developer_guide/migration_guide.html#id11">7.1.3.4. <strong>服务差异</strong></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../7_developer_guide/building_a_Debian_Package.html">7.2. 构建 Debian 软件包</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../7_developer_guide/building_a_Debian_Package.html#id1">7.2.1. 准备环境</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../7_developer_guide/building_a_Debian_Package.html#ros">7.2.2. 配置 ROS 依赖项</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../7_developer_guide/building_a_Debian_Package.html#id2">7.2.3. 构建软件包</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../8_FAQ/FAQ.html">8. 常见问题</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../8_FAQ/FAQ.html#id2">8.1. 意外崩溃</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../8_FAQ/FAQ.html#id3">8.2. 多相机无数据流</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../8_FAQ/FAQ.html#id4">8.3. 其他故障排除</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../8_FAQ/FAQ.html#id5">8.4. 为什么有这么多启动文件？</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OrbbecSDK V2 ROS2 封装</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="overview.html"><span class="section-number">1. </span>概述</a></li>
+      <li class="breadcrumb-item active"><span class="section-number">1.2. </span>Orbbec SDK 概述</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/source/1_overview/orbbecsdk_overview.md.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="orbbec-sdk">
+<h1><span class="section-number">1.2. </span>Orbbec SDK 概述<a class="headerlink" href="#orbbec-sdk" title="Link to this heading"></a></h1>
+<p>本节介绍 C++ 版本的 Orbbec SDK。其架构和概念与 Python 包装器一致。</p>
+<section id="id1">
+<h2><span class="section-number">1.2.1. </span>术语<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>序号</th>
+<th>名称</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>USB</td>
+<td>通用串行总线（Universal Serial Bus）</td>
+</tr>
+<tr>
+<td>2</td>
+<td>UVC</td>
+<td>USB 视频类（USB Video Class）</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Firmware</td>
+<td>3D 相机的固件</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Disparity</td>
+<td>视差是指从两个有一定距离的点观察同一目标时的方向差异。</td>
+</tr>
+<tr>
+<td>5</td>
+<td>D2D (Disparity to depth)</td>
+<td>视差转深度是一种图像处理技术，用于将视差信息转换为深度信息。</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Hardware D2D</td>
+<td>视差转深度在设备内部实现，不占用主机的计算能力。</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Software D2D</td>
+<td>视差转深度，在 Orbbec SDK 中实现</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Depth point cloud</td>
+<td>深度点云，三维世界坐标系中点的坐标，可以使用深度相机的内参转换为点云。</td>
+</tr>
+<tr>
+<td>9</td>
+<td>RGBD point cloud</td>
+<td>叠加了 RGB 信息的点云</td>
+</tr>
+<tr>
+<td>10</td>
+<td>D2C</td>
+<td>"深度到彩色"（Depth to Color）是一种对深度图像进行逐像素几何变换的功能。其结果是通过 D2C 变换将深度图像与其对应的彩色图像对齐，使我们能够通过在变换后的深度图像中使用相同图像坐标位置来定位彩色像素的深度信息。经过 D2C 变换后，我们生成一个与目标彩色图像大小相同的深度图像，其中图像内容表示彩色相机坐标系中的深度数据。换句话说，它重建了一个使用彩色相机的原点和尺寸"拍摄"的深度图像，其中每个像素与彩色相机的相应像素坐标匹配。</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Hardware D2C</td>
+<td>硬件 D2C 是指在相机内部执行深度到彩色变换的功能，相机直接输出 D2C 变换的结果。</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Software D2C</td>
+<td>使用 SDK 在主机端执行 D2C 计算。</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Frame aggregation (FrameSet)</td>
+<td>帧聚合，将深度、红外和彩色帧组合成一个帧集（Frameset），并通过管道调用。</td>
+</tr>
+<tr>
+<td>14</td>
+<td>C2D</td>
+<td>"彩色到深度"（Color to Depth）是一种对彩色图像进行逐像素几何变换的功能。其结果是通过 C2D 变换将彩色图像与其对应的深度图像对齐。</td>
+</tr>
+<tr>
+<td>15</td>
+<td>MetaData</td>
+<td>帧元数据是一组参数（或属性），提供了帧生成时传感器配置和/或系统状态的快照。</td>
+</tr>
+<tr>
+<td>16</td>
+<td>HDR</td>
+<td>高动态范围（High Dynamic Range，HDR）成像允许成像系统在极暗和极亮的场景中拍摄图像。我们提出了一种在主机 CPU 上运行的软件解决方案来实现此功能。它利用两个连续帧的数据，直接合成这两个深度图像，从而增强 16 位深度图像的动态范围。</td>
+</tr>
+<tr>
+<td>17</td>
+<td>LDP</td>
+<td>激光近距离保护（Laser close-range protection）</td>
+</tr>
+</tbody>
+</table></section>
+<section id="orbbec-sdk-v2">
+<h2><span class="section-number">1.2.2. </span>Orbbec SDK v2 架构概述<a class="headerlink" href="#orbbec-sdk-v2" title="Link to this heading"></a></h2>
+<p><img alt="OrbbecSDK v2 软件架构" src="../../_images/Soft_Architecture.png" /></p>
+<ul class="simple">
+<li><p>应用层（Application）</p></li>
+</ul>
+<p>OrbbecViewer、示例程序和用户应用程序实现。</p>
+<ul class="simple">
+<li><p>接口和封装层（Interfaces and Encapsulation Layer）</p></li>
+</ul>
+<p>OrbbecSDK 接口封装和包装器封装。</p>
+<ul class="simple">
+<li><p>高级层（High-level Layer）</p></li>
+</ul>
+<p>HighLevel 封装了核心业务组件，并使用管道（pipeline）向外部提供接口。</p>
+<ul class="simple">
+<li><p>基础业务层（Basic business layer）</p></li>
+</ul>
+<p>核心业务逻辑框架的实现。</p>
+<ul class="simple">
+<li><p>平台抽象层（Platform abstraction layer）</p></li>
+</ul>
+<p>跨平台组件抽象操作系统差异，提供统一的访问接口。</p>
+<ul class="simple">
+<li><p>平台实现层（Platform implementation layer）</p></li>
+</ul>
+<p>各平台的驱动实现。</p>
+</section>
+<section id="sdk">
+<h2><span class="section-number">1.2.3. </span>SDK 概念概述<a class="headerlink" href="#sdk" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Context（上下文）</p></li>
+</ul>
+<p>上下文提供一组设置，包括设备状态更改回调、日志级别等设置。Context 可以访问多个设备。</p>
+<ul class="simple">
+<li><p>Device（设备）</p></li>
+</ul>
+<p>一个实际的硬件设备对应一个 Device 对象，用于获取设备的相关信息并控制其属性。</p>
+<ul class="simple">
+<li><p>Pipeline（管道）</p></li>
+</ul>
+<p>HighLevel 对应的对象，封装了快速访问 SDK 的接口。它具有简单的功能，使用户能够快速上手并使用 SDK。</p>
+<ul class="simple">
+<li><p>Config（配置）</p></li>
+</ul>
+<p>提供启用数据流、对齐模式和帧聚合模式的配置，用于控制数据输出的行为。</p>
+<ul class="simple">
+<li><p>StreamProfile（流配置）</p></li>
+</ul>
+<p>流配置定义分辨率、帧率和编码格式等参数，还提供相机参数的管理。</p>
+<ul class="simple">
+<li><p>Frame（帧）</p></li>
+</ul>
+<p>表示流中的一帧数据，还包含该帧数据的相关信息，如时间戳、类型等。</p>
+<ul class="simple">
+<li><p>Filter（滤镜）</p></li>
+</ul>
+<p>主要指用于复合流 FrameSet 的一些算法处理模块，如点云算法处理。</p>
+<ul class="simple">
+<li><p>Record（录制）</p></li>
+</ul>
+<p>录制功能，捕获数据流并将其保存为文件，以便后续分析或回放。</p>
+<ul class="simple">
+<li><p>Playback（回放）</p></li>
+</ul>
+<p>回放功能，播放录制的文件，并支持控制回放速度和其他相关参数。</p>
+</section>
+<section id="id2">
+<h2><span class="section-number">1.2.4. </span>SDK 编程模型<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>以下是 C++ 编程逻辑流程图。Python 的编程逻辑与之相同。</p>
+<ul class="simple">
+<li><p>标准流程图：</p></li>
+</ul>
+<p><img alt="image.png" src="../../_images/Standard_Flowchart.png" /></p>
+<p>标准流程图演示了如何从设备列表创建设备、设置和获取参数，以及应用后处理滤镜。</p>
+<ul class="simple">
+<li><p>使用默认配置的流程图（基于 OrbbecSDKConfig.xml 中的默认设置获取流）：</p></li>
+</ul>
+<p><img alt="image" src="../../_images/Default_Flowchart.png" /></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
+        <a href="introduction.html" class="btn btn-neutral float-left" title="1.1. 引言" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
+        <a href="../2_installation/installation.html" class="btn btn-neutral float-right" title="2. 安装" accesskey="n" rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
+      <span class="lastupdated">最后更新于 2025年10月22日 03:11:00.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

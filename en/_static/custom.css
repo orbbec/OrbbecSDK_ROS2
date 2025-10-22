@@ -1,0 +1,49 @@
+
+.lang-switch {
+    position: fixed !important;
+    top: 60px !important;
+    right: 20px !important;
+    z-index: 1000 !important;
+    background: rgba(255,255,255,0.95) !important;
+    border: 1px solid #ddd !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+    font-size: 0.9em !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+    backdrop-filter: blur(5px) !important;
+    transition: all 0.3s ease !important;
+}
+
+.lang-switch:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+    transform: translateY(-1px) !important;
+}
+
+.lang-switch a {
+    text-decoration: none !important;
+    transition: color 0.2s ease !important;
+}
+
+.lang-switch .lang-other {
+    color: #0078d4 !important;
+    margin-right: 8px !important;
+}
+
+.lang-switch .lang-other:hover {
+    color: #106ebe !important;
+}
+
+.lang-switch .lang-current {
+    color: #333 !important;
+    font-weight: bold !important;
+    margin-left: 8px !important;
+}
+
+@media (max-width: 768px) {
+    .lang-switch {
+        top: 10px !important;
+        right: 10px !important;
+        font-size: 0.8em !important;
+        padding: 6px 8px !important;
+    }
+}

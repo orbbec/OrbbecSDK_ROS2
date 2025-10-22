@@ -7,19 +7,12 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -O3")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -fPIC -g3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O3")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fPIC -g3")
-set(CMAKE_BUILD_TYPE "Release")
 option(USE_RK_HW_DECODER "Use Rockchip hardware decoder" OFF)
 option(USE_NV_HW_DECODER "Use Nvidia hardware decoder" OFF)
 option(INSTALL_UDEV_RULES "Install udev rule for Orbbec cameras" ON)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_compile_options(-Wall -Wextra -Werror -Wno-pedantic -Wno-array-bounds)
-endif()
-# Check if ROS Jazzy or iron is installed
-if("$ENV{ROS_DISTRO}" STREQUAL "jazzy")
-    add_compile_definitions(ROS_JAZZY)
-elseif("$ENV{ROS_DISTRO}" STREQUAL "iron")
-    add_compile_definitions(ROS_IRON)
 endif()
 
 # find dependencies
@@ -41,7 +34,6 @@ set(dependencies
     std_msgs
     std_srvs
     tf2
-    tf2_eigen
     tf2_msgs
     tf2_ros
     tf2_sensor_msgs

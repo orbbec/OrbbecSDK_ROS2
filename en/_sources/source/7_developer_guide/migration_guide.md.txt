@@ -1,6 +1,6 @@
 # Migrating from main to Open-Source v2-main
 
-## **Introduction**
+## Introduction
 
 Initially, Orbbec provided a **closed-source SDK — Orbbec SDK v1**, which formed the foundation of the [OrbbecSDK ROS2 Wrapper main branch](https://github.com/orbbec/OrbbecSDK_ROS2/tree/main). Although the ROS wrapper layer itself was open-source, it relied on a closed-source underlying SDK. This architecture imposed limitations on flexibility and hindered community-driven improvements.
 
@@ -10,7 +10,7 @@ This document introduces the motivations and benefits of migrating ROS packages 
 
 **Note:** In the following content, **main** refers to the closed-source branch, while **v2-main** refers to the open-source v2-main branch.
 
-## **Advantages of Migrating from main to v2-main**
+## Advantages of Migrating from main to v2-main
 
 In October 2024, Orbbec released a major update: **OrbbecSDK ROS2 Wrapper v2**, which is entirely based on the open-source Orbbec SDK_v2. Compared to the legacy main branch (SDK v1.x), the v2-main branch (Orbbec SDK_v2.x) provides greater flexibility and scalability, while offering comprehensive support for all Orbbec USB products that comply with the UVC standard.The migration from main --> v2-main brings the following key advantages:
 

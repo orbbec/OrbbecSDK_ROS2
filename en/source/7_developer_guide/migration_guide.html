@@ -288,8 +288,8 @@
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="developer_guide.html">7. Developer Guide</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">7.1. Migrating from main to Open-Source v2-main</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#introduction">7.1.1. <strong>Introduction</strong></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#advantages-of-migrating-from-main-to-v2-main">7.1.2. <strong>Advantages of Migrating from main to v2-main</strong></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#introduction">7.1.1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#advantages-of-migrating-from-main-to-v2-main">7.1.2. Advantages of Migrating from main to v2-main</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#comprehensive-device-support">7.1.2.1. <strong>Comprehensive Device Support</strong></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#transparency-and-extensibility">7.1.2.2. <strong>Transparency and Extensibility</strong></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#advantages-in-maintenance-and-updates">7.1.2.3. Advantages in Maintenance and Updates</a></li>
@@ -350,14 +350,14 @@
   <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">中文</a> | <a class="lang-current" href="#">English</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="migrating-from-main-to-open-source-v2-main">
 <h1><span class="section-number">7.1. </span>Migrating from main to Open-Source v2-main<a class="headerlink" href="#migrating-from-main-to-open-source-v2-main" title="Link to this heading"></a></h1>
 <section id="introduction">
-<h2><span class="section-number">7.1.1. </span><strong>Introduction</strong><a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
+<h2><span class="section-number">7.1.1. </span>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
 <p>Initially, Orbbec provided a <strong>closed-source SDK — Orbbec SDK v1</strong>, which formed the foundation of the <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/main">OrbbecSDK ROS2 Wrapper main branch</a>. Although the ROS wrapper layer itself was open-source, it relied on a closed-source underlying SDK. This architecture imposed limitations on flexibility and hindered community-driven improvements.</p>
 <p>As developers increasingly demanded transparency, maintainability, and broader device support, Orbbec released a brand-new open-source v2-main <strong>— Orbbec SDK_v2</strong> (<a class="reference external" href="https://github.com/orbbec/OrbbecSDK/tree/v2-main">GitHub link</a>). Based on this SDK, the <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2">open-source v2-main branch of OrbbecSDK ROS2</a> is now fully open source, offering greater extensibility and alignment with Orbbec’s future product roadmap.</p>
 <p>This document introduces the motivations and benefits of migrating ROS packages from the main branch (based on SDK v1) to the v2-main branch (based on Orbbec SDK_v2). It highlights the key differences in <strong>launch files, parameters, topics, and services</strong>, and provides a migration guide to help developers smoothly transition.</p>
 <p><strong>Note:</strong> In the following content, <strong>main</strong> refers to the closed-source branch, while <strong>v2-main</strong> refers to the open-source v2-main branch.</p>
 </section>
 <section id="advantages-of-migrating-from-main-to-v2-main">
-<h2><span class="section-number">7.1.2. </span><strong>Advantages of Migrating from main to v2-main</strong><a class="headerlink" href="#advantages-of-migrating-from-main-to-v2-main" title="Link to this heading"></a></h2>
+<h2><span class="section-number">7.1.2. </span>Advantages of Migrating from main to v2-main<a class="headerlink" href="#advantages-of-migrating-from-main-to-v2-main" title="Link to this heading"></a></h2>
 <p>In October 2024, Orbbec released a major update: <strong>OrbbecSDK ROS2 Wrapper v2</strong>, which is entirely based on the open-source Orbbec SDK_v2. Compared to the legacy main branch (SDK v1.x), the v2-main branch (Orbbec SDK_v2.x) provides greater flexibility and scalability, while offering comprehensive support for all Orbbec USB products that comply with the UVC standard.The migration from main –&gt; v2-main brings the following key advantages:</p>
 <section id="comprehensive-device-support">
 <h3><span class="section-number">7.1.2.1. </span><strong>Comprehensive Device Support</strong><a class="headerlink" href="#comprehensive-device-support" title="Link to this heading"></a></h3>
@@ -1195,7 +1195,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2025, ORBBEC INC. www.orbbec.com..
-      <span class="lastupdated">Last updated on 2025-10-22 03:10:57.
+      <span class="lastupdated">Last updated on 2025-10-22 03:17:24.
       </span></p>
   </div>
 

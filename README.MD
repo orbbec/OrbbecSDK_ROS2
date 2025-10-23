@@ -25,68 +25,68 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
     </tr>
   </thead>
   <tbody>
-    <tr>
+      <tr>
       <td style="text-align: center; font-weight: bold;">Gemini 435Le</td>
       <td>Gemini 435Le</td>
-      <td>Not supported</td>
-      <td>Recommended for new designs</td>
+      <td>not supported</td>
+      <td>recommended for new designs</td>
     </tr>
     <tr>
       <td rowspan="8" style="text-align: center; font-weight: bold;">Gemini 330</td>
+      <td>Gemini 335Le</td>
+      <td>not supported</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
       <td>Gemini 335</td>
-      <td>Full maintenance</td>
-      <td>Recommended for new designs</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
     </tr>
     <tr>
       <td>Gemini 336</td>
-      <td>Full maintenance</td>
-      <td>Recommended for new designs</td>
-    </tr>
-    <tr>
-      <td>Gemini 335L</td>
-      <td>Full maintenance</td>
-      <td>Recommended for new designs</td>
-    </tr>
-    <tr>
-      <td>Gemini 336L</td>
-      <td>Full maintenance</td>
-      <td>Recommended for new designs</td>
-    </tr>
-    <tr>
-      <td>Gemini 335Lg</td>
-      <td>Not supported</td>
-      <td>Recommended for new designs</td>
-    </tr>
-    <tr>
-      <td>Gemini 335Le</td>
-      <td>Not supported</td>
-      <td>Recommended for new designs</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
     </tr>
     <tr>
       <td>Gemini 330</td>
-      <td>Full maintenance</td>
-      <td>Recommended for new designs</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 335L</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 336L</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
     </tr>
     <tr>
       <td>Gemini 330L</td>
-      <td>Full maintenance</td>
-      <td>Recommended for new designs</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 335Lg</td>
+      <td>not supported</td>
+      <td>recommended for new designs</td>
     </tr>
     <tr>
       <td rowspan="5" style="text-align: center; font-weight: bold;">Gemini 2</td>
       <td>Gemini 2</td>
-      <td>Full maintenance</td>
-      <td>Recommended for new designs</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
     </tr>
     <tr>
       <td>Gemini 2 L</td>
-      <td>Full maintenance</td>
-      <td>Recommended for new designs</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
     </tr>
     <tr>
       <td>Gemini 2 XL</td>
-      <td>Recommended for new designs</td>
-      <td>To be supported</td>
+      <td>recommended for new designs</td>
+      <td>to be supported</td>
     </tr>
     <tr>
       <td>Gemini 215</td>
@@ -101,40 +101,40 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
     <tr>
       <td rowspan="3" style="text-align: center; font-weight: bold;">Femto</td>
       <td>Femto Bolt</td>
-      <td>Full maintenance</td>
-      <td>Recommended for new designs</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
     </tr>
     <tr>
       <td>Femto Mega</td>
-      <td>Full maintenance</td>
-      <td>Recommended for new designs</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
     </tr>
     <tr>
       <td>Femto Mega I</td>
-      <td>Full maintenance</td>
-      <td>Recommended for new designs</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
     </tr>
     <tr>
       <td rowspan="3" style="text-align: center; font-weight: bold;">Astra</td>
       <td>Astra 2</td>
-      <td>Full maintenance</td>
-      <td>Recommended for new designs</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
     </tr>
     <tr>
       <td>Astra+</td>
-      <td>Limited maintenance</td>
-      <td>Not supported</td>
+      <td>limited maintenance</td>
+      <td>not supported</td>
     </tr>
     <tr>
       <td>Astra Pro Plus</td>
-      <td>Limited maintenance</td>
-      <td>Not supported</td>
+      <td>limited maintenance</td>
+      <td>not supported</td>
     </tr>
     <tr>
-      <td rowspan="1" style="text-align: center; font-weight: bold;">Astra Mini</td>
-      <td>Astra Mini Pro</td>
-      <td>Full maintenance</td>
-      <td>Full maintenance</td>
+      <td style="text-align: center; font-weight: bold;">Astra Mini</td>
+      <td>Astra Mini (S) Pro</td>
+      <td>full maintenance</td>
+      <td>recommended for new designs</td>
     </tr>
   </tbody>
 </table>
@@ -266,23 +266,20 @@ Currently, the following devices are supported by the OrbbecSDK ROS2 Wrapper v2-
 
 For optimal performance, we strongly recommend updating to the latest firmware version. This ensures that you benefit from the most recent enhancements and bug fixes.
 
-| Product List   | Minimal Firmware Version | **Launch File**             |
-| :------------- | :----------------------- | :-------------------------- |
-| Gemini 435Le   | 1.2.04                   | gemini435_le.launch.py      |
-| Gemini 335     | 1.2.20                   | gemini_330_series.launch.py |
-| Gemini 336     | 1.2.20                   | gemini_330_series.launch.py |
-| Gemini 335L    | 1.2.20                   | gemini_330_series.launch.py |
-| Gemini 336L    | 1.2.20                   | gemini_330_series.launch.py |
-| Gemini 335Lg   | 1.3.46                   | gemini_330_series.launch.py |
-| Gemini 335Le   | 1.5.31                   | gemini_330_series.launch.py |
-| Gemini 330     | 1.2.20                   | gemini_330_series.launch.py |
-| Gemini 330L    | 1.2.20                   | gemini_330_series.launch.py |
-| Gemini 2       | 1.4.92                   | gemini2.launch.py           |
-| Gemini 2 L     | 1.4.53                   | gemini2L.launch.py          |
-| Femto Bolt     | 1.1.2                    | femto_bolt.launch.py        |
-| Femto Mega     | 1.3.0                    | femto_mega.launch.py        |
-| Astra 2        | 2.8.20                   | astra2.launch.py            |
-| Astra Mini Pro | 2.0.01                   | astra.launch.py             |
+| **Products List** | **Recommended FW Version**                                                             | Launch File                 |
+| ----------------------- | -------------------------------------------------------------------------------------------- | --------------------------- |
+| Astra Mini Pro          | [2.0.03](https://github.com/orbbec/OrbbecFirmware/releases/tag/Astra-Mini-Pro)                  | astra.launch.py             |
+| Astra Mini S Pro        | [2.0.03](https://github.com/orbbec/OrbbecFirmware/releases/tag/Astra-Mini-S-Pro)                | astra.launch.py             |
+| Gemini 435Le            | [1.3.2](https://github.com/orbbec/OrbbecFirmware/releases/tag/Gemin435Le-Firmware)              | gemini435_le.launch.py      |
+| Gemini 330 series       | [1.6.00](https://orbbec-debian-repos-aws.s3.amazonaws.com/product/Gemini330_Release_1.6.00.zip) | gemini_330_series.launch.py |
+| Gemini 215              | [1.0.9](https://github.com/orbbec/OrbbecFirmware/releases/tag/Gemini215-Firmware)               | gemini210.launch.py         |
+| Gemini 210              | [1.0.9](https://github.com/orbbec/OrbbecFirmware/releases/tag/Gemini210-Firmware)               | gemini210.launch.py         |
+| Gemini 2                | [1.4.98](https://github.com/orbbec/OrbbecFirmware/releases/tag/Gemini2-Firmware)                | gemini2.launch.py           |
+| Gemini 2 L              | [1.5.2](https://github.com/orbbec/OrbbecFirmware/releases/tag/Gemini2L-Firmware)                | gemini2L.launch.py          |
+| Femto Bolt              | [1.1.2](https://github.com/orbbec/OrbbecFirmware/releases/tag/Femto-Bolt-Firmware)              | femto_bolt.launch.py        |
+| Femto Mega              | [1.3.1](https://github.com/orbbec/OrbbecFirmware/releases/tag/Femto-Mega-Firmware)              | femto_mega.launch.py        |
+| Femto Mega I            | [2.0.4](https://github.com/orbbec/OrbbecFirmware/releases/tag/Femto-Mega-I-Firmware)            | femto_mega.launch.py        |
+| Astra 2                 | [2.8.20](https://orbbec-debian-repos-aws.s3.amazonaws.com/product/Astra2_Release_2.8.20.zip)    | astra2.launch.py            |
 
 All launch files are essentially similar, with the primary difference being the default values of the parameters set
 for different models within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution settings in the launch file, as well as other parameters, to ensure compatibility and optimal performance.

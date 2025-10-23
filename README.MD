@@ -20,8 +20,19 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
     </tr>
   </thead>
   <tbody>
+      <tr>
+      <td style="text-align: center; font-weight: bold;">Gemini 435Le</td>
+      <td>Gemini 435Le</td>
+      <td>not supported</td>
+      <td>recommended for new designs</td>
+    </tr>
     <tr>
       <td rowspan="8" style="text-align: center; font-weight: bold;">Gemini 330</td>
+      <td>Gemini 335Le</td>
+      <td>not supported</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
       <td>Gemini 335</td>
       <td>full maintenance</td>
       <td>recommended for new designs</td>
@@ -57,12 +68,7 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
       <td>recommended for new designs</td>
     </tr>
     <tr>
-      <td>Gemini 335Le</td>
-      <td>not supported</td>
-      <td>recommended for new designs</td>
-    </tr>
-    <tr>
-      <td rowspan="3" style="text-align: center; font-weight: bold;">Gemini 2</td>
+      <td rowspan="5" style="text-align: center; font-weight: bold;">Gemini 2</td>
       <td>Gemini 2</td>
       <td>full maintenance</td>
       <td>recommended for new designs</td>
@@ -76,6 +82,16 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
       <td>Gemini 2 XL</td>
       <td>recommended for new designs</td>
       <td>to be supported</td>
+    </tr>
+    <tr>
+      <td>Gemini 215</td>
+      <td>not supported</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 210</td>
+      <td>not supported</td>
+      <td>recommended for new designs</td>
     </tr>
     <tr>
       <td rowspan="3" style="text-align: center; font-weight: bold;">Femto</td>
@@ -111,9 +127,9 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
     </tr>
     <tr>
       <td style="text-align: center; font-weight: bold;">Astra Mini</td>
-      <td>Astra Mini Pro</td>
+      <td>Astra Mini (S) Pro</td>
       <td>full maintenance</td>
-      <td>not supported</td>
+      <td>recommended for new designs</td>
     </tr>
   </tbody>
 </table>
@@ -754,6 +770,7 @@ The following devices are supported by the OrbbecSDK ROS2 Wrapper.
 | Gemini 336L      | 1.2.20                             | gemini_330_series.launch.py |
 | Femto Bolt       | 1.0.6                              | femto_bolt.launch.py        |
 | Femto Mega       | 1.1.7                              | femto_mega.launch.py        |
+| Femto Mega I     | 2.0.2                              | femto_mega.launch.py        |
 | Gemini 2 XL      | Obox: V1.2.5 VL:1.4.54             | gemini2XL.launch.py         |
 | Astra 2          | 2.8.20                             | astra2.launch.py            |
 | Gemini 2 L       | 1.4.32                             | gemini2L.launch.py          |

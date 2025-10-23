@@ -232,7 +232,7 @@ ros2 topic echo /camera/depth/camera_info
 ros2 service call /camera/get_sdk_version orbbec_camera_msgs/srv/GetString '{}'
 ```
 
-更多使用详情，请参考官方 [OrbbecSDK ROS2 文档](https://orbbec.github.io/OrbbecSDK_ROS2/source/4_application_guide/application_guide.html)
+更多使用详情，请参考官方 [OrbbecSDK ROS2 文档](https://orbbec.github.io/OrbbecSDK_ROS2/zh/source/4_application_guide/application_guide.html)
 
 ## 支持的设备
 
@@ -262,7 +262,7 @@ ros2 service call /camera/get_sdk_version orbbec_camera_msgs/srv/GetString '{}'
 
 ## 教程
 
-请参考官方 [OrbbecSDK ROS2 文档](https://orbbec.github.io/OrbbecSDK_ROS2/source/5_advanced_guide/advanced_guide.html)
+请参考官方 [OrbbecSDK ROS2 文档](https://orbbec.github.io/OrbbecSDK_ROS2/zh/source/5_advanced_guide/advanced_guide.html)
 
 ## 示例
 
@@ -270,7 +270,7 @@ ros2 service call /camera/get_sdk_version orbbec_camera_msgs/srv/GetString '{}'
 
 ## 其他有用链接
 
-- [OrbbecSDK ROS2 文档](https://orbbec.github.io/OrbbecSDK_ROS2/index.html)
+- [OrbbecSDK ROS2 文档](https://orbbec.github.io/OrbbecSDK_ROS2/zh/index.html)
 - [OrbbecSDK_v2](https://github.com/orbbec/OrbbecSDK_v2/releases)
 - [Gemini 330 深度预设](https://www.orbbec.com/docs/g330-use-depth-presets/)
 

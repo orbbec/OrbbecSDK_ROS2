@@ -258,7 +258,7 @@ ros2 topic echo /camera/depth/camera_info
 ros2 service call /camera/get_sdk_version orbbec_camera_msgs/srv/GetString '{}'
 ```
 
-For more usage details, please refer to the official [OrbbecSDK ROS2 documentation](https://orbbec.github.io/OrbbecSDK_ROS2/source/4_application_guide/application_guide.html)
+For more usage details, please refer to the official [OrbbecSDK ROS2 documentation](https://orbbec.github.io/OrbbecSDK_ROS2/en/source/4_application_guide/application_guide.html)
 
 ## Supported Devices
 
@@ -289,7 +289,7 @@ for different models within the same series. Differences in USB standards, such 
 
 ## Tutorial
 
-please refer to the official [OrbbecSDK ROS2 documentation](https://orbbec.github.io/OrbbecSDK_ROS2/source/5_advanced_guide/advanced_guide.html)
+please refer to the official [OrbbecSDK ROS2 documentation](https://orbbec.github.io/OrbbecSDK_ROS2/en/source/5_advanced_guide/advanced_guide.html)
 
 ## Examples
 
@@ -297,7 +297,7 @@ To explore practical examples and gain insight into how to use the camera in ROS
 
 ## Other useful links
 
-- [OrbbecSDK ROS2 documentation](https://orbbec.github.io/OrbbecSDK_ROS2/index.html)
+- [OrbbecSDK ROS2 documentation](https://orbbec.github.io/OrbbecSDK_ROS2/en/index.html)
 - [OrbbecSDK_v2](https://github.com/orbbec/OrbbecSDK_v2/releases)
 - [Gemini 330 depth presets](https://www.orbbec.com/docs/g330-use-depth-presets/)
 

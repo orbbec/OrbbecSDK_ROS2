@@ -13,9 +13,9 @@ option(USE_NV_HW_DECODER "Use Nvidia hardware decoder" OFF)
 option(INSTALL_UDEV_RULES "Install udev rule for Orbbec cameras" ON)
 
 
-if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Werror -Wno-pedantic -Wno-array-bounds)
-endif ()
+endif()
 
 # find dependencies
 set(dependencies
@@ -46,24 +46,24 @@ set(dependencies
   backward_ros
 )
 
-foreach (dep IN LISTS dependencies)
+foreach(dep IN LISTS dependencies)
   find_package(${dep} REQUIRED)
-endforeach ()
+endforeach()
 
 find_package(PkgConfig REQUIRED)
 
 
-if (USE_RK_HW_DECODER)
+if(USE_RK_HW_DECODER)
   pkg_search_module(RK_MPP REQUIRED rockchip_mpp)
-  if (NOT RK_MPP_FOUND)
+  if(NOT RK_MPP_FOUND)
     message(FATAL_ERROR "rockchip_mpp is not found")
-  endif ()
+  endif()
   pkg_search_module(RGA librga)
-  if (NOT RGA_FOUND)
+  if(NOT RGA_FOUND)
     add_definitions(-DUSE_LIBYUV)
     message("librga is not found, use libyuv instead")
-  endif ()
-endif ()
+  endif()
+endif()
 
 
 execute_process(COMMAND uname -m OUTPUT_VARIABLE MACHINES)
@@ -71,20 +71,20 @@ execute_process(COMMAND getconf LONG_BIT OUTPUT_VARIABLE MACHINES_BIT)
 message(STATUS "ORRBEC Machine : ${MACHINES}")
 message(STATUS "ORRBEC Machine Bits : ${MACHINES_BIT}")
 
-if ((${MACHINES} MATCHES "x86_64") AND (${MACHINES_BIT} MATCHES "64"))
+if((${MACHINES} MATCHES "x86_64") AND (${MACHINES_BIT} MATCHES "64"))
   set(HOST_PLATFORM "x64")
-elseif (${MACHINES} MATCHES "arm" OR (${MACHINES} MATCHES "aarch64" AND ${MACHINES_BIT} MATCHES "32"))
+elseif(${MACHINES} MATCHES "arm" OR (${MACHINES} MATCHES "aarch64" AND ${MACHINES_BIT} MATCHES "32"))
   set(HOST_PLATFORM "arm32")
-elseif ((${MACHINES} MATCHES "aarch64") AND (${MACHINES_BIT} MATCHES "64"))
+elseif((${MACHINES} MATCHES "aarch64") AND (${MACHINES_BIT} MATCHES "64"))
   set(HOST_PLATFORM "arm64")
-endif ()
+endif()
 
 set(ORBBEC_LIBS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/SDK/lib/${HOST_PLATFORM})
 set(ORBBEC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/SDK/include/)
 
 set(CMAKE_BUILD_RPATH "${CMAKE_BUILD_RPATH}:${ORBBEC_LIBS_DIR}")
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:${ORBBEC_LIBS_DIR}")
-if (USE_NV_HW_DECODER)
+if(USE_NV_HW_DECODER)
   set(JETSON_MULTI_MEDIA_API_DIR /usr/src/jetson_multimedia_api)
   set(JETSON_MULTI_MEDIA_API_CLASS_DIR ${JETSON_MULTI_MEDIA_API_DIR}/samples/common/classes)
   set(JETSON_MULTI_MEDIA_API_INCLUDE_DIR ${JETSON_MULTI_MEDIA_API_DIR}/include/)
@@ -97,7 +97,7 @@ if (USE_NV_HW_DECODER)
   )
   list(APPEND NV_LIBRARIES
     -L${TEGRA_ARMABI} -L${TEGRA_ARMABI}/tegra)
-endif ()
+endif()
 
 set(COMMON_INCLUDE_DIRS
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
@@ -118,18 +118,17 @@ set(COMMON_LIBRARIES
   -lrt
   -ldw
 )
-if (USE_RK_HW_DECODER)
+if(USE_RK_HW_DECODER)
   list(APPEND COMMON_LIBRARIES
     ${RK_MPP_LIBRARIES}
     ${RGA_LIBRARIES}
   )
+endif()
 
-endif ()
-
-if (USE_NV_HW_DECODER)
+if(USE_NV_HW_DECODER)
   list(APPEND COMMON_LIBRARIES
     ${NV_LIBRARIES})
-endif ()
+endif()
 
 
 set(SOURCE_FILES
@@ -145,7 +144,7 @@ set(SOURCE_FILES
   src/jpeg_decoder.cpp
 )
 
-if (USE_RK_HW_DECODER)
+if(USE_RK_HW_DECODER)
   add_definitions(-DUSE_RK_HW_DECODER)
   list(APPEND SOURCE_FILES src/rk_mpp_decoder.cpp)
   list(APPEND COMMON_INCLUDE_DIRS
@@ -156,14 +155,12 @@ if (USE_RK_HW_DECODER)
     ${RGA_LIBRARIES}
     ${RK_MPP_LIBRARIES}
   )
-  if (NOT RGA_FOUND)
-    list(APPEND COMMON_LIBRARIES
-      -lyuv
-    )
-  endif ()
-endif ()
+  if(NOT RGA_FOUND)
+    list(APPEND COMMON_LIBRARIES -lyuv)
+  endif()
+endif()
 
-if (USE_NV_HW_DECODER)
+if(USE_NV_HW_DECODER)
   list(APPEND SOURCE_FILES src/jetson_nv_decoder.cpp)
   list(APPEND COMMON_INCLUDE_DIRS ${JETSON_MULTI_MEDIA_API_INCLUDE_DIR}
     ${LIBJPEG8B_INCLUDE_DIR})
@@ -182,7 +179,7 @@ if (USE_NV_HW_DECODER)
     ${JETSON_MULTI_MEDIA_API_CLASS_DIR}/NvVideoEncoder.cpp
     ${JETSON_MULTI_MEDIA_API_CLASS_DIR}/NvBufSurface.cpp
   )
-endif ()
+endif()
 
 macro(add_orbbec_executable TARGET SOURCE)
   add_executable(${TARGET} ${SOURCE})
@@ -234,16 +231,12 @@ install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY ${ORBBEC_INCLUDE_DIR} DESTINATION include)
 install(DIRECTORY ${ORBBEC_LIBS_DIR}/ DESTINATION lib/ FILES_MATCHING PATTERN "*.so*")
-if (DEFINED ENV{BUILDING_PACKAGE})
+if(DEFINED ENV{BUILDING_PACKAGE})
   # Install udev rules
-  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/99-obsensor-libusb.rules
-    DESTINATION /etc/udev/rules.d
-  )
-endif ()
+  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/99-obsensor-libusb.rules DESTINATION /etc/udev/rules.d)
+endif()
 if(INSTALL_UDEV_RULES)
-    # Install udev rule into package share so user can manually copy with sudo if desired
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/99-obsensor-libusb.rules
-            DESTINATION share/${PROJECT_NAME}/udev)
+  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/99-obsensor-libusb.rules DESTINATION share/${PROJECT_NAME}/udev)
 endif()
 
 install(TARGETS list_devices_node
@@ -252,10 +245,10 @@ install(TARGETS list_devices_node
   topic_statistics_node
   DESTINATION lib/${PROJECT_NAME}/)
 
-if (BUILD_TESTING)
+if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
-endif ()
+endif()
 
 ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})

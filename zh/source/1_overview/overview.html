@@ -152,18 +152,33 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../4_application_guide/coordinate_systems.html">4.4. ROS2机器人坐标系 vs 相机光学坐标系</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/camera_sensor_structure.html">4.5. 相机传感器结构</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/tf_transformations.html">4.6. 从坐标系A到坐标系B的TF变换：</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/compressed_image.html">4.7. 压缩图像</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/point_cloud.html">4.8. 在ROS 2中启用和可视化点云</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/point_cloud.html#id1">4.8.1. 启用深度点云</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/point_cloud.html#id2">4.8.1.1. 启用深度点云的命令</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/point_cloud.html#rviz2">4.8.1.2. 在RViz2中可视化深度点云</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#ros2-tf">4.5. ROS2 TF工具的使用</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#tf">4.5.1. 查看TF树结构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#rviz2tf">4.5.2. 使用rviz2可视化TF树</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/point_cloud.html#id3">4.8.2. 启用彩色点云</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/point_cloud.html#id4">4.8.2.1. 启用彩色点云的命令</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/point_cloud.html#id5">4.8.2.2. 在RViz2中可视化彩色点云</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#id1">4.6. 相机TF计算和发布机制</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#obcameranode-calcandpublishstatictransform">4.6.1. 核心函数：<code class="docutils literal notranslate"><span class="pre">OBCameraNode::calcAndPublishStaticTransform()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#id2">4.6.2. 四元数初始化与坐标系变换</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#id3">4.6.3. 获取设备信息与基准流</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#id4">4.6.4. 遍历所有流并计算相对变换</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#id5">4.6.5. 发布TF变换</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#id6">4.6.6. 特殊处理左右红外摄像头</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#id7">4.6.7. 发布深度到其他传感器的外参</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/camera_sensor_structure.html">4.7. 相机传感器结构</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/tf_transformations.html">4.8. 从坐标系A到坐标系B的TF变换：</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/compressed_image.html">4.9. 压缩图像</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/point_cloud.html">4.10. 在ROS 2中启用和可视化点云</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/point_cloud.html#id1">4.10.1. 启用深度点云</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/point_cloud.html#id2">4.10.1.1. 启用深度点云的命令</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/point_cloud.html#rviz2">4.10.1.2. 在RViz2中可视化深度点云</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/point_cloud.html#id3">4.10.2. 启用彩色点云</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/point_cloud.html#id4">4.10.2.1. 启用彩色点云的命令</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/point_cloud.html#id5">4.10.2.2. 在RViz2中可视化彩色点云</a></li>
 </ul>
 </li>
 </ul>
@@ -381,7 +396,7 @@
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2025年10月23日 09:59:18.
+      <span class="lastupdated">最后更新于 2025年10月28日 05:42:30.
       </span></p>
   </div>
 

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>4.5. Camera sensor structure &mdash; OrbbecSDK V2 ROS2 Wrapper  documentation</title>
+  <title>4.7. Camera sensor structure &mdash; OrbbecSDK V2 ROS2 Wrapper  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=63de077d" />
@@ -21,7 +21,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="4.6. TF from coordinate A to coordinate B:" href="tf_transformations.html" />
+    <link rel="next" title="4.8. TF from coordinate A to coordinate B:" href="tf_transformations.html" />
     <link rel="prev" title="4.4. ROS2 Robot vs Camera Optical Coordination Systems" href="coordinate_systems.html" /> 
 </head>
 
@@ -151,18 +151,33 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="coordinate_systems.html">4.4. ROS2 Robot vs Camera Optical Coordination Systems</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">4.5. Camera sensor structure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tf_transformations.html">4.6. TF from coordinate A to coordinate B:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compressed_image.html">4.7. Compressed Image</a></li>
-<li class="toctree-l2"><a class="reference internal" href="point_cloud.html">4.8. Enabling and Visualizing Point Cloud in ROS 2</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#enabling-depth-point-cloud">4.8.1. Enabling Depth Point Cloud</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#command-to-enable-depth-point-cloud">4.8.1.1. Command to Enable Depth Point Cloud</a></li>
-<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#visualizing-depth-point-cloud-in-rviz2">4.8.1.2. Visualizing Depth Point Cloud in RViz2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coordinate_systems.html#using-ros2-tf-tools">4.5. Using ROS2 TF Tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="coordinate_systems.html#viewing-the-tf-tree-structure">4.5.1. Viewing the TF Tree Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="coordinate_systems.html#visualizing-tf-tree-with-rviz2">4.5.2. Visualizing TF Tree with rviz2</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#enabling-colored-point-cloud">4.8.2. Enabling Colored Point Cloud</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#command-to-enable-colored-point-cloud">4.8.2.1. Command to Enable Colored Point Cloud</a></li>
-<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#visualizing-colored-point-cloud-in-rviz2">4.8.2.2. Visualizing Colored Point Cloud in RViz2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coordinate_systems.html#camera-tf-calculation-and-publishing-mechanism">4.6. Camera TF Calculation and Publishing Mechanism</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="coordinate_systems.html#core-function-obcameranode-calcandpublishstatictransform">4.6.1. Core Function: <code class="docutils literal notranslate"><span class="pre">OBCameraNode::calcAndPublishStaticTransform()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="coordinate_systems.html#quaternion-initialization-and-coordinate-system-transformation">4.6.2. Quaternion Initialization and Coordinate System Transformation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="coordinate_systems.html#obtaining-device-information-and-base-stream">4.6.3. Obtaining Device Information and Base Stream</a></li>
+<li class="toctree-l3"><a class="reference internal" href="coordinate_systems.html#iterating-through-all-streams-and-calculating-relative-transformations">4.6.4. Iterating Through All Streams and Calculating Relative Transformations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="coordinate_systems.html#publishing-tf-transformations">4.6.5. Publishing TF Transformations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="coordinate_systems.html#special-handling-for-left-and-right-ir-cameras">4.6.6. Special Handling for Left and Right IR Cameras</a></li>
+<li class="toctree-l3"><a class="reference internal" href="coordinate_systems.html#publishing-extrinsics-from-depth-to-other-sensors">4.6.7. Publishing Extrinsics from Depth to Other Sensors</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">4.7. Camera sensor structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tf_transformations.html">4.8. TF from coordinate A to coordinate B:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compressed_image.html">4.9. Compressed Image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="point_cloud.html">4.10. Enabling and Visualizing Point Cloud in ROS 2</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#enabling-depth-point-cloud">4.10.1. Enabling Depth Point Cloud</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#command-to-enable-depth-point-cloud">4.10.1.1. Command to Enable Depth Point Cloud</a></li>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#visualizing-depth-point-cloud-in-rviz2">4.10.1.2. Visualizing Depth Point Cloud in RViz2</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#enabling-colored-point-cloud">4.10.2. Enabling Colored Point Cloud</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#command-to-enable-colored-point-cloud">4.10.2.1. Command to Enable Colored Point Cloud</a></li>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#visualizing-colored-point-cloud-in-rviz2">4.10.2.2. Visualizing Colored Point Cloud in RViz2</a></li>
 </ul>
 </li>
 </ul>
@@ -337,7 +352,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="application_guide.html"><span class="section-number">4. </span>Application Guide</a></li>
-      <li class="breadcrumb-item active"><span class="section-number">4.5. </span>Camera sensor structure</li>
+      <li class="breadcrumb-item active"><span class="section-number">4.7. </span>Camera sensor structure</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/source/4_application_guide/camera_sensor_structure.md.txt" rel="nofollow"> View page source</a>
       </li>
@@ -348,7 +363,7 @@
            <div itemprop="articleBody">
              
   <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">中文</a> | <a class="lang-current" href="#">English</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="camera-sensor-structure">
-<h1><span class="section-number">4.5. </span>Camera sensor structure<a class="headerlink" href="#camera-sensor-structure" title="Link to this heading"></a></h1>
+<h1><span class="section-number">4.7. </span>Camera sensor structure<a class="headerlink" href="#camera-sensor-structure" title="Link to this heading"></a></h1>
 <p><img alt="module in rviz2" src="../../_images/image3.png" /></p>
 <p><img alt="module in rviz2" src="../../_images/image1.png" /></p>
 </section>
@@ -358,14 +373,14 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="coordinate_systems.html" class="btn btn-neutral float-left" title="4.4. ROS2 Robot vs Camera Optical Coordination Systems" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="tf_transformations.html" class="btn btn-neutral float-right" title="4.6. TF from coordinate A to coordinate B:" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="tf_transformations.html" class="btn btn-neutral float-right" title="4.8. TF from coordinate A to coordinate B:" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2025, ORBBEC INC. www.orbbec.com..
-      <span class="lastupdated">Last updated on 2025-10-23 09:59:15.
+      <span class="lastupdated">Last updated on 2025-10-28 05:42:27.
       </span></p>
   </div>
 

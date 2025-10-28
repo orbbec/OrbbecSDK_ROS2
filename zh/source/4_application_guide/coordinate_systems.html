@@ -22,7 +22,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="索引" href="../../genindex.html" />
     <link rel="search" title="搜索" href="../../search.html" />
-    <link rel="next" title="4.5. 相机传感器结构" href="camera_sensor_structure.html" />
+    <link rel="next" title="4.7. 相机传感器结构" href="camera_sensor_structure.html" />
     <link rel="prev" title="4.3. 可用话题" href="topics.html" /> 
 </head>
 
@@ -152,18 +152,33 @@
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">4.4. ROS2机器人坐标系 vs 相机光学坐标系</a></li>
-<li class="toctree-l2"><a class="reference internal" href="camera_sensor_structure.html">4.5. 相机传感器结构</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tf_transformations.html">4.6. 从坐标系A到坐标系B的TF变换：</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compressed_image.html">4.7. 压缩图像</a></li>
-<li class="toctree-l2"><a class="reference internal" href="point_cloud.html">4.8. 在ROS 2中启用和可视化点云</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#id1">4.8.1. 启用深度点云</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#id2">4.8.1.1. 启用深度点云的命令</a></li>
-<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#rviz2">4.8.1.2. 在RViz2中可视化深度点云</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ros2-tf">4.5. ROS2 TF工具的使用</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#tf">4.5.1. 查看TF树结构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rviz2tf">4.5.2. 使用rviz2可视化TF树</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#id3">4.8.2. 启用彩色点云</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#id4">4.8.2.1. 启用彩色点云的命令</a></li>
-<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#id5">4.8.2.2. 在RViz2中可视化彩色点云</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">4.6. 相机TF计算和发布机制</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#obcameranode-calcandpublishstatictransform">4.6.1. 核心函数：<code class="docutils literal notranslate"><span class="pre">OBCameraNode::calcAndPublishStaticTransform()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">4.6.2. 四元数初始化与坐标系变换</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">4.6.3. 获取设备信息与基准流</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">4.6.4. 遍历所有流并计算相对变换</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">4.6.5. 发布TF变换</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">4.6.6. 特殊处理左右红外摄像头</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id7">4.6.7. 发布深度到其他传感器的外参</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="camera_sensor_structure.html">4.7. 相机传感器结构</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tf_transformations.html">4.8. 从坐标系A到坐标系B的TF变换：</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compressed_image.html">4.9. 压缩图像</a></li>
+<li class="toctree-l2"><a class="reference internal" href="point_cloud.html">4.10. 在ROS 2中启用和可视化点云</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#id1">4.10.1. 启用深度点云</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#id2">4.10.1.1. 启用深度点云的命令</a></li>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#rviz2">4.10.1.2. 在RViz2中可视化深度点云</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#id3">4.10.2. 启用彩色点云</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#id4">4.10.2.1. 启用彩色点云的命令</a></li>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#id5">4.10.2.2. 在RViz2中可视化彩色点云</a></li>
 </ul>
 </li>
 </ul>
@@ -366,20 +381,154 @@
 <li><p>静态和动态TF话题发布光学坐标系和ROS坐标系，使用户能够在两个坐标系之间转换。</p></li>
 </ul>
 </section>
+<section id="ros2-tf">
+<h1><span class="section-number">4.5. </span>ROS2 TF工具的使用<a class="headerlink" href="#ros2-tf" title="Link to this heading"></a></h1>
+<section id="tf">
+<h2><span class="section-number">4.5.1. </span>查看TF树结构<a class="headerlink" href="#tf" title="Link to this heading"></a></h2>
+<p>可以使用以下ROS2命令来打印和可视化相机包发布的TF树：</p>
+<p><strong>打印所有TF关系：</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>tf2_tools<span class="w"> </span>view_frames
+</pre></div>
+</div>
+<p>这个命令会生成一个 <code class="docutils literal notranslate"><span class="pre">frames.pdf</span></code>文件，展示所有frame之间的层级关系。</p>
+<p><img alt="image-20251027111351870" src="../../_images/image4.png" /></p>
+<p><strong>查看所有正在发布的TF信息：</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/tf_static
+</pre></div>
+</div>
+</section>
+<section id="rviz2tf">
+<h2><span class="section-number">4.5.2. </span>使用rviz2可视化TF树<a class="headerlink" href="#rviz2tf" title="Link to this heading"></a></h2>
+<p>在rviz2中可以实时可视化TF树结构和坐标系的相对位置：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rviz2
+</pre></div>
+</div>
+<p>在rviz2中：</p>
+<ul class="simple">
+<li><p>添加 <code class="docutils literal notranslate"><span class="pre">TF</span></code>显示插件</p></li>
+<li><p>配置固定框架（Fixed Frame）为 <code class="docutils literal notranslate"><span class="pre">camera_link</span></code>或 <code class="docutils literal notranslate"><span class="pre">camera_depth_optical_frame</span></code></p></li>
+<li><p>选择显示的TF框架树</p></li>
+</ul>
+<p><img alt="image-20251027140652727" src="../../_images/image5.png" /></p>
+</section>
+</section>
+<section id="id1">
+<h1><span class="section-number">4.6. </span>相机TF计算和发布机制<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<section id="obcameranode-calcandpublishstatictransform">
+<h2><span class="section-number">4.6.1. </span>核心函数：<code class="docutils literal notranslate"><span class="pre">OBCameraNode::calcAndPublishStaticTransform()</span></code><a class="headerlink" href="#obcameranode-calcandpublishstatictransform" title="Link to this heading"></a></h2>
+<p>相机节点通过此函数计算和发布所有传感器之间的静态转换关系。下面是代码的详细解释：</p>
+</section>
+<section id="id2">
+<h2><span class="section-number">4.6.2. </span>四元数初始化与坐标系变换<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">tf2</span><span class="o">::</span><span class="n">Quaternion</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="p">,</span><span class="w"> </span><span class="n">zero_rot</span><span class="p">;</span>
+<span class="n">zero_rot</span><span class="p">.</span><span class="n">setRPY</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+<span class="n">quaternion_optical</span><span class="p">.</span><span class="n">setRPY</span><span class="p">(</span><span class="o">-</span><span class="n">M_PI</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="n">M_PI</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><strong>说明：</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">quaternion_optical</span></code>：定义光学坐标系到ROS标准坐标系的旋转变换（90度旋转）</p></li>
+<li><p>这个旋转将相机光学坐标系（X右、Y下、Z前）转换为ROS标准坐标系（X前、Y左、Z上）</p></li>
+</ul>
+</section>
+<section id="id3">
+<h2><span class="section-number">4.6.3. </span>获取设备信息与基准流<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">base_stream_profile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stream_profile_</span><span class="p">[</span><span class="n">base_stream_</span><span class="p">];</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">device_info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">device_</span><span class="o">-&gt;</span><span class="n">getDeviceInfo</span><span class="p">();</span>
+<span class="c1">// 通常基准流是深度流(DEPTH)</span>
+</pre></div>
+</div>
+<p><strong>说明：</strong></p>
+<ul class="simple">
+<li><p>选择一个基准流（通常是深度流），所有其他传感器的变换都相对于这个基准流进行计算</p></li>
+</ul>
+</section>
+<section id="id4">
+<h2><span class="section-number">4.6.4. </span>遍历所有流并计算相对变换<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;</span><span class="n">item</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">stream_profile_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">stream_index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">item</span><span class="p">.</span><span class="n">first</span><span class="p">;</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">stream_profile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">item</span><span class="p">.</span><span class="n">second</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// 获取该流相对于基准流的外参</span>
+<span class="w">    </span><span class="n">OBExtrinsic</span><span class="w"> </span><span class="n">ex</span><span class="p">;</span>
+<span class="w">    </span><span class="n">ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stream_profile</span><span class="o">-&gt;</span><span class="n">getExtrinsicTo</span><span class="p">(</span><span class="n">base_stream_profile</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 将旋转矩阵转换为四元数</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">Q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rotationMatrixToQuaternion</span><span class="p">(</span><span class="n">ex</span><span class="p">.</span><span class="n">rot</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 应用光学坐标系变换：Q_new = quaternion_optical * Q * quaternion_optical.inverse()</span>
+<span class="w">    </span><span class="n">Q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Q</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="p">.</span><span class="n">inverse</span><span class="p">();</span>
+
+<span class="w">    </span><span class="n">tf2</span><span class="o">::</span><span class="n">Vector3</span><span class="w"> </span><span class="nf">trans</span><span class="p">(</span><span class="n">ex</span><span class="p">.</span><span class="n">trans</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="n">ex</span><span class="p">.</span><span class="n">trans</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">ex</span><span class="p">.</span><span class="n">trans</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+</pre></div>
+</div>
+<p><strong>说明：</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">OBExtrinsic</span></code>包含了两个传感器之间的旋转矩阵(<code class="docutils literal notranslate"><span class="pre">rot</span></code>)和平移向量(<code class="docutils literal notranslate"><span class="pre">trans</span></code>)</p></li>
+<li><p>通过四元数乘法将光学坐标系变换应用到每个传感器的旋转关系中</p></li>
+<li><p>这个变换将相机原生的光学坐标系转换为ROS标准坐标系</p></li>
+</ul>
+</section>
+<section id="id5">
+<h2><span class="section-number">4.6.5. </span>发布TF变换<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// 发布传感器到基准流的变换（在ROS坐标系中）</span>
+<span class="n">publishStaticTF</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span><span class="w"> </span><span class="n">trans</span><span class="p">,</span><span class="w"> </span><span class="n">Q</span><span class="p">,</span><span class="w"> </span><span class="n">frame_id_</span><span class="p">[</span><span class="n">base_stream_</span><span class="p">],</span><span class="w"> </span><span class="n">frame_id_</span><span class="p">[</span><span class="n">stream_index</span><span class="p">]);</span>
+
+<span class="c1">// 发布传感器到其光学frame的变换</span>
+<span class="n">publishStaticTF</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span><span class="w"> </span><span class="n">zero_trans</span><span class="p">,</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="p">,</span><span class="w"> </span><span class="n">frame_id_</span><span class="p">[</span><span class="n">stream_index</span><span class="p">],</span>
+<span class="w">                </span><span class="n">optical_frame_id_</span><span class="p">[</span><span class="n">stream_index</span><span class="p">]);</span>
+</pre></div>
+</div>
+<p><strong>说明：</strong></p>
+<ul class="simple">
+<li><p>第一个 <code class="docutils literal notranslate"><span class="pre">publishStaticTF</span></code>：发布从基准流到当前传感器的变换（平移+旋转）</p></li>
+<li><p>第二个 <code class="docutils literal notranslate"><span class="pre">publishStaticTF</span></code>：发布从物理frame到光学frame的变换（纯旋转，无平移）</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">frame_id_[stream_index]</span></code>：物理坐标系frame名称（如 <code class="docutils literal notranslate"><span class="pre">camera_depth_frame</span></code>）</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">optical_frame_id_[stream_index]</span></code>：光学坐标系frame名称（如 <code class="docutils literal notranslate"><span class="pre">camera_depth_optical_frame</span></code>）</p></li>
+</ul>
+</section>
+<section id="id6">
+<h2><span class="section-number">4.6.6. </span>特殊处理左右红外摄像头<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">stream_index</span><span class="p">.</span><span class="n">first</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">OB_STREAM_IR_RIGHT</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">base_stream_</span><span class="p">.</span><span class="n">first</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">OB_STREAM_DEPTH</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">trans</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">abs</span><span class="p">(</span><span class="n">trans</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>说明：</strong></p>
+<ul class="simple">
+<li><p>左右红外摄像头在设备坐标系中关于中心平面对称</p></li>
+<li><p>通过 <code class="docutils literal notranslate"><span class="pre">abs()</span></code>确保X轴偏移为正值，保持几何一致性</p></li>
+</ul>
+</section>
+<section id="id7">
+<h2><span class="section-number">4.6.7. </span>发布深度到其他传感器的外参<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">enable_stream_</span><span class="p">[</span><span class="n">DEPTH</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">enable_stream_</span><span class="p">[</span><span class="n">COLOR</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">enable_publish_extrinsic_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">OBExtrinsic</span><span class="w"> </span><span class="n">ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">base_stream_profile</span><span class="o">-&gt;</span><span class="n">getExtrinsicTo</span><span class="p">(</span><span class="n">stream_profile_</span><span class="p">[</span><span class="n">COLOR</span><span class="p">]);</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">ex_msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">obExtrinsicsToMsg</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;depth_to_color_extrinsics&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">depth_to_other_extrinsics_publishers_</span><span class="p">[</span><span class="n">COLOR</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">publish</span><span class="p">(</span><span class="n">ex_msg</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>说明：</strong></p>
+<ul class="simple">
+<li><p>通过TF发布变换关系</p></li>
+</ul>
+</section>
+</section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
         <a href="topics.html" class="btn btn-neutral float-left" title="4.3. 可用话题" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
-        <a href="camera_sensor_structure.html" class="btn btn-neutral float-right" title="4.5. 相机传感器结构" accesskey="n" rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="camera_sensor_structure.html" class="btn btn-neutral float-right" title="4.7. 相机传感器结构" accesskey="n" rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2025年10月23日 09:59:18.
+      <span class="lastupdated">最后更新于 2025年10月28日 05:42:30.
       </span></p>
   </div>
 

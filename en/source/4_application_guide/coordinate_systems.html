@@ -21,7 +21,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="4.5. Camera sensor structure" href="camera_sensor_structure.html" />
+    <link rel="next" title="4.7. Camera sensor structure" href="camera_sensor_structure.html" />
     <link rel="prev" title="4.3. Available Topics" href="topics.html" /> 
 </head>
 
@@ -151,18 +151,33 @@
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">4.4. ROS2 Robot vs Camera Optical Coordination Systems</a></li>
-<li class="toctree-l2"><a class="reference internal" href="camera_sensor_structure.html">4.5. Camera sensor structure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tf_transformations.html">4.6. TF from coordinate A to coordinate B:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compressed_image.html">4.7. Compressed Image</a></li>
-<li class="toctree-l2"><a class="reference internal" href="point_cloud.html">4.8. Enabling and Visualizing Point Cloud in ROS 2</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#enabling-depth-point-cloud">4.8.1. Enabling Depth Point Cloud</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#command-to-enable-depth-point-cloud">4.8.1.1. Command to Enable Depth Point Cloud</a></li>
-<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#visualizing-depth-point-cloud-in-rviz2">4.8.1.2. Visualizing Depth Point Cloud in RViz2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-ros2-tf-tools">4.5. Using ROS2 TF Tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#viewing-the-tf-tree-structure">4.5.1. Viewing the TF Tree Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#visualizing-tf-tree-with-rviz2">4.5.2. Visualizing TF Tree with rviz2</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#enabling-colored-point-cloud">4.8.2. Enabling Colored Point Cloud</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#command-to-enable-colored-point-cloud">4.8.2.1. Command to Enable Colored Point Cloud</a></li>
-<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#visualizing-colored-point-cloud-in-rviz2">4.8.2.2. Visualizing Colored Point Cloud in RViz2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#camera-tf-calculation-and-publishing-mechanism">4.6. Camera TF Calculation and Publishing Mechanism</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#core-function-obcameranode-calcandpublishstatictransform">4.6.1. Core Function: <code class="docutils literal notranslate"><span class="pre">OBCameraNode::calcAndPublishStaticTransform()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#quaternion-initialization-and-coordinate-system-transformation">4.6.2. Quaternion Initialization and Coordinate System Transformation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#obtaining-device-information-and-base-stream">4.6.3. Obtaining Device Information and Base Stream</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#iterating-through-all-streams-and-calculating-relative-transformations">4.6.4. Iterating Through All Streams and Calculating Relative Transformations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#publishing-tf-transformations">4.6.5. Publishing TF Transformations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#special-handling-for-left-and-right-ir-cameras">4.6.6. Special Handling for Left and Right IR Cameras</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#publishing-extrinsics-from-depth-to-other-sensors">4.6.7. Publishing Extrinsics from Depth to Other Sensors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="camera_sensor_structure.html">4.7. Camera sensor structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tf_transformations.html">4.8. TF from coordinate A to coordinate B:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compressed_image.html">4.9. Compressed Image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="point_cloud.html">4.10. Enabling and Visualizing Point Cloud in ROS 2</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#enabling-depth-point-cloud">4.10.1. Enabling Depth Point Cloud</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#command-to-enable-depth-point-cloud">4.10.1.1. Command to Enable Depth Point Cloud</a></li>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#visualizing-depth-point-cloud-in-rviz2">4.10.1.2. Visualizing Depth Point Cloud in RViz2</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#enabling-colored-point-cloud">4.10.2. Enabling Colored Point Cloud</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#command-to-enable-colored-point-cloud">4.10.2.1. Command to Enable Colored Point Cloud</a></li>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#visualizing-colored-point-cloud-in-rviz2">4.10.2.2. Visualizing Colored Point Cloud in RViz2</a></li>
 </ul>
 </li>
 </ul>
@@ -365,20 +380,155 @@
 <li><p>static and dynamic TF topics publish optical CS and ROS CS to give the user the ability to move from one CS to other CS.</p></li>
 </ul>
 </section>
+<section id="using-ros2-tf-tools">
+<h1><span class="section-number">4.5. </span>Using ROS2 TF Tools<a class="headerlink" href="#using-ros2-tf-tools" title="Link to this heading"></a></h1>
+<section id="viewing-the-tf-tree-structure">
+<h2><span class="section-number">4.5.1. </span>Viewing the TF Tree Structure<a class="headerlink" href="#viewing-the-tf-tree-structure" title="Link to this heading"></a></h2>
+<p>You can use the following ROS2 commands to print and visualize the TF tree published by the camera package:</p>
+<p><strong>Print all TF relationships:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>tf2_tools<span class="w"> </span>view_frames
+</pre></div>
+</div>
+<p>This command generates a <code class="docutils literal notranslate"><span class="pre">frames.pdf</span></code> file that displays the hierarchical relationships between all frames.</p>
+<p><img alt="image-20251027111351870" src="../../_images/image4.png" /></p>
+<p><strong>View all currently published TF information:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/tf_static
+</pre></div>
+</div>
+</section>
+<section id="visualizing-tf-tree-with-rviz2">
+<h2><span class="section-number">4.5.2. </span>Visualizing TF Tree with rviz2<a class="headerlink" href="#visualizing-tf-tree-with-rviz2" title="Link to this heading"></a></h2>
+<p>You can use rviz2 to visualize the TF tree structure and relative positions of coordinate systems in real-time:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rviz2
+</pre></div>
+</div>
+<p>In rviz2:</p>
+<ul class="simple">
+<li><p>Add the <code class="docutils literal notranslate"><span class="pre">TF</span></code> display plugin</p></li>
+<li><p>Configure the Fixed Frame to <code class="docutils literal notranslate"><span class="pre">camera_link</span></code> or <code class="docutils literal notranslate"><span class="pre">camera_depth_optical_frame</span></code></p></li>
+<li><p>Select the TF frames to display</p></li>
+</ul>
+<p><img alt="image-20251027140652727" src="../../_images/image5.png" /></p>
+</section>
+</section>
+<section id="camera-tf-calculation-and-publishing-mechanism">
+<h1><span class="section-number">4.6. </span>Camera TF Calculation and Publishing Mechanism<a class="headerlink" href="#camera-tf-calculation-and-publishing-mechanism" title="Link to this heading"></a></h1>
+<section id="core-function-obcameranode-calcandpublishstatictransform">
+<h2><span class="section-number">4.6.1. </span>Core Function: <code class="docutils literal notranslate"><span class="pre">OBCameraNode::calcAndPublishStaticTransform()</span></code><a class="headerlink" href="#core-function-obcameranode-calcandpublishstatictransform" title="Link to this heading"></a></h2>
+<p>The camera node calculates and publishes static transformation relationships between all sensors through this function. Below is a detailed explanation of the code:</p>
+</section>
+<section id="quaternion-initialization-and-coordinate-system-transformation">
+<h2><span class="section-number">4.6.2. </span>Quaternion Initialization and Coordinate System Transformation<a class="headerlink" href="#quaternion-initialization-and-coordinate-system-transformation" title="Link to this heading"></a></h2>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">tf2</span><span class="o">::</span><span class="n">Quaternion</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="p">,</span><span class="w"> </span><span class="n">zero_rot</span><span class="p">;</span>
+<span class="n">zero_rot</span><span class="p">.</span><span class="n">setRPY</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+<span class="n">quaternion_optical</span><span class="p">.</span><span class="n">setRPY</span><span class="p">(</span><span class="o">-</span><span class="n">M_PI</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="n">M_PI</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><strong>Explanation:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">quaternion_optical</span></code>: Defines the rotation transformation from the optical coordinate system to the ROS standard coordinate system (90-degree rotation)</p></li>
+<li><p>This rotation converts the camera optical coordinate system (X right, Y down, Z forward) to the ROS standard coordinate system (X forward, Y left, Z up)</p></li>
+</ul>
+</section>
+<section id="obtaining-device-information-and-base-stream">
+<h2><span class="section-number">4.6.3. </span>Obtaining Device Information and Base Stream<a class="headerlink" href="#obtaining-device-information-and-base-stream" title="Link to this heading"></a></h2>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">base_stream_profile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stream_profile_</span><span class="p">[</span><span class="n">base_stream_</span><span class="p">];</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">device_info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">device_</span><span class="o">-&gt;</span><span class="n">getDeviceInfo</span><span class="p">();</span>
+<span class="c1">// The base stream is typically the DEPTH stream</span>
+</pre></div>
+</div>
+<p><strong>Explanation:</strong></p>
+<ul class="simple">
+<li><p>A base stream (typically the depth stream) is selected, and all other sensor transformations are calculated relative to this base stream</p></li>
+</ul>
+</section>
+<section id="iterating-through-all-streams-and-calculating-relative-transformations">
+<h2><span class="section-number">4.6.4. </span>Iterating Through All Streams and Calculating Relative Transformations<a class="headerlink" href="#iterating-through-all-streams-and-calculating-relative-transformations" title="Link to this heading"></a></h2>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;</span><span class="n">item</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">stream_profile_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">stream_index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">item</span><span class="p">.</span><span class="n">first</span><span class="p">;</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">stream_profile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">item</span><span class="p">.</span><span class="n">second</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Get the extrinsics of this stream relative to the base stream</span>
+<span class="w">    </span><span class="n">OBExtrinsic</span><span class="w"> </span><span class="n">ex</span><span class="p">;</span>
+<span class="w">    </span><span class="n">ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stream_profile</span><span class="o">-&gt;</span><span class="n">getExtrinsicTo</span><span class="p">(</span><span class="n">base_stream_profile</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Convert rotation matrix to quaternion</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">Q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rotationMatrixToQuaternion</span><span class="p">(</span><span class="n">ex</span><span class="p">.</span><span class="n">rot</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Apply optical coordinate system transformation: Q_new = quaternion_optical * Q * quaternion_optical.inverse()</span>
+<span class="w">    </span><span class="n">Q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Q</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="p">.</span><span class="n">inverse</span><span class="p">();</span>
+
+<span class="w">    </span><span class="n">tf2</span><span class="o">::</span><span class="n">Vector3</span><span class="w"> </span><span class="nf">trans</span><span class="p">(</span><span class="n">ex</span><span class="p">.</span><span class="n">trans</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="n">ex</span><span class="p">.</span><span class="n">trans</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">ex</span><span class="p">.</span><span class="n">trans</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+</pre></div>
+</div>
+<p><strong>Explanation:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">OBExtrinsic</span></code> contains the rotation matrix (<code class="docutils literal notranslate"><span class="pre">rot</span></code>) and translation vector (<code class="docutils literal notranslate"><span class="pre">trans</span></code>) between two sensors</p></li>
+<li><p>Quaternion multiplication applies the optical coordinate system transformation to each sensor’s rotation relationship</p></li>
+<li><p>This transformation converts the camera’s native optical coordinate system to the ROS standard coordinate system</p></li>
+</ul>
+</section>
+<section id="publishing-tf-transformations">
+<h2><span class="section-number">4.6.5. </span>Publishing TF Transformations<a class="headerlink" href="#publishing-tf-transformations" title="Link to this heading"></a></h2>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Publish the transformation from sensor to base stream (in ROS coordinate system)</span>
+<span class="n">publishStaticTF</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span><span class="w"> </span><span class="n">trans</span><span class="p">,</span><span class="w"> </span><span class="n">Q</span><span class="p">,</span><span class="w"> </span><span class="n">frame_id_</span><span class="p">[</span><span class="n">base_stream_</span><span class="p">],</span><span class="w"> </span><span class="n">frame_id_</span><span class="p">[</span><span class="n">stream_index</span><span class="p">]);</span>
+
+<span class="c1">// Publish the transformation from physical frame to its optical frame</span>
+<span class="n">publishStaticTF</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span><span class="w"> </span><span class="n">zero_trans</span><span class="p">,</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="p">,</span><span class="w"> </span><span class="n">frame_id_</span><span class="p">[</span><span class="n">stream_index</span><span class="p">],</span>
+<span class="w">                </span><span class="n">optical_frame_id_</span><span class="p">[</span><span class="n">stream_index</span><span class="p">]);</span>
+</pre></div>
+</div>
+<p><strong>Explanation:</strong></p>
+<ul class="simple">
+<li><p>First <code class="docutils literal notranslate"><span class="pre">publishStaticTF</span></code>: Publishes the transformation from the base stream to the current sensor (translation + rotation)</p></li>
+<li><p>Second <code class="docutils literal notranslate"><span class="pre">publishStaticTF</span></code>: Publishes the transformation from physical frame to optical frame (pure rotation, no translation)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">frame_id_[stream_index]</span></code>: Physical coordinate system frame name (e.g., <code class="docutils literal notranslate"><span class="pre">camera_depth_frame</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">optical_frame_id_[stream_index]</span></code>: Optical coordinate system frame name (e.g., <code class="docutils literal notranslate"><span class="pre">camera_depth_optical_frame</span></code>)</p></li>
+</ul>
+</section>
+<section id="special-handling-for-left-and-right-ir-cameras">
+<h2><span class="section-number">4.6.6. </span>Special Handling for Left and Right IR Cameras<a class="headerlink" href="#special-handling-for-left-and-right-ir-cameras" title="Link to this heading"></a></h2>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">stream_index</span><span class="p">.</span><span class="n">first</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">OB_STREAM_IR_RIGHT</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">base_stream_</span><span class="p">.</span><span class="n">first</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">OB_STREAM_DEPTH</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">trans</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">abs</span><span class="p">(</span><span class="n">trans</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Explanation:</strong></p>
+<ul class="simple">
+<li><p>Left and right IR cameras are symmetric about the center plane in the device coordinate system</p></li>
+<li><p>Using <code class="docutils literal notranslate"><span class="pre">abs()</span></code> ensures the X-axis offset is positive, maintaining geometric consistency</p></li>
+</ul>
+</section>
+<section id="publishing-extrinsics-from-depth-to-other-sensors">
+<h2><span class="section-number">4.6.7. </span>Publishing Extrinsics from Depth to Other Sensors<a class="headerlink" href="#publishing-extrinsics-from-depth-to-other-sensors" title="Link to this heading"></a></h2>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">enable_stream_</span><span class="p">[</span><span class="n">DEPTH</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">enable_stream_</span><span class="p">[</span><span class="n">COLOR</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">enable_publish_extrinsic_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">OBExtrinsic</span><span class="w"> </span><span class="n">ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">base_stream_profile</span><span class="o">-&gt;</span><span class="n">getExtrinsicTo</span><span class="p">(</span><span class="n">stream_profile_</span><span class="p">[</span><span class="n">COLOR</span><span class="p">]);</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">ex_msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">obExtrinsicsToMsg</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;depth_to_color_extrinsics&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">depth_to_other_extrinsics_publishers_</span><span class="p">[</span><span class="n">COLOR</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">publish</span><span class="p">(</span><span class="n">ex_msg</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Explanation:</strong></p>
+<ul class="simple">
+<li><p>In addition to publishing transformation relationships through TF, raw extrinsic parameters are also published through custom topics</p></li>
+<li><p>This allows users to directly access the camera’s intrinsic and extrinsic parameters for high-precision point cloud alignment and depth-color registration</p></li>
+</ul>
+</section>
+</section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="topics.html" class="btn btn-neutral float-left" title="4.3. Available Topics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="camera_sensor_structure.html" class="btn btn-neutral float-right" title="4.5. Camera sensor structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="camera_sensor_structure.html" class="btn btn-neutral float-right" title="4.7. Camera sensor structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2025, ORBBEC INC. www.orbbec.com..
-      <span class="lastupdated">Last updated on 2025-10-23 09:59:15.
+      <span class="lastupdated">Last updated on 2025-10-28 05:42:27.
       </span></p>
   </div>
 

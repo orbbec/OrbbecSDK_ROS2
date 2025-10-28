@@ -151,18 +151,33 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../4_application_guide/coordinate_systems.html">4.4. ROS2 Robot vs Camera Optical Coordination Systems</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/camera_sensor_structure.html">4.5. Camera sensor structure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/tf_transformations.html">4.6. TF from coordinate A to coordinate B:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/compressed_image.html">4.7. Compressed Image</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/point_cloud.html">4.8. Enabling and Visualizing Point Cloud in ROS 2</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/point_cloud.html#enabling-depth-point-cloud">4.8.1. Enabling Depth Point Cloud</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/point_cloud.html#command-to-enable-depth-point-cloud">4.8.1.1. Command to Enable Depth Point Cloud</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/point_cloud.html#visualizing-depth-point-cloud-in-rviz2">4.8.1.2. Visualizing Depth Point Cloud in RViz2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#using-ros2-tf-tools">4.5. Using ROS2 TF Tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#viewing-the-tf-tree-structure">4.5.1. Viewing the TF Tree Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#visualizing-tf-tree-with-rviz2">4.5.2. Visualizing TF Tree with rviz2</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/point_cloud.html#enabling-colored-point-cloud">4.8.2. Enabling Colored Point Cloud</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/point_cloud.html#command-to-enable-colored-point-cloud">4.8.2.1. Command to Enable Colored Point Cloud</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/point_cloud.html#visualizing-colored-point-cloud-in-rviz2">4.8.2.2. Visualizing Colored Point Cloud in RViz2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#camera-tf-calculation-and-publishing-mechanism">4.6. Camera TF Calculation and Publishing Mechanism</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#core-function-obcameranode-calcandpublishstatictransform">4.6.1. Core Function: <code class="docutils literal notranslate"><span class="pre">OBCameraNode::calcAndPublishStaticTransform()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#quaternion-initialization-and-coordinate-system-transformation">4.6.2. Quaternion Initialization and Coordinate System Transformation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#obtaining-device-information-and-base-stream">4.6.3. Obtaining Device Information and Base Stream</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#iterating-through-all-streams-and-calculating-relative-transformations">4.6.4. Iterating Through All Streams and Calculating Relative Transformations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#publishing-tf-transformations">4.6.5. Publishing TF Transformations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#special-handling-for-left-and-right-ir-cameras">4.6.6. Special Handling for Left and Right IR Cameras</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_systems.html#publishing-extrinsics-from-depth-to-other-sensors">4.6.7. Publishing Extrinsics from Depth to Other Sensors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/camera_sensor_structure.html">4.7. Camera sensor structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/tf_transformations.html">4.8. TF from coordinate A to coordinate B:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/compressed_image.html">4.9. Compressed Image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../4_application_guide/point_cloud.html">4.10. Enabling and Visualizing Point Cloud in ROS 2</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/point_cloud.html#enabling-depth-point-cloud">4.10.1. Enabling Depth Point Cloud</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/point_cloud.html#command-to-enable-depth-point-cloud">4.10.1.1. Command to Enable Depth Point Cloud</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/point_cloud.html#visualizing-depth-point-cloud-in-rviz2">4.10.1.2. Visualizing Depth Point Cloud in RViz2</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/point_cloud.html#enabling-colored-point-cloud">4.10.2. Enabling Colored Point Cloud</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/point_cloud.html#command-to-enable-colored-point-cloud">4.10.2.1. Command to Enable Colored Point Cloud</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/point_cloud.html#visualizing-colored-point-cloud-in-rviz2">4.10.2.2. Visualizing Colored Point Cloud in RViz2</a></li>
 </ul>
 </li>
 </ul>
@@ -449,7 +464,7 @@ ros2<span class="w"> </span>param<span class="w"> </span>list
 
   <div role="contentinfo">
     <p>&#169; Copyright 2025, ORBBEC INC. www.orbbec.com..
-      <span class="lastupdated">Last updated on 2025-10-23 09:59:15.
+      <span class="lastupdated">Last updated on 2025-10-28 05:42:27.
       </span></p>
   </div>
 

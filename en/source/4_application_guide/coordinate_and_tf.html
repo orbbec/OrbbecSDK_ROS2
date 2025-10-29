@@ -21,7 +21,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="4.5. Camera sensor structure" href="camera_sensor_structure.html" />
+    <link rel="next" title="4.5. Compressed Image" href="compressed_image.html" />
     <link rel="prev" title="4.3. Available Topics" href="topics.html" /> 
 </head>
 
@@ -161,20 +161,20 @@
 <li class="toctree-l4"><a class="reference internal" href="#function-breakdown">4.4.2.2. Function Breakdown</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#camera-sensor-structure">4.4.3. Camera sensor structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tf-from-coordinate-a-to-coordinate-b">4.4.4. TF from coordinate A to coordinate B:</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="camera_sensor_structure.html">4.5. Camera sensor structure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tf_transformations.html">4.6. TF from coordinate A to coordinate B:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compressed_image.html">4.7. Compressed Image</a></li>
-<li class="toctree-l2"><a class="reference internal" href="point_cloud.html">4.8. Enabling and Visualizing Point Cloud in ROS 2</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#enabling-depth-point-cloud">4.8.1. Enabling Depth Point Cloud</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#command-to-enable-depth-point-cloud">4.8.1.1. Command to Enable Depth Point Cloud</a></li>
-<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#visualizing-depth-point-cloud-in-rviz2">4.8.1.2. Visualizing Depth Point Cloud in RViz2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compressed_image.html">4.5. Compressed Image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="point_cloud.html">4.6. Enabling and Visualizing Point Cloud in ROS 2</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#enabling-depth-point-cloud">4.6.1. Enabling Depth Point Cloud</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#command-to-enable-depth-point-cloud">4.6.1.1. Command to Enable Depth Point Cloud</a></li>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#visualizing-depth-point-cloud-in-rviz2">4.6.1.2. Visualizing Depth Point Cloud in RViz2</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#enabling-colored-point-cloud">4.8.2. Enabling Colored Point Cloud</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#command-to-enable-colored-point-cloud">4.8.2.1. Command to Enable Colored Point Cloud</a></li>
-<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#visualizing-colored-point-cloud-in-rviz2">4.8.2.2. Visualizing Colored Point Cloud in RViz2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#enabling-colored-point-cloud">4.6.2. Enabling Colored Point Cloud</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#command-to-enable-colored-point-cloud">4.6.2.1. Command to Enable Colored Point Cloud</a></li>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#visualizing-colored-point-cloud-in-rviz2">4.6.2.2. Visualizing Colored Point Cloud in RViz2</a></li>
 </ul>
 </li>
 </ul>
@@ -351,7 +351,7 @@
           <li class="breadcrumb-item"><a href="application_guide.html"><span class="section-number">4. </span>Application Guide</a></li>
       <li class="breadcrumb-item active"><span class="section-number">4.4. </span>ROS2 Robot Coordinate System vs Camera Optical Coordinate System</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../_sources/source/4_application_guide/coordinate_systems.md.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/source/4_application_guide/coordinate_and_tf.md.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -677,6 +677,22 @@
 </ul>
 </section>
 </section>
+<section id="camera-sensor-structure">
+<h2><span class="section-number">4.4.3. </span>Camera sensor structure<a class="headerlink" href="#camera-sensor-structure" title="Link to this heading"></a></h2>
+<p><img alt="module in rviz2" src="../../_images/image3.png" /></p>
+<p><img alt="module in rviz2" src="../../_images/image1.png" /></p>
+</section>
+<section id="tf-from-coordinate-a-to-coordinate-b">
+<h2><span class="section-number">4.4.4. </span>TF from coordinate A to coordinate B:<a class="headerlink" href="#tf-from-coordinate-a-to-coordinate-b" title="Link to this heading"></a></h2>
+<p>In Orbbec cameras, the origin point (0,0,0) is taken from the camera_link position</p>
+<p>Our wrapper provide static TFs between each sensor coordinate to the camera base (camera_link)</p>
+<p>Also, it provides TFs from each sensor ROS coordinates to its corrosponding optical coordinates.</p>
+<p>Example of static TFs of RGB sensor and right infra sensor of Gemini335 module as it shown in rviz2:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_description<span class="w"> </span>view_model.launch.py<span class="w"> </span>model:<span class="o">=</span>gemini_335_336.urdf.xacro
+</pre></div>
+</div>
+<p><img alt="module in rviz2" src="../../_images/image2.png" /></p>
+</section>
 </section>
 
 
@@ -684,14 +700,14 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="topics.html" class="btn btn-neutral float-left" title="4.3. Available Topics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="camera_sensor_structure.html" class="btn btn-neutral float-right" title="4.5. Camera sensor structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="compressed_image.html" class="btn btn-neutral float-right" title="4.5. Compressed Image" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2025, ORBBEC INC. www.orbbec.com..
-      <span class="lastupdated">Last updated on 2025-10-29 02:21:32.
+      <span class="lastupdated">Last updated on 2025-10-29 02:39:33.
       </span></p>
   </div>
 

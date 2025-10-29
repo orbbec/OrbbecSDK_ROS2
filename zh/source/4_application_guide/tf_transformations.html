@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>4.8. 从坐标系A到坐标系B的TF变换： &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+  <title>4.6. 从坐标系A到坐标系B的TF变换： &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=63de077d" />
@@ -22,8 +22,8 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="索引" href="../../genindex.html" />
     <link rel="search" title="搜索" href="../../search.html" />
-    <link rel="next" title="4.9. 压缩图像" href="compressed_image.html" />
-    <link rel="prev" title="4.7. 相机传感器结构" href="camera_sensor_structure.html" /> 
+    <link rel="next" title="4.7. 压缩图像" href="compressed_image.html" />
+    <link rel="prev" title="4.5. 相机传感器结构" href="camera_sensor_structure.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -151,34 +151,31 @@
 <li class="toctree-l3"><a class="reference internal" href="topics.html#id4">4.3.4. 设备状态与诊断</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="coordinate_systems.html">4.4. ROS2机器人坐标系 vs 相机光学坐标系</a></li>
-<li class="toctree-l2"><a class="reference internal" href="coordinate_systems.html#ros2-tf">4.5. ROS2 TF工具的使用</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="coordinate_systems.html#tf">4.5.1. 查看TF树结构</a></li>
-<li class="toctree-l3"><a class="reference internal" href="coordinate_systems.html#rviz2tf">4.5.2. 使用rviz2可视化TF树</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coordinate_systems.html">4.4. ROS2机器人坐标系 vs 相机光学坐标系</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="coordinate_systems.html#ros2-tf">4.4.1. ROS2 TF工具的使用</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="coordinate_systems.html#tf">4.4.1.1. 查看TF树结构</a></li>
+<li class="toctree-l4"><a class="reference internal" href="coordinate_systems.html#rviz2tf">4.4.1.2. 使用rviz2可视化TF树</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="coordinate_systems.html#id1">4.6. 相机TF计算和发布机制</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="coordinate_systems.html#obcameranode-calcandpublishstatictransform">4.6.1. 核心函数：<code class="docutils literal notranslate"><span class="pre">OBCameraNode::calcAndPublishStaticTransform()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="coordinate_systems.html#id2">4.6.2. 四元数初始化与坐标系变换</a></li>
-<li class="toctree-l3"><a class="reference internal" href="coordinate_systems.html#id3">4.6.3. 获取设备信息与基准流</a></li>
-<li class="toctree-l3"><a class="reference internal" href="coordinate_systems.html#id4">4.6.4. 遍历所有流并计算相对变换</a></li>
-<li class="toctree-l3"><a class="reference internal" href="coordinate_systems.html#id5">4.6.5. 发布TF变换</a></li>
-<li class="toctree-l3"><a class="reference internal" href="coordinate_systems.html#id6">4.6.6. 特殊处理左右红外摄像头</a></li>
-<li class="toctree-l3"><a class="reference internal" href="coordinate_systems.html#id7">4.6.7. 发布深度到其他传感器的外参</a></li>
+<li class="toctree-l3"><a class="reference internal" href="coordinate_systems.html#id1">4.4.2. 相机TF计算和发布机制</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="coordinate_systems.html#obcameranode-calcandpublishstatictransform">4.4.2.1. 核心函数：<code class="docutils literal notranslate"><span class="pre">OBCameraNode::calcAndPublishStaticTransform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="coordinate_systems.html#id2">4.4.2.2. 函数解析</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="camera_sensor_structure.html">4.7. 相机传感器结构</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">4.8. 从坐标系A到坐标系B的TF变换：</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compressed_image.html">4.9. 压缩图像</a></li>
-<li class="toctree-l2"><a class="reference internal" href="point_cloud.html">4.10. 在ROS 2中启用和可视化点云</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#id1">4.10.1. 启用深度点云</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#id2">4.10.1.1. 启用深度点云的命令</a></li>
-<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#rviz2">4.10.1.2. 在RViz2中可视化深度点云</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#id3">4.10.2. 启用彩色点云</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#id4">4.10.2.1. 启用彩色点云的命令</a></li>
-<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#id5">4.10.2.2. 在RViz2中可视化彩色点云</a></li>
+<li class="toctree-l2"><a class="reference internal" href="camera_sensor_structure.html">4.5. 相机传感器结构</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">4.6. 从坐标系A到坐标系B的TF变换：</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compressed_image.html">4.7. 压缩图像</a></li>
+<li class="toctree-l2"><a class="reference internal" href="point_cloud.html">4.8. 在ROS 2中启用和可视化点云</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#id1">4.8.1. 启用深度点云</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#id2">4.8.1.1. 启用深度点云的命令</a></li>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#rviz2">4.8.1.2. 在RViz2中可视化深度点云</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="point_cloud.html#id3">4.8.2. 启用彩色点云</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#id4">4.8.2.1. 启用彩色点云的命令</a></li>
+<li class="toctree-l4"><a class="reference internal" href="point_cloud.html#id5">4.8.2.2. 在RViz2中可视化彩色点云</a></li>
 </ul>
 </li>
 </ul>
@@ -353,7 +350,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="application_guide.html"><span class="section-number">4. </span>应用指南</a></li>
-      <li class="breadcrumb-item active"><span class="section-number">4.8. </span>从坐标系A到坐标系B的TF变换：</li>
+      <li class="breadcrumb-item active"><span class="section-number">4.6. </span>从坐标系A到坐标系B的TF变换：</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/source/4_application_guide/tf_transformations.md.txt" rel="nofollow"> 查看页面源码</a>
       </li>
@@ -364,7 +361,7 @@
            <div itemprop="articleBody">
              
   <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="abtf">
-<h1><span class="section-number">4.8. </span>从坐标系A到坐标系B的TF变换：<a class="headerlink" href="#abtf" title="Link to this heading"></a></h1>
+<h1><span class="section-number">4.6. </span>从坐标系A到坐标系B的TF变换：<a class="headerlink" href="#abtf" title="Link to this heading"></a></h1>
 <p>在Orbbec相机中，原点（0,0,0）取自camera_link位置</p>
 <p>我们的封装器提供从每个传感器坐标到相机基座（camera_link）之间的静态TF变换</p>
 <p>此外，它还提供从每个传感器ROS坐标到其对应光学坐标的TF变换。</p>
@@ -379,15 +376,15 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
-        <a href="camera_sensor_structure.html" class="btn btn-neutral float-left" title="4.7. 相机传感器结构" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
-        <a href="compressed_image.html" class="btn btn-neutral float-right" title="4.9. 压缩图像" accesskey="n" rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="camera_sensor_structure.html" class="btn btn-neutral float-left" title="4.5. 相机传感器结构" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
+        <a href="compressed_image.html" class="btn btn-neutral float-right" title="4.7. 压缩图像" accesskey="n" rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2025年10月28日 05:46:56.
+      <span class="lastupdated">最后更新于 2025年10月29日 02:21:35.
       </span></p>
   </div>
 

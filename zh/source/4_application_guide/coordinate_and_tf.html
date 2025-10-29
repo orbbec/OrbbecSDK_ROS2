@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>4.4. ROS2机器人坐标系 vs 相机光学坐标系 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+  <title>4.4. 坐标系和 TF 变换 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=63de077d" />
@@ -151,19 +151,20 @@
 <li class="toctree-l3"><a class="reference internal" href="topics.html#id4">4.3.4. 设备状态与诊断</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">4.4. ROS2机器人坐标系 vs 相机光学坐标系</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#ros2-tf">4.4.1. ROS2 TF工具的使用</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#tf">4.4.1.1. 查看TF树结构</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#rviz2tf">4.4.1.2. 使用rviz2可视化TF树</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">4.4. 坐标系和 TF 变换</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">4.4.1. 相机传感器结构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#abtf">4.4.2. 从坐标系A到坐标系B的TF变换：</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ros2-vs">4.4.3. ROS2机器人坐标系 vs 相机光学坐标系</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ros2-tf">4.4.4. ROS2 TF工具的使用</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id2">4.4.4.1. 查看TF树结构</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rviz2tf">4.4.4.2. 使用rviz2可视化TF树</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#id1">4.4.2. 相机TF计算和发布机制</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#obcameranode-calcandpublishstatictransform">4.4.2.1. 核心函数：<code class="docutils literal notranslate"><span class="pre">OBCameraNode::calcAndPublishStaticTransform()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id2">4.4.2.2. 函数解析</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">4.4.5. 相机TF计算和发布机制</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#obcameranode-calcandpublishstatictransform">4.4.5.1. 核心函数：<code class="docutils literal notranslate"><span class="pre">OBCameraNode::calcAndPublishStaticTransform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id4">4.4.5.2. 函数解析</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#id3">4.4.3. 相机传感器结构</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#abtf">4.4.4. 从坐标系A到坐标系B的TF变换：</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="compressed_image.html">4.5. 压缩图像</a></li>
@@ -350,7 +351,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="application_guide.html"><span class="section-number">4. </span>应用指南</a></li>
-      <li class="breadcrumb-item active"><span class="section-number">4.4. </span>ROS2机器人坐标系 vs 相机光学坐标系</li>
+      <li class="breadcrumb-item active"><span class="section-number">4.4. </span>坐标系和 TF 变换</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/source/4_application_guide/coordinate_and_tf.md.txt" rel="nofollow"> 查看页面源码</a>
       </li>
@@ -360,8 +361,26 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="ros2-vs">
-<h1><span class="section-number">4.4. </span>ROS2机器人坐标系 vs 相机光学坐标系<a class="headerlink" href="#ros2-vs" title="Link to this heading"></a></h1>
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="tf">
+<h1><span class="section-number">4.4. </span>坐标系和 TF 变换<a class="headerlink" href="#tf" title="Link to this heading"></a></h1>
+<section id="id1">
+<h2><span class="section-number">4.4.1. </span>相机传感器结构<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p><img alt="module in rviz2" src="../../_images/image3.png" /></p>
+<p><img alt="module in rviz2" src="../../_images/image1.png" /></p>
+</section>
+<section id="abtf">
+<h2><span class="section-number">4.4.2. </span>从坐标系A到坐标系B的TF变换：<a class="headerlink" href="#abtf" title="Link to this heading"></a></h2>
+<p>在Orbbec相机中，原点（0,0,0）取自camera_link位置</p>
+<p>我们的封装器提供从每个传感器坐标到相机基座（camera_link）之间的静态TF变换</p>
+<p>此外，它还提供从每个传感器ROS坐标到其对应光学坐标的TF变换。</p>
+<p>Gemini335模块的RGB传感器和右红外传感器静态TF变换示例，如rviz2中所示：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_description<span class="w"> </span>view_model.launch.py<span class="w"> </span>model:<span class="o">=</span>gemini_335_336.urdf.xacro
+</pre></div>
+</div>
+<p><img alt="rviz2中的模块" src="../../_images/image2.png" /></p>
+</section>
+<section id="ros2-vs">
+<h2><span class="section-number">4.4.3. </span>ROS2机器人坐标系 vs 相机光学坐标系<a class="headerlink" href="#ros2-vs" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>视角：</p>
 <ul>
@@ -377,10 +396,11 @@
 <li><p>我们封装器话题中发布的所有数据都是直接从相机传感器获取的光学数据。</p></li>
 <li><p>静态和动态TF话题发布光学坐标系和ROS坐标系，使用户能够在两个坐标系之间转换。</p></li>
 </ul>
+</section>
 <section id="ros2-tf">
-<h2><span class="section-number">4.4.1. </span>ROS2 TF工具的使用<a class="headerlink" href="#ros2-tf" title="Link to this heading"></a></h2>
-<section id="tf">
-<h3><span class="section-number">4.4.1.1. </span>查看TF树结构<a class="headerlink" href="#tf" title="Link to this heading"></a></h3>
+<h2><span class="section-number">4.4.4. </span>ROS2 TF工具的使用<a class="headerlink" href="#ros2-tf" title="Link to this heading"></a></h2>
+<section id="id2">
+<h3><span class="section-number">4.4.4.1. </span>查看TF树结构<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
 <p>可以使用以下ROS2命令来打印和可视化相机包发布的TF树：</p>
 <p><strong>打印所有TF关系：</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>tf2_tools<span class="w"> </span>view_frames
@@ -423,7 +443,7 @@
 </div>
 </section>
 <section id="rviz2tf">
-<h3><span class="section-number">4.4.1.2. </span>使用rviz2可视化TF树<a class="headerlink" href="#rviz2tf" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.4.4.2. </span>使用rviz2可视化TF树<a class="headerlink" href="#rviz2tf" title="Link to this heading"></a></h3>
 <p>在rviz2中可以实时可视化TF树结构和坐标系的相对位置：</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rviz2
 </pre></div>
@@ -437,10 +457,10 @@
 <p><img alt="image-20251027140652727" src="../../_images/image5.png" /></p>
 </section>
 </section>
-<section id="id1">
-<h2><span class="section-number">4.4.2. </span>相机TF计算和发布机制<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<section id="id3">
+<h2><span class="section-number">4.4.5. </span>相机TF计算和发布机制<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
 <section id="obcameranode-calcandpublishstatictransform">
-<h3><span class="section-number">4.4.2.1. </span>核心函数：<code class="docutils literal notranslate"><span class="pre">OBCameraNode::calcAndPublishStaticTransform()</span></code><a class="headerlink" href="#obcameranode-calcandpublishstatictransform" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.4.5.1. </span>核心函数：<code class="docutils literal notranslate"><span class="pre">OBCameraNode::calcAndPublishStaticTransform()</span></code><a class="headerlink" href="#obcameranode-calcandpublishstatictransform" title="Link to this heading"></a></h3>
 <p>相机节点通过此函数计算和发布所有传感器之间的静态转换关系。</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">OBCameraNode::calcAndPublishStaticTransform</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="n">tf2</span><span class="o">::</span><span class="n">Quaternion</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="p">,</span><span class="w"> </span><span class="n">zero_rot</span><span class="p">;</span>
@@ -609,8 +629,8 @@
 </pre></div>
 </div>
 </section>
-<section id="id2">
-<h3><span class="section-number">4.4.2.2. </span>函数解析<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<section id="id4">
+<h3><span class="section-number">4.4.5.2. </span>函数解析<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
 <p>下面是代码的详细解释：</p>
 <p><strong>四元数初始化与坐标系变换</strong></p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">tf2</span><span class="o">::</span><span class="n">Quaternion</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="p">,</span><span class="w"> </span><span class="n">zero_rot</span><span class="p">;</span>
@@ -692,22 +712,6 @@
 </ul>
 </section>
 </section>
-<section id="id3">
-<h2><span class="section-number">4.4.3. </span>相机传感器结构<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
-<p><img alt="module in rviz2" src="../../_images/image3.png" /></p>
-<p><img alt="module in rviz2" src="../../_images/image1.png" /></p>
-</section>
-<section id="abtf">
-<h2><span class="section-number">4.4.4. </span>从坐标系A到坐标系B的TF变换：<a class="headerlink" href="#abtf" title="Link to this heading"></a></h2>
-<p>在Orbbec相机中，原点（0,0,0）取自camera_link位置</p>
-<p>我们的封装器提供从每个传感器坐标到相机基座（camera_link）之间的静态TF变换</p>
-<p>此外，它还提供从每个传感器ROS坐标到其对应光学坐标的TF变换。</p>
-<p>Gemini335模块的RGB传感器和右红外传感器静态TF变换示例，如rviz2中所示：</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_description<span class="w"> </span>view_model.launch.py<span class="w"> </span>model:<span class="o">=</span>gemini_335_336.urdf.xacro
-</pre></div>
-</div>
-<p><img alt="rviz2中的模块" src="../../_images/image2.png" /></p>
-</section>
 </section>
 
 
@@ -722,7 +726,7 @@
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2025年10月29日 02:39:36.
+      <span class="lastupdated">最后更新于 2025年10月29日 02:54:49.
       </span></p>
   </div>
 

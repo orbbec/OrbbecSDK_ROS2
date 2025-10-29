@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>4.4. ROS2 Robot Coordinate System vs Camera Optical Coordinate System &mdash; OrbbecSDK V2 ROS2 Wrapper  documentation</title>
+  <title>4.4. Coordinate Systems and TF Transforms &mdash; OrbbecSDK V2 ROS2 Wrapper  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=63de077d" />
@@ -150,19 +150,20 @@
 <li class="toctree-l3"><a class="reference internal" href="topics.html#device-status-diagnostics">4.3.4. Device Status &amp; Diagnostics</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">4.4. ROS2 Robot Coordinate System vs Camera Optical Coordinate System</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#using-ros2-tf-tools">4.4.1. Using ROS2 TF Tools</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#view-tf-tree-structure">4.4.1.1. View TF Tree Structure</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#visualize-tf-tree-in-rviz2">4.4.1.2. Visualize TF Tree in rviz2</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">4.4. Coordinate Systems and TF Transforms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#camera-sensor-structure">4.4.1. Camera sensor structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tf-from-coordinate-a-to-coordinate-b">4.4.2. TF from coordinate A to coordinate B:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ros2-robot-coordinate-system-vs-camera-optical-coordinate-system">4.4.3. ROS2 Robot Coordinate System vs Camera Optical Coordinate System</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-ros2-tf-tools">4.4.4. Using ROS2 TF Tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#view-tf-tree-structure">4.4.4.1. View TF Tree Structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#visualize-tf-tree-in-rviz2">4.4.4.2. Visualize TF Tree in rviz2</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#camera-tf-calculation-and-publishing-mechanism">4.4.2. Camera TF Calculation and Publishing Mechanism</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#core-function-obcameranode-calcandpublishstatictransform">4.4.2.1. Core Function: <code class="docutils literal notranslate"><span class="pre">OBCameraNode::calcAndPublishStaticTransform()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#function-breakdown">4.4.2.2. Function Breakdown</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#camera-tf-calculation-and-publishing-mechanism">4.4.5. Camera TF Calculation and Publishing Mechanism</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core-function-obcameranode-calcandpublishstatictransform">4.4.5.1. Core Function: <code class="docutils literal notranslate"><span class="pre">OBCameraNode::calcAndPublishStaticTransform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#function-breakdown">4.4.5.2. Function Breakdown</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#camera-sensor-structure">4.4.3. Camera sensor structure</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#tf-from-coordinate-a-to-coordinate-b">4.4.4. TF from coordinate A to coordinate B:</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="compressed_image.html">4.5. Compressed Image</a></li>
@@ -349,7 +350,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="application_guide.html"><span class="section-number">4. </span>Application Guide</a></li>
-      <li class="breadcrumb-item active"><span class="section-number">4.4. </span>ROS2 Robot Coordinate System vs Camera Optical Coordinate System</li>
+      <li class="breadcrumb-item active"><span class="section-number">4.4. </span>Coordinate Systems and TF Transforms</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/source/4_application_guide/coordinate_and_tf.md.txt" rel="nofollow"> View page source</a>
       </li>
@@ -359,8 +360,26 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">中文</a> | <a class="lang-current" href="#">English</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="ros2-robot-coordinate-system-vs-camera-optical-coordinate-system">
-<h1><span class="section-number">4.4. </span>ROS2 Robot Coordinate System vs Camera Optical Coordinate System<a class="headerlink" href="#ros2-robot-coordinate-system-vs-camera-optical-coordinate-system" title="Link to this heading"></a></h1>
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">中文</a> | <a class="lang-current" href="#">English</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="coordinate-systems-and-tf-transforms">
+<h1><span class="section-number">4.4. </span>Coordinate Systems and TF Transforms<a class="headerlink" href="#coordinate-systems-and-tf-transforms" title="Link to this heading"></a></h1>
+<section id="camera-sensor-structure">
+<h2><span class="section-number">4.4.1. </span>Camera sensor structure<a class="headerlink" href="#camera-sensor-structure" title="Link to this heading"></a></h2>
+<p><img alt="module in rviz2" src="../../_images/image3.png" /></p>
+<p><img alt="module in rviz2" src="../../_images/image1.png" /></p>
+</section>
+<section id="tf-from-coordinate-a-to-coordinate-b">
+<h2><span class="section-number">4.4.2. </span>TF from coordinate A to coordinate B:<a class="headerlink" href="#tf-from-coordinate-a-to-coordinate-b" title="Link to this heading"></a></h2>
+<p>In Orbbec cameras, the origin point (0,0,0) is taken from the camera_link position</p>
+<p>Our wrapper provide static TFs between each sensor coordinate to the camera base (camera_link)</p>
+<p>Also, it provides TFs from each sensor ROS coordinates to its corrosponding optical coordinates.</p>
+<p>Example of static TFs of RGB sensor and right infra sensor of Gemini335 module as it shown in rviz2:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_description<span class="w"> </span>view_model.launch.py<span class="w"> </span>model:<span class="o">=</span>gemini_335_336.urdf.xacro
+</pre></div>
+</div>
+<p><img alt="module in rviz2" src="../../_images/image2.png" /></p>
+</section>
+<section id="ros2-robot-coordinate-system-vs-camera-optical-coordinate-system">
+<h2><span class="section-number">4.4.3. </span>ROS2 Robot Coordinate System vs Camera Optical Coordinate System<a class="headerlink" href="#ros2-robot-coordinate-system-vs-camera-optical-coordinate-system" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Point of View:</p>
 <ul>
@@ -376,10 +395,11 @@
 <li><p>All data published in the wrapper topics is optical data taken directly from the camera sensors.</p></li>
 <li><p>Static and dynamic TF topics publish optical and ROS coordinate systems so users can transform between them.</p></li>
 </ul>
+</section>
 <section id="using-ros2-tf-tools">
-<h2><span class="section-number">4.4.1. </span>Using ROS2 TF Tools<a class="headerlink" href="#using-ros2-tf-tools" title="Link to this heading"></a></h2>
+<h2><span class="section-number">4.4.4. </span>Using ROS2 TF Tools<a class="headerlink" href="#using-ros2-tf-tools" title="Link to this heading"></a></h2>
 <section id="view-tf-tree-structure">
-<h3><span class="section-number">4.4.1.1. </span>View TF Tree Structure<a class="headerlink" href="#view-tf-tree-structure" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.4.4.1. </span>View TF Tree Structure<a class="headerlink" href="#view-tf-tree-structure" title="Link to this heading"></a></h3>
 <p>Use the following ROS2 commands to print and visualize the TF tree published by the camera package:</p>
 <p><strong>Print all TF relationships:</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>tf2_tools<span class="w"> </span>view_frames
@@ -422,7 +442,7 @@
 </div>
 </section>
 <section id="visualize-tf-tree-in-rviz2">
-<h3><span class="section-number">4.4.1.2. </span>Visualize TF Tree in rviz2<a class="headerlink" href="#visualize-tf-tree-in-rviz2" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.4.4.2. </span>Visualize TF Tree in rviz2<a class="headerlink" href="#visualize-tf-tree-in-rviz2" title="Link to this heading"></a></h3>
 <p>Use rviz2 to visualize the TF tree and relative frame poses in real time:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rviz2
 </pre></div>
@@ -437,9 +457,9 @@
 </section>
 </section>
 <section id="camera-tf-calculation-and-publishing-mechanism">
-<h2><span class="section-number">4.4.2. </span>Camera TF Calculation and Publishing Mechanism<a class="headerlink" href="#camera-tf-calculation-and-publishing-mechanism" title="Link to this heading"></a></h2>
+<h2><span class="section-number">4.4.5. </span>Camera TF Calculation and Publishing Mechanism<a class="headerlink" href="#camera-tf-calculation-and-publishing-mechanism" title="Link to this heading"></a></h2>
 <section id="core-function-obcameranode-calcandpublishstatictransform">
-<h3><span class="section-number">4.4.2.1. </span>Core Function: <code class="docutils literal notranslate"><span class="pre">OBCameraNode::calcAndPublishStaticTransform()</span></code><a class="headerlink" href="#core-function-obcameranode-calcandpublishstatictransform" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.4.5.1. </span>Core Function: <code class="docutils literal notranslate"><span class="pre">OBCameraNode::calcAndPublishStaticTransform()</span></code><a class="headerlink" href="#core-function-obcameranode-calcandpublishstatictransform" title="Link to this heading"></a></h3>
 <p>The camera node uses this function to calculate and publish all static transforms between sensors.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">OBCameraNode::calcAndPublishStaticTransform</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="n">tf2</span><span class="o">::</span><span class="n">Quaternion</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="p">,</span><span class="w"> </span><span class="n">zero_rot</span><span class="p">;</span>
@@ -609,7 +629,7 @@
 </div>
 </section>
 <section id="function-breakdown">
-<h3><span class="section-number">4.4.2.2. </span>Function Breakdown<a class="headerlink" href="#function-breakdown" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.4.5.2. </span>Function Breakdown<a class="headerlink" href="#function-breakdown" title="Link to this heading"></a></h3>
 <p>Detailed explanation of the code:</p>
 <p><strong>Quaternion Initialization and Coordinate Transform</strong></p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">tf2</span><span class="o">::</span><span class="n">Quaternion</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="p">,</span><span class="w"> </span><span class="n">zero_rot</span><span class="p">;</span>
@@ -677,22 +697,6 @@
 </ul>
 </section>
 </section>
-<section id="camera-sensor-structure">
-<h2><span class="section-number">4.4.3. </span>Camera sensor structure<a class="headerlink" href="#camera-sensor-structure" title="Link to this heading"></a></h2>
-<p><img alt="module in rviz2" src="../../_images/image3.png" /></p>
-<p><img alt="module in rviz2" src="../../_images/image1.png" /></p>
-</section>
-<section id="tf-from-coordinate-a-to-coordinate-b">
-<h2><span class="section-number">4.4.4. </span>TF from coordinate A to coordinate B:<a class="headerlink" href="#tf-from-coordinate-a-to-coordinate-b" title="Link to this heading"></a></h2>
-<p>In Orbbec cameras, the origin point (0,0,0) is taken from the camera_link position</p>
-<p>Our wrapper provide static TFs between each sensor coordinate to the camera base (camera_link)</p>
-<p>Also, it provides TFs from each sensor ROS coordinates to its corrosponding optical coordinates.</p>
-<p>Example of static TFs of RGB sensor and right infra sensor of Gemini335 module as it shown in rviz2:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_description<span class="w"> </span>view_model.launch.py<span class="w"> </span>model:<span class="o">=</span>gemini_335_336.urdf.xacro
-</pre></div>
-</div>
-<p><img alt="module in rviz2" src="../../_images/image2.png" /></p>
-</section>
 </section>
 
 
@@ -707,7 +711,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2025, ORBBEC INC. www.orbbec.com..
-      <span class="lastupdated">Last updated on 2025-10-29 02:39:33.
+      <span class="lastupdated">Last updated on 2025-10-29 02:54:46.
       </span></p>
   </div>
 

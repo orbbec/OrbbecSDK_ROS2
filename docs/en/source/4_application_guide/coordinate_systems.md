@@ -1,21 +1,21 @@
-### ROS2 Robot vs Camera Optical Coordination Systems
+## ROS2 Robot Coordinate System vs Camera Optical Coordinate System
 
-* Point Of View:
-  * Imagine we are standing behind of the camera, and looking forward.
-  * Always use this point of view when talking about coordinates, left vs right IRs, position of sensor, etc..
+* Point of View:
+  * Imagine standing behind the camera and looking forward.
+  * Always use this point of view when discussing coordinates, left vs right IR, sensor positions, etc.
 
 ![ROS2 and Camera Coordinate System](../image/application_guide/image0.png)
 
-* ROS2 Coordinate System: (X: Forward, Y:Left, Z: Up)
+* ROS2 Coordinate System: (X: Forward, Y: Left, Z: Up)
 * Camera Optical Coordinate System: (X: Right, Y: Down, Z: Forward)
-* All data published in our wrapper topics is optical data taken directly from our camera sensors.
-* static and dynamic TF topics publish optical CS and ROS CS to give the user the ability to move from one CS to other CS.
+* All data published in the wrapper topics is optical data taken directly from the camera sensors.
+* Static and dynamic TF topics publish optical and ROS coordinate systems so users can transform between them.
 
 ### Using ROS2 TF Tools
 
-#### Viewing the TF Tree Structure
+#### View TF Tree Structure
 
-You can use the following ROS2 commands to print and visualize the TF tree published by the camera package:
+Use the following ROS2 commands to print and visualize the TF tree published by the camera package:
 
 **Print all TF relationships:**
 
@@ -23,7 +23,7 @@ You can use the following ROS2 commands to print and visualize the TF tree publi
 ros2 run tf2_tools view_frames
 ```
 
-This command generates a `frames.pdf` file that displays the hierarchical relationships between all frames.
+This command generates a `frames.pdf` file showing the hierarchy between all frames.
 
 ![image-20251027111351870](../image/application_guide/image4.png)
 
@@ -33,9 +33,45 @@ This command generates a `frames.pdf` file that displays the hierarchical relati
 ros2 topic echo /tf_static
 ```
 
-#### Visualizing TF Tree with rviz2
+**View the TF transform between two specified frames:**
 
-You can use rviz2 to visualize the TF tree structure and relative positions of coordinate systems in real-time:
+Use the following command to view the transform between two specific frames:
+
+```bash
+ros2 run tf2_ros tf2_echo [source_frame] [target_frame]
+```
+
+Example, view transform from `camera_link` to `camera_depth_optical_frame`:
+
+```bash
+ros2 run tf2_ros tf2_echo camera_link camera_depth_optical_frame
+```
+
+The command continuously outputs the real-time transform between the two frames, including:
+
+- Translation: x, y, z (meters)
+- Rotation (Quaternion): x, y, z, w
+- Rotation (RPY): roll, pitch, yaw (radians and degrees)
+- Transform Matrix: 4×4 matrix with rotation and translation
+
+Sample output:
+
+```
+At time 0.0
+- Translation: [0.000, 0.000, 0.000]
+- Rotation: in Quaternion [-0.500, 0.500, -0.500, 0.500]
+- Rotation: in RPY (radian) [-1.571, -0.000, -1.571]
+- Rotation: in RPY (degree) [-90.000, -0.000, -90.000]
+- Matrix:
+  0.000  0.000  1.000  0.000
+ -1.000  0.000  0.000  0.000
+  0.000 -1.000  0.000  0.000
+  0.000  0.000  0.000  1.000
+```
+
+#### Visualize TF Tree in rviz2
+
+Use rviz2 to visualize the TF tree and relative frame poses in real time:
 
 ```bash
 rviz2
@@ -44,8 +80,8 @@ rviz2
 In rviz2:
 
 - Add the `TF` display plugin
-- Configure the Fixed Frame to `camera_link` or `camera_depth_optical_frame`
-- Select the TF frames to display
+- Set the Fixed Frame to `camera_link` or `camera_depth_optical_frame`
+- Select which TF frames to display
 
 ![image-20251027140652727](../image/application_guide/image5.png)
 
@@ -53,9 +89,180 @@ In rviz2:
 
 #### Core Function: `OBCameraNode::calcAndPublishStaticTransform()`
 
-The camera node calculates and publishes static transformation relationships between all sensors through this function. Below is a detailed explanation of the code:
+The camera node uses this function to calculate and publish all static transforms between sensors.
 
-#### Quaternion Initialization and Coordinate System Transformation
+```cpp
+void OBCameraNode::calcAndPublishStaticTransform() {
+  tf2::Quaternion quaternion_optical, zero_rot;
+  zero_rot.setRPY(0.0, 0.0, 0.0);
+  quaternion_optical.setRPY(-M_PI / 2, 0.0, -M_PI / 2);
+  tf2::Vector3 zero_trans(0, 0, 0);
+  auto base_stream_profile = stream_profile_[base_stream_];
+  auto device_info = device_->getDeviceInfo();
+  CHECK_NOTNULL(device_info);
+  auto pid = device_info->getPid();
+  if (!base_stream_profile) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to get base stream profile");
+    return;
+  }
+  CHECK_NOTNULL(base_stream_profile.get());
+  for (const auto &item : stream_profile_) {
+    auto stream_index = item.first;
+
+    auto stream_profile = item.second;
+    if (!stream_profile) {
+      continue;
+    }
+    OBExtrinsic ex;
+    try {
+      ex = stream_profile->getExtrinsicTo(base_stream_profile);
+    } catch (const ob::Error &e) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to get " << stream_name_[stream_index]
+                                                    << " extrinsic: " << e.getMessage());
+      ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
+    }
+
+    auto Q = rotationMatrixToQuaternion(ex.rot);
+    Q = quaternion_optical * Q * quaternion_optical.inverse();
+    tf2::Vector3 trans(ex.trans[0], ex.trans[1], ex.trans[2]);
+    auto timestamp = node_->now();
+    if (stream_index.first != base_stream_.first) {
+      if (stream_index.first == OB_STREAM_IR_RIGHT && base_stream_.first == OB_STREAM_DEPTH) {
+        trans[0] = std::abs(trans[0]);  // because left and right ir calibration is error
+      }
+      publishStaticTF(timestamp, trans, Q, frame_id_[base_stream_], frame_id_[stream_index]);
+    }
+    publishStaticTF(timestamp, zero_trans, quaternion_optical, frame_id_[stream_index],
+                    optical_frame_id_[stream_index]);
+    RCLCPP_INFO_STREAM(logger_, "Publishing static transform from " << stream_name_[stream_index]
+                                                                    << " to "
+                                                                    << stream_name_[base_stream_]);
+    RCLCPP_INFO_STREAM(logger_, "Translation " << trans[0] << ", " << trans[1] << ", " << trans[2]);
+    RCLCPP_INFO_STREAM(logger_, "Rotation " << Q.getX() << ", " << Q.getY() << ", " << Q.getZ()
+                                            << ", " << Q.getW());
+  }
+
+  if ((pid == FEMTO_BOLT_PID || pid == FEMTO_MEGA_PID) && enable_stream_[DEPTH] &&
+      enable_stream_[COLOR] && enable_publish_extrinsic_) {
+    // calc depth to color
+
+    CHECK_NOTNULL(stream_profile_[COLOR]);
+    auto depth_to_color_extrinsics = base_stream_profile->getExtrinsicTo(stream_profile_[COLOR]);
+    auto Q = rotationMatrixToQuaternion(depth_to_color_extrinsics.rot);
+    Q = quaternion_optical * Q * quaternion_optical.inverse();
+    publishStaticTF(node_->now(), zero_trans, Q, camera_link_frame_id_, frame_id_[base_stream_]);
+  } else {
+    publishStaticTF(node_->now(), zero_trans, zero_rot, camera_link_frame_id_,
+                    frame_id_[base_stream_]);
+  }
+
+  if (enable_stream_[DEPTH] && enable_stream_[COLOR] && enable_publish_extrinsic_) {
+    static const char *frame_id = "depth_to_color_extrinsics";
+    OBExtrinsic ex;
+    try {
+      ex = base_stream_profile->getExtrinsicTo(stream_profile_[COLOR]);
+    } catch (const ob::Error &e) {
+      RCLCPP_ERROR_STREAM(logger_,
+                          "Failed to get " << frame_id << " extrinsic: " << e.getMessage());
+      ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
+    }
+    depth_to_other_extrinsics_[COLOR] = ex;
+    auto ex_msg = obExtrinsicsToMsg(ex, frame_id);
+    CHECK_NOTNULL(depth_to_other_extrinsics_publishers_[COLOR]);
+    depth_to_other_extrinsics_publishers_[COLOR]->publish(ex_msg);
+  }
+
+  if (enable_stream_[DEPTH] && enable_stream_[INFRA0] && enable_publish_extrinsic_) {
+    static const char *frame_id = "depth_to_ir_extrinsics";
+    OBExtrinsic ex;
+    try {
+      ex = base_stream_profile->getExtrinsicTo(stream_profile_[INFRA0]);
+    } catch (const ob::Error &e) {
+      RCLCPP_ERROR_STREAM(logger_,
+                          "Failed to get " << frame_id << " extrinsic: " << e.getMessage());
+      ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
+    }
+    depth_to_other_extrinsics_[INFRA0] = ex;
+    auto ex_msg = obExtrinsicsToMsg(ex, frame_id);
+    CHECK_NOTNULL(depth_to_other_extrinsics_publishers_[INFRA0]);
+    depth_to_other_extrinsics_publishers_[INFRA0]->publish(ex_msg);
+  }
+  if (enable_stream_[DEPTH] && enable_stream_[INFRA1] && enable_publish_extrinsic_) {
+    static const char *frame_id = "depth_to_left_ir_extrinsics";
+    OBExtrinsic ex;
+    try {
+      ex = base_stream_profile->getExtrinsicTo(stream_profile_[INFRA1]);
+    } catch (const ob::Error &e) {
+      RCLCPP_ERROR_STREAM(logger_,
+                          "Failed to get " << frame_id << " extrinsic: " << e.getMessage());
+      ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
+    }
+    depth_to_other_extrinsics_[INFRA1] = ex;
+    auto ex_msg = obExtrinsicsToMsg(ex, frame_id);
+    CHECK_NOTNULL(depth_to_other_extrinsics_publishers_[INFRA1]);
+    depth_to_other_extrinsics_publishers_[INFRA1]->publish(ex_msg);
+  }
+  if (enable_stream_[DEPTH] && enable_stream_[INFRA2] && enable_publish_extrinsic_) {
+    static const char *frame_id = "depth_to_right_ir_extrinsics";
+    OBExtrinsic ex;
+    try {
+      ex = base_stream_profile->getExtrinsicTo(stream_profile_[INFRA2]);
+    } catch (const ob::Error &e) {
+      RCLCPP_ERROR_STREAM(logger_,
+                          "Failed to get " << frame_id << " extrinsic: " << e.getMessage());
+      ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
+    }
+    ex.trans[0] = -std::abs(ex.trans[0]);
+    depth_to_other_extrinsics_[INFRA2] = ex;
+    auto ex_msg = obExtrinsicsToMsg(ex, frame_id);
+    CHECK_NOTNULL(depth_to_other_extrinsics_publishers_[INFRA2]);
+    depth_to_other_extrinsics_publishers_[INFRA2]->publish(ex_msg);
+  }
+  if (enable_stream_[DEPTH] && enable_stream_[ACCEL] && enable_publish_extrinsic_) {
+    static const char *frame_id = "depth_to_accel_extrinsics";
+    OBExtrinsic ex;
+    try {
+      ex = base_stream_profile->getExtrinsicTo(stream_profile_[ACCEL]);
+    } catch (const ob::Error &e) {
+      RCLCPP_ERROR_STREAM(logger_,
+                          "Failed to get " << frame_id << " extrinsic: " << e.getMessage());
+      ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
+    }
+    depth_to_other_extrinsics_[ACCEL] = ex;
+    auto ex_msg = obExtrinsicsToMsg(ex, frame_id);
+    CHECK_NOTNULL(depth_to_other_extrinsics_publishers_[ACCEL]);
+    depth_to_other_extrinsics_publishers_[ACCEL]->publish(ex_msg);
+  }
+  if (enable_stream_[DEPTH] && enable_stream_[GYRO] && enable_publish_extrinsic_) {
+    static const char *frame_id = "depth_to_gyro_extrinsics";
+    OBExtrinsic ex;
+    try {
+      ex = base_stream_profile->getExtrinsicTo(stream_profile_[GYRO]);
+    } catch (const ob::Error &e) {
+      RCLCPP_ERROR_STREAM(logger_,
+                          "Failed to get " << frame_id << " extrinsic: " << e.getMessage());
+      ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
+    }
+    depth_to_other_extrinsics_[GYRO] = ex;
+    auto ex_msg = obExtrinsicsToMsg(ex, frame_id);
+    CHECK_NOTNULL(depth_to_other_extrinsics_publishers_[GYRO]);
+    depth_to_other_extrinsics_publishers_[GYRO]->publish(ex_msg);
+  }
+  if (enable_sync_output_accel_gyro_) {
+    tf2::Quaternion zero_rot;
+    zero_rot.setRPY(0.0, 0.0, 0.0);
+    tf2::Vector3 zero_trans(0, 0, 0);
+    publishStaticTF(node_->now(), zero_trans, zero_rot, optical_frame_id_[GYRO],
+                    accel_gyro_frame_id_);
+  }
+}
+```
+
+#### Function Breakdown
+
+Detailed explanation of the code:
+
+**Quaternion Initialization and Coordinate Transform**
 
 ```cpp
 tf2::Quaternion quaternion_optical, zero_rot;
@@ -63,68 +270,47 @@ zero_rot.setRPY(0.0, 0.0, 0.0);
 quaternion_optical.setRPY(-M_PI / 2, 0.0, -M_PI / 2);
 ```
 
-**Explanation:**
+- `quaternion_optical`: Defines the rotation from optical coordinates to ROS standard (90° rotation)
+- Converts camera optical CS (X right, Y down, Z forward) to ROS CS (X forward, Y left, Z up)
 
-- `quaternion_optical`: Defines the rotation transformation from the optical coordinate system to the ROS standard coordinate system (90-degree rotation)
-- This rotation converts the camera optical coordinate system (X right, Y down, Z forward) to the ROS standard coordinate system (X forward, Y left, Z up)
-
-#### Obtaining Device Information and Base Stream
+**Get Device Info and Base Stream**
 
 ```cpp
 auto base_stream_profile = stream_profile_[base_stream_];
 auto device_info = device_->getDeviceInfo();
-// The base stream is typically the DEPTH stream
+// Base stream usually DEPTH
 ```
 
-**Explanation:**
+- Choose a base stream (usually depth); all other transforms are relative to it
 
-- A base stream (typically the depth stream) is selected, and all other sensor transformations are calculated relative to this base stream
-
-#### Iterating Through All Streams and Calculating Relative Transformations
+**Iterate Streams and Compute Relative Transforms**
 
 ```cpp
 for (const auto &item : stream_profile_) {
     auto stream_index = item.first;
     auto stream_profile = item.second;
-
-    // Get the extrinsics of this stream relative to the base stream
     OBExtrinsic ex;
     ex = stream_profile->getExtrinsicTo(base_stream_profile);
-
-    // Convert rotation matrix to quaternion
     auto Q = rotationMatrixToQuaternion(ex.rot);
-
-    // Apply optical coordinate system transformation: Q_new = quaternion_optical * Q * quaternion_optical.inverse()
     Q = quaternion_optical * Q * quaternion_optical.inverse();
-
     tf2::Vector3 trans(ex.trans[0], ex.trans[1], ex.trans[2]);
 ```
 
-**Explanation:**
+- `OBExtrinsic` holds rotation matrix (`rot`) and translation vector (`trans`)
+- Apply optical-to-ROS rotation via quaternion multiplication
 
-- `OBExtrinsic` contains the rotation matrix (`rot`) and translation vector (`trans`) between two sensors
-- Quaternion multiplication applies the optical coordinate system transformation to each sensor's rotation relationship
-- This transformation converts the camera's native optical coordinate system to the ROS standard coordinate system
-
-#### Publishing TF Transformations
+**Publish TF Transforms**
 
 ```cpp
-// Publish the transformation from sensor to base stream (in ROS coordinate system)
 publishStaticTF(timestamp, trans, Q, frame_id_[base_stream_], frame_id_[stream_index]);
-
-// Publish the transformation from physical frame to its optical frame
 publishStaticTF(timestamp, zero_trans, quaternion_optical, frame_id_[stream_index],
                 optical_frame_id_[stream_index]);
 ```
 
-**Explanation:**
+- First: base stream to sensor (translation + rotation)
+- Second: sensor frame to optical frame (pure rotation)
 
-- First `publishStaticTF`: Publishes the transformation from the base stream to the current sensor (translation + rotation)
-- Second `publishStaticTF`: Publishes the transformation from physical frame to optical frame (pure rotation, no translation)
-- `frame_id_[stream_index]`: Physical coordinate system frame name (e.g., `camera_depth_frame`)
-- `optical_frame_id_[stream_index]`: Optical coordinate system frame name (e.g., `camera_depth_optical_frame`)
-
-#### Special Handling for Left and Right IR Cameras
+**Special Handling for Left/Right IR**
 
 ```cpp
 if (stream_index.first == OB_STREAM_IR_RIGHT && base_stream_.first == OB_STREAM_DEPTH) {
@@ -132,12 +318,9 @@ if (stream_index.first == OB_STREAM_IR_RIGHT && base_stream_.first == OB_STREAM_
 }
 ```
 
-**Explanation:**
+- Ensures symmetry consistency between left/right IR cameras
 
-- Left and right IR cameras are symmetric about the center plane in the device coordinate system
-- Using `abs()` ensures the X-axis offset is positive, maintaining geometric consistency
-
-#### Publishing Extrinsics from Depth to Other Sensors
+**Publish Depth-to-Other Extrinsics**
 
 ```cpp
 if (enable_stream_[DEPTH] && enable_stream_[COLOR] && enable_publish_extrinsic_) {
@@ -147,7 +330,4 @@ if (enable_stream_[DEPTH] && enable_stream_[COLOR] && enable_publish_extrinsic_)
 }
 ```
 
-**Explanation:**
-
-- In addition to publishing transformation relationships through TF, raw extrinsic parameters are also published through custom topics
-- This allows users to directly access the camera's intrinsic and extrinsic parameters for high-precision point cloud alignment and depth-color registration
+- Publishes raw extrinsics via topic for advanced alignment and registration

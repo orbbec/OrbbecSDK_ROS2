@@ -42,6 +42,7 @@ set(dependencies
     diagnostic_msgs
     statistics_msgs
     yaml-cpp
+    camera_calibration_parsers
 )
 
 foreach(dep IN LISTS dependencies)

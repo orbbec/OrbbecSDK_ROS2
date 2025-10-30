@@ -34,3 +34,17 @@ If the camera node crashes unexpectedly, it will generate a crash log in the cur
 
 - Different cameras have varying default resolutions and image formats.
 - To simplify usage, each camera has its own launch file.
+
+### How to Launch a Specific Camera When Multiple Cameras Are Connected
+
+While the launch file did not explicitly specify which device to use. In that case, the driver will connect to the default device.
+
+You can check the serial number of your device by running:
+```bash
+ros2 run orbbec_camera list_devices_node
+```
+
+Then launch with the serial number explicitly set, for example:
+```bash
+ros2 launch orbbec_camera femto_bolt.launch.py serial_number:=CL8H741005J
+```

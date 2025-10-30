@@ -34,3 +34,17 @@
 
 - 不同的相机具有不同的默认分辨率和图像格式。
 - 为简化使用，每个相机都有自己的启动文件。
+
+### 多相机连接时如何指定启动某一个相机
+
+如果启动文件未显式指定要使用的设备，在同时连接多台相机时，驱动会默认连接到其中一个（默认设备）。
+
+可以先通过以下命令查看设备序列号：
+```bash
+ros2 run orbbec_camera list_devices_node
+```
+
+然后在启动时显式指定序列号，例如：
+```bash
+ros2 launch orbbec_camera femto_bolt.launch.py serial_number:=CL8H741005J
+```

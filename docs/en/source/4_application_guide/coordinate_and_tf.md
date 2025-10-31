@@ -6,7 +6,6 @@
 
 ![module in rviz2](../image/application_guide/image1.png)
 
-
 ### ROS2 Robot Coordinate System vs Camera Optical Coordinate System
 
 * Point of View:
@@ -96,7 +95,7 @@ In rviz2:
 
 ### Camera TF Calculation and Publishing Mechanism
 
-#### Core Function: `OBCameraNode::calcAndPublishStaticTransform()`
+#### Core Function: [OBCameraNode::calcAndPublishStaticTransform()](https://github.com/orbbec/OrbbecSDK_ROS2/blob/166c35b4ea211c60265ca9b38b1b15519d1ea3dd/orbbec_camera/src/ob_camera_node.cpp#L3475)
 
 The camera node uses this function to calculate and publish all static transforms between sensors.
 
@@ -340,4 +339,3 @@ if (enable_stream_[DEPTH] && enable_stream_[COLOR] && enable_publish_extrinsic_)
 ```
 
 - Publishes raw extrinsics via topic for advanced alignment and registration
-

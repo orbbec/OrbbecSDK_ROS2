@@ -159,7 +159,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#id3">4.4.4. 相机TF计算和发布机制</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#obcameranode-calcandpublishstatictransform">4.4.4.1. 核心函数：<code class="docutils literal notranslate"><span class="pre">OBCameraNode::calcAndPublishStaticTransform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#obcameranode-calcandpublishstatictransform">4.4.4.1. 核心函数：OBCameraNode::calcAndPublishStaticTransform()</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#id4">4.4.4.2. 函数解析</a></li>
 </ul>
 </li>
@@ -330,6 +330,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#id3">8.2. 多相机无数据流</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#id4">8.3. 其他故障排除</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#id5">8.4. 为什么有这么多启动文件？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id6">8.5. 多相机连接时如何指定启动某一个相机</a></li>
 </ul>
 </li>
 </ul>
@@ -400,6 +401,18 @@
 <li><p>为简化使用，每个相机都有自己的启动文件。</p></li>
 </ul>
 </section>
+<section id="id6">
+<h2><span class="section-number">8.5. </span>多相机连接时如何指定启动某一个相机<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<p>如果启动文件未显式指定要使用的设备，在同时连接多台相机时，驱动会默认连接到其中一个（默认设备）。</p>
+<p>可以先通过以下命令查看设备序列号：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>orbbec_camera<span class="w"> </span>list_devices_node
+</pre></div>
+</div>
+<p>然后在启动时显式指定序列号，例如：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>femto_bolt.launch.py<span class="w"> </span>serial_number:<span class="o">=</span>CL8H741005J
+</pre></div>
+</div>
+</section>
 </section>
 
 
@@ -413,7 +426,7 @@
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2025年10月30日 05:44:33.
+      <span class="lastupdated">最后更新于 2025年10月31日 02:59:39.
       </span></p>
   </div>
 

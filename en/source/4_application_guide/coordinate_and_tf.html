@@ -159,7 +159,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#camera-tf-calculation-and-publishing-mechanism">4.4.4. Camera TF Calculation and Publishing Mechanism</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#core-function-obcameranode-calcandpublishstatictransform">4.4.4.1. Core Function: <code class="docutils literal notranslate"><span class="pre">OBCameraNode::calcAndPublishStaticTransform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core-function-obcameranode-calcandpublishstatictransform">4.4.4.1. Core Function: OBCameraNode::calcAndPublishStaticTransform()</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#function-breakdown">4.4.4.2. Function Breakdown</a></li>
 </ul>
 </li>
@@ -330,6 +330,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../8_FAQ/FAQ.html#no-data-stream-from-multiple-cameras">8.2. No Data Stream from Multiple Cameras</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../8_FAQ/FAQ.html#additional-troubleshooting">8.3. Additional Troubleshooting</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../8_FAQ/FAQ.html#why-are-there-so-many-launch-files">8.4. Why Are There So Many Launch Files?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../8_FAQ/FAQ.html#how-to-launch-a-specific-camera-when-multiple-cameras-are-connected">8.5. How to Launch a Specific Camera When Multiple Cameras Are Connected</a></li>
 </ul>
 </li>
 </ul>
@@ -447,7 +448,7 @@
 <section id="camera-tf-calculation-and-publishing-mechanism">
 <h2><span class="section-number">4.4.4. </span>Camera TF Calculation and Publishing Mechanism<a class="headerlink" href="#camera-tf-calculation-and-publishing-mechanism" title="Link to this heading"></a></h2>
 <section id="core-function-obcameranode-calcandpublishstatictransform">
-<h3><span class="section-number">4.4.4.1. </span>Core Function: <code class="docutils literal notranslate"><span class="pre">OBCameraNode::calcAndPublishStaticTransform()</span></code><a class="headerlink" href="#core-function-obcameranode-calcandpublishstatictransform" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.4.4.1. </span>Core Function: <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/blob/166c35b4ea211c60265ca9b38b1b15519d1ea3dd/orbbec_camera/src/ob_camera_node.cpp#L3475">OBCameraNode::calcAndPublishStaticTransform()</a><a class="headerlink" href="#core-function-obcameranode-calcandpublishstatictransform" title="Link to this heading"></a></h3>
 <p>The camera node uses this function to calculate and publish all static transforms between sensors.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">OBCameraNode::calcAndPublishStaticTransform</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="n">tf2</span><span class="o">::</span><span class="n">Quaternion</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="p">,</span><span class="w"> </span><span class="n">zero_rot</span><span class="p">;</span>
@@ -699,7 +700,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2025, ORBBEC INC. www.orbbec.com..
-      <span class="lastupdated">Last updated on 2025-10-30 05:44:30.
+      <span class="lastupdated">Last updated on 2025-10-31 02:59:36.
       </span></p>
   </div>
 

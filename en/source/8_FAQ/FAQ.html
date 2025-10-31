@@ -158,7 +158,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#camera-tf-calculation-and-publishing-mechanism">4.4.4. Camera TF Calculation and Publishing Mechanism</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#core-function-obcameranode-calcandpublishstatictransform">4.4.4.1. Core Function: <code class="docutils literal notranslate"><span class="pre">OBCameraNode::calcAndPublishStaticTransform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#core-function-obcameranode-calcandpublishstatictransform">4.4.4.1. Core Function: OBCameraNode::calcAndPublishStaticTransform()</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#function-breakdown">4.4.4.2. Function Breakdown</a></li>
 </ul>
 </li>
@@ -329,6 +329,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#no-data-stream-from-multiple-cameras">8.2. No Data Stream from Multiple Cameras</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#additional-troubleshooting">8.3. Additional Troubleshooting</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#why-are-there-so-many-launch-files">8.4. Why Are There So Many Launch Files?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-launch-a-specific-camera-when-multiple-cameras-are-connected">8.5. How to Launch a Specific Camera When Multiple Cameras Are Connected</a></li>
 </ul>
 </li>
 </ul>
@@ -399,6 +400,18 @@
 <li><p>To simplify usage, each camera has its own launch file.</p></li>
 </ul>
 </section>
+<section id="how-to-launch-a-specific-camera-when-multiple-cameras-are-connected">
+<h2><span class="section-number">8.5. </span>How to Launch a Specific Camera When Multiple Cameras Are Connected<a class="headerlink" href="#how-to-launch-a-specific-camera-when-multiple-cameras-are-connected" title="Link to this heading"></a></h2>
+<p>While the launch file did not explicitly specify which device to use. In that case, the driver will connect to the default device.</p>
+<p>You can check the serial number of your device by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>orbbec_camera<span class="w"> </span>list_devices_node
+</pre></div>
+</div>
+<p>Then launch with the serial number explicitly set, for example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>femto_bolt.launch.py<span class="w"> </span>serial_number:<span class="o">=</span>CL8H741005J
+</pre></div>
+</div>
+</section>
 </section>
 
 
@@ -412,7 +425,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2025, ORBBEC INC. www.orbbec.com..
-      <span class="lastupdated">Last updated on 2025-10-30 05:44:30.
+      <span class="lastupdated">Last updated on 2025-10-31 02:59:36.
       </span></p>
   </div>
 

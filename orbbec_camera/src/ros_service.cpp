@@ -135,6 +135,13 @@ void OBCameraNode::setupCameraCtrlServices() {
         (void)request_header;
         getLdpStatusCallback(request, response);
       });
+  get_laser_status_srv_ = node_->create_service<GetBool>(
+      "get_laser_status", [this](const std::shared_ptr<rmw_request_id_t> request_header,
+                                 const std::shared_ptr<GetBool::Request> request,
+                                 std::shared_ptr<GetBool::Response> response) {
+        (void)request_header;
+        getLaserStatusCallback(request, response);
+      });
   set_ptp_config_srv_ = node_->create_service<SetBool>(
       "set_ptp_config", [this](const std::shared_ptr<rmw_request_id_t> request_header,
                                const std::shared_ptr<SetBool::Request> request,
@@ -937,6 +944,28 @@ void OBCameraNode::getLdpStatusCallback(const std::shared_ptr<GetBool::Request>&
   (void)request;
   try {
     response->data = device_->getBoolProperty(OB_PROP_LDP_STATUS_BOOL);
+    response->success = true;
+  } catch (const ob::Error& e) {
+    response->message = e.getMessage();
+    response->success = false;
+  } catch (const std::exception& e) {
+    response->message = e.what();
+    response->success = false;
+  } catch (...) {
+    response->message = "unknown error";
+    response->success = false;
+  }
+}
+
+void OBCameraNode::getLaserStatusCallback(const std::shared_ptr<GetBool::Request>& request,
+                                          std::shared_ptr<GetBool::Response>& response) {
+  (void)request;
+  try {
+    if (device_->isPropertySupported(OB_PROP_LASER_CONTROL_INT, OB_PERMISSION_READ_WRITE)) {
+      response->data = device_->getBoolProperty(OB_PROP_LASER_CONTROL_INT);
+    } else if (device_->isPropertySupported(OB_PROP_LASER_BOOL, OB_PERMISSION_READ_WRITE)) {
+      response->data = device_->getBoolProperty(OB_PROP_LASER_BOOL);
+    }
     response->success = true;
   } catch (const ob::Error& e) {
     response->message = e.getMessage();

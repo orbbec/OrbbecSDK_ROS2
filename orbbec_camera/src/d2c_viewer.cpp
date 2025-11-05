@@ -30,9 +30,9 @@ D2CViewer::D2CViewer(rclcpp::Node* const node, rmw_qos_profile_t rgb_qos,
                      rmw_qos_profile_t depth_qos)
     : node_(node), logger_(rclcpp::get_logger("d2c_viewer")) {
   rgb_sub_ = std::make_shared<message_filters::Subscriber<sensor_msgs::msg::Image>>(
-      node_, "color/image_raw", rgb_qos);
+      node_, "~/color/image_raw", rgb_qos);
   depth_sub_ = std::make_shared<message_filters::Subscriber<sensor_msgs::msg::Image>>(
-      node_, "depth/image_raw", depth_qos);
+      node_, "~/depth/image_raw", depth_qos);
   sync_ = std::make_shared<message_filters::Synchronizer<MySyncPolicy>>(MySyncPolicy(10), *rgb_sub_,
                                                                         *depth_sub_);
   sync_->setMaxIntervalDuration(rclcpp::Duration::from_seconds(1.0));  // 1s
@@ -41,7 +41,7 @@ D2CViewer::D2CViewer(rclcpp::Node* const node, rmw_qos_profile_t rgb_qos,
   using std::placeholders::_2;
   sync_->registerCallback(std::bind(&D2CViewer::messageCallback, this, _1, _2));
   d2c_viewer_pub_ =
-      node_->create_publisher<sensor_msgs::msg::Image>("depth_to_color/image_raw", rclcpp::QoS(1));
+      node_->create_publisher<sensor_msgs::msg::Image>("~/depth_to_color/image_raw", rclcpp::QoS(1));
 }
 D2CViewer::~D2CViewer() = default;
 

@@ -24,7 +24,7 @@ Stephen Brawner (brawner@gmail.com)
     </inertial>
     <visual>
       <origin
-        xyz="0 0 0"
+        xyz="-0.0117149999999995 -0.0475 -0.0143111800025738"
         rpy="0 0 0" />
       <geometry>
         <mesh
@@ -90,7 +90,7 @@ Stephen Brawner (brawner@gmail.com)
     name="camera_bottom_screw_frame"
     type="fixed">
     <origin
-      xyz="0 0 0"
+      xyz="-0.0117149999999995 -0.0475 -0.0143111800025738"
       rpy="0 0 0" />
     <parent
       link="camera_link" />
@@ -100,7 +100,7 @@ Stephen Brawner (brawner@gmail.com)
       xyz="0 0 0" />
   </joint>
   <link
-    name="camera_infra1_frame">
+    name="camera_left_ir_frame">
     <inertial>
       <origin
         xyz="-0.00158020638644197 -1.72113892998871E-08 -1.52265896555797E-07"
@@ -140,20 +140,20 @@ Stephen Brawner (brawner@gmail.com)
     </collision>
   </link>
   <joint
-    name="camera_infra1_frame"
+    name="camera_left_ir_frame"
     type="fixed">
     <origin
-      xyz="0.0117149999999995 0.0475 0.0143111800025738"
+      xyz="0 0 0"
       rpy="0 0 0" />
     <parent
-      link="camera_bottom_screw_frame" />
+      link="camera_depth_frame" />
     <child
-      link="camera_infra1_frame" />
+      link="camera_left_ir_frame" />
     <axis
       xyz="0 0 0" />
   </joint>
   <link
-    name="camera_infra1_optical_frame">
+    name="camera_left_ir_optical_frame">
     <inertial>
       <origin
         xyz="1.72113892998871E-08 1.52265896555812E-07 -0.00158020638644197"
@@ -193,15 +193,15 @@ Stephen Brawner (brawner@gmail.com)
     </collision>
   </link>
   <joint
-    name="camera_infra1_optical_frame"
+    name="camera_left_ir_optical_frame"
     type="fixed">
     <origin
       xyz="0 0 0"
       rpy="-1.5707963267949 0 -1.5707963267949" />
     <parent
-      link="camera_infra1_frame" />
+      link="camera_left_ir_frame" />
     <child
-      link="camera_infra1_optical_frame" />
+      link="camera_left_ir_optical_frame" />
     <axis
       xyz="0 0 0" />
   </joint>
@@ -249,10 +249,10 @@ Stephen Brawner (brawner@gmail.com)
     name="camera_color_frame"
     type="fixed">
     <origin
-      xyz="0.0117149999999995 0.02375 0.0143111800025738"
+      xyz="0 -0.023749999701976776 0"
       rpy="0 0 0" />
     <parent
-      link="camera_bottom_screw_frame" />
+      link="camera_depth_frame" />
     <child
       link="camera_color_frame" />
     <axis
@@ -312,7 +312,7 @@ Stephen Brawner (brawner@gmail.com)
       xyz="0 0 0" />
   </joint>
   <link
-    name="camera_infra2_frame">
+    name="camera_right_ir_frame">
     <inertial>
       <origin
         xyz="-0.00158020638644197 -1.7211389306826E-08 -1.5226589655147E-07"
@@ -352,20 +352,20 @@ Stephen Brawner (brawner@gmail.com)
     </collision>
   </link>
   <joint
-    name="camera_infra2_frame"
+    name="camera_right_ir_frame"
     type="fixed">
     <origin
-      xyz="0.0117149999999995 -0.0475 0.0143111800025738"
+      xyz="0 -0.095 0"
       rpy="0 0 0" />
     <parent
-      link="camera_bottom_screw_frame" />
+      link="camera_depth_frame" />
     <child
-      link="camera_infra2_frame" />
+      link="camera_right_ir_frame" />
     <axis
       xyz="0 0 0" />
   </joint>
   <link
-    name="camera_infra2_optical_frame">
+    name="camera_right_ir_optical_frame">
     <inertial>
       <origin
         xyz="1.7211389306826E-08 1.52265896497699E-07 -0.00158020638644197"
@@ -405,20 +405,20 @@ Stephen Brawner (brawner@gmail.com)
     </collision>
   </link>
   <joint
-    name="camera_infra2_optical_frame"
+    name="camera_right_ir_optical_frame"
     type="fixed">
     <origin
       xyz="0 0 0"
       rpy="-1.57079632679486 0 -1.5707963267949" />
     <parent
-      link="camera_infra2_frame" />
+      link="camera_right_ir_frame" />
     <child
-      link="camera_infra2_optical_frame" />
+      link="camera_right_ir_optical_frame" />
     <axis
       xyz="0 0 0" />
   </joint>
   <link
-    name="camera_IMU_frame">
+    name="camera_imu_frame">
     <inertial>
       <origin
         xyz="-0.000485747949726976 -9.01982197890061E-07 -5.03896938954429E-07"
@@ -458,15 +458,15 @@ Stephen Brawner (brawner@gmail.com)
     </collision>
   </link>
   <joint
-    name="camera_IMU_frame"
+    name="camera_imu_frame"
     type="fixed">
     <origin
-      xyz="-0.00253500000000046 0.036187989999999 0.0136240800025733"
+      xyz="-0.01425 -0.011312 -0.0006871"
       rpy="0 0 0" />
     <parent
-      link="camera_bottom_screw_frame" />
+      link="camera_depth_frame" />
     <child
-      link="camera_IMU_frame" />
+      link="camera_imu_frame" />
     <axis
       xyz="0 0 0" />
   </joint>
@@ -514,10 +514,10 @@ Stephen Brawner (brawner@gmail.com)
     name="camera_depth_frame"
     type="fixed">
     <origin
-      xyz="0.0117149999999995 0.0475 0.0143111800025738"
+      xyz="0 0 0"
       rpy="0 0 0" />
     <parent
-      link="camera_bottom_screw_frame" />
+      link="camera_link" />
     <child
       link="camera_depth_frame" />
     <axis

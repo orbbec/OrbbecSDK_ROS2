@@ -15,7 +15,7 @@ Stephen Brawner (brawner@gmail.com)
                 iyy="1.70686808598814E-06" iyz="-7.18717290327325E-09" izz="1.31766831843134E-05" />
         </inertial>
         <visual>
-            <origin xyz="0 0 0" rpy="0 0 0" />
+            <origin xyz="-0.01587 -0.025 -0.0125" rpy="0 0 0" />
             <geometry>
                 <mesh filename="${mesh_path}camera_link.STL" />
             </geometry>
@@ -57,7 +57,7 @@ Stephen Brawner (brawner@gmail.com)
     </link>
 
     <joint name="camera_bottom_screw_frame_joint" type="fixed">
-        <origin xyz="0 0 0" rpy="0 0 0" />
+        <origin xyz="-0.01587 -0.025 -0.0125" rpy="0 0 0" />
         <parent link="camera_link" />
         <child link="camera_bottom_screw_frame" />
         <axis xyz="0 0 0" />
@@ -90,8 +90,8 @@ Stephen Brawner (brawner@gmail.com)
     </link>
 
     <joint name="camera_left_ir_joint" type="fixed">
-        <origin xyz="0.01587 -0.025 0.0125" rpy="0 0 0" />
-        <parent link="camera_bottom_screw_frame" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <parent link="camera_depth_frame" />
         <child link="camera_left_ir_frame" />
         <axis xyz="0 0 0" />
     </joint>
@@ -122,8 +122,8 @@ Stephen Brawner (brawner@gmail.com)
     </link>
 
     <joint name="camera_left_ir_optical_joint" type="fixed">
-        <origin xyz="0.01587 -0.025 0.0125" rpy="-1.5707963267949 0 -1.5707963267949" />
-        <parent link="camera_bottom_screw_frame" />
+        <origin xyz="0 0 0" rpy="-1.5707963267949 0 -1.5707963267949" />
+        <parent link="camera_left_ir_frame" />
         <child link="camera_left_ir_optical_frame" />
         <axis xyz="0 0 0" />
     </joint>
@@ -155,8 +155,8 @@ Stephen Brawner (brawner@gmail.com)
     </link>
 
     <joint name="camera_right_ir_joint" type="fixed">
-        <origin xyz="0.01587 0.025 0.0125" rpy="0 0 0" />
-        <parent link="camera_bottom_screw_frame" />
+        <origin xyz="0 -0.05 0" rpy="0 0 0" />
+        <parent link="camera_depth_frame" />
         <child link="camera_right_ir_frame" />
         <axis xyz="0 0 0" />
     </joint>
@@ -187,8 +187,8 @@ Stephen Brawner (brawner@gmail.com)
     </link>
 
     <joint name="camera_right_ir_optical_joint" type="fixed">
-        <origin xyz="0.01587 0.025 0.0125" rpy="-1.5707963267949 0 -1.5707963267949" />
-        <parent link="camera_bottom_screw_frame" />
+        <origin xyz="0 0 0" rpy="-1.5707963267949 0 -1.5707963267949" />
+        <parent link="camera_right_ir_frame" />
         <child link="camera_right_ir_optical_frame" />
         <axis xyz="0 0 0" />
     </joint>
@@ -220,8 +220,8 @@ Stephen Brawner (brawner@gmail.com)
     </link>
 
     <joint name="camera_color_joint" type="fixed">
-        <origin xyz="0.017533 0.010995 0.012505" rpy="0 0 0" />
-        <parent link="camera_bottom_screw_frame" />
+        <origin xyz="0.001663 -0.014005 0.000005" rpy="0 0 0" />
+        <parent link="camera_depth_frame" />
         <child link="camera_color_frame" />
         <axis xyz="0 0 0" />
     </joint>
@@ -253,8 +253,8 @@ Stephen Brawner (brawner@gmail.com)
     </link>
 
     <joint name="camera_color_optical_joint" type="fixed">
-        <origin xyz="0.017533 0.010995 0.012505" rpy="-1.5707963267949 0 -1.5707963267949" />
-        <parent link="camera_bottom_screw_frame" />
+        <origin xyz="0 0 0" rpy="-1.5707963267949 0 -1.5707963267949" />
+        <parent link="camera_color_frame" />
         <child link="camera_color_optical_frame" />
         <axis xyz="0 0 0" />
     </joint>
@@ -286,8 +286,8 @@ Stephen Brawner (brawner@gmail.com)
     </link>
 
     <joint name="camera_depth_joint" type="fixed">
-        <origin xyz="0.01587 -0.025 0.0125" rpy="0 0 0" />
-        <parent link="camera_bottom_screw_frame" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <parent link="camera_link" />
         <child link="camera_depth_frame" />
         <axis xyz="0 0 0" />
     </joint>
@@ -317,8 +317,8 @@ Stephen Brawner (brawner@gmail.com)
     </link>
 
     <joint name="camera_depth_optical_joint" type="fixed">
-        <origin xyz="0.01587 -0.025 0.0125" rpy="-1.5707963267949 0 -1.5707963267949" />
-        <parent link="camera_bottom_screw_frame" />
+        <origin xyz="0 0 0" rpy="-1.5707963267949 0 -1.5707963267949" />
+        <parent link="camera_depth_frame" />
         <child link="camera_depth_optical_frame" />
         <axis xyz="0 0 0" />
     </joint>

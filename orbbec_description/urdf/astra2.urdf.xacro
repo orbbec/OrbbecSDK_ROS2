@@ -22,7 +22,7 @@
     </inertial>
     <visual>
       <origin
-        xyz="0 0 0"
+        xyz="-0.012323995999904 -0.0374999999985815 -0.0281503197112"
         rpy="0 0 0" />
       <geometry>
         <mesh
@@ -88,7 +88,7 @@
     name="camera_bottom_screw_frame"
     type="fixed">
     <origin
-      xyz="0 0 0"
+      xyz="-0.012323995999904 -0.0374999999985815 -0.0281503197112"
       rpy="0 0 0" />
     <parent
       link="camera_link" />
@@ -98,7 +98,7 @@
       xyz="0 0 0" />
   </joint>
   <link
-    name="camera_infra1_frame">
+    name="camera_ir_frame">
     <inertial>
       <origin
         xyz="-0.00168460453866946 5.33451517362171E-07 6.08796009742363E-07"
@@ -138,20 +138,20 @@
     </collision>
   </link>
   <joint
-    name="camera_infra1_frame"
+    name="camera_ir_frame"
     type="fixed">
     <origin
-      xyz="0.012323995999904 0.0374999999985815 0.0281503197112"
+      xyz="0 0 0"
       rpy="0 0 0" />
     <parent
-      link="camera_bottom_screw_frame" />
+      link="camera_depth_frame" />
     <child
-      link="camera_infra1_frame" />
+      link="camera_ir_frame" />
     <axis
       xyz="0 0 0" />
   </joint>
   <link
-    name="camera_infra1_optical_frame">
+    name="camera_ir_optical_frame">
     <inertial>
       <origin
         xyz="-5.33451517362171E-07 -6.0879600974216E-07 -0.00168460453866946"
@@ -191,20 +191,20 @@
     </collision>
   </link>
   <joint
-    name="camera_infra1_optical_frame"
+    name="camera_ir_optical_frame"
     type="fixed">
     <origin
       xyz="0 0 0"
       rpy="-1.5707963267949 0 -1.5707963267949" />
     <parent
-      link="camera_infra1_frame" />
+      link="camera_ir_frame" />
     <child
-      link="camera_infra1_optical_frame" />
+      link="camera_ir_optical_frame" />
     <axis
       xyz="0 0 0" />
   </joint>
   <link
-    name="camera_colorl_frame">
+    name="camera_color_frame">
     <inertial>
       <origin
         xyz="-0.0010912488631539 -4.73353451897057E-07 7.19396296308746E-07"
@@ -247,12 +247,12 @@
     name="camera_color_frame"
     type="fixed">
     <origin
-      xyz="0.014865995999904 0.0189999999985815 0.0281503197112"
+      xyz="0.0025420000310987234 -0.01850000023841858 0"
       rpy="0 0 0" />
     <parent
-      link="camera_bottom_screw_frame" />
+      link="camera_depth_frame" />
     <child
-      link="camera_colorl_frame" />
+      link="camera_color_frame" />
     <axis
       xyz="0 0 0" />
   </joint>
@@ -303,7 +303,7 @@
       xyz="0 0 0"
       rpy="-1.5707963267949 0 -1.5707963267949" />
     <parent
-      link="camera_colorl_frame" />
+      link="camera_color_frame" />
     <child
       link="camera_color_optical_frame" />
     <axis
@@ -353,10 +353,10 @@
     name="camera_depth_frame"
     type="fixed">
     <origin
-      xyz="0.012323995999904 0.0374999999985815 0.0281503197112"
+      xyz="0 0 0"
       rpy="0 0 0" />
     <parent
-      link="camera_bottom_screw_frame" />
+      link="camera_link" />
     <child
       link="camera_depth_frame" />
     <axis

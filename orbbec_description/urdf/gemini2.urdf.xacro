@@ -22,7 +22,7 @@
     </inertial>
     <visual>
       <origin
-        xyz="0 0 0"
+        xyz="-0.01491 -0.025 -0.0125"
         rpy="0 0 0" />
       <geometry>
         <mesh
@@ -88,7 +88,7 @@
     name="camera_botter_screw_frame"
     type="fixed">
     <origin
-      xyz="0 0 0"
+      xyz="-0.01491 -0.025 -0.0125"
       rpy="0 0 0" />
     <parent
       link="camera_link" />
@@ -98,7 +98,7 @@
       xyz="0 0 0" />
   </joint>
   <link
-    name="camera_infra1_frame">
+    name="camera_right_ir_frame">
     <inertial>
       <origin
         xyz="-0.000620201436687004 -1.61358465547434E-08 -1.50984520398332E-07"
@@ -138,20 +138,20 @@
     </collision>
   </link>
   <joint
-    name="camera_infra1_frame"
+    name="camera_right_ir_frame"
     type="fixed">
     <origin
-      xyz="0.01491 -0.025 0.0125"
+      xyz="0 -0.05000000074505806 0"
       rpy="0 0 0" />
     <parent
-      link="camera_botter_screw_frame" />
+      link="camera_depth_frame" />
     <child
-      link="camera_infra1_frame" />
+      link="camera_right_ir_frame" />
     <axis
       xyz="0 0 0" />
   </joint>
   <link
-    name="camera_infra1_optical_frame">
+    name="camera_right_ir_optical_frame">
     <inertial>
       <origin
         xyz="1.61358465547434E-08 1.50984520398324E-07 -0.000620201436687004"
@@ -191,15 +191,15 @@
     </collision>
   </link>
   <joint
-    name="camera_infra1_optical_frame"
+    name="camera_right_ir_optical_frame"
     type="fixed">
     <origin
       xyz="0 0 0"
       rpy="-1.5707963267949 0 -1.5707963267949" />
     <parent
-      link="camera_infra1_frame" />
+      link="camera_right_ir_frame" />
     <child
-      link="camera_infra1_optical_frame" />
+      link="camera_right_ir_optical_frame" />
     <axis
       xyz="0 0 0" />
   </joint>
@@ -247,10 +247,10 @@
     name="camera_color_frame"
     type="fixed">
     <origin
-      xyz="0.01682 0.010995 0.012505"
-      rpy="-1.5707963267949 0 -1.5707963267949" />
+      xyz="0.0019099999917671084 -0.01400499977171421 4.999999873689376e-06"
+      rpy="0 0 0" />
     <parent
-      link="camera_botter_screw_frame" />
+      link="camera_depth_frame" />
     <child
       link="camera_color_frame" />
     <axis
@@ -301,7 +301,7 @@
     type="fixed">
     <origin
       xyz="0 0 0"
-      rpy="0 0 0" />
+      rpy="-1.5707963267949 0 -1.5707963267949" />
     <parent
       link="camera_color_frame" />
     <child
@@ -310,7 +310,7 @@
       xyz="0 0 0" />
   </joint>
   <link
-    name="camera_infra2_frame">
+    name="camera_left_ir_frame">
     <inertial>
       <origin
         xyz="-0.000620201436687001 -1.6135846551274E-08 -1.50984520410662E-07"
@@ -350,20 +350,20 @@
     </collision>
   </link>
   <joint
-    name="camera_infra2_frame"
+    name="camera_left_ir_frame"
     type="fixed">
     <origin
-      xyz="0.01491 0.025 0.0125"
+      xyz="0 0 0"
       rpy="0 0 0" />
     <parent
-      link="camera_botter_screw_frame" />
+      link="camera_link" />
     <child
-      link="camera_infra2_frame" />
+      link="camera_left_ir_frame" />
     <axis
       xyz="0 0 0" />
   </joint>
   <link
-    name="camera_infra2_optical_frame">
+    name="camera_left_ir_optical_frame">
     <inertial>
       <origin
         xyz="1.6135846551274E-08 1.50984520410652E-07 -0.000620201436687001"
@@ -403,15 +403,15 @@
     </collision>
   </link>
   <joint
-    name="camera_infra2_optical_frame"
+    name="camera_left_ir_optical_frame"
     type="fixed">
     <origin
       xyz="0 0 0"
       rpy="-1.5707963267949 0 -1.5707963267949" />
     <parent
-      link="camera_infra2_frame" />
+      link="camera_left_ir_frame" />
     <child
-      link="camera_infra2_optical_frame" />
+      link="camera_left_ir_optical_frame" />
     <axis
       xyz="0 0 0" />
   </joint>
@@ -459,10 +459,10 @@
     name="camera_depth_frame"
     type="fixed">
     <origin
-      xyz="0.01491 0.025 0.0125"
+      xyz="0 0 0"
       rpy="0 0 0" />
     <parent
-      link="camera_botter_screw_frame" />
+      link="camera_link" />
     <child
       link="camera_depth_frame" />
     <axis

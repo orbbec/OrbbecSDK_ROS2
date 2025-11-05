@@ -10,7 +10,7 @@
   <!-- Connect the virtual root to the actual base link -->
   <joint name="base_link_to_camera_link" type="fixed">
     <parent link="base_link"/>
-    <child link="camera_botton_screw_frame"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <child link="camera_link"/>
+    <origin xyz="0.034005 0.0475 0.014048" rpy="0 0 0"/>
   </joint>
 </robot>

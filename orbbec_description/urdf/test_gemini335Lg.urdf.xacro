@@ -11,6 +11,6 @@
   <joint name="base_link_to_camera_link" type="fixed">
     <parent link="base_link"/>
     <child link="camera_link"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <origin xyz="0.0117149999999995 0.0475 0.0143111800025738" rpy="0 0 0"/>
   </joint>
 </robot>

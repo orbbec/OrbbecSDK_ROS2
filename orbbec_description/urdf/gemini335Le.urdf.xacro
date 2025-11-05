@@ -24,7 +24,7 @@ Stephen Brawner (brawner@gmail.com)
     </inertial>
     <visual>
       <origin
-        xyz="0 0 0"
+        xyz="-0.034005 -0.0475 -0.014048"
         rpy="0 0 0" />
       <geometry>
         <mesh
@@ -86,21 +86,51 @@ Stephen Brawner (brawner@gmail.com)
       </geometry>
     </collision>
   </link>
+    <link
+    name="camera_depth_frame">
+    <inertial>
+      <origin
+        xyz="-0.0015782 9.8699E-08 -1.6899E-07"
+        rpy="0 0 0" />
+      <mass
+        value="0.00045313" />
+      <inertia
+        ixx="4.3406E-09"
+        ixy="-5.1012E-13"
+        ixz="-6.3511E-13"
+        iyy="4.8388E-09"
+        iyz="1.081E-12"
+        izz="4.8408E-09" />
+    </inertial>
+  </link>
   <joint
-    name="base_Joint"
+    name="camera_depth_frame_Joint"
     type="fixed">
     <origin
       xyz="0 0 0"
       rpy="0 0 0" />
     <parent
-      link="camera_botton_screw_frame" />
-    <child
       link="camera_link" />
+    <child
+      link="camera_depth_frame" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <joint
+    name="base_Joint"
+    type="fixed">
+    <origin
+      xyz="-0.034005 -0.0475 -0.014048"
+      rpy="0 0 0" />
+    <parent
+      link="camera_link" />
+    <child
+      link="camera_botton_screw_frame" />
     <axis
       xyz="0 0 0" />
   </joint>
   <link
-    name="canera_right_IR_ROS_frame">
+    name="camera_right_ir_frame">
     <inertial>
       <origin
         xyz="-0.0015782 9.8699E-08 -1.6899E-07"
@@ -140,20 +170,20 @@ Stephen Brawner (brawner@gmail.com)
     </collision>
   </link>
   <joint
-    name="canera_right_IR_ROS_Joint"
+    name="camera_right_ir_Joint"
     type="fixed">
     <origin
-      xyz="0.034005 -0.0475 0.014048"
+      xyz="0 -0.095 0"
       rpy="0 0 0" />
     <parent
-      link="camera_link" />
+      link="camera_depth_frame" />
     <child
-      link="canera_right_IR_ROS_frame" />
+      link="camera_right_ir_frame" />
     <axis
       xyz="0 0 0" />
   </joint>
   <link
-    name="canera_left_IR_ROS_frame">
+    name="camera_left_ir_frame">
     <inertial>
       <origin
         xyz="-0.0015782 9.8699E-08 -1.6899E-07"
@@ -193,20 +223,20 @@ Stephen Brawner (brawner@gmail.com)
     </collision>
   </link>
   <joint
-    name="canera_left_IR_ROS_Joint"
+    name="camera_left_ir_Joint"
     type="fixed">
     <origin
-      xyz="0.034005 0.0475 0.014048"
+      xyz="0 0 0"
       rpy="0 0 0" />
     <parent
-      link="camera_link" />
+      link="camera_depth_frame" />
     <child
-      link="canera_left_IR_ROS_frame" />
+      link="camera_left_ir_frame" />
     <axis
       xyz="0 0 0" />
   </joint>
   <link
-    name="canera_RGB_ROS_frame">
+    name="camera_color_frame">
     <inertial>
       <origin
         xyz="-0.0015872 6.5366E-08 -8.8281E-08"
@@ -246,20 +276,20 @@ Stephen Brawner (brawner@gmail.com)
     </collision>
   </link>
   <joint
-    name="canera_RGB_ROS_Joint"
+    name="camera_color_Joint"
     type="fixed">
     <origin
-      xyz="0.034014 0.02375 0.014048"
+      xyz="9e-06 -0.02375 0"
       rpy="0 0 0" />
     <parent
-      link="camera_link" />
+      link="camera_depth_frame" />
     <child
-      link="canera_RGB_ROS_frame" />
+      link="camera_color_frame" />
     <axis
       xyz="0 0 0" />
   </joint>
   <link
-    name="canera_IMU_ROS_frame">
+    name="camera_imu_frame">
     <inertial>
       <origin
         xyz="0.012945 -0.036548 0.00068975"
@@ -299,15 +329,15 @@ Stephen Brawner (brawner@gmail.com)
     </collision>
   </link>
   <joint
-    name="canera_IMU_ROS_Joint"
+    name="camera_imu_Joint"
     type="fixed">
     <origin
-      xyz="0.019757 0.03619 0.013358"
+      xyz="-0.014248 -0.01131 -0.00069"
       rpy="0 0 0" />
     <parent
-      link="camera_link" />
+      link="camera_depth_frame" />
     <child
-      link="canera_IMU_ROS_frame" />
+      link="camera_imu_frame" />
     <axis
       xyz="0 0 0" />
   </joint>

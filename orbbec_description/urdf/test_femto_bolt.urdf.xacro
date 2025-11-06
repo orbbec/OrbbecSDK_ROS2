@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<robot name="test_femto_bolt" xmlns:xacro="http://wiki.ros.org/xacro">
+  <xacro:include filename="femto_bolt.urdf.xacro" />
+  <link name="base_link"/>
+  <!-- Instantiate the femto bolt macro once (fixed attribute syntax) -->
+  <xacro:femto_bolt prefix="camera" parent="base_link" use_nominal_extrinsics="true">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </xacro:femto_bolt>
+</robot>

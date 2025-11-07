@@ -162,11 +162,14 @@ void OBLidarNode::getParameters() {
   // Multi-frame publishing parameter - only for LIDAR_POINT and LIDAR_SPHERE_POINT formats
   setAndGetNodeParameter<int>(publish_n_pkts_, "publish_n_pkts", 1);
   if (publish_n_pkts_ < 1 || publish_n_pkts_ > 12000) {
-    RCLCPP_WARN_STREAM(logger_, "publish_n_pkts value " << publish_n_pkts_
-                                << " is out of range [1, 12000], setting to 1");
+    RCLCPP_WARN_STREAM(logger_, "publish_n_pkts value "
+                                    << publish_n_pkts_
+                                    << " is out of range [1, 12000], setting to 1");
     publish_n_pkts_ = 1;
   }
-  if(publish_n_pkts_ >1) RCLCPP_INFO_STREAM(logger_, "Multi-frame publishing enabled: " << publish_n_pkts_ << " frames will be merged");
+  if (publish_n_pkts_ > 1)
+    RCLCPP_INFO_STREAM(
+        logger_, "Multi-frame publishing enabled: " << publish_n_pkts_ << " frames will be merged");
 
   // Setup IMU streams if enabled
   if (enable_imu_) {
@@ -215,16 +218,16 @@ void OBLidarNode::setupDevices() {
     TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_HEARTBEAT_BOOL, enable_heartbeat_);
   }
   if (!echo_mode_.empty() &&
-      device_->isPropertySupported(OB_PROP_LIDAR_ECHO_MODE_INT, OB_PERMISSION_READ_WRITE)) {
+      device_->isPropertySupported(OB_PROP_LIDAR_SPECIFIC_MODE_INT, OB_PERMISSION_READ_WRITE)) {
     if (echo_mode_ == "Last Echo") {
-      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LIDAR_ECHO_MODE_INT, 0);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LIDAR_SPECIFIC_MODE_INT, 0);
     } else if (echo_mode_ == "First Echo") {
-      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LIDAR_ECHO_MODE_INT, 1);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LIDAR_SPECIFIC_MODE_INT, 1);
     }
-    RCLCPP_INFO_STREAM(logger_,
-                       "Setting echo mode to "
-                           << (device_->getIntProperty(OB_PROP_LIDAR_ECHO_MODE_INT) ? "First Echo"
-                                                                                    : "Last Echo"));
+    RCLCPP_INFO_STREAM(
+        logger_, "Setting echo mode to "
+                     << (device_->getIntProperty(OB_PROP_LIDAR_SPECIFIC_MODE_INT) ? "First Echo"
+                                                                                  : "Last Echo"));
   }
   if (repetitive_scan_mode_ != -1 &&
       device_->isPropertySupported(OB_PROP_LIDAR_REPETITIVE_SCAN_MODE_INT,
@@ -286,11 +289,11 @@ void OBLidarNode::setupProfiles() {
         if (profile == nullptr) {
           throw std::runtime_error("Failed cast profile to LiDARStreamProfile");
         }
-        RCLCPP_DEBUG_STREAM(
-            logger_,
-            "Sensor profile: " << "stream_type: " << magic_enum::enum_name(profile->getType())
-                               << "Scan Rate: " << magic_enum::enum_name(profile->getScanRate())
-                               << "Format:" << magic_enum::enum_name(profile->getFormat()));
+        RCLCPP_DEBUG_STREAM(logger_,
+                            "Sensor profile: "
+                                << "stream_type: " << magic_enum::enum_name(profile->getType())
+                                << "Scan Rate: " << magic_enum::enum_name(profile->getScanRate())
+                                << "Format:" << magic_enum::enum_name(profile->getFormat()));
         supported_profiles_[elem].emplace_back(profile);
       }
       std::shared_ptr<ob::LiDARStreamProfile> selected_profile;
@@ -363,8 +366,8 @@ void OBLidarNode::setupProfiles() {
         stream_profile_[stream_index] = profile;
       }
       RCLCPP_INFO_STREAM(logger_, "stream " << stream_name_[stream_index] << " full scale range "
-                                            << (stream_index == ACCEL ? accel_range_ : gyro_range_) << " sample rate "
-                                            << imu_rate_);
+                                            << (stream_index == ACCEL ? accel_range_ : gyro_range_)
+                                            << " sample rate " << imu_rate_);
     } catch (const ob::Error &e) {
       RCLCPP_INFO_STREAM(logger_, "Failed to setup << " << stream_name_[stream_index]
                                                         << " profile: " << e.getMessage());
@@ -454,7 +457,6 @@ void OBLidarNode::startStreams() {
   pipeline_started_.store(true);
 }
 
-
 void OBLidarNode::startIMU() {
   if (!enable_imu_) {
     return;
@@ -499,10 +501,10 @@ void OBLidarNode::startIMU() {
     RCLCPP_ERROR_STREAM(
         logger_, "Failed to start IMU stream, please check the imu_rate and imu_range parameters.");
   } else {
-    RCLCPP_INFO_STREAM(
-        logger_, "Started IMU stream with accel range: " << fullAccelScaleRangeToString(accel_range)
-                                                         << ", gyro range: " << fullGyroScaleRangeToString(gyro_range)
-                                                         << ", rate: " << sampleRateToString(accel_rate));
+    RCLCPP_INFO_STREAM(logger_, "Started IMU stream with accel range: "
+                                    << fullAccelScaleRangeToString(accel_range)
+                                    << ", gyro range: " << fullGyroScaleRangeToString(gyro_range)
+                                    << ", rate: " << sampleRateToString(accel_rate));
   }
 }
 
@@ -567,7 +569,7 @@ void OBLidarNode::setupPipelineConfig() {
 }
 
 void OBLidarNode::onNewIMUFrameCallback(const std::shared_ptr<ob::Frame> &accelframe,
-                                                  const std::shared_ptr<ob::Frame> &gryoframe) {
+                                        const std::shared_ptr<ob::Frame> &gryoframe) {
   if (!is_camera_node_initialized_) {
     return;
   }
@@ -613,7 +615,6 @@ void OBLidarNode::onNewIMUFrameCallback(const std::shared_ptr<ob::Frame> &accelf
   imu_publisher_->publish(imu_msg);
 }
 
-
 void OBLidarNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set) {
   if (!is_running_.load()) {
     return;
@@ -632,7 +633,8 @@ void OBLidarNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set)
     }
 
     // Handle multi-frame publishing for LIDAR_POINT and LIDAR_SPHERE_POINT formats
-    if ((format_[LIDAR] == OB_FORMAT_LIDAR_POINT || format_[LIDAR] == OB_FORMAT_LIDAR_SPHERE_POINT)) {
+    if ((format_[LIDAR] == OB_FORMAT_LIDAR_POINT ||
+         format_[LIDAR] == OB_FORMAT_LIDAR_SPHERE_POINT)) {
       std::lock_guard<std::mutex> lock(frame_buffer_mutex_);
       frame_buffer_.push_back(frame_set);
       // If we have enough frames, publish merged point cloud
@@ -644,8 +646,7 @@ void OBLidarNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set)
         }
         frame_buffer_.clear();
       }
-    }
-    else {
+    } else {
       // Original single frame publishing logic
       if (format_[LIDAR] == OB_FORMAT_LIDAR_SCAN && !enable_scan_to_point_) {
         publishScan(frame_set);
@@ -837,13 +838,13 @@ void OBLidarNode::publishMergedPointCloud() {
 
   // Calculate total point count across all frames
   size_t total_point_count = 0;
-  std::vector<std::pair<OBLiDARPoint*, size_t>> frame_data;
+  std::vector<std::pair<OBLiDARPoint *, size_t>> frame_data;
   std::vector<uint64_t> frame_timestamps;
 
-  for (const auto& fs : frame_buffer_) {
+  for (const auto &fs : frame_buffer_) {
     auto lidar_frame = fs->getFrame(OB_FRAME_LIDAR_POINTS);
     if (lidar_frame) {
-      auto* point_data = reinterpret_cast<OBLiDARPoint*>(lidar_frame->getData());
+      auto *point_data = reinterpret_cast<OBLiDARPoint *>(lidar_frame->getData());
       auto point_count = lidar_frame->getDataSize() / sizeof(OBLiDARPoint);
       frame_data.emplace_back(point_data, point_count);
       frame_timestamps.push_back(getFrameTimestampUs(lidar_frame));
@@ -858,13 +859,11 @@ void OBLidarNode::publishMergedPointCloud() {
   // Create merged point cloud message with offset_time field
   auto point_cloud_msg = std::make_unique<sensor_msgs::msg::PointCloud2>();
   sensor_msgs::PointCloud2Modifier modifier(*point_cloud_msg);
-  modifier.setPointCloud2Fields(6,
-                                "x", 1, sensor_msgs::msg::PointField::FLOAT32,
-                                "y", 1, sensor_msgs::msg::PointField::FLOAT32,
-                                "z", 1, sensor_msgs::msg::PointField::FLOAT32,
-                                "intensity", 1, sensor_msgs::msg::PointField::UINT8,
-                                "tag", 1, sensor_msgs::msg::PointField::UINT8,
-                                "offset_time", 1, sensor_msgs::msg::PointField::UINT32);
+  modifier.setPointCloud2Fields(
+      6, "x", 1, sensor_msgs::msg::PointField::FLOAT32, "y", 1,
+      sensor_msgs::msg::PointField::FLOAT32, "z", 1, sensor_msgs::msg::PointField::FLOAT32,
+      "intensity", 1, sensor_msgs::msg::PointField::UINT8, "tag", 1,
+      sensor_msgs::msg::PointField::UINT8, "offset_time", 1, sensor_msgs::msg::PointField::UINT32);
   modifier.resize(total_point_count);
 
   // Use the timestamp of the latest frame as the header timestamp
@@ -899,7 +898,8 @@ void OBLidarNode::publishMergedPointCloud() {
 
     // RCLCPP_INFO_STREAM(logger_, "Frame1 " << frame_idx << ": point_count = " << point_count
     //                                     << ", frame_timestamp_us = " << frame_timestamp_us
-    //                                     << ", point_time_increment_us = " << point_time_increment_us);
+    //                                     << ", point_time_increment_us = " <<
+    //                                     point_time_increment_us);
     for (size_t i = 0; i < point_count;
          ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_intensity, ++iter_tag, ++iter_offset_time) {
       *iter_x = static_cast<float>(point_data[i].x / 1000.0);
@@ -909,9 +909,12 @@ void OBLidarNode::publishMergedPointCloud() {
       *iter_tag = point_data[i].tag;
 
       // Calculate per-point offset time in nanoseconds relative to point cloud header timestamp
-      double point_timestamp_us = static_cast<double>(frame_timestamp_us) + (i * point_time_increment_us);
-      uint64_t header_timestamp_us = frame_timestamps[0]; // First frame timestamp
-      *iter_offset_time = static_cast<uint32_t>((point_timestamp_us - static_cast<double>(header_timestamp_us)) * 1000.0); // Convert to nanoseconds
+      double point_timestamp_us =
+          static_cast<double>(frame_timestamp_us) + (i * point_time_increment_us);
+      uint64_t header_timestamp_us = frame_timestamps[0];  // First frame timestamp
+      *iter_offset_time =
+          static_cast<uint32_t>((point_timestamp_us - static_cast<double>(header_timestamp_us)) *
+                                1000.0);  // Convert to nanoseconds
     }
   }
 
@@ -926,13 +929,13 @@ void OBLidarNode::publishMergedSpherePointCloud() {
 
   // Calculate total point count across all frames
   size_t total_point_count = 0;
-  std::vector<std::pair<OBLiDARSpherePoint*, size_t>> frame_data;
+  std::vector<std::pair<OBLiDARSpherePoint *, size_t>> frame_data;
   std::vector<uint64_t> frame_timestamps;
 
-  for (const auto& fs : frame_buffer_) {
+  for (const auto &fs : frame_buffer_) {
     auto lidar_frame = fs->getFrame(OB_FRAME_LIDAR_POINTS);
     if (lidar_frame) {
-      auto* point_data = reinterpret_cast<OBLiDARSpherePoint*>(lidar_frame->getData());
+      auto *point_data = reinterpret_cast<OBLiDARSpherePoint *>(lidar_frame->getData());
       auto point_count = lidar_frame->getDataSize() / sizeof(OBLiDARSpherePoint);
       frame_data.emplace_back(point_data, point_count);
       frame_timestamps.push_back(getFrameTimestampUs(lidar_frame));
@@ -947,13 +950,11 @@ void OBLidarNode::publishMergedSpherePointCloud() {
   // Create merged point cloud message with timestamp field
   auto point_cloud_msg = std::make_unique<sensor_msgs::msg::PointCloud2>();
   sensor_msgs::PointCloud2Modifier modifier(*point_cloud_msg);
-  modifier.setPointCloud2Fields(6,
-                                "x", 1, sensor_msgs::msg::PointField::FLOAT32,
-                                "y", 1, sensor_msgs::msg::PointField::FLOAT32,
-                                "z", 1, sensor_msgs::msg::PointField::FLOAT32,
-                                "intensity", 1, sensor_msgs::msg::PointField::UINT8,
-                                "tag", 1, sensor_msgs::msg::PointField::UINT8,
-                                "offset_time", 1, sensor_msgs::msg::PointField::UINT32);
+  modifier.setPointCloud2Fields(
+      6, "x", 1, sensor_msgs::msg::PointField::FLOAT32, "y", 1,
+      sensor_msgs::msg::PointField::FLOAT32, "z", 1, sensor_msgs::msg::PointField::FLOAT32,
+      "intensity", 1, sensor_msgs::msg::PointField::UINT8, "tag", 1,
+      sensor_msgs::msg::PointField::UINT8, "offset_time", 1, sensor_msgs::msg::PointField::UINT32);
   modifier.resize(total_point_count);
 
   // Use the timestamp of the latest frame as the header timestamp
@@ -991,7 +992,8 @@ void OBLidarNode::publishMergedSpherePointCloud() {
 
     // RCLCPP_INFO_STREAM(logger_, "Frame " << frame_idx << ": point_count = " << point_count
     //                                     << ", frame_timestamp_us = " << frame_timestamp_us
-    //                                     << ", point_time_increment_us = " << point_time_increment_us);
+    //                                     << ", point_time_increment_us = " <<
+    //                                     point_time_increment_us);
 
     for (size_t i = 0; i < point_count;
          ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_intensity, ++iter_tag, ++iter_offset_time) {
@@ -1002,9 +1004,12 @@ void OBLidarNode::publishMergedSpherePointCloud() {
       *iter_tag = result_point[i].tag;
 
       // Calculate per-point offset time in nanoseconds relative to point cloud header timestamp
-      double point_timestamp_us = static_cast<double>(frame_timestamp_us) + (i * point_time_increment_us);
-      uint64_t header_timestamp_us = frame_timestamps[0]; // First frame timestamp
-      *iter_offset_time = static_cast<uint32_t>((point_timestamp_us - static_cast<double>(header_timestamp_us)) * 1000.0); // Convert to nanoseconds
+      double point_timestamp_us =
+          static_cast<double>(frame_timestamp_us) + (i * point_time_increment_us);
+      uint64_t header_timestamp_us = frame_timestamps[0];  // First frame timestamp
+      *iter_offset_time =
+          static_cast<uint32_t>((point_timestamp_us - static_cast<double>(header_timestamp_us)) *
+                                1000.0);  // Convert to nanoseconds
     }
   }
 
@@ -1205,9 +1210,11 @@ void OBLidarNode::calcAndPublishStaticTransform() {
   //                   optical_frame_id_[stream_index]);
   //   RCLCPP_INFO_STREAM(logger_, "Publishing static transform from " << stream_name_[stream_index]
   //                                                                   << " to "
-  //                                                                   << stream_name_[base_stream_]);
-  //   RCLCPP_INFO_STREAM(logger_, "Translation " << trans[0] << ", " << trans[1] << ", " << trans[2]);
-  //   RCLCPP_INFO_STREAM(logger_, "Rotation " << Q.getX() << ", " << Q.getY() << ", " << Q.getZ()
+  //                                                                   <<
+  //                                                                   stream_name_[base_stream_]);
+  //   RCLCPP_INFO_STREAM(logger_, "Translation " << trans[0] << ", " << trans[1] << ", " <<
+  //   trans[2]); RCLCPP_INFO_STREAM(logger_, "Rotation " << Q.getX() << ", " << Q.getY() << ", " <<
+  //   Q.getZ()
   //                                           << ", " << Q.getW());
   // }
   if (enable_imu_) {
@@ -1241,7 +1248,8 @@ void OBLidarNode::calcAndPublishStaticTransform() {
           RCLCPP_DEBUG_STREAM(logger_, "ACCEL and GYRO extrinsics are identical");
         }
       } catch (const ob::Error &e) {
-        RCLCPP_WARN_STREAM(logger_, "Could not get GYRO extrinsic for verification: " << e.getMessage());
+        RCLCPP_WARN_STREAM(logger_,
+                           "Could not get GYRO extrinsic for verification: " << e.getMessage());
       }
 
     } catch (const ob::Error &e) {
@@ -1250,8 +1258,9 @@ void OBLidarNode::calcAndPublishStaticTransform() {
         ex = base_stream_profile->getExtrinsicTo(stream_profile_[GYRO]);
         RCLCPP_INFO_STREAM(logger_, "Using GYRO extrinsic for IMU");
       } catch (const ob::Error &e2) {
-        RCLCPP_ERROR_STREAM(logger_,
-                            "Failed to get " << frame_id << " extrinsic from both ACCEL and GYRO: " << e2.getMessage());
+        RCLCPP_ERROR_STREAM(
+            logger_, "Failed to get "
+                         << frame_id << " extrinsic from both ACCEL and GYRO: " << e2.getMessage());
         ex = OBExtrinsic({{1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0, 0}});
       }
     }
@@ -1267,8 +1276,8 @@ void OBLidarNode::calcAndPublishStaticTransform() {
     auto timestamp = node_->now();
     publishStaticTF(timestamp, trans, Q, frame_id_[base_stream_], accel_gyro_frame_id_);
 
-    RCLCPP_INFO_STREAM(logger_, "Publishing static transform from " << frame_id_[base_stream_]
-                                                                    << " to " << accel_gyro_frame_id_);
+    RCLCPP_INFO_STREAM(logger_, "Publishing static transform from "
+                                    << frame_id_[base_stream_] << " to " << accel_gyro_frame_id_);
     RCLCPP_INFO_STREAM(logger_, "Translation " << trans[0] << ", " << trans[1] << ", " << trans[2]);
     RCLCPP_INFO_STREAM(logger_, "Rotation " << Q.getX() << ", " << Q.getY() << ", " << Q.getZ()
                                             << ", " << Q.getW());

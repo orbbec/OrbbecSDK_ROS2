@@ -22,6 +22,7 @@ extern "C" {
  * @param[in] file_path The file path to record to.
  * @param[in] compression_enabled Whether to enable compression for the recording.
  * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return A pointer to the newly created recording device, or NULL if an error occurred.
  */
 OB_EXPORT ob_record_device *ob_create_record_device(ob_device *device, const char *file_path, bool compression_enabled, ob_error **error);
@@ -55,6 +56,7 @@ OB_EXPORT void ob_record_device_resume(ob_record_device *recorder, ob_error **er
  *
  * @param[in] file_path The file path to playback from.
  * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return A pointer to the newly created playback device, or NULL if an error occurred.
  */
 OB_EXPORT ob_device *ob_create_playback_device(const char *file_path, ob_error **error);
@@ -98,6 +100,7 @@ OB_EXPORT void ob_playback_device_set_playback_rate(ob_device *player, const flo
  *
  * @param[in] player The playback device to get the status for.
  * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return The current playback status of the played data.
  */
 OB_EXPORT ob_playback_status ob_playback_device_get_current_playback_status(ob_device *player, ob_error **error);
@@ -107,6 +110,7 @@ OB_EXPORT ob_playback_status ob_playback_device_get_current_playback_status(ob_d
  *
  * @param[in] player The playback device to set the callback for.
  * @param[in] callback The callback function to receive playback status updates.
+ * @param[in] user_data Pointer to user data that can be passed to and retrieved from the callback function
  * @param[out] error Pointer to an error object that will be set if an error occurs.
  */
 OB_EXPORT void ob_playback_device_set_playback_status_changed_callback(ob_device *player, ob_playback_status_changed_callback callback, void *user_data,
@@ -117,6 +121,7 @@ OB_EXPORT void ob_playback_device_set_playback_status_changed_callback(ob_device
  *
  * @param[in] player The playback device to get the position for.
  * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return The current playback position of the played data, in milliseconds.
  */
 OB_EXPORT uint64_t ob_playback_device_get_position(ob_device *player, ob_error **error);
@@ -126,6 +131,7 @@ OB_EXPORT uint64_t ob_playback_device_get_position(ob_device *player, ob_error *
  *
  * @param[in] player The playback device to get the duration for.
  * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return The duration of the played data, in milliseconds.
  */
 OB_EXPORT uint64_t ob_playback_device_get_duration(ob_device *player, ob_error **error);

@@ -34,6 +34,7 @@ extern "C" {
  * ```
  * @param[in] device The device handle.
  * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return uint16_t return the supported multi device sync mode bitmap of the device.
  */
 OB_EXPORT uint16_t ob_device_get_supported_multi_device_sync_mode_bitmap(const ob_device *device, ob_error **error);
@@ -52,6 +53,7 @@ OB_EXPORT void ob_device_set_multi_device_sync_config(ob_device *device, const o
  *
  * @param[in] device The device handle.
  * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return ob_multi_device_sync_config return the multi device sync configuration of the device.
  */
 OB_EXPORT ob_multi_device_sync_config ob_device_get_multi_device_sync_config(const ob_device *device, ob_error **error);
@@ -61,7 +63,7 @@ OB_EXPORT ob_multi_device_sync_config ob_device_get_multi_device_sync_config(con
  * @brief The device will start one time capture after receiving the capture command when it is in the @ref OB_MULTI_DEVICE_SYNC_MODE_SOFTWARE_TRIGGERING
  *
  * @attention The frequency of the user call this function multiplied by the number of frames per trigger should be less than the frame rate of the stream. The
- * number of frames per trigger can be set by @ref framesPerTrigger.
+ * number of frames per trigger can be set by @ref ob_multi_device_sync_config::framesPerTrigger.
  * @attention For some models, receive and execute the capture command will have a certain delay and performance consumption, so the frequency of calling this
  * function should not be too high, please refer to the product manual for the specific supported frequency.
  * @attention If the device is not in the @ref OB_MULTI_DEVICE_SYNC_MODE_HARDWARE_TRIGGERING mode, device will ignore the capture command.
@@ -85,6 +87,7 @@ OB_EXPORT void ob_device_set_timestamp_reset_config(ob_device *device, const ob_
  *
  * @param[in] device The device handle.
  * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return ob_device_timestamp_reset_config return the timestamp reset configuration of the device.
  */
 OB_EXPORT ob_device_timestamp_reset_config ob_device_get_timestamp_reset_config(ob_device *device, ob_error **error);

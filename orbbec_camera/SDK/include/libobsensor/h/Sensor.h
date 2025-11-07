@@ -18,6 +18,7 @@ extern "C" {
  *
  * @param[in] sensor The sensor object.
  * @param[out] error Logs error messages.
+ * 
  * @return The sensor type.
  */
 OB_EXPORT ob_sensor_type ob_sensor_get_type(const ob_sensor *sensor, ob_error **error);
@@ -27,6 +28,7 @@ OB_EXPORT ob_sensor_type ob_sensor_get_type(const ob_sensor *sensor, ob_error **
  *
  * @param[in] sensor The sensor object.
  * @param[out] error Logs error messages.
+ * 
  * @return A list of stream profiles.
  */
 OB_EXPORT ob_stream_profile_list *ob_sensor_get_stream_profile_list(const ob_sensor *sensor, ob_error **error);
@@ -82,6 +84,7 @@ OB_EXPORT ob_filter_list *ob_sensor_create_recommended_filter_list(const ob_sens
  *
  * @param[in] sensor_list The list of sensor objects.
  * @param[out] error Logs error messages.
+ * 
  * @return The number of sensors in the list.
  */
 OB_EXPORT uint32_t ob_sensor_list_get_count(const ob_sensor_list *sensor_list, ob_error **error);
@@ -92,6 +95,7 @@ OB_EXPORT uint32_t ob_sensor_list_get_count(const ob_sensor_list *sensor_list, o
  * @param[in] sensor_list The list of sensor objects.
  * @param[in] index The index of the sensor on the list.
  * @param[out] error Logs error messages.
+ * 
  * @return The sensor type.
  */
 OB_EXPORT ob_sensor_type ob_sensor_list_get_sensor_type(const ob_sensor_list *sensor_list, uint32_t index, ob_error **error);
@@ -102,6 +106,7 @@ OB_EXPORT ob_sensor_type ob_sensor_list_get_sensor_type(const ob_sensor_list *se
  * @param[in] sensor_list The list of sensor objects.
  * @param[in] sensorType The sensor type to be obtained.
  * @param[out] error Logs error messages.
+ * 
  * @return The sensor pointer. If the specified type of sensor does not exist, it will return null.
  */
 OB_EXPORT ob_sensor *ob_sensor_list_get_sensor_by_type(const ob_sensor_list *sensor_list, ob_sensor_type sensorType, ob_error **error);
@@ -112,6 +117,7 @@ OB_EXPORT ob_sensor *ob_sensor_list_get_sensor_by_type(const ob_sensor_list *sen
  * @param[in] sensor_list The list of sensor objects.
  * @param[in] index The index of the sensor on the list.
  * @param[out] error Logs error messages.
+ * 
  * @return The sensor object.
  */
 OB_EXPORT ob_sensor *ob_sensor_list_get_sensor(const ob_sensor_list *sensor_list, uint32_t index, ob_error **error);

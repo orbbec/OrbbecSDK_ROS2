@@ -114,6 +114,7 @@ public:
      * @brief Check if frame object is compatible with the given type.
      *
      * @tparam T  Given type.
+     *
      * @return bool return result.
      */
     template <typename T> bool is() const;
@@ -122,6 +123,7 @@ public:
      * @brief Converts object type to target type.
      *
      * @tparam T Target type.
+     *
      * @return std::shared_ptr<T> Return the result. Throws an exception if conversion is not possible.
      */
     template <typename T> std::shared_ptr<T> as() {
@@ -136,6 +138,7 @@ public:
      * @brief Converts object type to target type (const version).
      *
      * @tparam T Target type.
+     *
      * @return std::shared_ptr<T> Return the result. Throws an exception if conversion is not possible.
      */
     template <typename T> std::shared_ptr<const T> as() const {
@@ -219,7 +222,7 @@ public:
     /**
      * @brief Set the intrinsic parameters of the stream.
      *
-     * @param intrinsic The intrinsic parameters.
+     * @param[in] intrinsic The intrinsic parameters.
      */
     void setIntrinsic(const OBCameraIntrinsic &intrinsic) {
         ob_error *error = nullptr;
@@ -243,7 +246,7 @@ public:
     /**
      * @brief Set the distortion parameters of the stream.
      *
-     * @param distortion The distortion parameters.
+     * @param[in] distortion The distortion parameters.
      */
     void setDistortion(const OBCameraDistortion &distortion) {
         ob_error *error = nullptr;
@@ -476,7 +479,9 @@ public:
     /**
      * @brief Return the StreamProfile object at the specified index.
      *
-     * @param index The index of the StreamProfile object to be retrieved. Must be in the range [0, count-1]. Throws an exception if the index is out of range.
+     * @param[in] index The index of the StreamProfile object to be retrieved. Must be in the range [0, count-1]. Throws an exception if the index is out of
+     * range.
+     *
      * @return std::shared_ptr<StreamProfile> Return the StreamProfile object.
      */
     std::shared_ptr<StreamProfile> getProfile(uint32_t index) const {
@@ -490,10 +495,11 @@ public:
      * @brief Match the corresponding video stream profile based on the passed-in parameters. If multiple Match are found, the first one in the list is
      * returned by default. Throws an exception if no matching profile is found.
      *
-     * @param width The width of the stream. Pass OB_WIDTH_ANY if no matching condition is required.
-     * @param height The height of the stream. Pass OB_HEIGHT_ANY if no matching condition is required.
-     * @param format The type of the stream. Pass OB_FORMAT_ANY if no matching condition is required.
-     * @param fps The frame rate of the stream. Pass OB_FPS_ANY if no matching condition is required.
+     * @param[in] width The width of the stream. Pass OB_WIDTH_ANY if no matching condition is required.
+     * @param[in] height The height of the stream. Pass OB_HEIGHT_ANY if no matching condition is required.
+     * @param[in] format The type of the stream. Pass OB_FORMAT_ANY if no matching condition is required.
+     * @param[in] fps The frame rate of the stream. Pass OB_FPS_ANY if no matching condition is required.
+     *
      * @return std::shared_ptr<VideoStreamProfile> Return the matching resolution.
      */
     std::shared_ptr<VideoStreamProfile> getVideoStreamProfile(int width = OB_WIDTH_ANY, int height = OB_HEIGHT_ANY, OBFormat format = OB_FORMAT_ANY,
@@ -509,8 +515,8 @@ public:
      * @brief Match the corresponding accelerometer stream profile based on the passed-in parameters. If multiple Match are found, the first one in the list
      * is returned by default. Throws an exception if no matching profile is found.
      *
-     * @param fullScaleRange The full scale range. Pass 0 if no matching condition is required.
-     * @param sampleRate The sampling frequency. Pass 0 if no matching condition is required.
+     * @param[in] fullScaleRange The full scale range. Pass 0 if no matching condition is required.
+     * @param[in] sampleRate The sampling frequency. Pass 0 if no matching condition is required.
      */
     std::shared_ptr<AccelStreamProfile> getAccelStreamProfile(OBAccelFullScaleRange fullScaleRange, OBAccelSampleRate sampleRate) const {
         ob_error *error   = nullptr;
@@ -524,8 +530,8 @@ public:
      * @brief Match the corresponding gyroscope stream profile based on the passed-in parameters. If multiple Match are found, the first one in the list is
      * returned by default. Throws an exception if no matching profile is found.
      *
-     * @param fullScaleRange The full scale range. Pass 0 if no matching condition is required.
-     * @param sampleRate The sampling frequency. Pass 0 if no matching condition is required.
+     * @param[in] fullScaleRange The full scale range. Pass 0 if no matching condition is required.
+     * @param[in] sampleRate The sampling frequency. Pass 0 if no matching condition is required.
      */
     std::shared_ptr<GyroStreamProfile> getGyroStreamProfile(OBGyroFullScaleRange fullScaleRange, OBGyroSampleRate sampleRate) const {
         ob_error *error   = nullptr;

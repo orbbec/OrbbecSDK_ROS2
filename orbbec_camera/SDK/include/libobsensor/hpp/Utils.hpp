@@ -186,5 +186,22 @@ public:
         Error::handle(&error, false);
         return result;
     }
+
+    /**
+     * @brief Save LiDAR point cloud to PLY file.
+     *
+     * @param fileName Point cloud save path
+     * @param frame LiDAR point cloud frame
+     * @param saveBinary Binary or textual,true: binary, false: textual
+     * @return true if successful
+     * @return false if failed
+     */
+    static bool saveLiDARPointcloudToPly(const char *fileName, std::shared_ptr<ob::LiDARPointsFrame> frame, bool saveBinary) {
+        ob_error *error       = NULL;
+        auto      unConstImpl = const_cast<ob_frame *>(frame->getImpl());
+        bool      result      = ob_save_lidar_pointcloud_to_ply(fileName, unConstImpl, saveBinary, &error);
+        Error::handle(&error, false);
+        return result;
+    }
 };
 }  // namespace ob

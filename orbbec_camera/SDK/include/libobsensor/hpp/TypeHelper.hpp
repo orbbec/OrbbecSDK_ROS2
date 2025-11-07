@@ -17,6 +17,7 @@ public:
      * @brief Convert OBFormat to " string " type and then return.
      *
      * @param[in] type OBFormat type.
+     *
      * @return OBFormat of "string" type.
      */
     static std::string convertOBFormatTypeToString(const OBFormat &type) {
@@ -27,6 +28,7 @@ public:
      * @brief Convert OBFrameType to " string " type and then return.
      *
      * @param[in] type OBFrameType type.
+     *
      * @return OBFrameType of "string" type.
      */
     static std::string convertOBFrameTypeToString(const OBFrameType &type) {
@@ -37,6 +39,7 @@ public:
      * @brief Convert OBStreamType to " string " type and then return.
      *
      * @param[in] type OBStreamType type.
+     *
      * @return OBStreamType of "string" type.
      */
     static std::string convertOBStreamTypeToString(const OBStreamType &type) {
@@ -47,6 +50,7 @@ public:
      * @brief Convert OBSensorType to " string " type and then return.
      *
      * @param[in] type OBSensorType type.
+     *
      * @return OBSensorType of "string" type.
      */
     static std::string convertOBSensorTypeToString(const OBSensorType &type) {
@@ -57,6 +61,7 @@ public:
      * @brief Convert OBIMUSampleRate to " string " type and then return.
      *
      * @param[in] type OBIMUSampleRate type.
+     *
      * @return OBIMUSampleRate of "string" type.
      */
     static std::string convertOBIMUSampleRateTypeToString(const OBIMUSampleRate &type) {
@@ -67,6 +72,7 @@ public:
      * @brief Convert OBGyroFullScaleRange to " string " type and then return.
      *
      * @param[in] type OBGyroFullScaleRange type.
+     *
      * @return OBGyroFullScaleRange of "string" type.
      */
     static std::string convertOBGyroFullScaleRangeTypeToString(const OBGyroFullScaleRange &type) {
@@ -77,6 +83,7 @@ public:
      * @brief Convert OBAccelFullScaleRange to " string " type and then return.
      *
      * @param[in] type OBAccelFullScaleRange type.
+     *
      * @return OBAccelFullScaleRange of "string" type.
      */
     static std::string convertOBAccelFullScaleRangeTypeToString(const OBAccelFullScaleRange &type) {
@@ -97,6 +104,7 @@ public:
      * @brief Convert OBFrameMetadataType to " string " type and then return.
      *
      * @param[in] type OBFrameMetadataType type.
+     *
      * @return OBFrameMetadataType of "string" type.
      */
     static std::string convertOBFrameMetadataTypeToString(const OBFrameMetadataType &type) {
@@ -107,6 +115,7 @@ public:
      * @brief Convert OBSensorType to OBStreamType type and then return.
      *
      * @param[in] type OBSensorType type.
+     *
      * @return OBStreamType type.
      */
     static OBStreamType convertSensorTypeToStreamType(OBSensorType type) {
@@ -124,9 +133,9 @@ public:
      *      OB_SENSOR_IR_RIGHT,
      *      OB_SENSOR_CONFIDENCE,
      *
-     * @param type The sensor type
-     * @return true
-     * @return false
+     * @param[in] type The sensor type
+     *
+     * @return true/false
      */
     static bool isVideoSensorType(OBSensorType type) {
         return ob_is_video_sensor_type(type);
@@ -144,7 +153,8 @@ public:
      *      OB_STREAM_IR_RIGHT,
      *      OB_STREAM_CONFIDENCE,
      *
-     * @param type The stream type to check.
+     * @param[in] type The stream type to check.
+     *
      * @return true if the given stream type is a video stream, false otherwise.
      */
     static bool isVideoStreamType(OBStreamType type) {

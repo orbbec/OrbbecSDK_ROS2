@@ -119,6 +119,18 @@ OB_EXPORT bool ob_calibration_2d_to_2d(const ob_calibration_param calibration_pa
  * @return bool save point cloud result
  */
 OB_EXPORT bool ob_save_pointcloud_to_ply(const char *file_name, ob_frame *frame, bool save_binary, bool use_mesh, float mesh_threshold, ob_error **error);
+
+/**
+ * @brief save LiDAR point cloud to ply file.
+ *
+ * @param[in] file_name Point cloud save path
+ * @param[in] frame LiDAR point cloud frame
+ * @param[in] save_binary Binary or textual,true: binary, false: textual
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
+ * @return bool save LiDAR point cloud result
+ */
+OB_EXPORT bool ob_save_lidar_pointcloud_to_ply(const char *file_name, ob_frame *frame, bool save_binary, ob_error **error);
 #ifdef __cplusplus
 }
 #endif

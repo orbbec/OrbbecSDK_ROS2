@@ -30,24 +30,24 @@ class DevicePresetList;
 class OBDepthWorkModeList;
 class CameraParamList;
 class DeviceFrameInterleaveList;
-class PresetResolutionConfigeList;
+class PresetResolutionConfigList;
 
 class Device {
 public:
     /**
      * @brief Callback function for device firmware update progress
      *
-     * @param state The device firmware update status.
-     * @param message Status information.
-     * @param percent The percentage of the update progress.
+     * @param[in] state The device firmware update status.
+     * @param[in] message Status information.
+     * @param[in] percent The percentage of the update progress.
      */
     typedef std::function<void(OBFwUpdateState state, const char *message, uint8_t percent)> DeviceFwUpdateCallback;
 
     /**
      * @brief Callback function for device status updates.
      *
-     * @param state The device status.
-     * @param message Status information.
+     * @param[in] state The device status.
+     * @param[in] message Status information.
      */
     typedef std::function<void(OBDeviceState state, const char *message)> DeviceStateChangedCallback;
 
@@ -105,7 +105,8 @@ public:
     /**
      * @brief Check if the extension information is exist
      *
-     * @param infoKey The key of the extension information
+     * @param[in] infoKey The key of the extension information
+     *
      * @return bool Whether the extension information exists
      */
     bool isExtensionInfoExist(const std::string &infoKey) const {
@@ -118,7 +119,8 @@ public:
     /**
      * @brief Get information about extensions obtained from SDK supported by the device
      *
-     * @param infoKey The key of the extension information
+     * @param[in] infoKey The key of the extension information
+     *
      * @return const char* Returns extended information about the device
      */
     const char *getExtensionInfo(const std::string &infoKey) const {
@@ -156,8 +158,8 @@ public:
     /**
      * @brief Set int type of device property
      *
-     * @param propertyId Property id
-     * @param value Property value to be set
+     * @param[in] propertyId Property id
+     * @param[in] value Property value to be set
      */
     void setIntProperty(OBPropertyID propertyId, int32_t value) const {
         ob_error *error = nullptr;
@@ -168,8 +170,8 @@ public:
     /**
      * @brief Set float type of device property
      *
-     * @param propertyId Property id
-     * @param value Property value to be set
+     * @param[in] propertyId Property id
+     * @param[in] value Property value to be set
      */
     void setFloatProperty(OBPropertyID propertyId, float value) const {
         ob_error *error = nullptr;
@@ -180,8 +182,8 @@ public:
     /**
      * @brief Set bool type of device property
      *
-     * @param propertyId Property id
-     * @param value Property value to be set
+     * @param[in] propertyId Property id
+     * @param[in] value Property value to be set
      */
     void setBoolProperty(OBPropertyID propertyId, bool value) const {
         ob_error *error = nullptr;
@@ -192,7 +194,8 @@ public:
     /**
      * @brief Get int type of device property
      *
-     * @param propertyId Property id
+     * @param[in] propertyId Property id
+     *
      * @return int32_t Property to get
      */
     int32_t getIntProperty(OBPropertyID propertyId) const {
@@ -205,7 +208,8 @@ public:
     /**
      * @brief Get float type of device property
      *
-     * @param propertyId Property id
+     * @param[in] propertyId Property id
+     *
      * @return float Property to get
      */
     float getFloatProperty(OBPropertyID propertyId) const {
@@ -218,7 +222,8 @@ public:
     /**
      * @brief Get bool type of device property
      *
-     * @param propertyId Property id
+     * @param[in] propertyId Property id
+     *
      * @return bool Property to get
      */
     bool getBoolProperty(OBPropertyID propertyId) const {
@@ -231,7 +236,8 @@ public:
     /**
      * @brief Get int type device property range (including current value and default value)
      *
-     * @param propertyId Property id
+     * @param[in] propertyId Property id
+     *
      * @return OBIntPropertyRange Property range
      */
     OBIntPropertyRange getIntPropertyRange(OBPropertyID propertyId) const {
@@ -244,7 +250,8 @@ public:
     /**
      * @brief Get float type device property range((including current value and default value)
      *
-     * @param propertyId Property id
+     * @param[in] propertyId Property id
+     *
      * @return OBFloatPropertyRange Property range
      */
     OBFloatPropertyRange getFloatPropertyRange(OBPropertyID propertyId) const {
@@ -257,7 +264,8 @@ public:
     /**
      * @brief Get bool type device property range (including current value and default value)
      *
-     * @param propertyId The ID of the property
+     * @param[in] propertyId The ID of the property
+     *
      * @return OBBoolPropertyRange The range of the property
      */
     OBBoolPropertyRange getBoolPropertyRange(OBPropertyID propertyId) const {
@@ -270,9 +278,9 @@ public:
     /**
      * @brief Set the structured data type of a device property
      *
-     * @param propertyId The ID of the property
-     * @param data The data to set
-     * @param dataSize The size of the data to set
+     * @param[in] propertyId The ID of the property
+     * @param[in] data The data to set
+     * @param[in] dataSize The size of the data to set
      */
     void setStructuredData(OBPropertyID propertyId, const uint8_t *data, uint32_t dataSize) const {
         ob_error *error = nullptr;
@@ -283,9 +291,9 @@ public:
     /**
      * @brief Get the structured data type of a device property
      *
-     * @param propertyId The ID of the property
-     * @param data The property data obtained
-     * @param dataSize The size of the data obtained
+     * @param[in] propertyId The ID of the property
+     * @param[out] data The property data obtained
+     * @param[out] dataSize The size of the data obtained
      */
     void getStructuredData(OBPropertyID propertyId, uint8_t *data, uint32_t *dataSize) const {
         ob_error *error = nullptr;
@@ -296,8 +304,8 @@ public:
     /**
      * @brief Set the customer data type of a device property
      *
-     * @param data The data to set
-     * @param dataSize The size of the data to set,the maximum length cannot exceed 65532 bytes.
+     * @param[in] data The data to set
+     * @param[in] dataSize The size of the data to set,the maximum length cannot exceed 65532 bytes.
      */
     void writeCustomerData(const void *data, uint32_t dataSize) {
         ob_error *error = nullptr;
@@ -308,8 +316,8 @@ public:
     /**
      * @brief Get the customer data type of a device property
      *
-     * @param data The property data obtained
-     * @param dataSize The size of the data obtained
+     * @param[in] data The property data obtained
+     * @param[in] dataSize The size of the data obtained
      */
     void readCustomerData(void *data, uint32_t *dataSize) {
         ob_error *error = nullptr;
@@ -332,7 +340,8 @@ public:
     /**
      * @brief Get the supported properties of the device
      *
-     * @param index The index of the property
+     * @param[in] index The index of the property
+     *
      * @return The type of supported property
      */
     OBPropertyItem getSupportedProperty(uint32_t index) const {
@@ -345,8 +354,9 @@ public:
     /**
      * @brief Check if a property permission is supported
      *
-     * @param propertyId The ID of the property
-     * @param permission The read and write permissions to check
+     * @param[in] propertyId The ID of the property
+     * @param[in] permission The read and write permissions to check
+     *
      * @return Whether the property permission is supported
      */
     bool isPropertySupported(OBPropertyID propertyId, OBPermissionType permission) const {
@@ -371,7 +381,7 @@ public:
     /**
      * @brief Enable or disable the global timestamp
      *
-     * @param enable Whether to enable the global timestamp
+     * @param[in] enable Whether to enable the global timestamp
      */
     void enableGlobalTimestamp(bool enable) {
         ob_error *error = nullptr;
@@ -382,9 +392,9 @@ public:
     /**
      * @brief Update the device firmware
      *
-     * @param filePath Firmware path
-     * @param callback Firmware Update progress and status callback
-     * @param async Whether to execute asynchronously
+     * @param[in] filePath Firmware path
+     * @param[in] callback Firmware Update progress and status callback
+     * @param[in] async Whether to execute asynchronously
      */
     void updateFirmware(const char *filePath, DeviceFwUpdateCallback callback, bool async = true) {
         ob_error *error   = nullptr;
@@ -396,10 +406,10 @@ public:
     /**
      * @brief Update the device firmware from data
      *
-     * @param firmwareData Firmware data
-     * @param firmwareDataSize Firmware data size
-     * @param callback Firmware Update progress and status callback
-     * @param async Whether to execute asynchronously
+     * @param[in] firmwareData Firmware data
+     * @param[in] firmwareDataSize Firmware data size
+     * @param[in] callback Firmware Update progress and status callback
+     * @param[in] async Whether to execute asynchronously
      */
     void updateFirmwareFromData(const uint8_t *firmwareData, uint32_t firmwareDataSize, DeviceFwUpdateCallback callback, bool async = true) {
         ob_error *error   = nullptr;
@@ -411,9 +421,9 @@ public:
     /**
      * @brief Update the device optional depth presets
      *
-     * @param filePathList A list(2D array) of preset file paths, each up to OB_PATH_MAX characters.
-     * @param pathCount The number of the preset file paths.
-     * @param callback Preset update progress and status callback
+     * @param[in] filePathList A list(2D array) of preset file paths, each up to OB_PATH_MAX characters.
+     * @param[in] pathCount The number of the preset file paths.
+     * @param[in] callback Preset update progress and status callback
      */
     void updateOptionalDepthPresets(const char filePathList[][OB_PATH_MAX], uint8_t pathCount, DeviceFwUpdateCallback callback) {
         ob_error *error   = nullptr;
@@ -425,7 +435,7 @@ public:
     /**
      * @brief Set the device state changed callbacks
      *
-     * @param callback The callback function that is triggered when the device status changes (for example, the frame rate is automatically reduced or the
+     * @param[in] callback The callback function that is triggered when the device status changes (for example, the frame rate is automatically reduced or the
      * stream is closed due to high temperature, etc.)
      */
     void setDeviceStateChangedCallback(DeviceStateChangedCallback callback) {
@@ -455,6 +465,7 @@ public:
     /**
      * @brief Get current depth mode name
      * @brief According the current preset name to return current depth mode name
+     *
      * @return const char* return the current depth mode name.
      */
     const char *getCurrentDepthModeName() {
@@ -490,6 +501,7 @@ public:
 
     /**
      * @brief Request support depth work mode list
+     *
      * @return OBDepthWorkModeList list of ob_depth_work_mode
      */
     std::shared_ptr<OBDepthWorkModeList> getDepthWorkModeList() const {
@@ -588,7 +600,7 @@ public:
      * OB_MULTI_DEVICE_SYNC_MODE_SOFTWARE_TRIGGERING
      *
      * @attention The frequency of the user call this function multiplied by the number of frames per trigger should be less than the frame rate of the stream.
-     * The number of frames per trigger can be set by @ref framesPerTrigger.
+     * The number of frames per trigger can be set by @ref OBMultiDeviceSyncConfig::framesPerTrigger.
      * @attention For some models, receive and execute the capture command will have a certain delay and performance consumption, so the frequency of calling
      * this function should not be too high, please refer to the product manual for the specific supported frequency.
      * @attention If the device is not in the @ref OB_MULTI_DEVICE_SYNC_MODE_HARDWARE_TRIGGERING mode, device will ignore the capture command.
@@ -638,9 +650,11 @@ public:
     }
 
     /**
-     * @brief Alias for @ref timestampReset since it is more accurate.
+     * @brief Alias for @ref timestampReset() since it is more accurate.
      */
-#define timerReset timestampReset
+    inline void timerReset() const {
+        timestampReset();
+    }
 
     /**
      * @brief synchronize the timer of the device with the host.
@@ -662,6 +676,7 @@ public:
     /**
      * @brief Get current preset name
      * @brief The preset mean a set of parameters or configurations that can be applied to the device to achieve a specific effect or function.
+     *
      * @return const char* return the current preset name, it should be one of the preset names returned by @ref getAvailablePresetList.
      */
     const char *getCurrentPresetName() const {
@@ -675,7 +690,7 @@ public:
      * @brief load the preset according to the preset name.
      * @attention After loading the preset, the settings in the preset will set to the device immediately. Therefore, it is recommended to re-read the device
      * settings to update the user program temporarily.
-     * @param presetName The preset name to set. The name should be one of the preset names returned by @ref getAvailablePresetList.
+     * @param[in] presetName The preset name to set. The name should be one of the preset names returned by @ref getAvailablePresetList.
      */
     void loadPreset(const char *presetName) const {
         ob_error *error = nullptr;
@@ -705,7 +720,7 @@ public:
      * @attention The user should ensure that the custom preset file is adapted to the device and the settings in the file are valid.
      * @attention It is recommended to re-read the device settings to update the user program temporarily after successfully loading the custom preset.
      *
-     * @param filePath The path of the custom preset file.
+     * @param[in] filePath The path of the custom preset file.
      */
     void loadPresetFromJsonFile(const char *filePath) const {
         ob_error *error = nullptr;
@@ -716,13 +731,14 @@ public:
     /**
      * @brief Load custom preset from data.
      * @brief After loading the custom preset, the settings in the custom preset will set to the device immediately.
-     * @brief After loading the custom preset, the available preset list will be appended with the custom preset and named as the @ref presetName.
+     * @brief After loading the custom preset, the available preset list will be appended with the custom preset and named as the @p presetName.
      *
      * @attention The user should ensure that the custom preset data is adapted to the device and the settings in the data are valid.
      * @attention It is recommended to re-read the device settings to update the user program temporarily after successfully loading the custom preset.
      *
-     * @param data The custom preset data.
-     * @param size The size of the custom preset data.
+     * @param[in] presetName The name of the custome preset.
+     * @param[in] data The custom preset data.
+     * @param[in] size The size of the custom preset data.
      */
     void loadPresetFromJsonData(const char *presetName, const uint8_t *data, uint32_t size) {
         ob_error *error = nullptr;
@@ -731,12 +747,13 @@ public:
 
     /**
      * @brief Export current device settings as a preset json data.
-     * @brief After exporting the preset, a new preset named as the @ref presetName will be added to the available preset list.
+     * @brief After exporting the preset, a new preset named as the @p presetName will be added to the available preset list.
      *
      * @attention The memory of the data is allocated by the SDK, and will automatically be released by the SDK.
      * @attention The memory of the data will be reused by the SDK on the next call, so the user should copy the data to a new buffer if it needs to be
      * preserved.
      *
+     * @param[in] presetName The name of the custome preset.
      * @param[out] data return the preset json data.
      * @param[out] dataSize return the size of the preset json data.
      */
@@ -748,9 +765,9 @@ public:
     /**
      * @brief Export current device settings as a preset json file.
      * @brief The exported preset file can be loaded by calling @ref loadPresetFromJsonFile to restore the device setting.
-     * @brief After exporting the preset, a new preset named as the @ref filePath will be added to the available preset list.
+     * @brief After exporting the preset, a new preset named as the @p filePath will be added to the available preset list.
      *
-     * @param filePath The path of the preset file to be exported.
+     * @param[in] filePath The path of the preset file to be exported.
      */
     void exportSettingsAsPresetJsonFile(const char *filePath) const {
         ob_error *error = nullptr;
@@ -802,7 +819,7 @@ public:
 
     /**
      * @brief load the frame interleave according to frame interleave name.
-     * @param frameInterleaveName The frame interleave name to set. The name should be one of the frame interleave names returned by @ref
+     * @param[in] frameInterleaveName The frame interleave name to set. The name should be one of the frame interleave names returned by @ref
      * getAvailableFrameInterleaveList.
      */
     void loadFrameInterleave(const char *frameInterleaveName) const {
@@ -824,15 +841,15 @@ public:
     }
 
     /**
-     * @brief Get available frame interleave list
+     * @brief Get the available preset resolution config list
      *
-     * @return DeviceFrameInterleaveList return the available frame interleave list.
+     * @return PresetResolutionConfigList return the available preset resolution config list.
      */
-    std::shared_ptr<PresetResolutionConfigeList> getAvailablePresetResolutionConfigeList() const {
+    std::shared_ptr<PresetResolutionConfigList> getAvailablePresetResolutionConfigList() const {
         ob_error *error = nullptr;
         auto      list  = ob_device_get_available_preset_resolution_config_list(impl_, &error);
         Error::handle(&error);
-        return std::make_shared<PresetResolutionConfigeList>(list);
+        return std::make_shared<PresetResolutionConfigList>(list);
     }
 
 private:
@@ -1028,6 +1045,30 @@ public:
         return type;
     }
 
+    /**
+     * @brief Get the subnet mask of the device
+     *
+     * @return const char* the subnet mask of the device, such as "255.255.255.0"
+     */
+    const char *getDeviceSubnetMask() const {
+        ob_error   *error      = nullptr;
+        const char *subnetMask = ob_device_info_get_subnet_mask(impl_, &error);
+        Error::handle(&error);
+        return subnetMask;
+    }
+
+    /**
+     * @brief Get the gateway address of the device
+     *
+     * @return const char* the gateway address of the device, such as "192.168.1.1"
+     */
+    const char *getDevicegateway() const {
+        ob_error   *error      = nullptr;
+        const char *subnetMask = ob_device_info_get_gateway(impl_, &error);
+        Error::handle(&error);
+        return subnetMask;
+    }
+
 public:
     // The following interfaces are deprecated and are retained here for compatibility purposes.
     const char *name() const {
@@ -1109,7 +1150,8 @@ public:
     /**
      * @brief Get the PID of the device at the specified index
      *
-     * @param index the index of the device
+     * @param[in] index the index of the device
+     *
      * @return int the PID of the device
      */
     int getPid(uint32_t index) const {
@@ -1122,7 +1164,8 @@ public:
     /**
      * @brief Get the VID of the device at the specified index
      *
-     * @param index the index of the device
+     * @param[in] index the index of the device
+     *
      * @return int the VID of the device
      */
     int getVid(uint32_t index) const {
@@ -1135,7 +1178,8 @@ public:
     /**
      * @brief Get the UID of the device at the specified index
      *
-     * @param index the index of the device
+     * @param[in] index the index of the device
+     *
      * @return const char* the UID of the device
      */
     const char *getUid(uint32_t index) const {
@@ -1148,7 +1192,8 @@ public:
     /**
      * @brief Get the serial number of the device at the specified index
      *
-     * @param index the index of the device
+     * @param[in] index the index of the device
+     *
      * @return const char* the serial number of the device
      */
     const char *getSerialNumber(uint32_t index) const {
@@ -1164,7 +1209,8 @@ public:
      * This function retrieves the name of the device at the given index in the device list.
      * If an error occurs during the operation, it will be handled by the Error::handle function.
      *
-     * @param index The index of the device in the device list.
+     * @param[in] index The index of the device in the device list.
+     *
      * @return const char* The name of the device at the specified index.
      */
     const char *getName(uint32_t index) const {
@@ -1177,7 +1223,8 @@ public:
     /**
      * @brief Get device connection type
      *
-     * @param index device index
+     * @param[in] index device index
+     *
      * @return const char* returns connection type, currently supports: "USB", "USB1.0", "USB1.1", "USB2.0", "USB2.1", "USB3.0", "USB3.1", "USB3.2", "Ethernet"
      */
     const char *getConnectionType(uint32_t index) const {
@@ -1192,7 +1239,8 @@ public:
      *
      * @attention Only valid for network devices, otherwise it will return "0.0.0.0".
      *
-     * @param index the index of the device
+     * @param[in] index the index of the device
+     *
      * @return const char* the ip address of the device
      */
     const char *getIpAddress(uint32_t index) const {
@@ -1203,18 +1251,99 @@ public:
     }
 
     /**
-     * @brief get the local mac address of the device at the specified index
+     * @brief get the subnet mask of the device at the specified index
+     *
+     * @attention Only valid for network devices, otherwise it will return "0.0.0.0".
+     *
+     * @param[in] index the index of the device
+     *
+     * @return const char* the subnet mask of the device
+     */
+    const char *getSubnetMask(uint32_t index) const {
+        ob_error *error      = nullptr;
+        auto      subnetMask = ob_device_list_get_device_subnet_mask(impl_, index, &error);
+        Error::handle(&error);
+        return subnetMask;
+    }
+
+    /**
+     * @brief get the gateway of the device at the specified index
+     *
+     * @attention Only valid for network devices, otherwise it will return "0.0.0.0".
+     *
+     * @param[in] index the index of the device
+     *
+     * @return const char* the gateway of the device
+     */
+    const char *getGateway(uint32_t index) const {
+        ob_error *error   = nullptr;
+        auto      gateway = ob_device_list_get_device_gateway(impl_, index, &error);
+        Error::handle(&error);
+        return gateway;
+    }
+
+    /**
+     * @brief Get the MAC address of the host network interface corresponding to the device at the specified index
      *
      * @attention Only valid for network devices, otherwise it will return "0:0:0:0:0:0".
      *
-     * @param index the index of the device
-     * @return const char* the local mac address of the device
+     * @param[in] index the index of the device
+     *
+     * @return const char* The MAC address of the host network interface associated with the device.
      */
     const char *getLocalMacAddress(uint32_t index) const {
         ob_error *error = nullptr;
-        auto      mac    = ob_device_list_get_device_local_mac(impl_, index, &error);
+        auto      mac   = ob_device_list_get_device_local_mac(impl_, index, &error);
         Error::handle(&error);
         return mac;
+    }
+
+    /**
+     * @brief Get the IP address of the host network interface corresponding to the device at the specified index
+     *
+     * @attention Only valid for network devices, otherwise it will return "0.0.0.0".
+     *
+     * @param[in] index The index of the device
+     *
+     * @return const char* The IP address of the host network interface associated with the device.
+     */
+    const char *getLocalIP(uint32_t index) const {
+        ob_error *error = nullptr;
+        auto      ip    = ob_device_list_get_device_local_ip(impl_, index, &error);
+        Error::handle(&error);
+        return ip;
+    }
+
+    /**
+     * @brief Get the subnet length of the host network interface corresponding to the device at the specified index
+     *
+     * @attention Only valid for network devices, otherwise it will return 0.
+     *
+     * @param[in] index The index of the device
+     *
+     * @return uint8_t The subnet length (0~32) of the host network interface associated with the device.
+     */
+    uint8_t getLocalSubnetLength(uint32_t index) const {
+        ob_error *error      = nullptr;
+        auto      subnetMask = ob_device_list_get_device_local_subnet_length(impl_, index, &error);
+        Error::handle(&error);
+        return subnetMask;
+    }
+
+    /**
+     * @brief Get the gateway of the host network interface corresponding to the device at the specified index
+     *
+     * @attention Only valid for network devices, otherwise it will return "0.0.0.0".
+     *
+     * @param[in] index The index of the device
+     *
+     * @return const char* The gateway of the host network interface associated with the device.
+     */
+    const char *getLocalGateway(uint32_t index) const {
+        ob_error *error   = nullptr;
+        auto      gateway = ob_device_list_get_device_local_gateway(impl_, index, &error);
+        Error::handle(&error);
+        return gateway;
     }
 
     /**
@@ -1222,7 +1351,8 @@ public:
      *
      * @attention If the device has already been acquired and created elsewhere, repeated acquisition will throw an exception
      *
-     * @param index the index of the device to create
+     * @param[in] index the index of the device to create
+     *
      * @return std::shared_ptr<Device> the device object
      */
     std::shared_ptr<Device> getDevice(uint32_t index) const {
@@ -1237,7 +1367,8 @@ public:
      *
      * @attention If the device has already been acquired and created elsewhere, repeated acquisition will throw an exception
      *
-     * @param serialNumber the serial number of the device to create
+     * @param[in] serialNumber the serial number of the device to create
+     *
      * @return std::shared_ptr<Device> the device object
      */
     std::shared_ptr<Device> getDeviceBySN(const char *serialNumber) const {
@@ -1256,7 +1387,8 @@ public:
      *
      * @attention If the device has been acquired and created elsewhere, repeated acquisition will throw an exception
      *
-     * @param uid The uid of the device to be created
+     * @param[in] uid The uid of the device to be created
+     *
      * @return std::shared_ptr<Device> returns the device object
      */
     std::shared_ptr<Device> getDeviceByUid(const char *uid) const {
@@ -1328,7 +1460,8 @@ public:
     /**
      * @brief Get the OBDepthWorkMode object at the specified index
      *
-     * @param index the index of the target OBDepthWorkMode object
+     * @param[in] index the index of the target OBDepthWorkMode object
+     *
      * @return OBDepthWorkMode the OBDepthWorkMode object at the specified index
      */
     OBDepthWorkMode getOBDepthWorkMode(uint32_t index) {
@@ -1341,7 +1474,8 @@ public:
     /**
      * @brief Get the OBDepthWorkMode object at the specified index
      *
-     * @param index the index of the target OBDepthWorkMode object
+     * @param[in] index the index of the target OBDepthWorkMode object
+     *
      * @return OBDepthWorkMode the OBDepthWorkMode object at the specified index
      */
     OBDepthWorkMode operator[](uint32_t index) {
@@ -1386,7 +1520,8 @@ public:
     /**
      * @brief Get the name of the device preset at the specified index
      *
-     * @param index the index of the device preset
+     * @param[in] index the index of the device preset
+     *
      * @return const char* the name of the device preset
      */
     const char *getName(uint32_t index) {
@@ -1398,7 +1533,8 @@ public:
 
     /**
      * @brief check if the preset list contains the special name preset.
-     * @param name The name of the preset
+     * @param[in] name The name of the preset
+     *
      * @return bool Returns true if the special name is found in the preset list, otherwise returns false.
      */
     bool hasPreset(const char *name) {
@@ -1445,7 +1581,8 @@ public:
     /**
      * @brief Get the camera parameters for the specified index
      *
-     * @param index the index of the parameter group
+     * @param[in] index the index of the parameter group
+     *
      * @return OBCameraParam the corresponding group parameters
      */
     OBCameraParam getCameraParam(uint32_t index) {
@@ -1492,7 +1629,8 @@ public:
     /**
      * @brief Get the name of the device frame interleave at the specified index
      *
-     * @param index the index of the device frame interleave
+     * @param[in] index the index of the device frame interleave
+     *
      * @return const char* the name of the device frame interleave
      */
     const char *getName(uint32_t index) {
@@ -1504,7 +1642,9 @@ public:
 
     /**
      * @brief check if the frame interleave list contains the special name frame interleave.
-     * @param name The name of the frame interleave
+     *
+     * @param[in] name The name of the frame interleave
+     *
      * @return bool Returns true if the special name is found in the frame interleave list, otherwise returns false.
      */
     bool hasFrameInterleave(const char *name) {
@@ -1516,15 +1656,15 @@ public:
 };
 
 /**
- * @brief Class representing a list of device Frame Interleave
+ * @brief Class representing a list of preset resolution config list
  */
-class PresetResolutionConfigeList {
+class PresetResolutionConfigList {
 private:
     ob_preset_resolution_config_list_t *impl_ = nullptr;
 
 public:
-    explicit PresetResolutionConfigeList(ob_preset_resolution_config_list_t *impl) : impl_(impl) {}
-    ~PresetResolutionConfigeList() noexcept {
+    explicit PresetResolutionConfigList(ob_preset_resolution_config_list_t *impl) : impl_(impl) {}
+    ~PresetResolutionConfigList() noexcept {
         ob_error *error = nullptr;
         ob_delete_preset_resolution_config_list(impl_, &error);
         Error::handle(&error, false);
@@ -1542,7 +1682,9 @@ public:
 
     /*
      *  @brief Get the device preset resolution ratio at the specified index
-     *  @param index the index of the device preset resolution ratio
+
+     *  @param[in] index the index of the device preset resolution ratio
+     *
      *  @return OBPresetResolutionConfig the corresponding device preset resolution ratio
      */
     OBPresetResolutionConfig getPresetResolutionRatioConfig(uint32_t index) {

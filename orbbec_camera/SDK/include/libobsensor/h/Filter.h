@@ -18,16 +18,17 @@ extern "C" {
  *
  * @attention If the filter of the specified name is a private filter, and the creator of the filter have not been activated, the function will return NULL.
  *
- * @param name The name of the filter.
- * @param error Pointer to an error object that will be set if an error occurs.
+ * @param[in] name The name of the filter.
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
  */
 OB_EXPORT ob_filter *ob_create_filter(const char *name, ob_error **error);
 
 /**
  * @brief Get the name of ob_filter
  *
- * @param filter ob_filter object
- * @param error Pointer to an error object that will be set if an error occurs.
+ * @param[in] filter ob_filter object
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return char The filter of name
  */
 OB_EXPORT const char *ob_filter_get_name(const ob_filter *filter, ob_error **error);
@@ -36,8 +37,9 @@ OB_EXPORT const char *ob_filter_get_name(const ob_filter *filter, ob_error **err
  * @brief Get the vendor specific code of a filter by filter name.
  * @brief A private filter can define its own vendor specific code for specific purposes.
  *
- * @param name The name of the filter.
- * @param error Pointer to an error object that will be set if an error occurs.
+ * @param[in] name The name of the filter.
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return const char* Return the vendor specific code of the filter.
  */
 OB_EXPORT const char *ob_filter_get_vendor_specific_code(const char *name, ob_error **error);
@@ -46,9 +48,9 @@ OB_EXPORT const char *ob_filter_get_vendor_specific_code(const char *name, ob_er
  * @brief Create a private Filter object with activation key.
  * @brief Some private filters require an activation key to be activated, its depends on the vendor of the filter.
  *
- * @param name The name of the filter.
- * @param activation_key The activation key of the filter.
- * @param error Pointer to an error object that will be set if an error occurs.
+ * @param[in] name The name of the filter.
+ * @param[in] activation_key The activation key of the filter.
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
  *
  * @return ob_filter* Return the private filter object.
  */
@@ -65,7 +67,8 @@ OB_EXPORT void ob_delete_filter(ob_filter *filter, ob_error **error);
 /**
  * @brief Get config schema of the filter
  * @brief The returned string is a csv format string representing the configuration schema of the filter. The format of the string is:
- *  <parameter_name>, <parameter_type: "int", "float", "bool">, <minimum_value>, <maximum_value>, <value_step>, <default_value>, <parameter_description>
+ *  `<parameter_name>`, `<parameter_type: "int", "float", "bool">`, `<minimum_value>`, `<maximum_value>`, `<value_step>`, `<default_value>`,
+ * `<parameter_description>`
  *
  * @param[in] filter The filter object to get the configuration schema for
  * @param[out] error Pointer to an error object that will be set if an error occurs
@@ -80,8 +83,9 @@ OB_EXPORT const char *ob_filter_get_config_schema(const ob_filter *filter, ob_er
  *
  * @attention The returned list should be deleted by calling @ref ob_delete_filter_config_schema_list when it is no longer needed.
  *
- * @param filter The filter object to get the configuration schema for
- * @param error Pointer to an error object that will be set if an error occurs
+ * @param[in] filter The filter object to get the configuration schema for
+ * @param[out] error Pointer to an error object that will be set if an error occurs
+ *
  * @return ob_filter_config_schema_list* Return the filter config schema list of the filter
  */
 OB_EXPORT ob_filter_config_schema_list *ob_filter_get_config_schema_list(const ob_filter *filter, ob_error **error);
@@ -89,8 +93,8 @@ OB_EXPORT ob_filter_config_schema_list *ob_filter_get_config_schema_list(const o
 /**
  * @brief Delete a list of filter config schema items.
  *
- * @param config_schema_list The list of filter config schema items to delete.
- * @param error Pointer to an error object that will be set if an error occurs.
+ * @param[in] config_schema_list The list of filter config schema items to delete.
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
  */
 OB_EXPORT void ob_delete_filter_config_schema_list(ob_filter_config_schema_list *config_schema_list, ob_error **error);
 
@@ -115,6 +119,7 @@ OB_EXPORT void ob_filter_update_config(ob_filter *filter, uint8_t argc, const ch
  * @param[in] filter A filter object.
  * @param[in] config_name config name
  * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return double The value of the config.
  */
 OB_EXPORT double ob_filter_get_config_value(const ob_filter *filter, const char *config_name, ob_error **error);
@@ -203,6 +208,7 @@ OB_EXPORT void ob_filter_push_frame(ob_filter *filter, const ob_frame *frame, ob
  *
  * @param[in] filter_list  filter list
  * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return uint32_t The number of list
  */
 OB_EXPORT uint32_t ob_filter_list_get_count(const ob_filter_list *filter_list, ob_error **error);
@@ -213,6 +219,7 @@ OB_EXPORT uint32_t ob_filter_list_get_count(const ob_filter_list *filter_list, o
  * @param[in] filter_list Filter list
  * @param[in] index  Filter index
  * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return ob_filter The index of ob_filter
  */
 OB_EXPORT ob_filter *ob_filter_list_get_filter(const ob_filter_list *filter_list, uint32_t index, ob_error **error);
@@ -228,8 +235,9 @@ OB_EXPORT void ob_delete_filter_list(ob_filter_list *filter_list, ob_error **err
 /**
  * @brief Get the number of config schema items in the config schema list
  *
- * @param config_schema_list Filter config schema list
- * @param error Pointer to an error object that will be set if an error occurs.
+ * @param[in] config_schema_list Filter config schema list
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return uint32_t The number of config schema items in the filter list
  */
 OB_EXPORT uint32_t ob_filter_config_schema_list_get_count(const ob_filter_config_schema_list *config_schema_list, ob_error **error);
@@ -237,9 +245,9 @@ OB_EXPORT uint32_t ob_filter_config_schema_list_get_count(const ob_filter_config
 /**
  * @brief Get the config schema item by index
  *
- * @param config_schema_list Filter config schema list
- * @param index  Config schema item index
- * @param error Pointer to an error object that will be set if an error occurs.
+ * @param[in] config_schema_list Filter config schema list
+ * @param[in] index Config schema item index
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
  * @return ob_filter_config_schema_item* The config schema item by index
  */
 OB_EXPORT ob_filter_config_schema_item ob_filter_config_schema_list_get_item(const ob_filter_config_schema_list *config_schema_list, uint32_t index,
@@ -247,11 +255,11 @@ OB_EXPORT ob_filter_config_schema_item ob_filter_config_schema_list_get_item(con
 
 /**
  * @brief Set the align to stream profile for the align filter.
- * @breif It is useful when the align target stream dose not started (without any frame to get intrinsics and extrinsics).
+ * @brief It is useful when the align target stream dose not started (without any frame to get intrinsics and extrinsics).
  *
- * @param filter A filter object.
- * @param align_to_stream_profile The align target stream profile.
- * @param error Pointer to an error object that will be set if an error occurs.
+ * @param[in] filter A filter object.
+ * @param[in] align_to_stream_profile The align target stream profile.
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
  */
 OB_EXPORT void ob_align_filter_set_align_to_stream_profile(ob_filter *filter, const ob_stream_profile *align_to_stream_profile, ob_error **error);
 

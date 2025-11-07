@@ -57,7 +57,7 @@ public:
     /**
      * @brief enable a stream with a specific stream type
      *
-     * @param streamType The stream type to be enabled
+     * @param[in] streamType The stream type to be enabled
      */
     void enableStream(OBStreamType streamType) const {
         ob_error *error = nullptr;
@@ -69,7 +69,7 @@ public:
      * @brief Enable a stream with a specific sensor type
      * @brief Will convert sensor type to stream type automatically.
      *
-     * @param sensorType The sensor type to be enabled
+     * @param[in] sensorType The sensor type to be enabled
      */
     void enableStream(OBSensorType sensorType) const {
         auto streamType = ob::TypeHelper::convertSensorTypeToStreamType(sensorType);
@@ -79,7 +79,7 @@ public:
     /**
      * @brief Enable a stream to be used in the pipeline
      *
-     * @param streamProfile The stream configuration to be enabled
+     * @param[in] streamProfile The stream configuration to be enabled
      */
     void enableStream(std::shared_ptr<const StreamProfile> streamProfile) const {
         ob_error *error            = nullptr;
@@ -95,11 +95,11 @@ public:
      * If no parameters are specified, the stream will be enabled with default resolution settings.
      * Users who wish to set custom resolutions should refer to the product manual, as available resolutions vary by camera model.
      *
-     * @param streamType The video stream type.
-     * @param width The video stream width (default is OB_WIDTH_ANY, which selects the default resolution).
-     * @param height The video stream height (default is OB_HEIGHT_ANY, which selects the default resolution).
-     * @param fps The video stream frame rate (default is OB_FPS_ANY, which selects the default frame rate).
-     * @param format The video stream format (default is OB_FORMAT_ANY, which selects the default format).
+     * @param[in] streamType The video stream type.
+     * @param[in] width The video stream width (default is OB_WIDTH_ANY, which selects the default resolution).
+     * @param[in] height The video stream height (default is OB_HEIGHT_ANY, which selects the default resolution).
+     * @param[in] fps The video stream frame rate (default is OB_FPS_ANY, which selects the default frame rate).
+     * @param[in] format The video stream format (default is OB_FORMAT_ANY, which selects the default format).
      */
     void enableVideoStream(OBStreamType streamType, uint32_t width = OB_WIDTH_ANY, uint32_t height = OB_HEIGHT_ANY, uint32_t fps = OB_FPS_ANY,
                            OBFormat format = OB_FORMAT_ANY) const {
@@ -112,11 +112,11 @@ public:
      * @brief Enable a video stream to be used in the pipeline.
      * @brief Will convert sensor type to stream type automatically.
      *
-     * @param sensorType The sensor type to be enabled.
-     * @param width The video stream width (default is OB_WIDTH_ANY, which selects the default resolution).
-     * @param height The video stream height (default is OB_HEIGHT_ANY, which selects the default resolution).
-     * @param fps The video stream frame rate (default is OB_FPS_ANY, which selects the default frame rate).
-     * @param format The video stream format (default is OB_FORMAT_ANY, which selects the default format).
+     * @param[in] sensorType The sensor type to be enabled.
+     * @param[in] width The video stream width (default is OB_WIDTH_ANY, which selects the default resolution).
+     * @param[in] height The video stream height (default is OB_HEIGHT_ANY, which selects the default resolution).
+     * @param[in] fps The video stream frame rate (default is OB_FPS_ANY, which selects the default frame rate).
+     * @param[in] format The video stream format (default is OB_FORMAT_ANY, which selects the default format).
      */
     void enableVideoStream(OBSensorType sensorType, uint32_t width = OB_WIDTH_ANY, uint32_t height = OB_HEIGHT_ANY, uint32_t fps = OB_FPS_ANY,
                            OBFormat format = OB_FORMAT_ANY) const {
@@ -131,8 +131,8 @@ public:
      * If no parameters are specified, the stream will be enabled with default settings.
      * Users who wish to set custom full-scale ranges or sample rates should refer to the product manual, as available settings vary by device model.
      *
-     * @param fullScaleRange The full-scale range of the accelerometer (default is OB_ACCEL_FULL_SCALE_RANGE_ANY, which selects the default range).
-     * @param sampleRate The sample rate of the accelerometer (default is OB_ACCEL_SAMPLE_RATE_ANY, which selects the default rate).
+     * @param[in] fullScaleRange The full-scale range of the accelerometer (default is OB_ACCEL_FULL_SCALE_RANGE_ANY, which selects the default range).
+     * @param[in] sampleRate The sample rate of the accelerometer (default is OB_ACCEL_SAMPLE_RATE_ANY, which selects the default rate).
      */
     void enableAccelStream(OBAccelFullScaleRange fullScaleRange = OB_ACCEL_FULL_SCALE_RANGE_ANY,
                            OBAccelSampleRate     sampleRate     = OB_ACCEL_SAMPLE_RATE_ANY) const {
@@ -148,8 +148,8 @@ public:
      * If no parameters are specified, the stream will be enabled with default settings.
      * Users who wish to set custom full-scale ranges or sample rates should refer to the product manual, as available settings vary by device model.
      *
-     * @param fullScaleRange The full-scale range of the gyroscope (default is OB_GYRO_FULL_SCALE_RANGE_ANY, which selects the default range).
-     * @param sampleRate The sample rate of the gyroscope (default is OB_GYRO_SAMPLE_RATE_ANY, which selects the default rate).
+     * @param[in] fullScaleRange The full-scale range of the gyroscope (default is OB_GYRO_FULL_SCALE_RANGE_ANY, which selects the default range).
+     * @param[in] sampleRate The sample rate of the gyroscope (default is OB_GYRO_SAMPLE_RATE_ANY, which selects the default rate).
      */
     void enableGyroStream(OBGyroFullScaleRange fullScaleRange = OB_GYRO_FULL_SCALE_RANGE_ANY, OBGyroSampleRate sampleRate = OB_GYRO_SAMPLE_RATE_ANY) const {
         ob_error *error = nullptr;
@@ -186,7 +186,7 @@ public:
     /**
      * @brief Disable a stream to be used in the pipeline
      *
-     * @param streamType The stream configuration to be disabled
+     * @param[in] streamType The stream configuration to be disabled
      */
     void disableStream(OBStreamType streamType) const {
         ob_error *error = nullptr;
@@ -198,7 +198,7 @@ public:
      * @brief Disable a sensor stream to be used in the pipeline.
      * @brief Will convert sensor type to stream type automatically.
      *
-     * @param sensorType The sensor configuration to be disabled
+     * @param[in] sensorType The sensor configuration to be disabled
      */
     void disableStream(OBSensorType sensorType) const {
         auto streamType = ob::TypeHelper::convertSensorTypeToStreamType(sensorType);
@@ -229,7 +229,7 @@ public:
     /**
      * @brief Set the alignment mode
      *
-     * @param mode The alignment mode
+     * @param[in] mode The alignment mode
      */
     void setAlignMode(OBAlignMode mode) const {
         ob_error *error = nullptr;
@@ -240,7 +240,7 @@ public:
     /**
      * @brief Set whether the depth needs to be scaled after setting D2C
      *
-     * @param enable Whether scaling is required
+     * @param[in] enable Whether scaling is required
      */
     void setDepthScaleRequire(bool enable) const {
         ob_error *error = nullptr;
@@ -253,7 +253,7 @@ public:
      * @brief The processing strategy when the FrameSet generated by the frame aggregation function does not contain the frames of all opened streams (which
      * can be caused by different frame rates of each stream, or by the loss of frames of one stream): drop directly or output to the user.
      *
-     * @param mode The frame aggregation output mode to be set (default mode is @ref OB_FRAME_AGGREGATE_OUTPUT_ANY_SITUATION)
+     * @param[in] mode The frame aggregation output mode to be set (default mode is @ref OB_FRAME_AGGREGATE_OUTPUT_ANY_SITUATION)
      */
     void setFrameAggregateOutputMode(OBFrameAggregateOutputMode mode) const {
         ob_error *error = nullptr;
@@ -267,7 +267,7 @@ public:
     /**
      * @brief FrameSetCallback is a callback function type for frameset data arrival.
      *
-     * @param frame The returned frameset data
+     * @param[in] frame The returned frameset data
      */
     typedef std::function<void(std::shared_ptr<FrameSet> frame)> FrameSetCallback;
 
@@ -310,7 +310,7 @@ public:
     /**
      * @brief Start the pipeline with configuration parameters
      *
-     * @param config The parameter configuration of the pipeline
+     * @param[in] config The parameter configuration of the pipeline
      */
     void start(std::shared_ptr<Config> config = nullptr) const {
         ob_error    *error       = nullptr;
@@ -322,8 +322,8 @@ public:
     /**
      * @brief Start the pipeline and set the frameset data callback
      *
-     * @param config The configuration of the pipeline
-     * @param callback The callback to be triggered when all frame data in the frameset arrives
+     * @param[in] config The configuration of the pipeline
+     * @param[in] callback The callback to be triggered when all frame data in the frameset arrives
      */
     void start(std::shared_ptr<Config> config, FrameSetCallback callback) {
         callback_       = callback;
@@ -362,7 +362,8 @@ public:
     /**
      * @brief Wait for frameset
      *
-     * @param timeoutMs The waiting timeout in milliseconds
+     * @param[in] timeoutMs The waiting timeout in milliseconds
+     *
      * @return std::shared_ptr<FrameSet> The waiting frameset data
      */
     std::shared_ptr<FrameSet> waitForFrameset(uint32_t timeoutMs = 1000) const {
@@ -390,7 +391,8 @@ public:
     /**
      * @brief Get the stream profile of the specified sensor
      *
-     * @param sensorType The type of sensor
+     * @param[in] sensorType The type of sensor
+     *
      * @return std::shared_ptr<StreamProfileList> The stream profile list
      */
     std::shared_ptr<StreamProfileList> getStreamProfileList(OBSensorType sensorType) const {
@@ -403,8 +405,8 @@ public:
     /**
      * @brief Get the stream profile list of supported depth-to-color alignments
      *
-     * @param colorProfile The color stream profile, which is the target stream profile for the depth-to-color alignment.
-     * @param alignMode The alignment mode.
+     * @param[in] colorProfile The color stream profile, which is the target stream profile for the depth-to-color alignment.
+     * @param[in] alignMode The alignment mode.
      *
      * @attention Currently, only ALIGN_D2C_HW_MODE supported. For other align modes, please using the AlignFilter interface.
      *

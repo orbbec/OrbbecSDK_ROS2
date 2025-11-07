@@ -26,7 +26,7 @@ public:
     /**
      * @brief Callback function for frame data.
      *
-     * @param frame The frame data.
+     * @param[in] frame The frame data.
      */
     typedef std::function<void(std::shared_ptr<Frame> frame)> FrameCallback;
 
@@ -110,8 +110,8 @@ public:
     /**
      * @brief Open a frame data stream and set up a callback.
      *
-     * @param streamProfile The stream configuration.
-     * @param callback The callback to set when frame data arrives.
+     * @param[in] streamProfile The stream configuration.
+     * @param[in] callback The callback to set when frame data arrives.
      */
     void start(std::shared_ptr<StreamProfile> streamProfile, FrameCallback callback) {
         ob_error *error = nullptr;
@@ -132,7 +132,7 @@ public:
     /**
      * @brief Dynamically switch resolutions.
      *
-     * @param streamProfile The resolution to switch to.
+     * @param[in] streamProfile The resolution to switch to.
      */
     void switchProfile(std::shared_ptr<StreamProfile> streamProfile) {
         ob_error *error = nullptr;
@@ -185,7 +185,8 @@ public:
     /**
      * @brief Get the type of the specified sensor.
      *
-     * @param index The sensor index.
+     * @param[in] index The sensor index.
+     *
      * @return OBSensorType The sensor type.
      */
     OBSensorType getSensorType(uint32_t index) const {
@@ -198,7 +199,8 @@ public:
     /**
      * @brief Get a sensor by index number.
      *
-     * @param index The sensor index. The range is [0, count-1]. If the index exceeds the range, an exception will be thrown.
+     * @param[in] index The sensor index. The range is [0, count-1]. If the index exceeds the range, an exception will be thrown.
+     *
      * @return std::shared_ptr<Sensor> The sensor object.
      */
     std::shared_ptr<Sensor> getSensor(uint32_t index) const {
@@ -211,7 +213,8 @@ public:
     /**
      * @brief Get a sensor by sensor type.
      *
-     * @param sensorType The sensor type to obtain.
+     * @param[in] sensorType The sensor type to obtain.
+     *
      * @return std::shared_ptr<Sensor> A sensor object. If the specified sensor type does not exist, it will return empty.
      */
     std::shared_ptr<Sensor> getSensor(OBSensorType sensorType) const {

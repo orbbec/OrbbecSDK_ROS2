@@ -345,9 +345,14 @@ void OBCameraNode::setupDevices() {
       RCLCPP_ERROR_STREAM(logger_, "Failed to load device preset");
     }
   }
-  if (!depth_work_mode_.empty()) {
-    RCLCPP_INFO_STREAM(logger_, "Set depth work mode: " << depth_work_mode_);
+  if (!depth_work_mode_.empty() &&
+      device_->isPropertySupported(OB_STRUCT_CURRENT_DEPTH_ALG_MODE, OB_PERMISSION_READ_WRITE)) {
+    auto depthModeList = device_->getDepthWorkModeList();
+    for (uint32_t i = 0; i < depthModeList->getCount(); i++) {
+      RCLCPP_INFO_STREAM(logger_, "depthModeList[" << i << "]: " << (*depthModeList)[i].name);
+    }
     TRY_EXECUTE_BLOCK(device_->switchDepthWorkMode(depth_work_mode_.c_str()));
+    RCLCPP_INFO_STREAM(logger_, "Set depth work mode: " << depth_work_mode_);
   }
   if (!sync_mode_str_.empty()) {
     auto sync_config = device_->getMultiDeviceSyncConfig();

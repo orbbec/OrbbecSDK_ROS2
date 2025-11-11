@@ -259,7 +259,7 @@ def generate_launch_description():
         #color image transport plugins
         DeclareLaunchArgument('color.image_raw.enable_pub_plugins',default_value='["image_transport/compressed", "image_transport/raw", "image_transport/theora"]'),
         #depth image transport plugins
-        DeclareLaunchArgument('depth.image_raw.enable_pub_plugins',default_value='["image_transport/compressedDepth", "image_transport/raw", "image_transport/theora"]'),
+        DeclareLaunchArgument('depth.image_raw.enable_pub_plugins',default_value='["image_transport/compressedDepth", "image_transport/raw"]'),
         #infra1
         DeclareLaunchArgument('left_ir.image_raw.enable_pub_plugins',default_value='["image_transport/compressed", "image_transport/raw", "image_transport/theora"]'),
         #infra2

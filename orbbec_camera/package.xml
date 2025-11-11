@@ -33,6 +33,11 @@
   <depend>libgflags-dev</depend>
   <depend>nlohmann-json-dev</depend>
   <depend>libgoogle-glog-dev</depend>
+  <exec_depend>libegl1-mesa</exec_depend>
+  <exec_depend>libgl1-mesa-glx</exec_depend>
+  <exec_depend>libglu1-mesa</exec_depend>
+  <build_depend>libssl-dev</build_depend>
+  <exec_depend>libssl3</exec_depend>
   <export>
     <build_type>ament_cmake</build_type>
   </export>

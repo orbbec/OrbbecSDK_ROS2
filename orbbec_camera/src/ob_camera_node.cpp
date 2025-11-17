@@ -708,14 +708,16 @@ void OBCameraNode::publishLrmObstacleDistance() {
 }
 
 OBCameraNode::OBCameraNode(rclcpp::Node *node, std::shared_ptr<ob::Device> device,
-                           std::shared_ptr<Parameters> parameters, bool use_intra_process,
-                           bool is_playback_device)
+                           std::shared_ptr<Parameters> parameters,
+                           std::shared_ptr<CameraStatusPublisher> camera_status_publisher,
+                           bool use_intra_process, bool is_playback_device)
     : node_(node),
       device_(std::move(device)),
       parameters_(std::move(parameters)),
       logger_(node->get_logger()),
       use_intra_process_(use_intra_process),
-      is_playback_device_(is_playback_device) {
+      is_playback_device_(is_playback_device),
+      camera_status_publisher_(camera_status_publisher) {
   pid_ = device_->getDeviceInfo()->getPid();
   RCLCPP_INFO_STREAM(logger_,
                      "OBCameraNode: use_intra_process: " << (use_intra_process ? "ON" : "OFF"));
@@ -750,7 +752,12 @@ OBCameraNode::OBCameraNode(rclcpp::Node *node, std::shared_ptr<ob::Device> devic
     d2c_viewer_ = std::make_unique<D2CViewer>(node_, rgb_qos, depth_qos, use_intra_process_);
   }
   setupImageBuffers();
-  is_camera_node_initialized_ = true;
+  // SRS_Internal_Change
+  publishStaticTransforms();
+  // wait for 100ms to make sure the transforms are published
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  is_camera_node_initialized_.store(true);
+  // End of  SRS_Internal_Change
 
   fps_counter_color_ = std::make_unique<FpsCounter>("Color", logger_, 1);
   fps_counter_depth_ = std::make_unique<FpsCounter>("Depth", logger_, 1);
@@ -4408,6 +4415,13 @@ void OBCameraNode::getParameters() {
     setAndGetNodeParameter<std::string>(camera_info_qos_[stream_index], param_name, "default");
     param_name = "enable_" + stream_name_[stream_index] + "_undistortion";
     setAndGetNodeParameter<bool>(enable_undistortion_[stream_index], param_name, false);
+
+    if(stream_index == COLOR){
+      camera_status_publisher_->setColorExpectedFrameRate(fps_[COLOR]);
+    }
+    else if(stream_index == DEPTH){
+      camera_status_publisher_->setDepthExpectedFrameRate(fps_[DEPTH]);
+    }
   }
 
   for (auto stream_index : IMAGE_STREAMS) {
@@ -6598,6 +6612,17 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
       frame_timestamp_csv_logger_->recordImagePublishSkipped(stream_index.first, frame);
     }
   };
+
+  auto frame_timestamp = getFrameTimestampUs(frame);
+  auto timestamp = fromUsToROSTime(frame_timestamp);
+
+  if (stream_index == DEPTH){
+    camera_status_publisher_->depthFrameReceived(timestamp);
+  }
+  if (stream_index == COLOR){
+    camera_status_publisher_->colorFrameReceived(timestamp);
+  }
+
   CHECK_NOTNULL(image_publishers_[stream_index]);
   const bool has_raw_image_subscriber =
       image_publishers_[stream_index]->get_subscription_count() > 0;
@@ -6644,8 +6669,6 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   }
   int width = static_cast<int>(video_frame->getWidth());
   int height = static_cast<int>(video_frame->getHeight());
-  auto frame_timestamp = getFrameTimestampUs(frame);
-  auto timestamp = fromUsToROSTime(frame_timestamp);
   if (!device_) {
     RCLCPP_ERROR_STREAM(logger_, "device is null in onNewFrameCallback");
     record_image_publish_skipped();

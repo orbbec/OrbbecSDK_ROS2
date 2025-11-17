@@ -82,6 +82,7 @@
 #include <std_msgs/msg/header.hpp>
 #include <fcntl.h>
 #include <unistd.h>
+#include "orbbec_camera/camera_state_publisher.h"
 
 #if __has_include(<cv_bridge/cv_bridge.hpp>)
 #include <cv_bridge/cv_bridge.hpp>
@@ -172,8 +173,9 @@ typedef struct {
 class OBCameraNode {
  public:
   OBCameraNode(rclcpp::Node* node, std::shared_ptr<ob::Device> device,
-               std::shared_ptr<Parameters> parameters, bool use_intra_process = false,
-               bool is_playback_device = false);
+               std::shared_ptr<Parameters> parameters,
+               std::shared_ptr<CameraStatusPublisher> camera_status_publisher,
+               bool use_intra_process = false, bool is_playback_device = false);
 
   template <class T>
   void setAndGetNodeParameter(
@@ -233,6 +235,14 @@ class OBCameraNode {
     return user_calibration_ready_;
   }
 
+  void disableColorStream(){
+    enable_stream_[COLOR] = false;
+  }
+  
+  void disableDepthStream(){
+    enable_stream_[DEPTH] = false;
+  }
+  
  private:
   struct IMUData {
     IMUData() = default;
@@ -1100,5 +1110,6 @@ class OBCameraNode {
   std::string ae_reference_stream_;
   std::string ae_strategy_;
   int pid_ = 0;
+  std::shared_ptr<CameraStatusPublisher> camera_status_publisher_;
 };
 }  // namespace orbbec_camera

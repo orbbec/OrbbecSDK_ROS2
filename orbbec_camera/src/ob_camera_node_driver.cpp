@@ -359,6 +359,8 @@ void OBCameraNodeDriver::init() {
   set_bag_recording_srv_ = this->create_service<orbbec_camera_msgs::srv::SetBagRecording>(
       "set_bag_recording", std::bind(&OBCameraNodeDriver::setBagRecordingCallback, this,
                                      std::placeholders::_1, std::placeholders::_2));
+
+  camera_status_publisher_ = std::make_shared<CameraStatusPublisher>(this);
   pthread_mutexattr_init(&orb_device_lock_attr_);
   pthread_mutexattr_setpshared(&orb_device_lock_attr_, PTHREAD_PROCESS_SHARED);
   orb_device_lock_ = (pthread_mutex_t *)orb_device_lock_shm_addr_;
@@ -367,6 +369,8 @@ void OBCameraNodeDriver::init() {
   // Initialize the reset device completion time to allow immediate device connection on startup
   last_reset_device_completion_time_ = std::chrono::steady_clock::now() - std::chrono::seconds(10);
   parameters_ = std::make_shared<Parameters>(this);
+  disable_color_stream_on_start_ = declare_parameter<bool>("disable_color_stream_on_start", false);
+  disable_depth_stream_on_start_ = declare_parameter<bool>("disable_depth_stream_on_start", false);
   serial_number_ = declare_parameter<std::string>("serial_number", "");
   bag_record_filename_ = declare_parameter<std::string>("bag_record_filename", "");
   bag_record_compression_ = declare_parameter<bool>("bag_record_compression", true);
@@ -480,6 +484,7 @@ void OBCameraNodeDriver::onDeviceDisconnected(const std::shared_ptr<ob::DeviceLi
       delay_stream_start_after_reconnect_ = true;
       reset_device_flag_ = true;
       reset_device_cond_.notify_all();
+      camera_status_publisher_->disconnected();
       break;
     }
   }
@@ -958,6 +963,8 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDevice(
     device_connected_ = false;
     return nullptr;
   }
+
+  camera_status_publisher_->connected();
   return device;
 }
 
@@ -1157,6 +1164,7 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
     try {
       if (device_type_ == "camera") {
         ob_camera_node_ = std::make_unique<OBCameraNode>(this, device_, parameters_,
+                                                         camera_status_publisher_,
                                                          node_options_.use_intra_process_comms(),
                                                          playback_device_ != nullptr);
       } else if (device_type_ == "lidar") {
@@ -1185,6 +1193,17 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
                         "Device initialization failed after " << max_retries << " attempts.");
     throw std::runtime_error("Device initialization failed after " + std::to_string(max_retries) +
                              " attempts.");
+  }
+  // Override stream enable settings
+  bool color_stream_enabled = true;
+  bool depth_stream_enabled = true;
+  if(disable_color_stream_on_start_){
+    ob_camera_node_->disableColorStream();
+    color_stream_enabled = false;
+  }
+  if(disable_depth_stream_on_start_){
+    ob_camera_node_->disableDepthStream();
+    depth_stream_enabled = false;
   }
 
   device_connected_ = true;
@@ -1360,6 +1379,11 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
           logger_, "Failed to start recording: " << orbbec_camera::formatObErrorWithStatus(e));
     }
   }
+  camera_status_publisher_->setMessageAndPublish([color_stream_enabled, depth_stream_enabled](orbbec_camera_msgs::msg::CameraStatus& msg){
+    msg.color_stream_enabled = color_stream_enabled;
+    msg.depth_stream_enabled = depth_stream_enabled;
+    msg.initialized = true;
+  });
 
 }  // namespace orbbec_camera
 
@@ -1521,14 +1545,14 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
       RCLCPP_WARN_STREAM(logger_, "Device lock is held by another process, waiting 100ms");
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     } else {
-      RCLCPP_ERROR_STREAM(logger_, "Failed to lock orb_device_lock_");
+      RCLCPP_DEBUG_STREAM(logger_, "Failed to lock orb_device_lock_");
       return;  // Not EBUSY, return
     }
 
     try_lock_count++;
   }
   if (try_lock_count >= max_try_lock_count) {
-    RCLCPP_ERROR_STREAM(logger_, "Failed to lock orb_device_lock_");
+    RCLCPP_DEBUG_STREAM(logger_, "Failed to lock orb_device_lock_");
     return;
   }
 

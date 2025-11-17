@@ -1944,6 +1944,12 @@ bool OBCameraNode::toggleSensor(const stream_index_pair& stream_index, bool enab
     enable_stream_[stream_index] = enabled;
     setupProfiles();
     startStreams();
+    if (stream_index == COLOR){
+      camera_status_publisher_->updateColorStreamActive(enabled);
+    }
+    if (stream_index == DEPTH){
+      camera_status_publisher_->updateDepthStreamActive(enabled);
+    }
     return true;
   } catch (const ob::Error& e) {
     msg = orbbec_camera::formatObErrorWithStatus(e);

@@ -78,7 +78,7 @@
         <!-- Global UVC Backend select on Linux; optional values: Auto, V4L2, LibUVC; The default
         setting is "Auto," which will automatically select the appropriate option based on the
         system's capabilities and the device's speciality. -->
-        <LinuxUVCBackend>Auto</LinuxUVCBackend>
+        <LinuxUVCBackend>V4L2</LinuxUVCBackend>
 
         <!-- GVCP port scheme: Standard = default port, SchemeB = custom port -->
         <GVCPPortScheme>Standard</GVCPPortScheme>
@@ -1667,7 +1667,7 @@
         <Gemini336>
             <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
             will determine the device's speciality. Optional values: V4L2, LibUVC -->
-            <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
+            <LinuxUVCDefaultBackend>V4L2</LinuxUVCDefaultBackend>
 
             <!-- Enable auto device reboot when a fatal XU channel IO error (LIBUSB_ERROR_IO) is
             detected on the LibUVC backend. Set to true to enable; default is false. -->

@@ -9,7 +9,7 @@
 
 ## 使用教程
 
-1. **在 `multi_camera_synced.launch.py` 的基础上做以下修改**
+### **在 `multi_camera_synced.launch.py` 的基础上做以下修改**
 
    - 增加 `launch_include` 以适配 4 台相机
 
@@ -28,7 +28,7 @@
 
 ---
 
-2. **参数文件修改**
+### **参数文件修改**
 
    修改 `config` 目录下的以下两个配置文件：
 
@@ -44,7 +44,7 @@
 
 ---
 
-3. **启动与验证**
+### **启动与验证**
    - 启动多机同步 launch： `multi_camera_synced.launch.py`
 
    - 打开新终端运行同步验证节点： `ros2 run orbbec_camera image_sync_example_node`
@@ -52,7 +52,7 @@
 
 ---
 
-4. **参考 launch 文件**
+### **参考 launch 文件**
 
 ```
 import os
@@ -150,12 +150,12 @@ def generate_launch_description():
 
 ## 必要系统配置
 
-1. **提升 USB 缓冲区容量**
+### **提升 USB 缓冲区容量**
 
 ```
 echo 512 | sudo tee /sys/module/usbcore/parameters/usbfs_memory_mb
 ```
 
-2. **配置 Fast DDS**
+### **配置 Fast DDS**
 
 优化 ROS2 节点间通信延迟，可以有效减少图像传输延迟，[配置过程见此章节](../performance/fastdds_tuning.md)。

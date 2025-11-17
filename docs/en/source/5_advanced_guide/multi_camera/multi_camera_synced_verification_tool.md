@@ -9,7 +9,7 @@ It can be used to validate frame alignment accuracy under the multi-camera **Pri
 
 ## Usage Guide
 
-1. **Modify `multi_camera_synced.launch.py` as follows**
+### **Modify `multi_camera_synced.launch.py` as follows**
 
    - Add `launch_include` to support four cameras.
 
@@ -35,7 +35,7 @@ It can be used to validate frame alignment accuracy under the multi-camera **Pri
 
 ---
 
-2. **Modify configuration files**
+### **Modify configuration files**
 
    Edit the following two files under the `config` directory:
 
@@ -51,7 +51,7 @@ It can be used to validate frame alignment accuracy under the multi-camera **Pri
 
 ---
 
-3. **Launch and Verification**
+### **Launch and Verification**
 
    - Start the multi-camera synchronization launch file:
 
@@ -65,7 +65,7 @@ It can be used to validate frame alignment accuracy under the multi-camera **Pri
 
 ---
 
-4. **Reference Launch File**
+### **Reference Launch File**
 
 ```
 import os
@@ -165,13 +165,13 @@ def generate_launch_description():
 
 ## System Configuration Requirements
 
-1. **Increase USB Buffer Memory**
+### **Increase USB Buffer Memory**
 
    Prevent frame drops caused by concurrent data transmission:
 
    `echo 512 | sudo tee /sys/module/usbcore/parameters/usbfs_memory_mb`
 
-2. **Configure Fast DDS**
+### **Configure Fast DDS**
 
    Optimize ROS2 node communication latency to reduce image transmission delay.
-   See [this section](../performance/fastdds_tuning.md) for detailed configuration instructions.**
+   See [this section](../performance/fastdds_tuning.md) for detailed configuration instructions.

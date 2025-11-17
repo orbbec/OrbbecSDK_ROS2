@@ -266,10 +266,17 @@ endif()
 install(TARGETS list_devices_node list_depth_work_mode_node list_camera_profile_mode_node firmware_update_tool topic_statistics_node  service_benchmark_node ob_benchmark_node 435le_example_node ip_config_tool set_device_ip image_sync_example_node DESTINATION lib/${PROJECT_NAME}/
 )
 
-if(BUILD_TESTING)
-    find_package(ament_lint_auto REQUIRED)
-    ament_lint_auto_find_test_dependencies()
-endif()
+# Makes it easier to use the list_devices_node in other tools
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/list_devices_node
+  DESTINATION bin/
+  RENAME orbbec_list_devices
+  PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+)
+
+if (BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+endif ()
 
 ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})

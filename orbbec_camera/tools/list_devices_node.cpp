@@ -27,8 +27,14 @@
 #include <orbbec_camera/ob_camera_node_driver.h>
 #include <orbbec_camera/utils.h>
 
+// SRS_Internal_Change
+// Device attributes are additionally emitted as srs_yaml_prefix| tagged lines
+// so this tool's output can be parsed by other tools.
+// End of SRS_Internal_Change
+
 namespace {
 constexpr int kFirmwareLogDrainDelaySec = 5;
+const std::string kYamlPrefix = "srs_yaml_prefix|";
 
 struct CliArgs {
   bool help = false;
@@ -115,18 +121,18 @@ std::string deviceAccessStateToString(OBDeviceAccessState state) {
 }
 
 void printDeviceAccessState(const std::shared_ptr<ob::DeviceList> &list, uint32_t index) {
-  auto logger = rclcpp::get_logger("list_device_node");
   try {
     const auto state = list->queryDeviceAccessState(index);
-    RCLCPP_INFO_STREAM(
-        logger, "device access state [serial: " << list->getSerialNumber(index)
-                                                << ", ip: " << list->getIpAddress(index)
-                                                << "]: " << deviceAccessStateToString(state));
+    std::cout << kYamlPrefix << "  device access state [serial: " << list->getSerialNumber(index)
+               << ", ip: " << list->getIpAddress(index) << "]: "
+               << deviceAccessStateToString(state) << std::endl;
   } catch (const ob::Error &e) {
-    RCLCPP_WARN_STREAM(logger, "device access state: UNKNOWN ("
-                                   << orbbec_camera::formatObErrorWithStatus(e) << ")");
+    std::cout << kYamlPrefix
+               << "  device access state: UNKNOWN (" << orbbec_camera::formatObErrorWithStatus(e)
+               << ")" << std::endl;
   } catch (const std::exception &e) {
-    RCLCPP_WARN_STREAM(logger, "device access state: UNKNOWN (" << e.what() << ")");
+    std::cout << kYamlPrefix << "  device access state: UNKNOWN (" << e.what() << ")"
+               << std::endl;
   }
 }
 
@@ -138,9 +144,7 @@ bool isPropertyReadable(const std::shared_ptr<ob::Device> &device, OBPropertyID 
 }
 
 void printIpConfigStatus(const std::shared_ptr<ob::Device> &device) {
-  auto logger = rclcpp::get_logger("list_device_node");
-
-  RCLCPP_INFO_STREAM(logger, "IP config status:");
+  std::cout << kYamlPrefix << "  IP config status:" << std::endl;
 
   const bool v2_read_supported = isPropertyReadable(device, OB_STRUCT_DEVICE_IP_ADDR_CONFIG_V2);
   const bool legacy_read_supported = isPropertyReadable(device, OB_STRUCT_DEVICE_IP_ADDR_CONFIG);
@@ -150,44 +154,45 @@ void printIpConfigStatus(const std::shared_ptr<ob::Device> &device) {
     uint32_t data_size = sizeof(ip_config_v2);
     device->getStructuredData(OB_STRUCT_DEVICE_IP_ADDR_CONFIG_V2,
                               reinterpret_cast<uint8_t *>(&ip_config_v2), &data_size);
-    RCLCPP_INFO_STREAM(logger,
-                       "  DHCP: " << boolToString(ip_config_v2.flags & OB_NET_IP_FLAG_DHCP));
-    RCLCPP_INFO_STREAM(logger, "  persistent IP: "
-                                   << boolToString(ip_config_v2.flags & OB_NET_IP_FLAG_PERSISTENT));
+    std::cout << kYamlPrefix
+               << "    DHCP: " << boolToString(ip_config_v2.flags & OB_NET_IP_FLAG_DHCP)
+               << std::endl;
+    std::cout << kYamlPrefix << "    persistent IP: "
+               << boolToString(ip_config_v2.flags & OB_NET_IP_FLAG_PERSISTENT) << std::endl;
   } else if (legacy_read_supported) {
     OBNetIpConfig ip_config{};
     uint32_t data_size = sizeof(ip_config);
     device->getStructuredData(OB_STRUCT_DEVICE_IP_ADDR_CONFIG,
                               reinterpret_cast<uint8_t *>(&ip_config), &data_size);
-    RCLCPP_INFO_STREAM(logger, "  DHCP: " << boolToString(ip_config.dhcp != 0));
-    RCLCPP_INFO_STREAM(logger, "  persistent IP: " << boolToString(ip_config.dhcp == 0));
+    std::cout << kYamlPrefix << "    DHCP: " << boolToString(ip_config.dhcp != 0) << std::endl;
+    std::cout << kYamlPrefix << "    persistent IP: " << boolToString(ip_config.dhcp == 0)
+               << std::endl;
   } else {
-    RCLCPP_INFO_STREAM(logger, "  DHCP: not supported");
-    RCLCPP_INFO_STREAM(logger, "  persistent IP: not supported");
+    std::cout << kYamlPrefix << "    DHCP: not supported" << std::endl;
+    std::cout << kYamlPrefix << "    persistent IP: not supported" << std::endl;
   }
 }
 
 void printPresetInfo(const std::shared_ptr<ob::Device> &device) {
-  auto logger = rclcpp::get_logger("list_device_node");
   try {
     auto preset_list = device->getAvailablePresetList();
     const uint32_t preset_count = preset_list ? preset_list->getCount() : 0;
-    RCLCPP_INFO_STREAM(logger, "device_preset count: " << preset_count);
+    std::cout << kYamlPrefix << "  device_preset count: " << preset_count << std::endl;
     for (uint32_t i = 0; i < preset_count; ++i) {
       const char *preset_name = preset_list->getName(i);
       if (preset_name != nullptr && preset_name[0] != '\0') {
-        RCLCPP_INFO_STREAM(logger, "  - " << preset_name);
+        std::cout << kYamlPrefix << "    - " << preset_name << std::endl;
       }
     }
 
     if (device->isColorPresetSupported()) {
       auto color_preset_list = device->getColorPresetList();
       const uint32_t color_preset_count = color_preset_list ? color_preset_list->getCount() : 0;
-      RCLCPP_INFO_STREAM(logger, "color_preset count: " << color_preset_count);
+      std::cout << kYamlPrefix << "  color_preset count: " << color_preset_count << std::endl;
       for (uint32_t i = 0; i < color_preset_count; ++i) {
         const char *preset_name = color_preset_list->getName(i);
         if (preset_name != nullptr && preset_name[0] != '\0') {
-          RCLCPP_INFO_STREAM(logger, "  - " << preset_name);
+          std::cout << kYamlPrefix << "    - " << preset_name << std::endl;
         }
       }
     }
@@ -195,17 +200,18 @@ void printPresetInfo(const std::shared_ptr<ob::Device> &device) {
     std::string key = "PresetVer";
     if (device->isExtensionInfoExist(key)) {
       std::string value = device->getExtensionInfo(key);
-      RCLCPP_INFO_STREAM(logger, "preset version: " << value);
+      std::cout << kYamlPrefix << "  preset version: " << value << std::endl;
     } else {
-      RCLCPP_INFO_STREAM(logger, "preset version: not available");
+      std::cout << kYamlPrefix << "  preset version: not available" << std::endl;
     }
   } catch (ob::Error &e) {
-    RCLCPP_WARN_STREAM(logger,
-                       "Failed to get preset info: " << orbbec_camera::formatObErrorWithStatus(e));
+    std::cout << kYamlPrefix
+               << "  Failed to get preset info: " << orbbec_camera::formatObErrorWithStatus(e)
+               << std::endl;
   } catch (const std::exception &e) {
-    RCLCPP_WARN_STREAM(logger, "Failed to get preset info: " << e.what());
+    std::cout << kYamlPrefix << "  Failed to get preset info: " << e.what() << std::endl;
   } catch (...) {
-    RCLCPP_WARN_STREAM(logger, "Failed to get preset info");
+    std::cout << kYamlPrefix << "  Failed to get preset info" << std::endl;
   }
 }
 
@@ -259,7 +265,9 @@ int main(int argc, char **argv) {
     auto context = std::make_unique<ob::Context>();
     auto list = context->queryDeviceList();
     bool firmware_log_enabled = false;
-    for (size_t i = 0; i < list->deviceCount(); i++) {
+    const size_t device_count = list->deviceCount();
+    std::cout << kYamlPrefix << "orbbec_camera_device_count: " << device_count << std::endl;
+    for (size_t i = 0; i < device_count; i++) {
       try {
         if (std::string(list->getConnectionType(i)) == "Ethernet") {
           printDeviceAccessState(list, static_cast<uint32_t>(i));
@@ -277,14 +285,12 @@ int main(int argc, char **argv) {
           auto firmware_version = device_info_->getFirmwareVersion();
           std::stringstream pid_hex;
           pid_hex << std::hex << std::setw(4) << std::setfill('0') << list->getPid(i);
-          RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), "name: " << list->getName(i));
-          RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), "pid: 0x" << pid_hex.str());
-          RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), "serial: " << serial);
-          RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"),
-                             "connection: " << connection_type);
-          RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"),
-                             "firmware version: " << firmware_version);
-          RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), "usb port: " << usb_port);
+          std::cout << kYamlPrefix << "  name: " << list->getName(i) << std::endl;
+          std::cout << kYamlPrefix << "  pid: 0x" << pid_hex.str() << std::endl;
+          std::cout << kYamlPrefix << "  serial: " << serial << std::endl;
+          std::cout << kYamlPrefix << "  connection: " << connection_type << std::endl;
+          std::cout << kYamlPrefix << "  firmware version: " << firmware_version << std::endl;
+          std::cout << kYamlPrefix << "  usb port: " << usb_port << std::endl;
           printPresetInfo(device_);
           std::cout << std::endl;
         } else {
@@ -294,55 +300,48 @@ int main(int argc, char **argv) {
           std::stringstream pid_hex;
           auto firmware_version = device_info_->getFirmwareVersion();
           pid_hex << std::hex << std::setw(4) << std::setfill('0') << list->getPid(i);
-          RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), "name: " << list->getName(i));
-          RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), "pid: 0x" << pid_hex.str());
-          RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), "serial: " << serial);
-          RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"),
-                             "connection: " << connection_type);
-          RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"),
-                             "firmware version: " << firmware_version);
-          RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"), "ip address: " << ip_address);
-          RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"),
-                             "MAC address: " << list->getUid(i));
-          RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"),
-                             "subnet mask: " << list->getSubnetMask(i));
-          RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"),
-                             "gateway: " << list->getGateway(i));
-          RCLCPP_INFO_STREAM(
-              rclcpp::get_logger("list_device_node"),
-              "local net interface: " << list->getLocalNetInterfaceName(static_cast<uint32_t>(i)));
-          RCLCPP_INFO_STREAM(
-              rclcpp::get_logger("list_device_node"),
-              "local MAC address: " << list->getLocalMacAddress(static_cast<uint32_t>(i)));
-          RCLCPP_INFO_STREAM(rclcpp::get_logger("list_device_node"),
-                             "ip source type: " << ipSourceTypeToString(static_cast<int>(
-                                 list->getIpSourceType(static_cast<uint32_t>(i)))));
+          std::cout << kYamlPrefix << "  name: " << list->getName(i) << std::endl;
+          std::cout << kYamlPrefix << "  pid: 0x" << pid_hex.str() << std::endl;
+          std::cout << kYamlPrefix << "  serial: " << serial << std::endl;
+          std::cout << kYamlPrefix << "  connection: " << connection_type << std::endl;
+          std::cout << kYamlPrefix << "  firmware version: " << firmware_version << std::endl;
+          std::cout << kYamlPrefix << "  ip address: " << ip_address << std::endl;
+          std::cout << kYamlPrefix << "  MAC address: " << list->getUid(i) << std::endl;
+          std::cout << kYamlPrefix << "  subnet mask: " << list->getSubnetMask(i) << std::endl;
+          std::cout << kYamlPrefix << "  gateway: " << list->getGateway(i) << std::endl;
+          std::cout << kYamlPrefix << "  local net interface: "
+                     << list->getLocalNetInterfaceName(static_cast<uint32_t>(i)) << std::endl;
+          std::cout << kYamlPrefix << "  local MAC address: "
+                     << list->getLocalMacAddress(static_cast<uint32_t>(i)) << std::endl;
+          std::cout << kYamlPrefix << "  ip source type: "
+                     << ipSourceTypeToString(
+                            static_cast<int>(list->getIpSourceType(static_cast<uint32_t>(i))))
+                     << std::endl;
           printIpConfigStatus(device_);
           printPresetInfo(device_);
           std::cout << std::endl;
         }
       } catch (ob::Error &e) {
-        RCLCPP_ERROR_STREAM(rclcpp::get_logger("list_device_node"),
-                            "Failed to list device at index "
-                                << i << ": " << orbbec_camera::formatObErrorWithStatus(e));
+        std::cerr << kYamlPrefix << "error: Failed to list device at index " << i << ": "
+                   << orbbec_camera::formatObErrorWithStatus(e) << std::endl;
       } catch (const std::exception &e) {
-        RCLCPP_ERROR_STREAM(rclcpp::get_logger("list_device_node"),
-                            "Failed to list device at index " << i << ": " << e.what());
+        std::cerr << kYamlPrefix << "error: Failed to list device at index " << i << ": "
+                   << e.what() << std::endl;
       } catch (...) {
-        RCLCPP_ERROR_STREAM(rclcpp::get_logger("list_device_node"),
-                            "Failed to list device at index " << i << ": unknown error");
+        std::cerr << kYamlPrefix << "error: Failed to list device at index " << i
+                   << ": unknown error" << std::endl;
       }
     }
     if (firmware_log_enabled) {
       waitForFirmwareLogDrain();
     }
   } catch (ob::Error &e) {
-    RCLCPP_ERROR_STREAM(rclcpp::get_logger("list_device_node"),
-                        orbbec_camera::formatObErrorWithStatus(e));
+    std::cerr << kYamlPrefix << "error: " << orbbec_camera::formatObErrorWithStatus(e)
+               << std::endl;
   } catch (const std::exception &e) {
-    RCLCPP_ERROR_STREAM(rclcpp::get_logger("list_device_node"), e.what());
+    std::cerr << kYamlPrefix << "exception: " << e.what() << std::endl;
   } catch (...) {
-    RCLCPP_ERROR_STREAM(rclcpp::get_logger("list_device_node"), "unknown error");
+    std::cerr << kYamlPrefix << "unknown_error:" << std::endl;
   }
   return 0;
 }

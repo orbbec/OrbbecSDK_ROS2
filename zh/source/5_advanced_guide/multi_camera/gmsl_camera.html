@@ -23,7 +23,7 @@
     <link rel="index" title="索引" href="../../../genindex.html" />
     <link rel="search" title="搜索" href="../../../search.html" />
     <link rel="next" title="5.3.1. 在 ROS 2 中对齐深度到彩色" href="../configuration/align_depth_color.html" />
-    <link rel="prev" title="5.2.3. 多相机同步验证工具" href="multi_camera_synced_verification_tool.html" /> 
+    <link rel="prev" title="5.2.3. 多相机同步验证节点" href="multi_camera_synced_verification_tool.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -218,11 +218,19 @@
 <li class="toctree-l4"><a class="reference internal" href="multi_camera_synced.html#id4">5.2.2.4. 运行以下命令启动多相机同步</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="multi_camera_synced_verification_tool.html">5.2.3. 多相机同步验证工具</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="multi_camera_synced_verification_tool.html#id2">5.2.3.1. 目录结构</a></li>
-<li class="toctree-l4"><a class="reference internal" href="multi_camera_synced_verification_tool.html#id3">5.2.3.2. 运行准备</a></li>
-<li class="toctree-l4"><a class="reference internal" href="multi_camera_synced_verification_tool.html#id4">5.2.3.3. 运行此示例</a></li>
-<li class="toctree-l4"><a class="reference internal" href="multi_camera_synced_verification_tool.html#id5">5.2.3.4. 需要更改的文件</a></li>
+<li class="toctree-l3"><a class="reference internal" href="multi_camera_synced_verification_tool.html">5.2.3. 多相机同步验证节点</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="multi_camera_synced_verification_tool.html#id2">5.2.3.1. 使用教程</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="multi_camera_synced_verification_tool.html#multi-camera-synced-launch-py">5.2.3.1.1. <strong>在 <code class="docutils literal notranslate"><span class="pre">multi_camera_synced.launch.py</span></code> 的基础上做以下修改</strong></a></li>
+<li class="toctree-l5"><a class="reference internal" href="multi_camera_synced_verification_tool.html#id3">5.2.3.1.2. <strong>参数文件修改</strong></a></li>
+<li class="toctree-l5"><a class="reference internal" href="multi_camera_synced_verification_tool.html#id4">5.2.3.1.3. <strong>启动与验证</strong></a></li>
+<li class="toctree-l5"><a class="reference internal" href="multi_camera_synced_verification_tool.html#launch">5.2.3.1.4. <strong>参考 launch 文件</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="multi_camera_synced_verification_tool.html#id5">5.2.3.2. 必要系统配置</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="multi_camera_synced_verification_tool.html#usb">5.2.3.2.1. <strong>提升 USB 缓冲区容量</strong></a></li>
+<li class="toctree-l5"><a class="reference internal" href="multi_camera_synced_verification_tool.html#fast-dds">5.2.3.2.2. <strong>配置 Fast DDS</strong></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">5.2.4. GMSL 相机</a><ul>
@@ -430,7 +438,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
-        <a href="multi_camera_synced_verification_tool.html" class="btn btn-neutral float-left" title="5.2.3. 多相机同步验证工具" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
+        <a href="multi_camera_synced_verification_tool.html" class="btn btn-neutral float-left" title="5.2.3. 多相机同步验证节点" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
         <a href="../configuration/align_depth_color.html" class="btn btn-neutral float-right" title="5.3.1. 在 ROS 2 中对齐深度到彩色" accesskey="n" rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
@@ -438,7 +446,7 @@
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2025年10月31日 02:59:39.
+      <span class="lastupdated">最后更新于 2025年11月17日 01:39:35.
       </span></p>
   </div>
 

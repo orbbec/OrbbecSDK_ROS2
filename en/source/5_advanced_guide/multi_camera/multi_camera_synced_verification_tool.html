@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>5.2.3. Multi_camera_synced_verification_tool &mdash; OrbbecSDK V2 ROS2 Wrapper  documentation</title>
+  <title>5.2.3. Multi-Camera Synchronization Verification Node &mdash; OrbbecSDK V2 ROS2 Wrapper  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=63de077d" />
@@ -217,11 +217,19 @@
 <li class="toctree-l4"><a class="reference internal" href="multi_camera_synced.html#run-the-following-command-to-start-the-multi-camera-synced">5.2.2.4. Run the following command to start the multi-camera synced</a></li>
 </ul>
 </li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">5.2.3. Multi_camera_synced_verification_tool</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#directory-structure">5.2.3.1. Directory Structure</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#preparation-for-operation">5.2.3.2. Preparation for operation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#run-this-example">5.2.3.3. Run this example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#files-that-need-to-be-changed">5.2.3.4. Files that need to be changed</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">5.2.3. Multi-Camera Synchronization Verification Node</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#usage-guide">5.2.3.1. Usage Guide</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#modify-multi-camera-synced-launch-py-as-follows">5.2.3.1.1. <strong>Modify <code class="docutils literal notranslate"><span class="pre">multi_camera_synced.launch.py</span></code> as follows</strong></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#modify-configuration-files">5.2.3.1.2. <strong>Modify configuration files</strong></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#launch-and-verification">5.2.3.1.3. <strong>Launch and Verification</strong></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#reference-launch-file">5.2.3.1.4. <strong>Reference Launch File</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#system-configuration-requirements">5.2.3.2. System Configuration Requirements</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#increase-usb-buffer-memory">5.2.3.2.1. <strong>Increase USB Buffer Memory</strong></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#configure-fast-dds">5.2.3.2.2. <strong>Configure Fast DDS</strong></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="gmsl_camera.html">5.2.4. GMSL_camera</a><ul>
@@ -350,7 +358,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../advanced_guide.html"><span class="section-number">5. </span>Advanced Guide</a></li>
-      <li class="breadcrumb-item active"><span class="section-number">5.2.3. </span>Multi_camera_synced_verification_tool</li>
+      <li class="breadcrumb-item active"><span class="section-number">5.2.3. </span>Multi-Camera Synchronization Verification Node</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../_sources/source/5_advanced_guide/multi_camera/multi_camera_synced_verification_tool.md.txt" rel="nofollow"> View page source</a>
       </li>
@@ -360,153 +368,169 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">中文</a> | <a class="lang-current" href="#">English</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="multi-camera-synced-verification-tool">
-<h1><span class="section-number">5.2.3. </span>Multi_camera_synced_verification_tool<a class="headerlink" href="#multi-camera-synced-verification-tool" title="Link to this heading"></a></h1>
-<blockquote>
-<div><p>This article will introduce how to verify the synchronization accuracy of multi-camera synchronization.</p>
-<p>First, please see how to use <a class="reference internal" href="multi_camera_synced.html"><span class="doc">multi_camera_synced</span></a>.</p>
-</div></blockquote>
-<p>You can find example usage code in the <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples">example</a>.</p>
-<section id="directory-structure">
-<h2><span class="section-number">5.2.3.1. </span>Directory Structure<a class="headerlink" href="#directory-structure" title="Link to this heading"></a></h2>
-<div class="highlight-plaintext notranslate"><div class="highlight"><pre><span></span>.
-├── multicamera_sync/
-│   ├── output/
-│       ├──20250218102900/
-│          ├──DevicesInfo.txt
-│          ├──StreamProfileInfo.txt
-│   ├── Python/
-│       ├──Config.ini
-├── gemini_330_series_synced_verify.launch.py
-├── multi_camera_synced_verify.launch.py
-</pre></div>
-</div>
-<p><strong>multicamera_sync</strong></p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">gemini_330_series_synced_verify.launch.py</span></code> : Single camera runs launch, which provides the camera running node for multi_camera_synced_verify.launch.py.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">multi_camera_synced_verify.launch.py</span></code> : Multi camer synced + launch of save_rgbir tool.</p></li>
-</ul>
-<p><strong>output</strong></p>
-<blockquote>
-<div><p>The <code class="docutils literal notranslate"><span class="pre">ouput</span></code> folder is the folder where the camera pictures are output</p>
-</div></blockquote>
-<p>In the output example provided</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">20250218102900</span></code> : Represents the camera image information collected at 10:29:00 on February 18, 2025.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">TotalModeFrames</span></code> : Camera image information storage directory.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">results-2025-02-25_163648</span></code> : The result after analyzing and matching the image information of TotalModeFrames.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">DevicesInfo.txt</span></code> : Camera equipment basic information (need to be modified).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">StreamProfileInfo.txt</span></code> : Camera video stream information (no need to modify).</p></li>
-</ul>
-<p><strong>Python</strong></p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">Config.ini</span></code> : Configuration file for Python analysis script (need to be modified).</p></li>
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">中文</a> | <a class="lang-current" href="#">English</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="multi-camera-synchronization-verification-node">
+<h1><span class="section-number">5.2.3. </span>Multi-Camera Synchronization Verification Node<a class="headerlink" href="#multi-camera-synchronization-verification-node" title="Link to this heading"></a></h1>
+<p><strong>File path:</strong> <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/examples/multi_camera_time_sync/image_sync_example_node.cpp">image_sync_example_node.cpp</a></p>
+<p>This example node is designed for <strong>synchronized capture and timestamp verification</strong> across <strong>four Orbbec cameras</strong>.
+It can be used to validate frame alignment accuracy under the multi-camera <strong>Primary / Secondary Synced</strong> mode.</p>
+<hr class="docutils" />
+<section id="usage-guide">
+<h2><span class="section-number">5.2.3.1. </span>Usage Guide<a class="headerlink" href="#usage-guide" title="Link to this heading"></a></h2>
+<section id="modify-multi-camera-synced-launch-py-as-follows">
+<h3><span class="section-number">5.2.3.1.1. </span><strong>Modify <code class="docutils literal notranslate"><span class="pre">multi_camera_synced.launch.py</span></code> as follows</strong><a class="headerlink" href="#modify-multi-camera-synced-launch-py-as-follows" title="Link to this heading"></a></h3>
+<ul>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">launch_include</span></code> to support four cameras.</p></li>
+<li><p>Select the appropriate launch file based on your camera model.
+For example, use <code class="docutils literal notranslate"><span class="pre">gemini_330_series.launch.py</span></code> for the Gemini 330 series.</p></li>
+<li><p>Naming convention:
+<code class="docutils literal notranslate"><span class="pre">camera_name</span></code> should follow the format <code class="docutils literal notranslate"><span class="pre">camera_01</span></code>, <code class="docutils literal notranslate"><span class="pre">camera_02</span></code>, <code class="docutils literal notranslate"><span class="pre">camera_03</span></code>, …</p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">device_num</span></code> to <strong>4</strong>.</p></li>
+<li><p>Configure the USB ports using:</p>
+<p><code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">run</span> <span class="pre">orbbec_camera</span> <span class="pre">list_devices_node</span></code></p>
+<p>to view and bind the correct ports.</p>
+</li>
+<li><p>Set synchronization mode to <strong>Primary/Secondary Synced</strong>,
+with one camera as <strong>primary</strong> and the others as <strong>secondary_synced</strong>.</p></li>
+<li><p><strong>Startup sequence:</strong>
+The <strong>Primary camera should always be launched last</strong> to ensure the synchronization signal is established correctly.</p></li>
 </ul>
 </section>
-<section id="preparation-for-operation">
-<h2><span class="section-number">5.2.3.2. </span>Preparation for operation<a class="headerlink" href="#preparation-for-operation" title="Link to this heading"></a></h2>
-<p><strong>save_rgbir node</strong></p>
-<p>Edit multi_camera_synced_verify.launch.py and fill in the activated camera device,we can find that save_rgbir is started at the end.</p>
-<blockquote>
-<div><p>IMPORTANT</p>
-<p>If you are using ROS 2 Foxy, you need to launch the save_rgbir node first.</p>
-</div></blockquote>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Launch description</span>
+<hr class="docutils" />
+<section id="modify-configuration-files">
+<h3><span class="section-number">5.2.3.1.2. </span><strong>Modify configuration files</strong><a class="headerlink" href="#modify-configuration-files" title="Link to this heading"></a></h3>
+<p>Edit the following two files under the <code class="docutils literal notranslate"><span class="pre">config</span></code> directory:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">camera_params.yaml</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">camera_secondary_params.yaml</span></code></p></li>
+</ul>
+<p>Ensure the following settings are consistent across all cameras:</p>
+<ul class="simple">
+<li><p>Enable both <strong>depth</strong> and <strong>color</strong> streams.</p></li>
+<li><p>Use the same <strong>frame rate (fps)</strong> for all cameras.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="launch-and-verification">
+<h3><span class="section-number">5.2.3.1.3. </span><strong>Launch and Verification</strong><a class="headerlink" href="#launch-and-verification" title="Link to this heading"></a></h3>
+<ul>
+<li><p>Start the multi-camera synchronization launch file:</p>
+<p><code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">launch</span> <span class="pre">orbbec_camera</span> <span class="pre">multi_camera_synced.launch.py</span></code></p>
+</li>
+<li><p>In a new terminal, run the synchronization verification node:</p>
+<p><code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">run</span> <span class="pre">orbbec_camera</span> <span class="pre">image_sync_example_node</span></code></p>
+<p>This node outputs timestamp differences between multiple camera streams for synchronization validation.</p>
+</li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="reference-launch-file">
+<h3><span class="section-number">5.2.3.1.4. </span><strong>Reference Launch File</strong><a class="headerlink" href="#reference-launch-file" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ament_index_python.packages</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_package_share_directory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">launch</span><span class="w"> </span><span class="kn">import</span> <span class="n">LaunchDescription</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">launch_ros.actions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">launch.actions</span><span class="w"> </span><span class="kn">import</span> <span class="n">IncludeLaunchDescription</span><span class="p">,</span> <span class="n">GroupAction</span><span class="p">,</span> <span class="n">TimerAction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">launch.launch_description_sources</span><span class="w"> </span><span class="kn">import</span> <span class="n">PythonLaunchDescriptionSource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">launch_ros.actions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span><span class="p">,</span> <span class="n">LoadComposableNodes</span>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_launch_description</span><span class="p">():</span>
+    <span class="c1"># Include launch files</span>
+    <span class="n">package_dir</span> <span class="o">=</span> <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s2">&quot;orbbec_camera&quot;</span><span class="p">)</span>
+    <span class="n">launch_file_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">package_dir</span><span class="p">,</span> <span class="s2">&quot;launch&quot;</span><span class="p">)</span>
+    <span class="n">config_file_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">package_dir</span><span class="p">,</span> <span class="s2">&quot;config&quot;</span><span class="p">)</span>
+    <span class="n">config_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config_file_dir</span><span class="p">,</span> <span class="s2">&quot;camera_params.yaml&quot;</span><span class="p">)</span>
+    <span class="n">secondary_config_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config_file_dir</span><span class="p">,</span> <span class="s2">&quot;camera_secondary_params.yaml&quot;</span><span class="p">)</span>
+
+    <span class="n">launch1_include</span> <span class="o">=</span> <span class="n">IncludeLaunchDescription</span><span class="p">(</span>
+        <span class="n">PythonLaunchDescriptionSource</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">launch_file_dir</span><span class="p">,</span> <span class="s2">&quot;gemini_330_series.launch.py&quot;</span><span class="p">)</span>
+        <span class="p">),</span>
+        <span class="n">launch_arguments</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;camera_name&quot;</span><span class="p">:</span> <span class="s2">&quot;camera_01&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;usb_port&quot;</span><span class="p">:</span> <span class="s2">&quot;2-2.3&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;device_num&quot;</span><span class="p">:</span> <span class="s2">&quot;4&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;sync_mode&quot;</span><span class="p">:</span> <span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;config_file_path&quot;</span><span class="p">:</span> <span class="n">config_file_path</span><span class="p">,</span>
+            <span class="s2">&quot;trigger_out_enabled&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+        <span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+    <span class="p">)</span>
+
+    <span class="n">launch2_include</span> <span class="o">=</span> <span class="n">IncludeLaunchDescription</span><span class="p">(</span>
+        <span class="n">PythonLaunchDescriptionSource</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">launch_file_dir</span><span class="p">,</span> <span class="s2">&quot;gemini_330_series.launch.py&quot;</span><span class="p">)</span>
+        <span class="p">),</span>
+        <span class="n">launch_arguments</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;camera_name&quot;</span><span class="p">:</span> <span class="s2">&quot;camera_02&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;usb_port&quot;</span><span class="p">:</span> <span class="s2">&quot;2-1&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;device_num&quot;</span><span class="p">:</span> <span class="s2">&quot;4&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;sync_mode&quot;</span><span class="p">:</span> <span class="s2">&quot;secondary_synced&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;config_file_path&quot;</span><span class="p">:</span> <span class="n">secondary_config_file_path</span><span class="p">,</span>
+            <span class="s2">&quot;trigger_out_enabled&quot;</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span>
+        <span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+    <span class="p">)</span>
+
+    <span class="n">launch3_include</span> <span class="o">=</span> <span class="n">IncludeLaunchDescription</span><span class="p">(</span>
+        <span class="n">PythonLaunchDescriptionSource</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">launch_file_dir</span><span class="p">,</span> <span class="s2">&quot;gemini_330_series.launch.py&quot;</span><span class="p">)</span>
+        <span class="p">),</span>
+        <span class="n">launch_arguments</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;camera_name&quot;</span><span class="p">:</span> <span class="s2">&quot;camera_03&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;usb_port&quot;</span><span class="p">:</span> <span class="s2">&quot;2-3&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;device_num&quot;</span><span class="p">:</span> <span class="s2">&quot;4&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;sync_mode&quot;</span><span class="p">:</span> <span class="s2">&quot;secondary_synced&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;config_file_path&quot;</span><span class="p">:</span> <span class="n">secondary_config_file_path</span><span class="p">,</span>
+            <span class="s2">&quot;trigger_out_enabled&quot;</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span>
+        <span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+    <span class="p">)</span>
+
+    <span class="n">launch4_include</span> <span class="o">=</span> <span class="n">IncludeLaunchDescription</span><span class="p">(</span>
+        <span class="n">PythonLaunchDescriptionSource</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">launch_file_dir</span><span class="p">,</span> <span class="s2">&quot;gemini_330_series.launch.py&quot;</span><span class="p">)</span>
+        <span class="p">),</span>
+        <span class="n">launch_arguments</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;camera_name&quot;</span><span class="p">:</span> <span class="s2">&quot;camera_04&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;usb_port&quot;</span><span class="p">:</span> <span class="s2">&quot;2-4&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;device_num&quot;</span><span class="p">:</span> <span class="s2">&quot;4&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;sync_mode&quot;</span><span class="p">:</span> <span class="s2">&quot;secondary_synced&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;config_file_path&quot;</span><span class="p">:</span> <span class="n">secondary_config_file_path</span><span class="p">,</span>
+            <span class="s2">&quot;trigger_out_enabled&quot;</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span>
+        <span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+    <span class="p">)</span>
+
+
+
+    <span class="c1"># Launch description</span>
     <span class="n">ld</span> <span class="o">=</span> <span class="n">LaunchDescription</span><span class="p">(</span>
         <span class="p">[</span>
-            <span class="n">shared_orbbec_container</span><span class="p">,</span>
+
             <span class="n">TimerAction</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="n">GroupAction</span><span class="p">([</span><span class="n">launch2_include</span><span class="p">])]),</span>
-            <span class="n">TimerAction</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="n">GroupAction</span><span class="p">([</span><span class="n">launch1_include</span><span class="p">])]),</span>
+            <span class="n">TimerAction</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="n">GroupAction</span><span class="p">([</span><span class="n">launch3_include</span><span class="p">])]),</span>
+            <span class="n">TimerAction</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">4.0</span><span class="p">,</span> <span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="n">GroupAction</span><span class="p">([</span><span class="n">launch4_include</span><span class="p">])]),</span>
+            <span class="n">TimerAction</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">6.0</span><span class="p">,</span> <span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="n">GroupAction</span><span class="p">([</span><span class="n">launch1_include</span><span class="p">])]),</span>
             <span class="c1"># The primary camera should be launched at last</span>
-            <span class="n">TimerAction</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">6.0</span><span class="p">,</span> <span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="n">GroupAction</span><span class="p">([</span><span class="n">save_rgbir</span><span class="p">])]),</span>
-            <span class="c1"># save_rgbir is synced verification tool</span>
         <span class="p">]</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">ld</span>
 </pre></div>
 </div>
-<p>save_rgbir is a tool for saving images. The configuration file of this tool is in <a class="reference external" href="../../config/tools/multisavergbir/multi_save_rgbir_params.json">multi_save_rgbir_params.json</a>.</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;save_rgbir_params&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;time_domain&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;global&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;usb_ports&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">          </span><span class="s2">&quot;2-1&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="s2">&quot;2-3&quot;</span>
-<span class="w">      </span><span class="p">],</span>
-<span class="w">      </span><span class="nt">&quot;camera_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">          </span><span class="s2">&quot;camera_01&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="s2">&quot;camera_02&quot;</span>
-<span class="w">      </span><span class="p">]</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">time_domain</span></code> : Timestamp Type</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">usb_ports</span></code> : “primary”, “secondary 1”, “secondary 2”, “secondary 3”, fill in as many usb_ports as there are cameras</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">camera_name</span></code> : The name of the camera setting, for example: camera_01</p></li>
-</ul>
-<p><strong>DevicesInfo.txt</strong></p>
-<p>Edit DevicesInfo.txt. Only the <code class="docutils literal notranslate"><span class="pre">primarySerialNumber</span></code>, <code class="docutils literal notranslate"><span class="pre">index</span></code> and <code class="docutils literal notranslate"><span class="pre">serialNumber</span></code> parameters need to be changed. Other parameters do not need to be changed.Refer to the example of <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/multi_camera_synced_verification_tool/multicamera_sync/output/20250218102900">20250218102900</a>.</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">primarySerialNumber</span></code> : The SN serial number of the primary camera</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">index</span></code> : Camera index</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">serialNumber</span></code> : The SN serial number of the camera</p></li>
-</ul>
-<p><strong>Config.ini</strong></p>
-<p>Edit Config.ini.Modify <code class="docutils literal notranslate"><span class="pre">frameRate</span></code> and <code class="docutils literal notranslate"><span class="pre">tspRangeThreshold</span></code>.</p>
 </section>
-<section id="run-this-example">
-<h2><span class="section-number">5.2.3.3. </span>Run this example<a class="headerlink" href="#run-this-example" title="Link to this heading"></a></h2>
-<p><strong>Run launch and save camera pictures</strong></p>
-<ul class="simple">
-<li><p>First terminal</p></li>
-</ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>multi_camera_synced_verify.launch.py
-</pre></div>
-</div>
-<ul class="simple">
-<li><p>Second terminal</p></li>
-</ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/save_rgbir/start_capture<span class="w"> </span>orbbec_camera_msgs/srv/SetInt32<span class="w"> </span><span class="s1">&#39;{data: 100}&#39;</span>
-</pre></div>
-</div>
-<p>When the terminal displays “over”, the image is saved.A new multicamera_sync folder will be generated under the workspace.</p>
-<p><strong>Camera pictures naming format</strong></p>
-<p>Take <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/multi_camera_synced_verification_tool/multicamera_sync/output/20250218102900/TotalModeFrames/SNCP1E5420006D_Index0/color_SNCP1E5420006D_Index0_g1739874543227_f0_s1739874543327_e50_d16_.jpg">color_SNCP1E5420006D_Index0_g1739874543227_f0_s1739874543327_e50_d16_.jpg</a> as an example</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">color</span></code> : This image is a snapshot of the color stream.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">SNCP1E5420006D</span></code> : The camera’s SN serial number is CP1E5420006D.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Index0</span></code> : Camera 0 (usually referred to primary camera).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">g1739874543227</span></code> : “g” represents the global timestamp, which means the global timestamp of this frame is 1739874543227.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">f0</span></code> : The 0th picture of the color stream acquisition of this camera.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">s1739874543327</span></code> : “s” represents the timestamp of the current system, which means the current system timestamp of this frame is 1739874543327.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">e50</span></code> : The exposure of this frame is 50.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">d16</span></code> : The gain of this frame is 16.</p></li>
-</ul>
-<p><strong>Analyzing camera image data</strong></p>
-<p>You need to copy the modified <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/multi_camera_synced_verification_tool//multicamera_sync/Python">Python folder</a> to the new multi_camera_synced subdirectory, and copy the modified <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/multi_camera_synced_verification_tool/multicamera_sync/output/20250218102900/DevicesInfo.txt">DevicesInfo.txt </a>and <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/multi_camera_synced_verification_tool//multicamera_sync/output/20250218102900/StreamProfileInfo.txt">StreamProfileInfo.txt</a> to the same level directory as the TotalModeFrames folder.</p>
-<ul class="simple">
-<li><p>Finally everything is ready, run the python script</p></li>
-</ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>multicamera_sync/Python
-python3<span class="w"> </span>SyncFramesMain.py
-</pre></div>
-</div>
-<p>After the operation is successful, you can view the synchronization effect in the  <code class="docutils literal notranslate"><span class="pre">results</span> <span class="pre">folder</span></code></p>
 </section>
-<section id="files-that-need-to-be-changed">
-<h2><span class="section-number">5.2.3.4. </span>Files that need to be changed<a class="headerlink" href="#files-that-need-to-be-changed" title="Link to this heading"></a></h2>
-<p><strong>Analysis tools</strong></p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/config/tools/multisavergbir/multi_save_rgbir_params.json">multi_save_rgbir_params.json</a></p></li>
-<li><p><a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/multi_camera_synced_verification_tool//multicamera_sync/output/20250218102900/DevicesInfo.txt">DevicesInfo.txt </a></p></li>
-<li><p><a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/multi_camera_synced_verification_tool//multicamera_sync/Python/Config.ini">Config.ini</a></p></li>
-</ul>
-<p><strong>Camera Configuration</strong></p>
-<p><a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/config/camera_params.yaml">camera_params.yaml</a>(Camera startup parameter settings)</p>
-<p><a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/multi_camera_synced_verification_tool//multi_camera_synced_verify.launch.py">multi_camera_synced_verify.launch.py</a></p>
+<hr class="docutils" />
+<section id="system-configuration-requirements">
+<h2><span class="section-number">5.2.3.2. </span>System Configuration Requirements<a class="headerlink" href="#system-configuration-requirements" title="Link to this heading"></a></h2>
+<section id="increase-usb-buffer-memory">
+<h3><span class="section-number">5.2.3.2.1. </span><strong>Increase USB Buffer Memory</strong><a class="headerlink" href="#increase-usb-buffer-memory" title="Link to this heading"></a></h3>
+<p>Prevent frame drops caused by concurrent data transmission:</p>
+<p><code class="docutils literal notranslate"><span class="pre">echo</span> <span class="pre">512</span> <span class="pre">|</span> <span class="pre">sudo</span> <span class="pre">tee</span> <span class="pre">/sys/module/usbcore/parameters/usbfs_memory_mb</span></code></p>
+</section>
+<section id="configure-fast-dds">
+<h3><span class="section-number">5.2.3.2.2. </span><strong>Configure Fast DDS</strong><a class="headerlink" href="#configure-fast-dds" title="Link to this heading"></a></h3>
+<p>Optimize ROS2 node communication latency to reduce image transmission delay.
+See <a class="reference internal" href="../performance/fastdds_tuning.html"><span class="doc">this section</span></a> for detailed configuration instructions.</p>
+</section>
 </section>
 </section>
 
@@ -522,7 +546,7 @@ python3<span class="w"> </span>SyncFramesMain.py
 
   <div role="contentinfo">
     <p>&#169; Copyright 2025, ORBBEC INC. www.orbbec.com..
-      <span class="lastupdated">Last updated on 2025-10-31 02:59:36.
+      <span class="lastupdated">Last updated on 2025-11-17 01:39:33.
       </span></p>
   </div>
 

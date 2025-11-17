@@ -31,7 +31,7 @@ color_exposure: 30 # 3ms
 color_gain: 16 # -1 default
 
 # depth params
-enable_depth: false
+enable_depth: true
 depth_width: 0
 depth_height: 0
 depth_fps: 0
@@ -39,7 +39,7 @@ depth_format: "ANY"
 
 
 #left ir params
-enable_left_ir: true
+enable_left_ir: false
 left_ir_width: 0
 left_ir_height: 0
 left_ir_fps: 0

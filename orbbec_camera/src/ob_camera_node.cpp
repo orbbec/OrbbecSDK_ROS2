@@ -4789,6 +4789,8 @@ void OBCameraNode::getParameters() {
                           << laser_index0_depth_gain_ << " laser_index0_ir_brightness_ "
                           << laser_index0_ir_brightness_ << " laser_index0_ir_ae_max_exposure_ "
                           << laser_index0_ir_ae_max_exposure_ << "\n");
+  //Parameter for using SHM
+  setAndGetNodeParameter<bool>(use_shm_bridge_, "use_shm_bridge", false);
 }
 
 void OBCameraNode::setupTopics() {
@@ -5339,7 +5341,11 @@ void OBCameraNode::setupImagePublisher(const stream_index_pair &stream_index) {
   const bool is_mjpg_color_stream =
       (stream_index == COLOR || stream_index == COLOR_LEFT || stream_index == COLOR_RIGHT) &&
       format_[stream_index] == OB_FORMAT_MJPG;
-  if (use_intra_process_ || is_mjpg_color_stream) {
+  if (use_shm_bridge_) {
+    RCLCPP_INFO(logger_, "using shm bridge");
+    image_publishers_[stream_index] =
+        std::make_shared<shm_image_publisher>(*node_, topic, image_qos_profile);
+  } else if (use_intra_process_ || is_mjpg_color_stream) {
     image_publishers_[stream_index] =
         std::make_shared<image_rcl_publisher>(*node_, topic, image_qos_profile);
   } else {

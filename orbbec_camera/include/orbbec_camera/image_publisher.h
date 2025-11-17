@@ -16,14 +16,21 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
-
+#include <cv_bridge/cv_bridge.hpp>
+#include <std_msgs/msg/header.hpp>
+#include <orbbec_camera/utils.h>
+#include <fmt/format.h>
 #include <image_transport/image_transport.hpp>
+#include <shm_bridge/image_helper.h>
+
 namespace orbbec_camera {
 class image_publisher {
  public:
   virtual void publish(sensor_msgs::msg::Image::UniquePtr image_ptr) = 0;
   virtual size_t get_subscription_count() const = 0;
   virtual ~image_publisher() = default;
+  image_publisher() = default;
+
 };  // namespace image_publisher
 
 // Native RCL implementation of an image publisher (needed for intra-process communication)
@@ -49,4 +56,23 @@ class image_transport_publisher : public image_publisher {
  private:
   std::shared_ptr<image_transport::Publisher> image_publisher_impl;
 };
+
+class shm_image_publisher : public image_publisher {
+ public:
+  shm_image_publisher(rclcpp::Node& node,
+                      const std::string& topic_name,
+                      const rmw_qos_profile_t& qos):
+                      image_publisher()
+{
+  (void) qos;
+  shm_publisher_ = std::make_shared<shm_bridge::ShmPublisher>(&node, topic_name);
+}
+
+  void publish(sensor_msgs::msg::Image::UniquePtr image_ptr) override;
+  size_t get_subscription_count() const override;
+ 
+ private:
+  std::shared_ptr<shm_bridge::ShmPublisher> shm_publisher_;
+};
+
 }  // namespace orbbec_camera

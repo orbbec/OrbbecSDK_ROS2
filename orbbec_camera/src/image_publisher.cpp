@@ -45,4 +45,13 @@ void image_transport_publisher::publish(sensor_msgs::msg::Image::UniquePtr image
 size_t image_transport_publisher::get_subscription_count() const {
   return image_publisher_impl->getNumSubscribers();
 }
+
+size_t shm_image_publisher::get_subscription_count() const {
+  return shm_publisher_->get_subscription_count();
+}
+
+void shm_image_publisher::publish(sensor_msgs::msg::Image::UniquePtr image_ptr) {
+  shm_publisher_->publish(std::move(image_ptr));
+}
+
 }  // namespace orbbec_camera

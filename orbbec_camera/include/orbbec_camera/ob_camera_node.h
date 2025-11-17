@@ -647,6 +647,8 @@ class OBCameraNode {
   std::atomic_bool user_calibration_ready_{false};
   // New state flags to make clean() and rebootDevice() idempotent and thread-safe
   std::atomic_bool cleaning_{false};
+  // Use shared memory bridge for image transport
+  bool use_shm_bridge_ = false;
   rclcpp::Node* node_ = nullptr;
   std::shared_ptr<ob::Device> device_ = nullptr;
   std::shared_ptr<Parameters> parameters_ = nullptr;

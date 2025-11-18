@@ -27,7 +27,7 @@
 
 namespace orbbec_camera {
 D2CViewer::D2CViewer(rclcpp::Node* const node, rmw_qos_profile_t rgb_qos,
-                     rmw_qos_profile_t depth_qos)
+                     rmw_qos_profile_t depth_qos, bool use_intra_process)
     : node_(node), logger_(rclcpp::get_logger("d2c_viewer")), is_active_(true) {
   rgb_sub_ = std::make_shared<message_filters::Subscriber<sensor_msgs::msg::Image>>(
       node_, "color/image_raw", rgb_qos);
@@ -40,8 +40,13 @@ D2CViewer::D2CViewer(rclcpp::Node* const node, rmw_qos_profile_t rgb_qos,
   using std::placeholders::_1;
   using std::placeholders::_2;
   sync_->registerCallback(std::bind(&D2CViewer::messageCallback, this, _1, _2));
+
+  auto qos = rclcpp::QoS(1).transient_local();
+  if (use_intra_process) {
+    qos = rclcpp::QoS(1);
+  }
   d2c_viewer_pub_ =
-      node_->create_publisher<sensor_msgs::msg::Image>("depth_to_color/image_raw", rclcpp::QoS(1));
+      node_->create_publisher<sensor_msgs::msg::Image>("depth_to_color/image_raw", qos);
 }
 
 D2CViewer::~D2CViewer() {

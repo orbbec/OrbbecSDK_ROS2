@@ -27,7 +27,7 @@ namespace orbbec_camera {
 class D2CViewer {
  public:
   explicit D2CViewer(rclcpp::Node* const node, rmw_qos_profile_t rgb_qos,
-                     rmw_qos_profile_t depth_qos);
+                     rmw_qos_profile_t depth_qos, bool use_intra_process = false);
   ~D2CViewer();
 
   void messageCallback(const sensor_msgs::msg::Image::ConstSharedPtr & rgb_msg,

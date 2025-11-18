@@ -258,16 +258,24 @@ void OBCameraNodeDriver::init() {
   check_connect_timer_ =
       this->create_wall_timer(std::chrono::milliseconds(1000), [this]() { checkConnectTimer(); });
   CHECK_NOTNULL(check_connect_timer_);
-  query_thread_ = std::make_shared<std::thread>([this]() { queryDevice(); });
-  reset_device_thread_ = std::make_shared<std::thread>([this]() { resetDevice(); });
+  
 
   device_status_timer_ =
       this->create_wall_timer(std::chrono::milliseconds(1000 / device_status_interval_hz),
                               [this]() { deviceStatusTimer(); });
 
+  // transient_local durability is incompatible with intra-process comms, use volatile
+  auto qos = rclcpp::QoS(1);
+  if (!node_options_.use_intra_process_comms()) {
+    qos = qos.transient_local();
+  }
   // Initialize device status publisher
   device_status_pub_ = this->create_publisher<orbbec_camera_msgs::msg::DeviceStatus>(
-      "device_status", rclcpp::QoS(1).transient_local());
+      "device_status", qos);
+  
+  // Create threads LAST to ensure proper cleanup if ROS operations throw exceptions
+  query_thread_ = std::make_shared<std::thread>([this]() { queryDevice(); });
+  reset_device_thread_ = std::make_shared<std::thread>([this]() { resetDevice(); });
 }
 
 void OBCameraNodeDriver::onDeviceConnected(const std::shared_ptr<ob::DeviceList> &device_list) {

@@ -587,6 +587,7 @@ class OBCameraNode {
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr depth_cloud_pub_;
   bool enable_point_cloud_ = true;
   bool enable_colored_point_cloud_ = false;
+  int point_cloud_decimation_filter_factor_ = 1;
   std::recursive_mutex point_cloud_mutex_;
 
   orbbec_camera_msgs::msg::DeviceInfo device_info_;

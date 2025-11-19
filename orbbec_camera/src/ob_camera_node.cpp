@@ -1779,6 +1779,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<std::string>(color_info_url_, "color_info_url", "");
   setAndGetNodeParameter<bool>(enable_colored_point_cloud_, "enable_colored_point_cloud", false);
   setAndGetNodeParameter<bool>(enable_point_cloud_, "enable_point_cloud", false);
+  setAndGetNodeParameter<int>(point_cloud_decimation_filter_factor_, "point_cloud_decimation_filter_factor", 1);
   setAndGetNodeParameter<std::string>(point_cloud_qos_, "point_cloud_qos", "default");
   setAndGetNodeParameter<bool>(enable_d2c_viewer_, "enable_d2c_viewer", false);
   setAndGetNodeParameter<std::string>(disparity_to_depth_mode_, "disparity_to_depth_mode", "HW");
@@ -2404,6 +2405,7 @@ void OBCameraNode::publishDepthPointCloud(const std::shared_ptr<ob::FrameSet> &f
   float depth_scale = depth_frame->getValueScale();
   depth_point_cloud_filter_.setPositionDataScaled(depth_scale);
   depth_point_cloud_filter_.setCreatePointFormat(OB_FORMAT_POINT);
+  depth_point_cloud_filter_.setDecimationFactor(point_cloud_decimation_filter_factor_);
   auto result_frame = depth_point_cloud_filter_.process(depth_frame);
   if (!result_frame) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to process depth frame");
@@ -2515,6 +2517,7 @@ void OBCameraNode::publishColoredPointCloud(const std::shared_ptr<ob::FrameSet> 
   auto depth_scale = depth_frame->getValueScale();
   color_point_cloud_filter_.setPositionDataScaled(depth_scale);
   color_point_cloud_filter_.setCreatePointFormat(OB_FORMAT_RGB_POINT);
+  color_point_cloud_filter_.setDecimationFactor(point_cloud_decimation_filter_factor_);
   auto result_frame = color_point_cloud_filter_.process(frame_set);
   if (!result_frame) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to process depth frame");

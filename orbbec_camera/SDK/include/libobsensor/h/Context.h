@@ -19,6 +19,7 @@ extern "C" {
  * @brief Create a context object with the default configuration file
  *
  * @param[out] error Pointer to an error object that will be populated if an error occurs during context creation
+ *
  * @return Pointer to the created context object
  */
 OB_EXPORT ob_context *ob_create_context(ob_error **error);
@@ -28,6 +29,7 @@ OB_EXPORT ob_context *ob_create_context(ob_error **error);
  *
  * @param[in] config_file_path Path to the configuration file. If NULL, the default configuration file will be used.
  * @param[out] error Pointer to an error object that will be populated if an error occurs during context creation
+ *
  * @return Pointer to the created context object
  */
 OB_EXPORT ob_context *ob_create_context_with_config(const char *config_file_path, ob_error **error);
@@ -45,6 +47,7 @@ OB_EXPORT void ob_delete_context(ob_context *context, ob_error **error);
  *
  * @param[in] context Pointer to the context object
  * @param[out] error Pointer to an error object that will be populated if an error occurs during device enumeration
+ *
  * @return Pointer to the device list object
  */
 OB_EXPORT ob_device_list *ob_query_device_list(ob_context *context, ob_error **error);
@@ -67,15 +70,16 @@ OB_EXPORT void ob_enable_net_device_enumeration(ob_context *context, bool enable
  * @brief "Force" a static IP address configuration in a device identified by its MAC Address.
  *
  * @param[in] macAddress MAC address of the network device.
- *                       You can obtain it from @ref DeviceList::uid(), or specify it manually
+ *                       You can obtain it from @ref ob_device_info_get_uid, or specify it manually
  *                       in the format xx:xx:xx:xx:xx:xx, where each xx is a two-digit hexadecimal value.
  * @param[in] config The new IP configuration.
  * @param[out] error Pointer to an error object that will be populated if an error occurs.
+ *
  * @return bool true if the configuration command was processed successfully, false otherwise.
  *
- * @note This applies to all Orbbec GigE Vision devices
+ * @note This applies to all GigE Vision devices
  */
-OB_EXPORT bool ob_force_ip_config(const char *deviceUid, ob_net_ip_config config, ob_error **error);
+OB_EXPORT bool ob_force_ip_config(const char *macAddress, ob_net_ip_config config, ob_error **error);
 
 /**
  * @brief Create a network device object
@@ -84,12 +88,14 @@ OB_EXPORT bool ob_force_ip_config(const char *deviceUid, ob_net_ip_config config
  * @param[in] address IP address of the device
  * @param[in] port Port number of the device
  * @param[out] error Pointer to an error object that will be populated if an error occurs during device creation
+ *
  * @return Pointer to the created device object
  */
 OB_EXPORT ob_device *ob_create_net_device(ob_context *context, const char *address, uint16_t port, ob_error **error);
 
 /**
  * @brief Set a device plug-in callback function
+ *
  * @attention The added and removed device lists returned through the callback interface need to be released manually
  * @attention This function supports multiple callbacks. Each call to this function adds a new callback to an internal list.
  *
@@ -143,11 +149,25 @@ OB_EXPORT void ob_set_logger_severity(ob_log_severity severity, ob_error **error
  * @brief Set the log output to a file
  *
  * @param[in] severity Log level to output to file
- * @param[in] directory Path to the log file output directory. If the path is empty, the existing settings will continue to be used (if the existing
- * configuration is also empty, the log will not be output to the file)
+ * @param[in] directory Path to the log file output directory.
+ *                      If empty, the existing configuration is used;
+ *                      if the existing configuration is also empty,
+ *                      the value from the config file or the default configuration will be used.
  * @param[out] error Pointer to an error object that will be populated if an error occurs during log output setting
+ *
+ * @note Other settings, such as log file name, remain unchanged.
  */
 OB_EXPORT void ob_set_logger_to_file(ob_log_severity severity, const char *directory, ob_error **error);
+
+/**
+ * @brief Set the log file name for file output
+ *
+ * @param[in] file_name Log file name. Must not be empty.
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
+ * @note Other settings, such as log level and output directory, remain unchanged.
+ */
+OB_EXPORT void ob_set_logger_file_name(const char *file_name, ob_error **error);
 
 /**
  * @brief Set the log callback function
@@ -168,13 +188,27 @@ OB_EXPORT void ob_set_logger_to_callback(ob_log_severity severity, ob_log_callba
 OB_EXPORT void ob_set_logger_to_console(ob_log_severity severity, ob_error **error);
 
 /**
+ * @brief Logs a message with severity, file, function, and line info.
+ *
+ * @param[in] severity Log level, see @ref ob_log_severity for details
+ * @param[in] module The module or component the log belongs to
+ * @param[in] message Message string to log
+ * @param[in] file Source file name, e.g., __FILE__
+ * @param[in] func Function name, e.g., __func__
+ * @param[in] line Line number, e.g., __LINE__
+ * @param[out] error Pointer to an error object that will be populated if an error occurs during log output setting
+ */
+OB_EXPORT void ob_log_external_message(ob_log_severity severity, const char *module, const char *message, const char *file, const char *func, int line,
+                                       ob_error **error);
+
+/**
  * @brief Set the extensions directory
  * @brief The extensions directory is used to search for dynamic libraries that provide additional functionality to the SDK, such as the Frame filters.
  *
  * @attention Should be called before creating the context and pipeline, otherwise the default extensions directory (./extensions) will be used.
  *
- * @param directory Path to the extensions directory. If the path is empty, extensions path will be set to the current working directory.
- * @param error Pointer to an error object that will be populated if an error occurs during extensions directory setting
+ * @param[in] directory Path to the extensions directory. If the path is empty, extensions path will be set to the current working directory.
+ * @param[out] error Pointer to an error object that will be populated if an error occurs during extensions directory setting
  */
 OB_EXPORT void ob_set_extensions_directory(const char *directory, ob_error **error);
 

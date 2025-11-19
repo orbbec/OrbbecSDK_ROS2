@@ -19,6 +19,7 @@ extern "C" {
  * @brief Create a pipeline object
  *
  * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return ob_pipeline* return the pipeline object
  */
 OB_EXPORT ob_pipeline *ob_create_pipeline(ob_error **error);
@@ -28,6 +29,7 @@ OB_EXPORT ob_pipeline *ob_create_pipeline(ob_error **error);
  *
  * @param[in] dev Device object used to create pipeline
  * @param[out] error  Pointer to an error object that will be set if an error occurs.
+ *
  * @return ob_pipeline* return the pipeline object
  */
 OB_EXPORT ob_pipeline *ob_create_pipeline_with_device(const ob_device *dev, ob_error **error);
@@ -61,7 +63,7 @@ OB_EXPORT void ob_pipeline_start_with_config(ob_pipeline *pipeline, const ob_con
  * @brief Start the pipeline and set the frame collection data callback
  *
  * @attention After start the pipeline with this interface, the frames will be output to the callback function and cannot be obtained frames by call
- * @ob_pipeline_wait_for_frameset
+ * @ref ob_pipeline_wait_for_frameset
  *
  * @param[in] pipeline pipeline object
  * @param[in] config  Parameters to be configured
@@ -86,6 +88,7 @@ OB_EXPORT void ob_pipeline_stop(ob_pipeline *pipeline, ob_error **error);
  *
  * @param[in] pipeline The pipeline object
  * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return ob_config* The configuration object
  */
 OB_EXPORT ob_config *ob_pipeline_get_config(const ob_pipeline *pipeline, ob_error **error);
@@ -105,6 +108,7 @@ OB_EXPORT void ob_pipeline_switch_config(ob_pipeline *pipeline, ob_config *confi
  * @param[in] pipeline The pipeline object
  * @param[in] timeout_ms The timeout for waiting (in milliseconds)
  * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return ob_frame* The frameset that was waited for. A frameset is a special frame that can be used to obtain independent frames from the set.
  */
 OB_EXPORT ob_frame *ob_pipeline_wait_for_frameset(ob_pipeline *pipeline, uint32_t timeout_ms, ob_error **error);
@@ -114,6 +118,7 @@ OB_EXPORT ob_frame *ob_pipeline_wait_for_frameset(ob_pipeline *pipeline, uint32_
  *
  * @param[in] pipeline The pipeline object
  * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return ob_device* The device object
  */
 OB_EXPORT ob_device *ob_pipeline_get_device(const ob_pipeline *pipeline, ob_error **error);
@@ -124,6 +129,7 @@ OB_EXPORT ob_device *ob_pipeline_get_device(const ob_pipeline *pipeline, ob_erro
  * @param[in] pipeline The pipeline object
  * @param[in] sensorType The sensor type. The supported sensor types can be obtained through the ob_device_get_sensor_list() interface.
  * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return ob_stream_profile_list* The stream profile list
  */
 OB_EXPORT ob_stream_profile_list *ob_pipeline_get_stream_profile_list(const ob_pipeline *pipeline, ob_sensor_type sensorType, ob_error **error);
@@ -153,6 +159,7 @@ OB_EXPORT void ob_pipeline_disable_frame_sync(ob_pipeline *pipeline, ob_error **
  * @param[in] color_profile The input profile of the color sensor
  * @param[in] align_mode The input align mode
  * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return ob_stream_profile_list* The list of D2C-enabled depth sensor resolutions
  */
 OB_EXPORT ob_stream_profile_list *ob_get_d2c_depth_profile_list(const ob_pipeline *pipeline, const ob_stream_profile *color_profile, ob_align_mode align_mode,
@@ -162,6 +169,7 @@ OB_EXPORT ob_stream_profile_list *ob_get_d2c_depth_profile_list(const ob_pipelin
  * @brief Create the pipeline configuration
  *
  * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return ob_config* The configuration object
  */
 OB_EXPORT ob_config *ob_create_config(ob_error **error);
@@ -239,8 +247,9 @@ OB_EXPORT void ob_config_enable_gyro_stream(ob_config *config, ob_gyro_full_scal
 /**
  * @brief  Get the enabled stream profile list in the pipeline configuration
  *
- * @param config The pipeline configuration object
- * @param error Pointer to an error object that will be set if an error occurs.
+ * @param[in] config The pipeline configuration object
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
  * @return ob_stream_profile_list* The enabled stream profile list, should be released by @ref ob_delete_stream_profile_list after use
  */
 OB_EXPORT ob_stream_profile_list *ob_config_get_enabled_stream_profile_list(const ob_config *config, ob_error **error);
@@ -298,6 +307,7 @@ OB_EXPORT void ob_config_set_frame_aggregate_output_mode(ob_config *config, ob_f
  *
  * @param[in] pipeline pipeline object
  * @param[out] error Log error messages
+ *
  * @return ob_camera_param The camera internal parameters
  */
 OB_EXPORT ob_camera_param ob_pipeline_get_camera_param(ob_pipeline *pipeline, ob_error **error);
@@ -311,6 +321,7 @@ OB_EXPORT ob_camera_param ob_pipeline_get_camera_param(ob_pipeline *pipeline, ob
  * @param[in] depthWidth depth width
  * @param[in] depthHeight depth height
  * @param[out] error Log error messages
+ *
  * @return ob_camera_param returns camera internal parameters
  */
 OB_EXPORT ob_camera_param ob_pipeline_get_camera_param_with_profile(ob_pipeline *pipeline, uint32_t colorWidth, uint32_t colorHeight, uint32_t depthWidth,
@@ -322,6 +333,7 @@ OB_EXPORT ob_camera_param ob_pipeline_get_camera_param_with_profile(ob_pipeline 
  * @param[in] pipeline pipeline object
  * @param[in] config The pipeline configuration
  * @param[out] error Log error messages
+ *
  * @return ob_calibration_param The calibration parameters
  */
 OB_EXPORT ob_calibration_param ob_pipeline_get_calibration_param(ob_pipeline *pipeline, ob_config *config, ob_error **error);

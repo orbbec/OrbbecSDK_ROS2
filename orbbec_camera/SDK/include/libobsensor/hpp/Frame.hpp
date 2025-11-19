@@ -57,7 +57,7 @@ public:
      * frame object is destroyed.
      * @attention The internal frame object should not be deleted by the caller.
      *
-     * @param impl The pointer to the internal frame object.
+     * @param[in] impl The pointer to the internal frame object.
      */
     explicit Frame(const ob_frame *impl) : impl_(impl) {}
 
@@ -227,7 +227,8 @@ public:
     /**
      * @brief Check if the frame object has metadata of a given type.
      *
-     * @param type The metadata type. refer to @ref OBFrameMetadataType
+     * @param[in] type The metadata type. refer to @ref OBFrameMetadataType
+     *
      * @return bool The result.
      */
     bool hasMetadata(OBFrameMetadataType type) const {
@@ -241,7 +242,8 @@ public:
     /**
      * @brief Get the metadata value
      *
-     * @param type The metadata type. refer to @ref OBFrameMetadataType
+     * @param[in] type The metadata type. refer to @ref OBFrameMetadataType
+     *
      * @return int64_t The metadata value.
      */
     int64_t getMetadataValue(OBFrameMetadataType type) const {
@@ -294,6 +296,7 @@ public:
      * @brief Check if the runtime type of the frame object is compatible with a given type.
      *
      * @tparam T The given type.
+     *
      * @return bool The result.
      */
     template <typename T> bool is() const;
@@ -302,6 +305,7 @@ public:
      * @brief Convert the frame object to a target type.
      *
      * @tparam T The target type.
+     *
      * @return std::shared_ptr<T> The result. If it cannot be converted, an exception will be thrown.
      */
     template <typename T> std::shared_ptr<T> as() {
@@ -320,6 +324,7 @@ public:
      * @brief Convert the frame object to a target type.
      *
      * @tparam T The target type.
+     *
      * @return std::shared_ptr<T> The result. If it cannot be converted, an exception will be thrown.
      */
     template <typename T> std::shared_ptr<const T> as() const {
@@ -332,6 +337,87 @@ public:
         Error::handle(&error);
 
         return std::make_shared<const T>(impl_);
+    }
+
+    /**
+     * @brief Copy the information of the source frame object to the destination frame object.
+     * @brief Including the index, timestamp, system timestamp, global timestamp and metadata will be copied.
+     *
+     * @param[in] srcFrame Source frame object to copy the information from.
+     */
+    void copyFrameInfo(std::shared_ptr<const Frame> srcFrame) {
+        ob_error *error       = nullptr;
+        auto      unConstImpl = const_cast<ob_frame *>(impl_);
+
+        ob_frame_copy_info(srcFrame->getImpl(), unConstImpl, &error);
+        Error::handle(&error);
+    }
+
+    /**
+     * @brief Set the system timestamp of the frame in microseconds.
+     *
+     * @param systemTimestampUs frame system timestamp to set in microseconds.
+     */
+    void setSystemTimestampUs(uint64_t systemTimestampUs) {
+        ob_error *error       = nullptr;
+        auto      unConstImpl = const_cast<ob_frame *>(impl_);
+
+        ob_frame_set_system_timestamp_us(unConstImpl, systemTimestampUs, &error);
+        Error::handle(&error);
+    }
+
+    /**
+     * @brief Update the data of a frame.
+     * @brief The data will be memcpy to the frame data buffer.
+     * @brief The frame data size will be also updated as the input data size.
+     *
+     * @attention It is not recommended to update the frame data if the frame was not created by the user. If you must update it, ensure that the frame is not
+     * being used in other threads.
+     * @attention The size of the new data should be equal to or less than the current data size of the frame. Exceeding the original size may cause memory
+     * exceptions.
+     *
+     * @param[in] data The new data to update the frame with.
+     * @param[in] dataSize The size of the new data.
+     */
+    void updateData(const uint8_t *data, uint32_t dataSize) {
+        ob_error *error       = nullptr;
+        auto      unConstImpl = const_cast<ob_frame *>(impl_);
+
+        ob_frame_update_data(unConstImpl, data, dataSize, &error);
+        Error::handle(&error);
+    }
+
+    /**
+     * @brief Update the metadata of the frame
+     * @brief The metadata will be memcpy to the frame metadata buffer.
+     * @brief The frame metadata size will be also updated as the input metadata size.
+     *
+     * @attention It is not recommended to update the frame metadata if the frame was not created by the user. If you must update it, ensure that the frame is
+     * not being used in other threads or future use.
+     * @attention The metadata size should be equal to or less than 256 bytes, otherwise it will cause memory exception.
+     *
+     * @param[in] metadata The new metadata to update.
+     * @param[in] metadataSize The size of the new metadata.
+     */
+    void updateMetadata(const uint8_t *metadata, uint32_t metadataSize) {
+        ob_error *error       = nullptr;
+        auto      unConstImpl = const_cast<ob_frame *>(impl_);
+
+        ob_frame_update_metadata(unConstImpl, metadata, metadataSize, &error);
+        Error::handle(&error);
+    }
+
+    /**
+     * @brief Set (override) the stream profile of the frame
+     *
+     * @param profile The stream profile to set for the frame.
+     */
+    void setStreamProfile(std::shared_ptr<const StreamProfile> profile) {
+        ob_error *error       = nullptr;
+        auto      unConstImpl = const_cast<ob_frame *>(impl_);
+
+        ob_frame_set_stream_profile(unConstImpl, profile->getImpl(), &error);
+        Error::handle(&error);
     }
 
 public:
@@ -398,7 +484,7 @@ public:
      * frame object is destroyed.
      * @attention The internal frame object should not be deleted by the caller.
      *
-     * @param impl The pointer to the internal frame object.
+     * @param[in] impl The pointer to the internal frame object.
      */
     explicit VideoFrame(const ob_frame *impl) : Frame(impl) {};
 
@@ -460,6 +546,34 @@ public:
         return bitSize;
     }
 
+    /**
+     * @brief Set video frame pixel format
+     *
+     * @param pixelType the pixel format of the frame
+     */
+    void setPixelType(OBPixelType pixelType) {
+        ob_error *error       = nullptr;
+        auto      unConstImpl = const_cast<ob_frame *>(impl_);
+
+        ob_video_frame_set_pixel_type(unConstImpl, pixelType, &error);
+        Error::handle(&error);
+    }
+
+    /**
+     * @brief Set the effective number of pixels (such as Y16 format frame, but only the lower 10 bits are effective bits, and the upper 6 bits are filled with
+     * 0)
+     * @attention Only valid for Y8/Y10/Y11/Y12/Y14/Y16 format
+     *
+     * @param[in] bitSize the effective number of pixels in the pixel, or 0 if it is an unsupported format
+     */
+    void setPixelAvailableBitSize(uint8_t bitSize) {
+        ob_error *error       = nullptr;
+        auto      unConstImpl = const_cast<ob_frame *>(impl_);
+
+        ob_video_frame_set_pixel_available_bit_size(unConstImpl, bitSize, &error);
+        Error::handle(&error);
+    }
+
 public:
     // The following interfaces are deprecated and are retained here for compatibility purposes.
     uint32_t width() const {
@@ -488,7 +602,7 @@ public:
      * @attention The internal frame object should not be deleted by the caller.
      * @attention Please use the FrameFactory to create a Frame object.
      *
-     * @param impl The pointer to the internal frame object.
+     * @param[in] impl The pointer to the internal frame object.
      */
     explicit ColorFrame(const ob_frame *impl) : VideoFrame(impl) {};
 
@@ -509,7 +623,7 @@ public:
      * @attention The internal frame object should not be deleted by the caller.
      * @attention Please use the FrameFactory to create a Frame object.
      *
-     * @param impl The pointer to the internal frame object.
+     * @param[in] impl The pointer to the internal frame object.
      */
     explicit DepthFrame(const ob_frame *impl) : VideoFrame(impl) {};
 
@@ -529,6 +643,20 @@ public:
 
         return scale;
     }
+
+    /**
+     * @brief Set the value scale of the depth frame. The pixel value of the depth frame is multiplied by the scale to give a depth value in millimeters.
+     * For example, if valueScale=0.1 and a certain coordinate pixel value is pixelValue=10000, then the depth value = pixelValue*valueScale = 10000*0.1=1000mm.
+     *
+     * @param[in] valueScale The value scale of the depth frame
+     */
+    void setValueScale(float valueScale) {
+        ob_error *error       = nullptr;
+        auto      unConstImpl = const_cast<ob_frame *>(impl_);
+
+        ob_depth_frame_set_value_scale(unConstImpl, valueScale, &error);
+        Error::handle(&error);
+    }
 };
 
 /**
@@ -546,7 +674,7 @@ public:
      * @attention The internal frame object should not be deleted by the caller.
      * @attention Please use the FrameFactory to create a Frame object.
      *
-     * @param impl The pointer to the internal frame object.
+     * @param[in] impl The pointer to the internal frame object.
      */
     explicit IRFrame(const ob_frame *impl) : VideoFrame(impl) {};
 
@@ -568,7 +696,7 @@ public:
      * @attention The internal frame object should not be deleted by the caller.
      * @attention Please use the FrameFactory to create a Frame object.
      *
-     * @param impl The pointer to the internal frame object.
+     * @param[in] impl The pointer to the internal frame object.
      */
     explicit ConfidenceFrame(const ob_frame *impl) : VideoFrame(impl) {};
 
@@ -580,8 +708,8 @@ public:
  * @brief The PointsFrame class is used to obtain pointcloud data and point cloud information.
  *
  * @note The pointcloud data format can be obtained from the @ref Frame::getFormat() function. Witch can be one of the following formats:
- * - @ref OB_FORMAT_POINT: 32-bit float format with 3D point coordinates (x, y, z), @ref OBPoint
- * - @ref OB_FORMAT_RGB_POINT: 32-bit float format with 3D point coordinates (x, y, z) and point colors (r, g, b) @ref, OBColorPoint
+ * - @ref OB_FORMAT_POINT : 32-bit float format with 3D point coordinates (x, y, z), @ref OBPoint
+ * - @ref OB_FORMAT_RGB_POINT : 32-bit float format with 3D point coordinates (x, y, z) and point colors (r, g, b) @ref OBColorPoint
  */
 class PointsFrame : public Frame {
 
@@ -594,7 +722,7 @@ public:
      * @attention The internal frame object should not be deleted by the caller.
      * @attention Please use the FrameFactory to create a Frame object.
      *
-     * @param impl The pointer to the internal frame object.
+     * @param[in] impl The pointer to the internal frame object.
      */
     explicit PointsFrame(const ob_frame *impl) : Frame(impl) {};
 
@@ -768,7 +896,8 @@ public:
     /**
      * @brief Get a frame of a specific type from the FrameSet
      *
-     * @param frameType The type of sensor
+     * @param[in] frameType The type of sensor
+     *
      * @return std::shared_ptr<Frame> The corresponding type of frame
      */
     std::shared_ptr<Frame> getFrame(OBFrameType frameType) const {
@@ -784,7 +913,8 @@ public:
     /**
      * @brief Get a frame at a specific index from the FrameSet
      *
-     * @param index The index of the frame
+     * @param[in] index The index of the frame
+     *
      * @return std::shared_ptr<Frame> The frame at the specified index
      */
     std::shared_ptr<Frame> getFrameByIndex(uint32_t index) const {
@@ -802,7 +932,7 @@ public:
      *
      * @attention If the FrameSet contains the same type of frame, the new frame will replace the old one.
      *
-     * @param frame The frame to be pushed
+     * @param[in] frame The frame to be pushed
      */
     void pushFrame(std::shared_ptr<const Frame> frame) const {
         ob_error *error = nullptr;
@@ -814,6 +944,66 @@ public:
         ob_frameset_push_frame(unConstImpl, otherImpl, &error);
 
         Error::handle(&error);
+    }
+
+    /**
+     * @brief Get the depth frame from the frameset.
+     *
+     * @return std::shared_ptr<DepthFrame> Return the depth frame.
+     */
+    std::shared_ptr<DepthFrame> getDepthFrame() const {
+        ob_error *error = nullptr;
+        auto      frame = ob_frameset_get_depth_frame(impl_, &error);
+        if(!frame) {
+            return nullptr;
+        }
+        Error::handle(&error);
+        return std::make_shared<DepthFrame>(frame);
+    }
+
+    /**
+     * @brief Get the color frame from the frameset.
+     *
+     * @return std::shared_ptr<ColorFrame> Return the color frame.
+     */
+    std::shared_ptr<ColorFrame> getColorFrame() const {
+        ob_error *error = nullptr;
+        auto      frame = ob_frameset_get_color_frame(impl_, &error);
+        if(!frame) {
+            return nullptr;
+        }
+        Error::handle(&error);
+        return std::make_shared<ColorFrame>(frame);
+    }
+
+    /**
+     * @brief Get the infrared frame from the frameset.
+     *
+     * @return std::shared_ptr<IRFrame> Return the infrared frame.
+     */
+    std::shared_ptr<IRFrame> getIrFrame() const {
+        ob_error *error = nullptr;
+        auto      frame = ob_frameset_get_ir_frame(impl_, &error);
+        if(!frame) {
+            return nullptr;
+        }
+        Error::handle(&error);
+        return std::make_shared<IRFrame>(frame);
+    }
+
+    /**
+     * @brief Get the point cloud frame from the frameset.
+     *
+     * @return std::shared_ptr<PointsFrame> Return the point cloud frame.
+     */
+    std::shared_ptr<PointsFrame> getPointsFrame() const {
+        ob_error *error = nullptr;
+        auto      frame = ob_frameset_get_points_frame(impl_, &error);
+        if(!frame) {
+            return nullptr;
+        }
+        Error::handle(&error);
+        return std::make_shared<PointsFrame>(frame);
     }
 
 public:
@@ -873,9 +1063,10 @@ public:
     /**
      * @brief Create a Frame object of a specific type with a given format and data size.
      *
-     * @param frameType The type of the frame.
-     * @param format The format of the frame.
-     * @param dataSize The size of the data in bytes.
+     * @param[in] frameType The type of the frame.
+     * @param[in] format The format of the frame.
+     * @param[in] dataSize The size of the data in bytes.
+     *
      * @return std::shared_ptr<Frame> The created frame object.
      */
     static std::shared_ptr<Frame> createFrame(OBFrameType frameType, OBFormat format, uint32_t dataSize) {
@@ -890,11 +1081,11 @@ public:
      * @brief Create a VideoFrame object of a specific type with a given format, width, height, and stride.
      * @note If stride is not specified, it will be calculated based on the width and format.
      *
-     * @param frameType The type of the frame.
-     * @param format The format of the frame.
-     * @param width The width of the frame.
-     * @param height The height of the frame.
-     * @param stride The stride of the frame.
+     * @param[in] frameType The type of the frame.
+     * @param[in] format The format of the frame.
+     * @param[in] width The width of the frame.
+     * @param[in] height The height of the frame.
+     * @param[in] stride The stride of the frame.
      *
      * @return std::shared_ptr<VideoFrame> The created video frame object.
      */
@@ -911,7 +1102,8 @@ public:
      * @brief Create (clone) a frame object based on the specified other frame object.
      * @brief The new frame object will have the same properties as the other frame object, but the data buffer is newly allocated.
      *
-     * @param shouldCopyData If true, the data of the source frame object will be copied to the new frame object. If false, the new frame object will
+     * @param[in] otherFrame The source frame to be copied.
+     * @param[in] shouldCopyData If true, the data of the source frame object will be copied to the new frame object. If false, the new frame object will
      * have a data buffer with random data. The default value is true.
      *
      * @return std::shared_ptr<Frame> The new frame object.
@@ -928,7 +1120,7 @@ public:
     /**
      * @brief Create a Frame From (according to)Stream Profile object
      *
-     * @param profile The stream profile object to create the frame from.
+     * @param[in] profile The stream profile object to create the frame from.
      *
      * @return std::shared_ptr<Frame>  The created frame object.
      */
@@ -1038,8 +1230,8 @@ public:
     /**
      * @brief Set the device timestamp of the frame.
      *
-     * @param frame The frame object.
-     * @param deviceTimestampUs The device timestamp to set in microseconds.
+     * @param[in] frame The frame object.
+     * @param[in] deviceTimestampUs The device timestamp to set in microseconds.
      */
     static void setFrameDeviceTimestampUs(std::shared_ptr<Frame> frame, uint64_t deviceTimestampUs) {
         ob_error *error = nullptr;

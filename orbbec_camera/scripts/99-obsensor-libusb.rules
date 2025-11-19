@@ -1,4 +1,4 @@
-SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0501", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Bootloader Device"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0501", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Bootloader_Device"
 
 # UVC Modules
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0635", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Femto"
@@ -12,9 +12,9 @@ SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0669", MODE:="066
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="066b", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Femto_Bolt"
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0660", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Astra_2"
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0670", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Gemini_2"
-SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0671", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Gemini_2 XL"
-SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0673", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Gemini_2 L"
-SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0675", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Gemini_2 VL"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0671", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Gemini_2_XL"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0673", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Gemini_2_L"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0675", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Gemini_2_VL"
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0800", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Gemini_335"
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0801", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Gemini_330"
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0802", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Gemini_dm330"
@@ -38,11 +38,10 @@ SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0812", MODE:="066
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0813", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Gemini_345Lg"
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0816", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="CAM-5330"
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0817", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="CAM-5530"
-SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="065b", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="astra_mini_pro"
-SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="065e", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="astra_mini_s_pro"
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="0818", MODE:="0666",  OWNER:="root", GROUP:="video", SYMLINK+="Gemini_338"
 
 # OpenNI Modules
+SUBSYSTEM=="usb", ATTR{idProduct}=="0400", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="astra_bootloader"
 SUBSYSTEM=="usb", ATTR{idProduct}=="0401", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="astra"
 SUBSYSTEM=="usb", ATTR{idProduct}=="0402", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="astra_s"
 SUBSYSTEM=="usb", ATTR{idProduct}=="0403", ATTR{idVendor}=="2bc5", MODE:="0666", OWNER:="root", GROUP:="video", SYMLINK+="astra_pro"

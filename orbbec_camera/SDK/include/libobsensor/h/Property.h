@@ -463,6 +463,11 @@ typedef enum {
      */
     OB_PROP_DISP_SEARCH_OFFSET_INT = 196,
 
+     /**
+     * @brief cpu temperature correction . true: calibrate temperature
+     */
+    OB_PROP_CPU_TEMPERATURE_CALIBRATION_BOOL = 199,
+
     /**
      * @brief Repower device (cut off power and power on again)
      *

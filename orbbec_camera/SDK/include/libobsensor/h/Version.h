@@ -44,6 +44,7 @@ OB_EXPORT int ob_get_patch_version(void);
 
 /**
  * @brief Get the SDK stage version.
+ *
  * @attention The returned char* does not need to be freed.
  *
  * @return const char* The SDK stage version.

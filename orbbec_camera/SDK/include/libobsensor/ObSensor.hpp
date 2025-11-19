@@ -3,7 +3,7 @@
 
 /**
  * \file ObSensor.hpp
- * \brief This is the main entry point for the OrbbecSDK C++ library.
+ * \brief This is the main entry point for the SDK C++ library.
  *        It includes all necessary header files for using the library.
  */
 #pragma once

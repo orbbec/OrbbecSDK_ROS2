@@ -22,7 +22,7 @@ private:
      *
      * @attention This constructor should not be called directly, use the handle() function instead.
      *
-     * @param error The ob_error object
+     * @param[in] error The ob_error object
      */
     explicit Error(ob_error *error) : impl_(error) {};
 
@@ -32,8 +32,8 @@ public:
     /**
      * @brief A static function to handle the ob_error and throw an exception if needed.
      *
-     * @param error The ob_error pointer to be handled.
-     * @param throw_exception A boolean value to indicate whether to throw an exception or not, the default value is true.
+     * @param[in,out] error The ob_error pointer to be handled.
+     * @param[in] throw_exception A boolean value to indicate whether to throw an exception or not, the default value is true.
      */
     static void handle(ob_error **error, bool throw_exception = true) {
         if(!error || !*error) {  // no error

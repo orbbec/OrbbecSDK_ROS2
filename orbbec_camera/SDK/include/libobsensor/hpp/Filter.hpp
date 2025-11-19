@@ -171,7 +171,8 @@ public:
     /**
      * @brief Processes a frame synchronously.
      *
-     * @param frame The frame to be processed.
+     * @param[in] frame The frame to be processed.
+     *
      * @return std::shared_ptr< Frame > The processed frame.
      */
     virtual std::shared_ptr<Frame> process(std::shared_ptr<const Frame> frame) const {
@@ -187,7 +188,7 @@ public:
     /**
      * @brief Pushes the pending frame into the cache for asynchronous processing.
      *
-     * @param frame The pending frame. The processing result is returned by the callback function.
+     * @param[in] frame The pending frame. The processing result is returned by the callback function.
      */
     virtual void pushFrame(std::shared_ptr<Frame> frame) const {
         ob_error *error = nullptr;
@@ -198,7 +199,7 @@ public:
     /**
      * @brief Set the callback function for asynchronous processing.
      *
-     * @param callback The processing result callback.
+     * @param[in] callback The processing result callback.
      */
     virtual void setCallBack(FilterCallback callback) {
         callback_       = callback;
@@ -210,7 +211,8 @@ public:
     /**
      * @brief Get config schema of the filter
      * @brief The returned string is a csv format string representing the configuration schema of the filter. The format of the string is:
-     *  <parameter_name>, <parameter_type: "int", "float", "bool">, <minimum_value>, <maximum_value>, <value_step>, <default_value>, <parameter_description>
+     * `<parameter_name>`, `<parameter_type: "int", "float", "bool">`, `<minimum_value>`, `<maximum_value>`, `<value_step>`, `<default_value>`,
+     * `<parameter_description>`
      *
      * @return std::string The config schema of the filter.
      */
@@ -237,8 +239,8 @@ public:
      * @attention The pass into value type is double, witch will be cast to the actual type inside the filter. The actual type can be queried by the filter
      * config schema returned by @ref getConfigSchemaVec.
      *
-     * @param configName The name of the config.
-     * @param value The value of the config.
+     * @param[in] configName The name of the config.
+     * @param[in] value The value of the config.
      */
     virtual void setConfigValue(const std::string &configName, double value) const {
         ob_error *error = nullptr;
@@ -252,7 +254,8 @@ public:
      * @attention The returned value type has been casted to double inside the filter. The actual type can be queried by the filter config schema returned by
      * @ref getConfigSchemaVec.
      *
-     * @param configName  The name of the config.
+     * @param[in] configName The name of the config.
+     *
      * @return double The value of the config.
      */
     virtual double getConfigValue(const std::string &configName) const {
@@ -278,6 +281,7 @@ public:
      * @brief Check if the runtime type of the filter object is compatible with a given type.
      *
      * @tparam T The given type.
+     *
      * @return bool The result.
      */
     template <typename T> bool is();
@@ -310,8 +314,8 @@ public:
      * @brief Create a private filter by name and activation key.
      * @brief Some private filters require an activation key to be activated, its depends on the vendor of the filter.
      *
-     * @param name The name of the filter.
-     * @param activationKey The activation key of the filter.
+     * @param[in] name The name of the filter.
+     * @param[in] activationKey The activation key of the filter.
      */
     static std::shared_ptr<Filter> createPrivateFilter(const std::string &name, const std::string &activationKey) {
         ob_error *error = nullptr;
@@ -324,7 +328,8 @@ public:
      * @brief Get the vendor specific code of a filter by filter name.
      * @brief A private filter can define its own vendor specific code for specific purposes.
      *
-     * @param name The name of the filter.
+     * @param[in] name The name of the filter.
+     *
      * @return std::string The vendor specific code of the filter.
      */
     static std::string getFilterVendorSpecificCode(const std::string &name) {
@@ -352,7 +357,7 @@ public:
     /**
      * @brief Set the output pointcloud frame format.
      *
-     * @param format The point cloud frame format: OB_FORMAT_POINT or OB_FORMAT_RGB_POINT
+     * @param[in] format The point cloud frame format: OB_FORMAT_POINT or OB_FORMAT_RGB_POINT
      */
     void setCreatePointFormat(OBFormat format) {
         setConfigValue("pointFormat", static_cast<double>(format));
@@ -364,7 +369,7 @@ public:
      * @brief Calling this function to set the scale will change the point coordinate scaling factor of the output point cloud frame, The point coordinate
      * scaling factor for the output point cloud frame can be obtained via @ref PointsFrame::getCoordinateValueScale function.
      *
-     * @param factor The scale factor.
+     * @param[in] factor The scale factor.
      */
     void setCoordinateDataScaled(float factor) {
         setConfigValue("coordinateDataScale", factor);
@@ -376,7 +381,7 @@ public:
      *
      * @attention This function only works for when create point format is set to OB_FORMAT_RGB_POINT.
      *
-     * @param state Whether normalization is required.
+     * @param[in] state Whether normalization is required.
      */
     void setColorDataNormalization(bool state) {
         setConfigValue("colorDataNormalization", state);
@@ -385,10 +390,33 @@ public:
     /**
      * @brief Set the point cloud coordinate system.
      *
-     * @param type The coordinate system type.
+     * @param[in] type The coordinate system type.
      */
     void setCoordinateSystem(OBCoordinateSystemType type) {
         setConfigValue("coordinateSystemType", static_cast<double>(type));
+    }
+
+    /**
+     * @brief Set the point cloud decimation factor.
+     *
+     * @brief Calling this function to decimation factor will output thedownsampled data of the the cloud frame
+     *
+     * @param factor The decimation factor.
+     */
+    void setDecimationFactor(int value) {
+        setConfigValue("decimate", value);
+    }
+
+    /**
+     * @brief Get the property range of the decimation factor range.
+     */
+    OBIntPropertyRange getDecimationFactorRange() {
+        OBIntPropertyRange scaleRange{};
+        if(configSchemaVec_.size() != 0) {
+            const auto &item = configSchemaVec_[5];
+            scaleRange       = getPropertyRange<OBIntPropertyRange>(item, getConfigValue("decimate"));
+        }
+        return scaleRange;
     }
 
 public:
@@ -434,7 +462,7 @@ public:
      *        the aspect ratio of the target resolution.
      *
      *
-     * @param state If true, output frame resolution will match the target resolution; otherwise, it will
+     * @param[in] state If true, output frame resolution will match the target resolution; otherwise, it will
      *              maintain the original resolution with the target's aspect ratio.
      */
     void setMatchTargetResolution(bool state) {
@@ -445,7 +473,7 @@ public:
      * @brief Set the Align To Stream Profile
      * @brief  It is useful when the align target stream dose not started (without any frame to get intrinsics and extrinsics).
      *
-     * @param profile The Align To Stream Profile.
+     * @param[in] profile The Align To Stream Profile.
      */
     void setAlignToStreamProfile(std::shared_ptr<const StreamProfile> profile) {
         ob_error *error = nullptr;
@@ -471,7 +499,7 @@ public:
     /**
      * @brief Set the format conversion type.
      *
-     * @param type The format conversion type.
+     * @param[in] type The format conversion type.
      */
     void setFormatConvertType(OBConvertFormat type) {
         setConfigValue("convertType", static_cast<double>(type));
@@ -534,7 +562,7 @@ public:
     /**
      * @brief Set the sequenceId filter params.
      *
-     * @param sequence_id id to pass the filter.
+     * @param[in] sequence_id id to pass the filter.
      */
     void selectSequenceId(int sequence_id) {
         setConfigValue("sequenceid", static_cast<double>(sequence_id));
@@ -580,7 +608,7 @@ public:
     /**
      * @brief Set the decimation filter scale value.
      *
-     * @param value The decimation filter scale value.
+     * @param[in] value The decimation filter scale value.
      */
     void setScaleValue(uint8_t value) {
         setConfigValue("decimate", static_cast<double>(value));
@@ -769,7 +797,7 @@ public:
     /**
      * @brief Set the spatial advanced filter params.
      *
-     * @param params OBSpatialAdvancedFilterParams.
+     * @param[in] params OBSpatialAdvancedFilterParams.
      */
     void setFilterParams(OBSpatialAdvancedFilterParams params) {
         setConfigValue("alpha", params.alpha);
@@ -825,7 +853,7 @@ public:
     /**
      * @brief Set the spatial fast filter params.
      *
-     * @param params OBSpatialFastFilterParams.
+     * @param[in] params OBSpatialFastFilterParams.
      */
     void setFilterParams(OBSpatialFastFilterParams params) {
         setConfigValue("radius", params.radius);
@@ -914,7 +942,7 @@ public:
     /**
      * @brief Set the spatial moderate filter params.
      *
-     * @param params OBSpatialModerateFilterParams.
+     * @param[in] params OBSpatialModerateFilterParams.
      */
     void setFilterParams(OBSpatialModerateFilterParams params) {
         setConfigValue("magnitude", params.magnitude);
@@ -940,7 +968,7 @@ public:
     /**
      * @brief Set the HoleFillingFilter mode.
      *
-     * @param mode OBHoleFillingMode, OB_HOLE_FILL_TOP,OB_HOLE_FILL_NEAREST or OB_HOLE_FILL_FAREST.
+     * @param[in] mode OBHoleFillingMode, OB_HOLE_FILL_TOP,OB_HOLE_FILL_NEAREST or OB_HOLE_FILL_FAREST.
      */
     void setFilterMode(OBHoleFillingMode mode) {
         setConfigValue("hole_filling_mode", static_cast<double>(mode));
@@ -1061,7 +1089,7 @@ public:
     /**
      * @brief Set the TemporalFilter diffscale value.
      *
-     * @param value diffscale value.
+     * @param[in] value diffscale value.
      */
     void setDiffScale(float value) {
         setConfigValue("diff_scale", static_cast<double>(value));
@@ -1087,7 +1115,7 @@ public:
     /**
      * @brief Set the TemporalFilter weight value.
      *
-     * @param value weight value.
+     * @param[in] value weight value.
      */
     void setWeight(float value) {
         setConfigValue("weight", static_cast<double>(value));
@@ -1137,7 +1165,8 @@ public:
     /**
      * @brief Get the Filter object at the specified index
      *
-     * @param index The filter index. The range is [0, count-1]. If the index exceeds the range, an exception will be thrown.
+     * @param[in] index The filter index. The range is [0, count-1]. If the index exceeds the range, an exception will be thrown.
+     *
      * @return std::shared_ptr<Filter> The filter object.
      */
     std::shared_ptr<Filter> getFilter(uint32_t index) {

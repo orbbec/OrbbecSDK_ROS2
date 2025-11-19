@@ -269,6 +269,8 @@ typedef enum {
     ERR_MISMATCH              = -9,  /**< Mismatch firmware error */
     ERR_UNSUPPORT_DEV         = -10, /**< Unsupported device error */
     ERR_INVALID_COUNT         = -11, /**< invalid firmware/preset count */
+    ERR_FILE_READ             = -12, /**< Read image file error */
+    ERR_TRANSFER              = -13  /**< Transfer failed */
 } OBUpgradeState,
     OBFwUpdateState, ob_upgrade_state, ob_fw_update_state;
 
@@ -1253,8 +1255,8 @@ typedef enum {
      * @brief primary mode
      * @brief The device is the primary device in the multi-device system, it will output the trigger signal via VSYNC_OUT pin on synchronization port by
      * default.
-     * @brief The Color and Depth should be set to same frame rates, the Color and Depth will be synchronized and can be adjusted by @ref colorDelayUs, @ref
-     * depthDelayUs or @ref trigger2ImageDelayUs.
+     * @brief The Color and Depth should be set to same frame rates, the Color and Depth will be synchronized and can be adjusted by @ref
+     * OBMultiDeviceSyncConfig::colorDelayUs, @ref OBMultiDeviceSyncConfig::depthDelayUs or @ref OBMultiDeviceSyncConfig::trigger2ImageDelayUs.
      */
     OB_MULTI_DEVICE_SYNC_MODE_PRIMARY = 1 << 2,
 
@@ -1262,8 +1264,8 @@ typedef enum {
      * @brief secondary mode
      * @brief The device is the secondary device in the multi-device system, it will receive the trigger signal via VSYNC_IN pin on synchronization port. It
      * will out the trigger signal via VSYNC_OUT pin on synchronization port by default.
-     * @brief The Color and Depth should be set to same frame rates, the Color and Depth will be synchronized and can be adjusted by @ref colorDelayUs, @ref
-     * depthDelayUs or @ref trigger2ImageDelayUs.
+     * @brief The Color and Depth should be set to same frame rates, the Color and Depth will be synchronized and can be adjusted by @ref
+     * OBMultiDeviceSyncConfig::colorDelayUs, @ref OBMultiDeviceSyncConfig::depthDelayUs or @ref OBMultiDeviceSyncConfig::trigger2ImageDelayUs.
      * @brief After starting the stream, the device will wait for the trigger signal to start capturing images, and will stop capturing images when the trigger
      * signal is stopped.
      *
@@ -1275,8 +1277,8 @@ typedef enum {
      * @brief secondary synced mode
      * @brief The device is the secondary device in the multi-device system, it will receive the trigger signal via VSYNC_IN pin on synchronization port. It
      * will out the trigger signal via VSYNC_OUT pin on synchronization port by default.
-     * @brief The Color and Depth should be set to same frame rates, the Color and Depth will be synchronized and can be adjusted by @ref colorDelayUs, @ref
-     * depthDelayUs or @ref trigger2ImageDelayUs.
+     * @brief The Color and Depth should be set to same frame rates, the Color and Depth will be synchronized and can be adjusted by @ref
+     * OBMultiDeviceSyncConfig::colorDelayUs, @ref OBMultiDeviceSyncConfig::depthDelayUs or @ref OBMultiDeviceSyncConfig::trigger2ImageDelayUs.
      * @brief After starting the stream, the device will be immediately start capturing images, and will adjust the capture time when the trigger signal is
      * received to synchronize with the primary device. If the trigger signal is stopped, the device will still capture images.
      *
@@ -1288,9 +1290,9 @@ typedef enum {
      * @brief software triggering mode
      * @brief The device will start one time image capture after receiving the capture command and will output the trigger signal via VSYNC_OUT pin by default.
      * The capture command can be sent form host by call @ref ob_device_trigger_capture. The number of images captured each time can be set by @ref
-     * framesPerTrigger.
-     * @brief The Color and Depth should be set to same frame rates, the Color and Depth will be synchronized and can be adjusted by @ref colorDelayUs, @ref
-     * depthDelayUs or @ref trigger2ImageDelayUs.
+     * OBMultiDeviceSyncConfig::framesPerTrigger.
+     * @brief The Color and Depth should be set to same frame rates, the Color and Depth will be synchronized and can be adjusted by @ref
+     * OBMultiDeviceSyncConfig::colorDelayUs, @ref OBMultiDeviceSyncConfig::depthDelayUs or @ref OBMultiDeviceSyncConfig::trigger2ImageDelayUs.
      *
      * @brief The frequency of the user call @ref ob_device_trigger_capture to send the capture command multiplied by the number of frames per trigger should be
      * less than the frame rate of the stream profile which is set when starting the stream.
@@ -1300,9 +1302,9 @@ typedef enum {
     /**
      * @brief hardware triggering mode
      * @brief The device will start one time image capture after receiving the trigger signal via VSYNC_IN pin on synchronization port and will output the
-     * trigger signal via VSYNC_OUT pin by default. The number of images captured each time can be set by @ref framesPerTrigger.
-     * @brief The Color and Depth should be set to same frame rates, the Color and Depth will be synchronized and can be adjusted by @ref colorDelayUs, @ref
-     * depthDelayUs or @ref trigger2ImageDelayUs.
+     * trigger signal via VSYNC_OUT pin by default. The number of images captured each time can be set by @ref OBMultiDeviceSyncConfig::framesPerTrigger.
+     * @brief The Color and Depth should be set to same frame rates, the Color and Depth will be synchronized and can be adjusted by @ref
+     * OBMultiDeviceSyncConfig::colorDelayUs, @ref OBMultiDeviceSyncConfig::depthDelayUs or @ref OBMultiDeviceSyncConfig::trigger2ImageDelayUs.
      *
      * @attention The frequency of the trigger signal multiplied by the number of frames per trigger should be less than the frame rate of the stream profile
      * which is set when starting the stream.
@@ -1753,64 +1755,64 @@ typedef enum {
 /**
  * @brief Callback for file transfer
  *
- * @param state Transmission status
- * @param message Transfer status information
- * @param percent Transfer progress percentage
- * @param user_data User-defined data
+ * @param[in] state Transmission status
+ * @param[in] message Transfer status information
+ * @param[in] percent Transfer progress percentage
+ * @param[in] user_data User-defined data
  */
 typedef void (*ob_file_send_callback)(ob_file_tran_state state, const char *message, uint8_t percent, void *user_data);
 
 /**
  * @brief Callback for firmware upgrade
  *
- * @param state Upgrade status
- * @param message Upgrade status information
- * @param percent Upgrade progress percentage
- * @param user_data User-defined data
+ * @param[in] state Upgrade status
+ * @param[in] message Upgrade status information
+ * @param[in] percent Upgrade progress percentage
+ * @param[in] user_data User-defined data
  */
 typedef void (*ob_device_fw_update_callback)(ob_fw_update_state state, const char *message, uint8_t percent, void *user_data);
 
 /**
  * @brief Callback for device status
  *
- * @param state Device status
- * @param message Device status information
- * @param user_data User-defined data
+ * @param[in] state Device status
+ * @param[in] message Device status information
+ * @param[in] user_data User-defined data
  */
 typedef void (*ob_device_state_callback)(ob_device_state state, const char *message, void *user_data);
 
 /**
  * @brief Callback for writing data
  *
- * @param state Write data status
- * @param percent Write data percentage
- * @param user_data User-defined data
+ * @param[in] state Write data status
+ * @param[in] percent Write data percentage
+ * @param[in] user_data User-defined data
  */
 typedef void (*ob_set_data_callback)(ob_data_tran_state state, uint8_t percent, void *user_data);
 
 /**
  * @brief Callback for reading data
  *
- * @param state Read data status
- * @param dataChunk Read the returned data block
- * @param user_data User-defined data
+ * @param[in] state Read data status
+ * @param[in] dataChunk Read the returned data block
+ * @param[in] user_data User-defined data
  */
 typedef void (*ob_get_data_callback)(ob_data_tran_state state, ob_data_chunk *dataChunk, void *user_data);
 
 /**
  * @brief Callback for media status (recording and playback)
  *
- * @param state Condition
- * @param user_data User-defined data
+ * @param[in] state Condition
+ * @param[in] user_data User-defined data
  */
 typedef void (*ob_media_state_callback)(ob_media_state state, void *user_data);
 
 /**
  * @brief Callback for device change
  *
- * @param removed List of deleted (dropped) devices
- * @param added List of added (online) devices
- * @param user_data User-defined data
+ * @param[in] removed List of deleted (dropped) devices
+ * @param[in] added List of added (online) devices
+ * @param[in] user_data User-defined data
  */
 typedef void (*ob_device_changed_callback)(ob_device_list *removed, ob_device_list *added, void *user_data);
 
@@ -1820,8 +1822,8 @@ typedef void (*ob_device_changed_callback)(ob_device_list *removed, ob_device_li
 /**
  * @brief Callback for frame
  *
- * @param frame Frame object
- * @param user_data User-defined data
+ * @param[in] frame Frame object
+ * @param[in] user_data User-defined data
  */
 typedef void (*ob_frame_callback)(ob_frame *frame, void *user_data);
 #define ob_filter_callback ob_frame_callback
@@ -1830,25 +1832,25 @@ typedef void (*ob_frame_callback)(ob_frame *frame, void *user_data);
 /**
  * @brief Callback for frameset
  *
- * @param frameset Frameset object
- * @param user_data User-defined data
+ * @param[in] frameset Frameset object
+ * @param[in] user_data User-defined data
  */
 typedef void (*ob_frameset_callback)(ob_frame *frameset, void *user_data);
 
 /**
  * @brief Customize the delete callback
  *
- * @param buffer Data that needs to be deleted
- * @param user_data User-defined data
+ * @param[in] buffer Data that needs to be deleted
+ * @param[in] user_data User-defined data
  */
 typedef void(ob_frame_destroy_callback)(uint8_t *buffer, void *user_data);
 
 /**
  * @brief Callback for receiving log
  *
- * @param severity Current log level
- * @param message Log message
- * @param user_data User-defined data
+ * @param[in] severity Current log level
+ * @param[in] message Log message
+ * @param[in] user_data User-defined data
  */
 typedef void(ob_log_callback)(ob_log_severity severity, const char *message, void *user_data);
 
@@ -1856,7 +1858,7 @@ typedef void (*ob_playback_status_changed_callback)(ob_playback_status status, v
 /**
  * @brief Check if the sensor_type is a video sensor
  *
- * @param sensor_type Sensor type to check
+ * @param[in] sensor_type Sensor type to check
  * @return True if sensor_type is a video sensor, false otherwise
  */
 #define ob_is_video_sensor_type(sensor_type)                                                                                             \
@@ -1866,7 +1868,7 @@ typedef void (*ob_playback_status_changed_callback)(ob_playback_status status, v
 /**
  * @brief check if the stream_type is a video stream
  *
- * @param stream_type Stream type to check
+ * @param[in] stream_type Stream type to check
  * @return True if stream_type is a video stream, false otherwise
  */
 #define ob_is_video_stream_type(stream_type)                                                                                             \
@@ -1876,7 +1878,7 @@ typedef void (*ob_playback_status_changed_callback)(ob_playback_status status, v
 /**
  * @brief Check if sensor_type is an IR sensor
  *
- * @param sensor_type Sensor type to check
+ * @param[in] sensor_type Sensor type to check
  * @return True if sensor_type is an IR sensor, false otherwise
  */
 #define is_ir_sensor(sensor_type) (sensor_type == OB_SENSOR_IR || sensor_type == OB_SENSOR_IR_LEFT || sensor_type == OB_SENSOR_IR_RIGHT)
@@ -1885,7 +1887,7 @@ typedef void (*ob_playback_status_changed_callback)(ob_playback_status status, v
 /**
  * @brief Check if stream_type is an IR stream
  *
- * @param stream_type Stream type to check
+ * @param[in] stream_type Stream type to check
  * @return True if stream_type is an IR stream, false otherwise
  */
 #define is_ir_stream(stream_type) (stream_type == OB_STREAM_IR || stream_type == OB_STREAM_IR_LEFT || stream_type == OB_STREAM_IR_RIGHT)
@@ -1894,7 +1896,7 @@ typedef void (*ob_playback_status_changed_callback)(ob_playback_status status, v
 /**
  * @brief Check if frame_type is an IR frame
  *
- * @param frame_type Frame type to check
+ * @param[in] frame_type Frame type to check
  * @return True if frame_type is an IR frame, false otherwise
  */
 #define is_ir_frame(frame_type) (frame_type == OB_FRAME_IR || frame_type == OB_FRAME_IR_LEFT || frame_type == OB_FRAME_IR_RIGHT)

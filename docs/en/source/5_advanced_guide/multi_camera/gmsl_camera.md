@@ -1,6 +1,6 @@
 # GMSL_camera
 
-> This section describes how to use GMSL camera in OrbbecSDK_ROS2.Currently, only Gemini 335Lg GMSL devices are supported, and other GMSL devices will be supported in the near future.
+> This section describes how to use GMSL camera in OrbbecSDK_ROS2.Currently, only Gemini 335Lg and Gemini 345Lg, other GMSL devices will be supported in the near future.
 
 You can find example usage code in the [example](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples).
 
@@ -28,7 +28,7 @@ Go to the [multi_gmsl_camera.launch.py](https://github.com/orbbec/OrbbecSDK_ROS2
 ros2 launch orbbec_camera multi_gmsl_camera.launch.py
 ```
 
-> Note: By default, multi_gmsl_camera.launch.py only starts color and left_ir. If you want to start other sensors, please go to [camera_secondary_params.yaml](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_secondary_params.yaml) to modify them.
+> Note: By default, multi_gmsl_camera.launch.py only starts color and depth. If you want to start other sensors, please go to [camera_secondary_params.yaml](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_secondary_params.yaml) to modify them.
 
 ## Multi GMSL camera synced
 
@@ -49,9 +49,7 @@ Please refer to the configuration in [multi_gmsl_camera_synced.launch.py.](https
 ros2 launch orbbec_camera multi_gmsl_camera_synced.launch.py
 ```
 
-> Note: By default, multi_gmsl_camera_synced.launch.py only starts color and left_ir. If you want to start other sensors, please go to [camera_secondary_params.yaml](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_secondary_params.yaml) and [camera_params.yaml](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_params.yaml) to modify them.
-
-
+> Note: By default, multi_gmsl_camera_synced.launch.py only starts color and depth. If you want to start other sensors, please go to [camera_secondary_params.yaml](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_secondary_params.yaml) and [camera_params.yaml](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_params.yaml) to modify them.
 
 ## Usage Limitations of GMSL Cameras
 

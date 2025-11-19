@@ -1,6 +1,6 @@
 # GMSL 相机
 
-> 本节介绍如何在 OrbbecSDK_ROS2 中使用 GMSL 相机。目前仅支持 Gemini 335Lg GMSL 设备，其他 GMSL 设备将在不久的将来得到支持。
+> 本节介绍如何在 OrbbecSDK_ROS2 中使用 GMSL 相机。目前仅支持 Gemini 335Lg 和 Gemini 345Lg 设备，其他 GMSL 设备将在不久的将来得到支持。
 
 您可以在 [example](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples) 中找到示例使用代码。
 
@@ -28,7 +28,7 @@ ros2 run orbbec_camera list_devices_node
 ros2 launch orbbec_camera multi_gmsl_camera.launch.py
 ```
 
-> 注意：默认情况下，multi_gmsl_camera.launch.py 仅启动 color 和 left_ir。如果您想启动其他传感器，请转到 [camera_secondary_params.yaml](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_secondary_params.yaml) 进行修改。
+> 注意：默认情况下，multi_gmsl_camera.launch.py 仅启动 color 和 depth。如果您想启动其他传感器，请转到 [camera_secondary_params.yaml](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_secondary_params.yaml) 进行修改。
 
 ## 多个 GMSL 相机同步
 
@@ -49,7 +49,7 @@ ros2 launch orbbec_camera multi_gmsl_camera.launch.py
 ros2 launch orbbec_camera multi_gmsl_camera_synced.launch.py
 ```
 
-> 注意：默认情况下，multi_gmsl_camera_synced.launch.py 仅启动 color 和 left_ir。如果您想启动其他传感器，请转到 [camera_secondary_params.yaml](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_secondary_params.yaml) 和 [camera_params.yaml](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_params.yaml) 进行修改。
+> 注意：默认情况下，multi_gmsl_camera_synced.launch.py 仅启动 color 和 depth。如果您想启动其他传感器，请转到 [camera_secondary_params.yaml](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_secondary_params.yaml) 进行修改。
 
 ## GMSL 相机的使用限制
 

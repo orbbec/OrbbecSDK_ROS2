@@ -372,7 +372,7 @@
   <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="gmsl">
 <h1><span class="section-number">5.2.4. </span>GMSL 相机<a class="headerlink" href="#gmsl" title="Link to this heading"></a></h1>
 <blockquote>
-<div><p>本节介绍如何在 OrbbecSDK_ROS2 中使用 GMSL 相机。目前仅支持 Gemini 335Lg GMSL 设备，其他 GMSL 设备将在不久的将来得到支持。</p>
+<div><p>本节介绍如何在 OrbbecSDK_ROS2 中使用 GMSL 相机。目前仅支持 Gemini 335Lg 和 Gemini 345Lg 设备，其他 GMSL 设备将在不久的将来得到支持。</p>
 </div></blockquote>
 <p>您可以在 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples">example</a> 中找到示例使用代码。</p>
 <section id="id1">
@@ -394,7 +394,7 @@
 </pre></div>
 </div>
 <blockquote>
-<div><p>注意：默认情况下，multi_gmsl_camera.launch.py 仅启动 color 和 left_ir。如果您想启动其他传感器，请转到 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_secondary_params.yaml">camera_secondary_params.yaml</a> 进行修改。</p>
+<div><p>注意：默认情况下，multi_gmsl_camera.launch.py 仅启动 color 和 depth。如果您想启动其他传感器，请转到 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_secondary_params.yaml">camera_secondary_params.yaml</a> 进行修改。</p>
 </div></blockquote>
 </section>
 <section id="id3">
@@ -412,7 +412,7 @@
 </pre></div>
 </div>
 <blockquote>
-<div><p>注意：默认情况下，multi_gmsl_camera_synced.launch.py 仅启动 color 和 left_ir。如果您想启动其他传感器，请转到 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_secondary_params.yaml">camera_secondary_params.yaml</a> 和 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_params.yaml">camera_params.yaml</a> 进行修改。</p>
+<div><p>注意：默认情况下，multi_gmsl_camera_synced.launch.py 仅启动 color 和 depth。如果您想启动其他传感器，请转到 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_secondary_params.yaml">camera_secondary_params.yaml</a> 进行修改。</p>
 </div></blockquote>
 </section>
 <section id="id4">
@@ -424,8 +424,8 @@
 <li><p>当使用 Max96712 作为反序列化器芯片时，由于 Max96712 芯片的特性，在 secondary_synced 模式下必须提供多机同步触发信号。否则，在切换数据流时会发生数据流中断。</p></li>
 <li><p>连接在同一个 MAX9296、MAX96712 LinkA/B 或 MAX96712 LinkC/D 上的两个相机有以下限制：</p>
 <ul>
-<li><p>在驱动程序版本 v12.02 之前，存在一个限制，即一个相机的 RGB 和另一个相机的右 IR 不能同时流式传输。在驱动程序版本 v12.02 之后，限制修改为一个相机的 RGB 和另一个相机的左 IR 不能同时流式传输。</p></li>
-<li><p>在驱动程序版本 v12.02 之前，存在一个限制，即一个相机的 DEPTH 和另一个相机的左 IR 不能同时流式传输。在驱动程序版本 v12.02 之后，限制修改为一个相机的 DEPTH 和另一个相机的右 IR 不能同时流式传输。</p></li>
+<li><p>在驱动程序版本 v1.2.02 之前，存在一个限制，即一个相机的 RGB 和另一个相机的右 IR 不能同时流式传输。在驱动程序版本 v1.2.02 之后，限制修改为一个相机的 RGB 和另一个相机的左 IR 不能同时流式传输。</p></li>
+<li><p>在驱动程序版本 v1.2.02 之前，存在一个限制，即一个相机的 DEPTH 和另一个相机的左 IR 不能同时流式传输。在驱动程序版本 v1.2.02 之后，限制修改为一个相机的 DEPTH 和另一个相机的右 IR 不能同时流式传输。</p></li>
 <li><p>两个相机的活动流的组合最大数量限制为四个（满足上述两个条件即可确保合规）。</p></li>
 </ul>
 </li>
@@ -446,7 +446,7 @@
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2025年11月17日 01:39:35.
+      <span class="lastupdated">最后更新于 2025年11月19日 07:20:27.
       </span></p>
   </div>
 

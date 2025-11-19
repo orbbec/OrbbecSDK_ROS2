@@ -1,6 +1,6 @@
 # GMSL 相机
 
-> 本节介绍如何在 OrbbecSDK_ROS2 中使用 GMSL 相机。目前仅支持 Gemini 335Lg GMSL 设备，其他 GMSL 设备将在不久的将来得到支持。
+> 本节介绍如何在 OrbbecSDK_ROS2 中使用 GMSL 相机。目前仅支持 Gemini 335Lg 和 Gemini 345Lg 设备，其他 GMSL 设备将在不久的将来得到支持。
 
 您可以在 [example](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples) 中找到示例使用代码。
 
@@ -28,7 +28,7 @@ ros2 run orbbec_camera list_devices_node
 ros2 launch orbbec_camera multi_gmsl_camera.launch.py
 ```
 
-> 注意：默认情况下，multi_gmsl_camera.launch.py 仅启动 color 和 left_ir。如果您想启动其他传感器，请转到 [camera_secondary_params.yaml](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_secondary_params.yaml) 进行修改。
+> 注意：默认情况下，multi_gmsl_camera.launch.py 仅启动 color 和 depth。如果您想启动其他传感器，请转到 [camera_secondary_params.yaml](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_secondary_params.yaml) 进行修改。
 
 ## 多个 GMSL 相机同步
 
@@ -49,7 +49,7 @@ ros2 launch orbbec_camera multi_gmsl_camera.launch.py
 ros2 launch orbbec_camera multi_gmsl_camera_synced.launch.py
 ```
 
-> 注意：默认情况下，multi_gmsl_camera_synced.launch.py 仅启动 color 和 left_ir。如果您想启动其他传感器，请转到 [camera_secondary_params.yaml](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_secondary_params.yaml) 和 [camera_params.yaml](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_params.yaml) 进行修改。
+> 注意：默认情况下，multi_gmsl_camera_synced.launch.py 仅启动 color 和 depth。如果您想启动其他传感器，请转到 [camera_secondary_params.yaml](https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_secondary_params.yaml) 进行修改。
 
 ## GMSL 相机的使用限制
 
@@ -59,8 +59,8 @@ GMSL 相机与各种反序列化器芯片（如 MAX9296 和 MAX92716）接口。
 - Gemini-335Lg 的元数据通过单独的节点提供，而其他型号的元数据嵌入在视频帧中，这对用户保持透明。
 - 当使用 Max96712 作为反序列化器芯片时，由于 Max96712 芯片的特性，在 secondary_synced 模式下必须提供多机同步触发信号。否则，在切换数据流时会发生数据流中断。
 - 连接在同一个 MAX9296、MAX96712 LinkA/B 或 MAX96712 LinkC/D 上的两个相机有以下限制：
-  - 在驱动程序版本 v12.02 之前，存在一个限制，即一个相机的 RGB 和另一个相机的右 IR 不能同时流式传输。在驱动程序版本 v12.02 之后，限制修改为一个相机的 RGB 和另一个相机的左 IR 不能同时流式传输。
-  - 在驱动程序版本 v12.02 之前，存在一个限制，即一个相机的 DEPTH 和另一个相机的左 IR 不能同时流式传输。在驱动程序版本 v12.02 之后，限制修改为一个相机的 DEPTH 和另一个相机的右 IR 不能同时流式传输。
+  - 在驱动程序版本 v1.2.02 之前，存在一个限制，即一个相机的 RGB 和另一个相机的右 IR 不能同时流式传输。在驱动程序版本 v1.2.02 之后，限制修改为一个相机的 RGB 和另一个相机的左 IR 不能同时流式传输。
+  - 在驱动程序版本 v1.2.02 之前，存在一个限制，即一个相机的 DEPTH 和另一个相机的左 IR 不能同时流式传输。在驱动程序版本 v1.2.02 之后，限制修改为一个相机的 DEPTH 和另一个相机的右 IR 不能同时流式传输。
   - 两个相机的活动流的组合最大数量限制为四个（满足上述两个条件即可确保合规）。
 
 有关更多已知限制，请参考 [Orbbec GMSL 相机的使用限制](https://github.com/orbbec/MIPI_Camera_Platform_Driver/blob/main/doc/Instructions%20for%20Using%20GMSL%20Camera.md)

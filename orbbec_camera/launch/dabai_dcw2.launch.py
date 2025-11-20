@@ -71,6 +71,7 @@ def generate_launch_description():
         DeclareLaunchArgument('ir_info_url', default_value=''),
         DeclareLaunchArgument('color_info_url', default_value=''),
         DeclareLaunchArgument('log_level', default_value='none'),
+        DeclareLaunchArgument('log_file_name', default_value=''),
         DeclareLaunchArgument('enable_publish_extrinsic', default_value='false'),
         DeclareLaunchArgument('enable_soft_filter', default_value='true'),
         DeclareLaunchArgument('enable_ldp', default_value='true'),

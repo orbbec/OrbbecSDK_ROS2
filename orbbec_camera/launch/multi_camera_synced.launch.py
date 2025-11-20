@@ -25,6 +25,8 @@ def generate_launch_description():
             "sync_mode": "primary",
             "config_file_path": config_file_path,
             "trigger_out_enabled": "true"
+            "log_level": "none",
+            "log_file_name": "camera_01.log",
         }.items(),
     )
 
@@ -39,6 +41,8 @@ def generate_launch_description():
             "sync_mode": "secondary_synced",
             "config_file_path": secondary_config_file_path,
             "trigger_out_enabled": "false"
+            "log_level": "none",
+            "log_file_name": "camera_02.log",
         }.items(),
     )
 

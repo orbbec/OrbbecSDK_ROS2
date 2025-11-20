@@ -167,6 +167,7 @@ def generate_launch_description():
         DeclareLaunchArgument('net_device_port', default_value='0'),
         DeclareLaunchArgument('exposure_range_mode', default_value='default'),#default, ultimate or regular
         DeclareLaunchArgument('log_level', default_value='none'),
+        DeclareLaunchArgument('log_file_name', default_value=''),
         DeclareLaunchArgument('enable_publish_extrinsic', default_value='false'),
         DeclareLaunchArgument('enable_d2c_viewer', default_value='false'),
         DeclareLaunchArgument('disparity_to_depth_mode', default_value='HW'),

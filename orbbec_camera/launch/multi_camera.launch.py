@@ -21,6 +21,7 @@ def generate_launch_description():
             'sync_mode': 'standalone',
             'enable_left_ir': 'true',
             'enable_right_ir': 'true',
+            'log_level': 'none',
             'log_file_name': 'camera_01.log',
         }.items()
     )
@@ -36,6 +37,7 @@ def generate_launch_description():
             'sync_mode': 'standalone',
             'enable_left_ir': 'true',
             'enable_right_ir': 'true',
+            'log_level': 'none',
             'log_file_name': 'camera_02.log',
         }.items()
     )

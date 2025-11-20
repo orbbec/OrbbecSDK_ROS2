@@ -180,25 +180,15 @@ void OBCameraNodeDriver::init() {
   signal(SIGINT, signalHandler);
   signal(SIGTERM, signalHandler);
   ob::Context::setExtensionsDirectory(extension_path_.c_str());
-  if (config_path_.empty()) {
-    ctx_ = std::make_unique<ob::Context>();
-  } else {
-    ctx_ = std::make_unique<ob::Context>(config_path_.c_str());
-  }
-  // Force IP
-  force_ip_enable_ = declare_parameter<bool>("force_ip_enable", false);
-  force_ip_mac_ = declare_parameter<std::string>("force_ip_mac", "");
-  force_ip_address_ = declare_parameter<std::string>("force_ip_address", "192.168.1.10");
-  force_ip_subnet_mask_ = declare_parameter<std::string>("force_ip_subnet_mask", "255.255.255.0");
-  force_ip_gateway_ = declare_parameter<std::string>("force_ip_gateway", "192.168.1.1");
-  applyForceIpConfig();
+  g_camera_name = declare_parameter<std::string>("camera_name", g_camera_name);
   auto log_level_str = declare_parameter<std::string>("log_level", "none");
   auto log_level = obLogSeverityFromString(log_level_str);
   auto log_file_name = declare_parameter<std::string>("log_file_name", "");
-
+  std::string pwd_dir = std::getenv("PWD") ? std::getenv("PWD") : std::getenv("HOME");
+  std::string log_path = pwd_dir + "/Log/" + g_camera_name;
   // Set logger to console
   ob::Context::setLoggerToConsole(log_level);
-
+  ob::Context::setLoggerToFile(log_level, log_path.c_str());
   // Set custom log file name if specified
   if (!log_file_name.empty()) {
     try {
@@ -208,17 +198,26 @@ void OBCameraNodeDriver::init() {
       RCLCPP_WARN_STREAM(logger_, "Failed to set SDK log file name: " << e.getMessage());
     }
   }
-
+  // Force IP
+  force_ip_enable_ = declare_parameter<bool>("force_ip_enable", false);
+  force_ip_mac_ = declare_parameter<std::string>("force_ip_mac", "");
+  force_ip_address_ = declare_parameter<std::string>("force_ip_address", "192.168.1.10");
+  force_ip_subnet_mask_ = declare_parameter<std::string>("force_ip_subnet_mask", "255.255.255.0");
+  force_ip_gateway_ = declare_parameter<std::string>("force_ip_gateway", "192.168.1.1");
+  applyForceIpConfig();
+  if (config_path_.empty()) {
+    ctx_ = std::make_unique<ob::Context>();
+  } else {
+    ctx_ = std::make_unique<ob::Context>(config_path_.c_str());
+  }
   connection_delay_ = static_cast<int>(declare_parameter<int>("connection_delay", 100));
   enable_sync_host_time_ = declare_parameter<bool>("enable_sync_host_time", true);
   double time_sync_period = declare_parameter<double>("time_sync_period", 60.0);
   time_sync_period_ = std::chrono::milliseconds((int)(time_sync_period * 1000));
   upgrade_firmware_ = declare_parameter<std::string>("upgrade_firmware", "");
-  g_camera_name = declare_parameter<std::string>("camera_name", g_camera_name);
   g_time_domain = declare_parameter<std::string>("time_domain", g_time_domain);
   preset_firmware_path_ =
       declare_parameter<std::string>("preset_firmware_path", preset_firmware_path_);
-  ob::Context::setLoggerToConsole(log_level);
   orb_device_lock_shm_fd_ = shm_open(ORB_DEFAULT_LOCK_NAME.c_str(), O_CREAT | O_RDWR, 0666);
   if (orb_device_lock_shm_fd_ < 0) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to open shared memory " << ORB_DEFAULT_LOCK_NAME);

@@ -44,7 +44,7 @@ def generate_launch_description():
     # Include launch files
     package_dir = get_package_share_directory("orbbec_camera")
     launch_file_dir = os.path.join(
-        package_dir, "examples/gmsl_camera"
+        package_dir, "examples/gmsl_camera" #or launch
     )
     config_file_dir = os.path.join(package_dir, "config")
     secondary_config_file_path = os.path.join(config_file_dir, "camera_secondary_params.yaml")
@@ -68,7 +68,7 @@ def generate_launch_description():
 
     launch1_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "gemini_330_gmsl.launch.py")
+            os.path.join(launch_file_dir, "gemini_330_gmsl.launch.py") #or gemini345_lg.launch.py
         ),
         launch_arguments={
             "camera_name": "camera_01",
@@ -83,7 +83,7 @@ def generate_launch_description():
 
     launch2_include = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, "gemini_330_gmsl.launch.py")
+            os.path.join(launch_file_dir, "gemini_330_gmsl.launch.py")#or gemini345_lg.launch.py
         ),
         launch_arguments={
             "camera_name": "camera_02",

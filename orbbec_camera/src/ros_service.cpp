@@ -261,7 +261,63 @@ void OBCameraNode::setupCameraCtrlServices() {
                                    std::shared_ptr<GetBool::Response> response) {
         getStreamsEnableCallback(request, response);
       });
+  set_point_cloud_decimation_srv_ = node_->create_service<SetInt32>(
+      "set_point_cloud_decimation", [this](const std::shared_ptr<SetInt32::Request> request,
+                                            std::shared_ptr<SetInt32::Response> response) {
+        setPointCloudDecimationCallback(request, response);
+      });
+  get_point_cloud_decimation_srv_ = node_->create_service<GetInt32>(
+      "get_point_cloud_decimation", [this](const std::shared_ptr<GetInt32::Request> request,
+                                            std::shared_ptr<GetInt32::Response> response) {
+        getPointCloudDecimationCallback(request, response);
+      });
 }
+
+void OBCameraNode::getPointCloudDecimationCallback(
+    const std::shared_ptr<GetInt32::Request>& request,
+    std::shared_ptr<GetInt32::Response>& response) {
+  (void)request;
+  try {
+    response->data = point_cloud_decimation_filter_factor_;
+    response->success = true;
+  } catch (const std::exception& e) {
+    response->success = false;
+    response->message = e.what();
+  } catch (...) {
+    response->success = false;
+    response->message = "unknown error";
+  }
+}
+
+void OBCameraNode::setPointCloudDecimationCallback(
+    const std::shared_ptr<SetInt32::Request>& request,
+    std::shared_ptr<SetInt32::Response>& response) {
+  if (!request) {
+    response->success = false;
+    response->message = "Invalid request";
+    return;
+  }
+
+  if (request->data <= 0 || request->data > 8) {
+    response->success = false;
+    response->message = "Decimation factor must be between 1 and 8";
+    RCLCPP_WARN_STREAM(logger_, "Invalid decimation factor: " << request->data);
+    return;
+  }
+
+  try {
+    point_cloud_decimation_filter_factor_ = request->data;
+    RCLCPP_INFO_STREAM(logger_, "Set point_cloud_decimation_filter_factor to "
+                                << point_cloud_decimation_filter_factor_);
+    response->success = true;
+    response->message = "Point cloud decimation factor updated successfully";
+  } catch (const std::exception &e) {
+    response->success = false;
+    response->message = std::string("Failed to set decimation factor: ") + e.what();
+    RCLCPP_ERROR_STREAM(logger_, response->message);
+  }
+}
+
 void OBCameraNode::setStreamsEnableCallback(
     const std::shared_ptr<std_srvs::srv::SetBool::Request> request,
     std::shared_ptr<std_srvs::srv::SetBool::Response> response) {

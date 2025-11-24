@@ -2326,32 +2326,32 @@ void OBCameraNode::setupPublishers() {
   if (enable_stream_[DEPTH] && enable_stream_[INFRA0] && enable_publish_extrinsic_) {
     depth_to_other_extrinsics_publishers_[INFRA0] =
         node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
-            "/" + camera_name_ + "/depth_to_ir", extrinsics_qos);
+            "depth_to_ir", extrinsics_qos);
   }
   if (enable_stream_[DEPTH] && enable_stream_[COLOR] && enable_publish_extrinsic_) {
     depth_to_other_extrinsics_publishers_[COLOR] =
         node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
-            "/" + camera_name_ + "/depth_to_color", extrinsics_qos);
+            "depth_to_color", extrinsics_qos);
   }
   if (enable_stream_[DEPTH] && enable_stream_[INFRA1] && enable_publish_extrinsic_) {
     depth_to_other_extrinsics_publishers_[INFRA1] =
         node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
-            "/" + camera_name_ + "/depth_to_left_ir", extrinsics_qos);
+            "depth_to_left_ir", extrinsics_qos);
   }
   if (enable_stream_[DEPTH] && enable_stream_[INFRA2] && enable_publish_extrinsic_) {
     depth_to_other_extrinsics_publishers_[INFRA2] =
         node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
-            "/" + camera_name_ + "/depth_to_right_ir", extrinsics_qos);
+            "depth_to_right_ir", extrinsics_qos);
   }
   if (enable_stream_[DEPTH] && enable_stream_[ACCEL] && enable_publish_extrinsic_) {
     depth_to_other_extrinsics_publishers_[ACCEL] =
         node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
-            "/" + camera_name_ + "/depth_to_accel", extrinsics_qos);
+            "depth_to_accel", extrinsics_qos);
   }
   if (enable_stream_[DEPTH] && enable_stream_[GYRO] && enable_publish_extrinsic_) {
     depth_to_other_extrinsics_publishers_[GYRO] =
         node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
-            "/" + camera_name_ + "/depth_to_gyro", extrinsics_qos);
+            "depth_to_gyro", extrinsics_qos);
   }
   filter_status_pub_ =
       node_->create_publisher<std_msgs::msg::String>("depth_filter_status", extrinsics_qos);

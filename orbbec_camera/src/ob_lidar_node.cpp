@@ -635,6 +635,15 @@ void OBLidarNode::onNewFrameSetCallback(std::shared_ptr<ob::FrameSet> frame_set)
     // Handle multi-frame publishing for LIDAR_POINT and LIDAR_SPHERE_POINT formats
     if ((format_[LIDAR] == OB_FORMAT_LIDAR_POINT ||
          format_[LIDAR] == OB_FORMAT_LIDAR_SPHERE_POINT)) {
+      if (publish_n_pkts_ == 1) {
+        if (format_[LIDAR] == OB_FORMAT_LIDAR_POINT) {
+          publishPointCloud(frame_set);
+          return;
+        } else if (format_[LIDAR] == OB_FORMAT_LIDAR_SPHERE_POINT) {
+          publishSpherePointCloud(frame_set);
+          return;
+        }
+      }
       std::lock_guard<std::mutex> lock(frame_buffer_mutex_);
       frame_buffer_.push_back(frame_set);
       // If we have enough frames, publish merged point cloud
@@ -1208,13 +1217,14 @@ void OBLidarNode::calcAndPublishStaticTransform() {
   //   }
   //   publishStaticTF(timestamp, zero_trans, quaternion_optical, frame_id_[stream_index],
   //                   optical_frame_id_[stream_index]);
-  //   RCLCPP_INFO_STREAM(logger_, "Publishing static transform from " << stream_name_[stream_index]
+  //   RCLCPP_INFO_STREAM(logger_, "Publishing static transform from " <<
+  //   stream_name_[stream_index]
   //                                                                   << " to "
   //                                                                   <<
   //                                                                   stream_name_[base_stream_]);
   //   RCLCPP_INFO_STREAM(logger_, "Translation " << trans[0] << ", " << trans[1] << ", " <<
-  //   trans[2]); RCLCPP_INFO_STREAM(logger_, "Rotation " << Q.getX() << ", " << Q.getY() << ", " <<
-  //   Q.getZ()
+  //   trans[2]); RCLCPP_INFO_STREAM(logger_, "Rotation " << Q.getX() << ", " << Q.getY() << ", "
+  //   << Q.getZ()
   //                                           << ", " << Q.getW());
   // }
   if (enable_imu_) {

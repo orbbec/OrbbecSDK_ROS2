@@ -109,12 +109,12 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'repetitive_scan_mode',
             default_value='-1',
-            description='Repetitive scan mode. -1 uses device default; other values depend on device capability.'
+            description='Repetitive scan mode. -1 uses device default; 0 non-repeating; 1/2/4 for different repetition frequencies.'
         ),
         DeclareLaunchArgument(
             'filter_level',
             default_value='-1',
-            description='Filtering level. -1 uses default; non-negative integers increase filtering strength.'
+            description='Filtering level. -1 uses default; non-negative integers increase filtering strength, 0-5 are valid levels.'
         ),
         DeclareLaunchArgument(
             'vertical_fov',

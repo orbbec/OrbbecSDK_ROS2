@@ -6,6 +6,18 @@
 
 ![module in rviz2](../image/application_guide/image1.png)
 
+### TF from coordinate A to coordinate B:
+
+In Orbbec cameras, the origin point (0,0,0) is taken from the camera_link position.
+
+You can view the camera's URDF model and coordinate system structure using the following command:
+
+```bash
+ros2 launch orbbec_description view_model.launch.py model:=gemini_335_336.urdf.xacro
+```
+
+![module in rviz2](../image/application_guide/image2.png)
+
 ### ROS2 Robot Coordinate System vs Camera Optical Coordinate System
 
 * Point of View:

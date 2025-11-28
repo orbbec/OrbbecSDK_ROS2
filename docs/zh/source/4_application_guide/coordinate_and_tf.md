@@ -6,6 +6,18 @@
 
 ![module in rviz2](../image/application_guide/image1.png)
 
+### 从坐标系A到坐标系B的TF变换：
+
+在Orbbec相机中，原点（0,0,0）取自camera_link位置。
+
+可以使用以下命令查看相机的URDF模型和坐标系结构：
+
+```bash
+ros2 launch orbbec_description view_model.launch.py model:=gemini_335_336.urdf.xacro
+```
+
+![rviz2中的模块](../image/application_guide/image2.png)
+
 ### ROS2机器人坐标系 vs 相机光学坐标系
 
 * 视角：

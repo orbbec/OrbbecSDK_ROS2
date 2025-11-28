@@ -1,3 +1,30 @@
+### Binary Installation
+
+#### Environment
+
+Install ROS 2 according to the official guide:
+
+* [ROS 2 installation (Ubuntu)](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)
+
+#### Linux Binary Package Installation
+
+Check available packages:
+
+```bash
+sudo apt update
+apt list | grep orbbec
+```
+
+Install OrbbecSDK ROS2 package:
+
+```bash
+sudo apt install ros-humble-orbbec-camera ros-humble-orbbec-description
+```
+
+After installation, you can use it directly without compilation.
+
+---
+
 ### Build from Source
 
 #### Environment
@@ -36,15 +63,8 @@ Install dependencies:
 sudo apt install libgflags-dev nlohmann-json3-dev \
 ros-$ROS_DISTRO-image-transport ros-${ROS_DISTRO}-image-transport-plugins ros-${ROS_DISTRO}-compressed-image-transport \
 ros-$ROS_DISTRO-image-publisher ros-$ROS_DISTRO-camera-info-manager \
-ros-$ROS_DISTRO-diagnostic-updater ros-$ROS_DISTRO-diagnostic-msgs ros-$ROS_DISTRO-statistics-msgs \
-ros-$ROS_DISTRO-backward-ros libdw-dev
-```
-
-Optional dependencies:
-
-```bash
-# 435Le writeCustomerDate feature:
-sudo apt install libssl-dev
+ros-$ROS_DISTRO-diagnostic-updater ros-$ROS_DISTRO-diagnostic-msgs ros-$ROS_DISTRO-statistics-msgs ros-$ROS_DISTRO-xacro \
+ros-$ROS_DISTRO-backward-ros libdw-dev libssl-dev
 ```
 
 Build:

@@ -68,7 +68,7 @@
 
 #### IR Stream
 *   `/camera/toggle_ir`
-    
+
     ```bash
     ros2 service call /camera/toggle_ir std_srvs/srv/SetBool '{data: true}'
     ```
@@ -113,6 +113,10 @@
 *   `/camera/set_laser_enable`
     ```bash
     ros2 service call /camera/set_laser_enable std_srvs/srv/SetBool '{data: true}'
+    ```
+    `/camera/get_laser_status`
+    ```bash
+    ros2 service call /camera/get_laser_status orbbec_camera_msgs/srv/GetBool '{}'
     ```
 *   `/camera/set_ldp_enable` & `/camera/get_ldp_status`
     ```bash

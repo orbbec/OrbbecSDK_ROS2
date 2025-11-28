@@ -62,12 +62,21 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../2_installation/installation.html">2. Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../2_installation/build_the_package.html">2.1. Build from Source</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../2_installation/build_the_package.html">2.1. Binary Installation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../2_installation/build_the_package.html#environment">2.1.1. Environment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../2_installation/build_the_package.html#linux-ros2-wrapper-compilation">2.1.2. Linux ROS2 Wrapper Compilation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../2_installation/build_the_package.html#linux-binary-package-installation">2.1.2. Linux Binary Package Installation</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../2_installation/registration_script.html">2.2. Registration script (required)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2_installation/build_the_package.html#build-from-source">2.2. Build from Source</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../2_installation/build_the_package.html#id1">2.2.1. Environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../2_installation/build_the_package.html#linux-ros2-wrapper-compilation">2.2.2. Linux ROS2 Wrapper Compilation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../2_installation/registration_script.html">2.3. Registration Script (Required)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../2_installation/registration_script.html#binary-installation">2.3.1. Binary Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../2_installation/registration_script.html#build-from-source">2.3.2. Build from Source</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../3_quickstarts/quickstarts.html">3. Quickstarts</a><ul>
@@ -152,15 +161,16 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../4_application_guide/coordinate_and_tf.html">4.4. Coordinate Systems and TF Transforms</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../4_application_guide/coordinate_and_tf.html#camera-sensor-structure">4.4.1. Camera sensor structure</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../4_application_guide/coordinate_and_tf.html#ros2-robot-coordinate-system-vs-camera-optical-coordinate-system">4.4.2. ROS2 Robot Coordinate System vs Camera Optical Coordinate System</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../4_application_guide/coordinate_and_tf.html#using-ros2-tf-tools">4.4.3. Using ROS2 TF Tools</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../4_application_guide/coordinate_and_tf.html#view-tf-tree-structure">4.4.3.1. View TF Tree Structure</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../4_application_guide/coordinate_and_tf.html#visualize-tf-tree-in-rviz2">4.4.3.2. Visualize TF Tree in rviz2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../4_application_guide/coordinate_and_tf.html#tf-from-coordinate-a-to-coordinate-b">4.4.2. TF from coordinate A to coordinate B:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../4_application_guide/coordinate_and_tf.html#ros2-robot-coordinate-system-vs-camera-optical-coordinate-system">4.4.3. ROS2 Robot Coordinate System vs Camera Optical Coordinate System</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../4_application_guide/coordinate_and_tf.html#using-ros2-tf-tools">4.4.4. Using ROS2 TF Tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../4_application_guide/coordinate_and_tf.html#view-tf-tree-structure">4.4.4.1. View TF Tree Structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../4_application_guide/coordinate_and_tf.html#visualize-tf-tree-in-rviz2">4.4.4.2. Visualize TF Tree in rviz2</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../4_application_guide/coordinate_and_tf.html#camera-tf-calculation-and-publishing-mechanism">4.4.4. Camera TF Calculation and Publishing Mechanism</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../4_application_guide/coordinate_and_tf.html#core-function-obcameranode-calcandpublishstatictransform">4.4.4.1. Core Function: OBCameraNode::calcAndPublishStaticTransform()</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../4_application_guide/coordinate_and_tf.html#function-breakdown">4.4.4.2. Function Breakdown</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../4_application_guide/coordinate_and_tf.html#camera-tf-calculation-and-publishing-mechanism">4.4.5. Camera TF Calculation and Publishing Mechanism</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../4_application_guide/coordinate_and_tf.html#core-function-obcameranode-calcandpublishstatictransform">4.4.5.1. Core Function: OBCameraNode::calcAndPublishStaticTransform()</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../4_application_guide/coordinate_and_tf.html#function-breakdown">4.4.5.2. Function Breakdown</a></li>
 </ul>
 </li>
 </ul>
@@ -439,7 +449,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2025, ORBBEC INC. www.orbbec.com..
-      <span class="lastupdated">Last updated on 2025-11-19 07:20:24.
+      <span class="lastupdated">Last updated on 2025-11-28 12:55:13.
       </span></p>
   </div>
 

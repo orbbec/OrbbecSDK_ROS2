@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>2.1. 从源码构建 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+  <title>2.1. 环境配置 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=63de077d" />
@@ -22,7 +22,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="索引" href="../../genindex.html" />
     <link rel="search" title="搜索" href="../../search.html" />
-    <link rel="next" title="2.2. 注册脚本（必需）" href="registration_script.html" />
+    <link rel="next" title="2.4. 注册脚本（必需）" href="registration_script.html" />
     <link rel="prev" title="2. 安装" href="installation.html" /> 
 </head>
 
@@ -63,12 +63,20 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="installation.html">2. 安装</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">2.1. 从源码构建</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id2">2.1.1. 环境配置</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#linux-ros2">2.1.2. Linux ROS2 包装器编译</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">2.1. 环境配置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">2.2. 二进制安装</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#linux">2.2.1. Linux 二进制包安装</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="registration_script.html">2.2. 注册脚本（必需）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">2.3. 从源码构建</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#linux-ros2">2.3.1. Linux ROS2 包装器编译</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="registration_script.html">2.4. 注册脚本（必需）</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="registration_script.html#id2">2.4.1. 二进制安装</a></li>
+<li class="toctree-l3"><a class="reference internal" href="registration_script.html#id3">2.4.2. 从源码构建</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../3_quickstarts/quickstarts.html">3. 快速开始</a><ul>
@@ -153,15 +161,16 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html">4.4. 坐标系和 TF 变换</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#id1">4.4.1. 相机传感器结构</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#ros2-vs">4.4.2. ROS2机器人坐标系 vs 相机光学坐标系</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#ros2-tf">4.4.3. ROS2 TF工具的使用</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#id2">4.4.3.1. 查看TF树结构</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#rviz2tf">4.4.3.2. 使用rviz2可视化TF树</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#abtf">4.4.2. 从坐标系A到坐标系B的TF变换：</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#ros2-vs">4.4.3. ROS2机器人坐标系 vs 相机光学坐标系</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#ros2-tf">4.4.4. ROS2 TF工具的使用</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#id2">4.4.4.1. 查看TF树结构</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#rviz2tf">4.4.4.2. 使用rviz2可视化TF树</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#id3">4.4.4. 相机TF计算和发布机制</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#obcameranode-calcandpublishstatictransform">4.4.4.1. 核心函数：OBCameraNode::calcAndPublishStaticTransform()</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#id4">4.4.4.2. 函数解析</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#id3">4.4.5. 相机TF计算和发布机制</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#obcameranode-calcandpublishstatictransform">4.4.5.1. 核心函数：OBCameraNode::calcAndPublishStaticTransform()</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#id4">4.4.5.2. 函数解析</a></li>
 </ul>
 </li>
 </ul>
@@ -359,7 +368,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="installation.html"><span class="section-number">2. </span>安装</a></li>
-      <li class="breadcrumb-item active"><span class="section-number">2.1. </span>从源码构建</li>
+      <li class="breadcrumb-item active"><span class="section-number">2.1. </span>环境配置</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/source/2_installation/build_the_package.md.txt" rel="nofollow"> 查看页面源码</a>
       </li>
@@ -370,9 +379,7 @@
            <div itemprop="articleBody">
              
   <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="id1">
-<h1><span class="section-number">2.1. </span>从源码构建<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
-<section id="id2">
-<h2><span class="section-number">2.1.1. </span>环境配置<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<h1><span class="section-number">2.1. </span>环境配置<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
 <p>根据官方指南安装 ROS 2：</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html">ROS 2 安装指南（Ubuntu）</a></p></li>
@@ -387,8 +394,27 @@
 </pre></div>
 </div>
 </section>
+<section id="id2">
+<h1><span class="section-number">2.2. </span>二进制安装<a class="headerlink" href="#id2" title="Link to this heading"></a></h1>
+<section id="linux">
+<h2><span class="section-number">2.2.1. </span>Linux 二进制包安装<a class="headerlink" href="#linux" title="Link to this heading"></a></h2>
+<p>查看软件包：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update
+apt<span class="w"> </span>list<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>orbbec
+</pre></div>
+</div>
+<p>安装 OrbbecSDK ROS2 包：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ros-humble-orbbec-camera<span class="w"> </span>ros-humble-orbbec-description
+</pre></div>
+</div>
+<p>安装完成后，直接使用即可，无需编译。</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="id3">
+<h1><span class="section-number">2.3. </span>从源码构建<a class="headerlink" href="#id3" title="Link to this heading"></a></h1>
 <section id="linux-ros2">
-<h2><span class="section-number">2.1.2. </span>Linux ROS2 包装器编译<a class="headerlink" href="#linux-ros2" title="Link to this heading"></a></h2>
+<h2><span class="section-number">2.3.1. </span>Linux ROS2 包装器编译<a class="headerlink" href="#linux-ros2" title="Link to this heading"></a></h2>
 <p>克隆源代码并切换到 <code class="docutils literal notranslate"><span class="pre">v2-main</span></code> 分支：</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/ros2_ws/src
 git<span class="w"> </span>clone<span class="w"> </span>https://github.com/orbbec/OrbbecSDK_ROS2.git
@@ -400,13 +426,8 @@ git<span class="w"> </span>checkout<span class="w"> </span>v2-main
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>libgflags-dev<span class="w"> </span>nlohmann-json3-dev<span class="w"> </span><span class="se">\</span>
 ros-<span class="nv">$ROS_DISTRO</span>-image-transport<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-image-transport-plugins<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-compressed-image-transport<span class="w"> </span><span class="se">\</span>
 ros-<span class="nv">$ROS_DISTRO</span>-image-publisher<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-camera-info-manager<span class="w"> </span><span class="se">\</span>
-ros-<span class="nv">$ROS_DISTRO</span>-diagnostic-updater<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-diagnostic-msgs<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-statistics-msgs<span class="w"> </span><span class="se">\</span>
-ros-<span class="nv">$ROS_DISTRO</span>-backward-ros<span class="w"> </span>libdw-dev
-</pre></div>
-</div>
-<p>可选依赖项：</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 435Le writeCustomerDate 功能：</span>
-sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>libssl-dev
+ros-<span class="nv">$ROS_DISTRO</span>-diagnostic-updater<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-diagnostic-msgs<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-statistics-msgs<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-xacro<span class="w"> </span><span class="se">\</span>
+ros-<span class="nv">$ROS_DISTRO</span>-backward-ros<span class="w"> </span>libdw-dev<span class="w"> </span>libssl-dev
 </pre></div>
 </div>
 <p>构建：</p>
@@ -422,14 +443,14 @@ colcon<span class="w"> </span>build<span class="w"> </span>--event-handlers<span
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
         <a href="installation.html" class="btn btn-neutral float-left" title="2. 安装" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
-        <a href="registration_script.html" class="btn btn-neutral float-right" title="2.2. 注册脚本（必需）" accesskey="n" rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="registration_script.html" class="btn btn-neutral float-right" title="2.4. 注册脚本（必需）" accesskey="n" rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2025年11月19日 07:20:27.
+      <span class="lastupdated">最后更新于 2025年11月28日 12:55:17.
       </span></p>
   </div>
 

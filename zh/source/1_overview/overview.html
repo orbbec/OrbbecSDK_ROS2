@@ -63,12 +63,20 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../2_installation/installation.html">2. 安装</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../2_installation/build_the_package.html">2.1. 从源码构建</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../2_installation/build_the_package.html#id2">2.1.1. 环境配置</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../2_installation/build_the_package.html#linux-ros2">2.1.2. Linux ROS2 包装器编译</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../2_installation/build_the_package.html">2.1. 环境配置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../2_installation/build_the_package.html#id2">2.2. 二进制安装</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../2_installation/build_the_package.html#linux">2.2.1. Linux 二进制包安装</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../2_installation/registration_script.html">2.2. 注册脚本（必需）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../2_installation/build_the_package.html#id3">2.3. 从源码构建</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../2_installation/build_the_package.html#linux-ros2">2.3.1. Linux ROS2 包装器编译</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../2_installation/registration_script.html">2.4. 注册脚本（必需）</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../2_installation/registration_script.html#id2">2.4.1. 二进制安装</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../2_installation/registration_script.html#id3">2.4.2. 从源码构建</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../3_quickstarts/quickstarts.html">3. 快速开始</a><ul>
@@ -153,15 +161,16 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html">4.4. 坐标系和 TF 变换</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#id1">4.4.1. 相机传感器结构</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#ros2-vs">4.4.2. ROS2机器人坐标系 vs 相机光学坐标系</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#ros2-tf">4.4.3. ROS2 TF工具的使用</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#id2">4.4.3.1. 查看TF树结构</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#rviz2tf">4.4.3.2. 使用rviz2可视化TF树</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#abtf">4.4.2. 从坐标系A到坐标系B的TF变换：</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#ros2-vs">4.4.3. ROS2机器人坐标系 vs 相机光学坐标系</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#ros2-tf">4.4.4. ROS2 TF工具的使用</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#id2">4.4.4.1. 查看TF树结构</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#rviz2tf">4.4.4.2. 使用rviz2可视化TF树</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#id3">4.4.4. 相机TF计算和发布机制</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#obcameranode-calcandpublishstatictransform">4.4.4.1. 核心函数：OBCameraNode::calcAndPublishStaticTransform()</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#id4">4.4.4.2. 函数解析</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#id3">4.4.5. 相机TF计算和发布机制</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#obcameranode-calcandpublishstatictransform">4.4.5.1. 核心函数：OBCameraNode::calcAndPublishStaticTransform()</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../4_application_guide/coordinate_and_tf.html#id4">4.4.5.2. 函数解析</a></li>
 </ul>
 </li>
 </ul>
@@ -402,7 +411,7 @@
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2025年11月19日 07:20:27.
+      <span class="lastupdated">最后更新于 2025年11月28日 12:55:17.
       </span></p>
   </div>
 

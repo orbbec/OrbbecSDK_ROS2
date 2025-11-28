@@ -33,6 +33,14 @@ The following are the launch parameters available:
     *   Enable filtering of invalid point clouds.
 *   **`point_cloud_qos`, `[stream]_qos`, `[stream]_camera_info_qos`**
     *   ROS 2 Message Quality of Service (QoS) settings. The possible values are `SYSTEM_DEFAULT`, `DEFAULT`, `PARAMETER_EVENTS`, `SERVICES_DEFAULT`, `PARAMETERS`, `SENSOR_DATA` and are case-insensitive. These correspond to `rmw_qos_profile_system_default`, `rmw_qos_profile_default`, `rmw_qos_profile_parameter_events`, `rmw_qos_profile_services_default`, `rmw_qos_profile_parameters`, and `SENSOR_DATA`, respectively.
+*   **`color.image_raw.enable_pub_plugins`**
+    *   Enable Color image transport plugins. Default: `["image_transport/compressed", "image_transport/raw", "image_transport/theora"]`.
+*   **`depth.image_raw.enable_pub_plugins`**
+    *   Enable Depth image transport plugins. Default: `["image_transport/compressedDepth", "image_transport/raw"]`.
+*   **`left_ir.image_raw.enable_pub_plugins`**
+    *   Enable Left IR image transport plugins. Default: `["image_transport/compressed", "image_transport/raw", "image_transport/theora"]`.
+*   **`right_ir.image_raw.enable_pub_plugins`**
+    *   Enable Right IR image transport plugins. Default: `["image_transport/compressed", "image_transport/raw", "image_transport/theora"]`.
 
 ### Sensor Controls
 

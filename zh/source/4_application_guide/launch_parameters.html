@@ -63,12 +63,20 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../2_installation/installation.html">2. 安装</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../2_installation/build_the_package.html">2.1. 从源码构建</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../2_installation/build_the_package.html#id2">2.1.1. 环境配置</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../2_installation/build_the_package.html#linux-ros2">2.1.2. Linux ROS2 包装器编译</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../2_installation/build_the_package.html">2.1. 环境配置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../2_installation/build_the_package.html#id2">2.2. 二进制安装</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../2_installation/build_the_package.html#linux">2.2.1. Linux 二进制包安装</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../2_installation/registration_script.html">2.2. 注册脚本（必需）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../2_installation/build_the_package.html#id3">2.3. 从源码构建</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../2_installation/build_the_package.html#linux-ros2">2.3.1. Linux ROS2 包装器编译</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../2_installation/registration_script.html">2.4. 注册脚本（必需）</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../2_installation/registration_script.html#id2">2.4.1. 二进制安装</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../2_installation/registration_script.html#id3">2.4.2. 从源码构建</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../3_quickstarts/quickstarts.html">3. 快速开始</a><ul>
@@ -153,15 +161,16 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="coordinate_and_tf.html">4.4. 坐标系和 TF 变换</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="coordinate_and_tf.html#id1">4.4.1. 相机传感器结构</a></li>
-<li class="toctree-l3"><a class="reference internal" href="coordinate_and_tf.html#ros2-vs">4.4.2. ROS2机器人坐标系 vs 相机光学坐标系</a></li>
-<li class="toctree-l3"><a class="reference internal" href="coordinate_and_tf.html#ros2-tf">4.4.3. ROS2 TF工具的使用</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="coordinate_and_tf.html#id2">4.4.3.1. 查看TF树结构</a></li>
-<li class="toctree-l4"><a class="reference internal" href="coordinate_and_tf.html#rviz2tf">4.4.3.2. 使用rviz2可视化TF树</a></li>
+<li class="toctree-l3"><a class="reference internal" href="coordinate_and_tf.html#abtf">4.4.2. 从坐标系A到坐标系B的TF变换：</a></li>
+<li class="toctree-l3"><a class="reference internal" href="coordinate_and_tf.html#ros2-vs">4.4.3. ROS2机器人坐标系 vs 相机光学坐标系</a></li>
+<li class="toctree-l3"><a class="reference internal" href="coordinate_and_tf.html#ros2-tf">4.4.4. ROS2 TF工具的使用</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="coordinate_and_tf.html#id2">4.4.4.1. 查看TF树结构</a></li>
+<li class="toctree-l4"><a class="reference internal" href="coordinate_and_tf.html#rviz2tf">4.4.4.2. 使用rviz2可视化TF树</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="coordinate_and_tf.html#id3">4.4.4. 相机TF计算和发布机制</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="coordinate_and_tf.html#obcameranode-calcandpublishstatictransform">4.4.4.1. 核心函数：OBCameraNode::calcAndPublishStaticTransform()</a></li>
-<li class="toctree-l4"><a class="reference internal" href="coordinate_and_tf.html#id4">4.4.4.2. 函数解析</a></li>
+<li class="toctree-l3"><a class="reference internal" href="coordinate_and_tf.html#id3">4.4.5. 相机TF计算和发布机制</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="coordinate_and_tf.html#obcameranode-calcandpublishstatictransform">4.4.5.1. 核心函数：OBCameraNode::calcAndPublishStaticTransform()</a></li>
+<li class="toctree-l4"><a class="reference internal" href="coordinate_and_tf.html#id4">4.4.5.2. 函数解析</a></li>
 </ul>
 </li>
 </ul>
@@ -442,6 +451,26 @@
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">point_cloud_qos</span></code>、<code class="docutils literal notranslate"><span class="pre">[stream]_qos</span></code>、<code class="docutils literal notranslate"><span class="pre">[stream]_camera_info_qos</span></code></strong></p>
 <ul>
 <li><p>ROS 2消息服务质量（QoS）设置。可能的值为 <code class="docutils literal notranslate"><span class="pre">SYSTEM_DEFAULT</span></code>、<code class="docutils literal notranslate"><span class="pre">DEFAULT</span></code>、<code class="docutils literal notranslate"><span class="pre">PARAMETER_EVENTS</span></code>、<code class="docutils literal notranslate"><span class="pre">SERVICES_DEFAULT</span></code>、<code class="docutils literal notranslate"><span class="pre">PARAMETERS</span></code>、<code class="docutils literal notranslate"><span class="pre">SENSOR_DATA</span></code>，不区分大小写。这些分别对应 <code class="docutils literal notranslate"><span class="pre">rmw_qos_profile_system_default</span></code>、<code class="docutils literal notranslate"><span class="pre">rmw_qos_profile_default</span></code>、<code class="docutils literal notranslate"><span class="pre">rmw_qos_profile_parameter_events</span></code>、<code class="docutils literal notranslate"><span class="pre">rmw_qos_profile_services_default</span></code>、<code class="docutils literal notranslate"><span class="pre">rmw_qos_profile_parameters</span></code> 和 <code class="docutils literal notranslate"><span class="pre">SENSOR_DATA</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">color.image_raw.enable_pub_plugins</span></code></strong></p>
+<ul>
+<li><p>启用彩色图像传输插件。默认值：<code class="docutils literal notranslate"><span class="pre">[&quot;image_transport/compressed&quot;,</span> <span class="pre">&quot;image_transport/raw&quot;,</span> <span class="pre">&quot;image_transport/theora&quot;]</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">depth.image_raw.enable_pub_plugins</span></code></strong></p>
+<ul>
+<li><p>启用深度图像传输插件。默认值：<code class="docutils literal notranslate"><span class="pre">[&quot;image_transport/compressedDepth&quot;,</span> <span class="pre">&quot;image_transport/raw&quot;]</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">left_ir.image_raw.enable_pub_plugins</span></code></strong></p>
+<ul>
+<li><p>启用左红外图像传输插件。默认值：<code class="docutils literal notranslate"><span class="pre">[&quot;image_transport/compressed&quot;,</span> <span class="pre">&quot;image_transport/raw&quot;,</span> <span class="pre">&quot;image_transport/theora&quot;]</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">right_ir.image_raw.enable_pub_plugins</span></code></strong></p>
+<ul>
+<li><p>启用右红外图像传输插件。默认值：<code class="docutils literal notranslate"><span class="pre">[&quot;image_transport/compressed&quot;,</span> <span class="pre">&quot;image_transport/raw&quot;,</span> <span class="pre">&quot;image_transport/theora&quot;]</span></code>。</p></li>
 </ul>
 </li>
 </ul>
@@ -1009,7 +1038,7 @@
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2025年11月19日 07:20:27.
+      <span class="lastupdated">最后更新于 2025年11月28日 12:55:17.
       </span></p>
   </div>
 

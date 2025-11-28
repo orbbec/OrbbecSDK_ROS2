@@ -1,6 +1,15 @@
-## Registration script (required)
+## Registration Script (Required)
 
-To allow the Orbbec cameras to be recognized correctly on Linux, install the udev rules:
+To allow the Orbbec cameras to be recognized correctly on Linux, install the udev rules.
+
+### Binary Installation
+
+```bash
+sudo cp /opt/ros/$ROS_DISTRO/share/orbbec_camera/udev/99-obsensor-libusb.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules && sudo udevadm trigger
+```
+
+### Build from Source
 
 ```bash
 cd  ~/ros2_ws/src/OrbbecSDK_ROS2/orbbec_camera/scripts

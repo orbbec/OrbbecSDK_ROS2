@@ -33,6 +33,14 @@
     *   启用无效点云过滤。
 *   **`point_cloud_qos`、`[stream]_qos`、`[stream]_camera_info_qos`**
     *   ROS 2消息服务质量（QoS）设置。可能的值为 `SYSTEM_DEFAULT`、`DEFAULT`、`PARAMETER_EVENTS`、`SERVICES_DEFAULT`、`PARAMETERS`、`SENSOR_DATA`，不区分大小写。这些分别对应 `rmw_qos_profile_system_default`、`rmw_qos_profile_default`、`rmw_qos_profile_parameter_events`、`rmw_qos_profile_services_default`、`rmw_qos_profile_parameters` 和 `SENSOR_DATA`。
+*   **`color.image_raw.enable_pub_plugins`**
+    *   启用彩色图像传输插件。默认值：`["image_transport/compressed", "image_transport/raw", "image_transport/theora"]`。
+*   **`depth.image_raw.enable_pub_plugins`**
+    *   启用深度图像传输插件。默认值：`["image_transport/compressedDepth", "image_transport/raw"]`。
+*   **`left_ir.image_raw.enable_pub_plugins`**
+    *   启用左红外图像传输插件。默认值：`["image_transport/compressed", "image_transport/raw", "image_transport/theora"]`。
+*   **`right_ir.image_raw.enable_pub_plugins`**
+    *   启用右红外图像传输插件。默认值：`["image_transport/compressed", "image_transport/raw", "image_transport/theora"]`。
 
 ### 传感器控制
 
@@ -67,7 +75,6 @@
 
 #### 深度流
 *   **`enable_depth_auto_exposure_priority`**
-
     *   启用深度自动曝光优先级。
 *   **`mean_intensity_set_point`**
     *   设置深度图像的目标平均强度。例如：`mean_intensity_set_point:=100`。
@@ -124,16 +131,12 @@
     *   设置网络设备的IP地址和端口（通常为 `8090`）。
 *   **`force_ip_enable`**
     *   启用强制IP功能。**默认值：** `false`
-
 *   **`force_ip_mac`**
     *   连接多个相机时的目标设备MAC地址（例如，`"54:14:FD:06:07:DA"`）。您可以使用 `list_devices_node` 查找每个设备的MAC。**默认值：** `""`
-
 *   **`force_ip_address`**
     *   要分配的静态IP地址。**默认值：** `192.168.1.10`
-
 *   **`force_ip_subnet_mask`**
     *   静态IP的子网掩码。**默认值：** `255.255.255.0`
-
 *   **`force_ip_gateway`**
     *   静态IP的网关地址。**默认值：** `192.168.1.1`
 

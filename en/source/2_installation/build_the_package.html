@@ -68,8 +68,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#build-from-source">2.2. Build from Source</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id1">2.2.1. Environment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#linux-ros2-wrapper-compilation">2.2.2. Linux ROS2 Wrapper Compilation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#linux-ros2-wrapper-compilation">2.2.1. Linux ROS2 Wrapper Compilation</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="registration_script.html">2.3. Registration Script (Required)</a><ul>
@@ -386,6 +385,19 @@
 <ul class="simple">
 <li><p><a class="reference external" href="https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html">ROS 2 installation (Ubuntu)</a></p></li>
 </ul>
+<p>Install dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>libgflags-dev<span class="w"> </span>nlohmann-json3-dev<span class="w"> </span><span class="se">\</span>
+ros-<span class="nv">$ROS_DISTRO</span>-image-transport<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-image-transport-plugins<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-compressed-image-transport<span class="w"> </span><span class="se">\</span>
+ros-<span class="nv">$ROS_DISTRO</span>-image-publisher<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-camera-info-manager<span class="w"> </span><span class="se">\</span>
+ros-<span class="nv">$ROS_DISTRO</span>-diagnostic-updater<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-diagnostic-msgs<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-statistics-msgs<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-xacro<span class="w"> </span><span class="se">\</span>
+ros-<span class="nv">$ROS_DISTRO</span>-backward-ros<span class="w"> </span>libdw-dev<span class="w"> </span>libssl-dev
+</pre></div>
+</div>
+<p>Enable ROS 2 auto-completion:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>register-python-argcomplete3<span class="w"> </span>ros2<span class="k">)</span><span class="s2">&quot;</span>
+<span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>register-python-argcomplete3<span class="w"> </span>colcon<span class="k">)</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
 </section>
 <section id="linux-binary-package-installation">
 <h2><span class="section-number">2.1.2. </span>Linux Binary Package Installation<a class="headerlink" href="#linux-binary-package-installation" title="Link to this heading"></a></h2>
@@ -404,37 +416,17 @@ apt<span class="w"> </span>list<span class="w"> </span><span class="p">|</span><
 <hr class="docutils" />
 <section id="build-from-source">
 <h1><span class="section-number">2.2. </span>Build from Source<a class="headerlink" href="#build-from-source" title="Link to this heading"></a></h1>
-<section id="id1">
-<h2><span class="section-number">2.2.1. </span>Environment<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
-<p>Install ROS 2 according to the official guide:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html">ROS 2 installation (Ubuntu)</a></p></li>
-</ul>
-<p>Enable ROS 2 auto-completion:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>register-python-argcomplete3<span class="w"> </span>ros2<span class="k">)</span><span class="s2">&quot;</span>
-<span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>register-python-argcomplete3<span class="w"> </span>colcon<span class="k">)</span><span class="s2">&quot;</span>
-</pre></div>
-</div>
+<section id="linux-ros2-wrapper-compilation">
+<h2><span class="section-number">2.2.1. </span>Linux ROS2 Wrapper Compilation<a class="headerlink" href="#linux-ros2-wrapper-compilation" title="Link to this heading"></a></h2>
 <p>Create a <code class="docutils literal notranslate"><span class="pre">colcon</span></code> workspace:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>~/ros2_ws/src
 </pre></div>
 </div>
-</section>
-<section id="linux-ros2-wrapper-compilation">
-<h2><span class="section-number">2.2.2. </span>Linux ROS2 Wrapper Compilation<a class="headerlink" href="#linux-ros2-wrapper-compilation" title="Link to this heading"></a></h2>
 <p>Clone source and checkout <code class="docutils literal notranslate"><span class="pre">v2-main</span></code> branch:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/ros2_ws/src
 git<span class="w"> </span>clone<span class="w"> </span>https://github.com/orbbec/OrbbecSDK_ROS2.git
 <span class="nb">cd</span><span class="w"> </span>OrbbecSDK_ROS2
 git<span class="w"> </span>checkout<span class="w"> </span>v2-main
-</pre></div>
-</div>
-<p>Install dependencies:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>libgflags-dev<span class="w"> </span>nlohmann-json3-dev<span class="w"> </span><span class="se">\</span>
-ros-<span class="nv">$ROS_DISTRO</span>-image-transport<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-image-transport-plugins<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-compressed-image-transport<span class="w"> </span><span class="se">\</span>
-ros-<span class="nv">$ROS_DISTRO</span>-image-publisher<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-camera-info-manager<span class="w"> </span><span class="se">\</span>
-ros-<span class="nv">$ROS_DISTRO</span>-diagnostic-updater<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-diagnostic-msgs<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-statistics-msgs<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-xacro<span class="w"> </span><span class="se">\</span>
-ros-<span class="nv">$ROS_DISTRO</span>-backward-ros<span class="w"> </span>libdw-dev<span class="w"> </span>libssl-dev
 </pre></div>
 </div>
 <p>Build:</p>
@@ -457,7 +449,7 @@ colcon<span class="w"> </span>build<span class="w"> </span>--event-handlers<span
 
   <div role="contentinfo">
     <p>&#169; Copyright 2025, ORBBEC INC. www.orbbec.com..
-      <span class="lastupdated">Last updated on 2025-12-01 01:37:24.
+      <span class="lastupdated">Last updated on 2025-12-01 02:24:34.
       </span></p>
   </div>
 

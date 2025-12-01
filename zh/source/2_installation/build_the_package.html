@@ -384,13 +384,17 @@
 <ul class="simple">
 <li><p><a class="reference external" href="https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html">ROS 2 安装指南（Ubuntu）</a></p></li>
 </ul>
+<p>安装依赖项：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>libgflags-dev<span class="w"> </span>nlohmann-json3-dev<span class="w"> </span><span class="se">\</span>
+ros-<span class="nv">$ROS_DISTRO</span>-image-transport<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-image-transport-plugins<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-compressed-image-transport<span class="w"> </span><span class="se">\</span>
+ros-<span class="nv">$ROS_DISTRO</span>-image-publisher<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-camera-info-manager<span class="w"> </span><span class="se">\</span>
+ros-<span class="nv">$ROS_DISTRO</span>-diagnostic-updater<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-diagnostic-msgs<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-statistics-msgs<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-xacro<span class="w"> </span><span class="se">\</span>
+ros-<span class="nv">$ROS_DISTRO</span>-backward-ros<span class="w"> </span>libdw-dev<span class="w"> </span>libssl-dev
+</pre></div>
+</div>
 <p>启用 ROS 2 自动补全：</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>register-python-argcomplete3<span class="w"> </span>ros2<span class="k">)</span><span class="s2">&quot;</span>
 <span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>register-python-argcomplete3<span class="w"> </span>colcon<span class="k">)</span><span class="s2">&quot;</span>
-</pre></div>
-</div>
-<p>创建 <code class="docutils literal notranslate"><span class="pre">colcon</span></code> 工作空间：</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>~/ros2_ws/src
 </pre></div>
 </div>
 </section>
@@ -415,19 +419,15 @@ apt<span class="w"> </span>list<span class="w"> </span><span class="p">|</span><
 <h1><span class="section-number">2.3. </span>从源码构建<a class="headerlink" href="#id3" title="Link to this heading"></a></h1>
 <section id="linux-ros2">
 <h2><span class="section-number">2.3.1. </span>Linux ROS2 包装器编译<a class="headerlink" href="#linux-ros2" title="Link to this heading"></a></h2>
+<p>创建 <code class="docutils literal notranslate"><span class="pre">colcon</span></code> 工作空间：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>~/ros2_ws/src
+</pre></div>
+</div>
 <p>克隆源代码并切换到 <code class="docutils literal notranslate"><span class="pre">v2-main</span></code> 分支：</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/ros2_ws/src
 git<span class="w"> </span>clone<span class="w"> </span>https://github.com/orbbec/OrbbecSDK_ROS2.git
 <span class="nb">cd</span><span class="w"> </span>OrbbecSDK_ROS2
 git<span class="w"> </span>checkout<span class="w"> </span>v2-main
-</pre></div>
-</div>
-<p>安装依赖项：</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>libgflags-dev<span class="w"> </span>nlohmann-json3-dev<span class="w"> </span><span class="se">\</span>
-ros-<span class="nv">$ROS_DISTRO</span>-image-transport<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-image-transport-plugins<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-compressed-image-transport<span class="w"> </span><span class="se">\</span>
-ros-<span class="nv">$ROS_DISTRO</span>-image-publisher<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-camera-info-manager<span class="w"> </span><span class="se">\</span>
-ros-<span class="nv">$ROS_DISTRO</span>-diagnostic-updater<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-diagnostic-msgs<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-statistics-msgs<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-xacro<span class="w"> </span><span class="se">\</span>
-ros-<span class="nv">$ROS_DISTRO</span>-backward-ros<span class="w"> </span>libdw-dev<span class="w"> </span>libssl-dev
 </pre></div>
 </div>
 <p>构建：</p>
@@ -450,7 +450,7 @@ colcon<span class="w"> </span>build<span class="w"> </span>--event-handlers<span
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2025年12月01日 01:37:27.
+      <span class="lastupdated">最后更新于 2025年12月01日 02:24:36.
       </span></p>
   </div>
 

@@ -19,6 +19,11 @@
 
 ```bash
 source /opt/ros/$ROS_DISTRO/setup.bash
+```
+
+源码构建需要
+
+```bash
 source ~/ros2_ws/install/setup.bash
 ```
 
@@ -89,4 +94,3 @@ ros2 service call /camera/get_device_info orbbec_camera_msgs/srv/GetDeviceInfo '
 ```bash
 ros2 bag record /camera/color/image_raw /camera/depth/image_raw
 ```
-

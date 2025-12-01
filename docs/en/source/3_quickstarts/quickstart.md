@@ -19,6 +19,11 @@ Make sure ROS 2 and your workspace environment are sourced:
 
 ```bash
 source /opt/ros/$ROS_DISTRO/setup.bash
+```
+
+Source code build requirements
+
+```bash
 source ~/ros2_ws/install/setup.bash
 ```
 

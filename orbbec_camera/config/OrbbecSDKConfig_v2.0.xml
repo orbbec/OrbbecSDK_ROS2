@@ -59,6 +59,9 @@
                     <Format>MJPG</Format>
                 ]]>
             </Color>
+            <LiDAR>
+                <UseDefaultStreamProfile>true</UseDefaultStreamProfile>
+            </LiDAR>
             <!-- If you need to open other streams, you can refer to the above configuration to add -->
         </Stream>
     </Pipeline>

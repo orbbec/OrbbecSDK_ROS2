@@ -94,6 +94,21 @@ OB_EXPORT bool ob_force_ip_config(const char *macAddress, ob_net_ip_config confi
 OB_EXPORT ob_device *ob_create_net_device(ob_context *context, const char *address, uint16_t port, ob_error **error);
 
 /**
+ * @brief Create a network device object
+ *
+ * @param[in] context Pointer to the context object
+ * @param[in] address IP address of the device
+ * @param[in] port Port number of the device
+ * @param[in] accessMode Device access mode. @ref ob_device_access_mode.
+ *                       If the device does not support setting the Access Mode, the default OB_DEVICE_DEFAULT_ACCESS is used.
+ *                       Applies only on first device creation or after release and re-creation; subsequent calls ignore it.
+ * @param[out] error Pointer to an error object that will be populated if an error occurs during device creation
+ *
+ * @return Pointer to the created device object
+ */
+OB_EXPORT ob_device *ob_create_net_device_ex(ob_context *context, const char *address, uint16_t port, ob_device_access_mode accessMode, ob_error **error);
+
+/**
  * @brief Set a device plug-in callback function
  *
  * @attention The added and removed device lists returned through the callback interface need to be released manually

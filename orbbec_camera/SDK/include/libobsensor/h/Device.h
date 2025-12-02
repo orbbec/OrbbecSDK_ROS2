@@ -712,8 +712,25 @@ OB_EXPORT const char *ob_device_list_get_device_local_gateway(const ob_device_li
  *
  * @return ob_device* The created device.
  *
+ * @note Default access mode is OB_DEVICE_DEFAULT_ACCESS
  */
 OB_EXPORT ob_device *ob_device_list_get_device(const ob_device_list *list, uint32_t index, ob_error **error);
+
+/**
+ * @brief Create a device.
+ *
+ * @attention If the device has already been acquired and created elsewhere, repeated acquisitions will return an error.
+ *
+ * @param[in] list Device list object.
+ * @param[in] index The index of the device to create.
+ * @param[in] accessMode Device access mode. @ref ob_device_access_mode.
+ *                       If the device does not support setting the Access Mode, the default OB_DEVICE_DEFAULT_ACCESS is used.
+ *                       Applies only on first device creation or after release and re-creation; subsequent calls ignore it.
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
+ * @return ob_device* The created device.
+ */
+OB_EXPORT ob_device *ob_device_list_get_device_ex(const ob_device_list *list, uint32_t index, ob_device_access_mode accessMode, ob_error **error);
 
 /**
  * @brief Create a device.
@@ -725,8 +742,27 @@ OB_EXPORT ob_device *ob_device_list_get_device(const ob_device_list *list, uint3
  * @param[out] error Pointer to an error object that will be set if an error occurs.
  *
  * @return ob_device* The created device.
+ *
+ * @note Default access mode is OB_DEVICE_DEFAULT_ACCESS
  */
 OB_EXPORT ob_device *ob_device_list_get_device_by_serial_number(const ob_device_list *list, const char *serial_number, ob_error **error);
+
+/**
+ * @brief Create a device.
+ *
+ * @attention If the device has already been acquired and created elsewhere, repeated acquisitions will return an error.
+ *
+ * @param[in] list Device list object.
+ * @param[in] serial_number The serial number of the device to create.
+ * @param[in] accessMode Device access mode. @ref ob_device_access_mode.
+ *                       If the device does not support setting the Access Mode, the default OB_DEVICE_DEFAULT_ACCESS is used.
+ *                       Applies only on first device creation or after release and re-creation; subsequent calls ignore it.
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
+ * @return ob_device* The created device.
+ */
+OB_EXPORT ob_device *ob_device_list_get_device_by_serial_number_ex(const ob_device_list *list, const char *serial_number, ob_device_access_mode accessMode,
+                                                                   ob_error **error);
 
 /**
  * @brief Create device by uid
@@ -742,8 +778,30 @@ OB_EXPORT ob_device *ob_device_list_get_device_by_serial_number(const ob_device_
  * @param[out] error Pointer to an error object that will be set if an error occurs.
  *
  * @return ob_device* The created device.
+ *
+ * @note Default access mode is OB_DEVICE_DEFAULT_ACCESS
  */
 OB_EXPORT ob_device *ob_device_list_get_device_by_uid(const ob_device_list *list, const char *uid, ob_error **error);
+
+/**
+ * @brief Create device by uid
+ * @brief On Linux platform, for usb device, the uid of the device is composed of bus-port-dev, for example 1-1.2-1. But the SDK will remove the dev number and
+ * only keep the bus-port as the uid to create the device, for example 1-1.2, so that we can create a device connected to the specified USB port. Similarly,
+ * users can also directly pass in bus-port as uid to create device.
+ * @brief For GMSL device, the uid is GMSL port with "gmsl2-" prefix, for example gmsl2-1.
+ *
+ * @attention If the device has already been acquired and created elsewhere, repeated acquisitions will return an error.
+ *
+ * @param[in] list Device list object.
+ * @param[in] uid The UID of the device to create.
+ * @param[in] accessMode Device access mode. @ref ob_device_access_mode.
+ *                       If the device does not support setting the Access Mode, the default OB_DEVICE_DEFAULT_ACCESS is used.
+ *                       Applies only on first device creation or after release and re-creation; subsequent calls ignore it.
+ * @param[out] error Pointer to an error object that will be set if an error occurs.
+ *
+ * @return ob_device* The created device.
+ */
+OB_EXPORT ob_device *ob_device_list_get_device_by_uid_ex(const ob_device_list *list, const char *uid, ob_device_access_mode accessMode, ob_error **error);
 
 /**
  * @brief Get the original parameter list of camera calibration saved on the device.

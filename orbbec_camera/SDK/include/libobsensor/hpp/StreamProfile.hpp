@@ -381,6 +381,24 @@ public:
     }
 };
 
+/**
+ * @brief Class representing a LiDAR stream profile.
+ */
+
+class LiDARStreamProfile : public StreamProfile {
+public:
+    explicit LiDARStreamProfile(const ob_stream_profile_t *impl) : StreamProfile(impl) {}
+
+    ~LiDARStreamProfile() noexcept override = default;
+
+    OBLiDARScanRate getScanRate() const {
+        ob_error *error = nullptr;
+        auto      rate  = ob_lidar_stream_profile_get_scan_rate(impl_, &error);
+        Error::handle(&error);
+        return rate;
+    }
+};
+
 template <typename T> bool StreamProfile::is() const {
     switch(this->getType()) {
     case OB_STREAM_VIDEO:
@@ -396,6 +414,8 @@ template <typename T> bool StreamProfile::is() const {
         return typeid(T) == typeid(AccelStreamProfile);
     case OB_STREAM_GYRO:
         return typeid(T) == typeid(GyroStreamProfile);
+    case OB_STREAM_LIDAR:
+        return typeid(T) == typeid(LiDARStreamProfile);
     default:
         break;
     }
@@ -421,6 +441,8 @@ public:
             return std::make_shared<AccelStreamProfile>(impl);
         case OB_STREAM_GYRO:
             return std::make_shared<GyroStreamProfile>(impl);
+        case OB_STREAM_LIDAR:
+            return std::make_shared<LiDARStreamProfile>(impl);
         default: {
             ob_error *err = ob_create_error(OB_STATUS_ERROR, "Unsupported stream type.", "StreamProfileFactory::create", "", OB_EXCEPTION_TYPE_INVALID_VALUE);
             Error::handle(&err);
@@ -517,6 +539,21 @@ public:
         Error::handle(&error);
         auto gsp = StreamProfileFactory::create(profile);
         return gsp->as<GyroStreamProfile>();
+    }
+
+    /**
+     * @brief Match the corresponding LiDAR stream profile based on the passed-in parameters. If multiple Match are found, the first one in the list is
+     * returned by default. Throws an exception if no matching profile is found.
+     *
+     * @param[in] scanRate The scan rate of LiDAR. Pass OB_LIDAR_SCAN_ANY if no matching condition is required.
+     * @param[in] format The type of the stream. Pass OB_FORMAT_ANY if no matching condition is required.
+     */
+    std::shared_ptr<LiDARStreamProfile> getLiDARStreamProfile(OBLiDARScanRate scanRate, OBFormat format) const {
+        ob_error *error   = nullptr;
+        auto      profile = ob_stream_profile_list_get_lidar_stream_profile(impl_, scanRate, format, &error);
+        Error::handle(&error);
+        auto lsp = StreamProfileFactory::create(profile);
+        return lsp->as<LiDARStreamProfile>();
     }
 
 public:

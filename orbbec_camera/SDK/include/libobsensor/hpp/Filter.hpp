@@ -398,10 +398,9 @@ public:
 
     /**
      * @brief Set the point cloud decimation factor.
+     *        Calling this function to decimation factor will output thedownsampled data of the the cloud frame
      *
-     * @brief Calling this function to decimation factor will output thedownsampled data of the the cloud frame
-     *
-     * @param factor The decimation factor.
+     * @param value The decimation factor.
      */
     void setDecimationFactor(int value) {
         setConfigValue("decimate", value);

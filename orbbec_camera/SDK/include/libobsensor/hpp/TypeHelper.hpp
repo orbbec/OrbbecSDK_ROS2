@@ -91,6 +91,16 @@ public:
     }
 
     /**
+     * @brief Convert OBLiDARScanRate to " string " type and then return.
+     *
+     * @param[in] type OBLiDARScanRate type.
+     * @return OBLiDARScanRate of "string" type.
+     */
+    static std::string convertOBLiDARScanRateTypeToString(const OBLiDARScanRate &type) {
+        return ob_lidar_scan_rate_type_to_string(type);
+    }
+
+    /**
      * @brief Convert OBFrameMetadataType to " string " type and then return.
      *
      * @param[in] type OBFrameMetadataType type.
@@ -152,4 +162,3 @@ public:
     }
 };
 }  // namespace ob
-

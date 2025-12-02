@@ -121,11 +121,15 @@ public:
      *
      * @param[in] address The IP address, ipv4 only. such as "192.168.1.10"
      * @param[in] port The port number, currently only support 8090
+     * @param[in] accessMode Device access mode. @ref ob_device_access_mode.
+     *                       If the device does not support setting the Access Mode, the default OB_DEVICE_DEFAULT_ACCESS is used.
+     *                       Applies only on first device creation or after release and re-creation; subsequent calls ignore it.
+     *
      * @return std::shared_ptr<Device> The created device object.
      */
-    std::shared_ptr<Device> createNetDevice(const char *address, uint16_t port) const {
+    std::shared_ptr<Device> createNetDevice(const char *address, uint16_t port, OBDeviceAccessMode accessMode = OB_DEVICE_DEFAULT_ACCESS) const {
         ob_error *error  = nullptr;
-        auto      device = ob_create_net_device(impl_, address, port, &error);
+        auto      device = ob_create_net_device_ex(impl_, address, port, accessMode, &error);
         Error::handle(&error);
         return std::make_shared<Device>(device);
     }

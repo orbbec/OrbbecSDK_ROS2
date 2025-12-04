@@ -84,6 +84,9 @@ class OBCameraNodeDriver : public rclcpp::Node {
 
   bool applyForceIpConfig();
 
+  OBDeviceAccessMode stringToAccessMode(const std::string& mode_str);
+  std::string accessModeToString(OBDeviceAccessMode mode);
+
  private:
   const rclcpp::NodeOptions node_options_;
   std::string config_path_;
@@ -98,6 +101,8 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::string serial_number_;
   std::string device_unique_id_;
   std::string usb_port_;
+  std::string device_access_mode_str_;
+  OBDeviceAccessMode device_access_mode_ = OB_DEVICE_DEFAULT_ACCESS;
   bool enumerate_net_device_ = false;  // default false
   std::string uvc_backend_;
   std::shared_ptr<Parameters> parameters_ = nullptr;

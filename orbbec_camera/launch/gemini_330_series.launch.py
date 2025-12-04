@@ -187,6 +187,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enumerate_net_device', default_value='true'),
         DeclareLaunchArgument('net_device_ip', default_value=''),
         DeclareLaunchArgument('net_device_port', default_value='0'),
+        DeclareLaunchArgument('device_access_mode', default_value='default'), # default, exclusive, control or monitor . only for 335le
         DeclareLaunchArgument('exposure_range_mode', default_value='default'),#default, ultimate or regular
         DeclareLaunchArgument('log_level', default_value='none'),
         DeclareLaunchArgument('log_file_name', default_value=''),

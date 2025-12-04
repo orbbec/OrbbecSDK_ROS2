@@ -253,6 +253,10 @@ void OBCameraNodeDriver::init() {
   net_device_port_ = static_cast<int>(declare_parameter<int>("net_device_port", 0));
   enumerate_net_device_ = declare_parameter<bool>("enumerate_net_device", false);
   uvc_backend_ = declare_parameter<std::string>("uvc_backend", "libuvc");
+  device_access_mode_str_ = declare_parameter<std::string>("device_access_mode", "default");
+  device_access_mode_ = stringToAccessMode(device_access_mode_str_);
+  RCLCPP_INFO_STREAM(logger_, "Device access mode: " << device_access_mode_str_ << " ("
+                                                     << device_access_mode_ << ")");
   if (uvc_backend_ == "libuvc") {
     ctx_->setUvcBackendType(OB_UVC_BACKEND_TYPE_LIBUVC);
     RCLCPP_INFO_STREAM(logger_, "setUvcBackendType:" << uvc_backend_);
@@ -279,8 +283,8 @@ void OBCameraNodeDriver::init() {
   if (node_options_.use_intra_process_comms()) {
     qos = rclcpp::QoS(1);
   }
-  device_status_pub_ = this->create_publisher<orbbec_camera_msgs::msg::DeviceStatus>(
-      "device_status", qos);
+  device_status_pub_ =
+      this->create_publisher<orbbec_camera_msgs::msg::DeviceStatus>("device_status", qos);
   query_thread_ = std::make_shared<std::thread>([this]() { queryDevice(); });
   reset_device_thread_ = std::make_shared<std::thread>([this]() { resetDevice(); });
 }
@@ -764,7 +768,7 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDevice(
     device = selectDeviceByUSBPort(list, usb_port_);
   } else if (device_num_ == 1) {
     RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 5000, "Connecting to the default device");
-    return list->getDevice(0);
+    return list->getDevice(0, device_access_mode_);
   }
   if (device == nullptr) {
     RCLCPP_WARN_THROTTLE(logger_, *get_clock(), 5000, "Device with serial number %s not found",
@@ -790,7 +794,7 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceBySerialNumber(
       auto pid = list->getPid(i);
       if (isOpenNIDevice(pid)) {
         // openNI device
-        auto device = list->getDevice(i);
+        auto device = list->getDevice(i, device_access_mode_);
         auto device_info = device->getDeviceInfo();
         if (device_info->getSerialNumber() == serial_number) {
           RCLCPP_INFO_STREAM_THROTTLE(
@@ -804,7 +808,7 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceBySerialNumber(
         if (sn == serial_number) {
           RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 5000,
                                       "Device serial number " << sn << " matched");
-          return list->getDevice(i);
+          return list->getDevice(i, device_access_mode_);
         }
       }
     } catch (ob::Error &e) {
@@ -828,7 +832,7 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByUSBPort(
     std::lock_guard<decltype(device_lock_)> lock(device_lock_);
     RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 5000,
                                 "After lock: Select device usb port: " << usb_port);
-    auto device = list->getDeviceByUid(usb_port.c_str());
+    auto device = list->getDeviceByUid(usb_port.c_str(), device_access_mode_);
     if (device) {
       RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 5000,
                                   "getDeviceByUid device usb port " << usb_port << " done");
@@ -874,7 +878,7 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByNetIP(
       if (std::string(list->getIpAddress(i)) == net_ip) {
         RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 5000,
                                     "getDeviceByNetIP device net ip " << net_ip << " done");
-        return list->getDevice(i);
+        return list->getDevice(i, device_access_mode_);
       }
     } catch (ob::Error &e) {
       RCLCPP_ERROR_STREAM_THROTTLE(logger_, *get_clock(), 5000,
@@ -1130,7 +1134,7 @@ void OBCameraNodeDriver::connectNetDevice(const std::string &net_device_ip, int 
                                         [this](int *) { device_connecting_.store(false); });
 
   std::this_thread::sleep_for(std::chrono::milliseconds(connection_delay_));
-  auto device = ctx_->createNetDevice(net_device_ip.c_str(), net_device_port);
+  auto device = ctx_->createNetDevice(net_device_ip.c_str(), net_device_port, device_access_mode_);
   if (device == nullptr) {
     RCLCPP_ERROR_STREAM(logger_, "Failed to connect to net device " << net_device_ip);
     return;
@@ -1412,6 +1416,41 @@ void OBCameraNodeDriver::firmwareUpdateCallback(OBFwUpdateState state, const cha
     upgrade_firmware_ = "";
 
     firmware_update_success_ = true;
+  }
+}
+
+OBDeviceAccessMode OBCameraNodeDriver::stringToAccessMode(const std::string &mode_str) {
+  std::string lower_mode;
+  std::transform(mode_str.begin(), mode_str.end(), std::back_inserter(lower_mode),
+                 [](auto ch) { return tolower(ch); });
+
+  if (lower_mode == "exclusive") {
+    return OB_DEVICE_EXCLUSIVE_ACCESS;
+  } else if (lower_mode == "control") {
+    return OB_DEVICE_CONTROL_ACCESS;
+  } else if (lower_mode == "monitor") {
+    return OB_DEVICE_MONITOR_ACCESS;
+  } else if (lower_mode == "default") {
+    return OB_DEVICE_DEFAULT_ACCESS;
+  } else {
+    RCLCPP_WARN_STREAM(logger_, "Unknown access mode: " << mode_str << ", using default");
+    return OB_DEVICE_DEFAULT_ACCESS;
+  }
+}
+
+std::string OBCameraNodeDriver::accessModeToString(OBDeviceAccessMode mode) {
+  switch (mode) {
+    case OB_DEVICE_EXCLUSIVE_ACCESS:
+      return "exclusive";
+    case OB_DEVICE_CONTROL_ACCESS:
+      return "control";
+    case OB_DEVICE_MONITOR_ACCESS:
+      return "monitor";
+    case OB_DEVICE_ACCESS_DENIED:
+      return "denied";
+    case OB_DEVICE_DEFAULT_ACCESS:
+    default:
+      return "default";
   }
 }
 }  // namespace orbbec_camera

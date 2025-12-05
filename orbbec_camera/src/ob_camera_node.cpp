@@ -443,7 +443,7 @@ void OBCameraNode::setupDevices() {
     RCLCPP_INFO_STREAM(logger_, "Setting laser control to " << enable_laser_);
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_LASER_BOOL, enable_laser_);
   }
-  if (!sync_mode_str_.empty()) {
+  if (!sync_mode_str_.empty() && is_physical_device(device_)) {
     auto sync_config = device_->getMultiDeviceSyncConfig();
     RCLCPP_INFO_STREAM(logger_,
                        "Current sync mode: " << magic_enum::enum_name(sync_config.syncMode));
@@ -2225,7 +2225,7 @@ void OBCameraNode::getParameters() {
   if (isOpenNIDevice(pid_)) {
     time_domain_ = "system";
   }
-  if (time_domain_ == "global") {
+  if (time_domain_ == "global" && is_physical_device(device_)) {
     device_->enableGlobalTimestamp(true);
   }
   setAndGetNodeParameter<int>(frames_per_trigger_, "frames_per_trigger", 2);
@@ -2405,7 +2405,7 @@ void OBCameraNode::onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapp
 }
 
 void OBCameraNode::setupDiagnosticUpdater() {
-  if (diagnostic_period_ <= 0.0) {
+  if (diagnostic_period_ <= 0.0 || !is_physical_device(device_)) {
     return;
   }
   try {

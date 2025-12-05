@@ -222,4 +222,6 @@ double getScanAngleIncrement(OBLiDARScanRate fps);
 double deg2rad(double deg);
 
 double rad2deg(double rad);
+
+bool is_physical_device(std::shared_ptr<ob::Device> device);
 }  // namespace orbbec_camera

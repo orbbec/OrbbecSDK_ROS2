@@ -1016,4 +1016,10 @@ double rad2deg(double rad) {
   return angle_degrees;
 }
 
+bool is_physical_device(std::shared_ptr<ob::Device> device)
+{
+    // any non PlaybackDevice is supposed to be a physical one
+    return (dynamic_cast<ob::PlaybackDevice*>(device.get()) == nullptr);
+}
+
 }  // namespace orbbec_camera

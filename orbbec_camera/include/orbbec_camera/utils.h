@@ -210,4 +210,6 @@ cv::Mat undistortImage(const cv::Mat& image, const OBCameraIntrinsic& intrinsic,
 std::string getDistortionModels(OBCameraDistortion distortion);
 
 std::string calcMD5(const std::string& data);
+
+bool is_physical_device(std::shared_ptr<ob::Device> device);
 }  // namespace orbbec_camera

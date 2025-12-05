@@ -60,6 +60,8 @@ class OBCameraNodeDriver : public rclcpp::Node {
 
   void connectNetDevice(const std::string& net_device_ip, int net_device_port);
 
+  void openPlaybackDevice(const std::string &bagfile_path, bool bag_replay_loop);
+
   void onDeviceConnected(const std::shared_ptr<ob::DeviceList>& device_list);
 
   void onDeviceDisconnected(const std::shared_ptr<ob::DeviceList>& device_list);
@@ -119,6 +121,8 @@ class OBCameraNodeDriver : public rclcpp::Node {
   // net config
   std::string net_device_ip_;
   int net_device_port_ = 0;
+  std::string bag_filename_;
+  bool bag_replay_loop_ = false;
   int connection_delay_ = 100;
   bool enable_sync_host_time_ = true;
   std::chrono::milliseconds time_sync_period_{6000};

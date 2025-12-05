@@ -478,6 +478,11 @@ ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> 
 </pre></div>
 </div>
 </li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_ir_long_exposure</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_ir_long_exposure<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+</pre></div>
+</div>
+</li>
 <li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_ir_auto_exposure</span></code></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_ir_auto_exposure<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
 </pre></div>
@@ -486,6 +491,13 @@ ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> 
 <li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_ir_exposure</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">/camera/set_ir_gain</span></code></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_ir_exposure<span class="w"> </span>orbbec_camera_msgs/srv/SetInt32<span class="w"> </span><span class="s1">&#39;{data: 3000}&#39;</span>
 ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_ir_gain<span class="w"> </span>orbbec_camera_msgs/srv/SetInt32<span class="w"> </span><span class="s1">&#39;{data: 64}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_ir_mirror</span></code>, <code class="docutils literal notranslate"><span class="pre">/camera/set_ir_flip</span></code>, <code class="docutils literal notranslate"><span class="pre">/camera/set_ir_rotation</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_ir_mirror<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_ir_flip<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_ir_rotation<span class="w"> </span>orbbec_camera_msgs/srv/SetInt32<span class="w"> </span><span class="s1">&#39;{data: 180}&#39;</span>
 </pre></div>
 </div>
 </li>
@@ -538,6 +550,17 @@ ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> 
 </pre></div>
 </div>
 </li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_ptp_config</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">/camera/get_ptp_config</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_ptp_config<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/get_ptp_config<span class="w"> </span>orbbec_camera_msgs/srv/GetBool<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/get_lrm_measure_distance</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/get_lrm_measure_distance<span class="w"> </span>orbbec_camera_msgs/srv/GetInt32<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+</pre></div>
+</div>
+</li>
 <li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_fan_work_mode</span></code></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_fan_work_mode<span class="w"> </span>orbbec_camera_msgs/srv/SetInt32<span class="w"> </span><span class="s1">&#39;{data: 0}&#39;</span>
 </pre></div>
@@ -575,9 +598,16 @@ ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> 
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">/camera/send_software_trigger</span></code></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/send_software_trigger<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
-<span class="sb">```</span>*<span class="w">   </span><span class="sb">`</span>/camera/set_reset_timestamp<span class="sb">`</span>
-<span class="sb">```</span>bash
-<span class="c1"># Only available when time_domain param is set to device</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_sync_hosttime</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_sync_hosttime<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_reset_timestamp</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Only available when time_domain param is set to device</span>
 ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_reset_timestamp<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
 </pre></div>
 </div>
@@ -596,8 +626,29 @@ ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> 
 <li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_filter</span></code></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set DecimationFilter</span>
 ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_filter<span class="w"> </span>orbbec_camera_msgs/srv/SetFilter<span class="w"> </span><span class="s1">&#39;{filter_name: DecimationFilter, filter_enable: false, filter_param: [5]}&#39;</span>
+
 <span class="c1"># Set SpatialAdvancedFilter</span>
 ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_filter<span class="w"> </span>orbbec_camera_msgs/srv/SetFilter<span class="w"> </span><span class="s1">&#39;{filter_name: SpatialAdvancedFilter, filter_enable: true, filter_param: [0.5,160,1,8]}&#39;</span>
+
+<span class="c1"># Set SequenceIdFilter</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_filter<span class="w"> </span>orbbec_camera_msgs/srv/SetFilter<span class="w"> </span><span class="s1">&#39;{filter_name: SequenceIdFilter, filter_enable: true, filter_param: [1]}&#39;</span>
+
+<span class="c1"># Set ThresholdFilter</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_filter<span class="w"> </span>orbbec_camera_msgs/srv/SetFilter<span class="w"> </span><span class="s1">&#39;{filter_name: ThresholdFilter, filter_enable: true, filter_param: [0,15999]}&#39;</span>
+
+<span class="c1"># Set NoiseRemovalFilter</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_filter<span class="w"> </span>orbbec_camera_msgs/srv/SetFilter<span class="w"> </span><span class="s1">&#39;{filter_name: NoiseRemovalFilter, filter_enable: true, filter_param: [256,80]}&#39;</span>
+
+<span class="c1"># Set HardwareNoiseRemoval</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_filter<span class="w"> </span>orbbec_camera_msgs/srv/SetFilter<span class="w"> </span><span class="s1">&#39;{filter_name: HardwareNoiseRemoval, filter_enable: true, filter_param: []}&#39;</span>
+
+<span class="c1"># Set SpatialFastFilter</span>
+<span class="c1"># filter_param: [radius]</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_filter<span class="w"> </span>orbbec_camera_msgs/srv/SetFilter<span class="w"> </span><span class="s1">&#39;{filter_name: SpatialFastFilter, filter_enable: true, filter_param: [4]}&#39;</span>
+
+<span class="c1"># Set SpatialModerateFilter</span>
+<span class="c1"># filter_param: [disp_diff, magnitude, radius]</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_filter<span class="w"> </span>orbbec_camera_msgs/srv/SetFilter<span class="w"> </span><span class="s1">&#39;{filter_name: SpatialModerateFilter, filter_enable: true, filter_param: [160,1,3]}&#39;</span>
 </pre></div>
 </div>
 </li>
@@ -664,7 +715,7 @@ ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> 
 
   <div role="contentinfo">
     <p>&#169; Copyright 2025, ORBBEC INC. www.orbbec.com..
-      <span class="lastupdated">Last updated on 2025-12-01 02:24:34.
+      <span class="lastupdated">Last updated on 2025-12-05 01:26:04.
       </span></p>
   </div>
 

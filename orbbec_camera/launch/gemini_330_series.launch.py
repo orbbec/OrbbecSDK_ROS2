@@ -186,6 +186,8 @@ def generate_launch_description():
         DeclareLaunchArgument('enumerate_net_device', default_value='true'),
         DeclareLaunchArgument('net_device_ip', default_value=''),
         DeclareLaunchArgument('net_device_port', default_value='0'),
+        DeclareLaunchArgument('bag_filename', default_value=''),
+        DeclareLaunchArgument('bag_replay_loop', default_value='false'),
         DeclareLaunchArgument('exposure_range_mode', default_value='default'),#default, ultimate or regular
         DeclareLaunchArgument('log_level', default_value='none'),
         DeclareLaunchArgument('enable_publish_extrinsic', default_value='false'),

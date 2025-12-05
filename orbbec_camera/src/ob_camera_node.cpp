@@ -354,7 +354,7 @@ void OBCameraNode::setupDevices() {
     TRY_EXECUTE_BLOCK(device_->switchDepthWorkMode(depth_work_mode_.c_str()));
     RCLCPP_INFO_STREAM(logger_, "Set depth work mode: " << depth_work_mode_);
   }
-  if (!sync_mode_str_.empty()) {
+  if (!sync_mode_str_.empty() && is_physical_device(device_)) {
     auto sync_config = device_->getMultiDeviceSyncConfig();
     RCLCPP_INFO_STREAM(logger_,
                        "Current sync mode: " << magic_enum::enum_name(sync_config.syncMode));
@@ -1923,7 +1923,7 @@ void OBCameraNode::getParameters() {
   if (isOpenNIDevice(pid)) {
     time_domain_ = "system";
   }
-  if (time_domain_ == "global") {
+  if (time_domain_ == "global" && is_physical_device(device_)) {
     device_->enableGlobalTimestamp(true);
   }
   setAndGetNodeParameter<int>(frames_per_trigger_, "frames_per_trigger", 2);
@@ -2093,7 +2093,7 @@ void OBCameraNode::onTemperatureUpdate(diagnostic_updater::DiagnosticStatusWrapp
 }
 
 void OBCameraNode::setupDiagnosticUpdater() {
-  if (diagnostic_period_ <= 0.0) {
+  if (diagnostic_period_ <= 0.0 || !is_physical_device(device_)) {
     return;
   }
   try {

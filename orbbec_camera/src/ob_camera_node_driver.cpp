@@ -237,6 +237,8 @@ void OBCameraNodeDriver::init() {
   usb_port_ = declare_parameter<std::string>("usb_port", "");
   net_device_ip_ = declare_parameter<std::string>("net_device_ip", "");
   net_device_port_ = static_cast<int>(declare_parameter<int>("net_device_port", 0));
+  bag_filename_ = declare_parameter<std::string>("bag_filename", "");
+  bag_replay_loop_ = static_cast<int>(declare_parameter<bool>("bag_replay_loop", true));
   enumerate_net_device_ = declare_parameter<bool>("enumerate_net_device", false);
   uvc_backend_ = declare_parameter<std::string>("uvc_backend", "libuvc");
   if (uvc_backend_ == "libuvc") {
@@ -411,6 +413,8 @@ void OBCameraNodeDriver::queryDevice() {
 
       if (!enumerate_net_device_ && !net_device_ip_.empty() && net_device_port_ != 0) {
         connectNetDevice(net_device_ip_, net_device_port_);
+      } else if (!bag_filename_.empty()) {
+          openPlaybackDevice(bag_filename_, bag_replay_loop_);
       } else {
         auto device_list = ctx_->queryDeviceList();
         if (device_list->getCount() != 0) {
@@ -1131,6 +1135,51 @@ void OBCameraNodeDriver::connectNetDevice(const std::string &net_device_ip, int 
     device_connected_ = false;
   } catch (...) {
     RCLCPP_ERROR_STREAM(logger_, "Unknown exception during net device initialization");
+    device_connected_ = false;
+  }
+}
+
+void OBCameraNodeDriver::openPlaybackDevice(const std::string &bagfile_path, bool bag_replay_loop) {
+  if (bagfile_path.empty() || !std::filesystem::exists(bagfile_path)) {
+    RCLCPP_ERROR_STREAM(logger_, "Invalid bag file path " << bagfile_path);
+    return;
+  }
+
+  auto playback_device = std::make_shared<ob::PlaybackDevice>(bagfile_path.c_str());
+  if (playback_device == nullptr) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to open playback device " << bagfile_path);
+    return;
+  }
+  try {
+    RCLCPP_INFO_STREAM(logger_, "Opening bag file " << bagfile_path);
+
+    // Automatically restart playback when reaching file end
+    playback_device->setPlaybackStatusChangeCallback([&](OBPlaybackStatus status)
+    {
+        RCLCPP_INFO(logger_, "Playback status changed to %d", status);
+
+        if (status == OB_PLAYBACK_STOPPED) {
+            if (bag_replay_loop && is_alive_ && rclcpp::ok()) {
+                // restart bag file
+                ob_camera_node_->clean();
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                initializeDevice(playback_device);
+            } else {
+                // stop it here
+                rclcpp::shutdown();
+            }
+        }
+    });
+
+    initializeDevice(playback_device);
+    if (!device_connected_) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to initialize playback device " << bagfile_path);
+    }
+  } catch (const std::exception &e) {
+    RCLCPP_ERROR_STREAM(logger_, "Exception during playback device initialization: " << e.what());
+    device_connected_ = false;
+  } catch (...) {
+    RCLCPP_ERROR_STREAM(logger_, "Unknown exception during playback device initialization");
     device_connected_ = false;
   }
 }

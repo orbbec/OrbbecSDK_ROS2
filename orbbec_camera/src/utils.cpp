@@ -953,4 +953,11 @@ std::string calcMD5(const std::string &data) {
   for (unsigned int i = 0; i < digest_len; ++i) ss << std::setw(2) << (int)digest[i];
   return ss.str();
 }
+
+bool is_physical_device(std::shared_ptr<ob::Device> device)
+{
+    // any non PlaybackDevice is supposed to be a physical one
+    return (dynamic_cast<ob::PlaybackDevice*>(device.get()) == nullptr);
+}
+
 }  // namespace orbbec_camera

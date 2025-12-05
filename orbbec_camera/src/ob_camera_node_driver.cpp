@@ -253,7 +253,7 @@ void OBCameraNodeDriver::init() {
   net_device_port_ = static_cast<int>(declare_parameter<int>("net_device_port", 0));
   enumerate_net_device_ = declare_parameter<bool>("enumerate_net_device", false);
   uvc_backend_ = declare_parameter<std::string>("uvc_backend", "libuvc");
-  device_access_mode_str_ = declare_parameter<std::string>("device_access_mode", "default");
+  device_access_mode_str_ = declare_parameter<std::string>("device_access_mode", "Default");
   device_access_mode_ = stringToAccessMode(device_access_mode_str_);
   RCLCPP_INFO_STREAM(logger_, "Device access mode: " << device_access_mode_str_ << " ("
                                                      << device_access_mode_ << ")");
@@ -1424,11 +1424,11 @@ OBDeviceAccessMode OBCameraNodeDriver::stringToAccessMode(const std::string &mod
   std::transform(mode_str.begin(), mode_str.end(), std::back_inserter(lower_mode),
                  [](auto ch) { return tolower(ch); });
 
-  if (lower_mode == "exclusive") {
+  if (lower_mode == "ea") {
     return OB_DEVICE_EXCLUSIVE_ACCESS;
-  } else if (lower_mode == "control") {
+  } else if (lower_mode == "ca") {
     return OB_DEVICE_CONTROL_ACCESS;
-  } else if (lower_mode == "monitor") {
+  } else if (lower_mode == "mr") {
     return OB_DEVICE_MONITOR_ACCESS;
   } else if (lower_mode == "default") {
     return OB_DEVICE_DEFAULT_ACCESS;
@@ -1441,16 +1441,16 @@ OBDeviceAccessMode OBCameraNodeDriver::stringToAccessMode(const std::string &mod
 std::string OBCameraNodeDriver::accessModeToString(OBDeviceAccessMode mode) {
   switch (mode) {
     case OB_DEVICE_EXCLUSIVE_ACCESS:
-      return "exclusive";
+      return "EA";
     case OB_DEVICE_CONTROL_ACCESS:
-      return "control";
+      return "CA";
     case OB_DEVICE_MONITOR_ACCESS:
-      return "monitor";
+      return "MR";
     case OB_DEVICE_ACCESS_DENIED:
-      return "denied";
+      return "Denied";
     case OB_DEVICE_DEFAULT_ACCESS:
     default:
-      return "default";
+      return "Default";
   }
 }
 }  // namespace orbbec_camera

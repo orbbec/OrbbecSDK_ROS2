@@ -120,16 +120,17 @@ if(USE_NV_HW_DECODER)
 endif()
 
 set(SOURCE_FILES
-    src/d2c_viewer.cpp
-    src/dynamic_params.cpp
-    src/image_publisher.cpp
-    src/ob_camera_node_driver.cpp
-    src/ob_camera_node.cpp
-    src/ros_param_backend.cpp
-    src/ros_service.cpp
-    src/synced_imu_publisher.cpp
-    src/utils.cpp
-    src/jpeg_decoder.cpp
+  src/d2c_viewer.cpp
+  src/dynamic_params.cpp
+  src/image_publisher.cpp
+  src/ob_camera_node_driver.cpp
+  src/ob_camera_node.cpp
+  src/ob_lidar_node.cpp
+  src/ros_param_backend.cpp
+  src/ros_service.cpp
+  src/synced_imu_publisher.cpp
+  src/utils.cpp
+  src/jpeg_decoder.cpp
 )
 
 if(USE_RK_HW_DECODER)
@@ -232,7 +233,6 @@ install(TARGETS ${PROJECT_NAME} frame_latency start_benchmark multi_save_rgbir A
 install(DIRECTORY include/ DESTINATION include)
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME}/)
-install(DIRECTORY examples DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY ${ORBBEC_INCLUDE_DIR} DESTINATION include)
 install(DIRECTORY ${ORBBEC_LIBS_DIR}/ DESTINATION lib/ FILES_MATCHING PATTERN "*.so*")
 # Install extensions directory with explicit file copying to avoid symlink issues

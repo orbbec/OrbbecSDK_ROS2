@@ -21,6 +21,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <semaphore.h>
 #include "ob_camera_node.h"
+#include "ob_lidar_node.h"
 #include "utils.h"
 #include "dynamic_params.h"
 #include <orbbec_camera_msgs/msg/device_status.hpp>
@@ -93,6 +94,7 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::unique_ptr<ob::Context> ctx_ = nullptr;
   rclcpp::Logger logger_;
   std::unique_ptr<OBCameraNode> ob_camera_node_ = nullptr;
+  std::unique_ptr<orbbec_lidar::OBLidarNode> ob_lidar_node_ = nullptr;
   std::shared_ptr<ob::Device> device_ = nullptr;
   std::shared_ptr<ob::DeviceInfo> device_info_ = nullptr;
   std::atomic_bool is_alive_{false};
@@ -145,5 +147,6 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::string force_ip_subnet_mask_;  // e.g. "255.255.255.0"
   std::string force_ip_gateway_;      // e.g. "192.168.1.1"
   std::atomic<bool> force_ip_success_{false};
+  std::string device_type_;
 };
 }  // namespace orbbec_camera

@@ -32,12 +32,18 @@ void listSensorProfiles(const std::shared_ptr<ob::Device>& device) {
                   << magic_enum::enum_name(profile->getFormat()) << std::endl;
       } else if (sensor->getType() == OB_SENSOR_ACCEL) {
         auto profile = origin_profile->as<ob::AccelStreamProfile>();
-        std::cout << magic_enum::enum_name(sensor->getType()) << " profile: " << profile->getSampleRate()
-                  << "  full scale_range " << profile->getFullScaleRange() << std::endl;
+        std::cout << magic_enum::enum_name(sensor->getType())
+                  << " profile: " << profile->getSampleRate() << "  full scale_range "
+                  << profile->getFullScaleRange() << std::endl;
       } else if (sensor->getType() == OB_SENSOR_GYRO) {
         auto profile = origin_profile->as<ob::GyroStreamProfile>();
-        std::cout << magic_enum::enum_name(sensor->getType()) << " profile: " << profile->getSampleRate()
-                  << "  full scale_range " << profile->getFullScaleRange() << std::endl;
+        std::cout << magic_enum::enum_name(sensor->getType())
+                  << " profile: " << profile->getSampleRate() << "  full scale_range "
+                  << profile->getFullScaleRange() << std::endl;
+      } else if (sensor->getType() == OB_SENSOR_LIDAR) {
+        auto profile = origin_profile->as<ob::LiDARStreamProfile>();
+        std::cout << magic_enum::enum_name(sensor->getType())
+                  << " scan rate: " << magic_enum::enum_name(profile->getScanRate()) << "  format:"<<magic_enum::enum_name(profile->getFormat())<< std::endl;
       } else {
         std::cout << "Unknown profile: " << magic_enum::enum_name(sensor->getType()) << std::endl;
       }

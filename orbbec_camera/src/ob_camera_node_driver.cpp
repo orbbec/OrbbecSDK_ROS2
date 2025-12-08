@@ -162,8 +162,9 @@ OBCameraNodeDriver::~OBCameraNodeDriver() {
     reset_device_cond_.notify_all();
     reset_device_thread_->join();
   }
-
-  // Clean up shared memory
+  if (ob_camera_node_) {
+    ob_camera_node_->stopGmslTrigger();
+  }
   if (orb_device_lock_shm_fd_ != -1) {
     close(orb_device_lock_shm_fd_);
     orb_device_lock_shm_fd_ = -1;
@@ -210,6 +211,8 @@ void OBCameraNodeDriver::init() {
   } else {
     ctx_ = std::make_unique<ob::Context>(config_path_.c_str());
   }
+
+  device_type_ = declare_parameter<std::string>("device_type", "camera");
   connection_delay_ = static_cast<int>(declare_parameter<int>("connection_delay", 100));
   enable_sync_host_time_ = declare_parameter<bool>("enable_sync_host_time", true);
   double time_sync_period = declare_parameter<double>("time_sync_period", 60.0);
@@ -381,7 +384,7 @@ void OBCameraNodeDriver::checkConnectTimer() {
     RCLCPP_DEBUG_STREAM(logger_,
                         "checkConnectTimer: device " << serial_number_ << " not connected");
     return;
-  } else if (!ob_camera_node_) {
+  } else if (!ob_camera_node_ && !ob_lidar_node_) {
     device_connected_.store(false);
   }
 }
@@ -444,85 +447,93 @@ void OBCameraNodeDriver::queryDevice() {
 void OBCameraNodeDriver::resetDevice() {
   while (is_alive_ && rclcpp::ok()) {
     {
-      std::unique_lock<decltype(reset_device_mutex_)> lock(reset_device_mutex_);
-      // Use a timeout to make the wait interruptible
-      auto timeout = std::chrono::milliseconds(1000);
-      bool notified = reset_device_cond_.wait_for(
-          lock, timeout, [this]() { return !is_alive_ || !rclcpp::ok() || reset_device_flag_; });
+      if (ob_camera_node_) {
+        std::unique_lock<decltype(reset_device_mutex_)> lock(reset_device_mutex_);
+        // Use a timeout to make the wait interruptible
+        auto timeout = std::chrono::milliseconds(1000);
+        bool notified = reset_device_cond_.wait_for(
+            lock, timeout, [this]() { return !is_alive_ || !rclcpp::ok() || reset_device_flag_; });
 
-      // Check if we should exit due to shutdown
-      if (!is_alive_ || !rclcpp::ok()) {
-        break;
-      }
-
-      // If not notified by reset flag, continue waiting
-      if (!notified || !reset_device_flag_) {
-        continue;
-      }
-
-      // Stop sync timer to prevent it from accessing the device during reset
-      if (sync_host_time_timer_) {
-        try {
-          sync_host_time_timer_->cancel();
-          sync_host_time_timer_.reset();
-        } catch (...) {
-          RCLCPP_WARN_STREAM(logger_, "Exception during sync timer cleanup during reset");
+        // Check if we should exit due to shutdown
+        if (!is_alive_ || !rclcpp::ok()) {
+          break;
         }
-      }
 
-      RCLCPP_INFO_STREAM(logger_, "resetDevice : Reset device uid: " << device_unique_id_);
-      std::lock_guard<decltype(device_lock_)> device_lock(device_lock_);
-      {
-        // Mark device as disconnected immediately to prevent other threads from accessing it
-        device_connected_ = false;
-        device_connecting_ = false;  // Clear connecting flag
+        // If not notified by reset flag, continue waiting
+        if (!notified || !reset_device_flag_) {
+          continue;
+        }
 
-        // Reset objects in order, with additional safety checks
-        if (ob_camera_node_) {
+        // Stop sync timer to prevent it from accessing the device during reset
+        if (sync_host_time_timer_) {
           try {
-            RCLCPP_INFO_STREAM(logger_, "Resetting ob_camera_node_");
-            ob_camera_node_.reset();
-            RCLCPP_INFO_STREAM(logger_, "ob_camera_node_ reset completed");
+            sync_host_time_timer_->cancel();
+            sync_host_time_timer_.reset();
           } catch (...) {
-            RCLCPP_WARN_STREAM(logger_, "Exception during ob_camera_node reset");
+            RCLCPP_WARN_STREAM(logger_, "Exception during sync timer cleanup during reset");
           }
         }
 
-        // Allow more time for internal SDK cleanup
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        RCLCPP_INFO_STREAM(logger_, "resetDevice : Reset device uid: " << device_unique_id_);
+        std::lock_guard<decltype(device_lock_)> device_lock(device_lock_);
+        {
+          // Mark device as disconnected immediately to prevent other threads from accessing it
+          device_connected_ = false;
+          device_connecting_ = false;  // Clear connecting flag
 
-        if (device_) {
-          try {
-            RCLCPP_INFO_STREAM(logger_, "Resetting device_");
-            // Force free any idle memory before device reset
-            if (ctx_) {
-              try {
-                ctx_->freeIdleMemory();
-              } catch (...) {
-                // Ignore exceptions during memory cleanup
-              }
+          // Reset objects in order, with additional safety checks
+          if (ob_camera_node_) {
+            try {
+              RCLCPP_INFO_STREAM(logger_, "Resetting ob_camera_node_");
+              ob_camera_node_.reset();
+              RCLCPP_INFO_STREAM(logger_, "ob_camera_node_ reset completed");
+            } catch (...) {
+              RCLCPP_WARN_STREAM(logger_, "Exception during ob_camera_node reset");
             }
-            device_.reset();
-            RCLCPP_INFO_STREAM(logger_, "device_ reset completed");
-          } catch (const ob::Error &e) {
-            RCLCPP_WARN_STREAM(logger_, "OB Exception during device reset: " << e.getMessage());
-          } catch (const std::exception &e) {
-            RCLCPP_WARN_STREAM(logger_, "Standard exception during device reset: " << e.what());
-          } catch (...) {
-            RCLCPP_WARN_STREAM(logger_, "Unknown exception during device reset");
           }
-        }
 
-        if (device_info_) {
-          try {
-            RCLCPP_INFO_STREAM(logger_, "Resetting device_info_");
-            device_info_.reset();
-            RCLCPP_INFO_STREAM(logger_, "device_info_ reset completed");
-          } catch (...) {
-            RCLCPP_WARN_STREAM(logger_, "Exception during device_info reset");
+          // Allow more time for internal SDK cleanup
+          std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+          if (device_) {
+            try {
+              RCLCPP_INFO_STREAM(logger_, "Resetting device_");
+              // Force free any idle memory before device reset
+              if (ctx_) {
+                try {
+                  ctx_->freeIdleMemory();
+                } catch (...) {
+                  // Ignore exceptions during memory cleanup
+                }
+              }
+              device_.reset();
+              RCLCPP_INFO_STREAM(logger_, "device_ reset completed");
+            } catch (const ob::Error &e) {
+              RCLCPP_WARN_STREAM(logger_, "OB Exception during device reset: " << e.getMessage());
+            } catch (const std::exception &e) {
+              RCLCPP_WARN_STREAM(logger_, "Standard exception during device reset: " << e.what());
+            } catch (...) {
+              RCLCPP_WARN_STREAM(logger_, "Unknown exception during device reset");
+            }
           }
-        }
 
+          if (device_info_) {
+            try {
+              RCLCPP_INFO_STREAM(logger_, "Resetting device_info_");
+              device_info_.reset();
+              RCLCPP_INFO_STREAM(logger_, "device_info_ reset completed");
+            } catch (...) {
+              RCLCPP_WARN_STREAM(logger_, "Exception during device_info reset");
+            }
+          }
+
+          device_unique_id_.clear();
+        }
+      } else if (ob_lidar_node_) {
+        ob_lidar_node_.reset();
+        device_.reset();
+        device_info_.reset();
+        device_connected_ = false;
         device_unique_id_.clear();
       }
       reset_device_flag_ = false;
@@ -716,39 +727,46 @@ void OBCameraNodeDriver::rebootDeviceCallback(
     return;
   }
 
-  std::shared_ptr<int> process_lock_guard(
-      nullptr, [this](int *) { pthread_mutex_unlock(orb_device_lock_); });
+  if (ob_camera_node_) {
+    std::shared_ptr<int> process_lock_guard(
+        nullptr, [this](int *) { pthread_mutex_unlock(orb_device_lock_); });
 
-  try {
-    std::unique_lock<decltype(reset_device_mutex_)> reset_lock(reset_device_mutex_);
-    reset_device_flag_ = true;
-    {
-      std::lock_guard<decltype(device_lock_)> device_lock(device_lock_);
+    try {
+      std::unique_lock<decltype(reset_device_mutex_)> reset_lock(reset_device_mutex_);
+      reset_device_flag_ = true;
+      {
+        std::lock_guard<decltype(device_lock_)> device_lock(device_lock_);
 
-      if (!device_connected_ || !ob_camera_node_) {
-        RCLCPP_INFO(logger_, "Device not connected");
-        reset_device_flag_ = false;
-      } else {
-        std::string current_device_uid = device_unique_id_;
-        RCLCPP_INFO_STREAM(logger_, "Rebooting device with UID: " << current_device_uid);
-        ob_camera_node_->rebootDevice();
+        if (!device_connected_ || !ob_camera_node_) {
+          RCLCPP_INFO(logger_, "Device not connected");
+          reset_device_flag_ = false;
+        } else {
+          std::string current_device_uid = device_unique_id_;
+          RCLCPP_INFO_STREAM(logger_, "Rebooting device with UID: " << current_device_uid);
+          ob_camera_node_->rebootDevice();
+        }
       }
-    }
-    if (reset_device_flag_) {
-      RCLCPP_INFO(logger_, "Device reboot initiated, waiting for reconnection");
-    }
+      if (reset_device_flag_) {
+        RCLCPP_INFO(logger_, "Device reboot initiated, waiting for reconnection");
+      }
 
-  } catch (std::exception &e) {
-    RCLCPP_ERROR_STREAM(logger_, "Failed to reboot device: " << e.what());
-  } catch (...) {
-    RCLCPP_ERROR_STREAM(logger_, "Failed to reboot device: unknown error");
+    } catch (std::exception &e) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to reboot device: " << e.what());
+    } catch (...) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to reboot device: unknown error");
+    }
+    process_lock_guard.reset();
+    if (reset_device_flag_) {
+      reset_device_cond_.notify_all();
+    }
+    malloc_trim(0);
+    return;
+    RCLCPP_INFO(logger_, "Reboot device");
+  } else if (ob_lidar_node_) {
+    ob_lidar_node_->rebootDevice();
+    device_connected_ = false;
+    device_ = nullptr;
   }
-  process_lock_guard.reset();
-  if (reset_device_flag_) {
-    reset_device_cond_.notify_all();
-  }
-  malloc_trim(0);
-  return;
 }
 
 std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDevice(
@@ -904,6 +922,8 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   CHECK_NOTNULL(device_.get());
   if (ob_camera_node_) {
     ob_camera_node_.reset();
+  } else if (ob_lidar_node_) {
+    ob_lidar_node_.reset();
   }
   int retry_count = 0;
   constexpr int max_retries = 3;
@@ -913,8 +933,14 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
 
   while (retry_count < max_retries && !initialized) {
     try {
-      ob_camera_node_ = std::make_unique<OBCameraNode>(this, device_, parameters_,
-                                                       node_options_.use_intra_process_comms());
+      if (device_type_ == "camera") {
+        ob_camera_node_ = std::make_unique<OBCameraNode>(this, device_, parameters_,
+                                                         node_options_.use_intra_process_comms());
+      } else if (device_type_ == "lidar") {
+        ob_lidar_node_ = std::make_unique<orbbec_lidar::OBLidarNode>(
+            this, device_, parameters_, node_options_.use_intra_process_comms());
+      }
+
       initialized = true;
     } catch (const ob::Error &e) {
       RCLCPP_ERROR_STREAM(logger_, "Failed to initialize device (Attempt "
@@ -1033,6 +1059,9 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   if (ob_camera_node_) {
     ob_camera_node_->startIMU();
     ob_camera_node_->startStreams();
+  } else if (ob_lidar_node_) {
+    ob_lidar_node_->startStreams();
+    ob_lidar_node_->startIMU();
   } else {
     RCLCPP_INFO_STREAM(logger_, "ob_camera_node_ is nullptr");
   }
@@ -1400,18 +1429,21 @@ void OBCameraNodeDriver::firmwareUpdateCallback(OBFwUpdateState state, const cha
   if (state == STAT_DONE) {
     RCLCPP_INFO(logger_, "Reboot device");
 
-    // Don't call clean() here to avoid deadlock - just stop timers and reboot
-    // The resetDevice thread will handle proper cleanup when device disconnects
-    if (sync_host_time_timer_) {
-      try {
-        sync_host_time_timer_->cancel();
-        sync_host_time_timer_.reset();
-      } catch (...) {
-        RCLCPP_WARN_STREAM(logger_, "Exception during sync timer cleanup in firmware update");
+    if (ob_camera_node_) {
+      // Don't call clean() here to avoid deadlock - just stop timers and reboot
+      // The resetDevice thread will handle proper cleanup when device disconnects
+      if (sync_host_time_timer_) {
+        try {
+          sync_host_time_timer_->cancel();
+          sync_host_time_timer_.reset();
+        } catch (...) {
+          RCLCPP_WARN_STREAM(logger_, "Exception during sync timer cleanup in firmware update");
+        }
       }
+      device_->reboot();
+    } else if (ob_lidar_node_) {
+      ob_lidar_node_.reset();
     }
-
-    device_->reboot();
     device_connected_ = false;
     upgrade_firmware_ = "";
 

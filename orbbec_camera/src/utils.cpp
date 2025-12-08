@@ -272,6 +272,7 @@ OBFormat OBFormatFromString(const std::string &format) {
   std::string fixed_format;
   std::transform(format.begin(), format.end(), std::back_inserter(fixed_format),
                  [](const auto ch) { return std::isalpha(ch) ? toupper(ch) : ch; });
+  std::cout << "OBFormatFromString: " << fixed_format << std::endl;
   if (fixed_format == "MJPG") {
     return OB_FORMAT_MJPG;
   } else if (fixed_format == "MJPEG") {
@@ -342,12 +343,39 @@ OBFormat OBFormatFromString(const std::string &format) {
     return OB_FORMAT_RW16;
   } else if (fixed_format == "Y12C4") {
     return OB_FORMAT_Y12C4;
+  } else if (fixed_format == "LIDAR_POINT") {
+    return OB_FORMAT_LIDAR_POINT;
+  } else if (fixed_format == "LIDAR_SPHERE_POINT") {
+    return OB_FORMAT_LIDAR_SPHERE_POINT;
+  } else if (fixed_format == "LIDAR_SCAN") {
+    return OB_FORMAT_LIDAR_SCAN;
+  } else if (fixed_format == "LIDAR_CALIBRATION") {
+    return OB_FORMAT_LIDAR_CALIBRATION;
   }
   //   else if (fixed_format == "DISP16") {
   //     return OB_FORMAT_DISP16;
   //   }
   else {
     return OB_FORMAT_UNKNOWN;
+  }
+}
+
+OBLiDARScanRate OBScanRateFromInt(const int rate) {
+  std::cout << "OBScanRateFromInt: " << rate << std::endl;
+  if (rate == 5) {
+    return OB_LIDAR_SCAN_5HZ;
+  } else if (rate == 10) {
+    return OB_LIDAR_SCAN_10HZ;
+  } else if (rate == 15) {
+    return OB_LIDAR_SCAN_15HZ;
+  } else if (rate == 20) {
+    return OB_LIDAR_SCAN_20HZ;
+  } else if (rate == 25) {
+    return OB_LIDAR_SCAN_25HZ;
+  } else if (rate == 30) {
+    return OB_LIDAR_SCAN_30HZ;
+  } else {
+    return OB_LIDAR_SCAN_UNKNOWN;
   }
 }
 
@@ -953,4 +981,31 @@ std::string calcMD5(const std::string &data) {
   for (unsigned int i = 0; i < digest_len; ++i) ss << std::setw(2) << (int)digest[i];
   return ss.str();
 }
+double getScanAngleIncrement(OBLiDARScanRate fps) {
+  switch (fps) {
+    case OB_LIDAR_SCAN_15HZ:
+      return deg2rad(0.075);
+    case OB_LIDAR_SCAN_20HZ:
+      return deg2rad(0.1);
+    case OB_LIDAR_SCAN_25HZ:
+      return deg2rad(0.125);
+    case OB_LIDAR_SCAN_30HZ:
+      return deg2rad(0.15);
+    case OB_LIDAR_SCAN_40HZ:
+      return deg2rad(0.2);
+    default:
+      return deg2rad(0.1);
+  }
+}
+
+double deg2rad(double deg) { return deg * M_PI / 180.0; }
+
+double rad2deg(double rad) {
+  double angle_degrees = rad * (180.0 / M_PI);
+  if (angle_degrees < 0) {
+    angle_degrees += 360.0;
+  }
+  return angle_degrees;
+}
+
 }  // namespace orbbec_camera

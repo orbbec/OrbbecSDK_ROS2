@@ -789,7 +789,7 @@ void OBLidarNode::publishPointCloud(std::shared_ptr<ob::FrameSet> frame_set) {
     *iter_x = static_cast<float>(point_data[i].x / 1000.0);
     *iter_y = static_cast<float>(point_data[i].y / 1000.0);
     *iter_z = static_cast<float>(point_data[i].z / 1000.0);
-    *iter_intensity = point_data[i].intensity;
+    *iter_intensity = point_data[i].reflectivity;
     *iter_tag = point_data[i].tag;
   }
   *point_cloud_msg = filterPointCloud(*point_cloud_msg);
@@ -833,7 +833,7 @@ void OBLidarNode::publishSpherePointCloud(std::shared_ptr<ob::FrameSet> frame_se
     *iter_x = static_cast<float>(result_point[i].x / 1000.0);
     *iter_y = static_cast<float>(result_point[i].y / 1000.0);
     *iter_z = static_cast<float>(result_point[i].z / 1000.0);
-    *iter_intensity = result_point[i].intensity;
+    *iter_intensity = result_point[i].reflectivity;
     *iter_tag = result_point[i].tag;
   }
   *point_cloud_msg = filterPointCloud(*point_cloud_msg);
@@ -914,7 +914,7 @@ void OBLidarNode::publishMergedPointCloud() {
       *iter_x = static_cast<float>(point_data[i].x / 1000.0);
       *iter_y = static_cast<float>(point_data[i].y / 1000.0);
       *iter_z = static_cast<float>(point_data[i].z / 1000.0);
-      *iter_intensity = point_data[i].intensity;
+      *iter_intensity = point_data[i].reflectivity;
       *iter_tag = point_data[i].tag;
 
       // Calculate per-point offset time in nanoseconds relative to point cloud header timestamp
@@ -1009,7 +1009,7 @@ void OBLidarNode::publishMergedSpherePointCloud() {
       *iter_x = static_cast<float>(result_point[i].x / 1000.0);
       *iter_y = static_cast<float>(result_point[i].y / 1000.0);
       *iter_z = static_cast<float>(result_point[i].z / 1000.0);
-      *iter_intensity = result_point[i].intensity;
+      *iter_intensity = result_point[i].reflectivity;
       *iter_tag = result_point[i].tag;
 
       // Calculate per-point offset time in nanoseconds relative to point cloud header timestamp
@@ -1057,7 +1057,7 @@ std::vector<OBLiDARPoint> OBLidarNode::spherePointToPoint(OBLiDARSpherePoint *sp
       point_data->x = x;
       point_data->y = y;
       point_data->z = z;
-      point_data->intensity = sphere_point->intensity;
+      point_data->reflectivity = sphere_point->reflectivity;
       point_data->tag = sphere_point->tag;
       ++point_data;
     }

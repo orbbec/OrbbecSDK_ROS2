@@ -43,610 +43,620 @@ class Sensor;
  *
  */
 class Frame : public std::enable_shared_from_this<Frame> {
- protected:
-  /**
-   * @brief The pointer to the internal (c api level) frame object.
-   */
-  const ob_frame *impl_ = nullptr;
+protected:
+    /**
+     * @brief The pointer to the internal (c api level) frame object.
+     */
+    const ob_frame *impl_ = nullptr;
 
- public:
-  /**
-   * @brief Construct a new Frame object with a given pointer to the internal frame object.
-   *
-   * @attention After calling this constructor, the frame object will own the internal frame object,
-   * and the internal frame object will be deleted when the frame object is destroyed.
-   * @attention The internal frame object should not be deleted by the caller.
-   *
-   * @param[in] impl The pointer to the internal frame object.
-   */
-  explicit Frame(const ob_frame *impl) : impl_(impl) {}
+public:
+    /**
+     * @brief Construct a new Frame object with a given pointer to the internal frame object.
+     *
+     * @attention After calling this constructor, the frame object will own the internal frame object, and the internal frame object will be deleted when the
+     * frame object is destroyed.
+     * @attention The internal frame object should not be deleted by the caller.
+     *
+     * @param[in] impl The pointer to the internal frame object.
+     */
+    explicit Frame(const ob_frame *impl) : impl_(impl) {}
 
-  /**
-   * @brief Get the internal (impl) frame object
-   *
-   * @return const ob_frame* the pointer to the internal frame object.
-   */
-  const ob_frame *getImpl() const { return impl_; }
-
-  /**
-   * @brief Destroy the Frame object
-   */
-  virtual ~Frame() noexcept {
-    if (impl_) {
-      ob_error *error = nullptr;
-      ob_delete_frame(impl_, &error);
-      Error::handle(&error, false);
-      impl_ = nullptr;
-    }
-  }
-
-  /**
-   * @brief Get the type of frame.
-   *
-   * @return OBFrameType The type of frame.
-   */
-  virtual OBFrameType getType() const {
-    ob_error *error = nullptr;
-    auto type = ob_frame_get_type(impl_, &error);
-    Error::handle(&error);
-
-    return type;
-  }
-
-  /**
-   * @brief Get the format of the frame.
-   *
-   * @return OBFormat The format of the frame.
-   */
-  virtual OBFormat getFormat() const {
-    ob_error *error = nullptr;
-    auto format = ob_frame_get_format(impl_, &error);
-    Error::handle(&error);
-
-    return format;
-  }
-
-  /**
-   * @brief Get the sequence number of the frame.
-   *
-   * @note The sequence number for each frame is managed by the SDK. It increments by 1 for each
-   * frame on each stream.
-   *
-   * @return uint64_t The sequence number of the frame.
-   */
-  virtual uint64_t getIndex() const {
-    ob_error *error = nullptr;
-    auto index = ob_frame_get_index(impl_, &error);
-    Error::handle(&error);
-
-    return index;
-  }
-
-  /**
-   * @brief Get frame data
-   *
-   * @return const uint8_t * The frame data pointer.
-   */
-  virtual uint8_t *getData() const {
-    ob_error *error = nullptr;
-    auto data = ob_frame_get_data(impl_, &error);
-    Error::handle(&error);
-
-    return data;
-  }
-
-  /**
-   * @brief Get the size of the frame data.
-   *
-   * @return uint32_t The size of the frame data.
-   * For point cloud data, this returns the number of bytes occupied by all point sets. To find the
-   * number of points, divide the dataSize by the structure size of the corresponding point type.
-   */
-  virtual uint32_t getDataSize() const {
-    ob_error *error = nullptr;
-    auto dataSize = ob_frame_get_data_size(impl_, &error);
-    Error::handle(&error);
-
-    return dataSize;
-  }
-
-  /**
-   * @brief Get the hardware timestamp of the frame in microseconds.
-   * @brief The hardware timestamp is the time point when the frame was captured by the device, on
-   * device clock domain.
-   *
-   * @return uint64_t The hardware timestamp of the frame in microseconds.
-   */
-  uint64_t getTimeStampUs() const {
-    ob_error *error = nullptr;
-    auto timeStampUs = ob_frame_get_timestamp_us(impl_, &error);
-    Error::handle(&error);
-
-    return timeStampUs;
-  }
-
-  /**
-   * @brief Get the system timestamp of the frame in microseconds.
-   * @brief The system timestamp is the time point when the frame was received by the host, on host
-   * clock domain.
-   *
-   * @return uint64_t The system timestamp of the frame in microseconds.
-   */
-  uint64_t getSystemTimeStampUs() const {
-    ob_error *error = nullptr;
-    auto systemTimeStampUs = ob_frame_get_system_timestamp_us(impl_, &error);
-    Error::handle(&error);
-
-    return systemTimeStampUs;
-  }
-
-  /**
-   * @brief Get the global timestamp of the frame in microseconds.
-   * @brief The global timestamp is the time point when the frame was captured by the device, and
-   * has been converted to the host clock domain. The conversion process base on the device
-   * timestamp and can eliminate the timer drift of the device
-   *
-   * @attention The global timestamp disable by default. If global timestamp is not enabled, the
-   * function will return 0. To enable the global timestamp, please call @ref
-   * Device::enableGlobalTimestamp() function.
-   * @attention Only some devices support getting the global timestamp. Check the device support
-   * status by @ref Device::isGlobalTimestampSupported() function.
-   *
-   * @return uint64_t The global timestamp of the frame in microseconds.
-   */
-  uint64_t getGlobalTimeStampUs() const {
-    ob_error *error = nullptr;
-    auto globalTimeStampUs = ob_frame_get_global_timestamp_us(impl_, &error);
-    Error::handle(&error);
-
-    return globalTimeStampUs;
-  }
-
-  /**
-   * @brief Get the metadata pointer of the frame.
-   *
-   * @return const uint8_t * The metadata pointer of the frame.
-   */
-  uint8_t *getMetadata() const {
-    ob_error *error = nullptr;
-    auto metadata = ob_frame_get_metadata(impl_, &error);
-    Error::handle(&error);
-
-    return metadata;
-  }
-
-  /**
-   * @brief Get the size of the metadata of the frame.
-   *
-   * @return uint32_t The size of the metadata of the frame.
-   */
-  uint32_t getMetadataSize() const {
-    ob_error *error = nullptr;
-    auto metadataSize = ob_frame_get_metadata_size(impl_, &error);
-    Error::handle(&error);
-
-    return metadataSize;
-  }
-
-  /**
-   * @brief Check if the frame object has metadata of a given type.
-   *
-   * @param[in] type The metadata type. refer to @ref OBFrameMetadataType
-   *
-   * @return bool The result.
-   */
-  bool hasMetadata(OBFrameMetadataType type) const {
-    ob_error *error = nullptr;
-    auto result = ob_frame_has_metadata(impl_, type, &error);
-    Error::handle(&error);
-
-    return result;
-  }
-
-  /**
-   * @brief Get the metadata value
-   *
-   * @param[in] type The metadata type. refer to @ref OBFrameMetadataType
-   *
-   * @return int64_t The metadata value.
-   */
-  int64_t getMetadataValue(OBFrameMetadataType type) const {
-    ob_error *error = nullptr;
-    auto value = ob_frame_get_metadata_value(impl_, type, &error);
-    Error::handle(&error);
-
-    return value;
-  }
-
-  /**
-   * @brief get StreamProfile of the frame
-   *
-   * @return std::shared_ptr<StreamProfile> The StreamProfile of the frame, may return nullptr if
-   * the frame is not captured from a stream.
-   */
-  std::shared_ptr<StreamProfile> getStreamProfile() const {
-    ob_error *error = nullptr;
-    auto profile = ob_frame_get_stream_profile(impl_, &error);
-    Error::handle(&error);
-    return StreamProfileFactory::create(profile);
-  }
-
-  /**
-   * @brief get owner sensor of the frame
-   *
-   * @return std::shared_ptr<Sensor> The owner sensor of the frame, return nullptr if the frame is
-   * not owned by any sensor or the sensor is destroyed
-   */
-  std::shared_ptr<Sensor> getSensor() const {
-    ob_error *error = nullptr;
-    auto sensor = ob_frame_get_sensor(impl_, &error);
-    Error::handle(&error);
-
-    return std::make_shared<Sensor>(sensor);
-  }
-
-  /**
-   * @brief get owner device of the frame
-   *
-   * @return std::shared_ptr<Device> The owner device of the frame, return nullptr if the frame is
-   * not owned by any device or the device is destroyed
-   */
-  std::shared_ptr<Device> getDevice() const {
-    ob_error *error = nullptr;
-    auto device = ob_frame_get_device(impl_, &error);
-    Error::handle(&error);
-
-    return std::make_shared<Device>(device);
-  }
-
-  /**
-   * @brief Check if the runtime type of the frame object is compatible with a given type.
-   *
-   * @tparam T The given type.
-   *
-   * @return bool The result.
-   */
-  template <typename T>
-  bool is() const;
-
-  /**
-   * @brief Convert the frame object to a target type.
-   *
-   * @tparam T The target type.
-   *
-   * @return std::shared_ptr<T> The result. If it cannot be converted, an exception will be thrown.
-   */
-  template <typename T>
-  std::shared_ptr<T> as() {
-    if (!is<T>()) {
-      throw std::runtime_error("unsupported operation, object's type is not require type");
+    /**
+     * @brief Get the internal (impl) frame object
+     *
+     * @return const ob_frame* the pointer to the internal frame object.
+     */
+    const ob_frame *getImpl() const {
+        return impl_;
     }
 
-    ob_error *error = nullptr;
-    ob_frame_add_ref(impl_, &error);
-    Error::handle(&error);
-
-    return std::make_shared<T>(impl_);
-  }
-
-  /**
-   * @brief Convert the frame object to a target type.
-   *
-   * @tparam T The target type.
-   *
-   * @return std::shared_ptr<T> The result. If it cannot be converted, an exception will be thrown.
-   */
-  template <typename T>
-  std::shared_ptr<const T> as() const {
-    if (!is<const T>()) {
-      throw std::runtime_error("unsupported operation, object's type is not require type");
+    /**
+     * @brief Destroy the Frame object
+     */
+    virtual ~Frame() noexcept {
+        if(impl_) {
+            ob_error *error = nullptr;
+            ob_delete_frame(impl_, &error);
+            Error::handle(&error, false);
+            impl_ = nullptr;
+        }
     }
 
-    ob_error *error = nullptr;
-    ob_frame_add_ref(impl_, &error);
-    Error::handle(&error);
+    /**
+     * @brief Get the type of frame.
+     *
+     * @return OBFrameType The type of frame.
+     */
+    virtual OBFrameType getType() const {
+        ob_error *error = nullptr;
+        auto      type  = ob_frame_get_type(impl_, &error);
+        Error::handle(&error);
 
-    return std::make_shared<const T>(impl_);
-  }
+        return type;
+    }
 
-  /**
-   * @brief Copy the information of the source frame object to the destination frame object.
-   * @brief Including the index, timestamp, system timestamp, global timestamp and metadata will be
-   * copied.
-   *
-   * @param[in] srcFrame Source frame object to copy the information from.
-   */
-  void copyFrameInfo(std::shared_ptr<const Frame> srcFrame) {
-    ob_error *error = nullptr;
-    auto unConstImpl = const_cast<ob_frame *>(impl_);
+    /**
+     * @brief Get the format of the frame.
+     *
+     * @return OBFormat The format of the frame.
+     */
+    virtual OBFormat getFormat() const {
+        ob_error *error  = nullptr;
+        auto      format = ob_frame_get_format(impl_, &error);
+        Error::handle(&error);
 
-    ob_frame_copy_info(srcFrame->getImpl(), unConstImpl, &error);
-    Error::handle(&error);
-  }
+        return format;
+    }
 
-  /**
-   * @brief Set the system timestamp of the frame in microseconds.
-   *
-   * @param systemTimestampUs frame system timestamp to set in microseconds.
-   */
-  void setSystemTimestampUs(uint64_t systemTimestampUs) {
-    ob_error *error = nullptr;
-    auto unConstImpl = const_cast<ob_frame *>(impl_);
+    /**
+     * @brief Get the sequence number of the frame.
+     *
+     * @note The sequence number for each frame is managed by the SDK. It increments by 1 for each frame on each stream.
+     *
+     * @return uint64_t The sequence number of the frame.
+     */
+    virtual uint64_t getIndex() const {
+        ob_error *error = nullptr;
+        auto      index = ob_frame_get_index(impl_, &error);
+        Error::handle(&error);
 
-    ob_frame_set_system_timestamp_us(unConstImpl, systemTimestampUs, &error);
-    Error::handle(&error);
-  }
+        return index;
+    }
 
-  /**
-   * @brief Update the data of a frame.
-   * @brief The data will be memcpy to the frame data buffer.
-   * @brief The frame data size will be also updated as the input data size.
-   *
-   * @attention It is not recommended to update the frame data if the frame was not created by the
-   * user. If you must update it, ensure that the frame is not being used in other threads.
-   * @attention The size of the new data should be equal to or less than the current data size of
-   * the frame. Exceeding the original size may cause memory exceptions.
-   *
-   * @param[in] data The new data to update the frame with.
-   * @param[in] dataSize The size of the new data.
-   */
-  void updateData(const uint8_t *data, uint32_t dataSize) {
-    ob_error *error = nullptr;
-    auto unConstImpl = const_cast<ob_frame *>(impl_);
+    /**
+     * @brief Get frame data
+     *
+     * @return const uint8_t * The frame data pointer.
+     */
+    virtual uint8_t *getData() const {
+        ob_error *error = nullptr;
+        auto      data  = ob_frame_get_data(impl_, &error);
+        Error::handle(&error);
 
-    ob_frame_update_data(unConstImpl, data, dataSize, &error);
-    Error::handle(&error);
-  }
+        return data;
+    }
 
-  /**
-   * @brief Update the metadata of the frame
-   * @brief The metadata will be memcpy to the frame metadata buffer.
-   * @brief The frame metadata size will be also updated as the input metadata size.
-   *
-   * @attention It is not recommended to update the frame metadata if the frame was not created by
-   * the user. If you must update it, ensure that the frame is not being used in other threads or
-   * future use.
-   * @attention The metadata size should be equal to or less than 256 bytes, otherwise it will cause
-   * memory exception.
-   *
-   * @param[in] metadata The new metadata to update.
-   * @param[in] metadataSize The size of the new metadata.
-   */
-  void updateMetadata(const uint8_t *metadata, uint32_t metadataSize) {
-    ob_error *error = nullptr;
-    auto unConstImpl = const_cast<ob_frame *>(impl_);
+    /**
+     * @brief Get the size of the frame data.
+     *
+     * @return uint32_t The size of the frame data.
+     * For point cloud data, this returns the number of bytes occupied by all point sets. To find the number of points, divide the dataSize by the structure
+     * size of the corresponding point type.
+     */
+    virtual uint32_t getDataSize() const {
+        ob_error *error    = nullptr;
+        auto      dataSize = ob_frame_get_data_size(impl_, &error);
+        Error::handle(&error);
 
-    ob_frame_update_metadata(unConstImpl, metadata, metadataSize, &error);
-    Error::handle(&error);
-  }
+        return dataSize;
+    }
 
-  /**
-   * @brief Set (override) the stream profile of the frame
-   *
-   * @param profile The stream profile to set for the frame.
-   */
-  void setStreamProfile(std::shared_ptr<const StreamProfile> profile) {
-    ob_error *error = nullptr;
-    auto unConstImpl = const_cast<ob_frame *>(impl_);
+    /**
+     * @brief Get the hardware timestamp of the frame in microseconds.
+     * @brief The hardware timestamp is the time point when the frame was captured by the device, on device clock domain.
+     *
+     * @return uint64_t The hardware timestamp of the frame in microseconds.
+     */
+    uint64_t getTimeStampUs() const {
+        ob_error *error       = nullptr;
+        auto      timeStampUs = ob_frame_get_timestamp_us(impl_, &error);
+        Error::handle(&error);
 
-    ob_frame_set_stream_profile(unConstImpl, profile->getImpl(), &error);
-    Error::handle(&error);
-  }
+        return timeStampUs;
+    }
 
- public:
-  // The following interfaces are deprecated and are retained here for compatibility purposes.
-  OBFrameType type() const { return getType(); }
+    /**
+     * @brief Get the system timestamp of the frame in microseconds.
+     * @brief The system timestamp is the time point when the frame was received by the host, on host clock domain.
+     *
+     * @return uint64_t The system timestamp of the frame in microseconds.
+     */
+    uint64_t getSystemTimeStampUs() const {
+        ob_error *error             = nullptr;
+        auto      systemTimeStampUs = ob_frame_get_system_timestamp_us(impl_, &error);
+        Error::handle(&error);
 
-  virtual OBFormat format() const { return getFormat(); }
+        return systemTimeStampUs;
+    }
 
-  virtual uint64_t index() const { return getIndex(); }
+    /**
+     * @brief Get the global timestamp of the frame in microseconds.
+     * @brief The global timestamp is the time point when the frame was captured by the device, and has been converted to the host clock domain. The
+     * conversion process base on the device timestamp and can eliminate the timer drift of the device
+     *
+     * @attention The global timestamp disable by default. If global timestamp is not enabled, the function will return 0. To enable the global timestamp,
+     * please call @ref Device::enableGlobalTimestamp() function.
+     * @attention Only some devices support getting the global timestamp. Check the device support status by @ref Device::isGlobalTimestampSupported() function.
+     *
+     * @return uint64_t The global timestamp of the frame in microseconds.
+     */
+    uint64_t getGlobalTimeStampUs() const {
+        ob_error *error             = nullptr;
+        auto      globalTimeStampUs = ob_frame_get_global_timestamp_us(impl_, &error);
+        Error::handle(&error);
 
-  virtual void *data() const {
-    auto data = getData();
-    return reinterpret_cast<void *>(data);
-  }
+        return globalTimeStampUs;
+    }
 
-  virtual uint32_t dataSize() const { return getDataSize(); }
+    /**
+     * @brief Get the metadata pointer of the frame.
+     *
+     * @return const uint8_t * The metadata pointer of the frame.
+     */
+    uint8_t *getMetadata() const {
+        ob_error *error    = nullptr;
+        auto      metadata = ob_frame_get_metadata(impl_, &error);
+        Error::handle(&error);
 
-  uint64_t timeStamp() const { return getTimeStampUs() / 1000; }
+        return metadata;
+    }
 
-  uint64_t timeStampUs() const { return getTimeStampUs(); }
+    /**
+     * @brief Get the size of the metadata of the frame.
+     *
+     * @return uint32_t The size of the metadata of the frame.
+     */
+    uint32_t getMetadataSize() const {
+        ob_error *error        = nullptr;
+        auto      metadataSize = ob_frame_get_metadata_size(impl_, &error);
+        Error::handle(&error);
 
-  uint64_t systemTimeStamp() const { return getSystemTimeStampUs() / 1000; }
+        return metadataSize;
+    }
 
-  uint64_t systemTimeStampUs() const { return getSystemTimeStampUs(); }
+    /**
+     * @brief Check if the frame object has metadata of a given type.
+     *
+     * @param[in] type The metadata type. refer to @ref OBFrameMetadataType
+     *
+     * @return bool The result.
+     */
+    bool hasMetadata(OBFrameMetadataType type) const {
+        ob_error *error  = nullptr;
+        auto      result = ob_frame_has_metadata(impl_, type, &error);
+        Error::handle(&error);
 
-  uint64_t globalTimeStampUs() const { return getGlobalTimeStampUs(); }
+        return result;
+    }
 
-  uint8_t *metadata() const { return getMetadata(); }
+    /**
+     * @brief Get the metadata value
+     *
+     * @param[in] type The metadata type. refer to @ref OBFrameMetadataType
+     *
+     * @return int64_t The metadata value.
+     */
+    int64_t getMetadataValue(OBFrameMetadataType type) const {
+        ob_error *error = nullptr;
+        auto      value = ob_frame_get_metadata_value(impl_, type, &error);
+        Error::handle(&error);
 
-  uint32_t metadataSize() const { return getMetadataSize(); }
+        return value;
+    }
+
+    /**
+     * @brief get StreamProfile of the frame
+     *
+     * @return std::shared_ptr<StreamProfile> The StreamProfile of the frame, may return nullptr if the frame is not captured from a stream.
+     */
+    std::shared_ptr<StreamProfile> getStreamProfile() const {
+        ob_error *error   = nullptr;
+        auto      profile = ob_frame_get_stream_profile(impl_, &error);
+        Error::handle(&error);
+        return StreamProfileFactory::create(profile);
+    }
+
+    /**
+     * @brief get owner sensor of the frame
+     *
+     * @return std::shared_ptr<Sensor> The owner sensor of the frame, return nullptr if the frame is not owned by any sensor or the sensor is destroyed
+     */
+    std::shared_ptr<Sensor> getSensor() const {
+        ob_error *error  = nullptr;
+        auto      sensor = ob_frame_get_sensor(impl_, &error);
+        Error::handle(&error);
+
+        return std::make_shared<Sensor>(sensor);
+    }
+
+    /**
+     * @brief get owner device of the frame
+     *
+     * @return std::shared_ptr<Device> The owner device of the frame, return nullptr if the frame is not owned by any device or the device is destroyed
+     */
+    std::shared_ptr<Device> getDevice() const {
+        ob_error *error  = nullptr;
+        auto      device = ob_frame_get_device(impl_, &error);
+        Error::handle(&error);
+
+        return std::make_shared<Device>(device);
+    }
+
+    /**
+     * @brief Check if the runtime type of the frame object is compatible with a given type.
+     *
+     * @tparam T The given type.
+     *
+     * @return bool The result.
+     */
+    template <typename T> bool is() const;
+
+    /**
+     * @brief Convert the frame object to a target type.
+     *
+     * @tparam T The target type.
+     *
+     * @return std::shared_ptr<T> The result. If it cannot be converted, an exception will be thrown.
+     */
+    template <typename T> std::shared_ptr<T> as() {
+        if(!is<T>()) {
+            throw std::runtime_error("unsupported operation, object's type is not require type");
+        }
+
+        ob_error *error = nullptr;
+        ob_frame_add_ref(impl_, &error);
+        Error::handle(&error);
+
+        return std::make_shared<T>(impl_);
+    }
+
+    /**
+     * @brief Convert the frame object to a target type.
+     *
+     * @tparam T The target type.
+     *
+     * @return std::shared_ptr<T> The result. If it cannot be converted, an exception will be thrown.
+     */
+    template <typename T> std::shared_ptr<const T> as() const {
+        if(!is<const T>()) {
+            throw std::runtime_error("unsupported operation, object's type is not require type");
+        }
+
+        ob_error *error = nullptr;
+        ob_frame_add_ref(impl_, &error);
+        Error::handle(&error);
+
+        return std::make_shared<const T>(impl_);
+    }
+
+    /**
+     * @brief Copy the information of the source frame object to the destination frame object.
+     * @brief Including the index, timestamp, system timestamp, global timestamp and metadata will be copied.
+     *
+     * @param[in] srcFrame Source frame object to copy the information from.
+     */
+    void copyFrameInfo(std::shared_ptr<const Frame> srcFrame) {
+        ob_error *error       = nullptr;
+        auto      unConstImpl = const_cast<ob_frame *>(impl_);
+
+        ob_frame_copy_info(srcFrame->getImpl(), unConstImpl, &error);
+        Error::handle(&error);
+    }
+
+    /**
+     * @brief Set the system timestamp of the frame in microseconds.
+     *
+     * @param systemTimestampUs frame system timestamp to set in microseconds.
+     */
+    void setSystemTimestampUs(uint64_t systemTimestampUs) {
+        ob_error *error       = nullptr;
+        auto      unConstImpl = const_cast<ob_frame *>(impl_);
+
+        ob_frame_set_system_timestamp_us(unConstImpl, systemTimestampUs, &error);
+        Error::handle(&error);
+    }
+
+    /**
+     * @brief Update the data of a frame.
+     * @brief The data will be memcpy to the frame data buffer.
+     * @brief The frame data size will be also updated as the input data size.
+     *
+     * @attention It is not recommended to update the frame data if the frame was not created by the user. If you must update it, ensure that the frame is not
+     * being used in other threads.
+     * @attention The size of the new data should be equal to or less than the current data size of the frame. Exceeding the original size may cause memory
+     * exceptions.
+     *
+     * @param[in] data The new data to update the frame with.
+     * @param[in] dataSize The size of the new data.
+     */
+    void updateData(const uint8_t *data, uint32_t dataSize) {
+        ob_error *error       = nullptr;
+        auto      unConstImpl = const_cast<ob_frame *>(impl_);
+
+        ob_frame_update_data(unConstImpl, data, dataSize, &error);
+        Error::handle(&error);
+    }
+
+    /**
+     * @brief Update the metadata of the frame
+     * @brief The metadata will be memcpy to the frame metadata buffer.
+     * @brief The frame metadata size will be also updated as the input metadata size.
+     *
+     * @attention It is not recommended to update the frame metadata if the frame was not created by the user. If you must update it, ensure that the frame is
+     * not being used in other threads or future use.
+     * @attention The metadata size should be equal to or less than 256 bytes, otherwise it will cause memory exception.
+     *
+     * @param[in] metadata The new metadata to update.
+     * @param[in] metadataSize The size of the new metadata.
+     */
+    void updateMetadata(const uint8_t *metadata, uint32_t metadataSize) {
+        ob_error *error       = nullptr;
+        auto      unConstImpl = const_cast<ob_frame *>(impl_);
+
+        ob_frame_update_metadata(unConstImpl, metadata, metadataSize, &error);
+        Error::handle(&error);
+    }
+
+    /**
+     * @brief Set (override) the stream profile of the frame
+     *
+     * @param profile The stream profile to set for the frame.
+     */
+    void setStreamProfile(std::shared_ptr<const StreamProfile> profile) {
+        ob_error *error       = nullptr;
+        auto      unConstImpl = const_cast<ob_frame *>(impl_);
+
+        ob_frame_set_stream_profile(unConstImpl, profile->getImpl(), &error);
+        Error::handle(&error);
+    }
+
+public:
+    // The following interfaces are deprecated and are retained here for compatibility purposes.
+    OBFrameType type() const {
+        return getType();
+    }
+
+    virtual OBFormat format() const {
+        return getFormat();
+    }
+
+    virtual uint64_t index() const {
+        return getIndex();
+    }
+
+    virtual void *data() const {
+        auto data = getData();
+        return reinterpret_cast<void *>(data);
+    }
+
+    virtual uint32_t dataSize() const {
+        return getDataSize();
+    }
+
+    uint64_t timeStamp() const {
+        return getTimeStampUs() / 1000;
+    }
+
+    uint64_t timeStampUs() const {
+        return getTimeStampUs();
+    }
+
+    uint64_t systemTimeStamp() const {
+        return getSystemTimeStampUs() / 1000;
+    }
+
+    uint64_t systemTimeStampUs() const {
+        return getSystemTimeStampUs();
+    }
+
+    uint64_t globalTimeStampUs() const {
+        return getGlobalTimeStampUs();
+    }
+
+    uint8_t *metadata() const {
+        return getMetadata();
+    }
+
+    uint32_t metadataSize() const {
+        return getMetadataSize();
+    }
 };
 
 /**
  * @brief Define the VideoFrame class, which inherits from the Frame class
  */
 class VideoFrame : public Frame {
- public:
-  /**
-   * @brief Construct a new VideoFrame object with a given pointer to the internal frame object.
-   *
-   * @attention After calling this constructor, the frame object will own the internal frame object,
-   * and the internal frame object will be deleted when the frame object is destroyed.
-   * @attention The internal frame object should not be deleted by the caller.
-   *
-   * @param[in] impl The pointer to the internal frame object.
-   */
-  explicit VideoFrame(const ob_frame *impl) : Frame(impl){};
+public:
+    /**
+     * @brief Construct a new VideoFrame object with a given pointer to the internal frame object.
+     *
+     * @attention After calling this constructor, the frame object will own the internal frame object, and the internal frame object will be deleted when the
+     * frame object is destroyed.
+     * @attention The internal frame object should not be deleted by the caller.
+     *
+     * @param[in] impl The pointer to the internal frame object.
+     */
+    explicit VideoFrame(const ob_frame *impl) : Frame(impl) {};
 
-  ~VideoFrame() noexcept override = default;
+    ~VideoFrame() noexcept override = default;
 
-  /**
-   * @brief Get the width of the frame.
-   *
-   * @return uint32_t The width of the frame.
-   */
-  uint32_t getWidth() const {
-    ob_error *error = nullptr;
-    auto width = ob_video_frame_get_width(impl_, &error);
-    Error::handle(&error);
+    /**
+     * @brief Get the width of the frame.
+     *
+     * @return uint32_t The width of the frame.
+     */
+    uint32_t getWidth() const {
+        ob_error *error = nullptr;
+        auto      width = ob_video_frame_get_width(impl_, &error);
+        Error::handle(&error);
 
-    return width;
-  }
+        return width;
+    }
 
-  /**
-   * @brief Get the height of the frame.
-   *
-   * @return uint32_t The height of the frame.
-   */
-  uint32_t getHeight() const {
-    ob_error *error = nullptr;
-    auto height = ob_video_frame_get_height(impl_, &error);
-    Error::handle(&error);
+    /**
+     * @brief Get the height of the frame.
+     *
+     * @return uint32_t The height of the frame.
+     */
+    uint32_t getHeight() const {
+        ob_error *error  = nullptr;
+        auto      height = ob_video_frame_get_height(impl_, &error);
+        Error::handle(&error);
 
-    return height;
-  }
+        return height;
+    }
 
-  /**
-   * @brief Get the Pixel Type object
-   * @brief Usually used to determine the pixel type of depth frame (depth, disparity, raw phase,
-   * etc.)
-   *
-   * @attention Always return OB_PIXEL_UNKNOWN for non-depth frame currently
-   *
-   * @return OBPixelType
-   */
-  OBPixelType getPixelType() const {
-    ob_error *error = nullptr;
-    auto pixelType = ob_video_frame_get_pixel_type(impl_, &error);
-    Error::handle(&error);
+    /**
+     * @brief Get the Pixel Type object
+     * @brief Usually used to determine the pixel type of depth frame (depth, disparity, raw phase, etc.)
+     *
+     * @attention Always return OB_PIXEL_UNKNOWN for non-depth frame currently
+     *
+     * @return OBPixelType
+     */
+    OBPixelType getPixelType() const {
+        ob_error *error     = nullptr;
+        auto      pixelType = ob_video_frame_get_pixel_type(impl_, &error);
+        Error::handle(&error);
 
-    return pixelType;
-  }
+        return pixelType;
+    }
 
-  /**
-   * @brief Get the effective number of pixels in the frame.
-   * @attention Only valid for Y8/Y10/Y11/Y12/Y14/Y16 format.
-   *
-   * @return uint8_t The effective number of pixels in the frame, or 0 if it is an unsupported
-   * format.
-   */
-  uint8_t getPixelAvailableBitSize() const {
-    ob_error *error = nullptr;
-    auto bitSize = ob_video_frame_get_pixel_available_bit_size(impl_, &error);
-    Error::handle(&error);
+    /**
+     * @brief Get the effective number of pixels in the frame.
+     * @attention Only valid for Y8/Y10/Y11/Y12/Y14/Y16 format.
+     *
+     * @return uint8_t The effective number of pixels in the frame, or 0 if it is an unsupported format.
+     */
+    uint8_t getPixelAvailableBitSize() const {
+        ob_error *error   = nullptr;
+        auto      bitSize = ob_video_frame_get_pixel_available_bit_size(impl_, &error);
+        Error::handle(&error);
 
-    return bitSize;
-  }
+        return bitSize;
+    }
 
-  /**
-   * @brief Set video frame pixel format
-   *
-   * @param pixelType the pixel format of the frame
-   */
-  void setPixelType(OBPixelType pixelType) {
-    ob_error *error = nullptr;
-    auto unConstImpl = const_cast<ob_frame *>(impl_);
+    /**
+     * @brief Set video frame pixel format
+     *
+     * @param pixelType the pixel format of the frame
+     */
+    void setPixelType(OBPixelType pixelType) {
+        ob_error *error       = nullptr;
+        auto      unConstImpl = const_cast<ob_frame *>(impl_);
 
-    ob_video_frame_set_pixel_type(unConstImpl, pixelType, &error);
-    Error::handle(&error);
-  }
+        ob_video_frame_set_pixel_type(unConstImpl, pixelType, &error);
+        Error::handle(&error);
+    }
 
-  /**
-   * @brief Set the effective number of pixels (such as Y16 format frame, but only the lower 10 bits
-   * are effective bits, and the upper 6 bits are filled with 0)
-   * @attention Only valid for Y8/Y10/Y11/Y12/Y14/Y16 format
-   *
-   * @param[in] bitSize the effective number of pixels in the pixel, or 0 if it is an unsupported
-   * format
-   */
-  void setPixelAvailableBitSize(uint8_t bitSize) {
-    ob_error *error = nullptr;
-    auto unConstImpl = const_cast<ob_frame *>(impl_);
+    /**
+     * @brief Set the effective number of pixels (such as Y16 format frame, but only the lower 10 bits are effective bits, and the upper 6 bits are filled with
+     * 0)
+     * @attention Only valid for Y8/Y10/Y11/Y12/Y14/Y16 format
+     *
+     * @param[in] bitSize the effective number of pixels in the pixel, or 0 if it is an unsupported format
+     */
+    void setPixelAvailableBitSize(uint8_t bitSize) {
+        ob_error *error       = nullptr;
+        auto      unConstImpl = const_cast<ob_frame *>(impl_);
 
-    ob_video_frame_set_pixel_available_bit_size(unConstImpl, bitSize, &error);
-    Error::handle(&error);
-  }
+        ob_video_frame_set_pixel_available_bit_size(unConstImpl, bitSize, &error);
+        Error::handle(&error);
+    }
 
- public:
-  // The following interfaces are deprecated and are retained here for compatibility purposes.
-  uint32_t width() const { return getWidth(); }
+public:
+    // The following interfaces are deprecated and are retained here for compatibility purposes.
+    uint32_t width() const {
+        return getWidth();
+    }
 
-  uint32_t height() const { return getHeight(); }
+    uint32_t height() const {
+        return getHeight();
+    }
 
-  uint8_t pixelAvailableBitSize() const { return getPixelAvailableBitSize(); }
+    uint8_t pixelAvailableBitSize() const {
+        return getPixelAvailableBitSize();
+    }
 };
 
 /**
  * @brief Define the ColorFrame class, which inherits from the VideoFrame classd
  */
 class ColorFrame : public VideoFrame {
- public:
-  /**
-   * @brief Construct a new ColorFrame object with a given pointer to the internal frame object.
-   *
-   * @attention After calling this constructor, the frame object will own the internal frame object,
-   * and the internal frame object will be deleted when the frame object is destroyed.
-   * @attention The internal frame object should not be deleted by the caller.
-   * @attention Please use the FrameFactory to create a Frame object.
-   *
-   * @param[in] impl The pointer to the internal frame object.
-   */
-  explicit ColorFrame(const ob_frame *impl) : VideoFrame(impl){};
+public:
+    /**
+     * @brief Construct a new ColorFrame object with a given pointer to the internal frame object.
+     *
+     * @attention After calling this constructor, the frame object will own the internal frame object, and the internal frame object will be deleted when the
+     * frame object is destroyed.
+     * @attention The internal frame object should not be deleted by the caller.
+     * @attention Please use the FrameFactory to create a Frame object.
+     *
+     * @param[in] impl The pointer to the internal frame object.
+     */
+    explicit ColorFrame(const ob_frame *impl) : VideoFrame(impl) {};
 
-  ~ColorFrame() noexcept override = default;
+    ~ColorFrame() noexcept override = default;
 };
 
 /**
  * @brief Define the DepthFrame class, which inherits from the VideoFrame class
  */
 class DepthFrame : public VideoFrame {
- public:
-  /**
-   * @brief Construct a new DepthFrame object with a given pointer to the internal frame object.
-   *
-   * @attention After calling this constructor, the frame object will own the internal frame object,
-   * and the internal frame object will be deleted when the frame object is destroyed.
-   * @attention The internal frame object should not be deleted by the caller.
-   * @attention Please use the FrameFactory to create a Frame object.
-   *
-   * @param[in] impl The pointer to the internal frame object.
-   */
-  explicit DepthFrame(const ob_frame *impl) : VideoFrame(impl){};
 
-  ~DepthFrame() noexcept override = default;
+public:
+    /**
+     * @brief Construct a new DepthFrame object with a given pointer to the internal frame object.
+     *
+     * @attention After calling this constructor, the frame object will own the internal frame object, and the internal frame object will be deleted when the
+     * frame object is destroyed.
+     * @attention The internal frame object should not be deleted by the caller.
+     * @attention Please use the FrameFactory to create a Frame object.
+     *
+     * @param[in] impl The pointer to the internal frame object.
+     */
+    explicit DepthFrame(const ob_frame *impl) : VideoFrame(impl) {};
 
-  /**
-   * @brief Get the value scale of the depth frame. The pixel value of depth frame is multiplied by
-   * the scale to give a depth value in millimeters. For example, if valueScale=0.1 and a certain
-   * coordinate pixel value is pixelValue=10000, then the depth value = pixelValue*valueScale =
-   *   10000*0.1=1000mm.
-   *
-   * @return float The scale.
-   */
-  float getValueScale() const {
-    ob_error *error = nullptr;
-    auto scale = ob_depth_frame_get_value_scale(impl_, &error);
-    Error::handle(&error);
+    ~DepthFrame() noexcept override = default;
 
-    return scale;
-  }
+    /**
+     * @brief Get the value scale of the depth frame. The pixel value of depth frame is multiplied by the scale to give a depth value in millimeters.
+     *   For example, if valueScale=0.1 and a certain coordinate pixel value is pixelValue=10000, then the depth value = pixelValue*valueScale =
+     *   10000*0.1=1000mm.
+     *
+     * @return float The scale.
+     */
+    float getValueScale() const {
+        ob_error *error = nullptr;
+        auto      scale = ob_depth_frame_get_value_scale(impl_, &error);
+        Error::handle(&error);
 
-  /**
-   * @brief Set the value scale of the depth frame. The pixel value of the depth frame is multiplied
-   * by the scale to give a depth value in millimeters. For example, if valueScale=0.1 and a certain
-   * coordinate pixel value is pixelValue=10000, then the depth value = pixelValue*valueScale =
-   * 10000*0.1=1000mm.
-   *
-   * @param[in] valueScale The value scale of the depth frame
-   */
-  void setValueScale(float valueScale) {
-    ob_error *error = nullptr;
-    auto unConstImpl = const_cast<ob_frame *>(impl_);
+        return scale;
+    }
 
-    ob_depth_frame_set_value_scale(unConstImpl, valueScale, &error);
-    Error::handle(&error);
-  }
+    /**
+     * @brief Set the value scale of the depth frame. The pixel value of the depth frame is multiplied by the scale to give a depth value in millimeters.
+     * For example, if valueScale=0.1 and a certain coordinate pixel value is pixelValue=10000, then the depth value = pixelValue*valueScale = 10000*0.1=1000mm.
+     *
+     * @param[in] valueScale The value scale of the depth frame
+     */
+    void setValueScale(float valueScale) {
+        ob_error *error       = nullptr;
+        auto      unConstImpl = const_cast<ob_frame *>(impl_);
+
+        ob_depth_frame_set_value_scale(unConstImpl, valueScale, &error);
+        Error::handle(&error);
+    }
 };
 
 /**
@@ -654,20 +664,21 @@ class DepthFrame : public VideoFrame {
  *
  */
 class IRFrame : public VideoFrame {
- public:
-  /**
-   * @brief Construct a new IRFrame object with a given pointer to the internal frame object.
-   *
-   * @attention After calling this constructor, the frame object will own the internal frame object,
-   * and the internal frame object will be deleted when the frame object is destroyed.
-   * @attention The internal frame object should not be deleted by the caller.
-   * @attention Please use the FrameFactory to create a Frame object.
-   *
-   * @param[in] impl The pointer to the internal frame object.
-   */
-  explicit IRFrame(const ob_frame *impl) : VideoFrame(impl){};
 
-  ~IRFrame() noexcept override = default;
+public:
+    /**
+     * @brief Construct a new IRFrame object with a given pointer to the internal frame object.
+     *
+     * @attention After calling this constructor, the frame object will own the internal frame object, and the internal frame object will be deleted when the
+     * frame object is destroyed.
+     * @attention The internal frame object should not be deleted by the caller.
+     * @attention Please use the FrameFactory to create a Frame object.
+     *
+     * @param[in] impl The pointer to the internal frame object.
+     */
+    explicit IRFrame(const ob_frame *impl) : VideoFrame(impl) {};
+
+    ~IRFrame() noexcept override = default;
 };
 
 /**
@@ -675,94 +686,92 @@ class IRFrame : public VideoFrame {
  *
  */
 class ConfidenceFrame : public VideoFrame {
- public:
-  /**
-   * @brief Construct a new ConfidenceFrame object with a given pointer to the internal frame
-   * object.
-   *
-   * @attention After calling this constructor, the frame object will own the internal frame object,
-   * and the internal frame object will be deleted when the frame object is destroyed.
-   * @attention The internal frame object should not be deleted by the caller.
-   * @attention Please use the FrameFactory to create a Frame object.
-   *
-   * @param[in] impl The pointer to the internal frame object.
-   */
-  explicit ConfidenceFrame(const ob_frame *impl) : VideoFrame(impl){};
 
-  ~ConfidenceFrame() noexcept override = default;
+public:
+    /**
+     * @brief Construct a new ConfidenceFrame object with a given pointer to the internal frame object.
+     *
+     * @attention After calling this constructor, the frame object will own the internal frame object, and the internal frame object will be deleted when the
+     * frame object is destroyed.
+     * @attention The internal frame object should not be deleted by the caller.
+     * @attention Please use the FrameFactory to create a Frame object.
+     *
+     * @param[in] impl The pointer to the internal frame object.
+     */
+    explicit ConfidenceFrame(const ob_frame *impl) : VideoFrame(impl) {};
+
+    ~ConfidenceFrame() noexcept override = default;
 };
 
 /**
  * @brief Define the PointsFrame class, which inherits from the Frame class
  * @brief The PointsFrame class is used to obtain pointcloud data and point cloud information.
  *
- * @note The pointcloud data format can be obtained from the @ref Frame::getFormat() function. Witch
- * can be one of the following formats:
+ * @note The pointcloud data format can be obtained from the @ref Frame::getFormat() function. Witch can be one of the following formats:
  * - @ref OB_FORMAT_POINT : 32-bit float format with 3D point coordinates (x, y, z), @ref OBPoint
- * - @ref OB_FORMAT_RGB_POINT : 32-bit float format with 3D point coordinates (x, y, z) and point
- * colors (r, g, b) @ref OBColorPoint
+ * - @ref OB_FORMAT_RGB_POINT : 32-bit float format with 3D point coordinates (x, y, z) and point colors (r, g, b) @ref OBColorPoint
  */
 class PointsFrame : public Frame {
- public:
-  /**
-   * @brief Construct a new PointsFrame object with a given pointer to the internal frame object.
-   *
-   * @attention After calling this constructor, the frame object will own the internal frame object,
-   * and the internal frame object will be deleted when the frame object is destroyed.
-   * @attention The internal frame object should not be deleted by the caller.
-   * @attention Please use the FrameFactory to create a Frame object.
-   *
-   * @param[in] impl The pointer to the internal frame object.
-   */
-  explicit PointsFrame(const ob_frame *impl) : Frame(impl){};
 
-  ~PointsFrame() noexcept override = default;
+public:
+    /**
+     * @brief Construct a new PointsFrame object with a given pointer to the internal frame object.
+     *
+     * @attention After calling this constructor, the frame object will own the internal frame object, and the internal frame object will be deleted when the
+     * frame object is destroyed.
+     * @attention The internal frame object should not be deleted by the caller.
+     * @attention Please use the FrameFactory to create a Frame object.
+     *
+     * @param[in] impl The pointer to the internal frame object.
+     */
+    explicit PointsFrame(const ob_frame *impl) : Frame(impl) {};
 
-  /**
-   * @brief Get the point coordinate value scale of the points frame. The point position value of
-   * the points frame is multiplied by the scale to give a position value in millimeters. For
-   * example, if scale=0.1, the x-coordinate value of a point is x = 10000, which means that the
-   * actual x-coordinate value = x*scale = 10000*0.1 = 1000mm.
-   *
-   * @return float The coordinate value scale.
-   */
-  float getCoordinateValueScale() const {
-    ob_error *error = nullptr;
-    auto scale = ob_points_frame_get_coordinate_value_scale(impl_, &error);
-    Error::handle(&error);
+    ~PointsFrame() noexcept override = default;
 
-    return scale;
-  }
+    /**
+     * @brief Get the point coordinate value scale of the points frame. The point position value of the points frame is multiplied by the scale to give a
+     * position value in millimeters. For example, if scale=0.1, the x-coordinate value of a point is x = 10000, which means that the actual x-coordinate value
+     * = x*scale = 10000*0.1 = 1000mm.
+     *
+     * @return float The coordinate value scale.
+     */
+    float getCoordinateValueScale() const {
+        ob_error *error = nullptr;
+        auto      scale = ob_points_frame_get_coordinate_value_scale(impl_, &error);
+        Error::handle(&error);
 
-  /**
-   * @brief Get the width of the frame.
-   *
-   * @return uint32_t The width of the frame.
-   */
-  uint32_t getWidth() const {
-    ob_error *error = nullptr;
-    // TODO
-    auto width = ob_point_cloud_frame_get_width(impl_, &error);
-    Error::handle(&error);
+        return scale;
+    }
 
-    return width;
-  }
+    /**
+     * @brief Get the width of the frame.
+     *
+     * @return uint32_t The width of the frame.
+     */
+    uint32_t getWidth() const {
+        ob_error *error = nullptr;
+        // TODO
+        auto width = ob_point_cloud_frame_get_width(impl_, &error);
+        Error::handle(&error);
 
-  /**
-   * @brief Get the height of the frame.
-   *
-   * @return uint32_t The height of the frame.
-   */
-  uint32_t getHeight() const {
-    ob_error *error = nullptr;
-    auto height = ob_point_cloud_frame_get_height(impl_, &error);
-    Error::handle(&error);
+        return width;
+    }
 
-    return height;
-  }
+    /**
+     * @brief Get the height of the frame.
+     *
+     * @return uint32_t The height of the frame.
+     */
+    uint32_t getHeight() const {
+        ob_error *error  = nullptr;
+        auto      height = ob_point_cloud_frame_get_height(impl_, &error);
+        Error::handle(&error);
 
- public:
-  // The following interfaces are deprecated and are retained here for compatibility purposes.
+        return height;
+    }
+
+public:
+    // The following interfaces are deprecated and are retained here for compatibility purposes.
 #define getPositionValueScale getCoordinateValueScale
 };
 
@@ -771,114 +780,122 @@ class PointsFrame : public Frame {
  *
  */
 class AccelFrame : public Frame {
- public:
-  explicit AccelFrame(const ob_frame *impl) : Frame(impl){};
 
-  ~AccelFrame() noexcept override = default;
+public:
+    explicit AccelFrame(const ob_frame *impl) : Frame(impl) {};
 
-  /**
-   * @brief Get the accelerometer frame data
-   *
-   * @return OBAccelValue The accelerometer frame data
-   */
-  OBAccelValue getValue() const {
-    ob_error *error = nullptr;
-    auto value = ob_accel_frame_get_value(impl_, &error);
-    Error::handle(&error);
+    ~AccelFrame() noexcept override = default;
 
-    return value;
-  }
+    /**
+     * @brief Get the accelerometer frame data
+     *
+     * @return OBAccelValue The accelerometer frame data
+     */
+    OBAccelValue getValue() const {
+        ob_error *error = nullptr;
+        auto      value = ob_accel_frame_get_value(impl_, &error);
+        Error::handle(&error);
 
-  /**
-   * @brief Get the temperature when the frame was sampled
-   *
-   * @return float The temperature value in celsius
-   */
-  float getTemperature() const {
-    ob_error *error = nullptr;
-    auto temp = ob_accel_frame_get_temperature(impl_, &error);
-    Error::handle(&error);
+        return value;
+    }
 
-    return temp;
-  }
+    /**
+     * @brief Get the temperature when the frame was sampled
+     *
+     * @return float The temperature value in celsius
+     */
+    float getTemperature() const {
+        ob_error *error = nullptr;
+        auto      temp  = ob_accel_frame_get_temperature(impl_, &error);
+        Error::handle(&error);
 
- public:
-  // The following interfaces are deprecated and are retained here for compatibility purposes.
-  OBAccelValue value() { return getValue(); }
+        return temp;
+    }
 
-  float temperature() { return getTemperature(); }
+public:
+    // The following interfaces are deprecated and are retained here for compatibility purposes.
+    OBAccelValue value() {
+        return getValue();
+    }
+
+    float temperature() {
+        return getTemperature();
+    }
 };
 
 /**
  * @brief Define the GyroFrame class, which inherits from the Frame class
  */
 class GyroFrame : public Frame {
- public:
-  explicit GyroFrame(const ob_frame *impl) : Frame(impl){};
 
-  ~GyroFrame() noexcept override = default;
+public:
+    explicit GyroFrame(const ob_frame *impl) : Frame(impl) {};
 
-  /**
-   * @brief Get the gyro frame data
-   *
-   * @return OBAccelValue The gyro frame data
-   */
-  OBGyroValue getValue() const {
-    ob_error *error = nullptr;
-    auto value = ob_gyro_frame_get_value(impl_, &error);
-    Error::handle(&error);
+    ~GyroFrame() noexcept override = default;
 
-    return value;
-  }
+    /**
+     * @brief Get the gyro frame data
+     *
+     * @return OBAccelValue The gyro frame data
+     */
+    OBGyroValue getValue() const {
+        ob_error *error = nullptr;
+        auto      value = ob_gyro_frame_get_value(impl_, &error);
+        Error::handle(&error);
 
-  /**
-   * @brief Get the temperature when the frame was sampled
-   *
-   * @return float The temperature value in celsius
-   */
-  float getTemperature() const {
-    ob_error *error = nullptr;
-    auto temperature = ob_gyro_frame_get_temperature(impl_, &error);
-    Error::handle(&error);
+        return value;
+    }
 
-    return temperature;
-  }
+    /**
+     * @brief Get the temperature when the frame was sampled
+     *
+     * @return float The temperature value in celsius
+     */
+    float getTemperature() const {
+        ob_error *error       = nullptr;
+        auto      temperature = ob_gyro_frame_get_temperature(impl_, &error);
+        Error::handle(&error);
 
- public:
-  // The following interfaces are deprecated and are retained here for compatibility purposes.
-  OBGyroValue value() { return getValue(); }
+        return temperature;
+    }
 
-  float temperature() { return getTemperature(); }
+public:
+    // The following interfaces are deprecated and are retained here for compatibility purposes.
+    OBGyroValue value() {
+        return getValue();
+    }
+
+    float temperature() {
+        return getTemperature();
+    }
 };
 
 /**
  * @brief Define the LiDARPointsFrame class, which inherits from the Frame class
  * @brief The LiDARPointsFrame class is used to obtain LiDAR point cloud data.
  *
- * @note The pointcloud data format can be obtained from the @ref Frame::getFormat() function. Witch
- * can be one of the following formats:
+ * @note The pointcloud data format can be obtained from the @ref Frame::getFormat() function. Witch can be one of the following formats:
  * - @ref OB_FORMAT_LIDAR_POINT: @ref OBLiDARPoint
  * - @ref OB_FORMAT_LIDAR_SPHERE_POINT: @ref OBLiDARSpherePoint
  * - @ref OB_FORMAT_LIDAR_SCAN: @ref OBLiDARScanPoint
  * - @ref OB_FORMAT_LIDAR_CALIBRATION: LiDAR calibration mode point cloud, raw data
- * - The pointcloud data holds a set of points. To find the number of points, divide the dataSize by
- * the structure size of the corresponding point type.
+ * - The pointcloud data holds a set of points. To find the number of points, divide the dataSize by the structure
+ * size of the corresponding point type.
  */
 class LiDARPointsFrame : public Frame {
- public:
-  /**
-   * @brief Construct a new LiDARPointsFrame object with a given pointer to the internal frame
-   * object.
-   *
-   * @attention After calling this constructor, the frame object will own the internal frame object,
-   * and the internal frame object will be deleted when the frame object is destroyed.
-   * @attention The internal frame object should not be deleted by the caller.
-   * @attention Please use the FrameFactory to create a Frame object.
-   *
-   * @param[in] impl The pointer to the internal frame object.
-   */
-  explicit LiDARPointsFrame(const ob_frame *impl) : Frame(impl){};
-  ~LiDARPointsFrame() noexcept override = default;
+public:
+    /**
+     * @brief Construct a new LiDARPointsFrame object with a given pointer to the internal frame object.
+     *
+     * @attention After calling this constructor, the frame object will own the internal frame object, and the internal frame object will be deleted when the
+     * frame object is destroyed.
+     * @attention The internal frame object should not be deleted by the caller.
+     * @attention Please use the FrameFactory to create a Frame object.
+     *
+     * @param[in] impl The pointer to the internal frame object.
+     */
+    explicit LiDARPointsFrame(const ob_frame *impl) : Frame(impl){};
+    ~LiDARPointsFrame() noexcept override = default;
 };
 
 /**
@@ -886,431 +903,414 @@ class LiDARPointsFrame : public Frame {
  * @brief A FrameSet is a container for multiple frames of different types.
  */
 class FrameSet : public Frame {
- public:
-  explicit FrameSet(const ob_frame *impl) : Frame(impl){};
 
-  ~FrameSet() noexcept override = default;
+public:
+    explicit FrameSet(const ob_frame *impl) : Frame(impl) {};
 
-  /**
-   * @brief Get the number of frames in the FrameSet
-   *
-   * @return uint32_t The number of frames
-   */
-  uint32_t getCount() const {
-    ob_error *error = nullptr;
-    auto count = ob_frameset_get_count(impl_, &error);
-    Error::handle(&error);
-    return count;
-  }
+    ~FrameSet() noexcept override = default;
 
-  /**
-   * @brief Get a frame of a specific type from the FrameSet
-   *
-   * @param[in] frameType The type of sensor
-   *
-   * @return std::shared_ptr<Frame> The corresponding type of frame
-   */
-  std::shared_ptr<Frame> getFrame(OBFrameType frameType) const {
-    ob_error *error = nullptr;
-    auto frame = ob_frameset_get_frame(impl_, frameType, &error);
-    if (!frame) {
-      return nullptr;
+    /**
+     * @brief Get the number of frames in the FrameSet
+     *
+     * @return uint32_t The number of frames
+     */
+    uint32_t getCount() const {
+        ob_error *error = nullptr;
+        auto      count = ob_frameset_get_count(impl_, &error);
+        Error::handle(&error);
+        return count;
     }
-    Error::handle(&error);
-    return std::make_shared<Frame>(frame);
-  }
 
-  /**
-   * @brief Get a frame at a specific index from the FrameSet
-   *
-   * @param[in] index The index of the frame
-   *
-   * @return std::shared_ptr<Frame> The frame at the specified index
-   */
-  std::shared_ptr<Frame> getFrameByIndex(uint32_t index) const {
-    ob_error *error = nullptr;
-    auto frame = ob_frameset_get_frame_by_index(impl_, index, &error);
-    if (!frame) {
-      return nullptr;
+    /**
+     * @brief Get a frame of a specific type from the FrameSet
+     *
+     * @param[in] frameType The type of sensor
+     *
+     * @return std::shared_ptr<Frame> The corresponding type of frame
+     */
+    std::shared_ptr<Frame> getFrame(OBFrameType frameType) const {
+        ob_error *error = nullptr;
+        auto      frame = ob_frameset_get_frame(impl_, frameType, &error);
+        if(!frame) {
+            return nullptr;
+        }
+        Error::handle(&error);
+        return std::make_shared<Frame>(frame);
     }
-    Error::handle(&error);
-    return std::make_shared<Frame>(frame);
-  }
 
-  /**
-   * @brief Push a frame to the FrameSet
-   *
-   * @attention If the FrameSet contains the same type of frame, the new frame will replace the old
-   * one.
-   *
-   * @param[in] frame The frame to be pushed
-   */
-  void pushFrame(std::shared_ptr<const Frame> frame) const {
-    ob_error *error = nullptr;
-
-    // unsafe operation, need to cast const to non-const
-    auto unConstImpl = const_cast<ob_frame *>(impl_);
-
-    auto otherImpl = frame->getImpl();
-    ob_frameset_push_frame(unConstImpl, otherImpl, &error);
-
-    Error::handle(&error);
-  }
-
-  /**
-   * @brief Get the depth frame from the frameset.
-   *
-   * @return std::shared_ptr<DepthFrame> Return the depth frame.
-   */
-  std::shared_ptr<DepthFrame> getDepthFrame() const {
-    ob_error *error = nullptr;
-    auto frame = ob_frameset_get_depth_frame(impl_, &error);
-    if (!frame) {
-      return nullptr;
+    /**
+     * @brief Get a frame at a specific index from the FrameSet
+     *
+     * @param[in] index The index of the frame
+     *
+     * @return std::shared_ptr<Frame> The frame at the specified index
+     */
+    std::shared_ptr<Frame> getFrameByIndex(uint32_t index) const {
+        ob_error *error = nullptr;
+        auto      frame = ob_frameset_get_frame_by_index(impl_, index, &error);
+        if(!frame) {
+            return nullptr;
+        }
+        Error::handle(&error);
+        return std::make_shared<Frame>(frame);
     }
-    Error::handle(&error);
-    return std::make_shared<DepthFrame>(frame);
-  }
 
-  /**
-   * @brief Get the color frame from the frameset.
-   *
-   * @return std::shared_ptr<ColorFrame> Return the color frame.
-   */
-  std::shared_ptr<ColorFrame> getColorFrame() const {
-    ob_error *error = nullptr;
-    auto frame = ob_frameset_get_color_frame(impl_, &error);
-    if (!frame) {
-      return nullptr;
+    /**
+     * @brief Push a frame to the FrameSet
+     *
+     * @attention If the FrameSet contains the same type of frame, the new frame will replace the old one.
+     *
+     * @param[in] frame The frame to be pushed
+     */
+    void pushFrame(std::shared_ptr<const Frame> frame) const {
+        ob_error *error = nullptr;
+
+        // unsafe operation, need to cast const to non-const
+        auto unConstImpl = const_cast<ob_frame *>(impl_);
+
+        auto otherImpl = frame->getImpl();
+        ob_frameset_push_frame(unConstImpl, otherImpl, &error);
+
+        Error::handle(&error);
     }
-    Error::handle(&error);
-    return std::make_shared<ColorFrame>(frame);
-  }
 
-  /**
-   * @brief Get the infrared frame from the frameset.
-   *
-   * @return std::shared_ptr<IRFrame> Return the infrared frame.
-   */
-  std::shared_ptr<IRFrame> getIrFrame() const {
-    ob_error *error = nullptr;
-    auto frame = ob_frameset_get_ir_frame(impl_, &error);
-    if (!frame) {
-      return nullptr;
+    /**
+     * @brief Get the depth frame from the frameset.
+     *
+     * @return std::shared_ptr<DepthFrame> Return the depth frame.
+     */
+    std::shared_ptr<DepthFrame> getDepthFrame() const {
+        ob_error *error = nullptr;
+        auto      frame = ob_frameset_get_depth_frame(impl_, &error);
+        if(!frame) {
+            return nullptr;
+        }
+        Error::handle(&error);
+        return std::make_shared<DepthFrame>(frame);
     }
-    Error::handle(&error);
-    return std::make_shared<IRFrame>(frame);
-  }
 
-  /**
-   * @brief Get the point cloud frame from the frameset.
-   *
-   * @return std::shared_ptr<PointsFrame> Return the point cloud frame.
-   */
-  std::shared_ptr<PointsFrame> getPointsFrame() const {
-    ob_error *error = nullptr;
-    auto frame = ob_frameset_get_points_frame(impl_, &error);
-    if (!frame) {
-      return nullptr;
+    /**
+     * @brief Get the color frame from the frameset.
+     *
+     * @return std::shared_ptr<ColorFrame> Return the color frame.
+     */
+    std::shared_ptr<ColorFrame> getColorFrame() const {
+        ob_error *error = nullptr;
+        auto      frame = ob_frameset_get_color_frame(impl_, &error);
+        if(!frame) {
+            return nullptr;
+        }
+        Error::handle(&error);
+        return std::make_shared<ColorFrame>(frame);
     }
-    Error::handle(&error);
-    return std::make_shared<PointsFrame>(frame);
-  }
 
- public:
-  // The following interfaces are deprecated and are retained here for compatibility purposes.
-  uint32_t frameCount() const { return getCount(); }
-
-  std::shared_ptr<DepthFrame> depthFrame() const {
-    auto frame = getFrame(OB_FRAME_DEPTH);
-    if (frame == nullptr) {
-      return nullptr;
+    /**
+     * @brief Get the infrared frame from the frameset.
+     *
+     * @return std::shared_ptr<IRFrame> Return the infrared frame.
+     */
+    std::shared_ptr<IRFrame> getIrFrame() const {
+        ob_error *error = nullptr;
+        auto      frame = ob_frameset_get_ir_frame(impl_, &error);
+        if(!frame) {
+            return nullptr;
+        }
+        Error::handle(&error);
+        return std::make_shared<IRFrame>(frame);
     }
-    auto depthFrame = frame->as<ob::DepthFrame>();
-    return depthFrame;
-  }
 
-  std::shared_ptr<ColorFrame> colorFrame() const {
-    auto frame = getFrame(OB_FRAME_COLOR);
-    if (frame == nullptr) {
-      return nullptr;
+    /**
+     * @brief Get the point cloud frame from the frameset.
+     *
+     * @return std::shared_ptr<PointsFrame> Return the point cloud frame.
+     */
+    std::shared_ptr<PointsFrame> getPointsFrame() const {
+        ob_error *error = nullptr;
+        auto      frame = ob_frameset_get_points_frame(impl_, &error);
+        if(!frame) {
+            return nullptr;
+        }
+        Error::handle(&error);
+        return std::make_shared<PointsFrame>(frame);
     }
-    auto colorFrame = frame->as<ob::ColorFrame>();
-    return colorFrame;
-  }
 
-  std::shared_ptr<IRFrame> irFrame() const {
-    auto frame = getFrame(OB_FRAME_IR);
-    if (frame == nullptr) {
-      return nullptr;
+public:
+    // The following interfaces are deprecated and are retained here for compatibility purposes.
+    uint32_t frameCount() const {
+        return getCount();
     }
-    auto irFrame = frame->as<ob::IRFrame>();
-    return irFrame;
-  }
 
- public:
-  // The following interfaces are deprecated and are retained here for compatibility purposes.
-  std::shared_ptr<PointsFrame> pointsFrame() const {
-    auto frame = getFrame(OB_FRAME_POINTS);
-    if (frame == nullptr) {
-      return nullptr;
+    std::shared_ptr<DepthFrame> depthFrame() const {
+        auto frame = getFrame(OB_FRAME_DEPTH);
+        if(frame == nullptr) {
+            return nullptr;
+        }
+        auto depthFrame = frame->as<ob::DepthFrame>();
+        return depthFrame;
     }
-    auto pointsFrame = frame->as<ob::PointsFrame>();
-    return pointsFrame;
-  }
 
-  std::shared_ptr<Frame> getFrame(int index) const { return getFrameByIndex(index); }
+    std::shared_ptr<ColorFrame> colorFrame() const {
+        auto frame = getFrame(OB_FRAME_COLOR);
+        if(frame == nullptr) {
+            return nullptr;
+        }
+        auto colorFrame = frame->as<ob::ColorFrame>();
+        return colorFrame;
+    }
+
+    std::shared_ptr<IRFrame> irFrame() const {
+        auto frame = getFrame(OB_FRAME_IR);
+        if(frame == nullptr) {
+            return nullptr;
+        }
+        auto irFrame = frame->as<ob::IRFrame>();
+        return irFrame;
+    }
+
+public:
+    // The following interfaces are deprecated and are retained here for compatibility purposes.
+    std::shared_ptr<PointsFrame> pointsFrame() const {
+        auto frame = getFrame(OB_FRAME_POINTS);
+        if(frame == nullptr) {
+            return nullptr;
+        }
+        auto pointsFrame = frame->as<ob::PointsFrame>();
+        return pointsFrame;
+    }
+
+    std::shared_ptr<Frame> getFrame(int index) const {
+        return getFrameByIndex(index);
+    }
 };
 
 /**
  * @brief FrameFactory class, which provides some static functions to create frame objects
  */
 class FrameFactory {
- public:
-  /**
-   * @brief Create a Frame object of a specific type with a given format and data size.
-   *
-   * @param[in] frameType The type of the frame.
-   * @param[in] format The format of the frame.
-   * @param[in] dataSize The size of the data in bytes.
-   *
-   * @return std::shared_ptr<Frame> The created frame object.
-   */
-  static std::shared_ptr<Frame> createFrame(OBFrameType frameType, OBFormat format,
-                                            uint32_t dataSize) {
-    ob_error *error = nullptr;
-    auto impl = ob_create_frame(frameType, format, dataSize, &error);
-    Error::handle(&error);
+public:
+    /**
+     * @brief Create a Frame object of a specific type with a given format and data size.
+     *
+     * @param[in] frameType The type of the frame.
+     * @param[in] format The format of the frame.
+     * @param[in] dataSize The size of the data in bytes.
+     *
+     * @return std::shared_ptr<Frame> The created frame object.
+     */
+    static std::shared_ptr<Frame> createFrame(OBFrameType frameType, OBFormat format, uint32_t dataSize) {
+        ob_error *error = nullptr;
+        auto      impl  = ob_create_frame(frameType, format, dataSize, &error);
+        Error::handle(&error);
 
-    return std::make_shared<Frame>(impl);
-  }
-
-  /**
-   * @brief Create a VideoFrame object of a specific type with a given format, width, height, and
-   * stride.
-   * @note If stride is not specified, it will be calculated based on the width and format.
-   *
-   * @param[in] frameType The type of the frame.
-   * @param[in] format The format of the frame.
-   * @param[in] width The width of the frame.
-   * @param[in] height The height of the frame.
-   * @param[in] stride The stride of the frame.
-   *
-   * @return std::shared_ptr<VideoFrame> The created video frame object.
-   */
-  static std::shared_ptr<VideoFrame> createVideoFrame(OBFrameType frameType, OBFormat format,
-                                                      uint32_t width, uint32_t height,
-                                                      uint32_t stride = 0) {
-    ob_error *error = nullptr;
-    auto impl = ob_create_video_frame(frameType, format, width, height, stride, &error);
-    Error::handle(&error);
-
-    auto frame = std::make_shared<Frame>(impl);
-    return frame->as<VideoFrame>();
-  }
-
-  /**
-   * @brief Create (clone) a frame object based on the specified other frame object.
-   * @brief The new frame object will have the same properties as the other frame object, but the
-   * data buffer is newly allocated.
-   *
-   * @param[in] otherFrame The source frame to be copied.
-   * @param[in] shouldCopyData If true, the data of the source frame object will be copied to the
-   * new frame object. If false, the new frame object will have a data buffer with random data. The
-   * default value is true.
-   *
-   * @return std::shared_ptr<Frame> The new frame object.
-   */
-  static std::shared_ptr<Frame> createFrameFromOtherFrame(std::shared_ptr<const Frame> otherFrame,
-                                                          bool shouldCopyData = true) {
-    ob_error *error = nullptr;
-    auto otherImpl = otherFrame->getImpl();
-    auto impl = ob_create_frame_from_other_frame(otherImpl, shouldCopyData, &error);
-    Error::handle(&error);
-
-    return std::make_shared<Frame>(impl);
-  }
-
-  /**
-   * @brief Create a Frame From (according to)Stream Profile object
-   *
-   * @param[in] profile The stream profile object to create the frame from.
-   *
-   * @return std::shared_ptr<Frame>  The created frame object.
-   */
-  static std::shared_ptr<Frame> createFrameFromStreamProfile(
-      std::shared_ptr<const StreamProfile> profile) {
-    ob_error *error = nullptr;
-    auto impl = ob_create_frame_from_stream_profile(profile->getImpl(), &error);
-    Error::handle(&error);
-
-    return std::make_shared<Frame>(impl);
-  }
-
-  /**
-   * @brief The callback function to destroy the buffer when the frame is destroyed.
-   */
-  typedef std::function<void(uint8_t *)> BufferDestroyCallback;
-
-  /**
-   * @brief Create a frame object based on an externally created buffer.
-   *
-   * @attention The buffer is owned by the caller, and will not be destroyed by the frame object.
-   * The user should ensure that the buffer is valid and not modified.
-   *
-   * @param[in] frameType Frame object type.
-   * @param[in] format Frame object format.
-   * @param[in] buffer Frame object buffer.
-   * @param[in] destroyCallback Destroy callback, will be called when the frame object is destroyed.
-   * @param[in] bufferSize Frame object buffer size.
-   *
-   * @return std::shared_ptr<Frame> The created frame object.
-   */
-  static std::shared_ptr<Frame> createFrameFromBuffer(OBFrameType frameType, OBFormat format,
-                                                      uint8_t *buffer,
-                                                      BufferDestroyCallback destroyCallback,
-                                                      uint32_t bufferSize) {
-    ob_error *error = nullptr;
-    auto ctx = new BufferDestroyContext{destroyCallback};
-    auto impl = ob_create_frame_from_buffer(frameType, format, buffer, bufferSize,
-                                            &FrameFactory::BufferDestroy, ctx, &error);
-    Error::handle(&error);
-
-    return std::make_shared<Frame>(impl);
-  }
-
-  /**
-   * @brief Create a video frame object based on an externally created buffer.
-   *
-   * @attention The buffer is owned by the user and will not be destroyed by the frame object. The
-   * user should ensure that the buffer is valid and not modified.
-   * @attention The frame object is created with a reference count of 1, and the reference count
-   * should be decreased by calling @ref ob_delete_frame() when it is no longer needed.
-   *
-   * @param[in] frameType Frame object type.
-   * @param[in] format Frame object format.
-   * @param[in] width Frame object width.
-   * @param[in] height Frame object height.
-   * @param[in] buffer Frame object buffer.
-   * @param[in] bufferSize Frame object buffer size.
-   * @param[in] destroyCallback Destroy callback, will be called when the frame object is destroyed.
-   * @param[in] stride Row span in bytes. If 0, the stride is calculated based on the width and
-   * format.
-   *
-   * @return std::shared_ptr<VideoFrame> The created video frame object.
-   */
-  static std::shared_ptr<VideoFrame> createVideoFrameFromBuffer(
-      OBFrameType frameType, OBFormat format, uint32_t width, uint32_t height, uint8_t *buffer,
-      BufferDestroyCallback destroyCallback, uint32_t bufferSize, uint32_t stride = 0) {
-    ob_error *error = nullptr;
-    auto ctx = new BufferDestroyContext{destroyCallback};
-    auto impl =
-        ob_create_video_frame_from_buffer(frameType, format, width, height, stride, buffer,
-                                          bufferSize, &FrameFactory::BufferDestroy, ctx, &error);
-    Error::handle(&error);
-
-    auto frame = std::make_shared<Frame>(impl);
-    return frame->as<VideoFrame>();
-  }
-
-  /**
-   * @brief Create a new FrameSet object.
-   *
-   * This function creates a new FrameSet instance by internally calling the native C API.
-   * The returned FrameSet is managed by a std::shared_ptr, and its lifetime will be
-   * automatically managed. When no references remain, the underlying native resources will be
-   * released.
-   *
-   * @return std::shared_ptr<FrameSet> The created FrameSet object.
-   */
-  static std::shared_ptr<FrameSet> createFrameSet() {
-    ob_error *error = nullptr;
-    auto impl = ob_create_frameset(&error);
-    Error::handle(&error);
-    return std::make_shared<FrameSet>(impl);
-  }
-
- private:
-  struct BufferDestroyContext {
-    BufferDestroyCallback callback;
-  };
-
-  static void BufferDestroy(uint8_t *buffer, void *context) {
-    auto *ctx = static_cast<BufferDestroyContext *>(context);
-    if (ctx->callback) {
-      ctx->callback(buffer);
+        return std::make_shared<Frame>(impl);
     }
-    delete ctx;
-  }
+
+    /**
+     * @brief Create a VideoFrame object of a specific type with a given format, width, height, and stride.
+     * @note If stride is not specified, it will be calculated based on the width and format.
+     *
+     * @param[in] frameType The type of the frame.
+     * @param[in] format The format of the frame.
+     * @param[in] width The width of the frame.
+     * @param[in] height The height of the frame.
+     * @param[in] stride The stride of the frame.
+     *
+     * @return std::shared_ptr<VideoFrame> The created video frame object.
+     */
+    static std::shared_ptr<VideoFrame> createVideoFrame(OBFrameType frameType, OBFormat format, uint32_t width, uint32_t height, uint32_t stride = 0) {
+        ob_error *error = nullptr;
+        auto      impl  = ob_create_video_frame(frameType, format, width, height, stride, &error);
+        Error::handle(&error);
+
+        auto frame = std::make_shared<Frame>(impl);
+        return frame->as<VideoFrame>();
+    }
+
+    /**
+     * @brief Create (clone) a frame object based on the specified other frame object.
+     * @brief The new frame object will have the same properties as the other frame object, but the data buffer is newly allocated.
+     *
+     * @param[in] otherFrame The source frame to be copied.
+     * @param[in] shouldCopyData If true, the data of the source frame object will be copied to the new frame object. If false, the new frame object will
+     * have a data buffer with random data. The default value is true.
+     *
+     * @return std::shared_ptr<Frame> The new frame object.
+     */
+    static std::shared_ptr<Frame> createFrameFromOtherFrame(std::shared_ptr<const Frame> otherFrame, bool shouldCopyData = true) {
+        ob_error *error     = nullptr;
+        auto      otherImpl = otherFrame->getImpl();
+        auto      impl      = ob_create_frame_from_other_frame(otherImpl, shouldCopyData, &error);
+        Error::handle(&error);
+
+        return std::make_shared<Frame>(impl);
+    }
+
+    /**
+     * @brief Create a Frame From (according to)Stream Profile object
+     *
+     * @param[in] profile The stream profile object to create the frame from.
+     *
+     * @return std::shared_ptr<Frame>  The created frame object.
+     */
+    static std::shared_ptr<Frame> createFrameFromStreamProfile(std::shared_ptr<const StreamProfile> profile) {
+        ob_error *error = nullptr;
+        auto      impl  = ob_create_frame_from_stream_profile(profile->getImpl(), &error);
+        Error::handle(&error);
+
+        return std::make_shared<Frame>(impl);
+    }
+
+    /**
+     * @brief The callback function to destroy the buffer when the frame is destroyed.
+     */
+    typedef std::function<void(uint8_t *)> BufferDestroyCallback;
+
+    /**
+     * @brief Create a frame object based on an externally created buffer.
+     *
+     * @attention The buffer is owned by the caller, and will not be destroyed by the frame object. The user should ensure that the buffer is valid and not
+     * modified.
+     *
+     * @param[in] frameType Frame object type.
+     * @param[in] format Frame object format.
+     * @param[in] buffer Frame object buffer.
+     * @param[in] destroyCallback Destroy callback, will be called when the frame object is destroyed.
+     * @param[in] bufferSize Frame object buffer size.
+     *
+     * @return std::shared_ptr<Frame> The created frame object.
+     */
+    static std::shared_ptr<Frame> createFrameFromBuffer(OBFrameType frameType, OBFormat format, uint8_t *buffer, BufferDestroyCallback destroyCallback,
+                                                        uint32_t bufferSize) {
+        ob_error *error = nullptr;
+        auto      ctx   = new BufferDestroyContext{ destroyCallback };
+        auto      impl  = ob_create_frame_from_buffer(frameType, format, buffer, bufferSize, &FrameFactory::BufferDestroy, ctx, &error);
+        Error::handle(&error);
+
+        return std::make_shared<Frame>(impl);
+    }
+
+    /**
+     * @brief Create a video frame object based on an externally created buffer.
+     *
+     * @attention The buffer is owned by the user and will not be destroyed by the frame object. The user should ensure that the buffer is valid and not
+     * modified.
+     * @attention The frame object is created with a reference count of 1, and the reference count should be decreased by calling @ref ob_delete_frame() when it
+     * is no longer needed.
+     *
+     * @param[in] frameType Frame object type.
+     * @param[in] format Frame object format.
+     * @param[in] width Frame object width.
+     * @param[in] height Frame object height.
+     * @param[in] buffer Frame object buffer.
+     * @param[in] bufferSize Frame object buffer size.
+     * @param[in] destroyCallback Destroy callback, will be called when the frame object is destroyed.
+     * @param[in] stride Row span in bytes. If 0, the stride is calculated based on the width and format.
+     *
+     * @return std::shared_ptr<VideoFrame> The created video frame object.
+     */
+    static std::shared_ptr<VideoFrame> createVideoFrameFromBuffer(OBFrameType frameType, OBFormat format, uint32_t width, uint32_t height, uint8_t *buffer,
+                                                                  BufferDestroyCallback destroyCallback, uint32_t bufferSize, uint32_t stride = 0) {
+        ob_error *error = nullptr;
+        auto      ctx   = new BufferDestroyContext{ destroyCallback };
+        auto impl = ob_create_video_frame_from_buffer(frameType, format, width, height, stride, buffer, bufferSize, &FrameFactory::BufferDestroy, ctx, &error);
+        Error::handle(&error);
+
+        auto frame = std::make_shared<Frame>(impl);
+        return frame->as<VideoFrame>();
+    }
+
+    /**
+     * @brief Create a new FrameSet object.
+     *
+     * This function creates a new FrameSet instance by internally calling the native C API.
+     * The returned FrameSet is managed by a std::shared_ptr, and its lifetime will be
+     * automatically managed. When no references remain, the underlying native resources will be released.
+     *
+     * @return std::shared_ptr<FrameSet> The created FrameSet object.
+     */
+    static std::shared_ptr<FrameSet> createFrameSet() {
+        ob_error *error = nullptr;
+        auto      impl  = ob_create_frameset(&error);
+        Error::handle(&error);
+        return std::make_shared<FrameSet>(impl);
+    }
+
+private:
+    struct BufferDestroyContext {
+        BufferDestroyCallback callback;
+    };
+
+    static void BufferDestroy(uint8_t *buffer, void *context) {
+        auto *ctx = static_cast<BufferDestroyContext *>(context);
+        if(ctx->callback) {
+            ctx->callback(buffer);
+        }
+        delete ctx;
+    }
 };
 
 /**
  * @brief FrameHepler class, which provides some static functions to set timestamp for frame objects
- * FrameHepler inherited from the FrameFactory and the timestamp interface implement here both for
- * compatibility purposes.
+ * FrameHepler inherited from the FrameFactory and the timestamp interface implement here both for compatibility purposes.
  */
 class FrameHelper : public FrameFactory {
- public:
-  /**
-   * @brief Set the device timestamp of the frame.
-   *
-   * @param[in] frame The frame object.
-   * @param[in] deviceTimestampUs The device timestamp to set in microseconds.
-   */
-  static void setFrameDeviceTimestampUs(std::shared_ptr<Frame> frame, uint64_t deviceTimestampUs) {
-    ob_error *error = nullptr;
-    auto impl = const_cast<ob_frame *>(frame->getImpl());
-    ob_frame_set_timestamp_us(impl, deviceTimestampUs, &error);
-    Error::handle(&error);
-  }
+public:
+    /**
+     * @brief Set the device timestamp of the frame.
+     *
+     * @param[in] frame The frame object.
+     * @param[in] deviceTimestampUs The device timestamp to set in microseconds.
+     */
+    static void setFrameDeviceTimestampUs(std::shared_ptr<Frame> frame, uint64_t deviceTimestampUs) {
+        ob_error *error = nullptr;
+        auto      impl  = const_cast<ob_frame *>(frame->getImpl());
+        ob_frame_set_timestamp_us(impl, deviceTimestampUs, &error);
+        Error::handle(&error);
+    }
 
- public:
-  // The following interfaces are deprecated and are retained here for compatibility purposes.
-  static void setFrameSystemTimestamp(std::shared_ptr<Frame> frame, uint64_t systemTimestamp) {
-    // In order to compile, some high-version compilers will warn that the function parameters are
-    // not used.
-    (void)frame;
-    (void)systemTimestamp;
-  }
+public:
+    // The following interfaces are deprecated and are retained here for compatibility purposes.
+    static void setFrameSystemTimestamp(std::shared_ptr<Frame> frame, uint64_t systemTimestamp) {
+        // In order to compile, some high-version compilers will warn that the function parameters are not used.
+        (void)frame;
+        (void)systemTimestamp;
+    }
 
-  static void setFrameDeviceTimestamp(std::shared_ptr<Frame> frame, uint64_t deviceTimestamp) {
-    // In order to compile, some high-version compilers will warn that the function parameters are
-    // not used.
-    (void)frame;
-    (void)deviceTimestamp;
-  }
+    static void setFrameDeviceTimestamp(std::shared_ptr<Frame> frame, uint64_t deviceTimestamp) {
+        // In order to compile, some high-version compilers will warn that the function parameters are not used.
+        (void)frame;
+        (void)deviceTimestamp;
+    }
 };
 
 // Define the is() template function for the Frame class
-template <typename T>
-bool Frame::is() const {
-  switch (this->getType()) {
+template <typename T> bool Frame::is() const {
+    switch(this->getType()) {
     case OB_FRAME_IR_LEFT:   // Follow
     case OB_FRAME_IR_RIGHT:  // Follow
     case OB_FRAME_IR:
-      return (typeid(T) == typeid(IRFrame) || typeid(T) == typeid(VideoFrame));
+        return (typeid(T) == typeid(IRFrame) || typeid(T) == typeid(VideoFrame));
     case OB_FRAME_DEPTH:
-      return (typeid(T) == typeid(DepthFrame) || typeid(T) == typeid(VideoFrame));
+        return (typeid(T) == typeid(DepthFrame) || typeid(T) == typeid(VideoFrame));
     case OB_FRAME_COLOR:
-      return (typeid(T) == typeid(ColorFrame) || typeid(T) == typeid(VideoFrame));
+        return (typeid(T) == typeid(ColorFrame) || typeid(T) == typeid(VideoFrame));
     case OB_FRAME_CONFIDENCE:
-      return (typeid(T) == typeid(ConfidenceFrame) || typeid(T) == typeid(VideoFrame));
+        return (typeid(T) == typeid(ConfidenceFrame) || typeid(T) == typeid(VideoFrame));
     case OB_FRAME_GYRO:
-      return (typeid(T) == typeid(GyroFrame));
+        return (typeid(T) == typeid(GyroFrame));
     case OB_FRAME_ACCEL:
-      return (typeid(T) == typeid(AccelFrame));
+        return (typeid(T) == typeid(AccelFrame));
     case OB_FRAME_POINTS:
-      return (typeid(T) == typeid(PointsFrame));
+        return (typeid(T) == typeid(PointsFrame));
     case OB_FRAME_LIDAR_POINTS:
-      return (typeid(T) == typeid(LiDARPointsFrame));
+        return (typeid(T) == typeid(LiDARPointsFrame));
     case OB_FRAME_SET:
-      return (typeid(T) == typeid(FrameSet));
+        return (typeid(T) == typeid(FrameSet));
     default:
-      std::cout << "ob::Frame::is() did not catch frame type: " << (int)this->getType()
-                << std::endl;
-      break;
-  }
-  return false;
+        std::cout << "ob::Frame::is() did not catch frame type: " << (int)this->getType() << std::endl;
+        break;
+    }
+    return false;
 }
 
 }  // namespace ob

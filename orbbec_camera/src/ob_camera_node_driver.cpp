@@ -798,7 +798,7 @@ std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceBySerialNumber(
       auto pid = list->getPid(i);
       if (isOpenNIDevice(pid)) {
         // openNI device
-        auto device = list->getDevice(i, device_access_mode_);
+        auto device = list->getDevice(i);
         auto device_info = device->getDeviceInfo();
         if (device_info->getSerialNumber() == serial_number) {
           RCLCPP_INFO_STREAM_THROTTLE(

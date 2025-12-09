@@ -552,6 +552,18 @@ void OBCameraNode::setupDevices() {
       TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_BRIGHTNESS_INT, color_brightness_);
     }
   }
+  if (color_roi_brightness_ != -1 &&
+      device_->isPropertySupported(OB_PROP_COLOR_ROI_BRIGHTNESS_INT, OB_PERMISSION_WRITE)) {
+    auto range = device_->getIntPropertyRange(OB_PROP_COLOR_ROI_BRIGHTNESS_INT);
+    if (color_roi_brightness_ < range.min || color_roi_brightness_ > range.max) {
+      RCLCPP_ERROR(logger_,
+                   "color roi brightness value is out of range[%d,%d], please check the value",
+                   range.min, range.max);
+    } else {
+      RCLCPP_INFO_STREAM(logger_, "Setting color roi brightness to " << color_roi_brightness_);
+      TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_COLOR_ROI_BRIGHTNESS_INT, color_roi_brightness_);
+    }
+  }
   if (color_sharpness_ != -1 &&
       device_->isPropertySupported(OB_PROP_COLOR_SHARPNESS_INT, OB_PERMISSION_WRITE)) {
     auto range = device_->getIntPropertyRange(OB_PROP_COLOR_SHARPNESS_INT);
@@ -1779,7 +1791,8 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<std::string>(color_info_url_, "color_info_url", "");
   setAndGetNodeParameter<bool>(enable_colored_point_cloud_, "enable_colored_point_cloud", false);
   setAndGetNodeParameter<bool>(enable_point_cloud_, "enable_point_cloud", false);
-  setAndGetNodeParameter<int>(point_cloud_decimation_filter_factor_, "point_cloud_decimation_filter_factor", 1);
+  setAndGetNodeParameter<int>(point_cloud_decimation_filter_factor_,
+                              "point_cloud_decimation_filter_factor", 1);
   setAndGetNodeParameter<std::string>(point_cloud_qos_, "point_cloud_qos", "default");
   setAndGetNodeParameter<bool>(enable_d2c_viewer_, "enable_d2c_viewer", false);
   setAndGetNodeParameter<std::string>(disparity_to_depth_mode_, "disparity_to_depth_mode", "HW");
@@ -1802,6 +1815,7 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<int>(color_white_balance_, "color_white_balance", -1);
   setAndGetNodeParameter<int>(color_ae_max_exposure_, "color_ae_max_exposure", -1);
   setAndGetNodeParameter<int>(color_brightness_, "color_brightness", -1);
+  setAndGetNodeParameter<int>(color_roi_brightness_, "color_roi_brightness", -1);
   setAndGetNodeParameter<int>(color_sharpness_, "color_sharpness", -1);
   setAndGetNodeParameter<int>(color_gamma_, "color_gamma", -1);
   setAndGetNodeParameter<int>(color_saturation_, "color_saturation", -1);
@@ -2325,33 +2339,32 @@ void OBCameraNode::setupPublishers() {
   }
   if (enable_stream_[DEPTH] && enable_stream_[INFRA0] && enable_publish_extrinsic_) {
     depth_to_other_extrinsics_publishers_[INFRA0] =
-        node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
-            "depth_to_ir", extrinsics_qos);
+        node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>("depth_to_ir", extrinsics_qos);
   }
   if (enable_stream_[DEPTH] && enable_stream_[COLOR] && enable_publish_extrinsic_) {
     depth_to_other_extrinsics_publishers_[COLOR] =
-        node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
-            "depth_to_color", extrinsics_qos);
+        node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>("depth_to_color",
+                                                                     extrinsics_qos);
   }
   if (enable_stream_[DEPTH] && enable_stream_[INFRA1] && enable_publish_extrinsic_) {
     depth_to_other_extrinsics_publishers_[INFRA1] =
-        node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
-            "depth_to_left_ir", extrinsics_qos);
+        node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>("depth_to_left_ir",
+                                                                     extrinsics_qos);
   }
   if (enable_stream_[DEPTH] && enable_stream_[INFRA2] && enable_publish_extrinsic_) {
     depth_to_other_extrinsics_publishers_[INFRA2] =
-        node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
-            "depth_to_right_ir", extrinsics_qos);
+        node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>("depth_to_right_ir",
+                                                                     extrinsics_qos);
   }
   if (enable_stream_[DEPTH] && enable_stream_[ACCEL] && enable_publish_extrinsic_) {
     depth_to_other_extrinsics_publishers_[ACCEL] =
-        node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
-            "depth_to_accel", extrinsics_qos);
+        node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>("depth_to_accel",
+                                                                     extrinsics_qos);
   }
   if (enable_stream_[DEPTH] && enable_stream_[GYRO] && enable_publish_extrinsic_) {
     depth_to_other_extrinsics_publishers_[GYRO] =
-        node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>(
-            "depth_to_gyro", extrinsics_qos);
+        node_->create_publisher<orbbec_camera_msgs::msg::Extrinsics>("depth_to_gyro",
+                                                                     extrinsics_qos);
   }
   filter_status_pub_ =
       node_->create_publisher<std_msgs::msg::String>("depth_filter_status", extrinsics_qos);

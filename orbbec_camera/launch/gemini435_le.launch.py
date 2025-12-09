@@ -106,6 +106,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_color_auto_exposure', default_value='true'),
         DeclareLaunchArgument('color_ae_max_exposure', default_value='-1'),
         DeclareLaunchArgument('color_brightness', default_value='-1'),
+        DeclareLaunchArgument('color_roi_brightness', default_value='-1'),
         DeclareLaunchArgument('color_sharpness', default_value='-1'),
         DeclareLaunchArgument('color_gamma', default_value='-1'),
         DeclareLaunchArgument('color_saturation', default_value='-1'),

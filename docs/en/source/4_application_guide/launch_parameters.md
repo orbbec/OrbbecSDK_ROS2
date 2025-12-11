@@ -41,6 +41,8 @@ The following are the launch parameters available:
     *   Enable Left IR image transport plugins. Default: `["image_transport/compressed", "image_transport/raw", "image_transport/theora"]`.
 *   **`right_ir.image_raw.enable_pub_plugins`**
     *   Enable Right IR image transport plugins. Default: `["image_transport/compressed", "image_transport/raw", "image_transport/theora"]`.
+*   **`point_cloud_decimation_filter_factor`**
+    *   Point cloud downsampling factor. Range: `1–8`. `1` means no downsampling; larger values apply stronger decimation.
 
 ### Sensor Controls
 

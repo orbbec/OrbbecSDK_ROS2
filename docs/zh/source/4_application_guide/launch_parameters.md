@@ -41,6 +41,8 @@
     *   启用左红外图像传输插件。默认值：`["image_transport/compressed", "image_transport/raw", "image_transport/theora"]`。
 *   **`right_ir.image_raw.enable_pub_plugins`**
     *   启用右红外图像传输插件。默认值：`["image_transport/compressed", "image_transport/raw", "image_transport/theora"]`。
+*   **`point_cloud_decimation_filter_factor`**
+    *   点云下采样因子。范围：`1–8`，`1`表示不下采样，数值越大下采样越强。
 
 ### 传感器控制
 

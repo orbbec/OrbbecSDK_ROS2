@@ -256,3 +256,13 @@
                     -6.804073229432106e-06]}'
     ros2 service call /camera/get_user_calib_params orbbec_camera_msgs/srv/GetUserCalibParams '{}'
     ```
+
+### 点云下采样
+*   `/camera/set_point_cloud_decimation`
+    ```bash
+    ros2 service call /camera/set_point_cloud_decimation orbbec_camera_msgs/srv/SetInt32 '{data: 8}'
+    ```
+*   `/camera/get_point_cloud_decimation`
+    ```bash
+    ros2 service call /camera/get_point_cloud_decimation orbbec_camera_msgs/srv/GetInt32 '{}'
+    ```

@@ -62,3 +62,16 @@ Multi-camera systems place high demands on USB bandwidth and device initializati
   When invoking stream control services (such as `set_streams_enable`, `toggle_depth`, and `toggle_color`), avoid triggering multiple service calls at the same time. Instead, introduce a reasonable interval between operations (e.g., **20 ms**) to ensure reliable stream state transitions.
 
 Following these timing control guidelines can significantly improve the stability of multi-camera systems during startup and runtime, reducing errors and unexpected behavior.
+### femto bolt depth stream no data
+
+This module depends on the OpenGL library at runtime. If OpenGL is not installed or the graphics driver is incomplete, the depth stream may output no data. Please make sure to install the necessary OpenGL libraries first (Ubuntu example below):
+
+```bash
+  sudo apt update && sudo apt install -y mesa-utils libgl1-mesa-glx libglu1-mesa
+```
+
+  After installation, you can check whether OpenGL is available through the following command:
+
+```bash
+  glxinfo -B
+```

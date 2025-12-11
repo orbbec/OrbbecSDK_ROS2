@@ -40,11 +40,13 @@
 如果启动文件未显式指定要使用的设备，在同时连接多台相机时，驱动会默认连接到其中一个（默认设备）。
 
 可以先通过以下命令查看设备序列号：
+
 ```bash
 ros2 run orbbec_camera list_devices_node
 ```
 
 然后在启动时显式指定序列号，例如：
+
 ```bash
 ros2 launch orbbec_camera femto_bolt.launch.py serial_number:=CL8H741005J
 ```
@@ -62,3 +64,16 @@ ros2 launch orbbec_camera femto_bolt.launch.py serial_number:=CL8H741005J
   在调用开关流相关服务（如 `set_streams_enable`、`toggle_depth`、`toggle_color`）时，不建议同时触发多个接口调用，应在各操作之间设置合理的时间间隔（例如 **20 ms**），以保证流状态切换的可靠性。
 
 遵循上述时序控制原则，有助于提升多相机系统在启动和运行过程中的稳定性，减少异常和不可预期行为的发生。
+### femto bolt 深度流无数据
+
+该模组运行时依赖 OpenGL 库，若系统未安装或驱动不完整，将导致深度流无数据。请先安装 OpenGL 相关库（以 Ubuntu 为例）：
+
+```bash
+  sudo apt update && sudo apt install -y mesa-utils libgl1-mesa-glx libglu1-mesa
+```
+
+  安装后可通过以下命令检查 OpenGL 是否可用：
+
+```bash
+  glxinfo -B
+```

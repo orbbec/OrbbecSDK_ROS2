@@ -283,13 +283,13 @@ void OBCameraNodeDriver::init() {
     device_status_timer_ =
         this->create_wall_timer(std::chrono::milliseconds(1000 / device_status_interval_hz),
                                 [this]() { deviceStatusTimer(); });
+    auto qos = rclcpp::QoS(1).transient_local();
+    if (node_options_.use_intra_process_comms()) {
+      qos = rclcpp::QoS(1);
+    }
+    device_status_pub_ =
+        this->create_publisher<orbbec_camera_msgs::msg::DeviceStatus>("device_status", qos);
   }
-  auto qos = rclcpp::QoS(1).transient_local();
-  if (node_options_.use_intra_process_comms()) {
-    qos = rclcpp::QoS(1);
-  }
-  device_status_pub_ =
-      this->create_publisher<orbbec_camera_msgs::msg::DeviceStatus>("device_status", qos);
   query_thread_ = std::make_shared<std::thread>([this]() { queryDevice(); });
   reset_device_thread_ = std::make_shared<std::thread>([this]() { resetDevice(); });
 }
@@ -956,7 +956,7 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   CHECK_NOTNULL(device_info_.get());
   device_unique_id_ = device_info_->getUid();
 
-  if (enable_sync_host_time_ && !isOpenNIDevice(device_info_->pid())) {
+  if (enable_sync_host_time_ && !isOpenNIDevice(device_info_->pid()) && device_type_ == "camera") {
     TRY_EXECUTE_BLOCK(device_->timerSyncWithHost());
     if (g_time_domain != "global") {
       sync_host_time_timer_ = this->create_wall_timer(time_sync_period_, [this]() {
@@ -1027,16 +1027,23 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
 
   if (!upgrade_firmware_.empty()) {
     firmware_update_success_ = false;
-
-    TRY_EXECUTE_BLOCK({
-      ob_camera_node_->withDeviceLock([&]() {
-        device_->updateFirmware(
-            upgrade_firmware_.c_str(),
-            std::bind(&OBCameraNodeDriver::firmwareUpdateCallback, this, std::placeholders::_1,
-                      std::placeholders::_2, std::placeholders::_3),
-            false);
+    if (ob_camera_node_) {
+      TRY_EXECUTE_BLOCK({
+        ob_camera_node_->withDeviceLock([&]() {
+          device_->updateFirmware(
+              upgrade_firmware_.c_str(),
+              std::bind(&OBCameraNodeDriver::firmwareUpdateCallback, this, std::placeholders::_1,
+                        std::placeholders::_2, std::placeholders::_3),
+              false);
+        });
       });
-    });
+    } else if (ob_lidar_node_) {
+      device_->updateFirmware(
+          upgrade_firmware_.c_str(),
+          std::bind(&OBCameraNodeDriver::firmwareUpdateCallback, this, std::placeholders::_1,
+                    std::placeholders::_2, std::placeholders::_3),
+          false);
+    }
     if (firmware_update_success_) {
       return;
     }

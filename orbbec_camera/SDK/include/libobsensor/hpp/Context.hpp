@@ -16,6 +16,8 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <unordered_map>
+#include <mutex>
 
 namespace ob {
 
@@ -42,9 +44,20 @@ public:
      */
     typedef std::function<void(OBLogSeverity severity, const char *logMsg)> LogCallback;
 
+    struct DeviceChangedCallbackContext {
+        Context              *ctx;
+        uint64_t              callbackId;
+        DeviceChangedCallback callback;
+    };
+
 private:
-    ob_context           *impl_ = nullptr;
-    DeviceChangedCallback deviceChangedCallback_;
+    ob_context *impl_ = nullptr;
+    std::mutex  callbackMtx_;
+
+    std::mutex   legacyCallbackMtx_;
+    OBCallbackId legacyCallbackId_ = INVALID_CALLBACK_ID;
+
+    std::unordered_map<OBCallbackId, std::unique_ptr<DeviceChangedCallbackContext>> devChangedCallbacks_;
     // static LogCallback    logCallback_;
 
 public:
@@ -66,6 +79,7 @@ public:
      * @brief Context destructor.
      */
     ~Context() noexcept {
+        // delete contex of C API, which will auto unregister all callbacks
         ob_error *error = nullptr;
         ob_delete_context(impl_, &error);
         Error::handle(&error, false);
@@ -136,14 +150,45 @@ public:
 
     /**
      * @brief Set the device plug-in callback function.
+     *
+     * @deprecated This function is deprecated. Please use registerDeviceChangedCallback() instead.
+     *
      * @attention This function supports multiple callbacks. Each call to this function adds a new callback to an internal list.
      *
      * @param[in] callback The function triggered when the device is plugged and unplugged.
      */
     void setDeviceChangedCallback(DeviceChangedCallback callback) {
-        deviceChangedCallback_ = callback;
-        ob_error *error        = nullptr;
-        ob_set_device_changed_callback(impl_, &Context::deviceChangedCallback, this, &error);
+        std::lock_guard<std::mutex> lock(legacyCallbackMtx_);
+        // remove the last callback first
+        unregisterDeviceChangedCallback(legacyCallbackId_);
+        // register the new callback
+        legacyCallbackId_ = registerDeviceChangedCallback(callback);
+    }
+
+    OBCallbackId registerDeviceChangedCallback(DeviceChangedCallback callback) {
+        ob_error *error       = nullptr;
+        auto      cbCtxHolder = std::unique_ptr<DeviceChangedCallbackContext>(new DeviceChangedCallbackContext({ this, 0, nullptr }));
+        auto      id          = ob_register_device_changed_callback(impl_, &Context::deviceChangedCallback, (void *)cbCtxHolder.get(), &error);
+        Error::handle(&error);
+
+        cbCtxHolder->callbackId = id;
+        cbCtxHolder->callback   = callback;
+        {
+            std::unique_lock<std::mutex> lock(callbackMtx_);
+            devChangedCallbacks_[id] = std::move(cbCtxHolder);
+        }
+        return id;
+    }
+
+    void unregisterDeviceChangedCallback(OBCallbackId id) {
+        ob_error *error       = nullptr;
+        ob_unregister_device_changed_callback(impl_, id, &error);
+        {
+            std::unique_lock<std::mutex> lock(callbackMtx_);
+            if(devChangedCallbacks_.count(id)) {
+                devChangedCallbacks_.erase(id);
+            }
+        }
         Error::handle(&error);
     }
 
@@ -277,11 +322,19 @@ public:
 
 private:
     static void deviceChangedCallback(ob_device_list *removedList, ob_device_list *addedList, void *userData) {
-        auto ctx = static_cast<Context *>(userData);
-        if(ctx && ctx->deviceChangedCallback_) {
+        auto cbCtx = static_cast<DeviceChangedCallbackContext *>(userData);
+        if(cbCtx && cbCtx->ctx && cbCtx->callbackId != INVALID_CALLBACK_ID) {
+            DeviceChangedCallback callbackCopy;
+            {
+                // preventing the captured variables from being released.
+                std::unique_lock<std::mutex> lock(cbCtx->ctx->callbackMtx_);
+                if(cbCtx->ctx->devChangedCallbacks_.count(cbCtx->callbackId)) {
+                    callbackCopy = cbCtx->callback;
+                }
+            }
             auto removed = std::make_shared<DeviceList>(removedList);
             auto added   = std::make_shared<DeviceList>(addedList);
-            ctx->deviceChangedCallback_(removed, added);
+            callbackCopy(removed, added);
         }
     }
 

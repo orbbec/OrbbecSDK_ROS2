@@ -260,26 +260,27 @@ typedef enum {
  * @brief Enumeration value describing the firmware upgrade status
  */
 typedef enum {
-    STAT_DONE_WITH_DUPLICATES = 6,   /**< update completed, but some files were duplicated and ignored */
-    STAT_VERIFY_SUCCESS       = 5,   /**< Image file verifify success */
-    STAT_FILE_TRANSFER        = 4,   /**< file transfer */
-    STAT_DONE                 = 3,   /**< update completed */
-    STAT_IN_PROGRESS          = 2,   /**< upgrade in process */
-    STAT_START                = 1,   /**< start the upgrade */
-    STAT_VERIFY_IMAGE         = 0,   /**< Image file verification */
-    ERR_VERIFY                = -1,  /**< Verification failed */
-    ERR_PROGRAM               = -2,  /**< Program execution failed */
-    ERR_ERASE                 = -3,  /**< Flash parameter failed */
-    ERR_FLASH_TYPE            = -4,  /**< Flash type error */
-    ERR_IMAGE_SIZE            = -5,  /**< Image file size error */
-    ERR_OTHER                 = -6,  /**< other errors */
-    ERR_DDR                   = -7,  /**< DDR access error */
-    ERR_TIMEOUT               = -8,  /**< timeout error */
-    ERR_MISMATCH              = -9,  /**< Mismatch firmware error */
-    ERR_UNSUPPORT_DEV         = -10, /**< Unsupported device error */
-    ERR_INVALID_COUNT         = -11, /**< invalid firmware/preset count */
-    ERR_FILE_READ             = -12, /**< Read image file error */
-    ERR_TRANSFER              = -13  /**< Transfer failed */
+    STAT_DONE_REBOOT_AND_REUPDATE = 7,   /**< update completed and device requires manual reboot and a second update*/
+    STAT_DONE_WITH_DUPLICATES     = 6,   /**< update completed, but some files were duplicated and ignored */
+    STAT_VERIFY_SUCCESS           = 5,   /**< Image file verifify success */
+    STAT_FILE_TRANSFER            = 4,   /**< file transfer */
+    STAT_DONE                     = 3,   /**< update completed */
+    STAT_IN_PROGRESS              = 2,   /**< upgrade in process */
+    STAT_START                    = 1,   /**< start the upgrade */
+    STAT_VERIFY_IMAGE             = 0,   /**< Image file verification */
+    ERR_VERIFY                    = -1,  /**< Verification failed */
+    ERR_PROGRAM                   = -2,  /**< Program execution failed */
+    ERR_ERASE                     = -3,  /**< Flash parameter failed */
+    ERR_FLASH_TYPE                = -4,  /**< Flash type error */
+    ERR_IMAGE_SIZE                = -5,  /**< Image file size error */
+    ERR_OTHER                     = -6,  /**< other errors */
+    ERR_DDR                       = -7,  /**< DDR access error */
+    ERR_TIMEOUT                   = -8,  /**< timeout error */
+    ERR_MISMATCH                  = -9,  /**< Mismatch firmware error */
+    ERR_UNSUPPORT_DEV             = -10, /**< Unsupported device error */
+    ERR_INVALID_COUNT             = -11, /**< invalid firmware/preset count */
+    ERR_FILE_READ                 = -12, /**< Read image file error */
+    ERR_TRANSFER                  = -13  /**< Transfer failed */
 } OBUpgradeState,
     OBFwUpdateState, ob_upgrade_state, ob_fw_update_state;
 
@@ -1925,6 +1926,13 @@ typedef void(ob_frame_destroy_callback)(uint8_t *buffer, void *user_data);
 typedef void(ob_log_callback)(ob_log_severity severity, const char *message, void *user_data);
 
 typedef void (*ob_playback_status_changed_callback)(ob_playback_status status, void *user_data);
+
+/**
+ * @brief Callback Id
+ */
+typedef uint64_t OBCallbackId, ob_callback_id;
+#define INVALID_CALLBACK_ID (0)
+
 /**
  * @brief Check if the sensor_type is a video sensor
  *

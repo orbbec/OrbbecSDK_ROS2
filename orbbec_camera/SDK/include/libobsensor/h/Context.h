@@ -110,6 +110,8 @@ OB_EXPORT ob_device *ob_create_net_device_ex(ob_context *context, const char *ad
 
 /**
  * @brief Set a device plug-in callback function
+ * 
+ * @deprecated This function is deprecated. Please use ob_register_device_changed_callback() instead.
  *
  * @attention The added and removed device lists returned through the callback interface need to be released manually
  * @attention This function supports multiple callbacks. Each call to this function adds a new callback to an internal list.
@@ -120,6 +122,36 @@ OB_EXPORT ob_device *ob_create_net_device_ex(ob_context *context, const char *ad
  * @param[out] error Pointer to an error object that will be populated if an error occurs during callback function setting
  */
 OB_EXPORT void ob_set_device_changed_callback(ob_context *context, ob_device_changed_callback callback, void *user_data, ob_error **error);
+
+/**
+ * @brief Register a device plug-in callback function.
+ *
+ * This function registers a callback that will be triggered whenever a device is plugged in or unplugged.
+ *
+ * @attention The added and removed device lists returned through the callback interface need to be released manually.
+ * @attention This function supports multiple callbacks. Each call to this function adds a new callback to an internal list.
+ *
+ * @param[in] context Pointer to the context object.
+ * @param[in] callback Pointer to the callback function triggered when a device is plugged or unplugged.
+ * @param[in] user_data Pointer to user data that can be passed to and retrieved from the callback function.
+ * @param[out] error Pointer to an error object that will be populated if an error occurs during callback function setting.
+ *
+ * @return A ob_callback_id that uniquely identifies the registered callback.
+ *         This ID can be used later to unregister the callback with ob_unregister_device_changed_callback().
+ *         Returns INVALID_DEVICE_CHANGED_CALLBACK_ID if the registration fails.
+ */
+OB_EXPORT ob_callback_id ob_register_device_changed_callback(ob_context *context, ob_device_changed_callback callback, void *user_data, ob_error **error);
+
+/**
+ * @brief Unregister a previously registered device plug-in callback function.
+ *
+ * This function removes a callback that was registered by ob_register_device_changed_callback().
+ *
+ * @param[in] context Pointer to the context object.
+ * @param[in] callback_id The callback ID returned by ob_register_device_changed_callback().
+ * @param[out] error Pointer to an error object that will be populated if an error occurs during callback function setting.
+ */
+OB_EXPORT void ob_unregister_device_changed_callback(ob_context *context, ob_callback_id callback_id, ob_error **error);
 
 /**
  * @brief Activates device clock synchronization to synchronize the clock of the host and all created devices (if supported).

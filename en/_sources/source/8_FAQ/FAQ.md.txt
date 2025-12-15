@@ -48,3 +48,17 @@ Then launch with the serial number explicitly set, for example:
 ```bash
 ros2 launch orbbec_camera femto_bolt.launch.py serial_number:=CL8H741005J
 ```
+
+### Why Is It Necessary to Add Delays When Starting Multiple Cameras or Switching Streams?
+
+Multi-camera systems place high demands on USB bandwidth and device initialization timing. If multiple camera streams are started or switched simultaneously, it may cause temporary bandwidth congestion, leading to device initialization failures, stream startup errors, or frame drops. To ensure system stability, the following practices are recommended:
+
+- **Multi-camera startup phase**
+
+  When starting multiple cameras, it is recommended to introduce an appropriate delay between each camera startup (e.g., **2 seconds**) to avoid instantaneous bandwidth overload or low-level device initialization conflicts.
+
+- **Stream enable/disable and mode switching phase**
+
+  When invoking stream control services (such as `set_streams_enable`, `toggle_depth`, and `toggle_color`), avoid triggering multiple service calls at the same time. Instead, introduce a reasonable interval between operations (e.g., **20 ms**) to ensure reliable stream state transitions.
+
+Following these timing control guidelines can significantly improve the stability of multi-camera systems during startup and runtime, reducing errors and unexpected behavior.

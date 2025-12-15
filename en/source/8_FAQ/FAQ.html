@@ -347,6 +347,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#additional-troubleshooting">8.3. Additional Troubleshooting</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#why-are-there-so-many-launch-files">8.4. Why Are There So Many Launch Files?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#how-to-launch-a-specific-camera-when-multiple-cameras-are-connected">8.5. How to Launch a Specific Camera When Multiple Cameras Are Connected</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#why-is-it-necessary-to-add-delays-when-starting-multiple-cameras-or-switching-streams">8.6. Why Is It Necessary to Add Delays When Starting Multiple Cameras or Switching Streams?</a></li>
 </ul>
 </li>
 </ul>
@@ -429,6 +430,19 @@
 </pre></div>
 </div>
 </section>
+<section id="why-is-it-necessary-to-add-delays-when-starting-multiple-cameras-or-switching-streams">
+<h2><span class="section-number">8.6. </span>Why Is It Necessary to Add Delays When Starting Multiple Cameras or Switching Streams?<a class="headerlink" href="#why-is-it-necessary-to-add-delays-when-starting-multiple-cameras-or-switching-streams" title="Link to this heading"></a></h2>
+<p>Multi-camera systems place high demands on USB bandwidth and device initialization timing. If multiple camera streams are started or switched simultaneously, it may cause temporary bandwidth congestion, leading to device initialization failures, stream startup errors, or frame drops. To ensure system stability, the following practices are recommended:</p>
+<ul>
+<li><p><strong>Multi-camera startup phase</strong></p>
+<p>When starting multiple cameras, it is recommended to introduce an appropriate delay between each camera startup (e.g., <strong>2 seconds</strong>) to avoid instantaneous bandwidth overload or low-level device initialization conflicts.</p>
+</li>
+<li><p><strong>Stream enable/disable and mode switching phase</strong></p>
+<p>When invoking stream control services (such as <code class="docutils literal notranslate"><span class="pre">set_streams_enable</span></code>, <code class="docutils literal notranslate"><span class="pre">toggle_depth</span></code>, and <code class="docutils literal notranslate"><span class="pre">toggle_color</span></code>), avoid triggering multiple service calls at the same time. Instead, introduce a reasonable interval between operations (e.g., <strong>20 ms</strong>) to ensure reliable stream state transitions.</p>
+</li>
+</ul>
+<p>Following these timing control guidelines can significantly improve the stability of multi-camera systems during startup and runtime, reducing errors and unexpected behavior.</p>
+</section>
 </section>
 
 
@@ -442,7 +456,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2025, ORBBEC INC. www.orbbec.com..
-      <span class="lastupdated">Last updated on 2025-12-09 09:19:44.
+      <span class="lastupdated">Last updated on 2025-12-15 11:57:22.
       </span></p>
   </div>
 

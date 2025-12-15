@@ -348,6 +348,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#id4">8.3. 其他故障排除</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#id5">8.4. 为什么有这么多启动文件？</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#id6">8.5. 多相机连接时如何指定启动某一个相机</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id7">8.6. 多相机启动或切换流时为什么需要设置延迟？</a></li>
 </ul>
 </li>
 </ul>
@@ -430,6 +431,19 @@
 </pre></div>
 </div>
 </section>
+<section id="id7">
+<h2><span class="section-number">8.6. </span>多相机启动或切换流时为什么需要设置延迟？<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<p>多相机系统对带宽和设备初始化时序要求较高。如果在同一时间启动或切换多个相机流，可能会引发带宽瞬时拥塞，进而导致设备初始化失败、流启动异常或丢帧等问题。为确保系统稳定性，建议注意以下几点：</p>
+<ul>
+<li><p><strong>多相机启动阶段</strong></p>
+<p>在启动多个相机时，建议在每个相机启动之间增加适当的延迟（例如 <strong>2s</strong>），以避免瞬时带宽过载或底层设备初始化冲突。</p>
+</li>
+<li><p><strong>流开关与模式切换阶段</strong></p>
+<p>在调用开关流相关服务（如 <code class="docutils literal notranslate"><span class="pre">set_streams_enable</span></code>、<code class="docutils literal notranslate"><span class="pre">toggle_depth</span></code>、<code class="docutils literal notranslate"><span class="pre">toggle_color</span></code>）时，不建议同时触发多个接口调用，应在各操作之间设置合理的时间间隔（例如 <strong>20 ms</strong>），以保证流状态切换的可靠性。</p>
+</li>
+</ul>
+<p>遵循上述时序控制原则，有助于提升多相机系统在启动和运行过程中的稳定性，减少异常和不可预期行为的发生。</p>
+</section>
 </section>
 
 
@@ -443,7 +457,7 @@
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2025年12月09日 09:19:47.
+      <span class="lastupdated">最后更新于 2025年12月15日 11:57:25.
       </span></p>
   </div>
 

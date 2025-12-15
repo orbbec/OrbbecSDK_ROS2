@@ -1039,7 +1039,18 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
   RCLCPP_INFO_STREAM(logger_, "Start device cost " << time_cost.count() << " ms");
 
   if (!upgrade_firmware_.empty()) {
+    // Check if this is a second update (reupdate scenario)
+    bool is_second_update = is_reupdating_.load();
+
+    if (is_second_update) {
+      RCLCPP_INFO(logger_, "Device reconnected, starting the second firmware update...");
+    } else {
+      RCLCPP_INFO(logger_, "Starting firmware update from file: %s", upgrade_firmware_.c_str());
+    }
+
     firmware_update_success_ = false;
+    need_reupdate_ = false;
+
     if (ob_camera_node_) {
       TRY_EXECUTE_BLOCK({
         ob_camera_node_->withDeviceLock([&]() {
@@ -1057,7 +1068,26 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
                     std::placeholders::_2, std::placeholders::_3),
           false);
     }
+
+    if (need_reupdate_) {
+      // Some devices require a second update after reboot
+      RCLCPP_INFO(logger_, "Firmware update completed but not finalized.");
+      RCLCPP_INFO(logger_, "The device will reboot and perform a second update automatically.");
+      RCLCPP_INFO(logger_, "Please wait for the device to reconnect...");
+      // Set flag to indicate we're waiting for device to reboot for second update
+      is_reupdating_ = true;
+      // Keep upgrade_firmware_ path and wait for device to reconnect
+      // The second update will be triggered automatically when device reconnects
+      return;
+    }
+
     if (firmware_update_success_) {
+      if (is_second_update) {
+        RCLCPP_INFO(logger_, "Second firmware update completed successfully!");
+        is_reupdating_ = false;
+      } else {
+        RCLCPP_INFO(logger_, "Firmware update completed successfully!");
+      }
       return;
     }
   }
@@ -1416,6 +1446,10 @@ void OBCameraNodeDriver::firmwareUpdateCallback(OBFwUpdateState state, const cha
     case STAT_DONE:
       std::cout << "Update completed" << std::endl;
       break;
+    case STAT_DONE_REBOOT_AND_REUPDATE:
+      need_reupdate_ = true;
+      std::cout << "Update completed" << std::endl;
+      break;
     case STAT_IN_PROGRESS:
       std::cout << "Upgrade in progress" << std::endl;
       break;
@@ -1432,7 +1466,7 @@ void OBCameraNodeDriver::firmwareUpdateCallback(OBFwUpdateState state, const cha
 
   std::cout << "\033[K";
   std::cout << "Message : " << message << std::endl << std::flush;
-  if (state == STAT_DONE) {
+  if (state == STAT_DONE || state == STAT_DONE_REBOOT_AND_REUPDATE) {
     RCLCPP_INFO(logger_, "Reboot device");
 
     if (ob_camera_node_) {
@@ -1451,9 +1485,14 @@ void OBCameraNodeDriver::firmwareUpdateCallback(OBFwUpdateState state, const cha
       ob_lidar_node_.reset();
     }
     device_connected_ = false;
-    upgrade_firmware_ = "";
 
-    firmware_update_success_ = true;
+    if (state == STAT_DONE_REBOOT_AND_REUPDATE) {
+      // Keep upgrade_firmware_ path for second update
+      RCLCPP_INFO(logger_, "Firmware update requires a second update after reboot");
+    } else {
+      upgrade_firmware_ = "";
+      firmware_update_success_ = true;
+    }
   }
 }
 

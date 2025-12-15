@@ -93,6 +93,7 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::string config_path_;
   std::unique_ptr<ob::Context> ctx_ = nullptr;
   rclcpp::Logger logger_;
+  uint64_t device_changed_callback_id_ = 0;  // Store callback ID for unregistering (OBCallbackId)
   std::unique_ptr<OBCameraNode> ob_camera_node_ = nullptr;
   std::unique_ptr<orbbec_lidar::OBLidarNode> ob_lidar_node_ = nullptr;
   std::shared_ptr<ob::Device> device_ = nullptr;

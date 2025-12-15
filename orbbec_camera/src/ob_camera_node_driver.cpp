@@ -165,6 +165,18 @@ OBCameraNodeDriver::~OBCameraNodeDriver() {
   if (ob_camera_node_) {
     ob_camera_node_->stopGmslTrigger();
   }
+
+  // Unregister device changed callback before destroying context
+  if (ctx_ && device_changed_callback_id_ != 0) {
+    try {
+      ctx_->unregisterDeviceChangedCallback(device_changed_callback_id_);
+      device_changed_callback_id_ = 0;
+    } catch (...) {
+      RCLCPP_WARN_STREAM(logger_,
+                         "Exception during device changed callback unregister in destructor");
+    }
+  }
+
   if (orb_device_lock_shm_fd_ != -1) {
     close(orb_device_lock_shm_fd_);
     orb_device_lock_shm_fd_ = -1;
@@ -271,11 +283,12 @@ void OBCameraNodeDriver::init() {
     RCLCPP_INFO_STREAM(logger_, "setUvcBackendType:" << uvc_backend_);
   }
   ctx_->enableNetDeviceEnumeration(enumerate_net_device_);
-  ctx_->setDeviceChangedCallback([this](const std::shared_ptr<ob::DeviceList> &removed_list,
-                                        const std::shared_ptr<ob::DeviceList> &added_list) {
-    onDeviceDisconnected(removed_list);
-    onDeviceConnected(added_list);
-  });
+  device_changed_callback_id_ = ctx_->registerDeviceChangedCallback(
+      [this](const std::shared_ptr<ob::DeviceList> &removed_list,
+             const std::shared_ptr<ob::DeviceList> &added_list) {
+        onDeviceDisconnected(removed_list);
+        onDeviceConnected(added_list);
+      });
   check_connect_timer_ =
       this->create_wall_timer(std::chrono::milliseconds(1000), [this]() { checkConnectTimer(); });
   CHECK_NOTNULL(check_connect_timer_);

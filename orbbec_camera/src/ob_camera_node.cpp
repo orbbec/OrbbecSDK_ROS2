@@ -3543,7 +3543,7 @@ void OBCameraNode::calcAndPublishStaticTransform() {
   }
 
   if ((pid == FEMTO_BOLT_PID || pid == FEMTO_MEGA_PID) && enable_stream_[DEPTH] &&
-      enable_stream_[COLOR] && enable_publish_extrinsic_) {
+      enable_stream_[COLOR]) {
     // calc depth to color
 
     CHECK_NOTNULL(stream_profile_[COLOR]);

@@ -167,10 +167,10 @@ OBCameraNodeDriver::~OBCameraNodeDriver() {
   }
 
   // Unregister device changed callback before destroying context
-  if (ctx_ && device_changed_callback_id_ != 0) {
+  if (ctx_ && device_changed_callback_id_ != INVALID_CALLBACK_ID) {
     try {
       ctx_->unregisterDeviceChangedCallback(device_changed_callback_id_);
-      device_changed_callback_id_ = 0;
+      device_changed_callback_id_ = INVALID_CALLBACK_ID;
     } catch (...) {
       RCLCPP_WARN_STREAM(logger_,
                          "Exception during device changed callback unregister in destructor");

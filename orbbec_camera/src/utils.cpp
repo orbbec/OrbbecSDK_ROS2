@@ -199,8 +199,6 @@ void savePointsToPly(const std::shared_ptr<ob::Frame> &frame, const std::string 
 
 tf2::Quaternion rotationMatrixToQuaternion(const float rotation[9]) {
   Eigen::Matrix3f m;
-  // We need to be careful about the order, as RS2 rotation matrix is
-  // column-major, while Eigen::Matrix3f expects row-major.
   m << rotation[0], rotation[1], rotation[2], rotation[3], rotation[4], rotation[5], rotation[6],
       rotation[7], rotation[8];
   Eigen::Quaternionf q(m);

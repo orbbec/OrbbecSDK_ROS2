@@ -70,9 +70,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#if defined(ROS_JAZZY) || defined(ROS_IRON)
+#if __has_include(<cv_bridge/cv_bridge.hpp>)
 #include <cv_bridge/cv_bridge.hpp>
-#else
+#elif __has_include(<cv_bridge/cv_bridge.h>)
 #include <cv_bridge/cv_bridge.h>
 #endif
 
@@ -226,7 +226,8 @@ class OBLidarNode {
       supported_profiles_;
   std::map<stream_index_pair, std::shared_ptr<ob::StreamProfile>> stream_profile_;
   OBExtrinsic lidar_to_imu_extrinsic_;
-  rclcpp::Publisher<orbbec_camera_msgs::msg::Extrinsics>::SharedPtr lidar_to_imu_extrinsics_publisher_;
+  rclcpp::Publisher<orbbec_camera_msgs::msg::Extrinsics>::SharedPtr
+      lidar_to_imu_extrinsics_publisher_;
   stream_index_pair base_stream_ = LIDAR;
 
   std::map<stream_index_pair, bool> enable_stream_;

@@ -885,7 +885,7 @@ void OBCameraNode::setupDevices() {
     TRY_TO_SET_PROPERTY(setBoolProperty, OB_PROP_SDK_GYRO_FRAME_TRANSFORMED_BOOL,
                         enable_gyro_data_correction_);
   }
-  if (isGemini335PID(pid) &&
+  if (isGemini335PID(pid) && !intra_camera_sync_reference_.empty() &&
       (sync_mode_ == OB_MULTI_DEVICE_SYNC_MODE_SOFTWARE_TRIGGERING ||
        sync_mode_ == OB_MULTI_DEVICE_SYNC_MODE_HARDWARE_TRIGGERING) &&
       device_->isPropertySupported(OB_PROP_INTRA_CAMERA_SYNC_REFERENCE_INT, OB_PERMISSION_WRITE)) {

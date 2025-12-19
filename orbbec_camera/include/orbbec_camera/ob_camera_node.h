@@ -843,6 +843,6 @@ class OBCameraNode {
   std::unique_ptr<FpsDelayStatus> fps_delay_status_color_{nullptr};
   std::unique_ptr<FpsDelayStatus> fps_delay_status_depth_{nullptr};
 
-  std::string intra_camera_sync_reference_;
+  std::string intra_camera_sync_reference_ = "";
 };
 }  // namespace orbbec_camera

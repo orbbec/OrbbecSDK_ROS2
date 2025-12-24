@@ -1125,6 +1125,7 @@ void OBCameraNode::toggleSensorCallback(const std::shared_ptr<SetBool::Request>&
 
 bool OBCameraNode::toggleSensor(const stream_index_pair& stream_index, bool enabled,
                                 std::string& msg) {
+  std::lock_guard<decltype(device_lock_)> lock(device_lock_);
   try {
     pipeline_->stop();
     enable_stream_[stream_index] = enabled;

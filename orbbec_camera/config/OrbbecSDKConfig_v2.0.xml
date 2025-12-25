@@ -832,7 +832,7 @@
             <!--  Depth Filter Params -->
             <!--
             <DepthFilterDDOConfig>./Gemini2_v1.0.json</DepthFilterDDOConfig>
-			 -->
+            -->
             <Depth>
                 <!-- Number of retries for open stream failures, 0 means no retries -->
                 <StreamFailedRetry>0</StreamFailedRetry>
@@ -916,7 +916,7 @@
             <!--  Depth Filter Params -->
             <!--
             <DepthFilterDDOConfig>./Gemini2_v1.0.json</DepthFilterDDOConfig>
-			 -->
+            -->
             <Depth>
                 <!-- Number of retries for open stream failures, 0 means no retries -->
                 <StreamFailedRetry>0</StreamFailedRetry>
@@ -999,7 +999,7 @@
             <!--  Depth Filter Params -->
             <!--
             <DepthFilterDDOConfig>./Gemini2_v1.0.json</DepthFilterDDOConfig>
-			 -->
+            -->
             <Depth>
                 <!-- Number of retries for open stream failures, 0 means no retries -->
                 <StreamFailedRetry>0</StreamFailedRetry>
@@ -1083,7 +1083,7 @@
             <!--  Depth Filter Params -->
             <!--
             <DepthFilterDDOConfig>./Gemini2_v1.0.json</DepthFilterDDOConfig>
-			 -->
+            -->
             <Depth>
                 <!-- Number of retries for open stream failures, 0 means no retries -->
                 <StreamFailedRetry>0</StreamFailedRetry>
@@ -1216,16 +1216,15 @@
                 <Format>Y8</Format>
             </RightIR>
         </Gemini335Lg>
-		
-		<!-- Gemini335Le config -->
+
+        <!-- Gemini335Le config -->
         <Gemini335Le>
             <!-- Whether to enable heartbeat by default -->
             <DefaultHeartBeat>0</DefaultHeartBeat>
             <!-- Whether to enable firmware upgrade foolproof by default, only internal version
             supports -->
             <FirmwareUpgradeFoolproof>1</FirmwareUpgradeFoolproof>
-
-			<Misc>
+            <Misc>
                 <GlobalTimestampFitterEnable>true</GlobalTimestampFitterEnable>
                 <!-- Global timestamp fitter refresh interval, unit: milliseconds, default value: 1000,
                 minimum value: 100, it is recommended not to be greater than 1000 -->
@@ -1233,13 +1232,13 @@
                 <!-- Global timestamp fitter queue size, default value: 100, minimum value: 20 -->
                 <GlobalTimestampFitterQueueSize>100</GlobalTimestampFitterQueueSize>
             </Misc>
-			
-			<DepthPostProcessing>
+
+            <DepthPostProcessing>
                 <HardwareNoiseRemoveFilter>false</HardwareNoiseRemoveFilter>
                 <SoftwareNoiseRemoveFilter>true</SoftwareNoiseRemoveFilter>
             </DepthPostProcessing>
-			
-			<!-- Whether to enable heartbeat by default -->
+
+            <!-- Whether to enable heartbeat by default -->
             <DefaultHeartBeat>0</DefaultHeartBeat>
             <!-- Whether to enable firmware upgrade foolproof by default, only internal version
             supports -->
@@ -1248,7 +1247,7 @@
             <!--  Depth Filter Params -->
             <!--
             <DepthFilterDDOConfig>./Gemini2_v1.0.json</DepthFilterDDOConfig>
-			 -->
+            -->
             <Depth>
                 <!-- Number of retries for open stream failures, 0 means no retries -->
                 <StreamFailedRetry>0</StreamFailedRetry>
@@ -1332,7 +1331,7 @@
             <!--  Depth Filter Params -->
             <!--
             <DepthFilterDDOConfig>./Gemini2_v1.0.json</DepthFilterDDOConfig>
-			 -->
+            -->
             <Depth>
                 <!-- Number of retries for open stream failures, 0 means no retries -->
                 <StreamFailedRetry>0</StreamFailedRetry>
@@ -1416,7 +1415,7 @@
             <!--  Depth Filter Params -->
             <!--
             <DepthFilterDDOConfig>./Gemini2_v1.0.json</DepthFilterDDOConfig>
-			 -->
+            -->
             <Depth>
                 <!-- Number of retries for open stream failures, 0 means no retries -->
                 <StreamFailedRetry>0</StreamFailedRetry>
@@ -1499,7 +1498,7 @@
             <!--  Depth Filter Params -->
             <!--
             <DepthFilterDDOConfig>./Gemini2_v1.0.json</DepthFilterDDOConfig>
-			 -->
+            -->
             <Depth>
                 <!-- Number of retries for open stream failures, 0 means no retries -->
                 <StreamFailedRetry>0</StreamFailedRetry>
@@ -1904,7 +1903,7 @@
                 <Format>Y8</Format>
             </RightIR>
         </Gemini345Lg>
-		<!-- Gemini210 config -->
+        <!-- Gemini210 config -->
         <Gemini210>
             <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
             will determine the device's speciality. Optional values: V4L2, LibUVC -->
@@ -1952,7 +1951,7 @@
                 <Format>Y8</Format>
             </IR>
         </Gemini210>
-		<!-- Gemini215 config -->
+        <!-- Gemini215 config -->
         <Gemini215>
             <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
             will determine the device's speciality. Optional values: V4L2, LibUVC -->
@@ -2030,7 +2029,7 @@
             <!--  Depth Filter Params -->
             <!--
             <DepthFilterDDOConfig>./Gemini2_v1.0.json</DepthFilterDDOConfig>
-			 -->
+            -->
             <Depth>
                 <!-- Number of retries for open stream failures, 0 means no retries -->
                 <StreamFailedRetry>0</StreamFailedRetry>
@@ -2114,7 +2113,7 @@
             <!--  Depth Filter Params -->
             <!--
             <DepthFilterDDOConfig>./Gemini2_v1.0.json</DepthFilterDDOConfig>
-			 -->
+            -->
             <Depth>
                 <!-- Number of retries for open stream failures, 0 means no retries -->
                 <StreamFailedRetry>0</StreamFailedRetry>
@@ -2410,7 +2409,7 @@
                 <Format>Y10</Format>
             </IR>
         </DaBaiMax>
-		<AstraMiniPro>
+        <AstraMiniPro>
             <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
             will determine the device's speciality. Optional values: V4L2, LibUVC -->
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
@@ -2442,7 +2441,7 @@
                 <FPS>30</FPS>
                 <Format>Y10</Format>
             </IR>
-			<Color>
+            <Color>
                 <!-- The resolution width is enabled by default, int type -->
                 <Width>640</Width>
                 <!-- High resolution is enabled by default, int type -->
@@ -2452,7 +2451,7 @@
                 <Format>UYVY</Format>
             </Color>
         </AstraMiniPro>
-		<AstraMiniSPro>
+        <AstraMiniSPro>
             <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
             will determine the device's speciality. Optional values: V4L2, LibUVC -->
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
@@ -2484,7 +2483,7 @@
                 <FPS>30</FPS>
                 <Format>Y10</Format>
             </IR>
-			<Color>
+            <Color>
                 <!-- The resolution width is enabled by default, int type -->
                 <Width>640</Width>
                 <!-- High resolution is enabled by default, int type -->
@@ -2494,7 +2493,7 @@
                 <Format>UYVY</Format>
             </Color>
         </AstraMiniSPro>
-		<AstraPro2>
+        <AstraPro2>
             <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
             will determine the device's speciality. Optional values: V4L2, LibUVC -->
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
@@ -2526,7 +2525,7 @@
                 <FPS>30</FPS>
                 <Format>Y10</Format>
             </IR>
-			<Color>
+            <Color>
                 <!-- The resolution width is enabled by default, int type -->
                 <Width>640</Width>
                 <!-- High resolution is enabled by default, int type -->
@@ -2536,7 +2535,7 @@
                 <Format>UYVY</Format>
             </Color>
         </AstraPro2>
-		<DaBaiDW2>
+        <DaBaiDW2>
             <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
             will determine the device's speciality. Optional values: V4L2, LibUVC -->
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
@@ -2569,7 +2568,7 @@
                 <Format>Y10</Format>
             </IR>
         </DaBaiDW2>
-		<DaBaiDCW2>
+        <DaBaiDCW2>
             <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
             will determine the device's speciality. Optional values: V4L2, LibUVC -->
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
@@ -2601,7 +2600,7 @@
                 <FPS>15</FPS>
                 <Format>Y10</Format>
             </IR>
-			<Color>
+            <Color>
                 <!-- The resolution width is enabled by default, int type -->
                 <Width>640</Width>
                 <!-- High resolution is enabled by default, int type -->
@@ -2611,7 +2610,7 @@
                 <Format>MJPG</Format>
             </Color>
         </DaBaiDCW2>
-		<GeminiEWLite>
+        <GeminiEWLite>
             <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
             will determine the device's speciality. Optional values: V4L2, LibUVC -->
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
@@ -2644,7 +2643,7 @@
                 <Format>Y10</Format>
             </IR>
         </GeminiEWLite>
-		<GeminiEW>
+        <GeminiEW>
             <!-- The default Linux UVC backend. If the LinuxUVCBackend is set to "Auto," this item
             will determine the device's speciality. Optional values: V4L2, LibUVC -->
             <LinuxUVCDefaultBackend>LibUVC</LinuxUVCDefaultBackend>
@@ -2676,7 +2675,7 @@
                 <FPS>15</FPS>
                 <Format>Y10</Format>
             </IR>
-			<Color>
+            <Color>
                 <!-- The resolution width is enabled by default, int type -->
                 <Width>640</Width>
                 <!-- High resolution is enabled by default, int type -->

@@ -160,7 +160,9 @@ public:
     void setDeviceChangedCallback(DeviceChangedCallback callback) {
         std::lock_guard<std::mutex> lock(legacyCallbackMtx_);
         // remove the last callback first
-        unregisterDeviceChangedCallback(legacyCallbackId_);
+        if(legacyCallbackId_ != INVALID_CALLBACK_ID) {
+            unregisterDeviceChangedCallback(legacyCallbackId_);
+        }
         // register the new callback
         legacyCallbackId_ = registerDeviceChangedCallback(callback);
     }

@@ -372,6 +372,8 @@ OBLiDARScanRate OBScanRateFromInt(const int rate) {
     return OB_LIDAR_SCAN_25HZ;
   } else if (rate == 30) {
     return OB_LIDAR_SCAN_30HZ;
+  } else if (rate == 40) {
+    return OB_LIDAR_SCAN_40HZ;
   } else {
     return OB_LIDAR_SCAN_UNKNOWN;
   }

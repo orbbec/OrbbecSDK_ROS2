@@ -599,18 +599,15 @@ void OBLidarNode::onNewIMUFrameCallback(const std::shared_ptr<ob::Frame> &accelf
   auto gyro_frame = gryoframe->as<ob::GyroFrame>();
   auto gyroData = gyro_frame->getValue();
 
-  const double G = 9.81;
-  const double DEG2RAD = M_PI / 180.0;
-
-  imu_msg.angular_velocity.x = -gyroData.x * DEG2RAD;
-  imu_msg.angular_velocity.y = gyroData.y * DEG2RAD;
-  imu_msg.angular_velocity.z = -gyroData.z * DEG2RAD;
+  imu_msg.angular_velocity.x = -gyroData.x;
+  imu_msg.angular_velocity.y = gyroData.y;
+  imu_msg.angular_velocity.z = -gyroData.z;
 
   auto accel_frame = accelframe->as<ob::AccelFrame>();
   auto accelData = accel_frame->getValue();
-  imu_msg.linear_acceleration.x = -accelData.x * G;
-  imu_msg.linear_acceleration.y = accelData.y * G;
-  imu_msg.linear_acceleration.z = -accelData.z * G;
+  imu_msg.linear_acceleration.x = -accelData.x;
+  imu_msg.linear_acceleration.y = accelData.y;
+  imu_msg.linear_acceleration.z = -accelData.z;
 
   imu_publisher_->publish(imu_msg);
 }

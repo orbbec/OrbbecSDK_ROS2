@@ -217,12 +217,12 @@ void OBCameraNodeDriver::init() {
   force_ip_address_ = declare_parameter<std::string>("force_ip_address", "192.168.1.10");
   force_ip_subnet_mask_ = declare_parameter<std::string>("force_ip_subnet_mask", "255.255.255.0");
   force_ip_gateway_ = declare_parameter<std::string>("force_ip_gateway", "192.168.1.1");
-  applyForceIpConfig();
   if (config_path_.empty()) {
     ctx_ = std::make_unique<ob::Context>();
   } else {
     ctx_ = std::make_unique<ob::Context>(config_path_.c_str());
   }
+  applyForceIpConfig();
 
   device_type_ = declare_parameter<std::string>("device_type", "camera");
   connection_delay_ = static_cast<int>(declare_parameter<int>("connection_delay", 100));

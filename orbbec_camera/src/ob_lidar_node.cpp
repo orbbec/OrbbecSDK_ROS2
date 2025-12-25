@@ -233,7 +233,7 @@ void OBLidarNode::setupDevices() {
       device_->isPropertySupported(OB_PROP_LIDAR_REPETITIVE_SCAN_MODE_INT,
                                    OB_PERMISSION_READ_WRITE)) {
     auto range = device_->getIntPropertyRange(OB_PROP_LIDAR_REPETITIVE_SCAN_MODE_INT);
-    if (repetitive_scan_mode_ <= range.min || repetitive_scan_mode_ >= range.max) {
+    if (repetitive_scan_mode_ < range.min || repetitive_scan_mode_ > range.max) {
       RCLCPP_ERROR(logger_,
                    "repetitive scan mode value is out of range[%d,%d], please check the value",
                    range.min, range.max);
@@ -247,7 +247,7 @@ void OBLidarNode::setupDevices() {
   if (filter_level_ != -1 &&
       device_->isPropertySupported(OB_PROP_LIDAR_TAIL_FILTER_LEVEL_INT, OB_PERMISSION_READ_WRITE)) {
     auto range = device_->getIntPropertyRange(OB_PROP_LIDAR_TAIL_FILTER_LEVEL_INT);
-    if (filter_level_ <= range.min || filter_level_ >= range.max) {
+    if (filter_level_ < range.min || filter_level_ > range.max) {
       RCLCPP_ERROR(logger_, "filter level value is out of range[%d,%d], please check the value",
                    range.min, range.max);
     } else {
@@ -261,7 +261,7 @@ void OBLidarNode::setupDevices() {
   if (vertical_fov_ != -1.0 &&
       device_->isPropertySupported(OB_PROP_LIDAR_MEMS_FOV_SIZE_FLOAT, OB_PERMISSION_READ_WRITE)) {
     auto range = device_->getFloatPropertyRange(OB_PROP_LIDAR_MEMS_FOV_SIZE_FLOAT);
-    if (vertical_fov_ <= range.min || vertical_fov_ >= range.max) {
+    if (vertical_fov_ < range.min || vertical_fov_ > range.max) {
       RCLCPP_ERROR(logger_, "vertical fov value is out of range[%f,%f], please check the value",
                    range.min, range.max);
     } else {

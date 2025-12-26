@@ -226,9 +226,8 @@ void OBCameraNode::setupDevices() {
       presetResolutionConfig.irDecimationFactor = values[2];
       presetResolutionConfig.depthDecimationFactor = values[3];
     } else {
-      RCLCPP_WARN_STREAM(logger_, "preset_resolution_config parse failed ('"
-                                      << preset_resolution_config_
-                                      << "'), use default 640,400,1,1");
+      RCLCPP_WARN_STREAM(logger_, "Invalid preset_resolution_config parameter. "
+                        "Expected format: width,height,ir_decimation_factor,depth_decimation_factor");
     }
 
     RCLCPP_INFO_STREAM(logger_, "Setting preset resolution config to "

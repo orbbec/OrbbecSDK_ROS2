@@ -18,6 +18,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <thread>
 #include <geometry_msgs/msg/transform_stamped.hpp>
+#include <sstream>
 
 #include "orbbec_camera/utils.h"
 #include <filesystem>
@@ -209,6 +210,40 @@ void OBCameraNode::clean() noexcept {
 }
 
 void OBCameraNode::setupDevices() {
+  if (!preset_resolution_config_.empty()) {
+    OBPresetResolutionConfig presetResolutionConfig;
+    std::istringstream iss(preset_resolution_config_);
+    std::string token;
+    std::vector<int> values;
+    values.reserve(4);
+    while (std::getline(iss, token, ',')) {
+        values.push_back(std::stoi(token));
+    }
+
+    if (values.size() >= 4) {
+      presetResolutionConfig.width = values[0];
+      presetResolutionConfig.height = values[1];
+      presetResolutionConfig.irDecimationFactor = values[2];
+      presetResolutionConfig.depthDecimationFactor = values[3];
+    } else {
+      RCLCPP_WARN_STREAM(logger_, "preset_resolution_config parse failed ('"
+                                      << preset_resolution_config_
+                                      << "'), use default 640,400,1,1");
+    }
+
+    RCLCPP_INFO_STREAM(logger_, "Setting preset resolution config to "
+                                    << "width: " << presetResolutionConfig.width
+                                    << ", height: " << presetResolutionConfig.height
+                                    << ", ir decimation factor: "
+                                    << presetResolutionConfig.irDecimationFactor
+                                    << ", depth decimation factor: "
+                                    << presetResolutionConfig.depthDecimationFactor);
+
+    TRY_EXECUTE_BLOCK(device_->setStructuredData(OB_STRUCT_PRESET_RESOLUTION_CONFIG,
+                                                 (uint8_t *)&presetResolutionConfig,
+                                                 sizeof(presetResolutionConfig)));
+  }
+
   auto sensor_list = device_->getSensorList();
   for (size_t i = 0; i < sensor_list->getCount(); i++) {
     auto sensor = sensor_list->getSensor(i);
@@ -1853,6 +1888,7 @@ void OBCameraNode::getParameters() {
                                "enable_left_ir_sequence_id_filter", false);
   setAndGetNodeParameter<int>(left_ir_sequence_id_filter_id_, "left_ir_sequence_id_filter_id", -1);
   setAndGetNodeParameter<std::string>(depth_work_mode_, "depth_work_mode", "");
+  setAndGetNodeParameter<std::string>(preset_resolution_config_, "preset_resolution_config", "");
   setAndGetNodeParameter<std::string>(sync_mode_str_, "sync_mode", "");
   setAndGetNodeParameter<int>(depth_delay_us_, "depth_delay_us", 0);
   setAndGetNodeParameter<int>(color_delay_us_, "color_delay_us", 0);
@@ -2170,15 +2206,6 @@ void OBCameraNode::setupPipelineConfig() {
   auto device_info = device_->getDeviceInfo();
   CHECK_NOTNULL(device_info.get());
   auto pid = device_info->getPid();
-  if (depth_registration_ && enable_stream_[COLOR] && enable_stream_[DEPTH] &&
-      !isGemini335PID(pid)) {
-    OBAlignMode align_mode = align_mode_ == "HW" ? ALIGN_D2C_HW_MODE : ALIGN_D2C_SW_MODE;
-    RCLCPP_INFO_STREAM(logger_, "set align mode to " << magic_enum::enum_name(align_mode));
-    calibration_param_ = pipeline_->getCalibrationParam(pipeline_config_);
-    pipeline_config_->setAlignMode(align_mode);
-    RCLCPP_INFO_STREAM(logger_, "enable depth scale " << (enable_depth_scale_ ? "ON" : "OFF"));
-    pipeline_config_->setDepthScaleRequire(enable_depth_scale_);
-  }
   for (const auto &stream_index : IMAGE_STREAMS) {
     if (enable_stream_[stream_index]) {
       RCLCPP_INFO_STREAM(logger_, "Enable " << stream_name_[stream_index] << " stream");
@@ -2200,6 +2227,15 @@ void OBCameraNode::setupPipelineConfig() {
                              << " format: " << profile->getFormat());
       pipeline_config_->enableStream(stream_profile_[stream_index]);
     }
+  }
+  if (depth_registration_ && enable_stream_[COLOR] && enable_stream_[DEPTH] &&
+      !isGemini335PID(pid)) {
+    OBAlignMode align_mode = align_mode_ == "HW" ? ALIGN_D2C_HW_MODE : ALIGN_D2C_SW_MODE;
+    RCLCPP_INFO_STREAM(logger_, "set align mode to " << magic_enum::enum_name(align_mode));
+    TRY_EXECUTE_BLOCK(calibration_param_ = pipeline_->getCalibrationParam(pipeline_config_));
+    TRY_EXECUTE_BLOCK(pipeline_config_->setAlignMode(align_mode));
+    RCLCPP_INFO_STREAM(logger_, "enable depth scale " << (enable_depth_scale_ ? "ON" : "OFF"));
+    TRY_EXECUTE_BLOCK(pipeline_config_->setDepthScaleRequire(enable_depth_scale_));
   }
   if (enable_stream_[DEPTH] && depth_registration_) {
     auto profile = stream_profile_[COLOR]->as<ob::VideoStreamProfile>();

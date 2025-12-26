@@ -233,6 +233,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_laser', default_value='true'),
         DeclareLaunchArgument('depth_precision', default_value=''),
         DeclareLaunchArgument('depth_work_mode', default_value='AMR Perception'),
+        DeclareLaunchArgument('preset_resolution_config', default_value='1280, 800, 1, 1'),
         DeclareLaunchArgument('retry_on_usb3_detection_failure', default_value='false'),
         DeclareLaunchArgument('laser_energy_level', default_value='-1'),
         DeclareLaunchArgument('enable_sync_host_time', default_value='true'),

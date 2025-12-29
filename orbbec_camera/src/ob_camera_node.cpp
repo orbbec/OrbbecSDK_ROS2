@@ -2235,15 +2235,6 @@ void OBCameraNode::setupPipelineConfig() {
       pipeline_config_->enableStream(stream_profile_[stream_index]);
     }
   }
-  if (depth_registration_ && enable_stream_[COLOR] && enable_stream_[DEPTH] &&
-      !isGemini335PID(pid)) {
-    OBAlignMode align_mode = align_mode_ == "HW" ? ALIGN_D2C_HW_MODE : ALIGN_D2C_SW_MODE;
-    RCLCPP_INFO_STREAM(logger_, "set align mode to " << magic_enum::enum_name(align_mode));
-    TRY_EXECUTE_BLOCK(calibration_param_ = pipeline_->getCalibrationParam(pipeline_config_));
-    TRY_EXECUTE_BLOCK(pipeline_config_->setAlignMode(align_mode));
-    RCLCPP_INFO_STREAM(logger_, "enable depth scale " << (enable_depth_scale_ ? "ON" : "OFF"));
-    TRY_EXECUTE_BLOCK(pipeline_config_->setDepthScaleRequire(enable_depth_scale_));
-  }
   if (enable_stream_[DEPTH] && depth_registration_) {
     auto profile = stream_profile_[COLOR]->as<ob::VideoStreamProfile>();
     RCLCPP_INFO_STREAM(logger_, "depth_registration is enabled. "

@@ -206,8 +206,13 @@ bool isGemini2R(int pid);
 
 OBStreamType obStreamTypeFromString(const std::string& stream_type);
 
-cv::Mat undistortImage(const cv::Mat& image, const OBCameraIntrinsic& intrinsic,
-                       const OBCameraDistortion& distortion);
+struct UndistortedImageResult {
+  cv::Mat image;
+  OBCameraIntrinsic new_intrinsic;
+};
+
+UndistortedImageResult undistortImage(const cv::Mat& image, const OBCameraIntrinsic& intrinsic,
+                                      const OBCameraDistortion& distortion);
 
 std::string getDistortionModels(OBCameraDistortion distortion);
 

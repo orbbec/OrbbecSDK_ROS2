@@ -23,8 +23,6 @@ eval "$(register-python-argcomplete3 colcon)"
 
 ### 二进制安装
 
-#### Linux 二进制包安装
-
 查看软件包：
 
 ```bash
@@ -43,8 +41,6 @@ sudo apt install ros-humble-orbbec-camera ros-humble-orbbec-description
 ---
 
 ### 从源码构建
-
-#### Linux ROS2 包装器编译
 
 创建 `colcon` 工作空间：
 

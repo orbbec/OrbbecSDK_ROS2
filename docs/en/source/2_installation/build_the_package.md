@@ -1,6 +1,5 @@
-### Binary Installation
+### Environment configuration
 
-#### Environment
 
 Install ROS 2 according to the official guide:
 
@@ -22,7 +21,7 @@ Enable ROS 2 auto-completion:
 eval "$(register-python-argcomplete3 ros2)"
 eval "$(register-python-argcomplete3 colcon)"
 ```
-#### Linux Binary Package Installation
+### Linux Binary Package Installation
 
 Check available packages:
 
@@ -43,7 +42,6 @@ After installation, you can use it directly without compilation.
 
 ### Build from Source
 
-#### Linux ROS2 Wrapper Compilation
 
 Create a `colcon` workspace:
 

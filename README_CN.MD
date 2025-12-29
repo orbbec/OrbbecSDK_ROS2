@@ -153,49 +153,81 @@ OrbbecSDK ROS2 Wrapper 提供 Orbbec 相机与 ROS 2 环境的无缝集成，支
 
 ## 安装说明
 
-安装 ROS 2
+**环境配置**
 
-- 请参考官方 [ROS 2 安装指南](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)
+根据官方指南安装 ROS 2：
 
-> 如果您的 ROS 2 命令无法自动补全，请将以下两行加入到 `.bashrc` 或 `.zshrc` 中
+* [ROS 2 安装指南（Ubuntu）](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)
 
+安装依赖项：
+
+```bash
+sudo apt install libgflags-dev nlohmann-json3-dev \
+ros-$ROS_DISTRO-image-transport ros-${ROS_DISTRO}-image-transport-plugins ros-${ROS_DISTRO}-compressed-image-transport \
+ros-$ROS_DISTRO-image-publisher ros-$ROS_DISTRO-camera-info-manager \
+ros-$ROS_DISTRO-diagnostic-updater ros-$ROS_DISTRO-diagnostic-msgs ros-$ROS_DISTRO-statistics-msgs ros-$ROS_DISTRO-xacro \
+ros-$ROS_DISTRO-backward-ros libdw-dev libssl-dev
 ```
+
+启用 ROS 2 自动补全：
+
+```bash
 eval "$(register-python-argcomplete3 ros2)"
 eval "$(register-python-argcomplete3 colcon)"
 ```
 
-创建 `colcon` 工作区
+**二进制安装**
 
+查看软件包：
+
+```bash
+sudo apt update
+apt list | grep orbbec
 ```
+
+安装 OrbbecSDK ROS2 包：
+
+```bash
+sudo apt install ros-humble-orbbec-camera ros-humble-orbbec-description
+```
+
+安装完成后，直接使用即可，无需编译。
+
+**从源码构建**
+
+创建 `colcon` 工作空间：
+
+```bash
 mkdir -p ~/ros2_ws/src
 ```
 
-获取源码
+克隆源代码并切换到 `v2-main` 分支：
 
-```
+```bash
 cd ~/ros2_ws/src
 git clone https://github.com/orbbec/OrbbecSDK_ROS2.git
 cd OrbbecSDK_ROS2
 git checkout v2-main
-git branch  #检查分支是否切换成功
 ```
 
-安装依赖包
+构建：
 
 ```bash
-# 假设您已经 source ROS 环境，下同
-sudo apt install libgflags-dev nlohmann-json3-dev \
-ros-$ROS_DISTRO-image-transport ros-${ROS_DISTRO}-image-transport-plugins ros-${ROS_DISTRO}-compressed-image-transport \
-ros-$ROS_DISTRO-image-publisher ros-$ROS_DISTRO-camera-info-manager \
-ros-$ROS_DISTRO-diagnostic-updater ros-$ROS_DISTRO-diagnostic-msgs ros-$ROS_DISTRO-statistics-msgs \
-ros-$ROS_DISTRO-backward-ros libdw-dev
+cd ~/ros2_ws
+colcon build --event-handlers console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=Release
+```
+## 注册脚本（必需）
 
-# 可选依赖
-# 435Le writeCustomerDate 功能需要：
-sudo apt install libssl-dev
+为了让 Orbbec 相机在 Linux 上被正确识别，请安装 udev 规则。
+
+**二进制安装**
+
+```bash
+sudo cp /opt/ros/$ROS_DISTRO/share/orbbec_camera/udev/99-obsensor-libusb.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
 
-安装 udev 规则
+**从源码构建**
 
 ```bash
 cd  ~/ros2_ws/src/OrbbecSDK_ROS2/orbbec_camera/scripts
@@ -203,14 +235,9 @@ sudo bash install_udev_rules.sh
 sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
 
-编译
+此步骤对于 Linux 用户是**必需的**。
 
-```bash
-cd ~/ros2_ws/
-source /opt/ros/$ROS_DISTRO/setup.bash
-# 编译 release，默认是 Debug
-colcon build --event-handlers  console_direct+  --cmake-args  -DCMAKE_BUILD_TYPE=Release
-```
+`注意：` 如果不执行此脚本，由于权限问题，打开设备将会失败。您需要使用 sudo（管理员权限）运行示例程序。
 
 ## 快速开始
 

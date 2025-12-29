@@ -155,67 +155,92 @@ If you need to migrate existing projects from the main (v1.x) branch to the v2-m
 
 ## Installation Instructions
 
-Install ROS 2
+**Environment configuration**
 
-- Please refer to the
-  official [ROS 2 installation guide](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)
-  guidance
+Install ROS 2 according to the official guide:
 
-> If your ROS 2 command does not auto-complete, put the following two lines into your `.bashrc`
-> or `.zshrc`
+* [ROS 2 installation (Ubuntu)](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)
+
+Install dependencies:
+
+```bash
+sudo apt install libgflags-dev nlohmann-json3-dev \
+ros-$ROS_DISTRO-image-transport ros-${ROS_DISTRO}-image-transport-plugins ros-${ROS_DISTRO}-compressed-image-transport \
+ros-$ROS_DISTRO-image-publisher ros-$ROS_DISTRO-camera-info-manager \
+ros-$ROS_DISTRO-diagnostic-updater ros-$ROS_DISTRO-diagnostic-msgs ros-$ROS_DISTRO-statistics-msgs ros-$ROS_DISTRO-xacro \
+ros-$ROS_DISTRO-backward-ros libdw-dev libssl-dev
+```
+
+Enable ROS 2 auto-completion:
 
 ```bash
 eval "$(register-python-argcomplete3 ros2)"
 eval "$(register-python-argcomplete3 colcon)"
 ```
 
-Create `colcon` workspace
+**Linux Binary Package Installation**
+
+Check available packages:
+
+```bash
+sudo apt update
+apt list | grep orbbec
+```
+
+Install OrbbecSDK ROS2 package:
+
+```bash
+sudo apt install ros-humble-orbbec-camera ros-humble-orbbec-description
+```
+
+After installation, you can use it directly without compilation.
+
+**Build from Source**
+
+Create a `colcon` workspace:
 
 ```bash
 mkdir -p ~/ros2_ws/src
 ```
 
-Get source code
+Clone source and checkout `v2-main` branch:
 
 ```bash
 cd ~/ros2_ws/src
 git clone https://github.com/orbbec/OrbbecSDK_ROS2.git
 cd OrbbecSDK_ROS2
 git checkout v2-main
-git branch  #Check whether the branch switch is successful
 ```
 
-Install deb dependencies
+Build:
 
 ```bash
-# assume you have sourced ROS environment, same blow
-sudo apt install libgflags-dev nlohmann-json3-dev \
-ros-$ROS_DISTRO-image-transport ros-${ROS_DISTRO}-image-transport-plugins ros-${ROS_DISTRO}-compressed-image-transport \
-ros-$ROS_DISTRO-image-publisher ros-$ROS_DISTRO-camera-info-manager \
-ros-$ROS_DISTRO-diagnostic-updater ros-$ROS_DISTRO-diagnostic-msgs ros-$ROS_DISTRO-statistics-msgs \
-ros-$ROS_DISTRO-backward-ros libdw-dev
-
-# Optional dependencies:
-# 435Le writeCustomerDate feature:
-sudo apt install libssl-dev
+cd ~/ros2_ws
+colcon build --event-handlers console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
 
-build:
+## Registration Script (Required)
+
+To allow the Orbbec cameras to be recognized correctly on Linux, install the udev rules.
+
+**Binary Installation**
 
 ```bash
-cd ~/ros2_ws/
-source /opt/ros/$ROS_DISTRO/setup.bash
-# build release, Default is Debug
-colcon build --event-handlers  console_direct+  --cmake-args  -DCMAKE_BUILD_TYPE=Release
+sudo cp /opt/ros/$ROS_DISTRO/share/orbbec_camera/udev/99-obsensor-libusb.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
 
-Install udev rules:
+**Build from Source**
 
 ```bash
 cd  ~/ros2_ws/src/OrbbecSDK_ROS2/orbbec_camera/scripts
 sudo bash install_udev_rules.sh
 sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
+
+This step is **mandatory** for Linux users.
+
+`Notes:` If this script is not executed, open the device will fail due to permission issues. You need to run the sample with sudo (administrator privileges).
 
 ## Getting start
 

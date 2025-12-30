@@ -136,6 +136,17 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
       <td>full maintenance</td>
       <td>recommended for new designs</td>
     </tr>
+    <tr>
+      <td rowspan="3" style="text-align: center; font-weight: bold;">LiDAR</td>
+      <td>Pulsar ME450</td>
+      <td>not supported</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Pulsar SL450</td>
+      <td>not supported</td>
+      <td>recommended for new designs</td>
+    </tr>
   </tbody>
 </table>
 
@@ -168,7 +179,7 @@ sudo apt install libgflags-dev nlohmann-json3-dev \
 ros-$ROS_DISTRO-image-transport ros-${ROS_DISTRO}-image-transport-plugins ros-${ROS_DISTRO}-compressed-image-transport \
 ros-$ROS_DISTRO-image-publisher ros-$ROS_DISTRO-camera-info-manager \
 ros-$ROS_DISTRO-diagnostic-updater ros-$ROS_DISTRO-diagnostic-msgs ros-$ROS_DISTRO-statistics-msgs ros-$ROS_DISTRO-xacro \
-ros-$ROS_DISTRO-backward-ros libdw-dev libssl-dev
+ros-$ROS_DISTRO-backward-ros libdw-dev libssl-dev mesa-utils libgl1
 ```
 
 Enable ROS 2 auto-completion:
@@ -305,6 +316,8 @@ For optimal performance, we strongly recommend updating to the latest firmware v
 | Femto Mega              | [1.3.1](https://github.com/orbbec/OrbbecFirmware/releases/tag/Femto-Mega-Firmware)              | femto_mega.launch.py        |
 | Femto Mega I            | [2.0.4](https://github.com/orbbec/OrbbecFirmware/releases/tag/Femto-Mega-I-Firmware)            | femto_mega.launch.py        |
 | Astra 2                 | [2.8.20](https://orbbec-debian-repos-aws.s3.amazonaws.com/product/Astra2_Release_2.8.20.zip)    | astra2.launch.py            |
+| Pulsar SL450            | 2.2.4.5 | lidar.launch.py |
+| Pulsar ME450            | 1.0.0.6 | lidar.launch.py |
 
 All launch files are essentially similar, with the primary difference being the default values of the parameters set
 for different models within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution settings in the launch file, as well as other parameters, to ensure compatibility and optimal performance.

@@ -43,6 +43,8 @@
     *   启用右红外图像传输插件。默认值：`["image_transport/compressed", "image_transport/raw", "image_transport/theora"]`。
 *   **`point_cloud_decimation_filter_factor`**
     *   点云下采样因子。范围：`1–8`，`1`表示不下采样，数值越大下采样越强。
+*   **`preset_resolution_config`**
+    * 摄像头设备的预设分辨率配置。格式: "width,height,ir_decimation_factor,depth_decimation_factor". Example: "1280,720,4,4". 仅在 Gemini435Le 设备上受支持。留空禁用。
 
 ### 传感器控制
 
@@ -178,7 +180,7 @@
   *   `COLOR`：将深度对齐到彩色。
   *   `DEPTH`：将彩色对齐到深度。
 - **`intra_camera_sync_reference`**
-  - 设置相机内同步的参考点。适用于Gemini 330系列设备，当 `sync_mode` 设置为**软件**或**硬件触发**模式时。**选项：** `Start`、`Middle`、`End`。**默认值：** `Middle`
+  - 设置相机内同步的参考点。适用于Gemini 330系列设备，当 `sync_mode` 设置为**软件**或**硬件触发**模式时。**选项：** `Start`、`Middle`、`End`。设置为空时，长基线设备默认End，短基线设备默认Middle。
 
 ### 基础与通用参数
 
@@ -221,6 +223,8 @@
 #### 日志与诊断
 *   **`log_level`**
     *   SDK日志级别。默认为 `info`。可选值：`debug`、`info`、`warn`、`error`、`fatal`。
+*   **`log_file_name`**
+    *   保存的SDK日志文件名。当`log_level`为`debug`时生效。
 *   **`diagnostic_period`**
     *   诊断周期（秒）。
 *   **`enable_heartbeat`**

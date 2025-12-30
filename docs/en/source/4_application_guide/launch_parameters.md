@@ -43,6 +43,8 @@ The following are the launch parameters available:
     *   Enable Right IR image transport plugins. Default: `["image_transport/compressed", "image_transport/raw", "image_transport/theora"]`.
 *   **`point_cloud_decimation_filter_factor`**
     *   Point cloud downsampling factor. Range: `1–8`. `1` means no downsampling; larger values apply stronger decimation.
+*   **`preset_resolution_config`**
+    * Preset resolution configuration for the camera device. Format: "width,height,ir_decimation_factor,depth_decimation_factor". Example: "1280,720,4,4". Only supported on specific devices like Gemini2. Leave empty to disable.
 
 ### Sensor Controls
 
@@ -183,7 +185,7 @@ The following are the launch parameters available:
   *   `COLOR`: Align depth to color.
   *   `DEPTH`: Align color to depth.
 - **`intra_camera_sync_reference`**
-  - Sets the reference point for intra-camera synchronization. Applicable for Gemini 330 series devices when `sync_mode` is set to **software** or **hardware trigger** mode. **Options:** `Start`, `Middle`, `End`. **Default:** `Middle`
+  - Sets the reference point for intra-camera synchronization. Applicable for Gemini 330 series devices when `sync_mode` is set to **software** or **hardware trigger** mode. **Options:** `Start`, `Middle`, `End`. When set to empty, the long baseline device defaults to End, and the short baseline device defaults to Middle.
 
 ### Basic & General Parameters
 
@@ -226,6 +228,8 @@ The following are the launch parameters available:
 #### Logging & Diagnostics
 *   **`log_level`**
     *   SDK log level. Default is `info`. Optional values: `debug`, `info`, `warn`, `error`, `fatal`.
+* **`log_file_name`**
+    * Saved SDK log file name. Effective when `log_level` is `debug`.
 *   **`diagnostic_period`**
     *   Diagnostic period in seconds.
 *   **`enable_heartbeat`**

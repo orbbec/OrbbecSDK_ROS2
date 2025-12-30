@@ -137,7 +137,7 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
       <td>recommended for new designs</td>
     </tr>
     <tr>
-      <td rowspan="3" style="text-align: center; font-weight: bold;">LiDAR</td>
+      <td rowspan="2" style="text-align: center; font-weight: bold;">LiDAR</td>
       <td>Pulsar ME450</td>
       <td>not supported</td>
       <td>recommended for new designs</td>

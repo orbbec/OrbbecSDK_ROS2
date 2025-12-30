@@ -940,14 +940,11 @@ UndistortedImageResult undistortImage(const cv::Mat &image, const OBCameraIntrin
   // Create the distortion coefficients matrix using the extended distortion model
   cv::Mat dist_coeffs = (cv::Mat_<float>(8, 1) << distortion.k1, distortion.k2, distortion.p1,
                          distortion.p2, distortion.k3, distortion.k4, distortion.k5, distortion.k6);
-  std::cout << "1" << camera_matrix << std::endl;
   cv::Size image_size(image.cols, image.rows);
   cv::Mat new_camera_matrix =
       cv::getOptimalNewCameraMatrix(camera_matrix, dist_coeffs, image_size, 0.0, image_size);
-  std::cout << new_camera_matrix << std::endl;
   // Undistort the image using the new camera matrix
   cv::undistort(image, result.image, camera_matrix, dist_coeffs, new_camera_matrix);
-  std::cout << new_camera_matrix << std::endl;
   // Update the intrinsic parameters with the new camera matrix
   result.new_intrinsic = intrinsic;  // Copy original values first
   result.new_intrinsic.fx = new_camera_matrix.at<double>(0, 0);

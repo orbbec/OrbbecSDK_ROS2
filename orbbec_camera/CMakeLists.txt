@@ -233,6 +233,7 @@ install(TARGETS ${PROJECT_NAME} frame_latency start_benchmark multi_save_rgbir A
 install(DIRECTORY include/ DESTINATION include)
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME}/)
+install(DIRECTORY examples DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY ${ORBBEC_INCLUDE_DIR} DESTINATION include)
 install(DIRECTORY ${ORBBEC_LIBS_DIR}/ DESTINATION lib/ FILES_MATCHING PATTERN "*.so*")
 # Install extensions directory with explicit file copying to avoid symlink issues

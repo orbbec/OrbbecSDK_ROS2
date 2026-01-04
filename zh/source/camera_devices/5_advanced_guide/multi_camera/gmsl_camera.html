@@ -1,0 +1,173 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GMSL 相机 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=63de077d" />
+
+  
+    <link rel="shortcut icon" href="../../../../_static/orbbec_footerlogo_3d_world.svg"/>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=7d86a446"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/translations.js?v=beaddf03"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../../genindex.html" />
+    <link rel="search" title="搜索" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            OrbbecSDK V2 ROS2 封装
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">GMSL 相机</a><ul>
+<li><a class="reference internal" href="#id1">单个 GMSL 相机</a></li>
+<li><a class="reference internal" href="#id2">多个 GMSL 相机</a></li>
+<li><a class="reference internal" href="#id3">多个 GMSL 相机同步</a></li>
+<li><a class="reference internal" href="#id4">GMSL 相机的使用限制</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">OrbbecSDK V2 ROS2 封装</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">GMSL 相机</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/source/camera_devices/5_advanced_guide/multi_camera/gmsl_camera.md.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="gmsl">
+<h1>GMSL 相机<a class="headerlink" href="#gmsl" title="Link to this heading"></a></h1>
+<blockquote>
+<div><p>本节介绍如何在 OrbbecSDK_ROS2 中使用 GMSL 相机。目前仅支持 Gemini 335Lg 和 Gemini 345Lg 设备，其他 GMSL 设备将在不久的将来得到支持。</p>
+</div></blockquote>
+<p>您可以在 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples">example</a> 中找到示例使用代码。</p>
+<section id="id1">
+<h2>单个 GMSL 相机<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p>GMSL 相机在 OrbbecSDK_ROS2 中的使用与通过 USB 的 Gemini 330 系列相机相同。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>gemini_330_gmsl.launch.py
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h2>多个 GMSL 相机<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>要获取 GMSL 相机的 <code class="docutils literal notranslate"><span class="pre">usb_port</span></code>，插入相机并在终端中运行以下命令：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>orbbec_camera<span class="w"> </span>list_devices_node
+</pre></div>
+</div>
+<p>例如，获得的 gmsl 相机 <code class="docutils literal notranslate"><span class="pre">usb_port</span></code>：<code class="docutils literal notranslate"><span class="pre">gmsl2-1</span></code></p>
+<p>转到 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/examples/gmsl_camera/multi_gmsl_camera.launch.py">multi_gmsl_camera.launch.py</a> 文件并更改 <code class="docutils literal notranslate"><span class="pre">usb_port</span></code>。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>multi_gmsl_camera.launch.py
+</pre></div>
+</div>
+<blockquote>
+<div><p>注意：默认情况下，multi_gmsl_camera.launch.py 仅启动 color 和 depth。如果您想启动其他传感器，请转到 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_secondary_params.yaml">camera_secondary_params.yaml</a> 进行修改。</p>
+</div></blockquote>
+</section>
+<section id="id3">
+<h2>多个 GMSL 相机同步<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<p>首先，请查看如何使用 <a class="reference internal" href="multi_camera_synced.html"><span class="doc">multi_camera_synced</span></a>。</p>
+<p>此外，GMSL 多相机同步不需要 Multi-Camera Sync Hub Pro，因此无需设置 <code class="docutils literal notranslate"><span class="pre">primary</span></code> 模式。每个 GMSL 相机都是 <code class="docutils literal notranslate"><span class="pre">secondary</span></code>。</p>
+<p><strong>额外的参数设置</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">gmsl_trigger_fps</span></code>：设置硬件 soc 触发源帧率。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">enable_gmsl_trigger</span></code>：启用硬件 soc 触发。</p></li>
+</ul>
+<p><strong>运行启动文件</strong></p>
+<p>请参考 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/examples/gmsl_camera/multi_gmsl_camera_synced.launch.py">multi_gmsl_camera_synced.launch.py</a> 中的配置。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>multi_gmsl_camera_synced.launch.py
+</pre></div>
+</div>
+<blockquote>
+<div><p>注意：默认情况下，multi_gmsl_camera_synced.launch.py 仅启动 color 和 depth。如果您想启动其他传感器，请转到 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/config/camera_secondary_params.yaml">camera_secondary_params.yaml</a> 进行修改。</p>
+</div></blockquote>
+</section>
+<section id="id4">
+<h2>GMSL 相机的使用限制<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<p>GMSL 相机与各种反序列化器芯片（如 MAX9296 和 MAX92716）接口。Orbbec GMSL 相机支持多个流，包括深度、彩色、IR 和 IMU 数据，但存在某些使用限制：</p>
+<ul class="simple">
+<li><p>GMSL 仅支持 V4L2 和 YUYV 格式；不支持 MJPG 格式。RGB 输出源自 YUYV 格式转换。</p></li>
+<li><p>Gemini-335Lg 的元数据通过单独的节点提供，而其他型号的元数据嵌入在视频帧中，这对用户保持透明。</p></li>
+<li><p>当使用 Max96712 作为反序列化器芯片时，由于 Max96712 芯片的特性，在 secondary_synced 模式下必须提供多机同步触发信号。否则，在切换数据流时会发生数据流中断。</p></li>
+<li><p>连接在同一个 MAX9296、MAX96712 LinkA/B 或 MAX96712 LinkC/D 上的两个相机有以下限制：</p>
+<ul>
+<li><p>在驱动程序版本 v1.2.02 之前，存在一个限制，即一个相机的 RGB 和另一个相机的右 IR 不能同时流式传输。在驱动程序版本 v1.2.02 之后，限制修改为一个相机的 RGB 和另一个相机的左 IR 不能同时流式传输。</p></li>
+<li><p>在驱动程序版本 v1.2.02 之前，存在一个限制，即一个相机的 DEPTH 和另一个相机的左 IR 不能同时流式传输。在驱动程序版本 v1.2.02 之后，限制修改为一个相机的 DEPTH 和另一个相机的右 IR 不能同时流式传输。</p></li>
+<li><p>两个相机的活动流的组合最大数量限制为四个（满足上述两个条件即可确保合规）。</p></li>
+</ul>
+</li>
+</ul>
+<p>有关更多已知限制，请参考 <a class="reference external" href="https://github.com/orbbec/MIPI_Camera_Platform_Driver/blob/main/doc/Instructions%20for%20Using%20GMSL%20Camera.md">Orbbec GMSL 相机的使用限制</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
+      <span class="lastupdated">最后更新于 2026年01月04日 01:12:35.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

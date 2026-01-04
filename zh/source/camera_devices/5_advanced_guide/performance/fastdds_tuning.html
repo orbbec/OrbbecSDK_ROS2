@@ -1,0 +1,239 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>针对Orbbec相机与ROS2的Fast DDS优化 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=63de077d" />
+
+  
+    <link rel="shortcut icon" href="../../../../_static/orbbec_footerlogo_3d_world.svg"/>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=7d86a446"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/translations.js?v=beaddf03"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../../genindex.html" />
+    <link rel="search" title="搜索" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            OrbbecSDK V2 ROS2 封装
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">针对Orbbec相机与ROS2的Fast DDS优化</a><ul>
+<li><a class="reference internal" href="#id1">调整系统参数</a></li>
+<li><a class="reference internal" href="#fast-dds">Fast DDS配置</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">OrbbecSDK V2 ROS2 封装</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">针对Orbbec相机与ROS2的Fast DDS优化</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/source/camera_devices/5_advanced_guide/performance/fastdds_tuning.md.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="orbbecros2fast-dds">
+<h1>针对Orbbec相机与ROS2的Fast DDS优化<a class="headerlink" href="#orbbecros2fast-dds" title="Link to this heading"></a></h1>
+<p>使用默认配置时，Fast DDS表现出次优的传输效率，导致在ROS2中使用Orbbec相机时图像传输延迟显著。本文档提供了优化Fast DDS以提高图像传输效率的指导。</p>
+<section id="id1">
+<h2>调整系统参数<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p><strong>IP分片时间</strong></p>
+<ul>
+<li><p><strong>路径</strong>: <code class="docutils literal notranslate"><span class="pre">/proc/sys/net/ipv4/ipfrag_time</span></code>（默认值：30秒）</p></li>
+<li><p><strong>目的</strong>: 定义IP分片保留在内存中的持续时间。</p></li>
+<li><p><strong>调整</strong>: 减少此值以缩短未接收到分片的时间窗口，这有助于减少延迟。考虑到您环境的具体需求，因为此设置会影响所有传入的分片。</p>
+<p><strong>示例</strong>: 设置为3秒。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>sysctl<span class="w"> </span>net.ipv4.ipfrag_time<span class="o">=</span><span class="m">3</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p><strong>IP分片内存阈值</strong></p>
+<ul>
+<li><p><strong>路径</strong>: <code class="docutils literal notranslate"><span class="pre">/proc/sys/net/ipv4/ipfrag_high_thresh</span></code>（默认值：262144字节）</p></li>
+<li><p><strong>目的</strong>: 设置用于重组IP分片的最大内存。</p></li>
+<li><p><strong>调整</strong>: 增加此值以允许更多内存用于分片重组，这可以改善较大数据包的处理。</p>
+<p><strong>示例</strong>: 增加到128 MB。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>sysctl<span class="w"> </span>net.ipv4.ipfrag_high_thresh<span class="o">=</span><span class="m">134217728</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p><strong>最大缓冲区大小</strong></p>
+<ul>
+<li><p><strong>目的</strong>: 配置接收和发送数据的最大缓冲区大小，这对高吞吐量数据传输至关重要。</p></li>
+<li><p><strong>调整</strong>: 设置接收和发送操作的最大缓冲区大小。</p>
+<p><strong>命令</strong>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>sysctl<span class="w"> </span>-w<span class="w"> </span>net.core.rmem_max<span class="o">=</span><span class="m">2147483647</span>
+sudo<span class="w"> </span>sysctl<span class="w"> </span>-w<span class="w"> </span>net.core.rmem_default<span class="o">=</span><span class="m">2147483647</span>
+sudo<span class="w"> </span>sysctl<span class="w"> </span>-w<span class="w"> </span>net.core.wmem_max<span class="o">=</span><span class="m">2147483647</span>
+sudo<span class="w"> </span>sysctl<span class="w"> </span>-w<span class="w"> </span>net.core.wmem_default<span class="o">=</span><span class="m">2147483647</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>或者，通过将这些设置添加到 <code class="docutils literal notranslate"><span class="pre">/etc/sysctl.d/10-fastrtps-max.conf</span></code> 文件中使其永久生效。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>gedit<span class="w"> </span>/etc/sysctl.d/10-fastrtps-max.conf
+</pre></div>
+</div>
+<p>将以下行添加到文件中：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>net.core.rmem_max<span class="o">=</span><span class="m">2147483647</span>
+net.core.rmem_default<span class="o">=</span><span class="m">2147483647</span>
+net.core.wmem_max<span class="o">=</span><span class="m">2147483647</span>
+net.core.wmem_default<span class="o">=</span><span class="m">2147483647</span>
+</pre></div>
+</div>
+<p>然后保存并退出文件。运行 <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">sysctl</span> <span class="pre">-p</span></code> 以应用更改。</p>
+<p>有关详细指导，请参考 <a class="reference external" href="https://docs.ros.org/en/foxy/How-To-Guides/DDS-tuning.html">ROS 2 DDS调优文档</a>。</p>
+</section>
+<section id="fast-dds">
+<h2>Fast DDS配置<a class="headerlink" href="#fast-dds" title="Link to this heading"></a></h2>
+<p>以下是针对Orbbec相机与ROS2使用而优化的Fast DDS配置文件示例。此配置通过调整缓冲区大小和传输设置来增强整体数据传输。</p>
+<p><strong>配置文件:</strong> <code class="docutils literal notranslate"><span class="pre">shm_fastdds.xml</span></code></p>
+<p>将此文件放在 <code class="docutils literal notranslate"><span class="pre">$HOME</span></code> 目录中。</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;profiles</span><span class="w"> </span><span class="na">xmlns=</span><span class="s">&quot;http://www.eprosima.com/XMLSchemas/fastRTPS_Profiles&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;transport_descriptors&gt;</span>
+<span class="w">        </span><span class="nt">&lt;transport_descriptor&gt;</span>
+<span class="w">            </span><span class="nt">&lt;transport_id&gt;</span>UDP_transport<span class="nt">&lt;/transport_id&gt;</span>
+<span class="w">            </span><span class="nt">&lt;type&gt;</span>UDPv4<span class="nt">&lt;/type&gt;</span>
+<span class="w">            </span><span class="nt">&lt;maxInitialPeersRange&gt;</span>10<span class="nt">&lt;/maxInitialPeersRange&gt;</span>
+<span class="w">            </span><span class="nt">&lt;maxMessageSize&gt;</span>65000<span class="nt">&lt;/maxMessageSize&gt;</span>
+<span class="w">            </span><span class="nt">&lt;sendBufferSize&gt;</span>1048576<span class="nt">&lt;/sendBufferSize&gt;</span>
+<span class="w">            </span><span class="nt">&lt;receiveBufferSize&gt;</span>1048576<span class="nt">&lt;/receiveBufferSize&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/transport_descriptor&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/transport_descriptors&gt;</span>
+<span class="w">    </span><span class="nt">&lt;participant</span><span class="w"> </span><span class="na">profile_name=</span><span class="s">&quot;participant_profile_ros2&quot;</span><span class="w"> </span><span class="na">is_default_profile=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
+<span class="w">        </span><span class="nt">&lt;rtps&gt;</span>
+<span class="w">            </span><span class="nt">&lt;name&gt;</span>profile_for_ros2_context<span class="nt">&lt;/name&gt;</span>
+<span class="w">            </span><span class="nt">&lt;userTransports&gt;</span>
+<span class="w">                </span><span class="nt">&lt;transport_id&gt;</span>UDP_transport<span class="nt">&lt;/transport_id&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/userTransports&gt;</span>
+<span class="w">            </span><span class="nt">&lt;useBuiltinTransports&gt;</span>false<span class="nt">&lt;/useBuiltinTransports&gt;</span>
+<span class="w">            </span><span class="nt">&lt;sendSocketBufferSize&gt;</span>1048576<span class="nt">&lt;/sendSocketBufferSize&gt;</span>
+<span class="w">            </span><span class="nt">&lt;listenSocketBufferSize&gt;</span>1048576<span class="nt">&lt;/listenSocketBufferSize&gt;</span>
+<span class="w">            </span><span class="nt">&lt;builtin&gt;</span>
+<span class="w">                </span><span class="nt">&lt;initialPeersList&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;locator&gt;</span>
+<span class="w">                        </span><span class="nt">&lt;udpv4&gt;</span>
+<span class="w">                            </span><span class="nt">&lt;address&gt;</span>127.0.0.1<span class="nt">&lt;/address&gt;</span>
+<span class="w">                        </span><span class="nt">&lt;/udpv4&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;/locator&gt;</span>
+<span class="w">                </span><span class="nt">&lt;/initialPeersList&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/builtin&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/rtps&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/participant&gt;</span>
+<span class="w">    </span><span class="nt">&lt;data_writer</span><span class="w"> </span><span class="na">profile_name=</span><span class="s">&quot;default publisher profile&quot;</span><span class="w"> </span><span class="na">is_default_profile=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
+<span class="w">        </span><span class="nt">&lt;qos&gt;</span>
+<span class="w">            </span><span class="nt">&lt;publishMode&gt;</span>
+<span class="w">                </span><span class="nt">&lt;kind&gt;</span>ASYNCHRONOUS<span class="nt">&lt;/kind&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/publishMode&gt;</span>
+<span class="w">            </span><span class="nt">&lt;latencyBudget&gt;</span>
+<span class="w">                </span><span class="nt">&lt;duration&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;sec&gt;</span>0<span class="nt">&lt;/sec&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;nanosec&gt;</span>1000000<span class="nt">&lt;/nanosec&gt;</span>
+<span class="w">                </span><span class="nt">&lt;/duration&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/latencyBudget&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/qos&gt;</span>
+<span class="w">        </span><span class="nt">&lt;historyMemoryPolicy&gt;</span>PREALLOCATED_WITH_REALLOC<span class="nt">&lt;/historyMemoryPolicy&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/data_writer&gt;</span>
+<span class="w">    </span><span class="nt">&lt;data_reader</span><span class="w"> </span><span class="na">profile_name=</span><span class="s">&quot;default subscription profile&quot;</span><span class="w"> </span><span class="na">is_default_profile=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
+<span class="w">        </span><span class="nt">&lt;qos&gt;</span>
+<span class="w">            </span><span class="nt">&lt;data_sharing&gt;</span>
+<span class="w">                </span><span class="nt">&lt;kind&gt;</span>AUTOMATIC<span class="nt">&lt;/kind&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/data_sharing&gt;</span>
+<span class="w">            </span><span class="nt">&lt;latencyBudget&gt;</span>
+<span class="w">                </span><span class="nt">&lt;duration&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;sec&gt;</span>0<span class="nt">&lt;/sec&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;nanosec&gt;</span>1000000<span class="nt">&lt;/nanosec&gt;</span>
+<span class="w">                </span><span class="nt">&lt;/duration&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/latencyBudget&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/qos&gt;</span>
+<span class="w">        </span><span class="nt">&lt;historyMemoryPolicy&gt;</span>PREALLOCATED_WITH_REALLOC<span class="nt">&lt;/historyMemoryPolicy&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/data_reader&gt;</span>
+<span class="nt">&lt;/profiles&gt;</span>
+</pre></div>
+</div>
+<p><strong>环境变量</strong></p>
+<p>设置以下环境变量以使用自定义Fast DDS配置文件：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">RMW_IMPLEMENTATION</span><span class="o">=</span>rmw_fastrtps_cpp
+<span class="nb">export</span><span class="w"> </span><span class="nv">FASTRTPS_DEFAULT_PROFILES_FILE</span><span class="o">=</span><span class="nv">$HOME</span>/shm_fastdds.xml
+<span class="nb">export</span><span class="w"> </span><span class="nv">RMW_FASTRTPS_USE_QOS_FROM_XML</span><span class="o">=</span><span class="m">1</span>
+</pre></div>
+</div>
+<p>此配置旨在优化数据流并减少传输延迟，提高Orbbec相机系统在ROS2环境中的响应性和可靠性。</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
+      <span class="lastupdated">最后更新于 2026年01月04日 01:12:35.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

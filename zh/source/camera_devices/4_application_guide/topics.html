@@ -1,0 +1,228 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>可用话题 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=63de077d" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/orbbec_footerlogo_3d_world.svg"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=7d86a446"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/translations.js?v=beaddf03"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="搜索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            OrbbecSDK V2 ROS2 封装
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">可用话题</a><ul>
+<li><a class="reference internal" href="#id2">图像流</a></li>
+<li><a class="reference internal" href="#id3">点云话题</a></li>
+<li><a class="reference internal" href="#imu">IMU话题</a></li>
+<li><a class="reference internal" href="#id4">设备状态与诊断</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">OrbbecSDK V2 ROS2 封装</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">可用话题</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/source/camera_devices/4_application_guide/topics.md.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="id1">
+<h1>可用话题<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<p>话题按数据流和功能组织。默认情况下，所有话题都发布在 <code class="docutils literal notranslate"><span class="pre">/camera</span></code> 命名空间下，可以通过 <code class="docutils literal notranslate"><span class="pre">camera_name</span></code> 启动参数进行更改。</p>
+<blockquote>
+<div><p><strong>注意：</strong> 特定数据流的话题（例如 <code class="docutils literal notranslate"><span class="pre">/camera/color/...</span></code>）只有在相应的启动参数（例如 <code class="docutils literal notranslate"><span class="pre">enable_color</span></code>）设置为 <code class="docutils literal notranslate"><span class="pre">true</span></code> 时才会发布。</p>
+</div></blockquote>
+<section id="id2">
+<h2>图像流<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>这些话题提供每个启用的相机数据流的原始图像数据和相应的校准信息。对于 <code class="docutils literal notranslate"><span class="pre">color</span></code>、<code class="docutils literal notranslate"><span class="pre">depth</span></code>、<code class="docutils literal notranslate"><span class="pre">ir</span></code>、<code class="docutils literal notranslate"><span class="pre">left_ir</span></code> 和 <code class="docutils literal notranslate"><span class="pre">right_ir</span></code> 数据流，模式是一致的。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/color/image_raw</span></code></p>
+<ul>
+<li><p>彩色流的原始图像数据。</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/color/camera_info</span></code></p>
+<ul>
+<li><p>彩色流的相机校准数据和元数据。</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/color/metadata</span></code></p>
+<ul>
+<li><p>来自彩色流固件的底层元数据。</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/depth/image_raw</span></code></p>
+<ul>
+<li><p>深度流的原始图像数据。</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/depth/camera_info</span></code></p>
+<ul>
+<li><p>深度流的相机校准数据和元数据。</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/depth/metadata</span></code></p>
+<ul>
+<li><p>来自深度流固件的底层元数据。</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/ir/image_raw</span></code></p>
+<ul>
+<li><p>红外（IR）流的原始图像数据。</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/ir/camera_info</span></code></p>
+<ul>
+<li><p>IR流的相机校准数据和元数据。</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/ir/metadata</span></code></p>
+<ul>
+<li><p>来自IR流固件的底层元数据。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id3">
+<h2>点云话题<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/depth/points</span></code></p>
+<ul>
+<li><p>从深度流生成的点云数据。</p></li>
+<li><p><strong>条件：</strong> 仅在 <code class="docutils literal notranslate"><span class="pre">enable_point_cloud</span></code> 为 <code class="docutils literal notranslate"><span class="pre">true</span></code> 时发布。</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/depth_registered/points</span></code></p>
+<ul>
+<li><p>彩色点云数据，其中深度点配准到彩色图像帧。</p></li>
+<li><p><strong>条件：</strong> 仅在 <code class="docutils literal notranslate"><span class="pre">enable_colored_point_cloud</span></code> 为 <code class="docutils literal notranslate"><span class="pre">true</span></code> 时发布。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="imu">
+<h2>IMU话题<a class="headerlink" href="#imu" title="Link to this heading"></a></h2>
+<p>惯性测量单元（IMU）话题提供加速度计和陀螺仪数据。其行为取决于同步设置。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/accel/sample</span></code></p>
+<ul>
+<li><p>单独的加速度计数据流。</p></li>
+<li><p><strong>条件：</strong> 在 <code class="docutils literal notranslate"><span class="pre">enable_accel</span></code> 为 <code class="docutils literal notranslate"><span class="pre">true</span></code> 且 <code class="docutils literal notranslate"><span class="pre">enable_sync_output_accel_gyro</span></code> 为 <code class="docutils literal notranslate"><span class="pre">false</span></code> 时发布。</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/gyro/sample</span></code></p>
+<ul>
+<li><p>单独的陀螺仪数据流。</p></li>
+<li><p><strong>条件：</strong> 在 <code class="docutils literal notranslate"><span class="pre">enable_gyro</span></code> 为 <code class="docutils literal notranslate"><span class="pre">true</span></code> 且 <code class="docutils literal notranslate"><span class="pre">enable_sync_output_accel_gyro</span></code> 为 <code class="docutils literal notranslate"><span class="pre">false</span></code> 时发布。</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/gyro_accel/sample</span></code></p>
+<ul>
+<li><p>包含加速度计和陀螺仪数据的同步数据流（单条消息）。</p></li>
+<li><p><strong>条件：</strong> 在 <code class="docutils literal notranslate"><span class="pre">enable_sync_output_accel_gyro</span></code> 为 <code class="docutils literal notranslate"><span class="pre">true</span></code> 时发布。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id4">
+<h2>设备状态与诊断<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/device_status</span></code></p>
+<ul>
+<li><p>报告相机设备的当前状态。</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/depth_filter_status</span></code></p>
+<ul>
+<li><p>报告深度传感器后处理滤波器的状态。</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/diagnostics</span></code></p>
+<ul>
+<li><p>发布相机节点的诊断信息。目前包括设备温度。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
+      <span class="lastupdated">最后更新于 2026年01月04日 01:12:35.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

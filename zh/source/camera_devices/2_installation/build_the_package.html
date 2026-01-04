@@ -1,0 +1,158 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>环境配置 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=63de077d" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/orbbec_footerlogo_3d_world.svg"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=7d86a446"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/translations.js?v=beaddf03"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="搜索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            OrbbecSDK V2 ROS2 封装
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">环境配置</a></li>
+<li><a class="reference internal" href="#id2">二进制安装</a></li>
+<li><a class="reference internal" href="#id3">从源码构建</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">OrbbecSDK V2 ROS2 封装</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">环境配置</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/source/camera_devices/2_installation/build_the_package.md.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="id1">
+<h1>环境配置<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<p>根据官方指南安装 ROS 2：</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html">ROS 2 安装指南（Ubuntu）</a></p></li>
+</ul>
+<p>安装依赖项：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>libgflags-dev<span class="w"> </span>nlohmann-json3-dev<span class="w"> </span><span class="se">\</span>
+ros-<span class="nv">$ROS_DISTRO</span>-image-transport<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-image-transport-plugins<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-compressed-image-transport<span class="w"> </span><span class="se">\</span>
+ros-<span class="nv">$ROS_DISTRO</span>-image-publisher<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-camera-info-manager<span class="w"> </span><span class="se">\</span>
+ros-<span class="nv">$ROS_DISTRO</span>-diagnostic-updater<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-diagnostic-msgs<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-statistics-msgs<span class="w"> </span>ros-<span class="nv">$ROS_DISTRO</span>-xacro<span class="w"> </span><span class="se">\</span>
+ros-<span class="nv">$ROS_DISTRO</span>-backward-ros<span class="w"> </span>libdw-dev<span class="w"> </span>libssl-dev
+</pre></div>
+</div>
+<p>启用 ROS 2 自动补全：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>register-python-argcomplete3<span class="w"> </span>ros2<span class="k">)</span><span class="s2">&quot;</span>
+<span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>register-python-argcomplete3<span class="w"> </span>colcon<span class="k">)</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h1>二进制安装<a class="headerlink" href="#id2" title="Link to this heading"></a></h1>
+<p>查看软件包：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update
+apt<span class="w"> </span>list<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>orbbec
+</pre></div>
+</div>
+<p>安装 OrbbecSDK ROS2 包：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ros-humble-orbbec-camera<span class="w"> </span>ros-humble-orbbec-description
+</pre></div>
+</div>
+<p>安装完成后，直接使用即可，无需编译。</p>
+</section>
+<hr class="docutils" />
+<section id="id3">
+<h1>从源码构建<a class="headerlink" href="#id3" title="Link to this heading"></a></h1>
+<p>创建 <code class="docutils literal notranslate"><span class="pre">colcon</span></code> 工作空间：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>~/ros2_ws/src
+</pre></div>
+</div>
+<p>克隆源代码并切换到 <code class="docutils literal notranslate"><span class="pre">v2-main</span></code> 分支：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/ros2_ws/src
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/orbbec/OrbbecSDK_ROS2.git
+<span class="nb">cd</span><span class="w"> </span>OrbbecSDK_ROS2
+git<span class="w"> </span>checkout<span class="w"> </span>v2-main
+</pre></div>
+</div>
+<p>构建：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/ros2_ws
+colcon<span class="w"> </span>build<span class="w"> </span>--event-handlers<span class="w"> </span>console_direct+<span class="w"> </span>--cmake-args<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
+      <span class="lastupdated">最后更新于 2026年01月04日 01:12:35.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

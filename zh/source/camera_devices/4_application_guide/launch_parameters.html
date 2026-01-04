@@ -1,0 +1,794 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>启动参数 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=63de077d" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/orbbec_footerlogo_3d_world.svg"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=7d86a446"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/translations.js?v=beaddf03"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="搜索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            OrbbecSDK V2 ROS2 封装
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">启动参数</a><ul>
+<li><a class="reference internal" href="#id2">核心与数据流配置</a></li>
+<li><a class="reference internal" href="#id3">传感器控制</a><ul>
+<li><a class="reference internal" href="#id4">彩色流</a></li>
+<li><a class="reference internal" href="#id5">深度流</a></li>
+<li><a class="reference internal" href="#id6">红外流</a></li>
+<li><a class="reference internal" href="#ldp">激光 / LDP</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id7">设备、同步与高级功能</a><ul>
+<li><a class="reference internal" href="#id8">多相机同步</a></li>
+<li><a class="reference internal" href="#id9">网络相机</a></li>
+<li><a class="reference internal" href="#id10">设备特定</a></li>
+<li><a class="reference internal" href="#id11">视差</a></li>
+<li><a class="reference internal" href="#ae">交错AE模式</a></li>
+<li><a class="reference internal" href="#id12">相机内同步</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id13">基础与通用参数</a><ul>
+<li><a class="reference internal" href="#id14">固件与后端</a></li>
+<li><a class="reference internal" href="#tf">TF、外参与校准</a></li>
+<li><a class="reference internal" href="#id15">时间同步</a></li>
+<li><a class="reference internal" href="#id16">日志与诊断</a></li>
+<li><a class="reference internal" href="#id17">其他</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#imu">IMU</a></li>
+<li><a class="reference internal" href="#id18">深度滤波器</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">OrbbecSDK V2 ROS2 封装</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">启动参数</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/source/camera_devices/4_application_guide/launch_parameters.md.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="id1">
+<h1>启动参数<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<blockquote>
+<div><p>如果您不确定如何设置参数，可以连接orbbec相机并打开 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK/releases">OrbbecViewer</a>。</p>
+</div></blockquote>
+<p>以下是可用的启动参数：</p>
+<section id="id2">
+<h2>核心与数据流配置<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">camera_name</span></code></strong></p>
+<ul>
+<li><p>启动节点的命名空间。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">serial_number</span></code></strong></p>
+<ul>
+<li><p>相机的序列号。当使用多个相机时需要此参数。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">usb_port</span></code></strong></p>
+<ul>
+<li><p>相机的USB端口。当使用多个相机时需要此参数。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">device_num</span></code></strong></p>
+<ul>
+<li><p>设备数量。如果需要多个相机，必须填写此参数。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">[color|depth|left_ir|right_ir|ir]_[width|height|fps|format]</span></code></strong></p>
+<ul>
+<li><p>传感器流的分辨率和帧率。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">[color|depth|left_ir|right_ir|ir]_rotation</span></code></strong></p>
+<ul>
+<li><p>设置流图像旋转。</p></li>
+<li><p>可能的值为 <code class="docutils literal notranslate"><span class="pre">0</span></code>、<code class="docutils literal notranslate"><span class="pre">90</span></code>、<code class="docutils literal notranslate"><span class="pre">180</span></code>、<code class="docutils literal notranslate"><span class="pre">270</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">[color|depth|left_ir|right_ir|ir]_flip</span></code></strong></p>
+<ul>
+<li><p>启用流图像翻转。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">[color|depth|left_ir|right_ir|ir]_mirror</span></code></strong></p>
+<ul>
+<li><p>启用流图像镜像。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_point_cloud</span></code></strong></p>
+<ul>
+<li><p>启用点云。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_colored_point_cloud</span></code></strong></p>
+<ul>
+<li><p>启用RGB点云。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">cloud_frame_id</span></code></strong></p>
+<ul>
+<li><p>修改ros消息中的 <code class="docutils literal notranslate"><span class="pre">frame_id</span></code> 名称。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">ordered_pc</span></code></strong></p>
+<ul>
+<li><p>启用无效点云过滤。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">point_cloud_qos</span></code>、<code class="docutils literal notranslate"><span class="pre">[stream]_qos</span></code>、<code class="docutils literal notranslate"><span class="pre">[stream]_camera_info_qos</span></code></strong></p>
+<ul>
+<li><p>ROS 2消息服务质量（QoS）设置。可能的值为 <code class="docutils literal notranslate"><span class="pre">SYSTEM_DEFAULT</span></code>、<code class="docutils literal notranslate"><span class="pre">DEFAULT</span></code>、<code class="docutils literal notranslate"><span class="pre">PARAMETER_EVENTS</span></code>、<code class="docutils literal notranslate"><span class="pre">SERVICES_DEFAULT</span></code>、<code class="docutils literal notranslate"><span class="pre">PARAMETERS</span></code>、<code class="docutils literal notranslate"><span class="pre">SENSOR_DATA</span></code>，不区分大小写。这些分别对应 <code class="docutils literal notranslate"><span class="pre">rmw_qos_profile_system_default</span></code>、<code class="docutils literal notranslate"><span class="pre">rmw_qos_profile_default</span></code>、<code class="docutils literal notranslate"><span class="pre">rmw_qos_profile_parameter_events</span></code>、<code class="docutils literal notranslate"><span class="pre">rmw_qos_profile_services_default</span></code>、<code class="docutils literal notranslate"><span class="pre">rmw_qos_profile_parameters</span></code> 和 <code class="docutils literal notranslate"><span class="pre">SENSOR_DATA</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">color.image_raw.enable_pub_plugins</span></code></strong></p>
+<ul>
+<li><p>启用彩色图像传输插件。默认值：<code class="docutils literal notranslate"><span class="pre">[&quot;image_transport/compressed&quot;,</span> <span class="pre">&quot;image_transport/raw&quot;,</span> <span class="pre">&quot;image_transport/theora&quot;]</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">depth.image_raw.enable_pub_plugins</span></code></strong></p>
+<ul>
+<li><p>启用深度图像传输插件。默认值：<code class="docutils literal notranslate"><span class="pre">[&quot;image_transport/compressedDepth&quot;,</span> <span class="pre">&quot;image_transport/raw&quot;]</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">left_ir.image_raw.enable_pub_plugins</span></code></strong></p>
+<ul>
+<li><p>启用左红外图像传输插件。默认值：<code class="docutils literal notranslate"><span class="pre">[&quot;image_transport/compressed&quot;,</span> <span class="pre">&quot;image_transport/raw&quot;,</span> <span class="pre">&quot;image_transport/theora&quot;]</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">right_ir.image_raw.enable_pub_plugins</span></code></strong></p>
+<ul>
+<li><p>启用右红外图像传输插件。默认值：<code class="docutils literal notranslate"><span class="pre">[&quot;image_transport/compressed&quot;,</span> <span class="pre">&quot;image_transport/raw&quot;,</span> <span class="pre">&quot;image_transport/theora&quot;]</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">point_cloud_decimation_filter_factor</span></code></strong></p>
+<ul>
+<li><p>点云下采样因子。范围：<code class="docutils literal notranslate"><span class="pre">1–8</span></code>，<code class="docutils literal notranslate"><span class="pre">1</span></code>表示不下采样，数值越大下采样越强。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">preset_resolution_config</span></code></strong></p>
+<ul>
+<li><p>摄像头设备的预设分辨率配置。格式: &quot;width,height,ir_decimation_factor,depth_decimation_factor&quot;. Example: &quot;1280,720,4,4&quot;. 仅在 Gemini435Le 设备上受支持。留空禁用。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id3">
+<h2>传感器控制<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<section id="id4">
+<h3>彩色流<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_color_auto_exposure</span></code></strong></p>
+<ul>
+<li><p>启用彩色自动曝光。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_color_auto_exposure_priority</span></code></strong></p>
+<ul>
+<li><p>启用彩色自动曝光优先级。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">color_exposure</span></code></strong></p>
+<ul>
+<li><p>设置彩色曝光。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">color_gain</span></code></strong></p>
+<ul>
+<li><p>设置彩色增益。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_color_auto_white_balance</span></code></strong></p>
+<ul>
+<li><p>启用彩色自动白平衡。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">color_white_balance</span></code></strong></p>
+<ul>
+<li><p>设置彩色白平衡。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">color_ae_max_exposure</span></code></strong></p>
+<ul>
+<li><p>设置彩色自动曝光的最大曝光值。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">color_brightness</span></code></strong>、<strong><code class="docutils literal notranslate"><span class="pre">color_sharpness</span></code></strong>、<strong><code class="docutils literal notranslate"><span class="pre">color_gamma</span></code></strong>、<strong><code class="docutils literal notranslate"><span class="pre">color_saturation</span></code></strong>、<strong><code class="docutils literal notranslate"><span class="pre">color_contrast</span></code></strong>、<strong><code class="docutils literal notranslate"><span class="pre">color_hue</span></code></strong></p>
+<ul>
+<li><p>设置彩色亮度、锐度、伽马、饱和度、对比度和色调。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">color_backlight_compensation</span></code></strong></p>
+<ul>
+<li><p>启用彩色相机的背光补偿功能。<strong>范围</strong>：<code class="docutils literal notranslate"><span class="pre">0–6</span></code>，<strong>默认值</strong>：<code class="docutils literal notranslate"><span class="pre">3</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">color_powerline_freq</span></code></strong></p>
+<ul>
+<li><p>设置电源线频率。可能的值为 <code class="docutils literal notranslate"><span class="pre">disable</span></code>、<code class="docutils literal notranslate"><span class="pre">50hz</span></code>、<code class="docutils literal notranslate"><span class="pre">60hz</span></code>、<code class="docutils literal notranslate"><span class="pre">auto</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_color_decimation_filter</span></code></strong> / <strong><code class="docutils literal notranslate"><span class="pre">color_decimation_filter_scale</span></code></strong></p>
+<ul>
+<li><p>启用彩色抽取滤波器并设置其比例。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">color_ae_roi_[left|right|top|bottom]</span></code></strong></p>
+<ul>
+<li><p>设置彩色自动曝光ROI。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">color_denoising_level</span></code></strong></p>
+<ul>
+<li><p>启用Gemini 330系列设备的ISP降噪功能。<strong>范围：</strong> <code class="docutils literal notranslate"><span class="pre">0–8</span></code>，<strong>默认值：</strong> <code class="docutils literal notranslate"><span class="pre">0</span></code>（自动）。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id5">
+<h3>深度流<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<ul>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_depth_auto_exposure_priority</span></code></strong></p>
+<ul class="simple">
+<li><p>启用深度自动曝光优先级。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">mean_intensity_set_point</span></code></strong></p>
+<ul class="simple">
+<li><p>设置深度图像的目标平均强度。例如：<code class="docutils literal notranslate"><span class="pre">mean_intensity_set_point:=100</span></code>。</p></li>
+</ul>
+<blockquote>
+<div><p><strong>注意：</strong> 这取代了已弃用的 <code class="docutils literal notranslate"><span class="pre">depth_brightness</span></code>，后者仍支持以保持向后兼容性。</p>
+</div></blockquote>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_depth_scale</span></code></strong></p>
+<ul class="simple">
+<li><p>启用深度缩放。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">depth_precision</span></code></strong></p>
+<ul class="simple">
+<li><p>深度精度应为 <code class="docutils literal notranslate"><span class="pre">1mm</span></code> 格式。默认值为 <code class="docutils literal notranslate"><span class="pre">1mm</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">depth_ae_roi_[left|right|top|bottom]</span></code></strong></p>
+<ul class="simple">
+<li><p>设置深度自动曝光ROI。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id6">
+<h3>红外流<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_ir_auto_exposure</span></code></strong></p>
+<ul>
+<li><p>启用红外自动曝光。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">ir_exposure</span></code></strong> / <strong><code class="docutils literal notranslate"><span class="pre">ir_gain</span></code></strong></p>
+<ul>
+<li><p>设置红外曝光和增益。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">ir_ae_max_exposure</span></code></strong></p>
+<ul>
+<li><p>设置红外自动曝光的最大曝光值。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">ir_brightness</span></code></strong></p>
+<ul>
+<li><p>设置红外亮度。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="ldp">
+<h3>激光 / LDP<a class="headerlink" href="#ldp" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_laser</span></code></strong></p>
+<ul>
+<li><p>启用激光。默认值为 <code class="docutils literal notranslate"><span class="pre">true</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">laser_energy_level</span></code></strong></p>
+<ul>
+<li><p>设置激光能量级别。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_ldp</span></code></strong> / <strong><code class="docutils literal notranslate"><span class="pre">ldp_power_level</span></code></strong></p>
+<ul>
+<li><p>启用LDP并设置其功率级别。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+<section id="id7">
+<h2>设备、同步与高级功能<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<section id="id8">
+<h3>多相机同步<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">sync_mode</span></code></strong></p>
+<ul>
+<li><p>设置同步模式。默认值为 <code class="docutils literal notranslate"><span class="pre">standalone</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">depth_delay_us</span></code></strong> / <strong><code class="docutils literal notranslate"><span class="pre">color_delay_us</span></code></strong></p>
+<ul>
+<li><p>接收捕获命令或触发信号后深度/彩色图像捕获的延迟时间（微秒）。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">trigger2image_delay_us</span></code></strong></p>
+<ul>
+<li><p>接收捕获命令或触发信号后图像捕获的延迟时间（微秒）。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">trigger_out_delay_us</span></code></strong></p>
+<ul>
+<li><p>接收捕获命令或触发信号后触发信号输出的延迟时间（微秒）。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">trigger_out_enabled</span></code></strong></p>
+<ul>
+<li><p>启用触发输出信号。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">software_trigger_enabled</span></code></strong> / <strong><code class="docutils literal notranslate"><span class="pre">software_trigger_period</span></code></strong></p>
+<ul>
+<li><p>启用软件触发输出信号 / 设置软件触发周期（毫秒）。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">frames_per_trigger</span></code></strong></p>
+<ul>
+<li><p>触发模式下每次触发后每个流的帧数。</p></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<div><p>用于 <a class="reference internal" href="../5_advanced_guide/multi_camera/multi_camera_synced.html"><span class="doc">多相机同步</span></a>。</p>
+</div></blockquote>
+</section>
+<section id="id9">
+<h3>网络相机<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enumerate_net_device</span></code></strong></p>
+<ul>
+<li><p>启用自动枚举网络设备。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">net_device_ip</span></code></strong> / <strong><code class="docutils literal notranslate"><span class="pre">net_device_port</span></code></strong></p>
+<ul>
+<li><p>设置网络设备的IP地址和端口（通常为 <code class="docutils literal notranslate"><span class="pre">8090</span></code>）。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">force_ip_enable</span></code></strong></p>
+<ul>
+<li><p>启用强制IP功能。<strong>默认值：</strong> <code class="docutils literal notranslate"><span class="pre">false</span></code></p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">force_ip_mac</span></code></strong></p>
+<ul>
+<li><p>连接多个相机时的目标设备MAC地址（例如，<code class="docutils literal notranslate"><span class="pre">&quot;54:14:FD:06:07:DA&quot;</span></code>）。您可以使用 <code class="docutils literal notranslate"><span class="pre">list_devices_node</span></code> 查找每个设备的MAC。<strong>默认值：</strong> <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code></p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">force_ip_address</span></code></strong></p>
+<ul>
+<li><p>要分配的静态IP地址。<strong>默认值：</strong> <code class="docutils literal notranslate"><span class="pre">192.168.1.10</span></code></p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">force_ip_subnet_mask</span></code></strong></p>
+<ul>
+<li><p>静态IP的子网掩码。<strong>默认值：</strong> <code class="docutils literal notranslate"><span class="pre">255.255.255.0</span></code></p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">force_ip_gateway</span></code></strong></p>
+<ul>
+<li><p>静态IP的网关地址。<strong>默认值：</strong> <code class="docutils literal notranslate"><span class="pre">192.168.1.1</span></code></p></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<div><p>用于 <a class="reference internal" href="../5_advanced_guide/configuration/net_camera.html"><span class="doc">网络相机</span></a>。</p>
+</div></blockquote>
+</section>
+<section id="id10">
+<h3>设备特定<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">device_preset</span></code></strong></p>
+<ul>
+<li><p>默认值为 <code class="docutils literal notranslate"><span class="pre">Default</span></code>。仅支持G330系列。有关更多信息，请参阅 <a class="reference external" href="https://www.orbbec.com/docs/g330-use-depth-presets/">G330文档</a>。该值应为 <a class="reference internal" href="../5_advanced_guide/configuration/predefined_presets.html"><span class="doc">表中列出</span></a> 的预设名称之一。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_gmsl_trigger</span></code></strong> / <strong><code class="docutils literal notranslate"><span class="pre">gmsl_trigger_fps</span></code></strong></p>
+<ul>
+<li><p>启用gmsl触发输出信号 / 设置gmsl触发fps。用于 <a class="reference internal" href="../5_advanced_guide/multi_camera/gmsl_camera.html"><span class="doc">gmsl相机</span></a>。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id11">
+<h3>视差<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">disparity_to_depth_mode</span></code></strong></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">HW</span></code>：使用硬件视差到深度转换。<code class="docutils literal notranslate"><span class="pre">SW</span></code>：使用软件视差到深度转换。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">disparity_range_mode</span></code></strong>、<strong><code class="docutils literal notranslate"><span class="pre">disparity_search_offset</span></code></strong>、<strong><code class="docutils literal notranslate"><span class="pre">disparity_offset_config</span></code></strong></p>
+<ul>
+<li><p>视差搜索偏移参数。用于 <a class="reference internal" href="../5_advanced_guide/configuration/disparity_search_offset.html"><span class="doc">视差搜索偏移</span></a>。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="ae">
+<h3>交错AE模式<a class="headerlink" href="#ae" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">interleave_ae_mode</span></code></strong></p>
+<ul>
+<li><p>设置 <code class="docutils literal notranslate"><span class="pre">laser</span></code> 或 <code class="docutils literal notranslate"><span class="pre">hdr</span></code> 交错。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">interleave_frame_enable</span></code></strong>、<strong><code class="docutils literal notranslate"><span class="pre">interleave_skip_enable</span></code></strong>、<strong><code class="docutils literal notranslate"><span class="pre">interleave_skip_index</span></code></strong></p>
+<ul>
+<li><p>控制交错帧模式的参数。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">[hdr|laser]_index[0|1]_[...]</span></code></strong></p>
+<ul>
+<li><p>在交错帧模式下，设置hdr或laser交错帧的第0和第1帧参数。</p></li>
+</ul>
+</li>
+<li><p><em>所有交错参数用于 <a class="reference internal" href="../5_advanced_guide/configuration/interleave_ae_mode.html"><span class="doc">交错ae模式</span></a>。</em></p></li>
+</ul>
+</section>
+<section id="id12">
+<h3>相机内同步<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">depth_registration</span></code></strong></p>
+<ul>
+<li><p>启用深度帧与彩色帧的对齐。当 <code class="docutils literal notranslate"><span class="pre">enable_colored_point_cloud</span></code> 设置为 <code class="docutils literal notranslate"><span class="pre">true</span></code> 时需要此字段。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">align_mode</span></code></strong></p>
+<ul>
+<li><p>要使用的对齐模式。选项为 <code class="docutils literal notranslate"><span class="pre">HW</span></code>（硬件对齐）和 <code class="docutils literal notranslate"><span class="pre">SW</span></code>（软件对齐）。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">align_target_stream</span></code></strong></p>
+<ul>
+<li><p>设置对齐目标流模式。</p></li>
+<li><p>可能的值为 <code class="docutils literal notranslate"><span class="pre">COLOR</span></code>、<code class="docutils literal notranslate"><span class="pre">DEPTH</span></code>。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">COLOR</span></code>：将深度对齐到彩色。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DEPTH</span></code>：将彩色对齐到深度。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">intra_camera_sync_reference</span></code></strong></p>
+<ul>
+<li><p>设置相机内同步的参考点。适用于Gemini 330系列设备，当 <code class="docutils literal notranslate"><span class="pre">sync_mode</span></code> 设置为<strong>软件</strong>或<strong>硬件触发</strong>模式时。<strong>选项：</strong> <code class="docutils literal notranslate"><span class="pre">Start</span></code>、<code class="docutils literal notranslate"><span class="pre">Middle</span></code>、<code class="docutils literal notranslate"><span class="pre">End</span></code>。设置为空时，长基线设备默认End，短基线设备默认Middle。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+<section id="id13">
+<h2>基础与通用参数<a class="headerlink" href="#id13" title="Link to this heading"></a></h2>
+<section id="id14">
+<h3>固件与后端<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">upgrade_firmware</span></code></strong></p>
+<ul>
+<li><p>输入参数为固件路径。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">preset_firmware_path</span></code></strong></p>
+<ul>
+<li><p>输入参数为预设固件路径。如果输入多个路径，每个路径需要用 <code class="docutils literal notranslate"><span class="pre">,</span></code> 分隔，最多可输入3个固件路径。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">uvc_backend</span></code></strong></p>
+<ul>
+<li><p>可选值：<code class="docutils literal notranslate"><span class="pre">v4l2</span></code>、<code class="docutils literal notranslate"><span class="pre">libuvc</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">connection_delay</span></code></strong></p>
+<ul>
+<li><p>重新打开设备的延迟时间（毫秒）。某些设备（如Astra mini）需要较长时间初始化，热插拔时立即重新打开设备可能导致固件崩溃。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">retry_on_usb3_detection_failure</span></code></strong></p>
+<ul>
+<li><p>如果相机连接到USB 2.0端口且未检测到，系统将尝试重置相机最多三次。使用USB 2.0连接时建议将此参数设置为 <code class="docutils literal notranslate"><span class="pre">false</span></code>，以避免不必要的重置。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="tf">
+<h3>TF、外参与校准<a class="headerlink" href="#tf" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">publish_tf</span></code></strong> / <strong><code class="docutils literal notranslate"><span class="pre">tf_publish_rate</span></code></strong></p>
+<ul>
+<li><p>启用TF发布并设置其发布速率。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_publish_extrinsic</span></code></strong></p>
+<ul>
+<li><p>启用外参发布。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">ir_info_url</span></code></strong> / <strong><code class="docutils literal notranslate"><span class="pre">color_info_url</span></code></strong></p>
+<ul>
+<li><p>设置IR/彩色相机信息的URL。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_color_undistortion</span></code></strong></p>
+<ul>
+<li><p>启用彩色去畸变。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id15">
+<h3>时间同步<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<ul>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_sync_host_time</span></code></strong></p>
+<ul class="simple">
+<li><p>启用主机时间与相机时间的同步。默认值为 <code class="docutils literal notranslate"><span class="pre">true</span></code>。如果使用全局时间，设置为 <code class="docutils literal notranslate"><span class="pre">false</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">time_domain</span></code></strong></p>
+<ul class="simple">
+<li><p>选择时间戳类型：<code class="docutils literal notranslate"><span class="pre">device</span></code>、<code class="docutils literal notranslate"><span class="pre">global</span></code> 和 <code class="docutils literal notranslate"><span class="pre">system</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">time_sync_period</span></code></strong></p>
+<ul class="simple">
+<li><p>相机时间与主机系统同步的间隔（秒）。</p></li>
+</ul>
+<blockquote>
+<div><p><strong>注意</strong>：仅当 <strong><code class="docutils literal notranslate"><span class="pre">enable_sync_host_time</span> <span class="pre">=</span> <span class="pre">true</span></code></strong> 且 <strong><code class="docutils literal notranslate"><span class="pre">time_domain</span> <span class="pre">=</span> <span class="pre">device</span></code></strong> 时需要设置此参数。</p>
+</div></blockquote>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_ptp_config</span></code></strong></p>
+<ul class="simple">
+<li><p>启用PTP时间同步。仅适用于Gemini 335Le。需要 <code class="docutils literal notranslate"><span class="pre">enable_sync_host_time</span></code> 设置为 <code class="docutils literal notranslate"><span class="pre">false</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_frame_sync</span></code></strong></p>
+<ul class="simple">
+<li><p>启用帧同步。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id16">
+<h3>日志与诊断<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">log_level</span></code></strong></p>
+<ul>
+<li><p>SDK日志级别。默认为 <code class="docutils literal notranslate"><span class="pre">info</span></code>。可选值：<code class="docutils literal notranslate"><span class="pre">debug</span></code>、<code class="docutils literal notranslate"><span class="pre">info</span></code>、<code class="docutils literal notranslate"><span class="pre">warn</span></code>、<code class="docutils literal notranslate"><span class="pre">error</span></code>、<code class="docutils literal notranslate"><span class="pre">fatal</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">log_file_name</span></code></strong></p>
+<ul>
+<li><p>保存的SDK日志文件名。当<code class="docutils literal notranslate"><span class="pre">log_level</span></code>为<code class="docutils literal notranslate"><span class="pre">debug</span></code>时生效。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">diagnostic_period</span></code></strong></p>
+<ul>
+<li><p>诊断周期（秒）。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_heartbeat</span></code></strong></p>
+<ul>
+<li><p>启用心跳功能。默认为 <code class="docutils literal notranslate"><span class="pre">false</span></code>。如果为 <code class="docutils literal notranslate"><span class="pre">true</span></code>，相机节点将向固件发送心跳信号。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id17">
+<h3>其他<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">config_file_path</span></code></strong></p>
+<ul>
+<li><p>YAML配置文件的路径。默认为 <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code>。如果未指定，将使用启动文件中的默认参数。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">frame_aggregate_mode</span></code></strong></p>
+<ul>
+<li><p>设置帧聚合输出模式。可选值：<code class="docutils literal notranslate"><span class="pre">full_frame</span></code>、<code class="docutils literal notranslate"><span class="pre">color_frame</span></code>、<code class="docutils literal notranslate"><span class="pre">ANY</span></code>、<code class="docutils literal notranslate"><span class="pre">disable</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_d2c_viewer</span></code></strong></p>
+<ul>
+<li><p>发布D2C叠加图像（仅用于测试）。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+<section id="imu">
+<h2>IMU<a class="headerlink" href="#imu" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_accel</span></code></strong> / <strong><code class="docutils literal notranslate"><span class="pre">enable_gyro</span></code></strong></p>
+<ul>
+<li><p>启用加速度计/陀螺仪并输出其信息话题数据。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_sync_output_accel_gyro</span></code></strong></p>
+<ul>
+<li><p>启用同步 <code class="docutils literal notranslate"><span class="pre">accel_gyro</span></code>，并输出IMU话题实时数据。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">accel_rate</span></code></strong> / <strong><code class="docutils literal notranslate"><span class="pre">gyro_rate</span></code></strong></p>
+<ul>
+<li><p>加速度计/陀螺仪的频率。值范围从 <code class="docutils literal notranslate"><span class="pre">1.5625hz</span></code> 到 <code class="docutils literal notranslate"><span class="pre">32khz</span></code>。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">accel_range</span></code></strong> / <strong><code class="docutils literal notranslate"><span class="pre">gyro_range</span></code></strong></p>
+<ul>
+<li><p>加速度计（<code class="docutils literal notranslate"><span class="pre">2g</span></code>、<code class="docutils literal notranslate"><span class="pre">4g</span></code>、<code class="docutils literal notranslate"><span class="pre">8g</span></code>、<code class="docutils literal notranslate"><span class="pre">16g</span></code>）和陀螺仪（<code class="docutils literal notranslate"><span class="pre">16dps</span></code> 到 <code class="docutils literal notranslate"><span class="pre">2000dps</span></code>）的范围。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_accel_data_correction</span></code></strong> / <strong><code class="docutils literal notranslate"><span class="pre">enable_gyro_data_correction</span></code></strong></p>
+<ul>
+<li><p>启用加速度计/陀螺仪的数据校正。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">linear_accel_cov</span></code></strong> / <strong><code class="docutils literal notranslate"><span class="pre">angular_vel_cov</span></code></strong></p>
+<ul>
+<li><p>线性加速度和角速度的协方差。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id18">
+<h2>深度滤波器<a class="headerlink" href="#id18" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_decimation_filter</span></code></strong></p>
+<ul>
+<li><p>启用深度抽取滤波器。使用 <code class="docutils literal notranslate"><span class="pre">decimation_filter_scale</span></code> 设置。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_hdr_merge</span></code></strong></p>
+<ul>
+<li><p>启用深度hdr合并滤波器。使用 <code class="docutils literal notranslate"><span class="pre">hdr_merge_exposure_1</span></code> 等设置。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_sequence_id_filter</span></code></strong></p>
+<ul>
+<li><p>启用深度序列id滤波器。使用 <code class="docutils literal notranslate"><span class="pre">sequence_id_filter_id</span></code> 设置。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_threshold_filter</span></code></strong></p>
+<ul>
+<li><p>启用深度阈值滤波器。使用 <code class="docutils literal notranslate"><span class="pre">threshold_filter_max</span></code>、<code class="docutils literal notranslate"><span class="pre">threshold_filter_min</span></code> 设置。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_hardware_noise_removal_filter</span></code></strong></p>
+<ul>
+<li><p>启用深度硬件降噪滤波器。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_noise_removal_filter</span></code></strong></p>
+<ul>
+<li><p>启用深度软件降噪滤波器。使用 <code class="docutils literal notranslate"><span class="pre">noise_removal_filter_min_diff</span></code> 等设置。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_spatial_filter</span></code></strong></p>
+<ul>
+<li><p>启用深度空间滤波器。使用 <code class="docutils literal notranslate"><span class="pre">spatial_filter_alpha</span></code> 等设置。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_temporal_filter</span></code></strong></p>
+<ul>
+<li><p>启用深度时间滤波器。使用 <code class="docutils literal notranslate"><span class="pre">temporal_filter_diff_threshold</span></code> 等设置。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_hole_filling_filter</span></code></strong></p>
+<ul>
+<li><p>启用深度孔洞填充滤波器。使用 <code class="docutils literal notranslate"><span class="pre">hole_filling_filter_mode</span></code> 设置。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_spatial_fast_filter</span></code></strong></p>
+<ul>
+<li><p>启用深度空间快速滤波器。使用 <code class="docutils literal notranslate"><span class="pre">spatial_fast_filter_radius</span></code> 设置。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_spatial_moderate_filter</span></code></strong></p>
+<ul>
+<li><p>启用深度空间中等滤波器。使用 <code class="docutils literal notranslate"><span class="pre">spatial_moderate_filter_diff_threshold</span></code> 等设置。</p></li>
+</ul>
+</li>
+</ul>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong><em>重要</em></strong>：请仔细阅读 <a class="reference external" href="https://www.orbbec.com/docs/g330-use-depth-post-processing-blocks/">此链接</a> 中有关软件滤波设置的说明。如果不确定，请勿修改这些设置。</p>
+</div></blockquote>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
+      <span class="lastupdated">最后更新于 2026年01月04日 01:12:35.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

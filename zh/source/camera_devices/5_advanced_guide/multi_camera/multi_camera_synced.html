@@ -1,0 +1,190 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>多相机同步说明 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=63de077d" />
+
+  
+    <link rel="shortcut icon" href="../../../../_static/orbbec_footerlogo_3d_world.svg"/>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=7d86a446"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/translations.js?v=beaddf03"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../../genindex.html" />
+    <link rel="search" title="搜索" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            OrbbecSDK V2 ROS2 封装
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">多相机同步说明</a><ul>
+<li><a class="reference internal" href="#id2">设置说明</a></li>
+<li><a class="reference internal" href="#orbbecsdk-ros2">使用 OrbbecSDK_ROS2 检查相机端口</a></li>
+<li><a class="reference internal" href="#id3">OrbbecSDK_ROS2 多相机同步配置</a></li>
+<li><a class="reference internal" href="#id4">运行以下命令启动多相机同步</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">OrbbecSDK V2 ROS2 封装</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">多相机同步说明</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/source/camera_devices/5_advanced_guide/multi_camera/multi_camera_synced.md.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="id1">
+<h1>多相机同步说明<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<blockquote>
+<div><p>本文档的目的是说明如何在 OrbbecSDK_ROS2 中使用多相机同步</p>
+</div></blockquote>
+<section id="id2">
+<h2>设置说明<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>请阅读多相机同步设置指南：<a class="reference external" href="https://www.orbbec.com/docs/set-up-cameras-for-external-synchronization_v1-2/">多相机同步设置</a></p></li>
+<li><p>确保相机正确连接到多相机同步器。</p></li>
+</ul>
+<p><img alt="深度点云可视化" src="../../../../_images/multi_camera_synced1.png" /></p>
+</section>
+<section id="orbbecsdk-ros2">
+<h2>使用 OrbbecSDK_ROS2 检查相机端口<a class="headerlink" href="#orbbecsdk-ros2" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>orbbec_camera<span class="w"> </span>list_devices_node
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h2>OrbbecSDK_ROS2 多相机同步配置<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<p>打开 multi_camera_synced.launch.py，并按照下面所示配置相机设置：</p>
+<p><img alt="深度点云可视化" src="../../../../_images/multi_camera_synced2.png" /></p>
+<ol class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">gemini_330_series.launch.py</span></code> 是用于启动相机的启动文件。</p></li>
+<li><p>将 <code class="docutils literal notranslate"><span class="pre">camera_name</span></code> 设置为 <code class="docutils literal notranslate"><span class="pre">G330_0</span></code>。例如，发布的彩色图像话题将是 <code class="docutils literal notranslate"><span class="pre">/G330_0/color/image_raw</span></code>。</p></li>
+<li><p>将 <code class="docutils literal notranslate"><span class="pre">usb_port</span></code> 设置为 <code class="docutils literal notranslate"><span class="pre">2-2</span></code>，表示正在使用端口 <code class="docutils literal notranslate"><span class="pre">2-2</span></code> 上的相机设备。此值可以在 <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">run</span> <span class="pre">orbbec_camera</span> <span class="pre">list_devices_node</span></code> 命令的输出中找到。</p></li>
+<li><p>将 <code class="docutils literal notranslate"><span class="pre">device_num</span></code> 设置为 <code class="docutils literal notranslate"><span class="pre">2</span></code>，表示将使用两个相机。</p></li>
+<li><p>将 <code class="docutils literal notranslate"><span class="pre">sync_mode</span></code> 设置为 <code class="docutils literal notranslate"><span class="pre">primary</span></code>，表示 <code class="docutils literal notranslate"><span class="pre">2-7</span></code> 相机设备处于主模式。多相机同步模式选项可以在下图中找到。</p></li>
+<li><p>来自 <code class="docutils literal notranslate"><span class="pre">config_file_path</span></code> 的参数可以覆盖在 <code class="docutils literal notranslate"><span class="pre">gemini_330_series.launch.py</span></code> 中设置的参数（可选）。</p></li>
+<li><p>对于从属相机，将 <code class="docutils literal notranslate"><span class="pre">trigger_out_enabled</span></code> 设置为 false。</p></li>
+</ol>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th><strong>模式名称</strong></th>
+<th><strong>设置效果说明</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>free_run</td>
+<td>- 支持不同的帧率设置<br />- 8 针同步接口不支持外部输出同步相关信号</td>
+</tr>
+<tr>
+<td>standalone（默认）</td>
+<td>● 默认与 Primary 相同<br />● 内置 RGBD 帧同步<br />● 8 针同步接口默认不向外部输出信号</td>
+</tr>
+<tr>
+<td>primary</td>
+<td>● 设置为主相机<br />● 8 针同步接口向外部设备输出信号</td>
+</tr>
+<tr>
+<td>secondary</td>
+<td>● 设置为从属（被动同步；当外部有硬件连续触发信号输入且连续触发信号与当前设置的帧率匹配时，根据外部触发信号采集图像；当没有外部触发信号时，停止流）<br />● 8 针同步接口向外部设备输出信号</td>
+</tr>
+<tr>
+<td>secondary_synced</td>
+<td>● 设置为从属同步（被动同步；当外部有硬件连续触发信号输入且连续触发信号与当前设置的帧率匹配时，根据外部触发信号采集图像；当没有外部触发信号时，根据设置的帧率的内部触发信号采集图像）<br />● 8 针同步接口向外部设备输出信号</td>
+</tr>
+<tr>
+<td>hardware_triggering</td>
+<td>● 设置为硬件触发（被动触发；当外部有硬件触发信号输入且触发信号时间间隔不小于当前上限时，根据外部触发信号采集图像；当没有外部触发信号时，不采集图像）<br />● 8 针同步接口向外部设备输出信号</td>
+</tr>
+<tr>
+<td>software_triggering</td>
+<td>● 设置为软件触发（被动触发；当主机有触发命令输入且触发命令时间间隔不小于当前上限时，根据触发命令采集图像；当没有触发命令时，不采集图像）<br />● 8 针同步接口向外部设备输出信号</td>
+</tr>
+</tbody>
+</table><ul class="simple">
+<li><p>主相机应该最后启动。</p></li>
+<li><p>理想情况下，启动每个相机之间应该有 2 秒的延迟。</p></li>
+</ul>
+</section>
+<section id="id4">
+<h2>运行以下命令启动多相机同步<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>multi_camera_synced.launch.py
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
+      <span class="lastupdated">最后更新于 2026年01月04日 01:12:35.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

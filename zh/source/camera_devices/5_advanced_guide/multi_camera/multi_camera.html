@@ -1,0 +1,200 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>多相机 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=63de077d" />
+
+  
+    <link rel="shortcut icon" href="../../../../_static/orbbec_footerlogo_3d_world.svg"/>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=7d86a446"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/translations.js?v=beaddf03"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../../genindex.html" />
+    <link rel="search" title="搜索" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            OrbbecSDK V2 ROS2 封装
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">多相机</a><ul>
+<li><a class="reference internal" href="#id2">多相机无数据流</a></li>
+<li><a class="reference internal" href="#id3">多相机图像话题帧率过低</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">OrbbecSDK V2 ROS2 封装</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">多相机</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/source/camera_devices/5_advanced_guide/multi_camera/multi_camera.md.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="id1">
+<h1>多相机<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p>要获取相机的 <code class="docutils literal notranslate"><span class="pre">usb_port</span></code>，插入相机并在终端中运行以下命令：</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>orbbec_camera<span class="w"> </span>list_devices_node
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>将 <code class="docutils literal notranslate"><span class="pre">device_num</span></code> 参数设置为您拥有的相机数量。</p></li>
+<li><p>转到 <code class="docutils literal notranslate"><span class="pre">OrbbecSDK_ROS2/launch/multi_xxx.launch.py</span></code> 文件并更改 <code class="docutils literal notranslate"><span class="pre">usb_port</span></code>。</p></li>
+<li><p>不要忘记将 <code class="docutils literal notranslate"><span class="pre">include</span></code> 标签放在 <code class="docutils literal notranslate"><span class="pre">group</span></code> 标签内。
+否则，不同相机的参数值可能会被污染。</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">launch</span><span class="w"> </span><span class="kn">import</span> <span class="n">LaunchDescription</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">launch.actions</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeclareLaunchArgument</span><span class="p">,</span> <span class="n">IncludeLaunchDescription</span><span class="p">,</span> <span class="n">GroupAction</span><span class="p">,</span> <span class="n">ExecuteProcess</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">launch.launch_description_sources</span><span class="w"> </span><span class="kn">import</span> <span class="n">PythonLaunchDescriptionSource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">launch_ros.actions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ament_index_python.packages</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_package_share_directory</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_launch_description</span><span class="p">():</span>
+    <span class="c1"># Include launch files</span>
+    <span class="n">package_dir</span> <span class="o">=</span> <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">&#39;orbbec_camera&#39;</span><span class="p">)</span>
+    <span class="n">launch_file_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">package_dir</span><span class="p">,</span> <span class="s1">&#39;launch&#39;</span><span class="p">)</span>
+    <span class="n">launch1_include</span> <span class="o">=</span> <span class="n">IncludeLaunchDescription</span><span class="p">(</span>
+        <span class="n">PythonLaunchDescriptionSource</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">launch_file_dir</span><span class="p">,</span> <span class="s1">&#39;gemini2L.launch.py&#39;</span><span class="p">)</span>
+        <span class="p">),</span>
+        <span class="n">launch_arguments</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;camera_name&#39;</span><span class="p">:</span> <span class="s1">&#39;camera_01&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;usb_port&#39;</span><span class="p">:</span> <span class="s1">&#39;6-2.4.4.2&#39;</span><span class="p">,</span>  <span class="c1"># replace your usb port here</span>
+            <span class="s1">&#39;device_num&#39;</span><span class="p">:</span> <span class="s1">&#39;2&#39;</span>
+        <span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="n">launch2_include</span> <span class="o">=</span> <span class="n">IncludeLaunchDescription</span><span class="p">(</span>
+        <span class="n">PythonLaunchDescriptionSource</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">launch_file_dir</span><span class="p">,</span> <span class="s1">&#39;gemini2L.launch.py&#39;</span><span class="p">)</span>
+        <span class="p">),</span>
+        <span class="n">launch_arguments</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;camera_name&#39;</span><span class="p">:</span> <span class="s1">&#39;camera_02&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;usb_port&#39;</span><span class="p">:</span> <span class="s1">&#39;6-2.4.1&#39;</span><span class="p">,</span>  <span class="c1"># replace your usb port here</span>
+            <span class="s1">&#39;device_num&#39;</span><span class="p">:</span> <span class="s1">&#39;2&#39;</span>
+        <span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="c1"># If you need more cameras, just add more launch_include here, and change the usb_port and device_num</span>
+
+    <span class="c1"># Launch description</span>
+    <span class="n">ld</span> <span class="o">=</span> <span class="n">LaunchDescription</span><span class="p">([</span>
+        <span class="n">GroupAction</span><span class="p">([</span><span class="n">launch1_include</span><span class="p">]),</span>
+        <span class="n">GroupAction</span><span class="p">([</span><span class="n">launch2_include</span><span class="p">]),</span>
+    <span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">ld</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>要启动相机，运行以下命令：</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>multi_camera.launch.py
+</pre></div>
+</div>
+<section id="id2">
+<h2>多相机无数据流<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p><strong>电源供应不足</strong>：</p>
+<ul class="simple">
+<li><p>确保每个相机连接到单独的集线器。</p></li>
+<li><p>使用带电源的集线器为每个相机提供足够的电力。</p></li>
+</ul>
+<p><strong>高分辨率</strong>：</p>
+<ul class="simple">
+<li><p>尝试降低分辨率以解决数据流问题。</p></li>
+</ul>
+<p><strong>增加 usbfs_memory_mb 值</strong>：</p>
+<ul class="simple">
+<li><p>将 <code class="docutils literal notranslate"><span class="pre">usbfs_memory_mb</span></code> 值增加到 128MB（这是一个参考值，可以根据系统需求进行调整）
+通过运行以下命令：</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="m">128</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/sys/module/usbcore/parameters/usbfs_memory_mb
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>要使此更改永久生效，请查看<a class="reference external" href="https://github.com/OpenKinect/libfreenect2/issues/807">此链接</a>。</p></li>
+</ul>
+</section>
+<section id="id3">
+<h2>多相机图像话题帧率过低<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<p>请参考 <a class="reference internal" href="../performance/fastdds_tuning.html"><span class="doc">Fast DDS 配置</span></a> 文件。</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
+      <span class="lastupdated">最后更新于 2026年01月04日 01:12:35.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

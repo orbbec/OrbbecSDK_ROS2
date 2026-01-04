@@ -1,0 +1,146 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>在 ROS 2 中对齐深度到彩色 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=63de077d" />
+
+  
+    <link rel="shortcut icon" href="../../../../_static/orbbec_footerlogo_3d_world.svg"/>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=7d86a446"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/translations.js?v=beaddf03"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../../genindex.html" />
+    <link rel="search" title="搜索" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            OrbbecSDK V2 ROS2 封装
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">在 ROS 2 中对齐深度到彩色</a><ul>
+<li><a class="reference internal" href="#id1">对齐和查看深度和彩色图像的命令</a></li>
+<li><a class="reference internal" href="#rviz2">在 RViz2 中选择话题</a></li>
+<li><a class="reference internal" href="#id2">深度到彩色叠加示例</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">OrbbecSDK V2 ROS2 封装</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">在 ROS 2 中对齐深度到彩色</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/source/camera_devices/5_advanced_guide/configuration/align_depth_color.md.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="ros-2">
+<h1>在 ROS 2 中对齐深度到彩色<a class="headerlink" href="#ros-2" title="Link to this heading"></a></h1>
+<p>本节说明如何使用 ROS 2 将深度图像与彩色图像对齐以创建叠加图像。这对于需要来自不同传感器模态的同步视觉信息的应用特别有用。</p>
+<section id="id1">
+<h2>对齐和查看深度和彩色图像的命令<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<ol>
+<li><p><strong>基本深度到彩色对齐：</strong></p>
+<p>要简单地将深度图像对齐到彩色图像，请使用以下命令：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>gemini_330_series.launch.py<span class="w"> </span>depth_registration:<span class="o">=</span><span class="nb">true</span>
+</pre></div>
+</div>
+<p>此命令激活深度配准功能，但不打开查看器。</p>
+</li>
+<li><p><strong>查看深度到彩色叠加：</strong></p>
+<p>如果您希望查看深度到彩色叠加，需要使用以下命令启用查看器：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>gemini_330_series.launch.py<span class="w"> </span>depth_registration:<span class="o">=</span><span class="nb">true</span><span class="w"> </span>enable_d2c_viewer:<span class="o">=</span><span class="nb">true</span>
+</pre></div>
+</div>
+<p>这将启动带有深度到彩色配准的相机节点并打开查看器以显示叠加图像。</p>
+</li>
+</ol>
+</section>
+<section id="rviz2">
+<h2>在 RViz2 中选择话题<a class="headerlink" href="#rviz2" title="Link to this heading"></a></h2>
+<p>要在 RViz2 中可视化对齐的图像：</p>
+<ol>
+<li><p>运行上述命令之一后启动 RViz2。</p></li>
+<li><p>选择深度到彩色叠加图像的话题。话题选择示例如下所示：</p>
+<p><img alt="深度到彩色叠加的话题选择" src="../../../../_images/image31.png" /></p>
+</li>
+</ol>
+</section>
+<section id="id2">
+<h2>深度到彩色叠加示例<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>在 RViz2 中选择适当的话题后，您将能够看到深度到彩色叠加图像。它可能看起来像这样：</p>
+<p><img alt="深度到彩色叠加图像" src="../../../../_images/image4.jpg" /></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
+      <span class="lastupdated">最后更新于 2026年01月04日 01:12:35.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

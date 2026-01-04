@@ -1,0 +1,166 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>在 Gemini330 系列相机中使用 interleave_ae &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=63de077d" />
+
+  
+    <link rel="shortcut icon" href="../../../../_static/orbbec_footerlogo_3d_world.svg"/>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=7d86a446"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/translations.js?v=beaddf03"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../../genindex.html" />
+    <link rel="search" title="搜索" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            OrbbecSDK V2 ROS2 封装
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">在 Gemini330 系列相机中使用 interleave_ae</a><ul>
+<li><a class="reference internal" href="#id1">参数介绍</a></li>
+<li><a class="reference internal" href="#id2">运行启动文件</a></li>
+<li><a class="reference internal" href="#multi-camera-synced-interleave-ae">Multi_camera_synced + Interleave_ae</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">OrbbecSDK V2 ROS2 封装</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">在 Gemini330 系列相机中使用 interleave_ae</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/source/camera_devices/5_advanced_guide/configuration/interleave_ae_mode.md.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="gemini330-interleave-ae">
+<h1>在 Gemini330 系列相机中使用 interleave_ae<a class="headerlink" href="#gemini330-interleave-ae" title="Link to this heading"></a></h1>
+<blockquote>
+<div><p>本节介绍如何在 Gemini 330 系列相机中使用 interleave_ae（相机固件最低版本 <a class="reference external" href="https://www.orbbec.com/docs/g330-firmware-release/">1.4.00</a>）</p>
+</div></blockquote>
+<section id="id1">
+<h2>参数介绍<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p>interleave_ae 相关参数在 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/launch/gemini_330_series.launch.py">gemini_330_series.launch.py</a> 中设置</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">interleave_ae_mode</span></code>：设置激光或 hdr 交错。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">interleave_frame_enable</span></code>：启用交错帧模式。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">interleave_skip_enable</span></code>：启用跳帧模式。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">interleave_skip_index</span></code>：设置为 0 跳过图案 ir，设置为 1 跳过泛光 ir。</p></li>
+</ul>
+<p><strong>interleave hdr</strong></p>
+<p>当 <code class="docutils literal notranslate"><span class="pre">interleave_ae_mode</span></code> 参数设置为 <code class="docutils literal notranslate"><span class="pre">hdr</span></code> 且 <code class="docutils literal notranslate"><span class="pre">interleave_frame_enable</span></code> 设置为 <code class="docutils literal notranslate"><span class="pre">true</span></code> 时，将启用 interleave hdr</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">hdr_index1_laser_control</span></code>：帧 1 激光开关设置。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hdr_index1_depth_exposure</span></code>：帧 1 深度曝光值设置，非 AE 模式。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hdr_index1_depth_gain</span></code>：帧 1 深度增益值设置，非 AE 模式。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hdr_index1_ir_brightness</span></code>：帧 1 ir 增益值设置。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hdr_index1_ir_ae_max_exposure</span></code>：AE（自动曝光）中帧 1 ir 最大曝光值设置。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hdr_index0_laser_control</span></code>：帧 0 激光开关设置。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hdr_index0_depth_exposure</span></code>：帧 0 深度曝光值设置，非 AE 模式。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hdr_index0_depth_gain</span></code>：帧 0 深度增益值设置，非 AE 模式。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hdr_index0_ir_brightness</span></code>：帧 0 ir 增益值设置。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hdr_index0_ir_ae_max_exposure</span></code>：AE（自动曝光）中帧 0 ir 最大曝光值设置。</p></li>
+</ul>
+<p><strong>interleave laser</strong></p>
+<p>当 <code class="docutils literal notranslate"><span class="pre">interleave_ae_mode</span></code> 参数设置为 <code class="docutils literal notranslate"><span class="pre">laser</span></code> 且 <code class="docutils literal notranslate"><span class="pre">interleave_frame_enable</span></code> 设置为 <code class="docutils literal notranslate"><span class="pre">true</span></code> 时，将启用 interleave laser</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">laser_index1_laser_control</span></code>：帧 1 激光开关设置。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">laser_index1_depth_exposure</span></code>：帧 1 深度曝光值设置，非 AE 模式。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">laser_index1_depth_gain</span></code>：帧 1 深度增益值设置，非 AE 模式。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">laser_index1_ir_brightness</span></code>：帧 1 ir 增益值设置。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">laser_index1_ir_ae_max_exposure</span></code>：AE（自动曝光）中帧 1 ir 最大曝光值设置。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">laser_index0_laser_control</span></code>：帧 0 激光开关设置。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">laser_index0_depth_exposure</span></code>：帧 0 深度曝光值设置，非 AE 模式。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">laser_index0_depth_gain</span></code>：帧 0 深度增益值设置，非 AE 模式。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">laser_index0_ir_brightness</span></code>：帧 0 ir 增益值设置。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">laser_index0_ir_ae_max_exposure</span></code>：AE（自动曝光）中帧 0 ir 最大曝光值设置。</p></li>
+</ul>
+</section>
+<section id="id2">
+<h2>运行启动文件<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>设置 interleave_ae 参数，重新 <code class="docutils literal notranslate"><span class="pre">colcon</span> <span class="pre">build</span></code> 并运行启动文件</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>gemini_330_series.launch.py
+</pre></div>
+</div>
+<p><strong>示例可视化</strong></p>
+<p><img alt="深度点云可视化" src="../../../../_images/interleave_ae0.jpeg" /></p>
+<p><img alt="深度点云可视化" src="../../../../_images/interleave_ae1.jpeg" /></p>
+</section>
+<section id="multi-camera-synced-interleave-ae">
+<h2>Multi_camera_synced + Interleave_ae<a class="headerlink" href="#multi-camera-synced-interleave-ae" title="Link to this heading"></a></h2>
+<p>请参考 <a class="reference external" href="./multi_camera_synced">multi_camera_synced</a> 和 <a class="reference external" href="#%E5%8F%82%E6%95%B0%E4%BB%8B%E7%BB%8D">参数介绍</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
+      <span class="lastupdated">最后更新于 2026年01月04日 01:12:35.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

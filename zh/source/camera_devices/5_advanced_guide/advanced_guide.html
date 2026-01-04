@@ -1,0 +1,203 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>高级指南 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=63de077d" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/orbbec_footerlogo_3d_world.svg"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=7d86a446"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/translations.js?v=beaddf03"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="搜索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            OrbbecSDK V2 ROS2 封装
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">高级指南</a><ul>
+<li><a class="reference internal" href="#id2">性能与优化</a></li>
+<li><a class="reference internal" href="#id3">多相机</a></li>
+<li><a class="reference internal" href="#id4">配置与模式</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">OrbbecSDK V2 ROS2 封装</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">高级指南</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/source/camera_devices/5_advanced_guide/advanced_guide.rst.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="id1">
+<h1>高级指南<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<p>本章介绍SDK的高级功能，包括多相机使用和特殊配置模式。</p>
+<section id="id2">
+<h2>性能与优化<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="performance/lower_cpu_usage.html">使用Orbbec ROS包降低CPU使用率</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="performance/lower_cpu_usage.html#cpu">降低CPU使用率的推荐设置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="performance/lower_cpu_usage.html#id1">用于测试的启动文件</a></li>
+<li class="toctree-l2"><a class="reference internal" href="performance/lower_cpu_usage.html#id2">测试环境</a></li>
+<li class="toctree-l2"><a class="reference internal" href="performance/lower_cpu_usage.html#id3">测试设置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="performance/lower_cpu_usage.html#id4">测试结果</a></li>
+<li class="toctree-l2"><a class="reference internal" href="performance/lower_cpu_usage.html#id5">进一步优化</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="performance/efficient_intra_process_communication.html">高效的进程内通信：</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="performance/efficient_intra_process_communication.html#id2">简介</a></li>
+<li class="toctree-l2"><a class="reference internal" href="performance/efficient_intra_process_communication.html#id3">示例</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="performance/fastdds_tuning.html">针对Orbbec相机与ROS2的Fast DDS优化</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="performance/fastdds_tuning.html#id1">调整系统参数</a></li>
+<li class="toctree-l2"><a class="reference internal" href="performance/fastdds_tuning.html#fast-dds">Fast DDS配置</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="id3">
+<h2>多相机<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="multi_camera/multi_camera.html">多相机</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="multi_camera/multi_camera.html#id2">多相机无数据流</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi_camera/multi_camera.html#id3">多相机图像话题帧率过低</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="multi_camera/multi_camera_synced.html">多相机同步说明</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="multi_camera/multi_camera_synced.html#id2">设置说明</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi_camera/multi_camera_synced.html#orbbecsdk-ros2">使用 OrbbecSDK_ROS2 检查相机端口</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi_camera/multi_camera_synced.html#id3">OrbbecSDK_ROS2 多相机同步配置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi_camera/multi_camera_synced.html#id4">运行以下命令启动多相机同步</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="multi_camera/multi_camera_synced_verification_tool.html">多相机同步验证节点</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="multi_camera/multi_camera_synced_verification_tool.html#id2">使用教程</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi_camera/multi_camera_synced_verification_tool.html#id5">必要系统配置</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="multi_camera/gmsl_camera.html">GMSL 相机</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="multi_camera/gmsl_camera.html#id1">单个 GMSL 相机</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi_camera/gmsl_camera.html#id2">多个 GMSL 相机</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi_camera/gmsl_camera.html#id3">多个 GMSL 相机同步</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi_camera/gmsl_camera.html#id4">GMSL 相机的使用限制</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="id4">
+<h2>配置与模式<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="configuration/align_depth_color.html">在 ROS 2 中对齐深度到彩色</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration/align_depth_color.html#id1">对齐和查看深度和彩色图像的命令</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration/align_depth_color.html#rviz2">在 RViz2 中选择话题</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration/align_depth_color.html#id2">深度到彩色叠加示例</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/configuration_of_depth_NFOV_and_WFOV_modes.html">深度 NFOV 和 WFOV 模式配置</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/depth_work_mode_switch.html">深度工作模式切换</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/disparity_search_offset.html">视差搜索偏移</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration/disparity_search_offset.html#id2">功能介绍</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration/disparity_search_offset.html#id3">参数介绍</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration/disparity_search_offset.html#id4">运行启动文件</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/interleave_ae_mode.html">在 Gemini330 系列相机中使用 interleave_ae</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration/interleave_ae_mode.html#id1">参数介绍</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration/interleave_ae_mode.html#id2">运行启动文件</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration/interleave_ae_mode.html#multi-camera-synced-interleave-ae">Multi_camera_synced + Interleave_ae</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/predefined_presets.html">预定义预设</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/net_camera.html">网络相机</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration/net_camera.html#femto-mega-gemini-435le-gemini-335le">Femto Mega &amp; Gemini 435Le &amp; Gemini 335Le</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration/net_camera.html#set-device-ip">set_device_ip 工具</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration/net_camera.html#ip">强制 IP 功能</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
+      <span class="lastupdated">最后更新于 2026年01月04日 01:12:35.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

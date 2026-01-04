@@ -1,0 +1,211 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ROS 包快速入门 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=63de077d" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/orbbec_footerlogo_3d_world.svg"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=7d86a446"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/translations.js?v=beaddf03"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="搜索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            OrbbecSDK V2 ROS2 封装
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">ROS 包快速入门</a><ul>
+<li><a class="reference internal" href="#id1">简介</a></li>
+<li><a class="reference internal" href="#id2">构建您的第一个相机应用</a><ul>
+<li><a class="reference internal" href="#ros-2">步骤 1：配置 ROS 2 和工作空间环境</a></li>
+<li><a class="reference internal" href="#id3">步骤 2：启动相机节点</a></li>
+<li><a class="reference internal" href="#rviz2">步骤 3：在 RViz2 中可视化</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id4">示例功能</a><ul>
+<li><a class="reference internal" href="#id5">列出可用的话题/服务/参数</a></li>
+<li><a class="reference internal" href="#id6">回显话题</a></li>
+<li><a class="reference internal" href="#id7">调用服务</a></li>
+<li><a class="reference internal" href="#rosbag2">使用 rosbag2 录制</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">OrbbecSDK V2 ROS2 封装</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">ROS 包快速入门</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/source/camera_devices/3_quickstarts/quickstart.md.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="ros">
+<h1>ROS 包快速入门<a class="headerlink" href="#ros" title="Link to this heading"></a></h1>
+<section id="id1">
+<h2>简介<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p>本节提供 Orbbec ROS 2 包装器的快速入门指南。
+您将学习如何：</p>
+<ul class="simple">
+<li><p>启动相机节点。</p></li>
+<li><p>在 <strong>RViz2</strong> 中可视化深度/彩色流。</p></li>
+<li><p>使用 <strong>ROS 2 CLI 工具</strong>与话题和服务交互。</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="id2">
+<h2>构建您的第一个相机应用<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<section id="ros-2">
+<h3>步骤 1：配置 ROS 2 和工作空间环境<a class="headerlink" href="#ros-2" title="Link to this heading"></a></h3>
+<p>确保已配置 ROS 2 和工作空间环境：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>/opt/ros/<span class="nv">$ROS_DISTRO</span>/setup.bash
+</pre></div>
+</div>
+<p>源码构建需要</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>~/ros2_ws/install/setup.bash
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h3>步骤 2：启动相机节点<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>在终端 1 中</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>.<span class="w"> </span>./install/setup.bash
+ros2<span class="w"> </span>run<span class="w"> </span>orbbec_camera<span class="w"> </span>list_devices_node<span class="w"> </span><span class="c1">#检查相机是否已连接</span>
+ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>gemini_330_series.launch.py<span class="w"> </span><span class="c1"># 或其他启动文件，见下表</span>
+</pre></div>
+</div>
+<p>如果您连接了多个相机，可以指定<strong>序列号</strong>：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>gemini_330_series.launch.py<span class="w"> </span>serial_number:<span class="o">=</span>&lt;您的相机序列号&gt;
+</pre></div>
+</div>
+</section>
+<section id="rviz2">
+<h3>步骤 3：在 RViz2 中可视化<a class="headerlink" href="#rviz2" title="Link to this heading"></a></h3>
+<p>启动 RViz2 并加载默认配置：</p>
+<ul class="simple">
+<li><p>在终端 2 中</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rviz2
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>添加一个 <strong>Image</strong> 显示，将话题设置为 <code class="docutils literal notranslate"><span class="pre">/camera/color/image_raw</span></code>。</p></li>
+<li><p>为 <code class="docutils literal notranslate"><span class="pre">/camera/depth/image_raw</span></code> 添加另一个 <strong>Image</strong> 显示。</p></li>
+<li><p>可选：为 <code class="docutils literal notranslate"><span class="pre">/camera/depth/points</span></code> 添加 <strong>PointCloud2</strong> 显示。</p></li>
+</ul>
+<p>现在您应该能在 RViz2 中看到彩色流、深度流和 3D 点云。</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="id4">
+<h2>示例功能<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<p>节点运行后，尝试一些 ROS 2 CLI 命令：</p>
+<section id="id5">
+<h3>列出可用的话题/服务/参数<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span>list
+ros2<span class="w"> </span>service<span class="w"> </span>list
+ros2<span class="w"> </span>param<span class="w"> </span>list
+</pre></div>
+</div>
+</section>
+<section id="id6">
+<h3>回显话题<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<p>查看深度相机数据：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/camera/depth/camera_info
+</pre></div>
+</div>
+</section>
+<section id="id7">
+<h3>调用服务<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<p>例如，获取设备信息：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/get_device_info<span class="w"> </span>orbbec_camera_msgs/srv/GetDeviceInfo<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="rosbag2">
+<h3>使用 rosbag2 录制<a class="headerlink" href="#rosbag2" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>bag<span class="w"> </span>record<span class="w"> </span>/camera/color/image_raw<span class="w"> </span>/camera/depth/image_raw
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
+      <span class="lastupdated">最后更新于 2026年01月04日 01:12:35.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

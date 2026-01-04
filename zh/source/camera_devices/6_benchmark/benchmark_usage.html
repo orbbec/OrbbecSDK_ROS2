@@ -1,0 +1,234 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>性能基准测试使用 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=63de077d" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/orbbec_footerlogo_3d_world.svg"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=7d86a446"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/translations.js?v=beaddf03"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="搜索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            OrbbecSDK V2 ROS2 封装
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">性能基准测试使用</a><ul>
+<li><a class="reference internal" href="#id2">使用通用基准测试节点</a></li>
+<li><a class="reference internal" href="#id3">使用服务基准测试节点</a><ul>
+<li><a class="reference internal" href="#ros2-c">ROS2 C++</a></li>
+<li><a class="reference internal" href="#ros2-python">ROS2 Python</a></li>
+<li><a class="reference internal" href="#yaml"><strong>示例 YAML 配置</strong></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">OrbbecSDK V2 ROS2 封装</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">性能基准测试使用</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/source/camera_devices/6_benchmark/benchmark_usage.md.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="id1">
+<h1>性能基准测试使用<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<p>本节介绍如何在 C++ 和 Python 中使用性能基准测试工具，并提供示例 YAML 配置文件。</p>
+<section id="id2">
+<h2>使用通用基准测试节点<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ros2</span> <span class="n">run</span> <span class="n">orbbec_camera</span> <span class="n">common_benchmark_node</span><span class="o">.</span><span class="n">py</span> \
+    <span class="o">--</span><span class="n">run_time</span> <span class="mi">2</span><span class="n">h</span>  \
+    <span class="o">--</span><span class="n">csv_file</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">log</span><span class="o">.</span><span class="n">csv</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>参数</strong></p>
+<ul>
+<li><p><strong>--run_time</strong>：监控持续时间，指定为时间字符串，如 <code class="docutils literal notranslate"><span class="pre">&quot;10s&quot;</span></code>、<code class="docutils literal notranslate"><span class="pre">&quot;5m&quot;</span></code>、<code class="docutils literal notranslate"><span class="pre">&quot;1h&quot;</span></code>、<code class="docutils literal notranslate"><span class="pre">&quot;2d&quot;</span></code>。默认为 10 秒。</p></li>
+<li><p><strong>--csv_file</strong>：输出 CSV 文件的路径。默认情况下，它保存在工作空间目录中，名称为 &quot;camera_monitor_log.csv&quot;。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id3">
+<h2>使用服务基准测试节点<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<section id="ros2-c">
+<h3>ROS2 C++<a class="headerlink" href="#ros2-c" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>单个服务基准测试</strong></p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ros2</span> <span class="n">run</span> <span class="n">orbbec_camera</span> <span class="n">service_benchmark_node</span> \
+    <span class="o">--</span><span class="n">ros</span><span class="o">-</span><span class="n">args</span> \
+    <span class="o">-</span><span class="n">p</span> <span class="n">service_name</span><span class="o">:=/</span><span class="n">camera</span><span class="o">/</span><span class="n">get_depth_gain</span> \
+    <span class="o">-</span><span class="n">p</span> <span class="n">service_type</span><span class="o">:=</span><span class="n">orbbec_camera_msgs</span><span class="o">/</span><span class="n">srv</span><span class="o">/</span><span class="n">GetInt32</span> \
+    <span class="o">-</span><span class="n">p</span> <span class="n">count</span><span class="o">:=</span><span class="mi">10</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>多个服务基准测试（YAML 配置）</strong></p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ros2</span> <span class="n">run</span> <span class="n">orbbec_camera</span> <span class="n">service_benchmark_node</span> \
+    <span class="o">--</span><span class="n">ros</span><span class="o">-</span><span class="n">args</span> \
+    <span class="o">-</span><span class="n">p</span> <span class="n">yaml_file</span><span class="o">:=/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">default_service_cpp</span><span class="o">.</span><span class="n">yaml</span>
+</pre></div>
+</div>
+</section>
+<section id="ros2-python">
+<h3>ROS2 Python<a class="headerlink" href="#ros2-python" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>单个服务基准测试</strong></p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ros2</span> <span class="n">run</span> <span class="n">orbbec_camera</span> <span class="n">service_benchmark_node</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">service</span> <span class="o">/</span><span class="n">camera</span><span class="o">/</span><span class="n">get_depth_gain</span> <span class="o">--</span><span class="n">count</span> <span class="mi">10</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>多个服务基准测试（YAML 配置）</strong></p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ros2</span> <span class="n">run</span> <span class="n">orbbec_camera</span> <span class="n">service_benchmark_node</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">yaml_file</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">default_service</span><span class="o">.</span><span class="n">yaml</span>
+</pre></div>
+</div>
+</section>
+<section id="yaml">
+<h3><strong>示例 YAML 配置</strong><a class="headerlink" href="#yaml" title="Link to this heading"></a></h3>
+<p>我们提供了一个示例 YAML 配置，位于 <code class="docutils literal notranslate"><span class="pre">scripts</span></code> 目录中，名为 <code class="docutils literal notranslate"><span class="pre">service_default.yaml</span></code>。</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">default_count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+
+<span class="nt">services</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/camera/get_auto_white_balance</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">orbbec_camera_msgs/srv/GetInt32</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/camera/get_color_exposure</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">orbbec_camera_msgs/srv/GetInt32</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/camera/get_color_gain</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">orbbec_camera_msgs/srv/GetInt32</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/camera/get_depth_exposure</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">orbbec_camera_msgs/srv/GetInt32</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/camera/get_depth_gain</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">orbbec_camera_msgs/srv/GetInt32</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/camera/get_device_info</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">orbbec_camera_msgs/srv/GetDeviceInfo</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/camera/send_software_trigger</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">std_srvs/srv/SetBool</span>
+<span class="w">  </span><span class="nt">request</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="nv">false</span><span class="p p-Indicator">}</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/camera/set_auto_white_balance</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">std_srvs/srv/SetBool</span>
+<span class="w">  </span><span class="nt">request</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="nv">false</span><span class="p p-Indicator">}</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/camera/set_color_ae_roi</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">orbbec_camera_msgs/srv/SetArrays</span>
+<span class="w">  </span><span class="nt">request</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">data_param</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="nv">1279</span><span class="p p-Indicator">,</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="nv">719</span><span class="p p-Indicator">]}</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/camera/set_color_auto_exposure</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">std_srvs/srv/SetBool</span>
+<span class="w">  </span><span class="nt">request</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="nv">false</span><span class="p p-Indicator">}</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/camera/set_color_exposure</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">orbbec_camera_msgs/srv/SetInt32</span>
+<span class="w">  </span><span class="nt">request</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="nv">30</span><span class="p p-Indicator">}</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/camera/set_color_flip</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">std_srvs/srv/SetBool</span>
+<span class="w">  </span><span class="nt">request</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="nv">false</span><span class="p p-Indicator">}</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/camera/set_color_gain</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">orbbec_camera_msgs/srv/SetInt32</span>
+<span class="w">  </span><span class="nt">request</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="nv">20</span><span class="p p-Indicator">}</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/camera/set_color_mirror</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">std_srvs/srv/SetBool</span>
+<span class="w">  </span><span class="nt">request</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="nv">false</span><span class="p p-Indicator">}</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/camera/set_color_rotation</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">orbbec_camera_msgs/srv/SetInt32</span>
+<span class="w">  </span><span class="nt">request</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="nv">90</span><span class="p p-Indicator">}</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/camera/set_depth_ae_roi</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">orbbec_camera_msgs/srv/SetArrays</span>
+<span class="w">  </span><span class="nt">request</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">data_param</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="nv">1279</span><span class="p p-Indicator">,</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="nv">719</span><span class="p p-Indicator">]}</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/camera/set_depth_auto_exposure</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">std_srvs/srv/SetBool</span>
+<span class="w">  </span><span class="nt">request</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="nv">false</span><span class="p p-Indicator">}</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/camera/set_depth_exposure</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">orbbec_camera_msgs/srv/SetInt32</span>
+<span class="w">  </span><span class="nt">request</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="nv">3000</span><span class="p p-Indicator">}</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/camera/set_depth_flip</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">std_srvs/srv/SetBool</span>
+<span class="w">  </span><span class="nt">request</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="nv">false</span><span class="p p-Indicator">}</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/camera/set_depth_gain</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">orbbec_camera_msgs/srv/SetInt32</span>
+<span class="w">  </span><span class="nt">request</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="nv">200</span><span class="p p-Indicator">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
+      <span class="lastupdated">最后更新于 2026年01月04日 01:12:35.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,146 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>构建 Debian 软件包 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=63de077d" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/orbbec_footerlogo_3d_world.svg"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=7d86a446"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/translations.js?v=beaddf03"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="搜索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            OrbbecSDK V2 ROS2 封装
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">构建 Debian 软件包</a><ul>
+<li><a class="reference internal" href="#id1">准备环境</a></li>
+<li><a class="reference internal" href="#ros">配置 ROS 依赖项</a></li>
+<li><a class="reference internal" href="#id2">构建软件包</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">OrbbecSDK V2 ROS2 封装</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">构建 Debian 软件包</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/source/camera_devices/7_developer_guide/building_a_Debian_Package.md.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="debian">
+<h1>构建 Debian 软件包<a class="headerlink" href="#debian" title="Link to this heading"></a></h1>
+<section id="id1">
+<h2>准备环境<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p>在开始之前，安装所需的工具：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>debhelper<span class="w"> </span>fakeroot<span class="w"> </span>python3-bloom
+</pre></div>
+</div>
+</section>
+<section id="ros">
+<h2>配置 ROS 依赖项<a class="headerlink" href="#ros" title="Link to this heading"></a></h2>
+<p>在系统中的 <code class="docutils literal notranslate"><span class="pre">/etc/ros/rosdep/sources.list.d/00-orbbec.yaml</span></code> 添加以下 YAML 文件。确保将 <code class="docutils literal notranslate"><span class="pre">focal</span></code> 替换为您的 Ubuntu 版本的代号，将 <code class="docutils literal notranslate"><span class="pre">humble</span></code> 替换为您的 ROS2 发行版名称：</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">orbbec_camera_msgs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ubuntu</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">focal</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">ros-humble-orbbec-camera-msgs</span><span class="w"> </span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>接下来，创建一个新文件 <code class="docutils literal notranslate"><span class="pre">/etc/ros/rosdep/sources.list.d/50-orbbec.list</span></code> 并添加此行以指定 YAML 文件的路径：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>yaml<span class="w"> </span>file:///etc/ros/rosdep/sources.list.d/00-orbbec.yaml
+</pre></div>
+</div>
+<p>更新 rosdep 数据库以反映这些更改：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosdep<span class="w"> </span>update
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h2>构建软件包<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>导航到您的工作空间并构建项目：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/ros2_ws/
+colcon<span class="w"> </span>build<span class="w"> </span>--event-handlers<span class="w"> </span>console_direct+<span class="w"> </span>--cmake-args<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release
+.<span class="w"> </span>install/setup.bash
+<span class="nb">cd</span><span class="w"> </span>src/OrbbecSDK_ROS2/
+bash<span class="w"> </span>.make_deb.sh
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
+      <span class="lastupdated">最后更新于 2026年01月04日 01:12:35.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

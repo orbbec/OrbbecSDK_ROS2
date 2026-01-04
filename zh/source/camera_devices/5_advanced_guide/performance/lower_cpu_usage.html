@@ -1,0 +1,304 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>使用Orbbec ROS包降低CPU使用率 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=63de077d" />
+
+  
+    <link rel="shortcut icon" href="../../../../_static/orbbec_footerlogo_3d_world.svg"/>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=7d86a446"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/translations.js?v=beaddf03"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../../genindex.html" />
+    <link rel="search" title="搜索" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            OrbbecSDK V2 ROS2 封装
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">使用Orbbec ROS包降低CPU使用率</a><ul>
+<li><a class="reference internal" href="#cpu">降低CPU使用率的推荐设置</a></li>
+<li><a class="reference internal" href="#id1">用于测试的启动文件</a></li>
+<li><a class="reference internal" href="#id2">测试环境</a></li>
+<li><a class="reference internal" href="#id3">测试设置</a></li>
+<li><a class="reference internal" href="#id4">测试结果</a></li>
+<li><a class="reference internal" href="#id5">进一步优化</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">OrbbecSDK V2 ROS2 封装</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">使用Orbbec ROS包降低CPU使用率</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/source/camera_devices/5_advanced_guide/performance/lower_cpu_usage.md.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="orbbec-roscpu">
+<h1>使用Orbbec ROS包降低CPU使用率<a class="headerlink" href="#orbbec-roscpu" title="Link to this heading"></a></h1>
+<p>您可以在 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples">示例</a> 中找到使用示例代码。</p>
+<p>本文档概述了在使用 <strong>Gemini 330系列相机</strong> 的 <strong>OrbbecSDK_ROS2 v2</strong> 环境中最小化CPU使用率的策略。固件版本必须 <strong>不低于1.4.10</strong>，且 <code class="docutils literal notranslate"><span class="pre">device</span></code> 应设置为 <strong>Default</strong>。</p>
+<section id="cpu">
+<h2>降低CPU使用率的推荐设置<a class="headerlink" href="#cpu" title="Link to this heading"></a></h2>
+<p>要在OrbbecSDK_ROS2中实现最低的CPU使用率，建议配置以下参数。</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">参数</th>
+<th style="text-align: center;">推荐值</th>
+<th style="text-align: center;">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><code>uvc_backend</code></td>
+<td style="text-align: center;"><code>v4l2</code></td>
+<td style="text-align: center;">与 <code>libuvc</code> 相比CPU使用率更低</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>color_format</code></td>
+<td style="text-align: center;"><code>RGB</code></td>
+<td style="text-align: center;">CPU使用率低于 <code>MJPG</code></td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>filter</code></td>
+<td style="text-align: center;">仅使用 <code>hardware_noise_removal_filter</code></td>
+<td style="text-align: center;">其他滤波器会显著增加CPU使用率</td>
+</tr>
+</tbody>
+</table></section>
+<section id="id1">
+<h2>用于测试的启动文件<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">gemini_330_series_lower_cpu_usage.launch.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">multi_camera_lower_cpu_usage.launch.py</span></code></p></li>
+</ul>
+</section>
+<section id="id2">
+<h2>测试环境<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p><strong>硬件配置</strong></p>
+<ul class="simple">
+<li><p><strong>CPU</strong>: Intel i7-8700 &#64; 3.20GHz</p></li>
+<li><p><strong>内存</strong>: 24 GB</p></li>
+<li><p><strong>存储</strong>: Micron 2200S NVMe 256GB</p></li>
+<li><p><strong>GPU</strong>: NVIDIA GeForce GTX 1660Ti</p></li>
+<li><p><strong>操作系统</strong>: Ubuntu22.04</p></li>
+</ul>
+<p><strong>ROS配置</strong></p>
+<ul class="simple">
+<li><p><strong>ROS版本</strong>: ROS2 Humble</p></li>
+<li><p><strong>SDK版本</strong>: OrbbecSDK_ROS2 v2.2.1</p></li>
+</ul>
+<p><strong>相机设置</strong></p>
+<ul class="simple">
+<li><p>设备: 2x Gemini 335, 1x Gemini 336, 1x Gemini 336L</p></li>
+<li><p>固件版本: 1.4.10</p></li>
+</ul>
+</section>
+<section id="id3">
+<h2>测试设置<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<p><strong>数据流设置：</strong></p>
+<ul class="simple">
+<li><p>深度/左IR/右IR: 848×480 &#64; 30fps</p></li>
+<li><p>彩色: 848×480 &#64; 30fps</p></li>
+</ul>
+<p>注意：以下CPU使用率数据重点关注 <code class="docutils literal notranslate"><span class="pre">uvc_backend</span></code>、<code class="docutils literal notranslate"><span class="pre">color_format</span></code> 和各种滤波器组合。</p>
+</section>
+<section id="id4">
+<h2>测试结果<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<p><strong><code class="docutils literal notranslate"><span class="pre">uvc_backend</span></code> 对比（RGB格式）</strong></p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">libuvc CPU使用率</th>
+<th style="text-align: center;">v4l2 CPU使用率</th>
+<th style="text-align: center;">绝对变化</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">182.8%</td>
+<td style="text-align: center;">118.8%</td>
+<td style="text-align: center;">-64.0%</td>
+</tr>
+</tbody>
+</table><p>使用v4l2后端可以显著降低CPU使用率。在我们的实现中，v4l2无需对Linux内核进行任何补丁即可工作，允许用户轻松在v4l2和libuvc之间切换，并保持与标准Linux发行版的完全兼容性。</p>
+<p><strong><code class="docutils literal notranslate"><span class="pre">color_format</span></code> 对比（MJPG vs RGB）</strong></p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">后端</th>
+<th style="text-align: center;">MJPG CPU使用率</th>
+<th style="text-align: center;">RGB CPU使用率</th>
+<th style="text-align: center;">绝对变化</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">libuvc</td>
+<td style="text-align: center;">347.7%</td>
+<td style="text-align: center;">182.8%</td>
+<td style="text-align: center;">-164.9%</td>
+</tr>
+<tr>
+<td style="text-align: center;">v4l2</td>
+<td style="text-align: center;">170.0%</td>
+<td style="text-align: center;">118.8%</td>
+<td style="text-align: center;">-51.2%</td>
+</tr>
+</tbody>
+</table><p>如果选择RGB格式而不是MJPG，可以降低CPU使用率，因为MJPG图像的解码会消耗主机CPU资源。</p>
+<p><strong>滤波器配置影响</strong></p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>应用的滤波器</th>
+<th>libuvc CPU使用率</th>
+<th>CPU使用率增加</th>
+<th>v4l2 CPU使用率</th>
+<th>CPU使用率增加</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>无滤波器（基准）</td>
+<td>182.8%</td>
+<td>0.0%（基准）</td>
+<td>118.8%</td>
+<td>0.0%（基准）</td>
+</tr>
+<tr>
+<td><code>（软件）noise_removal_filter</code></td>
+<td>218.0%</td>
+<td>+35.2%</td>
+<td>128.5%</td>
+<td>+9.7%</td>
+</tr>
+<tr>
+<td><code>（软件）noise_removal_filter + spatial_filter</code></td>
+<td>469.6%</td>
+<td>+286.8%</td>
+<td>336.7%</td>
+<td>+217.9%</td>
+</tr>
+<tr>
+<td><code>hardware_noise_removal_filter</code></td>
+<td>186.3%</td>
+<td>+3.5%</td>
+<td>115.4%</td>
+<td>-3.4%</td>
+</tr>
+<tr>
+<td><code>hardware_noise_removal_filter + spatial_filter</code></td>
+<td>251.3%</td>
+<td>+68.5%</td>
+<td>152.5%</td>
+<td>+33.7%</td>
+</tr>
+</tbody>
+</table><p>根据测试结果，仅使用 <code class="docutils literal notranslate"><span class="pre">hardware_noise_removal_filter</span></code> 相比无滤波器基准，对 <code class="docutils literal notranslate"><span class="pre">libuvc</span></code>（+3.5%）和 <code class="docutils literal notranslate"><span class="pre">v4l2</span></code>（-3.4%）的CPU使用率变化可以忽略不计，因为此滤波器在相机硬件内部运行。相比之下，其他滤波器在主机系统上执行。将 <code class="docutils literal notranslate"><span class="pre">spatial_filter</span></code> 添加到硬件滤波器会导致CPU使用率适度增加，而应用基于软件的 <code class="docutils literal notranslate"><span class="pre">noise_removal_filter</span></code>——无论是单独使用还是与 <code class="docutils literal notranslate"><span class="pre">spatial_filter</span></code> 结合——都会显著增加CPU负载。为保持较低的CPU使用率，建议避免使用基于软件的滤波器，仅依赖 <code class="docutils literal notranslate"><span class="pre">hardware_noise_removal_filter</span></code>。</p>
+</section>
+<section id="id5">
+<h2>进一步优化<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">参数</th>
+<th style="text-align: center;">推荐值</th>
+<th style="text-align: center;">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><code>depth_registration</code></td>
+<td style="text-align: center;"><code>false</code> 或 <code>true</code> 配合 <code>align_mode=HW</code></td>
+<td style="text-align: center;">软件对齐消耗更多CPU</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>enable_point_cloud</code></td>
+<td style="text-align: center;"><code>false</code></td>
+<td style="text-align: center;">禁用点云可降低CPU使用率</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>enable_colored_point_cloud</code></td>
+<td style="text-align: center;"><code>false</code></td>
+<td style="text-align: center;">禁用彩色点云可降低CPU使用率</td>
+</tr>
+</tbody>
+</table></section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
+      <span class="lastupdated">最后更新于 2026年01月04日 01:12:35.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

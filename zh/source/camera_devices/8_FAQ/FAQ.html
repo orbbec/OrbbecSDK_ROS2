@@ -1,0 +1,191 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>常见问题 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=63de077d" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/orbbec_footerlogo_3d_world.svg"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=7d86a446"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/translations.js?v=beaddf03"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="搜索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            OrbbecSDK V2 ROS2 封装
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">常见问题</a><ul>
+<li><a class="reference internal" href="#id2">意外崩溃</a></li>
+<li><a class="reference internal" href="#id3">多相机无数据流</a></li>
+<li><a class="reference internal" href="#id4">其他故障排除</a></li>
+<li><a class="reference internal" href="#id5">为什么有这么多启动文件？</a></li>
+<li><a class="reference internal" href="#id6">多相机连接时如何指定启动某一个相机</a></li>
+<li><a class="reference internal" href="#id7">多相机启动或切换流时为什么需要设置延迟？</a></li>
+<li><a class="reference internal" href="#femto-bolt">femto bolt 深度流无数据</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">OrbbecSDK V2 ROS2 封装</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">常见问题</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/source/camera_devices/8_FAQ/FAQ.md.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="id1">
+<h1>常见问题<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<section id="id2">
+<h2>意外崩溃<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>如果相机节点意外崩溃，它将在当前运行目录中生成崩溃日志：<code class="docutils literal notranslate"><span class="pre">Log/camera_crash_stack_trace_xx.log</span></code>。请将此日志发送给支持团队或提交到GitHub issue以获得进一步帮助。</p>
+</section>
+<section id="id3">
+<h2>多相机无数据流<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<p><strong>电源供应不足</strong>：</p>
+<ul class="simple">
+<li><p>确保每个相机连接到单独的集线器。</p></li>
+<li><p>使用有源集线器为每个相机提供足够的电力。</p></li>
+</ul>
+<p><strong>高分辨率</strong>：</p>
+<ul class="simple">
+<li><p>尝试降低分辨率以解决数据流问题。</p></li>
+</ul>
+<p><strong>增加usbfs_memory_mb值</strong>：</p>
+<ul class="simple">
+<li><p>通过运行以下命令将 <code class="docutils literal notranslate"><span class="pre">usbfs_memory_mb</span></code> 值增加到128MB（这是参考值，可根据系统需求调整）：</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">echo</span> <span class="mi">128</span> <span class="o">|</span> <span class="n">sudo</span> <span class="n">tee</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">module</span><span class="o">/</span><span class="n">usbcore</span><span class="o">/</span><span class="n">parameters</span><span class="o">/</span><span class="n">usbfs_memory_mb</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>要使此更改永久生效，请查看<a class="reference external" href="https://github.com/OpenKinect/libfreenect2/issues/807">此链接</a>。</p></li>
+</ul>
+</section>
+<section id="id4">
+<h2>其他故障排除<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>如果遇到其他问题，将 <code class="docutils literal notranslate"><span class="pre">log_level</span></code> 参数设置为 <code class="docutils literal notranslate"><span class="pre">debug</span></code>。这将在运行目录中生成SDK日志文件：<code class="docutils literal notranslate"><span class="pre">Log/OrbbecSDK.log.txt</span></code>。请将此文件提供给支持团队以获得进一步帮助。</p></li>
+<li><p>如果需要固件日志，将 <code class="docutils literal notranslate"><span class="pre">enable_heartbeat</span></code> 设置为 <code class="docutils literal notranslate"><span class="pre">true</span></code> 以激活此功能。</p></li>
+</ul>
+</section>
+<section id="id5">
+<h2>为什么有这么多启动文件？<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>不同的相机具有不同的默认分辨率和图像格式。</p></li>
+<li><p>为简化使用，每个相机都有自己的启动文件。</p></li>
+</ul>
+</section>
+<section id="id6">
+<h2>多相机连接时如何指定启动某一个相机<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<p>如果启动文件未显式指定要使用的设备，在同时连接多台相机时，驱动会默认连接到其中一个（默认设备）。</p>
+<p>可以先通过以下命令查看设备序列号：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>orbbec_camera<span class="w"> </span>list_devices_node
+</pre></div>
+</div>
+<p>然后在启动时显式指定序列号，例如：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>femto_bolt.launch.py<span class="w"> </span>serial_number:<span class="o">=</span>CL8H741005J
+</pre></div>
+</div>
+</section>
+<section id="id7">
+<h2>多相机启动或切换流时为什么需要设置延迟？<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<p>多相机系统对带宽和设备初始化时序要求较高。如果在同一时间启动或切换多个相机流，可能会引发带宽瞬时拥塞，进而导致设备初始化失败、流启动异常或丢帧等问题。为确保系统稳定性，建议注意以下几点：</p>
+<ul>
+<li><p><strong>多相机启动阶段</strong></p>
+<p>在启动多个相机时，建议在每个相机启动之间增加适当的延迟（例如 <strong>2s</strong>），以避免瞬时带宽过载或底层设备初始化冲突。</p>
+</li>
+<li><p><strong>流开关与模式切换阶段</strong></p>
+<p>在调用开关流相关服务（如 <code class="docutils literal notranslate"><span class="pre">set_streams_enable</span></code>、<code class="docutils literal notranslate"><span class="pre">toggle_depth</span></code>、<code class="docutils literal notranslate"><span class="pre">toggle_color</span></code>）时，不建议同时触发多个接口调用，应在各操作之间设置合理的时间间隔（例如 <strong>20 ms</strong>），以保证流状态切换的可靠性。</p>
+</li>
+</ul>
+<p>遵循上述时序控制原则，有助于提升多相机系统在启动和运行过程中的稳定性，减少异常和不可预期行为的发生。</p>
+</section>
+<section id="femto-bolt">
+<h2>femto bolt 深度流无数据<a class="headerlink" href="#femto-bolt" title="Link to this heading"></a></h2>
+<p>该模组运行时依赖 OpenGL 库，若系统未安装或驱动不完整，将导致深度流无数据。请先安装 OpenGL 相关库（以 Ubuntu 为例）：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">  </span>sudo<span class="w"> </span>apt<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>mesa-utils<span class="w"> </span>libgl1-mesa-glx<span class="w"> </span>libglu1-mesa
+</pre></div>
+</div>
+<p>安装后可通过以下命令检查 OpenGL 是否可用：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">  </span>glxinfo<span class="w"> </span>-B
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
+      <span class="lastupdated">最后更新于 2026年01月04日 01:12:35.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

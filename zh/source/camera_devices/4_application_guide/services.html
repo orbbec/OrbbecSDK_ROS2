@@ -1,0 +1,458 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>所有可用的相机控制服务 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=63de077d" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/orbbec_footerlogo_3d_world.svg"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=7d86a446"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/translations.js?v=beaddf03"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="搜索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            OrbbecSDK V2 ROS2 封装
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">所有可用的相机控制服务</a><ul>
+<li><a class="reference internal" href="#id2">数据流控制</a><ul>
+<li><a class="reference internal" href="#id3">彩色流</a></li>
+<li><a class="reference internal" href="#id4">深度流</a></li>
+<li><a class="reference internal" href="#id5">红外流</a></li>
+<li><a class="reference internal" href="#id6">所有数据流</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id7">传感器与发射器控制</a></li>
+<li><a class="reference internal" href="#id8">设备信息与管理</a></li>
+<li><a class="reference internal" href="#id9">同步与触发</a></li>
+<li><a class="reference internal" href="#id10">深度滤波器配置</a></li>
+<li><a class="reference internal" href="#id11">数据捕获与校准管理</a></li>
+<li><a class="reference internal" href="#id12">点云下采样</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">OrbbecSDK V2 ROS2 封装</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">所有可用的相机控制服务</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/source/camera_devices/4_application_guide/services.md.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="id1">
+<h1>所有可用的相机控制服务<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<blockquote>
+<div><p><strong>注意：</strong> 与特定数据流相关的服务（例如 <code class="docutils literal notranslate"><span class="pre">/camera/set_color_*</span></code>）仅在启动文件中启用该数据流时可用（例如 <code class="docutils literal notranslate"><span class="pre">enable_color:=true</span></code>）。</p>
+</div></blockquote>
+<section id="id2">
+<h2>数据流控制<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<section id="id3">
+<h3>彩色流<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/toggle_color</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/toggle_color<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/get_color_exposure</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">/camera/get_color_gain</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/get_color_exposure<span class="w"> </span>orbbec_camera_msgs/srv/GetInt32<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/get_color_gain<span class="w"> </span>orbbec_camera_msgs/srv/GetInt32<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_color_auto_exposure</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_color_auto_exposure<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_color_exposure</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">/camera/set_color_gain</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_color_exposure<span class="w"> </span>orbbec_camera_msgs/srv/SetInt32<span class="w"> </span><span class="s1">&#39;{data: 1}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_color_gain<span class="w"> </span>orbbec_camera_msgs/srv/SetInt32<span class="w"> </span><span class="s1">&#39;{data: 64}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_color_mirror</span></code>, <code class="docutils literal notranslate"><span class="pre">/camera/set_color_flip</span></code>, <code class="docutils literal notranslate"><span class="pre">/camera/set_color_rotation</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_color_mirror<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_color_flip<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_color_rotation<span class="w"> </span>orbbec_camera_msgs/srv/SetInt32<span class="w"> </span><span class="s1">&#39;{data: 180}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_color_ae_roi</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># data_param: [左, 右, 上, 下]</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_color_ae_roi<span class="w"> </span>orbbec_camera_msgs/srv/SetArrays<span class="w"> </span><span class="s1">&#39;{data_param: [0,1279,0,719]}&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id4">
+<h3>深度流<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/toggle_depth</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/toggle_depth<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/get_depth_exposure</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">/camera/get_depth_gain</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/get_depth_exposure<span class="w"> </span>orbbec_camera_msgs/srv/GetInt32<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/get_depth_gain<span class="w"> </span>orbbec_camera_msgs/srv/GetInt32<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_depth_auto_exposure</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_depth_auto_exposure<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_depth_exposure</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">/camera/set_depth_gain</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_depth_exposure<span class="w"> </span>orbbec_camera_msgs/srv/SetInt32<span class="w"> </span><span class="s1">&#39;{data: 3000}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_depth_gain<span class="w"> </span>orbbec_camera_msgs/srv/SetInt32<span class="w"> </span><span class="s1">&#39;{data: 64}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_depth_mirror</span></code>, <code class="docutils literal notranslate"><span class="pre">/camera/set_depth_flip</span></code>, <code class="docutils literal notranslate"><span class="pre">/camera/set_depth_rotation</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_depth_mirror<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_depth_flip<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_depth_rotation<span class="w"> </span>orbbec_camera_msgs/srv/SetInt32<span class="w"> </span><span class="s1">&#39;{data: 180}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_depth_ae_roi</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># data_param: [左, 右, 上, 下]</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_depth_ae_roi<span class="w"> </span>orbbec_camera_msgs/srv/SetArrays<span class="w"> </span><span class="s1">&#39;{data_param: [0,847,0,479]}&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id5">
+<h3>红外流<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/toggle_ir</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/toggle_ir<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/get_ir_exposure</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">/camera/get_ir_gain</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/get_ir_exposure<span class="w"> </span>orbbec_camera_msgs/srv/GetInt32<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/get_ir_gain<span class="w"> </span>orbbec_camera_msgs/srv/GetInt32<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_ir_long_exposure</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_ir_long_exposure<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_ir_auto_exposure</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_ir_auto_exposure<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_ir_exposure</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">/camera/set_ir_gain</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_ir_exposure<span class="w"> </span>orbbec_camera_msgs/srv/SetInt32<span class="w"> </span><span class="s1">&#39;{data: 3000}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_ir_gain<span class="w"> </span>orbbec_camera_msgs/srv/SetInt32<span class="w"> </span><span class="s1">&#39;{data: 64}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_ir_mirror</span></code>, <code class="docutils literal notranslate"><span class="pre">/camera/set_ir_flip</span></code>, <code class="docutils literal notranslate"><span class="pre">/camera/set_ir_rotation</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_ir_mirror<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_ir_flip<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_ir_rotation<span class="w"> </span>orbbec_camera_msgs/srv/SetInt32<span class="w"> </span><span class="s1">&#39;{data: 180}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/switch_ir</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/switch_ir<span class="w"> </span>orbbec_camera_msgs/srv/SetString<span class="w"> </span><span class="s1">&#39;{data: left}&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id6">
+<h3>所有数据流<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/get_streams_enable</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">/camera/set_streams_enable</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/get_streams_enable<span class="w"> </span>orbbec_camera_msgs/srv/GetBool<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_streams_enable<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: false}&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+</section>
+<section id="id7">
+<h2>传感器与发射器控制<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_auto_white_balance</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">/camera/get_auto_white_balance</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_auto_white_balance<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/get_auto_white_balance<span class="w"> </span>orbbec_camera_msgs/srv/GetInt32<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_white_balance</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">/camera/get_white_balance</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_white_balance<span class="w"> </span>orbbec_camera_msgs/srv/SetInt32<span class="w"> </span><span class="s1">&#39;{data: 2800}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/get_white_balance<span class="w"> </span>orbbec_camera_msgs/srv/GetInt32<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_laser_enable</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_laser_enable<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">/camera/get_laser_status</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/get_laser_status<span class="w"> </span>orbbec_camera_msgs/srv/GetBool<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_ldp_enable</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">/camera/get_ldp_status</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_ldp_enable<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/get_ldp_status<span class="w"> </span>orbbec_camera_msgs/srv/GetBool<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_ptp_config</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">/camera/get_ptp_config</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_ptp_config<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/get_ptp_config<span class="w"> </span>orbbec_camera_msgs/srv/GetBool<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/get_lrm_measure_distance</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/get_lrm_measure_distance<span class="w"> </span>orbbec_camera_msgs/srv/GetInt32<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_fan_work_mode</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_fan_work_mode<span class="w"> </span>orbbec_camera_msgs/srv/SetInt32<span class="w"> </span><span class="s1">&#39;{data: 0}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_floor_enable</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_floor_enable<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id8">
+<h2>设备信息与管理<a class="headerlink" href="#id8" title="Link to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/get_device_info</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/get_device_info<span class="w"> </span>orbbec_camera_msgs/srv/GetDeviceInfo
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/get_sdk_version</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/get_sdk_version<span class="w"> </span>orbbec_camera_msgs/srv/GetString
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/reboot_device</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/reboot_device<span class="w"> </span>std_srvs/srv/Empty<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id9">
+<h2>同步与触发<a class="headerlink" href="#id9" title="Link to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/send_software_trigger</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/send_software_trigger<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_sync_hosttime</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_sync_hosttime<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_reset_timestamp</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 仅在time_domain参数设置为device时可用</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_reset_timestamp<span class="w"> </span>std_srvs/srv/SetBool<span class="w"> </span><span class="s1">&#39;{data: true}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_sync_interleaverlaser</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 仅在interleave_ae_mode为&#39;laser&#39;且interleave_frame_enable为true时可用</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_sync_interleaverlaser<span class="w"> </span>orbbec_camera_msgs/srv/SetInt32<span class="w"> </span><span class="s1">&#39;{data: 0}&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id10">
+<h2>深度滤波器配置<a class="headerlink" href="#id10" title="Link to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_filter</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 设置DecimationFilter</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_filter<span class="w"> </span>orbbec_camera_msgs/srv/SetFilter<span class="w"> </span><span class="s1">&#39;{filter_name: DecimationFilter, filter_enable: false, filter_param: [5]}&#39;</span>
+
+<span class="c1"># 设置SpatialAdvancedFilter</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_filter<span class="w"> </span>orbbec_camera_msgs/srv/SetFilter<span class="w"> </span><span class="s1">&#39;{filter_name: SpatialAdvancedFilter, filter_enable: true, filter_param: [0.5,160,1,8]}&#39;</span>
+
+<span class="c1"># 设置SequenceIdFilter</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_filter<span class="w"> </span>orbbec_camera_msgs/srv/SetFilter<span class="w"> </span><span class="s1">&#39;{filter_name: SequenceIdFilter, filter_enable: true, filter_param: [1]}&#39;</span>
+
+<span class="c1"># 设置ThresholdFilter</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_filter<span class="w"> </span>orbbec_camera_msgs/srv/SetFilter<span class="w"> </span><span class="s1">&#39;{filter_name: ThresholdFilter, filter_enable: true, filter_param: [0,15999]}&#39;</span>
+
+<span class="c1"># 设置NoiseRemovalFilter</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_filter<span class="w"> </span>orbbec_camera_msgs/srv/SetFilter<span class="w"> </span><span class="s1">&#39;{filter_name: NoiseRemovalFilter, filter_enable: true, filter_param: [256,80]}&#39;</span>
+
+<span class="c1"># 设置HardwareNoiseRemoval</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_filter<span class="w"> </span>orbbec_camera_msgs/srv/SetFilter<span class="w"> </span><span class="s1">&#39;{filter_name: HardwareNoiseRemoval, filter_enable: true, filter_param: []}&#39;</span>
+
+<span class="c1"># 设置SpatialFastFilter</span>
+<span class="c1"># filter_param: [radius]</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_filter<span class="w"> </span>orbbec_camera_msgs/srv/SetFilter<span class="w"> </span><span class="s1">&#39;{filter_name: SpatialFastFilter, filter_enable: true, filter_param: [4]}&#39;</span>
+
+<span class="c1"># 设置SpatialModerateFilter</span>
+<span class="c1"># filter_param: [disp_diff, magnitude, radius]</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_filter<span class="w"> </span>orbbec_camera_msgs/srv/SetFilter<span class="w"> </span><span class="s1">&#39;{filter_name: SpatialModerateFilter, filter_enable: true, filter_param: [160,1,3]}&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id11">
+<h2>数据捕获与校准管理<a class="headerlink" href="#id11" title="Link to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/save_images</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/save_images<span class="w"> </span>std_srvs/srv/Empty<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/save_point_cloud</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/save_point_cloud<span class="w"> </span>std_srvs/srv/Empty<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<blockquote>
+<div><p><strong>注意</strong>：以下服务目前仅支持435Le模块。每个服务一次只能存储一组数据或字符串。</p>
+</div></blockquote>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/write_customer_data</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">/camera/read_customer_data</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/write_customer_data<span class="w"> </span>orbbec_camera_msgs/srv/SetString<span class="w"> </span><span class="s1">&#39;{data: &quot;string&quot;}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/read_customer_data<span class="w"> </span>orbbec_camera_msgs/srv/GetString<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_user_calib_params</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">/camera/get_user_calib_params</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_user_calib_params<span class="w"> </span>orbbec_camera_msgs/srv/SetUserCalibParams<span class="w"> </span><span class="se">\</span>
+<span class="s1">&#39;{k: [614.9613647460938, 0.0, 634.91552734375,</span>
+<span class="s1">      0.0, 614.65771484375, 391.407470703125,</span>
+<span class="s1">      0.0, 0.0, 1.0],</span>
+<span class="s1">  d: [-0.03131488710641861,</span>
+<span class="s1">       0.032955970615148544,</span>
+<span class="s1">       9.096559369936585e-05,</span>
+<span class="s1">      -0.0003368517500348389,</span>
+<span class="s1">      -0.01115430984646082,</span>
+<span class="s1">       0.0, 0.0, 0.0],</span>
+<span class="s1">  rotation: [0.9999880790710449,  0.0003024190664291382, -0.004874417092651129,</span>
+<span class="s1">            -0.0002965621242765337, 0.9999992251396179,   0.001202247804030776,</span>
+<span class="s1">             0.004874777048826218, -0.0012007878394797444, 0.9999874234199524],</span>
+<span class="s1">  translation: [-0.023897956848144532,</span>
+<span class="s1">                -9.439220279455185e-05,</span>
+<span class="s1">                -6.804073229432106e-06]}&#39;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/get_user_calib_params<span class="w"> </span>orbbec_camera_msgs/srv/GetUserCalibParams<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id12">
+<h2>点云下采样<a class="headerlink" href="#id12" title="Link to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/set_point_cloud_decimation</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/set_point_cloud_decimation<span class="w"> </span>orbbec_camera_msgs/srv/SetInt32<span class="w"> </span><span class="s1">&#39;{data: 8}&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/camera/get_point_cloud_decimation</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/camera/get_point_cloud_decimation<span class="w"> </span>orbbec_camera_msgs/srv/GetInt32<span class="w"> </span><span class="s1">&#39;{}&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
+      <span class="lastupdated">最后更新于 2026年01月04日 01:12:35.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

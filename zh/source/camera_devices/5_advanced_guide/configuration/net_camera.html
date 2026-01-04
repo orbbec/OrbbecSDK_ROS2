@@ -1,0 +1,202 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>网络相机 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=63de077d" />
+
+  
+    <link rel="shortcut icon" href="../../../../_static/orbbec_footerlogo_3d_world.svg"/>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=7d86a446"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/translations.js?v=beaddf03"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../../genindex.html" />
+    <link rel="search" title="搜索" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            OrbbecSDK V2 ROS2 封装
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">网络相机</a><ul>
+<li><a class="reference internal" href="#femto-mega-gemini-435le-gemini-335le">Femto Mega &amp; Gemini 435Le &amp; Gemini 335Le</a></li>
+<li><a class="reference internal" href="#set-device-ip">set_device_ip 工具</a></li>
+<li><a class="reference internal" href="#ip">强制 IP 功能</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">OrbbecSDK V2 ROS2 封装</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">网络相机</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/source/camera_devices/5_advanced_guide/configuration/net_camera.md.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="id1">
+<h1>网络相机<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<blockquote>
+<div><p>本节介绍如何在 OrbbecSDK_ROS2 中使用网络相机。目前仅支持 Femto_Mega、Gemini 335Le 和 Gemini 435Le 设备，其他网络设备将在不久的将来得到支持。</p>
+</div></blockquote>
+<p>您可以在 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples">example</a> 中找到示例使用代码。</p>
+<section id="femto-mega-gemini-435le-gemini-335le">
+<h2>Femto Mega &amp; Gemini 435Le &amp; Gemini 335Le<a class="headerlink" href="#femto-mega-gemini-435le-gemini-335le" title="Link to this heading"></a></h2>
+<p><strong>参数介绍</strong></p>
+<p>网络设备设置：<code class="docutils literal notranslate"><span class="pre">enumerate_net_device</span></code> 设置为 true，将自动枚举网络设备。</p>
+<p>如果您不想自动枚举网络设备，可以将 <code class="docutils literal notranslate"><span class="pre">enumerate_net_device</span></code> 设置为 false，将 <code class="docutils literal notranslate"><span class="pre">net_device_ip</span></code> 设置为设备的 IP 地址，并将 <code class="docutils literal notranslate"><span class="pre">net_device_port</span></code> 设置为默认值 8090。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">enumerate_net_device</span></code>：启用自动枚举网络设备。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">net_device_ip</span></code>：设置网络设备的 IP 地址。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">net_device_port</span></code>：设置网络设备的端口。通常可以设置为 8090。</p></li>
+</ul>
+<p><strong>单个网络相机</strong></p>
+<blockquote>
+<div><p>如果您需要运行 Gemini 435Le/Gemini 335Le，只需在运行命令中将 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/launch/femto_mega.launch.py">femto_mega.launch.py</a> 替换为 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/launch/gemini435_le.launch.py">gemini435_le.launch.py</a>/<a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/launch/gemini_330_series.launch.py">gemini_330_series.launch.py</a></p>
+</div></blockquote>
+<p>以 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/launch/femto_mega.launch.py">femto_mega.launch.py</a> 为例：</p>
+<ul class="simple">
+<li><p><strong>自动枚举网络设备：</strong></p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>femto_mega.launch.py<span class="w"> </span>enumerate_net_device:<span class="o">=</span><span class="nb">true</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>指定 IP 地址启动设备：</strong></p></li>
+</ul>
+<p>注意：<code class="docutils literal notranslate"><span class="pre">net_device_ip</span></code> 需要更改为设备的 IP 地址，这里是 192.168.1.10</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>femto_mega.launch.py<span class="w"> </span>enumerate_net_device:<span class="o">=</span><span class="nb">false</span><span class="w"> </span>net_device_ip:<span class="o">=</span><span class="m">192</span>.168.1.10<span class="w"> </span>net_device_port:<span class="o">=</span><span class="m">8090</span>
+</pre></div>
+</div>
+<p><strong>多个网络相机</strong></p>
+<p>以 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/examples/net_camera/multi_net_camera.launch.py">multi_net_camera.launch.py</a> 为例：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>multi_net_camera.launch.py
+</pre></div>
+</div>
+</section>
+<section id="set-device-ip">
+<h2>set_device_ip 工具<a class="headerlink" href="#set-device-ip" title="Link to this heading"></a></h2>
+<p><strong><code class="docutils literal notranslate"><span class="pre">set_device_ip</span></code></strong> 可执行文件允许您直接从 ROS 2 配置网络相机的 IP 设置，包括在 DHCP 和静态 IP 之间切换，以及设置子网掩码和网关。这对于快速分配或更新 IP 地址而无需修改启动文件非常有用。</p>
+<blockquote>
+<div><p><strong>注意：<strong>使用 <code class="docutils literal notranslate"><span class="pre">set_device_ip</span></code> 应用的 IP 设置是</strong>永久性的</strong>，如果设备断电或重启，<strong>不会重置</strong>。</p>
+</div></blockquote>
+<p><strong>示例用法</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>orbbec_camera<span class="w"> </span>set_device_ip<span class="w"> </span>--ros-args<span class="w"> </span><span class="se">\</span>
+-p<span class="w"> </span>old_ip:<span class="o">=</span><span class="m">192</span>.168.1.10<span class="w"> </span><span class="se">\</span>
+-p<span class="w"> </span>dhcp:<span class="o">=</span><span class="nb">false</span><span class="w"> </span><span class="se">\</span>
+-p<span class="w"> </span>new_ip:<span class="o">=</span><span class="m">192</span>.168.1.11<span class="w"> </span><span class="se">\</span>
+-p<span class="w"> </span>mask:<span class="o">=</span><span class="m">255</span>.255.255.0<span class="w"> </span><span class="se">\</span>
+-p<span class="w"> </span>gateway:<span class="o">=</span><span class="m">192</span>.168.1.1
+</pre></div>
+</div>
+<p><strong>参数</strong></p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">old_ip</span></code></strong> – 设备的当前 IP 地址。</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">dhcp</span></code></strong> – 设置为 <code class="docutils literal notranslate"><span class="pre">true</span></code> 使用 DHCP 或 <code class="docutils literal notranslate"><span class="pre">false</span></code> 使用静态 IP。</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">new_ip</span></code></strong> – 禁用 DHCP 时要分配的静态 IP 地址。</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">mask</span></code></strong> – 新 IP 的子网掩码。</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">gateway</span></code></strong> – 新 IP 的网关地址。</p></li>
+</ul>
+</section>
+<section id="ip">
+<h2>强制 IP 功能<a class="headerlink" href="#ip" title="Link to this heading"></a></h2>
+<p><strong>强制 IP</strong> 功能允许您为网络相机分配<strong>静态 IP 地址</strong>，覆盖 DHCP 设置。当连接多个网络相机时，这非常有用，您需要每个设备具有固定的 IP 以实现可靠的通信。</p>
+<blockquote>
+<div><p><strong>注意：<strong>如果设备断电或重启，强制 IP 配置</strong>将被重置</strong>。您需要在重启后重新应用设置。</p>
+</div></blockquote>
+<p><strong>参数</strong></p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">force_ip_enable</span></code></strong> – 启用强制 IP 功能。<strong>默认值：</strong> <code class="docutils literal notranslate"><span class="pre">false</span></code></p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">force_ip_mac</span></code></strong> – 连接多个相机时的目标设备 MAC 地址（例如 <code class="docutils literal notranslate"><span class="pre">&quot;54:14:FD:06:07:DA&quot;</span></code>）。您可以使用 <code class="docutils literal notranslate"><span class="pre">list_devices_node</span></code> 查找每个设备的 MAC。<strong>默认值：</strong> <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code></p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">force_ip_address</span></code></strong> – 要分配的静态 IP 地址。<strong>默认值：</strong> <code class="docutils literal notranslate"><span class="pre">192.168.1.10</span></code></p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">force_ip_subnet_mask</span></code></strong> – 静态 IP 的子网掩码。<strong>默认值：</strong> <code class="docutils literal notranslate"><span class="pre">255.255.255.0</span></code></p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">force_ip_gateway</span></code></strong> – 静态 IP 的网关地址。<strong>默认值：</strong> <code class="docutils literal notranslate"><span class="pre">192.168.1.1</span></code></p></li>
+</ul>
+<p><strong>示例用法</strong></p>
+<ul class="simple">
+<li><p><strong>为特定设备启用强制 IP：</strong></p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>gemini_330_series.launch.py<span class="w"> </span><span class="se">\</span>
+force_ip_enable:<span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
+force_ip_mac:<span class="o">=</span><span class="m">54</span>:14:FD:06:07:DA<span class="w"> </span><span class="se">\</span>
+force_ip_address:<span class="o">=</span><span class="m">192</span>.168.1.50<span class="w"> </span><span class="se">\</span>
+force_ip_subnet_mask:<span class="o">=</span><span class="m">255</span>.255.255.0<span class="w"> </span><span class="se">\</span>
+force_ip_gateway:<span class="o">=</span><span class="m">192</span>.168.1.1<span class="w"> </span><span class="se">\</span>
+net_device_ip:<span class="o">=</span><span class="m">192</span>.168.1.50<span class="w"> </span><span class="se">\</span>
+net_device_port:<span class="o">=</span><span class="m">8090</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
+      <span class="lastupdated">最后更新于 2026年01月04日 01:12:35.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,140 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>介绍 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=63de077d" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/orbbec_footerlogo_3d_world.svg"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=7d86a446"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/translations.js?v=beaddf03"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="搜索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            OrbbecSDK V2 ROS2 封装
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">介绍</a><ul>
+<li><a class="reference internal" href="#id2">通用基准测试节点</a></li>
+<li><a class="reference internal" href="#id3">服务基准测试节点</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">OrbbecSDK V2 ROS2 封装</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">介绍</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/source/camera_devices/6_benchmark/introduction.md.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="id1">
+<h1>介绍<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<p>本节介绍性能基准测试工具，解释其目的、功能以及它可以帮助您测量的内容。</p>
+<section id="id2">
+<h2>通用基准测试节点<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">common_benchmark_node.py</span></code> 是一个用于监控在 ROS 环境中运行的 Orbbec 相机性能的工具。它实时收集和记录关键相机指标，如帧率、延迟、系统资源使用和丢包率，帮助用户评估相机节点的稳定性和性能（每秒更新一次）。</p>
+<p><strong>功能</strong></p>
+<ul class="simple">
+<li><p>测量发布的图像帧率和延迟（当前、最小、最大、平均）</p></li>
+<li><p>监控相机节点的 CPU/ARM 使用率（当前、最小、最大、平均）</p></li>
+<li><p>跟踪丢帧率（发布者）和丢包率（订阅者）</p></li>
+<li><p>将实时统计信息（1 Hz）打印到终端并将结果保存到 CSV 文件</p></li>
+<li><p>支持可配置的运行时长和 CSV 输出路径</p></li>
+</ul>
+<p><strong>示例</strong></p>
+<p>在 ROS1 中，可以测量丢帧率和丢包率，而在 ROS2 中，header 缺少 <code class="docutils literal notranslate"><span class="pre">seq</span></code> 字段，因此仅计算发布者端的丢帧率。</p>
+<p><img alt="common_benchmark_ros1" src="../../../_images/common_benchmark_ros1.png" /></p>
+<p><img alt="common_benchmark_ros2" src="../../../_images/common_benchmark_ros2.png" /></p>
+</section>
+<section id="id3">
+<h2>服务基准测试节点<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">service_benchmark_node</span></code> 工具用于监控服务调用的性能。它可以测量服务调用的成功率和执行服务所需的时间。</p>
+<p><strong>功能</strong></p>
+<ul class="simple">
+<li><p>对单个服务调用进行基准测试，测量延迟和成功率</p></li>
+<li><p>对 YAML 配置文件中定义的多个服务进行基准测试</p></li>
+<li><p>可选择将基准测试结果保存到 CSV 文件</p></li>
+</ul>
+<p><strong>示例</strong></p>
+<p><img alt="service benchmark" src="../../../_images/service_benchmark.png" /></p>
+<p>当您需要收集多个服务的数据时，建议使用 CSV 文件进行分析。</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
+      <span class="lastupdated">最后更新于 2026年01月04日 01:12:35.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

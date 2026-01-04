@@ -1,0 +1,468 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>坐标系和 TF 变换 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=63de077d" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/orbbec_footerlogo_3d_world.svg"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=7d86a446"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/translations.js?v=beaddf03"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="搜索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            OrbbecSDK V2 ROS2 封装
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">坐标系和 TF 变换</a><ul>
+<li><a class="reference internal" href="#id1">相机传感器结构</a></li>
+<li><a class="reference internal" href="#abtf">从坐标系A到坐标系B的TF变换：</a></li>
+<li><a class="reference internal" href="#ros2-vs">ROS2机器人坐标系 vs 相机光学坐标系</a></li>
+<li><a class="reference internal" href="#ros2-tf">ROS2 TF工具的使用</a><ul>
+<li><a class="reference internal" href="#id2">查看TF树结构</a></li>
+<li><a class="reference internal" href="#rviz2tf">使用rviz2可视化TF树</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id3">相机TF计算和发布机制</a><ul>
+<li><a class="reference internal" href="#obcameranode-calcandpublishstatictransform">核心函数：OBCameraNode::calcAndPublishStaticTransform()</a></li>
+<li><a class="reference internal" href="#id4">函数解析</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">OrbbecSDK V2 ROS2 封装</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">坐标系和 TF 变换</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/source/camera_devices/4_application_guide/coordinate_and_tf.md.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="tf">
+<h1>坐标系和 TF 变换<a class="headerlink" href="#tf" title="Link to this heading"></a></h1>
+<section id="id1">
+<h2>相机传感器结构<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p><img alt="module in rviz2" src="../../../_images/image3.png" /></p>
+<p><img alt="module in rviz2" src="../../../_images/image1.png" /></p>
+</section>
+<section id="abtf">
+<h2>从坐标系A到坐标系B的TF变换：<a class="headerlink" href="#abtf" title="Link to this heading"></a></h2>
+<p>在Orbbec相机中，原点（0,0,0）取自camera_link位置。</p>
+<p>可以使用以下命令查看相机的URDF模型和坐标系结构：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_description<span class="w"> </span>view_model.launch.py<span class="w"> </span>model:<span class="o">=</span>gemini_335_336.urdf.xacro
+</pre></div>
+</div>
+<p><img alt="rviz2中的模块" src="../../../_images/image2.png" /></p>
+</section>
+<section id="ros2-vs">
+<h2>ROS2机器人坐标系 vs 相机光学坐标系<a class="headerlink" href="#ros2-vs" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>视角：</p>
+<ul>
+<li><p>想象我们站在相机后面，向前看。</p></li>
+<li><p>在讨论坐标、左右红外、传感器位置等时，始终使用此视角。</p></li>
+</ul>
+</li>
+</ul>
+<p><img alt="ROS2和相机坐标系统" src="../../../_images/image0.png" /></p>
+<ul class="simple">
+<li><p>ROS2坐标系：（X: 向前，Y: 向左，Z: 向上）</p></li>
+<li><p>相机光学坐标系：（X: 向右，Y: 向下，Z: 向前）</p></li>
+<li><p>我们封装器话题中发布的所有数据都是直接从相机传感器获取的光学数据。</p></li>
+<li><p>静态和动态TF话题发布光学坐标系和ROS坐标系，使用户能够在两个坐标系之间转换。</p></li>
+</ul>
+</section>
+<section id="ros2-tf">
+<h2>ROS2 TF工具的使用<a class="headerlink" href="#ros2-tf" title="Link to this heading"></a></h2>
+<section id="id2">
+<h3>查看TF树结构<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<p>可以使用以下ROS2命令来打印和可视化相机包发布的TF树：</p>
+<p><strong>打印所有TF关系：</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>tf2_tools<span class="w"> </span>view_frames
+</pre></div>
+</div>
+<p>这个命令会生成一个 <code class="docutils literal notranslate"><span class="pre">frames.pdf</span></code>文件，展示所有frame之间的层级关系。</p>
+<p><img alt="image-20251027111351870" src="../../../_images/image4.png" /></p>
+<p><strong>查看所有正在发布的TF信息：</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/tf_static
+</pre></div>
+</div>
+<p><strong>查看指定两个frame之间的TF变换关系：</strong></p>
+<p>使用以下命令可以查看两个特定frame之间的变换关系：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>tf2_ros<span class="w"> </span>tf2_echo<span class="w"> </span><span class="o">[</span>source_frame<span class="o">]</span><span class="w"> </span><span class="o">[</span>target_frame<span class="o">]</span>
+</pre></div>
+</div>
+<p>例如，查看从 <code class="docutils literal notranslate"><span class="pre">camera_link</span></code> 到 <code class="docutils literal notranslate"><span class="pre">camera_depth_optical_frame</span></code> 的变换：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>tf2_ros<span class="w"> </span>tf2_echo<span class="w"> </span>camera_link<span class="w"> </span>camera_depth_optical_frame
+</pre></div>
+</div>
+<p>此命令会持续输出两个frame之间的实时变换信息，包括：</p>
+<ul class="simple">
+<li><p>平移 (Translation)：x、y、z 坐标（单位：米）</p></li>
+<li><p>旋转 (Rotation)：四元数 (x, y, z, w)</p></li>
+<li><p>欧拉角 (RPY)：以欧拉角形式表示的旋转</p></li>
+<li><p>齐次变换矩阵 (Transform Matrix)：包含旋转和平移信息的 4×4 矩阵</p></li>
+</ul>
+<p>示例输出：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">At</span> <span class="n">time</span> <span class="mf">0.0</span>
+<span class="o">-</span> <span class="n">Translation</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.000</span><span class="p">,</span> <span class="mf">0.000</span><span class="p">,</span> <span class="mf">0.000</span><span class="p">]</span>
+<span class="o">-</span> <span class="n">Rotation</span><span class="p">:</span> <span class="ow">in</span> <span class="n">Quaternion</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.500</span><span class="p">,</span> <span class="mf">0.500</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.500</span><span class="p">,</span> <span class="mf">0.500</span><span class="p">]</span>
+<span class="o">-</span> <span class="n">Rotation</span><span class="p">:</span> <span class="ow">in</span> <span class="n">RPY</span> <span class="p">(</span><span class="n">radian</span><span class="p">)</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.571</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.000</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.571</span><span class="p">]</span>
+<span class="o">-</span> <span class="n">Rotation</span><span class="p">:</span> <span class="ow">in</span> <span class="n">RPY</span> <span class="p">(</span><span class="n">degree</span><span class="p">)</span> <span class="p">[</span><span class="o">-</span><span class="mf">90.000</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.000</span><span class="p">,</span> <span class="o">-</span><span class="mf">90.000</span><span class="p">]</span>
+<span class="o">-</span> <span class="n">Matrix</span><span class="p">:</span>
+  <span class="mf">0.000</span>  <span class="mf">0.000</span>  <span class="mf">1.000</span>  <span class="mf">0.000</span>
+ <span class="o">-</span><span class="mf">1.000</span>  <span class="mf">0.000</span>  <span class="mf">0.000</span>  <span class="mf">0.000</span>
+  <span class="mf">0.000</span> <span class="o">-</span><span class="mf">1.000</span>  <span class="mf">0.000</span>  <span class="mf">0.000</span>
+  <span class="mf">0.000</span>  <span class="mf">0.000</span>  <span class="mf">0.000</span>  <span class="mf">1.000</span>
+</pre></div>
+</div>
+</section>
+<section id="rviz2tf">
+<h3>使用rviz2可视化TF树<a class="headerlink" href="#rviz2tf" title="Link to this heading"></a></h3>
+<p>在rviz2中可以实时可视化TF树结构和坐标系的相对位置：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rviz2
+</pre></div>
+</div>
+<p>在rviz2中：</p>
+<ul class="simple">
+<li><p>添加 <code class="docutils literal notranslate"><span class="pre">TF</span></code>显示插件</p></li>
+<li><p>配置固定框架（Fixed Frame）为 <code class="docutils literal notranslate"><span class="pre">camera_link</span></code>或 <code class="docutils literal notranslate"><span class="pre">camera_depth_optical_frame</span></code></p></li>
+<li><p>选择显示的TF框架树</p></li>
+</ul>
+<p><img alt="image-20251027140652727" src="../../../_images/image5.png" /></p>
+</section>
+</section>
+<section id="id3">
+<h2>相机TF计算和发布机制<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<section id="obcameranode-calcandpublishstatictransform">
+<h3>核心函数：<a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/blob/166c35b4ea211c60265ca9b38b1b15519d1ea3dd/orbbec_camera/src/ob_camera_node.cpp#L3475">OBCameraNode::calcAndPublishStaticTransform()</a><a class="headerlink" href="#obcameranode-calcandpublishstatictransform" title="Link to this heading"></a></h3>
+<p>相机节点通过此函数计算和发布所有传感器之间的静态转换关系。</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">OBCameraNode::calcAndPublishStaticTransform</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">tf2</span><span class="o">::</span><span class="n">Quaternion</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="p">,</span><span class="w"> </span><span class="n">zero_rot</span><span class="p">;</span>
+<span class="w">  </span><span class="n">zero_rot</span><span class="p">.</span><span class="n">setRPY</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+<span class="w">  </span><span class="n">quaternion_optical</span><span class="p">.</span><span class="n">setRPY</span><span class="p">(</span><span class="o">-</span><span class="n">M_PI</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="n">M_PI</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<span class="w">  </span><span class="n">tf2</span><span class="o">::</span><span class="n">Vector3</span><span class="w"> </span><span class="n">zero_trans</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">base_stream_profile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stream_profile_</span><span class="p">[</span><span class="n">base_stream_</span><span class="p">];</span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">device_info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">device_</span><span class="o">-&gt;</span><span class="n">getDeviceInfo</span><span class="p">();</span>
+<span class="w">  </span><span class="n">CHECK_NOTNULL</span><span class="p">(</span><span class="n">device_info</span><span class="p">);</span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">pid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">device_info</span><span class="o">-&gt;</span><span class="n">getPid</span><span class="p">();</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">base_stream_profile</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">RCLCPP_ERROR_STREAM</span><span class="p">(</span><span class="n">logger_</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Failed to get base stream profile&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="n">CHECK_NOTNULL</span><span class="p">(</span><span class="n">base_stream_profile</span><span class="p">.</span><span class="n">get</span><span class="p">());</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;</span><span class="n">item</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">stream_profile_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">stream_index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">item</span><span class="p">.</span><span class="n">first</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">stream_profile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">item</span><span class="p">.</span><span class="n">second</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">stream_profile</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">continue</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">OBExtrinsic</span><span class="w"> </span><span class="n">ex</span><span class="p">;</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stream_profile</span><span class="o">-&gt;</span><span class="n">getExtrinsicTo</span><span class="p">(</span><span class="n">base_stream_profile</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ob</span><span class="o">::</span><span class="n">Error</span><span class="w"> </span><span class="o">&amp;</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">RCLCPP_ERROR_STREAM</span><span class="p">(</span><span class="n">logger_</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Failed to get &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">stream_name_</span><span class="p">[</span><span class="n">stream_index</span><span class="p">]</span>
+<span class="w">                                                    </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; extrinsic: &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">getMessage</span><span class="p">());</span>
+<span class="w">      </span><span class="n">ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OBExtrinsic</span><span class="p">({{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">}});</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">Q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rotationMatrixToQuaternion</span><span class="p">(</span><span class="n">ex</span><span class="p">.</span><span class="n">rot</span><span class="p">);</span>
+<span class="w">    </span><span class="n">Q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Q</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="p">.</span><span class="n">inverse</span><span class="p">();</span>
+<span class="w">    </span><span class="n">tf2</span><span class="o">::</span><span class="n">Vector3</span><span class="w"> </span><span class="n">trans</span><span class="p">(</span><span class="n">ex</span><span class="p">.</span><span class="n">trans</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="n">ex</span><span class="p">.</span><span class="n">trans</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">ex</span><span class="p">.</span><span class="n">trans</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">node_</span><span class="o">-&gt;</span><span class="n">now</span><span class="p">();</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">stream_index</span><span class="p">.</span><span class="n">first</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">base_stream_</span><span class="p">.</span><span class="n">first</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">stream_index</span><span class="p">.</span><span class="n">first</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">OB_STREAM_IR_RIGHT</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">base_stream_</span><span class="p">.</span><span class="n">first</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">OB_STREAM_DEPTH</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">trans</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">abs</span><span class="p">(</span><span class="n">trans</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span><span class="w">  </span><span class="c1">// because left and right ir calibration is error</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">      </span><span class="n">publishStaticTF</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span><span class="w"> </span><span class="n">trans</span><span class="p">,</span><span class="w"> </span><span class="n">Q</span><span class="p">,</span><span class="w"> </span><span class="n">frame_id_</span><span class="p">[</span><span class="n">base_stream_</span><span class="p">],</span><span class="w"> </span><span class="n">frame_id_</span><span class="p">[</span><span class="n">stream_index</span><span class="p">]);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">publishStaticTF</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span><span class="w"> </span><span class="n">zero_trans</span><span class="p">,</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="p">,</span><span class="w"> </span><span class="n">frame_id_</span><span class="p">[</span><span class="n">stream_index</span><span class="p">],</span>
+<span class="w">                    </span><span class="n">optical_frame_id_</span><span class="p">[</span><span class="n">stream_index</span><span class="p">]);</span>
+<span class="w">    </span><span class="n">RCLCPP_INFO_STREAM</span><span class="p">(</span><span class="n">logger_</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Publishing static transform from &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">stream_name_</span><span class="p">[</span><span class="n">stream_index</span><span class="p">]</span>
+<span class="w">                                                                    </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; to &quot;</span>
+<span class="w">                                                                    </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">stream_name_</span><span class="p">[</span><span class="n">base_stream_</span><span class="p">]);</span>
+<span class="w">    </span><span class="n">RCLCPP_INFO_STREAM</span><span class="p">(</span><span class="n">logger_</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Translation &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">trans</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;, &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">trans</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;, &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">trans</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+<span class="w">    </span><span class="n">RCLCPP_INFO_STREAM</span><span class="p">(</span><span class="n">logger_</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Rotation &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">Q</span><span class="p">.</span><span class="n">getX</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;, &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">Q</span><span class="p">.</span><span class="n">getY</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;, &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">Q</span><span class="p">.</span><span class="n">getZ</span><span class="p">()</span>
+<span class="w">                                            </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;, &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">Q</span><span class="p">.</span><span class="n">getW</span><span class="p">());</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">pid</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">FEMTO_BOLT_PID</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">pid</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">FEMTO_MEGA_PID</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">enable_stream_</span><span class="p">[</span><span class="n">DEPTH</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">      </span><span class="n">enable_stream_</span><span class="p">[</span><span class="n">COLOR</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">enable_publish_extrinsic_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// calc depth to color</span>
+
+<span class="w">    </span><span class="n">CHECK_NOTNULL</span><span class="p">(</span><span class="n">stream_profile_</span><span class="p">[</span><span class="n">COLOR</span><span class="p">]);</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">depth_to_color_extrinsics</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">base_stream_profile</span><span class="o">-&gt;</span><span class="n">getExtrinsicTo</span><span class="p">(</span><span class="n">stream_profile_</span><span class="p">[</span><span class="n">COLOR</span><span class="p">]);</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">Q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rotationMatrixToQuaternion</span><span class="p">(</span><span class="n">depth_to_color_extrinsics</span><span class="p">.</span><span class="n">rot</span><span class="p">);</span>
+<span class="w">    </span><span class="n">Q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Q</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="p">.</span><span class="n">inverse</span><span class="p">();</span>
+<span class="w">    </span><span class="n">publishStaticTF</span><span class="p">(</span><span class="n">node_</span><span class="o">-&gt;</span><span class="n">now</span><span class="p">(),</span><span class="w"> </span><span class="n">zero_trans</span><span class="p">,</span><span class="w"> </span><span class="n">Q</span><span class="p">,</span><span class="w"> </span><span class="n">camera_link_frame_id_</span><span class="p">,</span><span class="w"> </span><span class="n">frame_id_</span><span class="p">[</span><span class="n">base_stream_</span><span class="p">]);</span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">publishStaticTF</span><span class="p">(</span><span class="n">node_</span><span class="o">-&gt;</span><span class="n">now</span><span class="p">(),</span><span class="w"> </span><span class="n">zero_trans</span><span class="p">,</span><span class="w"> </span><span class="n">zero_rot</span><span class="p">,</span><span class="w"> </span><span class="n">camera_link_frame_id_</span><span class="p">,</span>
+<span class="w">                    </span><span class="n">frame_id_</span><span class="p">[</span><span class="n">base_stream_</span><span class="p">]);</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">enable_stream_</span><span class="p">[</span><span class="n">DEPTH</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">enable_stream_</span><span class="p">[</span><span class="n">COLOR</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">enable_publish_extrinsic_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">frame_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;depth_to_color_extrinsics&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="n">OBExtrinsic</span><span class="w"> </span><span class="n">ex</span><span class="p">;</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">base_stream_profile</span><span class="o">-&gt;</span><span class="n">getExtrinsicTo</span><span class="p">(</span><span class="n">stream_profile_</span><span class="p">[</span><span class="n">COLOR</span><span class="p">]);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ob</span><span class="o">::</span><span class="n">Error</span><span class="w"> </span><span class="o">&amp;</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">RCLCPP_ERROR_STREAM</span><span class="p">(</span><span class="n">logger_</span><span class="p">,</span>
+<span class="w">                          </span><span class="s">&quot;Failed to get &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">frame_id</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; extrinsic: &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">getMessage</span><span class="p">());</span>
+<span class="w">      </span><span class="n">ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OBExtrinsic</span><span class="p">({{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">}});</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">depth_to_other_extrinsics_</span><span class="p">[</span><span class="n">COLOR</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ex</span><span class="p">;</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">ex_msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">obExtrinsicsToMsg</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span><span class="w"> </span><span class="n">frame_id</span><span class="p">);</span>
+<span class="w">    </span><span class="n">CHECK_NOTNULL</span><span class="p">(</span><span class="n">depth_to_other_extrinsics_publishers_</span><span class="p">[</span><span class="n">COLOR</span><span class="p">]);</span>
+<span class="w">    </span><span class="n">depth_to_other_extrinsics_publishers_</span><span class="p">[</span><span class="n">COLOR</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">publish</span><span class="p">(</span><span class="n">ex_msg</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">enable_stream_</span><span class="p">[</span><span class="n">DEPTH</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">enable_stream_</span><span class="p">[</span><span class="n">INFRA0</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">enable_publish_extrinsic_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">frame_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;depth_to_ir_extrinsics&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="n">OBExtrinsic</span><span class="w"> </span><span class="n">ex</span><span class="p">;</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">base_stream_profile</span><span class="o">-&gt;</span><span class="n">getExtrinsicTo</span><span class="p">(</span><span class="n">stream_profile_</span><span class="p">[</span><span class="n">INFRA0</span><span class="p">]);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ob</span><span class="o">::</span><span class="n">Error</span><span class="w"> </span><span class="o">&amp;</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">RCLCPP_ERROR_STREAM</span><span class="p">(</span><span class="n">logger_</span><span class="p">,</span>
+<span class="w">                          </span><span class="s">&quot;Failed to get &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">frame_id</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; extrinsic: &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">getMessage</span><span class="p">());</span>
+<span class="w">      </span><span class="n">ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OBExtrinsic</span><span class="p">({{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">}});</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">depth_to_other_extrinsics_</span><span class="p">[</span><span class="n">INFRA0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ex</span><span class="p">;</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">ex_msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">obExtrinsicsToMsg</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span><span class="w"> </span><span class="n">frame_id</span><span class="p">);</span>
+<span class="w">    </span><span class="n">CHECK_NOTNULL</span><span class="p">(</span><span class="n">depth_to_other_extrinsics_publishers_</span><span class="p">[</span><span class="n">INFRA0</span><span class="p">]);</span>
+<span class="w">    </span><span class="n">depth_to_other_extrinsics_publishers_</span><span class="p">[</span><span class="n">INFRA0</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">publish</span><span class="p">(</span><span class="n">ex_msg</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">enable_stream_</span><span class="p">[</span><span class="n">DEPTH</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">enable_stream_</span><span class="p">[</span><span class="n">INFRA1</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">enable_publish_extrinsic_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">frame_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;depth_to_left_ir_extrinsics&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="n">OBExtrinsic</span><span class="w"> </span><span class="n">ex</span><span class="p">;</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">base_stream_profile</span><span class="o">-&gt;</span><span class="n">getExtrinsicTo</span><span class="p">(</span><span class="n">stream_profile_</span><span class="p">[</span><span class="n">INFRA1</span><span class="p">]);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ob</span><span class="o">::</span><span class="n">Error</span><span class="w"> </span><span class="o">&amp;</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">RCLCPP_ERROR_STREAM</span><span class="p">(</span><span class="n">logger_</span><span class="p">,</span>
+<span class="w">                          </span><span class="s">&quot;Failed to get &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">frame_id</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; extrinsic: &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">getMessage</span><span class="p">());</span>
+<span class="w">      </span><span class="n">ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OBExtrinsic</span><span class="p">({{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">}});</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">depth_to_other_extrinsics_</span><span class="p">[</span><span class="n">INFRA1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ex</span><span class="p">;</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">ex_msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">obExtrinsicsToMsg</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span><span class="w"> </span><span class="n">frame_id</span><span class="p">);</span>
+<span class="w">    </span><span class="n">CHECK_NOTNULL</span><span class="p">(</span><span class="n">depth_to_other_extrinsics_publishers_</span><span class="p">[</span><span class="n">INFRA1</span><span class="p">]);</span>
+<span class="w">    </span><span class="n">depth_to_other_extrinsics_publishers_</span><span class="p">[</span><span class="n">INFRA1</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">publish</span><span class="p">(</span><span class="n">ex_msg</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">enable_stream_</span><span class="p">[</span><span class="n">DEPTH</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">enable_stream_</span><span class="p">[</span><span class="n">INFRA2</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">enable_publish_extrinsic_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">frame_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;depth_to_right_ir_extrinsics&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="n">OBExtrinsic</span><span class="w"> </span><span class="n">ex</span><span class="p">;</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">base_stream_profile</span><span class="o">-&gt;</span><span class="n">getExtrinsicTo</span><span class="p">(</span><span class="n">stream_profile_</span><span class="p">[</span><span class="n">INFRA2</span><span class="p">]);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ob</span><span class="o">::</span><span class="n">Error</span><span class="w"> </span><span class="o">&amp;</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">RCLCPP_ERROR_STREAM</span><span class="p">(</span><span class="n">logger_</span><span class="p">,</span>
+<span class="w">                          </span><span class="s">&quot;Failed to get &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">frame_id</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; extrinsic: &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">getMessage</span><span class="p">());</span>
+<span class="w">      </span><span class="n">ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OBExtrinsic</span><span class="p">({{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">}});</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">ex</span><span class="p">.</span><span class="n">trans</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">std</span><span class="o">::</span><span class="n">abs</span><span class="p">(</span><span class="n">ex</span><span class="p">.</span><span class="n">trans</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+<span class="w">    </span><span class="n">depth_to_other_extrinsics_</span><span class="p">[</span><span class="n">INFRA2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ex</span><span class="p">;</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">ex_msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">obExtrinsicsToMsg</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span><span class="w"> </span><span class="n">frame_id</span><span class="p">);</span>
+<span class="w">    </span><span class="n">CHECK_NOTNULL</span><span class="p">(</span><span class="n">depth_to_other_extrinsics_publishers_</span><span class="p">[</span><span class="n">INFRA2</span><span class="p">]);</span>
+<span class="w">    </span><span class="n">depth_to_other_extrinsics_publishers_</span><span class="p">[</span><span class="n">INFRA2</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">publish</span><span class="p">(</span><span class="n">ex_msg</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">enable_stream_</span><span class="p">[</span><span class="n">DEPTH</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">enable_stream_</span><span class="p">[</span><span class="n">ACCEL</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">enable_publish_extrinsic_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">frame_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;depth_to_accel_extrinsics&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="n">OBExtrinsic</span><span class="w"> </span><span class="n">ex</span><span class="p">;</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">base_stream_profile</span><span class="o">-&gt;</span><span class="n">getExtrinsicTo</span><span class="p">(</span><span class="n">stream_profile_</span><span class="p">[</span><span class="n">ACCEL</span><span class="p">]);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ob</span><span class="o">::</span><span class="n">Error</span><span class="w"> </span><span class="o">&amp;</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">RCLCPP_ERROR_STREAM</span><span class="p">(</span><span class="n">logger_</span><span class="p">,</span>
+<span class="w">                          </span><span class="s">&quot;Failed to get &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">frame_id</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; extrinsic: &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">getMessage</span><span class="p">());</span>
+<span class="w">      </span><span class="n">ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OBExtrinsic</span><span class="p">({{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">}});</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">depth_to_other_extrinsics_</span><span class="p">[</span><span class="n">ACCEL</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ex</span><span class="p">;</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">ex_msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">obExtrinsicsToMsg</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span><span class="w"> </span><span class="n">frame_id</span><span class="p">);</span>
+<span class="w">    </span><span class="n">CHECK_NOTNULL</span><span class="p">(</span><span class="n">depth_to_other_extrinsics_publishers_</span><span class="p">[</span><span class="n">ACCEL</span><span class="p">]);</span>
+<span class="w">    </span><span class="n">depth_to_other_extrinsics_publishers_</span><span class="p">[</span><span class="n">ACCEL</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">publish</span><span class="p">(</span><span class="n">ex_msg</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">enable_stream_</span><span class="p">[</span><span class="n">DEPTH</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">enable_stream_</span><span class="p">[</span><span class="n">GYRO</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">enable_publish_extrinsic_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">frame_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;depth_to_gyro_extrinsics&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="n">OBExtrinsic</span><span class="w"> </span><span class="n">ex</span><span class="p">;</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">base_stream_profile</span><span class="o">-&gt;</span><span class="n">getExtrinsicTo</span><span class="p">(</span><span class="n">stream_profile_</span><span class="p">[</span><span class="n">GYRO</span><span class="p">]);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ob</span><span class="o">::</span><span class="n">Error</span><span class="w"> </span><span class="o">&amp;</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">RCLCPP_ERROR_STREAM</span><span class="p">(</span><span class="n">logger_</span><span class="p">,</span>
+<span class="w">                          </span><span class="s">&quot;Failed to get &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">frame_id</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; extrinsic: &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">getMessage</span><span class="p">());</span>
+<span class="w">      </span><span class="n">ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OBExtrinsic</span><span class="p">({{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">}});</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">depth_to_other_extrinsics_</span><span class="p">[</span><span class="n">GYRO</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ex</span><span class="p">;</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">ex_msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">obExtrinsicsToMsg</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span><span class="w"> </span><span class="n">frame_id</span><span class="p">);</span>
+<span class="w">    </span><span class="n">CHECK_NOTNULL</span><span class="p">(</span><span class="n">depth_to_other_extrinsics_publishers_</span><span class="p">[</span><span class="n">GYRO</span><span class="p">]);</span>
+<span class="w">    </span><span class="n">depth_to_other_extrinsics_publishers_</span><span class="p">[</span><span class="n">GYRO</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">publish</span><span class="p">(</span><span class="n">ex_msg</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">enable_sync_output_accel_gyro_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">tf2</span><span class="o">::</span><span class="n">Quaternion</span><span class="w"> </span><span class="n">zero_rot</span><span class="p">;</span>
+<span class="w">    </span><span class="n">zero_rot</span><span class="p">.</span><span class="n">setRPY</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+<span class="w">    </span><span class="n">tf2</span><span class="o">::</span><span class="n">Vector3</span><span class="w"> </span><span class="n">zero_trans</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">    </span><span class="n">publishStaticTF</span><span class="p">(</span><span class="n">node_</span><span class="o">-&gt;</span><span class="n">now</span><span class="p">(),</span><span class="w"> </span><span class="n">zero_trans</span><span class="p">,</span><span class="w"> </span><span class="n">zero_rot</span><span class="p">,</span><span class="w"> </span><span class="n">optical_frame_id_</span><span class="p">[</span><span class="n">GYRO</span><span class="p">],</span>
+<span class="w">                    </span><span class="n">accel_gyro_frame_id_</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h3>函数解析<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<p>下面是代码的详细解释：</p>
+<p><strong>四元数初始化与坐标系变换</strong></p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">tf2</span><span class="o">::</span><span class="n">Quaternion</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="p">,</span><span class="w"> </span><span class="n">zero_rot</span><span class="p">;</span>
+<span class="n">zero_rot</span><span class="p">.</span><span class="n">setRPY</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+<span class="n">quaternion_optical</span><span class="p">.</span><span class="n">setRPY</span><span class="p">(</span><span class="o">-</span><span class="n">M_PI</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="n">M_PI</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">quaternion_optical</span></code>：定义光学坐标系到ROS标准坐标系的旋转变换（90度旋转）</p></li>
+<li><p>这个旋转将相机光学坐标系（X右、Y下、Z前）转换为ROS标准坐标系（X前、Y左、Z上）</p></li>
+</ul>
+<p><strong>获取设备信息与基准流</strong></p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">base_stream_profile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stream_profile_</span><span class="p">[</span><span class="n">base_stream_</span><span class="p">];</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">device_info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">device_</span><span class="o">-&gt;</span><span class="n">getDeviceInfo</span><span class="p">();</span>
+<span class="c1">// 通常基准流是深度流(DEPTH)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>选择一个基准流（通常是深度流），所有其他传感器的变换都相对于这个基准流进行计算</p></li>
+</ul>
+<p><strong>遍历所有流并计算相对变换</strong></p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;</span><span class="n">item</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">stream_profile_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">stream_index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">item</span><span class="p">.</span><span class="n">first</span><span class="p">;</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">stream_profile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">item</span><span class="p">.</span><span class="n">second</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// 获取该流相对于基准流的外参</span>
+<span class="w">    </span><span class="n">OBExtrinsic</span><span class="w"> </span><span class="n">ex</span><span class="p">;</span>
+<span class="w">    </span><span class="n">ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stream_profile</span><span class="o">-&gt;</span><span class="n">getExtrinsicTo</span><span class="p">(</span><span class="n">base_stream_profile</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 将旋转矩阵转换为四元数</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">Q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rotationMatrixToQuaternion</span><span class="p">(</span><span class="n">ex</span><span class="p">.</span><span class="n">rot</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 应用光学坐标系变换：Q_new = quaternion_optical * Q * quaternion_optical.inverse()</span>
+<span class="w">    </span><span class="n">Q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Q</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="p">.</span><span class="n">inverse</span><span class="p">();</span>
+
+<span class="w">    </span><span class="n">tf2</span><span class="o">::</span><span class="n">Vector3</span><span class="w"> </span><span class="nf">trans</span><span class="p">(</span><span class="n">ex</span><span class="p">.</span><span class="n">trans</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="n">ex</span><span class="p">.</span><span class="n">trans</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">ex</span><span class="p">.</span><span class="n">trans</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">OBExtrinsic</span></code>包含了两个传感器之间的旋转矩阵(<code class="docutils literal notranslate"><span class="pre">rot</span></code>)和平移向量(<code class="docutils literal notranslate"><span class="pre">trans</span></code>)</p></li>
+<li><p>通过四元数乘法将光学坐标系变换应用到每个传感器的旋转关系中</p></li>
+<li><p>这个变换将相机原生的光学坐标系转换为ROS标准坐标系</p></li>
+</ul>
+<p><strong>发布TF变换</strong></p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// 发布传感器到基准流的变换（在ROS坐标系中）</span>
+<span class="n">publishStaticTF</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span><span class="w"> </span><span class="n">trans</span><span class="p">,</span><span class="w"> </span><span class="n">Q</span><span class="p">,</span><span class="w"> </span><span class="n">frame_id_</span><span class="p">[</span><span class="n">base_stream_</span><span class="p">],</span><span class="w"> </span><span class="n">frame_id_</span><span class="p">[</span><span class="n">stream_index</span><span class="p">]);</span>
+
+<span class="c1">// 发布传感器到其光学frame的变换</span>
+<span class="n">publishStaticTF</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span><span class="w"> </span><span class="n">zero_trans</span><span class="p">,</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="p">,</span><span class="w"> </span><span class="n">frame_id_</span><span class="p">[</span><span class="n">stream_index</span><span class="p">],</span>
+<span class="w">                </span><span class="n">optical_frame_id_</span><span class="p">[</span><span class="n">stream_index</span><span class="p">]);</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>第一个 <code class="docutils literal notranslate"><span class="pre">publishStaticTF</span></code>：发布从基准流到当前传感器的变换（平移+旋转）</p></li>
+<li><p>第二个 <code class="docutils literal notranslate"><span class="pre">publishStaticTF</span></code>：发布从物理frame到光学frame的变换（纯旋转，无平移）</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">frame_id_[stream_index]</span></code>：物理坐标系frame名称（如 <code class="docutils literal notranslate"><span class="pre">camera_depth_frame</span></code>）</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">optical_frame_id_[stream_index]</span></code>：光学坐标系frame名称（如 <code class="docutils literal notranslate"><span class="pre">camera_depth_optical_frame</span></code>）</p></li>
+</ul>
+<p><strong>特殊处理左右红外摄像头</strong></p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">stream_index</span><span class="p">.</span><span class="n">first</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">OB_STREAM_IR_RIGHT</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">base_stream_</span><span class="p">.</span><span class="n">first</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">OB_STREAM_DEPTH</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">trans</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">abs</span><span class="p">(</span><span class="n">trans</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>左右红外摄像头在设备坐标系中关于中心平面对称</p></li>
+<li><p>通过 <code class="docutils literal notranslate"><span class="pre">abs()</span></code>确保X轴偏移为正值，保持几何一致性</p></li>
+</ul>
+<p><strong>发布深度到其他传感器的外参</strong></p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">enable_stream_</span><span class="p">[</span><span class="n">DEPTH</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">enable_stream_</span><span class="p">[</span><span class="n">COLOR</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">enable_publish_extrinsic_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">OBExtrinsic</span><span class="w"> </span><span class="n">ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">base_stream_profile</span><span class="o">-&gt;</span><span class="n">getExtrinsicTo</span><span class="p">(</span><span class="n">stream_profile_</span><span class="p">[</span><span class="n">COLOR</span><span class="p">]);</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">ex_msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">obExtrinsicsToMsg</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;depth_to_color_extrinsics&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">depth_to_other_extrinsics_publishers_</span><span class="p">[</span><span class="n">COLOR</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">publish</span><span class="p">(</span><span class="n">ex_msg</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>通过TF发布变换关系</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
+      <span class="lastupdated">最后更新于 2026年01月04日 01:12:35.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -8,7 +8,6 @@ OrbbecSDK V2 ROS2 Wrapper documentation
 
 .. toctree::
     :maxdepth: 3
-    :numbered:
 
     source/camera_devices/index.rst
     source/lidar_devices/index.rst

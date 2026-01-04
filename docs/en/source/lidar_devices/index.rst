@@ -1,9 +1,8 @@
-.. _lidar_devices:
-
 Lidar Devices
 =======================================
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
+    :numbered:
 
     lidar.md

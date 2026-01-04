@@ -59,11 +59,11 @@ rviz2
 
 * `PointCloud2` visualization example:
 
-![module in rviz2](./docs/images/lidar0.jpg)
+![module in rviz2](./image/lidar0.jpg)
 
 * `LaserScan` visualization example:
 
-![module in rviz2](./docs/images/lidar1.png)
+![module in rviz2](./image/lidar1.png)
 
 ## Usage
 

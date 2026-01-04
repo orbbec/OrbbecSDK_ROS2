@@ -59,11 +59,11 @@ rviz2
 
 * `PointCloud2`可视化示例：
 
-![rviz2中的模块](./docs/images/lidar0.jpg)
+![rviz2中的模块](./image/lidar0.jpg)
 
 * `LaserScan`可视化示例：
 
-![rviz2中的模块](./docs/images/lidar1.png)
+![rviz2中的模块](./image/lidar1.png)
 
 ## 使用方法
 

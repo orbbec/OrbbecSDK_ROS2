@@ -399,13 +399,34 @@
            <div itemprop="articleBody">
              
   <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">中文</a> | <a class="lang-current" href="#">English</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="lidar-devices">
-<h1><span class="section-number">1. </span>Lidar Devices<a class="headerlink" href="#lidar-devices" title="Link to this heading"></a></h1>
+<span id="id1"></span><h1><span class="section-number">1. </span>Lidar Devices<a class="headerlink" href="#lidar-devices" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="lidar.html">1.1. Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lidar.html#usage">1.2. Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lidar.html#point-cloud-data-details">1.3. Point Cloud Data Details</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lidar.html#imu-data">1.4. IMU Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lidar.html">1.1. Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lidar.html#prerequisites">1.1.1. Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lidar.html#install-deb-dependencies">1.1.2. Install deb Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lidar.html#install-udev-rules">1.1.3. Install udev Rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lidar.html#build-the-package">1.1.4. Build the Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lidar.html#launch-the-lidar-node">1.1.5. Launch the LiDAR Node</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="lidar.html#usage">1.2. Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lidar.html#running-the-driver">1.2.1. Running the Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lidar.html#get-device-information-for-connected-lidars">1.2.2. Get Device Information for Connected LiDARs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lidar.html#check-which-configurations-the-lidar-supports">1.2.3. Check Which Configurations the LiDAR Supports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lidar.html#parameters-and-configuration">1.2.4. Parameters and Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="lidar.html#point-cloud-data-details">1.3. Point Cloud Data Details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lidar.html#point-cloud-format">1.3.1. Point Cloud Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lidar.html#point-cloud-aggregation-functionality">1.3.2. Point Cloud Aggregation Functionality</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="lidar.html#imu-data">1.4. IMU Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lidar.html#imu-topics">1.4.1. IMU Topics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lidar.html#using-imu-data">1.4.2. Using IMU Data</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </section>
@@ -422,7 +443,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2025, ORBBEC INC. www.orbbec.com..
-      <span class="lastupdated">Last updated on 2026-01-04 01:12:32.
+      <span class="lastupdated">Last updated on 2026-01-04 01:19:52.
       </span></p>
   </div>
 

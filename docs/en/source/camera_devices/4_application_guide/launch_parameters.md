@@ -42,7 +42,7 @@ The following are the launch parameters available:
 *   **`right_ir.image_raw.enable_pub_plugins`**
     *   Enable Right IR image transport plugins. Default: `["image_transport/compressed", "image_transport/raw", "image_transport/theora"]`.
 *   **`point_cloud_decimation_filter_factor`**
-    *   Point cloud downsampling factor. Range: `1–8`. `1` means no downsampling; larger values apply stronger decimation.
+    *   Point cloud downsampling factor. Range: `1–8`. `1` means no downsampling.
 *   **`preset_resolution_config`**
     * Preset resolution configuration for the camera device. Format: "width,height,ir_decimation_factor,depth_decimation_factor". Example: "1280,720,4,4". Only supported on specific devices like Gemini2. Leave empty to disable.
 

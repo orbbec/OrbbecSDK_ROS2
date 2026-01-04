@@ -7,7 +7,6 @@ OrbbecSDK V2 ROS2 封装文档
 
 .. toctree::
     :maxdepth: 3
-    :numbered:
 
     source/camera_devices/index.rst
     source/lidar_devices/index.rst

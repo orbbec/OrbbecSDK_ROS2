@@ -1029,6 +1029,8 @@ void OBCameraNodeDriver::initializeDevice(const std::shared_ptr<ob::Device> &dev
     RCLCPP_INFO_STREAM(logger_, "Device " << device_info_->getName() << " connected");
     RCLCPP_INFO_STREAM(logger_, "Serial number: " << device_info_->getSerialNumber());
     RCLCPP_INFO_STREAM(logger_, "Firmware version: " << device_info_->getFirmwareVersion());
+    RCLCPP_INFO_STREAM(logger_, "ROS Wrapper version: " << OB_ROS_VERSION_STR);
+    RCLCPP_INFO_STREAM(logger_, "SDK version: " << getObSDKVersion());
     RCLCPP_INFO_STREAM(logger_, "Hardware version: " << device_info_->getHardwareVersion());
     RCLCPP_INFO_STREAM(logger_, "usb connect type: " << device_info_->getConnectionType());
   });

@@ -14,6 +14,11 @@ The following are the launch parameters available:
     *   The USB port of the camera. This is required when multiple cameras are used.
 *   **`device_num`**
     *   The number of devices. This must be filled in if multiple cameras are required.
+* **`device_preset`**
+    * The default value is `Default`. You can use the following command to view the configurable mode
+    ```bash
+    ros2 run orbbec_camera list_camera_profile_mode_node
+    ```
 *   **`[color|depth|left_ir|right_ir|ir]_[width|height|fps|format]`**
     *   The resolution and frame rate of the sensor stream.
 *   **`[color|depth|left_ir|right_ir|ir]_rotation`**
@@ -43,8 +48,6 @@ The following are the launch parameters available:
     *   Enable Right IR image transport plugins. Default: `["image_transport/compressed", "image_transport/raw", "image_transport/theora"]`.
 *   **`point_cloud_decimation_filter_factor`**
     *   Point cloud downsampling factor. Range: `1–8`. `1` means no downsampling.
-*   **`preset_resolution_config`**
-    * Preset resolution configuration for the camera device. Format: "width,height,ir_decimation_factor,depth_decimation_factor". Example: "1280,720,4,4". Only supported on specific devices like Gemini2. Leave empty to disable.
 
 ### Sensor Controls
 
@@ -85,7 +88,7 @@ The following are the launch parameters available:
     *   Set the target mean intensity of the Depth image. For example: `mean_intensity_set_point:=100`.
     > **Note:** This replaces the deprecated `depth_brightness`, which is still supported for backward compatibility.
 *   **`enable_depth_scale`**
-    *   Enable the depth scale.
+    *   Whether to enable depth scaling after setting D2C. `true` means enabled, the default is `true`.
 *   **`depth_precision`**
     *   The depth precision should be in the format `1mm`. The default value is `1mm`.
 *   **`depth_ae_roi_[left|right|top|bottom]`**
@@ -152,8 +155,8 @@ The following are the launch parameters available:
 > Used for [net camera](../5_advanced_guide/configuration/net_camera.md).
 
 #### Device-Specific
-*   **`device_preset`**
-    *   The default value is `Default`. Only the G330 series is supported. For more information, refer to the [G330 documentation](https://www.orbbec.com/docs/g330-use-depth-presets/). The value should be one of the preset names listed [in the table](../5_advanced_guide/configuration/predefined_presets.md).
+*   **`preset_resolution_config`**
+    * Preset resolution configuration for the camera device. Format: "width,height,ir_decimation_factor,depth_decimation_factor". Example: "1280,720,4,4". Only supported on 435Le. Leave empty to disable.
 *   **`enable_gmsl_trigger`** / **`gmsl_trigger_fps`**
     *   Enable the gmsl trigger out signal / set gmsl trigger fps. Used for [gmsl camera](../5_advanced_guide/multi_camera/gmsl_camera.md).
 

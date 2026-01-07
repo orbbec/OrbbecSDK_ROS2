@@ -14,6 +14,11 @@
     *   相机的USB端口。当使用多个相机时需要此参数。
 *   **`device_num`**
     *   设备数量。如果需要多个相机，必须填写此参数。
+*   **`device_preset`**
+    *   默认值为 `Default`。可以使用下面命令查看可设置模式
+    ```bash
+    ros2 run orbbec_camera list_camera_profile_mode_node
+    ```
 *   **`[color|depth|left_ir|right_ir|ir]_[width|height|fps|format]`**
     *   传感器流的分辨率和帧率。
 *   **`[color|depth|left_ir|right_ir|ir]_rotation`**
@@ -42,9 +47,7 @@
 *   **`right_ir.image_raw.enable_pub_plugins`**
     *   启用右红外图像传输插件。默认值：`["image_transport/compressed", "image_transport/raw", "image_transport/theora"]`。
 *   **`point_cloud_decimation_filter_factor`**
-    *   点云下采样因子。范围：`1–8`，`1`表示不下采样，数值越大下采样越强。
-*   **`preset_resolution_config`**
-    * 摄像头设备的预设分辨率配置。格式: "width,height,ir_decimation_factor,depth_decimation_factor". Example: "1280,720,4,4". 仅在 Gemini435Le 设备上受支持。留空禁用。
+    *   点云下采样因子。范围：`1–8`，`1`表示不下采样，数值越大下采样倍数越大。
 
 ### 传感器控制
 
@@ -84,7 +87,7 @@
     *   设置深度图像的目标平均强度。例如：`mean_intensity_set_point:=100`。
     > **注意：** 这取代了已弃用的 `depth_brightness`，后者仍支持以保持向后兼容性。
 *   **`enable_depth_scale`**
-    *   启用深度缩放。
+    *   设置D2C后是否启用深度缩放。`true`表示启用，默认为`true`。
 *   **`depth_precision`**
     *   深度精度应为 `1mm` 格式。默认值为 `1mm`。
 *   **`depth_ae_roi_[left|right|top|bottom]`**
@@ -147,11 +150,10 @@
 > 用于 [网络相机](../5_advanced_guide/configuration/net_camera.md)。
 
 #### 设备特定
-*   **`device_preset`**
-    *   默认值为 `Default`。仅支持G330系列。有关更多信息，请参阅 [G330文档](https://www.orbbec.com/docs/g330-use-depth-presets/)。该值应为 [表中列出](../5_advanced_guide/configuration/predefined_presets.md) 的预设名称之一。
 *   **`enable_gmsl_trigger`** / **`gmsl_trigger_fps`**
     *   启用gmsl触发输出信号 / 设置gmsl触发fps。用于 [gmsl相机](../5_advanced_guide/multi_camera/gmsl_camera.md)。
-
+*   **`preset_resolution_config`**
+    * 摄像头设备的预设分辨率配置。格式: "width,height,ir_decimation_factor,depth_decimation_factor". Example: "1280,720,4,4". 仅在 Gemini435Le 设备上受支持。留空禁用。
 
 #### 视差
 *   **`disparity_to_depth_mode`**

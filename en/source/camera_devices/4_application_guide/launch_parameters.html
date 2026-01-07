@@ -408,101 +408,104 @@
 <p>The following are the launch parameters available:</p>
 <section id="core-stream-configuration">
 <h2><span class="section-number">4.1.1. </span>Core &amp; Stream Configuration<a class="headerlink" href="#core-stream-configuration" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">camera_name</span></code></strong></p>
 <ul>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">camera_name</span></code></strong></p>
+<ul class="simple">
 <li><p>Start the node namespace.</p></li>
 </ul>
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">serial_number</span></code></strong></p>
-<ul>
+<ul class="simple">
 <li><p>The serial number of the camera. This is required when multiple cameras are used.</p></li>
 </ul>
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">usb_port</span></code></strong></p>
-<ul>
+<ul class="simple">
 <li><p>The USB port of the camera. This is required when multiple cameras are used.</p></li>
 </ul>
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">device_num</span></code></strong></p>
-<ul>
+<ul class="simple">
 <li><p>The number of devices. This must be filled in if multiple cameras are required.</p></li>
 </ul>
 </li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">device_preset</span></code></strong></p>
+<ul class="simple">
+<li><p>The default value is <code class="docutils literal notranslate"><span class="pre">Default</span></code>. You can use the following command to view the configurable mode</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>orbbec_camera<span class="w"> </span>list_camera_profile_mode_node
+</pre></div>
+</div>
+</li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">[color|depth|left_ir|right_ir|ir]_[width|height|fps|format]</span></code></strong></p>
-<ul>
+<ul class="simple">
 <li><p>The resolution and frame rate of the sensor stream.</p></li>
 </ul>
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">[color|depth|left_ir|right_ir|ir]_rotation</span></code></strong></p>
-<ul>
+<ul class="simple">
 <li><p>Set stream image rotation.</p></li>
 <li><p>The possible values are <code class="docutils literal notranslate"><span class="pre">0</span></code>, <code class="docutils literal notranslate"><span class="pre">90</span></code>, <code class="docutils literal notranslate"><span class="pre">180</span></code>, <code class="docutils literal notranslate"><span class="pre">270</span></code>.</p></li>
 </ul>
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">[color|depth|left_ir|right_ir|ir]_flip</span></code></strong></p>
-<ul>
+<ul class="simple">
 <li><p>Enable the stream image flip.</p></li>
 </ul>
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">[color|depth|left_ir|right_ir|ir]_mirror</span></code></strong></p>
-<ul>
+<ul class="simple">
 <li><p>Enable the stream image mirror.</p></li>
 </ul>
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_point_cloud</span></code></strong></p>
-<ul>
+<ul class="simple">
 <li><p>Enable the point cloud.</p></li>
 </ul>
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_colored_point_cloud</span></code></strong></p>
-<ul>
+<ul class="simple">
 <li><p>Enable the RGB point cloud.</p></li>
 </ul>
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">cloud_frame_id</span></code></strong></p>
-<ul>
+<ul class="simple">
 <li><p>Modify the <code class="docutils literal notranslate"><span class="pre">frame_id</span></code> name within the ros message.</p></li>
 </ul>
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">ordered_pc</span></code></strong></p>
-<ul>
+<ul class="simple">
 <li><p>Enable filtering of invalid point clouds.</p></li>
 </ul>
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">point_cloud_qos</span></code>, <code class="docutils literal notranslate"><span class="pre">[stream]_qos</span></code>, <code class="docutils literal notranslate"><span class="pre">[stream]_camera_info_qos</span></code></strong></p>
-<ul>
+<ul class="simple">
 <li><p>ROS 2 Message Quality of Service (QoS) settings. The possible values are <code class="docutils literal notranslate"><span class="pre">SYSTEM_DEFAULT</span></code>, <code class="docutils literal notranslate"><span class="pre">DEFAULT</span></code>, <code class="docutils literal notranslate"><span class="pre">PARAMETER_EVENTS</span></code>, <code class="docutils literal notranslate"><span class="pre">SERVICES_DEFAULT</span></code>, <code class="docutils literal notranslate"><span class="pre">PARAMETERS</span></code>, <code class="docutils literal notranslate"><span class="pre">SENSOR_DATA</span></code> and are case-insensitive. These correspond to <code class="docutils literal notranslate"><span class="pre">rmw_qos_profile_system_default</span></code>, <code class="docutils literal notranslate"><span class="pre">rmw_qos_profile_default</span></code>, <code class="docutils literal notranslate"><span class="pre">rmw_qos_profile_parameter_events</span></code>, <code class="docutils literal notranslate"><span class="pre">rmw_qos_profile_services_default</span></code>, <code class="docutils literal notranslate"><span class="pre">rmw_qos_profile_parameters</span></code>, and <code class="docutils literal notranslate"><span class="pre">SENSOR_DATA</span></code>, respectively.</p></li>
 </ul>
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">color.image_raw.enable_pub_plugins</span></code></strong></p>
-<ul>
+<ul class="simple">
 <li><p>Enable Color image transport plugins. Default: <code class="docutils literal notranslate"><span class="pre">[&quot;image_transport/compressed&quot;,</span> <span class="pre">&quot;image_transport/raw&quot;,</span> <span class="pre">&quot;image_transport/theora&quot;]</span></code>.</p></li>
 </ul>
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">depth.image_raw.enable_pub_plugins</span></code></strong></p>
-<ul>
+<ul class="simple">
 <li><p>Enable Depth image transport plugins. Default: <code class="docutils literal notranslate"><span class="pre">[&quot;image_transport/compressedDepth&quot;,</span> <span class="pre">&quot;image_transport/raw&quot;]</span></code>.</p></li>
 </ul>
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">left_ir.image_raw.enable_pub_plugins</span></code></strong></p>
-<ul>
+<ul class="simple">
 <li><p>Enable Left IR image transport plugins. Default: <code class="docutils literal notranslate"><span class="pre">[&quot;image_transport/compressed&quot;,</span> <span class="pre">&quot;image_transport/raw&quot;,</span> <span class="pre">&quot;image_transport/theora&quot;]</span></code>.</p></li>
 </ul>
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">right_ir.image_raw.enable_pub_plugins</span></code></strong></p>
-<ul>
+<ul class="simple">
 <li><p>Enable Right IR image transport plugins. Default: <code class="docutils literal notranslate"><span class="pre">[&quot;image_transport/compressed&quot;,</span> <span class="pre">&quot;image_transport/raw&quot;,</span> <span class="pre">&quot;image_transport/theora&quot;]</span></code>.</p></li>
 </ul>
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">point_cloud_decimation_filter_factor</span></code></strong></p>
-<ul>
-<li><p>Point cloud downsampling factor. Range: <code class="docutils literal notranslate"><span class="pre">1–8</span></code>. <code class="docutils literal notranslate"><span class="pre">1</span></code> means no downsampling; larger values apply stronger decimation.</p></li>
-</ul>
-</li>
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">preset_resolution_config</span></code></strong></p>
-<ul>
-<li><p>Preset resolution configuration for the camera device. Format: “width,height,ir_decimation_factor,depth_decimation_factor”. Example: “1280,720,4,4”. Only supported on specific devices like Gemini2. Leave empty to disable.</p></li>
+<ul class="simple">
+<li><p>Point cloud downsampling factor. Range: <code class="docutils literal notranslate"><span class="pre">1–8</span></code>. <code class="docutils literal notranslate"><span class="pre">1</span></code> means no downsampling.</p></li>
 </ul>
 </li>
 </ul>
@@ -597,7 +600,7 @@
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_depth_scale</span></code></strong></p>
 <ul class="simple">
-<li><p>Enable the depth scale.</p></li>
+<li><p>Whether to enable depth scaling after setting D2C. <code class="docutils literal notranslate"><span class="pre">true</span></code> means enabled, the default is <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p></li>
 </ul>
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">depth_precision</span></code></strong></p>
@@ -749,9 +752,9 @@
 <section id="device-specific">
 <h3><span class="section-number">4.1.3.3. </span>Device-Specific<a class="headerlink" href="#device-specific" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">device_preset</span></code></strong></p>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">preset_resolution_config</span></code></strong></p>
 <ul>
-<li><p>The default value is <code class="docutils literal notranslate"><span class="pre">Default</span></code>. Only the G330 series is supported. For more information, refer to the <a class="reference external" href="https://www.orbbec.com/docs/g330-use-depth-presets/">G330 documentation</a>. The value should be one of the preset names listed <a class="reference internal" href="../5_advanced_guide/configuration/predefined_presets.html"><span class="doc">in the table</span></a>.</p></li>
+<li><p>Preset resolution configuration for the camera device. Format: “width,height,ir_decimation_factor,depth_decimation_factor”. Example: “1280,720,4,4”. Only supported on 435Le. Leave empty to disable.</p></li>
 </ul>
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_gmsl_trigger</span></code></strong> / <strong><code class="docutils literal notranslate"><span class="pre">gmsl_trigger_fps</span></code></strong></p>
@@ -1075,7 +1078,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2025, ORBBEC INC. www.orbbec.com..
-      <span class="lastupdated">Last updated on 2026-01-04 01:36:39.
+      <span class="lastupdated">Last updated on 2026-01-07 06:53:08.
       </span></p>
   </div>
 

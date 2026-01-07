@@ -129,6 +129,17 @@ Here is the device support list of main branch (v1.x) and v2-main branch (v2.x):
       <td>full maintenance</td>
       <td>recommended for new designs</td>
     </tr>
+    <tr>
+      <td rowspan="2" style="text-align: center; font-weight: bold;">LiDAR</td>
+      <td>Pulsar ME450</td>
+      <td>not supported</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Pulsar SL450</td>
+      <td>not supported</td>
+      <td>recommended for new designs</td>
+    </tr>
   </tbody>
 </table>
 
@@ -150,20 +161,22 @@ For optimal performance, we strongly recommend updating to the latest firmware v
 
 To learn how to obtain and upgrade the latest firmware, [please click here](../3_quickstarts/orbbecviewer.md).
 
-| **Products List** | **Recommended FW Version**                                                             |  **Launch File**                                          |
-| ----------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| Astra Mini Pro           | [2.0.03](https://github.com/orbbec/OrbbecFirmware/releases/tag/Astra-Mini-Pro)             |                                               astra.launch.py   |
-| Astra Mini S Pro            | [2.0.03](https://github.com/orbbec/OrbbecFirmware/releases/tag/Astra-Mini-S-Pro)             |                                               astra.launch.py   |
-| Gemini 435Le            | [1.3.2](https://github.com/orbbec/OrbbecFirmware/releases/tag/Gemin435Le-Firmware)             |                                               gemini435_le.launch.py   |
+| **Products List** | **Recommended FW Version**                                                             | Launch File                 |
+| ----------------------- | -------------------------------------------------------------------------------------------- | --------------------------- |
+| Astra Mini Pro          | [2.0.03](https://github.com/orbbec/OrbbecFirmware/releases/tag/Astra-Mini-Pro)                  | astra.launch.py             |
+| Astra Mini S Pro        | [2.0.03](https://github.com/orbbec/OrbbecFirmware/releases/tag/Astra-Mini-S-Pro)                | astra.launch.py             |
+| Gemini 435Le            | [1.3.6](https://github.com/orbbec/OrbbecFirmware/releases/tag/Gemin435Le-Firmware)              | gemini435_le.launch.py      |
 | Gemini 330 series       | [1.6.00](https://orbbec-debian-repos-aws.s3.amazonaws.com/product/Gemini330_Release_1.6.00.zip) | gemini_330_series.launch.py |
-| Gemini 215              | [1.0.9](https://github.com/orbbec/OrbbecFirmware/releases/tag/Gemini215-Firmware)               |                                               gemini210.launch.py   |
-| Gemini 210              | [1.0.9](https://github.com/orbbec/OrbbecFirmware/releases/tag/Gemini210-Firmware)               |                                               gemini210.launch.py    |
-| Gemini 2                | [1.4.98](https://github.com/orbbec/OrbbecFirmware/releases/tag/Gemini2-Firmware)                |                                               gemini2.launch.py     |
-| Gemini 2 L              | [1.5.2](https://github.com/orbbec/OrbbecFirmware/releases/tag/Gemini2L-Firmware)                |                                               gemini2L.launch.py  |
-| Femto Bolt              | [1.1.2](https://github.com/orbbec/OrbbecFirmware/releases/tag/Femto-Bolt-Firmware)              |                               femto_bolt.launch.py |
-| Femto Mega              | [1.3.1](https://github.com/orbbec/OrbbecFirmware/releases/tag/Femto-Mega-Firmware)              |                                               femto_mega.launch.py  |
-| Femto Mega I             | [2.0.4](https://github.com/orbbec/OrbbecFirmware/releases/tag/Femto-Mega-I-Firmware)              |                                               femto_mega.launch.py  |
-| Astra 2                 | [2.8.20](https://orbbec-debian-repos-aws.s3.amazonaws.com/product/Astra2_Release_2.8.20.zip)    |                                               astra2.launch.py    |
+| Gemini 215              | [1.0.9](https://github.com/orbbec/OrbbecFirmware/releases/tag/Gemini215-Firmware)               | gemini210.launch.py         |
+| Gemini 210              | [1.0.9](https://github.com/orbbec/OrbbecFirmware/releases/tag/Gemini210-Firmware)               | gemini210.launch.py         |
+| Gemini 2                | [1.4.98](https://github.com/orbbec/OrbbecFirmware/releases/tag/Gemini2-Firmware)                | gemini2.launch.py           |
+| Gemini 2 L              | [1.5.2](https://github.com/orbbec/OrbbecFirmware/releases/tag/Gemini2L-Firmware)                | gemini2L.launch.py          |
+| Femto Bolt              | [1.1.2](https://github.com/orbbec/OrbbecFirmware/releases/tag/Femto-Bolt-Firmware)              | femto_bolt.launch.py        |
+| Femto Mega              | [1.3.1](https://github.com/orbbec/OrbbecFirmware/releases/tag/Femto-Mega-Firmware)              | femto_mega.launch.py        |
+| Femto Mega I            | [2.0.4](https://github.com/orbbec/OrbbecFirmware/releases/tag/Femto-Mega-I-Firmware)            | femto_mega.launch.py        |
+| Astra 2                 | [2.8.20](https://orbbec-debian-repos-aws.s3.amazonaws.com/product/Astra2_Release_2.8.20.zip)    | astra2.launch.py            |
+| Pulsar SL450            | 2.2.4.5 | lidar.launch.py |
+| Pulsar ME450            | 1.0.0.6 | lidar.launch.py |
 
 All launch files are essentially similar, with the primary difference being the default values of the parameters set
 for different models within the same series. Differences in USB standards, such as USB 2.0 versus USB 3.0, may require adjustments to these parameters. If you encounter a startup failure, please carefully review the specification manual. Pay special attention to the resolution settings in the launch file, as well as other parameters, to ensure compatibility and optimal performance.

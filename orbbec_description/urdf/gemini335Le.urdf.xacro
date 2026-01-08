@@ -104,7 +104,7 @@ Stephen Brawner (brawner@gmail.com)
     </inertial>
   </link>
   <joint
-    name="camera_depth_frame_Joint"
+    name="camera_depth_joint"
     type="fixed">
     <origin
       xyz="0 0 0"
@@ -117,7 +117,7 @@ Stephen Brawner (brawner@gmail.com)
       xyz="0 0 0" />
   </joint>
   <joint
-    name="base_Joint"
+    name="base_joint"
     type="fixed">
     <origin
       xyz="-0.034005 -0.0475 -0.014048"
@@ -170,7 +170,7 @@ Stephen Brawner (brawner@gmail.com)
     </collision>
   </link>
   <joint
-    name="camera_right_ir_Joint"
+    name="camera_right_ir_joint"
     type="fixed">
     <origin
       xyz="0 -0.095 0"
@@ -223,7 +223,7 @@ Stephen Brawner (brawner@gmail.com)
     </collision>
   </link>
   <joint
-    name="camera_left_ir_Joint"
+    name="camera_left_ir_joint"
     type="fixed">
     <origin
       xyz="0 0 0"
@@ -276,7 +276,7 @@ Stephen Brawner (brawner@gmail.com)
     </collision>
   </link>
   <joint
-    name="camera_color_Joint"
+    name="camera_color_joint"
     type="fixed">
     <origin
       xyz="9e-06 -0.02375 0"
@@ -329,7 +329,7 @@ Stephen Brawner (brawner@gmail.com)
     </collision>
   </link>
   <joint
-    name="camera_imu_Joint"
+    name="camera_imu_joint"
     type="fixed">
     <origin
       xyz="-0.014248 -0.01131 -0.00069"

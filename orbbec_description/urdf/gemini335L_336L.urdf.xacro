@@ -85,7 +85,7 @@
     </collision>
   </link>
   <joint
-    name="camera_color_screw_frame"
+    name="camera_color_screw_joint"
     type="fixed">
     <origin
       xyz="-0.011715 -0.0475 -0.014311"
@@ -138,7 +138,7 @@
     </collision>
   </link>
   <joint
-    name="camera_IMU_frame"
+    name="camera_IMU_joint"
     type="fixed">
     <origin
       xyz="-0.01425 -0.007866 -0.001068"
@@ -191,7 +191,7 @@
     </collision>
   </link>
   <joint
-    name="camera_depth_frame"
+    name="camera_depth_joint"
     type="fixed">
     <origin
       xyz="0 0 0"
@@ -244,7 +244,7 @@
     </collision>
   </link>
   <joint
-    name="camera_left_ir_frame"
+    name="camera_left_ir_joint"
     type="fixed">
     <origin
       xyz="0 0 0"
@@ -297,7 +297,7 @@
     </collision>
   </link>
   <joint
-    name="camera_left_ir_optical_frame"
+    name="camera_left_ir_optical_joint"
     type="fixed">
     <origin
       xyz="0 0 0"
@@ -350,7 +350,7 @@
     </collision>
   </link>
   <joint
-    name="camera_right_ir_frame"
+    name="camera_right_ir_joint"
     type="fixed">
     <origin
       xyz="0 -0.095 0"
@@ -403,7 +403,7 @@
     </collision>
   </link>
   <joint
-    name="camera_right_ir_optical_frame"
+    name="camera_right_ir_optical_joint"
     type="fixed">
     <origin
       xyz="0 0 0"
@@ -456,7 +456,7 @@
     </collision>
   </link>
   <joint
-    name="camera_color_frame"
+    name="camera_color_joint"
     type="fixed">
     <origin
       xyz="0 -0.02375 0"
@@ -509,7 +509,7 @@
     </collision>
   </link>
   <joint
-    name="camera_color_optical_frame"
+    name="camera_color_optical_joint"
     type="fixed">
     <origin
       xyz="0 0 0"

@@ -84,7 +84,7 @@
 *   **`enable_depth_auto_exposure_priority`**
     *   启用深度自动曝光优先级。
 *   **`mean_intensity_set_point`**
-    *   设置深度图像的目标平均强度。例如：`mean_intensity_set_point:=100`。
+    *   设置开启自动曝光时深度图像的目标平均强度。例如：`mean_intensity_set_point:=100`。
     > **注意：** 这取代了已弃用的 `depth_brightness`，后者仍支持以保持向后兼容性。
 *   **`enable_depth_scale`**
     *   设置D2C后是否启用深度缩放。`true`表示启用，默认为`true`。
@@ -101,7 +101,7 @@
 *   **`ir_ae_max_exposure`**
     *   设置红外自动曝光的最大曝光值。
 *   **`ir_brightness`**
-    *   设置红外亮度。
+    *   设置开启自动曝光时ir图像的目标平均强度。
 
 #### 激光 / LDP
 *   **`enable_laser`**

@@ -85,7 +85,7 @@ The following are the launch parameters available:
 
     *   Enable the Depth auto exposure priority.
 *   **`mean_intensity_set_point`**
-    *   Set the target mean intensity of the Depth image. For example: `mean_intensity_set_point:=100`.
+    *   Set the target average intensity of the depth image when auto-exposure is turned on. For example: `mean_intensity_set_point:=100`.
     > **Note:** This replaces the deprecated `depth_brightness`, which is still supported for backward compatibility.
 *   **`enable_depth_scale`**
     *   Whether to enable depth scaling after setting D2C. `true` means enabled, the default is `true`.
@@ -102,8 +102,7 @@ The following are the launch parameters available:
 *   **`ir_ae_max_exposure`**
     *   Set the maximum exposure value for IR auto exposure.
 *   **`ir_brightness`**
-    *   Set the IR brightness.
-
+    *   Set the target average intensity of the ir image when auto-exposure is turned on.
 #### Laser / LDP
 *   **`enable_laser`**
     *   Enable the laser. The default value is `true`.

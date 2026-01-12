@@ -154,6 +154,20 @@
     *   启用gmsl触发输出信号 / 设置gmsl触发fps。用于 [gmsl相机](../5_advanced_guide/multi_camera/gmsl_camera.md)。
 *   **`preset_resolution_config`**
     * 摄像头设备的预设分辨率配置。格式: "width,height,ir_decimation_factor,depth_decimation_factor". Example: "1280,720,4,4". 仅在 Gemini435Le 设备上受支持。留空禁用。
+* **`ae_mode`**
+  * `colorbased`：自动曝光基于彩色流。`depthbased`：自动曝光基于深度流。**默认值：** `depthbased`
+    > 仅支持Gemini 305。
+    >
+* **`enalbe_sports_mode`**
+  * 是否开启运动模式。**默认值：** `false`
+    > 仅支持Gemini 305。
+    >
+* **`depth_downscale`** / **`left_ir_downscale`** /**`right_ir_downscale`**
+  * 设置下采样倍数。可用`ros2 run orbbec_camera list_camera_profile_mode_node`查看可设置分辨率。**默认值：** `1`
+    > 仅支持Gemini 305。
+    >
+*   **`enable_ptp_config`**
+    *   启用PTP时间同步。仅适用于Gemini 335Le。需要 `enable_sync_host_time` 设置为 `false`。
 
 #### 视差
 *   **`disparity_to_depth_mode`**
@@ -217,8 +231,6 @@
 
     *   相机时间与主机系统同步的间隔（秒）。
     > **注意**：仅当 **`enable_sync_host_time = true`** 且 **`time_domain = device`** 时需要设置此参数。
-*   **`enable_ptp_config`**
-    *   启用PTP时间同步。仅适用于Gemini 335Le。需要 `enable_sync_host_time` 设置为 `false`。
 *   **`enable_frame_sync`**
     *   启用帧同步。
 

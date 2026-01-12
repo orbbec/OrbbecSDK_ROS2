@@ -1,4 +1,4 @@
-# All available services for camera control
+# Available services
 
 > **Note:** Services related to a specific stream (e.g., `/camera/set_color_*`) are only available if that stream is enabled in the launch file (e.g., `enable_color:=true`).
 

@@ -17,7 +17,7 @@
   <depend>rclcpp_components</depend>
   <depend>cv_bridge</depend>
   <depend>camera_info_manager</depend>
-  <depend>orbbec_camera_msgs</depend>
+  <depend version_gte="2">orbbec_camera_msgs</depend>
   <depend>builtin_interfaces</depend>
   <depend>rclcpp</depend>
   <depend>sensor_msgs</depend>

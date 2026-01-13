@@ -28,7 +28,8 @@ If the camera node crashes unexpectedly, it will generate a crash log in the cur
 ### Additional Troubleshooting
 
 - If you encounter other issues, set the `log_level` parameter to `debug`. This will generate an SDK log file in the running directory: `Log/OrbbecSDK.log.txt`. Please provide this file to the support team for further assistance.
-- If firmware logs are required, set `enable_heartbeat` to `true` to activate this feature.
+- If firmware logs are required, set the `log_level` parameter to `debug` and set `enable_heartbeat` to `true` to activate this feature.
+- If you set the `log_level` parameter to `debug` and do not want the terminal to refresh too many logs, you can change `output="screen"` to `output="log"` in `launch`, and the logs will be saved in the `~/.ros/log` directory.
 
 ### Why Are There So Many Launch Files?
 
@@ -75,3 +76,44 @@ This module depends on the OpenGL library at runtime. If OpenGL is not installed
 ```bash
   glxinfo -B
 ```
+
+### The image does not reach the preset frame rate
+
+First you need to confirm whether the image does not reach the preset frame rate. There are several ways to view framerate in ROS 2, such as:
+
+* `ros2 topic hz`
+* `rqt`
+* Custom tools (such as the `benchmark` tool provided by this ROS package)
+
+It should be noted that different tools have different statistical methods and QoS configurations, so the frame rate results obtained may be different. When you find that the frame rate is lower than expected, please prioritize whether the error is caused by the frame rate statistics tool itself.
+
+If you confirm that the image frame rate does not reach the preset value, you can try the following troubleshooting steps:
+
+1. **Reduce the resolution or frame rate** to determine whether the frame rate is reduced due to USB/network bandwidth limitations;
+2. **Confirm whether the camera firmware version and ROS package version are the latest**. Older versions may have performance or compatibility issues.
+
+If the above methods still cannot solve the problem, please contact our company **FAE**, or submit an issue in **GitHub Issue** for further support.
+
+
+### Issues related to soft trigger mode
+
+* **Each sensor does not flow out at the same time when the signal is triggered**
+  Please enable the frame aggregation function and set the parameter `frame_aggregate_mode` to `full_frame` to ensure that multiple sensor data are output synchronously under the same trigger.
+
+* **The preset frame rate cannot be reached in auto trigger mode**
+  When setting `software_trigger_period`, you need to consider the actual open stream frame rate and exposure time. For example, when `color_fps` is set to 10 FPS, `software_trigger_period` cannot be lower than the following calculated value:
+
+  ```
+  software_trigger_period ≥ 1000000 / fps × N + 2 × expo
+  ```
+
+  Among them:
+
+  * `fps`: sensor frame rate
+  * `N`: The number of frames collected in a single trigger
+  * `expo`: exposure time
+  * `Unit`: µs
+
+  If `software_trigger_period` is set too small, the trigger frequency will be limited, resulting in frame loss.
+
+

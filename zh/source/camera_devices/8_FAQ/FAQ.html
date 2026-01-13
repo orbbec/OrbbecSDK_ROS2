@@ -337,6 +337,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#id6">8.5. 多相机连接时如何指定启动某一个相机</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#id7">8.6. 多相机启动或切换流时为什么需要设置延迟？</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#femto-bolt">8.7. femto bolt 深度流无数据</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id8">8.8. 图像未达到预设帧率</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id9">8.9. 软触发模式相关问题</a></li>
 </ul>
 </li>
 </ul>
@@ -432,7 +434,8 @@
 <h2><span class="section-number">8.3. </span>其他故障排除<a class="headerlink" href="#id4" title="链接到此标题。"></a></h2>
 <ul class="simple">
 <li><p>如果遇到其他问题，将 <code class="docutils literal notranslate"><span class="pre">log_level</span></code> 参数设置为 <code class="docutils literal notranslate"><span class="pre">debug</span></code>。这将在运行目录中生成SDK日志文件：<code class="docutils literal notranslate"><span class="pre">Log/OrbbecSDK.log.txt</span></code>。请将此文件提供给支持团队以获得进一步帮助。</p></li>
-<li><p>如果需要固件日志，将 <code class="docutils literal notranslate"><span class="pre">enable_heartbeat</span></code> 设置为 <code class="docutils literal notranslate"><span class="pre">true</span></code> 以激活此功能。</p></li>
+<li><p>如果需要固件日志，将<code class="docutils literal notranslate"><span class="pre">log_level</span></code> 参数设置为 <code class="docutils literal notranslate"><span class="pre">debug</span></code>的同时，将 <code class="docutils literal notranslate"><span class="pre">enable_heartbeat</span></code> 设置为 <code class="docutils literal notranslate"><span class="pre">true</span></code> 以激活此功能。</p></li>
+<li><p>若将<code class="docutils literal notranslate"><span class="pre">log_level</span></code> 参数设置为 <code class="docutils literal notranslate"><span class="pre">debug</span></code>的同时，又不想终端刷新太多日志，可以在<code class="docutils literal notranslate"><span class="pre">launch</span></code>中将<code class="docutils literal notranslate"><span class="pre">output=&quot;screen&quot;</span></code>改为<code class="docutils literal notranslate"><span class="pre">output=&quot;log&quot;</span></code>，日志会被保存在<code class="docutils literal notranslate"><span class="pre">~/.ros/log</span></code>目录下。</p></li>
 </ul>
 </section>
 <section id="id5">
@@ -478,6 +481,43 @@
 </pre></div>
 </div>
 </section>
+<section id="id8">
+<h2><span class="section-number">8.8. </span>图像未达到预设帧率<a class="headerlink" href="#id8" title="链接到此标题。"></a></h2>
+<p>首先需要确认图像是否确实未达到预设帧率。在 ROS 2 中可通过多种方式查看帧率，例如：</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">topic</span> <span class="pre">hz</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rqt</span></code></p></li>
+<li><p>自定义工具（如本 ROS 包提供的 <code class="docutils literal notranslate"><span class="pre">benchmark</span></code> 工具）</p></li>
+</ul>
+<p>需要注意的是，不同工具的统计方式和 QoS 配置不同，因此得到的帧率结果可能存在差异。当发现帧率低于预期时，请优先排查是否为帧率统计工具本身导致的误差。</p>
+<p>若确认图像帧率确实未达到预设值，可尝试以下排查步骤：</p>
+<ol class="simple">
+<li><p><strong>降低分辨率或帧率</strong>，判断是否由于 USB / 网络带宽受限导致帧率下降；</p></li>
+<li><p><strong>确认相机固件版本及 ROS 包版本是否为最新</strong>，旧版本可能存在性能或兼容性问题。</p></li>
+</ol>
+<p>若以上方法仍无法解决问题，请联系我司 <strong>FAE</strong>，或在 <strong>GitHub Issue</strong> 中提交问题以获得进一步支持。</p>
+</section>
+<section id="id9">
+<h2><span class="section-number">8.9. </span>软触发模式相关问题<a class="headerlink" href="#id9" title="链接到此标题。"></a></h2>
+<ul>
+<li><p><strong>信号触发时各传感器未同时出流</strong>
+请开启帧汇聚功能，将参数<code class="docutils literal notranslate"><span class="pre">frame_aggregate_mode</span></code>设置为<code class="docutils literal notranslate"><span class="pre">full_frame</span></code>，以保证多传感器数据在同一次触发下同步输出。</p></li>
+<li><p><strong>自动触发模式下无法达到预设帧率</strong>
+设置 <code class="docutils literal notranslate"><span class="pre">software_trigger_period</span></code> 时，需要综合考虑实际开流帧率与曝光时间。例如，当 <code class="docutils literal notranslate"><span class="pre">color_fps</span></code> 设置为 10 FPS 时，<code class="docutils literal notranslate"><span class="pre">software_trigger_period</span></code> 不能低于以下计算值：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>software_trigger_period ≥ 1000000 / fps × N + 2 × expo
+</pre></div>
+</div>
+<p>其中：</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">fps</span></code>：传感器帧率</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">N</span></code>：单次触发采集的帧数量</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">expo</span></code>：曝光时间</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">单位</span></code>：µs</p></li>
+</ul>
+<p>若 <code class="docutils literal notranslate"><span class="pre">software_trigger_period</span></code> 设置过小，将导致触发频率受限，从而丢帧。</p>
+</li>
+</ul>
+</section>
 </section>
 
 
@@ -492,7 +532,7 @@
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2026年01月13日 02:41:42.
+      <span class="lastupdated">最后更新于 2026年01月13日 11:20:26.
       </span></p>
   </div>
 

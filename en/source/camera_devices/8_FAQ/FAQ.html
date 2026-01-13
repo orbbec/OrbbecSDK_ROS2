@@ -336,6 +336,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#how-to-launch-a-specific-camera-when-multiple-cameras-are-connected">8.5. How to Launch a Specific Camera When Multiple Cameras Are Connected</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#why-is-it-necessary-to-add-delays-when-starting-multiple-cameras-or-switching-streams">8.6. Why Is It Necessary to Add Delays When Starting Multiple Cameras or Switching Streams?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#femto-bolt-depth-stream-no-data">8.7. femto bolt depth stream no data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-image-does-not-reach-the-preset-frame-rate">8.8. The image does not reach the preset frame rate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#issues-related-to-soft-trigger-mode">8.9. Issues related to soft trigger mode</a></li>
 </ul>
 </li>
 </ul>
@@ -431,7 +433,8 @@
 <h2><span class="section-number">8.3. </span>Additional Troubleshooting<a class="headerlink" href="#additional-troubleshooting" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>If you encounter other issues, set the <code class="docutils literal notranslate"><span class="pre">log_level</span></code> parameter to <code class="docutils literal notranslate"><span class="pre">debug</span></code>. This will generate an SDK log file in the running directory: <code class="docutils literal notranslate"><span class="pre">Log/OrbbecSDK.log.txt</span></code>. Please provide this file to the support team for further assistance.</p></li>
-<li><p>If firmware logs are required, set <code class="docutils literal notranslate"><span class="pre">enable_heartbeat</span></code> to <code class="docutils literal notranslate"><span class="pre">true</span></code> to activate this feature.</p></li>
+<li><p>If firmware logs are required, set the <code class="docutils literal notranslate"><span class="pre">log_level</span></code> parameter to <code class="docutils literal notranslate"><span class="pre">debug</span></code> and set <code class="docutils literal notranslate"><span class="pre">enable_heartbeat</span></code> to <code class="docutils literal notranslate"><span class="pre">true</span></code> to activate this feature.</p></li>
+<li><p>If you set the <code class="docutils literal notranslate"><span class="pre">log_level</span></code> parameter to <code class="docutils literal notranslate"><span class="pre">debug</span></code> and do not want the terminal to refresh too many logs, you can change <code class="docutils literal notranslate"><span class="pre">output=&quot;screen&quot;</span></code> to <code class="docutils literal notranslate"><span class="pre">output=&quot;log&quot;</span></code> in <code class="docutils literal notranslate"><span class="pre">launch</span></code>, and the logs will be saved in the <code class="docutils literal notranslate"><span class="pre">~/.ros/log</span></code> directory.</p></li>
 </ul>
 </section>
 <section id="why-are-there-so-many-launch-files">
@@ -477,6 +480,43 @@
 </pre></div>
 </div>
 </section>
+<section id="the-image-does-not-reach-the-preset-frame-rate">
+<h2><span class="section-number">8.8. </span>The image does not reach the preset frame rate<a class="headerlink" href="#the-image-does-not-reach-the-preset-frame-rate" title="Link to this heading"></a></h2>
+<p>First you need to confirm whether the image does not reach the preset frame rate. There are several ways to view framerate in ROS 2, such as:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">topic</span> <span class="pre">hz</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rqt</span></code></p></li>
+<li><p>Custom tools (such as the <code class="docutils literal notranslate"><span class="pre">benchmark</span></code> tool provided by this ROS package)</p></li>
+</ul>
+<p>It should be noted that different tools have different statistical methods and QoS configurations, so the frame rate results obtained may be different. When you find that the frame rate is lower than expected, please prioritize whether the error is caused by the frame rate statistics tool itself.</p>
+<p>If you confirm that the image frame rate does not reach the preset value, you can try the following troubleshooting steps:</p>
+<ol class="simple">
+<li><p><strong>Reduce the resolution or frame rate</strong> to determine whether the frame rate is reduced due to USB/network bandwidth limitations;</p></li>
+<li><p><strong>Confirm whether the camera firmware version and ROS package version are the latest</strong>. Older versions may have performance or compatibility issues.</p></li>
+</ol>
+<p>If the above methods still cannot solve the problem, please contact our company <strong>FAE</strong>, or submit an issue in <strong>GitHub Issue</strong> for further support.</p>
+</section>
+<section id="issues-related-to-soft-trigger-mode">
+<h2><span class="section-number">8.9. </span>Issues related to soft trigger mode<a class="headerlink" href="#issues-related-to-soft-trigger-mode" title="Link to this heading"></a></h2>
+<ul>
+<li><p><strong>Each sensor does not flow out at the same time when the signal is triggered</strong>
+Please enable the frame aggregation function and set the parameter <code class="docutils literal notranslate"><span class="pre">frame_aggregate_mode</span></code> to <code class="docutils literal notranslate"><span class="pre">full_frame</span></code> to ensure that multiple sensor data are output synchronously under the same trigger.</p></li>
+<li><p><strong>The preset frame rate cannot be reached in auto trigger mode</strong>
+When setting <code class="docutils literal notranslate"><span class="pre">software_trigger_period</span></code>, you need to consider the actual open stream frame rate and exposure time. For example, when <code class="docutils literal notranslate"><span class="pre">color_fps</span></code> is set to 10 FPS, <code class="docutils literal notranslate"><span class="pre">software_trigger_period</span></code> cannot be lower than the following calculated value:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>software_trigger_period ≥ 1000000 / fps × N + 2 × expo
+</pre></div>
+</div>
+<p>Among them:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">fps</span></code>: sensor frame rate</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">N</span></code>: The number of frames collected in a single trigger</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">expo</span></code>: exposure time</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Unit</span></code>: µs</p></li>
+</ul>
+<p>If <code class="docutils literal notranslate"><span class="pre">software_trigger_period</span></code> is set too small, the trigger frequency will be limited, resulting in frame loss.</p>
+</li>
+</ul>
+</section>
 </section>
 
 
@@ -491,7 +531,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2025, ORBBEC INC. www.orbbec.com..
-      <span class="lastupdated">Last updated on 2026-01-13 02:41:39.
+      <span class="lastupdated">Last updated on 2026-01-13 11:20:23.
       </span></p>
   </div>
 

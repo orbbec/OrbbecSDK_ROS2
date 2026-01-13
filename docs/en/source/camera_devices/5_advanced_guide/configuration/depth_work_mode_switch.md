@@ -1,7 +1,6 @@
 # Depth work mode switch
 
-Orbbec SDK ROS 2 supports the depth work mode switch. The depth work mode switch is supported by Gemini 2, Gemini 2 L,
-and Femto and Femto Bolt cameras.
+Orbbec SDK ROS 2 supports the depth work mode switch. The depth work mode switch is supported by Gemini 2 and Gemini 2 L.
 
 - Before starting the camera, depth work mode (depth_work_mode) can be configured for the corresponding xxx.launch.py
   file's support.

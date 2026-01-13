@@ -1,6 +1,6 @@
 # 深度工作模式切换
 
-Orbbec SDK ROS 2 支持深度工作模式切换。Gemini 2、Gemini 2 L 和 Femto 以及 Femto Bolt 相机支持深度工作模式切换。
+Orbbec SDK ROS 2 支持深度工作模式切换。Gemini 2 和 Gemini 2 L 相机支持深度工作模式切换。
 
 - 在启动相机之前，可以为相应的 xxx.launch.py 文件的支持配置深度工作模式（depth_work_mode）。
 - Gemini 2、Gemini 2 L 和 Gemini 2 XL 相机支持深度工作模式切换。

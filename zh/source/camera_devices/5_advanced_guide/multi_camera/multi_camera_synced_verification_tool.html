@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>5.2.3. 多相机同步验证节点 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=63de077d" />
 
   
@@ -16,9 +16,9 @@
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../../_static/documentation_options.js?v=7d86a446"></script>
-      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script src="../../../../_static/translations.js?v=beaddf03"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../../_static/translations.js?v=540d3cec"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="索引" href="../../../../genindex.html" />
     <link rel="search" title="搜索" href="../../../../search.html" />
@@ -132,7 +132,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../4_application_guide/launch_parameters.html#id18">4.1.6. 深度滤波器</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../4_application_guide/services.html">4.2. 所有可用的相机控制服务</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../4_application_guide/services.html">4.2. 可用服务</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../4_application_guide/services.html#id2">4.2.1. 数据流控制</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../4_application_guide/services.html#id3">4.2.1.1. 彩色流</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../4_application_guide/services.html#id4">4.2.1.2. 深度流</a></li>
@@ -402,15 +402,15 @@
            <div itemprop="articleBody">
              
   <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="id1">
-<h1><span class="section-number">5.2.3. </span>多相机同步验证节点<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<h1><span class="section-number">5.2.3. </span>多相机同步验证节点<a class="headerlink" href="#id1" title="链接到此标题。"></a></h1>
 <p>文件路径：<a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/examples/multi_camera_time_sync/image_sync_example_node.cpp">image_sync_example_node.cpp</a></p>
 <p>此示例节点用于 <strong>4 台 Orbbec 相机</strong> 的同步采集与时间戳验证。
 它可用于验证多相机主从同步（Primary / Secondary Synced）模式下的帧对齐精度。</p>
 <hr class="docutils" />
 <section id="id2">
-<h2><span class="section-number">5.2.3.1. </span>使用教程<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<h2><span class="section-number">5.2.3.1. </span>使用教程<a class="headerlink" href="#id2" title="链接到此标题。"></a></h2>
 <section id="multi-camera-synced-launch-py">
-<h3><span class="section-number">5.2.3.1.1. </span><strong>在 <code class="docutils literal notranslate"><span class="pre">multi_camera_synced.launch.py</span></code> 的基础上做以下修改</strong><a class="headerlink" href="#multi-camera-synced-launch-py" title="Link to this heading"></a></h3>
+<h3><span class="section-number">5.2.3.1.1. </span><strong>在 <code class="docutils literal notranslate"><span class="pre">multi_camera_synced.launch.py</span></code> 的基础上做以下修改</strong><a class="headerlink" href="#multi-camera-synced-launch-py" title="链接到此标题。"></a></h3>
 <ul class="simple">
 <li><p>增加 <code class="docutils literal notranslate"><span class="pre">launch_include</span></code> 以适配 4 台相机</p></li>
 <li><p>根据设备型号选择对应的 launch 文件，如 330 系列选择 gemini_330_series.launch.py</p></li>
@@ -424,7 +424,7 @@
 </section>
 <hr class="docutils" />
 <section id="id3">
-<h3><span class="section-number">5.2.3.1.2. </span><strong>参数文件修改</strong><a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<h3><span class="section-number">5.2.3.1.2. </span><strong>参数文件修改</strong><a class="headerlink" href="#id3" title="链接到此标题。"></a></h3>
 <p>修改 <code class="docutils literal notranslate"><span class="pre">config</span></code> 目录下的以下两个配置文件：</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">camera_params.yaml</span></code></p></li>
@@ -438,7 +438,7 @@
 </section>
 <hr class="docutils" />
 <section id="id4">
-<h3><span class="section-number">5.2.3.1.3. </span><strong>启动与验证</strong><a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<h3><span class="section-number">5.2.3.1.3. </span><strong>启动与验证</strong><a class="headerlink" href="#id4" title="链接到此标题。"></a></h3>
 <ul class="simple">
 <li><p>启动多机同步 launch： <code class="docutils literal notranslate"><span class="pre">multi_camera_synced.launch.py</span></code></p></li>
 <li><p>打开新终端运行同步验证节点： <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">run</span> <span class="pre">orbbec_camera</span> <span class="pre">image_sync_example_node</span></code>
@@ -447,7 +447,7 @@
 </section>
 <hr class="docutils" />
 <section id="launch">
-<h3><span class="section-number">5.2.3.1.4. </span><strong>参考 launch 文件</strong><a class="headerlink" href="#launch" title="Link to this heading"></a></h3>
+<h3><span class="section-number">5.2.3.1.4. </span><strong>参考 launch 文件</strong><a class="headerlink" href="#launch" title="链接到此标题。"></a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ament_index_python.packages</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_package_share_directory</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">launch</span><span class="w"> </span><span class="kn">import</span> <span class="n">LaunchDescription</span>
@@ -543,15 +543,15 @@
 </section>
 <hr class="docutils" />
 <section id="id5">
-<h2><span class="section-number">5.2.3.2. </span>必要系统配置<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<h2><span class="section-number">5.2.3.2. </span>必要系统配置<a class="headerlink" href="#id5" title="链接到此标题。"></a></h2>
 <section id="usb">
-<h3><span class="section-number">5.2.3.2.1. </span><strong>提升 USB 缓冲区容量</strong><a class="headerlink" href="#usb" title="Link to this heading"></a></h3>
+<h3><span class="section-number">5.2.3.2.1. </span><strong>提升 USB 缓冲区容量</strong><a class="headerlink" href="#usb" title="链接到此标题。"></a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">echo</span> <span class="mi">512</span> <span class="o">|</span> <span class="n">sudo</span> <span class="n">tee</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">module</span><span class="o">/</span><span class="n">usbcore</span><span class="o">/</span><span class="n">parameters</span><span class="o">/</span><span class="n">usbfs_memory_mb</span>
 </pre></div>
 </div>
 </section>
 <section id="fast-dds">
-<h3><span class="section-number">5.2.3.2.2. </span><strong>配置 Fast DDS</strong><a class="headerlink" href="#fast-dds" title="Link to this heading"></a></h3>
+<h3><span class="section-number">5.2.3.2.2. </span><strong>配置 Fast DDS</strong><a class="headerlink" href="#fast-dds" title="链接到此标题。"></a></h3>
 <p>优化 ROS2 节点间通信延迟，可以有效减少图像传输延迟，<a class="reference internal" href="../performance/fastdds_tuning.html"><span class="doc">配置过程见此章节</span></a>。</p>
 </section>
 </section>
@@ -569,7 +569,7 @@
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2026年01月07日 06:53:11.
+      <span class="lastupdated">最后更新于 2026年01月13日 02:41:42.
       </span></p>
   </div>
 

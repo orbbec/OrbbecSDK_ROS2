@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>5.2.4. GMSL 相机 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=63de077d" />
 
   
@@ -16,9 +16,9 @@
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../../_static/documentation_options.js?v=7d86a446"></script>
-      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script src="../../../../_static/translations.js?v=beaddf03"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../../_static/translations.js?v=540d3cec"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="索引" href="../../../../genindex.html" />
     <link rel="search" title="搜索" href="../../../../search.html" />
@@ -132,7 +132,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../4_application_guide/launch_parameters.html#id18">4.1.6. 深度滤波器</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../4_application_guide/services.html">4.2. 所有可用的相机控制服务</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../4_application_guide/services.html">4.2. 可用服务</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../4_application_guide/services.html#id2">4.2.1. 数据流控制</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../4_application_guide/services.html#id3">4.2.1.1. 彩色流</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../4_application_guide/services.html#id4">4.2.1.2. 深度流</a></li>
@@ -402,20 +402,20 @@
            <div itemprop="articleBody">
              
   <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="gmsl">
-<h1><span class="section-number">5.2.4. </span>GMSL 相机<a class="headerlink" href="#gmsl" title="Link to this heading"></a></h1>
+<h1><span class="section-number">5.2.4. </span>GMSL 相机<a class="headerlink" href="#gmsl" title="链接到此标题。"></a></h1>
 <blockquote>
 <div><p>本节介绍如何在 OrbbecSDK_ROS2 中使用 GMSL 相机。目前仅支持 Gemini 335Lg 和 Gemini 345Lg 设备，其他 GMSL 设备将在不久的将来得到支持。</p>
 </div></blockquote>
 <p>您可以在 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples">example</a> 中找到示例使用代码。</p>
 <section id="id1">
-<h2><span class="section-number">5.2.4.1. </span>单个 GMSL 相机<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<h2><span class="section-number">5.2.4.1. </span>单个 GMSL 相机<a class="headerlink" href="#id1" title="链接到此标题。"></a></h2>
 <p>GMSL 相机在 OrbbecSDK_ROS2 中的使用与通过 USB 的 Gemini 330 系列相机相同。</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>gemini_330_gmsl.launch.py
 </pre></div>
 </div>
 </section>
 <section id="id2">
-<h2><span class="section-number">5.2.4.2. </span>多个 GMSL 相机<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<h2><span class="section-number">5.2.4.2. </span>多个 GMSL 相机<a class="headerlink" href="#id2" title="链接到此标题。"></a></h2>
 <p>要获取 GMSL 相机的 <code class="docutils literal notranslate"><span class="pre">usb_port</span></code>，插入相机并在终端中运行以下命令：</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>orbbec_camera<span class="w"> </span>list_devices_node
 </pre></div>
@@ -430,7 +430,7 @@
 </div></blockquote>
 </section>
 <section id="id3">
-<h2><span class="section-number">5.2.4.3. </span>多个 GMSL 相机同步<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<h2><span class="section-number">5.2.4.3. </span>多个 GMSL 相机同步<a class="headerlink" href="#id3" title="链接到此标题。"></a></h2>
 <p>首先，请查看如何使用 <a class="reference internal" href="multi_camera_synced.html"><span class="doc">multi_camera_synced</span></a>。</p>
 <p>此外，GMSL 多相机同步不需要 Multi-Camera Sync Hub Pro，因此无需设置 <code class="docutils literal notranslate"><span class="pre">primary</span></code> 模式。每个 GMSL 相机都是 <code class="docutils literal notranslate"><span class="pre">secondary</span></code>。</p>
 <p><strong>额外的参数设置</strong></p>
@@ -448,7 +448,7 @@
 </div></blockquote>
 </section>
 <section id="id4">
-<h2><span class="section-number">5.2.4.4. </span>GMSL 相机的使用限制<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<h2><span class="section-number">5.2.4.4. </span>GMSL 相机的使用限制<a class="headerlink" href="#id4" title="链接到此标题。"></a></h2>
 <p>GMSL 相机与各种反序列化器芯片（如 MAX9296 和 MAX92716）接口。Orbbec GMSL 相机支持多个流，包括深度、彩色、IR 和 IMU 数据，但存在某些使用限制：</p>
 <ul class="simple">
 <li><p>GMSL 仅支持 V4L2 和 YUYV 格式；不支持 MJPG 格式。RGB 输出源自 YUYV 格式转换。</p></li>
@@ -478,7 +478,7 @@
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2026年01月07日 06:53:11.
+      <span class="lastupdated">最后更新于 2026年01月13日 02:41:42.
       </span></p>
   </div>
 

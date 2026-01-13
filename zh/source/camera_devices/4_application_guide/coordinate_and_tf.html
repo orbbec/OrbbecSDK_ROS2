@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>4.4. 坐标系和 TF 变换 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=63de077d" />
 
   
@@ -16,9 +16,9 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=7d86a446"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script src="../../../_static/translations.js?v=beaddf03"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../_static/translations.js?v=540d3cec"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="索引" href="../../../genindex.html" />
     <link rel="search" title="搜索" href="../../../search.html" />
@@ -132,7 +132,7 @@
 <li class="toctree-l4"><a class="reference internal" href="launch_parameters.html#id18">4.1.6. 深度滤波器</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="services.html">4.2. 所有可用的相机控制服务</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="services.html">4.2. 可用服务</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="services.html#id2">4.2.1. 数据流控制</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="services.html#id3">4.2.1.1. 彩色流</a></li>
 <li class="toctree-l5"><a class="reference internal" href="services.html#id4">4.2.1.2. 深度流</a></li>
@@ -402,14 +402,14 @@
            <div itemprop="articleBody">
              
   <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="tf">
-<h1><span class="section-number">4.4. </span>坐标系和 TF 变换<a class="headerlink" href="#tf" title="Link to this heading"></a></h1>
+<h1><span class="section-number">4.4. </span>坐标系和 TF 变换<a class="headerlink" href="#tf" title="链接到此标题。"></a></h1>
 <section id="id1">
-<h2><span class="section-number">4.4.1. </span>相机传感器结构<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<h2><span class="section-number">4.4.1. </span>相机传感器结构<a class="headerlink" href="#id1" title="链接到此标题。"></a></h2>
 <p><img alt="module in rviz2" src="../../../_images/image3.png" /></p>
 <p><img alt="module in rviz2" src="../../../_images/image1.png" /></p>
 </section>
 <section id="abtf">
-<h2><span class="section-number">4.4.2. </span>从坐标系A到坐标系B的TF变换：<a class="headerlink" href="#abtf" title="Link to this heading"></a></h2>
+<h2><span class="section-number">4.4.2. </span>从坐标系A到坐标系B的TF变换：<a class="headerlink" href="#abtf" title="链接到此标题。"></a></h2>
 <p>在Orbbec相机中，原点（0,0,0）取自camera_link位置。</p>
 <p>可以使用以下命令查看相机的URDF模型和坐标系结构：</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_description<span class="w"> </span>view_model.launch.py<span class="w"> </span>model:<span class="o">=</span>gemini_335_336.urdf.xacro
@@ -418,7 +418,7 @@
 <p><img alt="rviz2中的模块" src="../../../_images/image2.png" /></p>
 </section>
 <section id="ros2-vs">
-<h2><span class="section-number">4.4.3. </span>ROS2机器人坐标系 vs 相机光学坐标系<a class="headerlink" href="#ros2-vs" title="Link to this heading"></a></h2>
+<h2><span class="section-number">4.4.3. </span>ROS2机器人坐标系 vs 相机光学坐标系<a class="headerlink" href="#ros2-vs" title="链接到此标题。"></a></h2>
 <ul class="simple">
 <li><p>视角：</p>
 <ul>
@@ -436,9 +436,9 @@
 </ul>
 </section>
 <section id="ros2-tf">
-<h2><span class="section-number">4.4.4. </span>ROS2 TF工具的使用<a class="headerlink" href="#ros2-tf" title="Link to this heading"></a></h2>
+<h2><span class="section-number">4.4.4. </span>ROS2 TF工具的使用<a class="headerlink" href="#ros2-tf" title="链接到此标题。"></a></h2>
 <section id="id2">
-<h3><span class="section-number">4.4.4.1. </span>查看TF树结构<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.4.4.1. </span>查看TF树结构<a class="headerlink" href="#id2" title="链接到此标题。"></a></h3>
 <p>可以使用以下ROS2命令来打印和可视化相机包发布的TF树：</p>
 <p><strong>打印所有TF关系：</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>tf2_tools<span class="w"> </span>view_frames
@@ -481,7 +481,7 @@
 </div>
 </section>
 <section id="rviz2tf">
-<h3><span class="section-number">4.4.4.2. </span>使用rviz2可视化TF树<a class="headerlink" href="#rviz2tf" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.4.4.2. </span>使用rviz2可视化TF树<a class="headerlink" href="#rviz2tf" title="链接到此标题。"></a></h3>
 <p>在rviz2中可以实时可视化TF树结构和坐标系的相对位置：</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rviz2
 </pre></div>
@@ -496,9 +496,9 @@
 </section>
 </section>
 <section id="id3">
-<h2><span class="section-number">4.4.5. </span>相机TF计算和发布机制<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<h2><span class="section-number">4.4.5. </span>相机TF计算和发布机制<a class="headerlink" href="#id3" title="链接到此标题。"></a></h2>
 <section id="obcameranode-calcandpublishstatictransform">
-<h3><span class="section-number">4.4.5.1. </span>核心函数：<a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/blob/166c35b4ea211c60265ca9b38b1b15519d1ea3dd/orbbec_camera/src/ob_camera_node.cpp#L3475">OBCameraNode::calcAndPublishStaticTransform()</a><a class="headerlink" href="#obcameranode-calcandpublishstatictransform" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.4.5.1. </span>核心函数：<a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/blob/166c35b4ea211c60265ca9b38b1b15519d1ea3dd/orbbec_camera/src/ob_camera_node.cpp#L3475">OBCameraNode::calcAndPublishStaticTransform()</a><a class="headerlink" href="#obcameranode-calcandpublishstatictransform" title="链接到此标题。"></a></h3>
 <p>相机节点通过此函数计算和发布所有传感器之间的静态转换关系。</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">OBCameraNode::calcAndPublishStaticTransform</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="n">tf2</span><span class="o">::</span><span class="n">Quaternion</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="p">,</span><span class="w"> </span><span class="n">zero_rot</span><span class="p">;</span>
@@ -668,7 +668,7 @@
 </div>
 </section>
 <section id="id4">
-<h3><span class="section-number">4.4.5.2. </span>函数解析<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.4.5.2. </span>函数解析<a class="headerlink" href="#id4" title="链接到此标题。"></a></h3>
 <p>下面是代码的详细解释：</p>
 <p><strong>四元数初始化与坐标系变换</strong></p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">tf2</span><span class="o">::</span><span class="n">Quaternion</span><span class="w"> </span><span class="n">quaternion_optical</span><span class="p">,</span><span class="w"> </span><span class="n">zero_rot</span><span class="p">;</span>
@@ -764,7 +764,7 @@
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2026年01月07日 06:53:11.
+      <span class="lastupdated">最后更新于 2026年01月13日 02:41:42.
       </span></p>
   </div>
 

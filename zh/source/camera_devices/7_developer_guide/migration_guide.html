@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>7.1. 从 main 分支迁移到开源 v2-main 分支 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=63de077d" />
 
   
@@ -16,9 +16,9 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=7d86a446"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script src="../../../_static/translations.js?v=beaddf03"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../_static/translations.js?v=540d3cec"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="索引" href="../../../genindex.html" />
     <link rel="search" title="搜索" href="../../../search.html" />
@@ -132,7 +132,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#id18">4.1.6. 深度滤波器</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/services.html">4.2. 所有可用的相机控制服务</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/services.html">4.2. 可用服务</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../4_application_guide/services.html#id2">4.2.1. 数据流控制</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../4_application_guide/services.html#id3">4.2.1.1. 彩色流</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../4_application_guide/services.html#id4">4.2.1.2. 深度流</a></li>
@@ -402,38 +402,38 @@
            <div itemprop="articleBody">
              
   <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="main-v2-main">
-<h1><span class="section-number">7.1. </span>从 main 分支迁移到开源 v2-main 分支<a class="headerlink" href="#main-v2-main" title="Link to this heading"></a></h1>
+<h1><span class="section-number">7.1. </span>从 main 分支迁移到开源 v2-main 分支<a class="headerlink" href="#main-v2-main" title="链接到此标题。"></a></h1>
 <section id="id1">
-<h2><span class="section-number">7.1.1. </span>引言<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<h2><span class="section-number">7.1.1. </span>引言<a class="headerlink" href="#id1" title="链接到此标题。"></a></h2>
 <p>最初，奥比中光提供了一个<strong>闭源 SDK — Orbbec SDK v1</strong>，它构成了 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/main">OrbbecSDK ROS2 Wrapper main 分支</a>的基础。虽然 ROS 封装层本身是开源的，但它依赖于闭源的底层 SDK。这种架构限制了灵活性，阻碍了社区驱动的改进。</p>
 <p>随着开发者越来越需要透明性、可维护性和更广泛的设备支持，奥比中光发布了全新的开源 v2-main <strong>— Orbbec SDK_v2</strong> (<a class="reference external" href="https://github.com/orbbec/OrbbecSDK/tree/v2-main">GitHub 链接</a>)。基于此 SDK，<a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2">OrbbecSDK ROS2 的开源 v2-main 分支</a>现在完全开源，提供了更好的可扩展性，并与奥比中光未来的产品路线图保持一致。</p>
 <p>本文档介绍了将 ROS 包从 main 分支（基于 SDK v1）迁移到 v2-main 分支（基于 Orbbec SDK_v2）的动机和好处。它重点介绍了<strong>启动文件、参数、话题和服务</strong>的主要差异，并提供迁移指南帮助开发者顺利过渡。</p>
 <p><strong>注意：</strong> 在以下内容中，<strong>main</strong> 指闭源分支，而 <strong>v2-main</strong> 指开源 v2-main 分支。</p>
 </section>
 <section id="id2">
-<h2><span class="section-number">7.1.2. </span>从 main 迁移到 v2-main 的优势<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<h2><span class="section-number">7.1.2. </span>从 main 迁移到 v2-main 的优势<a class="headerlink" href="#id2" title="链接到此标题。"></a></h2>
 <p>2024年10月，奥比中光发布了重大更新：<strong>OrbbecSDK ROS2 Wrapper v2</strong>，它完全基于开源的 Orbbec SDK_v2。与传统的 main 分支（SDK v1.x）相比，v2-main 分支（Orbbec SDK_v2.x）提供了更大的灵活性和可扩展性，同时为所有符合 UVC 标准的奥比中光 USB 产品提供全面支持。从 main --&gt; v2-main 的迁移带来以下关键优势：</p>
 <section id="id3">
-<h3><span class="section-number">7.1.2.1. </span><strong>全面的设备支持</strong><a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<h3><span class="section-number">7.1.2.1. </span><strong>全面的设备支持</strong><a class="headerlink" href="#id3" title="链接到此标题。"></a></h3>
 <p>v2-main 分支支持所有符合 UVC 标准的奥比中光 USB 相机，并将成为支持所有新发布设备的主要平台。</p>
 </section>
 <section id="id4">
-<h3><span class="section-number">7.1.2.2. </span><strong>透明性和可扩展性</strong><a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<h3><span class="section-number">7.1.2.2. </span><strong>透明性和可扩展性</strong><a class="headerlink" href="#id4" title="链接到此标题。"></a></h3>
 <p>Orbbec SDK_v2 完全开源，允许开发者直接访问底层实现，便于调试、优化和二次开发。相比之下，SDK v1 是闭源的，引入了&quot;黑盒&quot;约束。</p>
 </section>
 <section id="id5">
-<h3><span class="section-number">7.1.2.3. </span>维护和更新优势<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<h3><span class="section-number">7.1.2.3. </span>维护和更新优势<a class="headerlink" href="#id5" title="链接到此标题。"></a></h3>
 <p>v2-main 分支提供全功能支持，包括新功能开发、性能优化和错误修复。main 分支已进入仅维护模式，只有关键错误可能获得有限更新，不再开发新功能。</p>
 </section>
 <section id="id6">
-<h3><span class="section-number">7.1.2.4. </span><strong>社区和生态系统支持</strong><a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<h3><span class="section-number">7.1.2.4. </span><strong>社区和生态系统支持</strong><a class="headerlink" href="#id6" title="链接到此标题。"></a></h3>
 <p>有了开源 SDK，开发者可以直接在 GitHub 或 Gitee 上提交问题和拉取请求，为功能演进做出贡献。这不仅加速了问题解决，还促进了更开放和活跃的奥比中光生态系统。</p>
 </section>
 </section>
 <section id="id7">
-<h2><span class="section-number">7.1.3. </span>main 和 v2-main 分支的比较<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<h2><span class="section-number">7.1.3. </span>main 和 v2-main 分支的比较<a class="headerlink" href="#id7" title="链接到此标题。"></a></h2>
 <section id="id8">
-<h3><span class="section-number">7.1.3.1. </span><strong>启动文件差异</strong><a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<h3><span class="section-number">7.1.3.1. </span><strong>启动文件差异</strong><a class="headerlink" href="#id8" title="链接到此标题。"></a></h3>
 <ol class="simple">
 <li><p>在 v2-main 中，为 Gemini 330 系列添加了新的低功耗启动文件：</p>
 <ul class="simple">
@@ -550,7 +550,7 @@
 </tbody>
 </table></section>
 <section id="id9">
-<h3><span class="section-number">7.1.3.2. </span><strong>参数差异</strong><a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<h3><span class="section-number">7.1.3.2. </span><strong>参数差异</strong><a class="headerlink" href="#id9" title="链接到此标题。"></a></h3>
 <p><strong>v2-main 中的新参数（main 中不可用）</strong></p>
 <table border="1" class="docutils">
 <thead>
@@ -1049,7 +1049,7 @@
 </tbody>
 </table></section>
 <section id="id10">
-<h3><span class="section-number">7.1.3.3. </span><strong>话题差异</strong><a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<h3><span class="section-number">7.1.3.3. </span><strong>话题差异</strong><a class="headerlink" href="#id10" title="链接到此标题。"></a></h3>
 <p><strong>v2-main</strong> 在 main 基础上添加了以下话题：</p>
 <table border="1" class="docutils">
 <thead>
@@ -1070,7 +1070,7 @@
 </tbody>
 </table></section>
 <section id="id11">
-<h3><span class="section-number">7.1.3.4. </span><strong>服务差异</strong><a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<h3><span class="section-number">7.1.3.4. </span><strong>服务差异</strong><a class="headerlink" href="#id11" title="链接到此标题。"></a></h3>
 <p><strong>v2-main</strong> 在 main 基础上添加了以下服务：</p>
 <table border="1" class="docutils">
 <thead>
@@ -1249,7 +1249,7 @@
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2026年01月07日 06:53:11.
+      <span class="lastupdated">最后更新于 2026年01月13日 02:41:42.
       </span></p>
   </div>
 

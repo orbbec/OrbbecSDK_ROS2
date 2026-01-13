@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>5.2.2. 多相机同步说明 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=63de077d" />
 
   
@@ -16,9 +16,9 @@
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../../_static/documentation_options.js?v=7d86a446"></script>
-      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script src="../../../../_static/translations.js?v=beaddf03"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../../_static/translations.js?v=540d3cec"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="索引" href="../../../../genindex.html" />
     <link rel="search" title="搜索" href="../../../../search.html" />
@@ -132,7 +132,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../4_application_guide/launch_parameters.html#id18">4.1.6. 深度滤波器</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../4_application_guide/services.html">4.2. 所有可用的相机控制服务</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../4_application_guide/services.html">4.2. 可用服务</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../4_application_guide/services.html#id2">4.2.1. 数据流控制</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../4_application_guide/services.html#id3">4.2.1.1. 彩色流</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../4_application_guide/services.html#id4">4.2.1.2. 深度流</a></li>
@@ -402,12 +402,12 @@
            <div itemprop="articleBody">
              
   <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="id1">
-<h1><span class="section-number">5.2.2. </span>多相机同步说明<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<h1><span class="section-number">5.2.2. </span>多相机同步说明<a class="headerlink" href="#id1" title="链接到此标题。"></a></h1>
 <blockquote>
 <div><p>本文档的目的是说明如何在 OrbbecSDK_ROS2 中使用多相机同步</p>
 </div></blockquote>
 <section id="id2">
-<h2><span class="section-number">5.2.2.1. </span>设置说明<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<h2><span class="section-number">5.2.2.1. </span>设置说明<a class="headerlink" href="#id2" title="链接到此标题。"></a></h2>
 <ul class="simple">
 <li><p>请阅读多相机同步设置指南：<a class="reference external" href="https://www.orbbec.com/docs/set-up-cameras-for-external-synchronization_v1-2/">多相机同步设置</a></p></li>
 <li><p>确保相机正确连接到多相机同步器。</p></li>
@@ -415,13 +415,13 @@
 <p><img alt="深度点云可视化" src="../../../../_images/multi_camera_synced1.png" /></p>
 </section>
 <section id="orbbecsdk-ros2">
-<h2><span class="section-number">5.2.2.2. </span>使用 OrbbecSDK_ROS2 检查相机端口<a class="headerlink" href="#orbbecsdk-ros2" title="Link to this heading"></a></h2>
+<h2><span class="section-number">5.2.2.2. </span>使用 OrbbecSDK_ROS2 检查相机端口<a class="headerlink" href="#orbbecsdk-ros2" title="链接到此标题。"></a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>orbbec_camera<span class="w"> </span>list_devices_node
 </pre></div>
 </div>
 </section>
 <section id="id3">
-<h2><span class="section-number">5.2.2.3. </span>OrbbecSDK_ROS2 多相机同步配置<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<h2><span class="section-number">5.2.2.3. </span>OrbbecSDK_ROS2 多相机同步配置<a class="headerlink" href="#id3" title="链接到此标题。"></a></h2>
 <p>打开 multi_camera_synced.launch.py，并按照下面所示配置相机设置：</p>
 <p><img alt="深度点云可视化" src="../../../../_images/multi_camera_synced2.png" /></p>
 <ol class="simple">
@@ -476,7 +476,7 @@
 </ul>
 </section>
 <section id="id4">
-<h2><span class="section-number">5.2.2.4. </span>运行以下命令启动多相机同步<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<h2><span class="section-number">5.2.2.4. </span>运行以下命令启动多相机同步<a class="headerlink" href="#id4" title="链接到此标题。"></a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>multi_camera_synced.launch.py
 </pre></div>
 </div>
@@ -495,7 +495,7 @@
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2026年01月07日 06:53:11.
+      <span class="lastupdated">最后更新于 2026年01月13日 02:41:42.
       </span></p>
   </div>
 

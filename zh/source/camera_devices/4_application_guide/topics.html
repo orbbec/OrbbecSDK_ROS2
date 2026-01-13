@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>4.3. 可用话题 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=63de077d" />
 
   
@@ -16,14 +16,14 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=7d86a446"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script src="../../../_static/translations.js?v=beaddf03"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../_static/translations.js?v=540d3cec"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="索引" href="../../../genindex.html" />
     <link rel="search" title="搜索" href="../../../search.html" />
     <link rel="next" title="4.4. 坐标系和 TF 变换" href="coordinate_and_tf.html" />
-    <link rel="prev" title="4.2. 所有可用的相机控制服务" href="services.html" /> 
+    <link rel="prev" title="4.2. 可用服务" href="services.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -132,7 +132,7 @@
 <li class="toctree-l4"><a class="reference internal" href="launch_parameters.html#id18">4.1.6. 深度滤波器</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="services.html">4.2. 所有可用的相机控制服务</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="services.html">4.2. 可用服务</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="services.html#id2">4.2.1. 数据流控制</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="services.html#id3">4.2.1.1. 彩色流</a></li>
 <li class="toctree-l5"><a class="reference internal" href="services.html#id4">4.2.1.2. 深度流</a></li>
@@ -402,13 +402,13 @@
            <div itemprop="articleBody">
              
   <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="id1">
-<h1><span class="section-number">4.3. </span>可用话题<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<h1><span class="section-number">4.3. </span>可用话题<a class="headerlink" href="#id1" title="链接到此标题。"></a></h1>
 <p>话题按数据流和功能组织。默认情况下，所有话题都发布在 <code class="docutils literal notranslate"><span class="pre">/camera</span></code> 命名空间下，可以通过 <code class="docutils literal notranslate"><span class="pre">camera_name</span></code> 启动参数进行更改。</p>
 <blockquote>
 <div><p><strong>注意：</strong> 特定数据流的话题（例如 <code class="docutils literal notranslate"><span class="pre">/camera/color/...</span></code>）只有在相应的启动参数（例如 <code class="docutils literal notranslate"><span class="pre">enable_color</span></code>）设置为 <code class="docutils literal notranslate"><span class="pre">true</span></code> 时才会发布。</p>
 </div></blockquote>
 <section id="id2">
-<h2><span class="section-number">4.3.1. </span>图像流<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<h2><span class="section-number">4.3.1. </span>图像流<a class="headerlink" href="#id2" title="链接到此标题。"></a></h2>
 <p>这些话题提供每个启用的相机数据流的原始图像数据和相应的校准信息。对于 <code class="docutils literal notranslate"><span class="pre">color</span></code>、<code class="docutils literal notranslate"><span class="pre">depth</span></code>、<code class="docutils literal notranslate"><span class="pre">ir</span></code>、<code class="docutils literal notranslate"><span class="pre">left_ir</span></code> 和 <code class="docutils literal notranslate"><span class="pre">right_ir</span></code> 数据流，模式是一致的。</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">/camera/color/image_raw</span></code></p>
@@ -459,7 +459,7 @@
 </ul>
 </section>
 <section id="id3">
-<h2><span class="section-number">4.3.2. </span>点云话题<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<h2><span class="section-number">4.3.2. </span>点云话题<a class="headerlink" href="#id3" title="链接到此标题。"></a></h2>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">/camera/depth/points</span></code></p>
 <ul>
@@ -476,7 +476,7 @@
 </ul>
 </section>
 <section id="imu">
-<h2><span class="section-number">4.3.3. </span>IMU话题<a class="headerlink" href="#imu" title="Link to this heading"></a></h2>
+<h2><span class="section-number">4.3.3. </span>IMU话题<a class="headerlink" href="#imu" title="链接到此标题。"></a></h2>
 <p>惯性测量单元（IMU）话题提供加速度计和陀螺仪数据。其行为取决于同步设置。</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">/camera/accel/sample</span></code></p>
@@ -500,7 +500,7 @@
 </ul>
 </section>
 <section id="id4">
-<h2><span class="section-number">4.3.4. </span>设备状态与诊断<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<h2><span class="section-number">4.3.4. </span>设备状态与诊断<a class="headerlink" href="#id4" title="链接到此标题。"></a></h2>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">/camera/device_status</span></code></p>
 <ul>
@@ -525,7 +525,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
-        <a href="services.html" class="btn btn-neutral float-left" title="4.2. 所有可用的相机控制服务" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
+        <a href="services.html" class="btn btn-neutral float-left" title="4.2. 可用服务" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
         <a href="coordinate_and_tf.html" class="btn btn-neutral float-right" title="4.4. 坐标系和 TF 变换" accesskey="n" rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
@@ -533,7 +533,7 @@
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2026年01月07日 06:53:11.
+      <span class="lastupdated">最后更新于 2026年01月13日 02:41:42.
       </span></p>
   </div>
 

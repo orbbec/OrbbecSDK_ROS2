@@ -85,7 +85,7 @@ The following are the launch parameters available:
 
     *   Enable the Depth auto exposure priority.
 *   **`mean_intensity_set_point`**
-    *   Set the target mean intensity of the Depth image. For example: `mean_intensity_set_point:=100`.
+    *   Set the target average intensity of the depth image when auto-exposure is turned on. For example: `mean_intensity_set_point:=100`.
     > **Note:** This replaces the deprecated `depth_brightness`, which is still supported for backward compatibility.
 *   **`enable_depth_scale`**
     *   Whether to enable depth scaling after setting D2C. `true` means enabled, the default is `true`.
@@ -102,8 +102,7 @@ The following are the launch parameters available:
 *   **`ir_ae_max_exposure`**
     *   Set the maximum exposure value for IR auto exposure.
 *   **`ir_brightness`**
-    *   Set the IR brightness.
-
+    *   Set the target average intensity of the ir image when auto-exposure is turned on.
 #### Laser / LDP
 *   **`enable_laser`**
     *   Enable the laser. The default value is `true`.
@@ -156,10 +155,27 @@ The following are the launch parameters available:
 
 #### Device-Specific
 *   **`preset_resolution_config`**
-    * Preset resolution configuration for the camera device. Format: "width,height,ir_decimation_factor,depth_decimation_factor". Example: "1280,720,4,4". Only supported on 435Le. Leave empty to disable.
+    * Preset resolution configuration for the camera device. Format: "width,height,ir_decimation_factor,depth_decimation_factor". Example: "1280,720,4,4". Leave empty to disable.
+    > Only supported 435Le.
+    >
 *   **`enable_gmsl_trigger`** / **`gmsl_trigger_fps`**
-    *   Enable the gmsl trigger out signal / set gmsl trigger fps. Used for [gmsl camera](../5_advanced_guide/multi_camera/gmsl_camera.md).
-
+    *   Enable the gmsl trigger out signal / set gmsl trigger fps.
+    > Only supports [gmsl camera](../5_advanced_guide/multi_camera/gmsl_camera.md).
+    >
+* **`ae_mode`**
+  * `colorbased`: Automatic exposure based on color flow. `depthbased`: Automatic exposure based on depth flow. **默认值：** `depthbased`
+    > Only supports Gemini 305.
+    >
+* **`enalbe_sports_mode`**
+  * Whether to enable sports mode. **Default:** `false`
+    > Only supports Gemini 305.
+    >
+* **`depth_downscale`** / **`left_ir_downscale`** /**`right_ir_downscale`**
+  * Set the downsampling multiple. You can use `ros2 run orbbec_camera list_camera_profile_mode_node` to view the settable resolution. **Default value:** `1`
+    > Only supports Gemini 305.
+    >
+*   **`enable_ptp_config`**
+    *   Enable PTP time synchronization. Only for Gemini 335Le. Requires `enable_sync_host_time` to be `false`.
 
 #### Disparity
 *   **`disparity_to_depth_mode`**
@@ -223,8 +239,6 @@ The following are the launch parameters available:
 
     *   Interval (in seconds) for synchronizing the camera time with the host system.
     > **Note**: This parameter only needs to be set when **`enable_sync_host_time = true`** and **`time_domain = device`**.
-*   **`enable_ptp_config`**
-    *   Enable PTP time synchronization. Only for Gemini 335Le. Requires `enable_sync_host_time` to be `false`.
 *   **`enable_frame_sync`**
     *   Enable the frame synchronization.
 

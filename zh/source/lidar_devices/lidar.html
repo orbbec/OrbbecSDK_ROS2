@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>1. 安装 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=63de077d" />
 
   
@@ -16,9 +16,9 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=7d86a446"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script src="../../_static/translations.js?v=beaddf03"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/translations.js?v=540d3cec"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="索引" href="../../genindex.html" />
     <link rel="search" title="搜索" href="../../search.html" />
@@ -131,7 +131,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../camera_devices/4_application_guide/launch_parameters.html#id18">4.1.6. 深度滤波器</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../camera_devices/4_application_guide/services.html">4.2. 所有可用的相机控制服务</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../camera_devices/4_application_guide/services.html">4.2. 可用服务</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../camera_devices/4_application_guide/services.html#id2">4.2.1. 数据流控制</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../camera_devices/4_application_guide/services.html#id3">4.2.1.1. 彩色流</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../camera_devices/4_application_guide/services.html#id4">4.2.1.2. 深度流</a></li>
@@ -401,9 +401,9 @@
              
   <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><p>本ROS2驱动支持您使用奥比中光单线/多线激光雷达。本文档提供安装说明、使用指南和其他重要信息，帮助您快速开始使用此驱动。</p>
 <section id="id1">
-<h1><span class="section-number">1. </span>安装<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<h1><span class="section-number">1. </span>安装<a class="headerlink" href="#id1" title="链接到此标题。"></a></h1>
 <section id="id2">
-<h2><span class="section-number">1.1. </span>先决条件<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<h2><span class="section-number">1.1. </span>先决条件<a class="headerlink" href="#id2" title="链接到此标题。"></a></h2>
 <p>在使用OrbbecSDK ROS2 LiDAR驱动程序之前，请确保您的系统上安装了以下依赖项：</p>
 <ul class="simple">
 <li><p><strong>ROS2</strong>：Humble、Jazzy 或其他受支持的发行版。</p>
@@ -414,7 +414,7 @@
 </ul>
 </section>
 <section id="deb">
-<h2><span class="section-number">1.2. </span>安装deb依赖项<a class="headerlink" href="#deb" title="Link to this heading"></a></h2>
+<h2><span class="section-number">1.2. </span>安装deb依赖项<a class="headerlink" href="#deb" title="链接到此标题。"></a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 假设您已经配置了ROS环境，下同</span>
 sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>libgflags-dev<span class="w"> </span>nlohmann-json3-dev<span class="w">  </span><span class="se">\</span>
 ros-<span class="nv">$ROS_DISTRO</span>-image-transport<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-image-transport-plugins<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-compressed-image-transport<span class="w"> </span><span class="se">\</span>
@@ -425,7 +425,7 @@ ros-<span class="nv">$ROS_DISTRO</span>-backward-ros<span class="w"> </span>libd
 </div>
 </section>
 <section id="udev">
-<h2><span class="section-number">1.3. </span>安装udev规则<a class="headerlink" href="#udev" title="Link to this heading"></a></h2>
+<h2><span class="section-number">1.3. </span>安装udev规则<a class="headerlink" href="#udev" title="链接到此标题。"></a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w">  </span>~/ros2_ws/src/OrbbecSDK_ROS2/orbbec_camera/scripts
 sudo<span class="w"> </span>bash<span class="w"> </span>install_udev_rules.sh
 sudo<span class="w"> </span>udevadm<span class="w"> </span>control<span class="w"> </span>--reload-rules<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>udevadm<span class="w"> </span>trigger
@@ -433,7 +433,7 @@ sudo<span class="w"> </span>udevadm<span class="w"> </span>control<span class="w
 </div>
 </section>
 <section id="id3">
-<h2><span class="section-number">1.4. </span>构建包<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<h2><span class="section-number">1.4. </span>构建包<a class="headerlink" href="#id3" title="链接到此标题。"></a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/ros2_ws/
 <span class="c1"># 构建发布版本，默认为调试版本</span>
 colcon<span class="w"> </span>build<span class="w"> </span>--event-handlers<span class="w">  </span>console_direct+<span class="w">  </span>--cmake-args<span class="w">  </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release
@@ -441,7 +441,7 @@ colcon<span class="w"> </span>build<span class="w"> </span>--event-handlers<span
 </div>
 </section>
 <section id="id4">
-<h2><span class="section-number">1.5. </span>启动激光雷达节点<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<h2><span class="section-number">1.5. </span>启动激光雷达节点<a class="headerlink" href="#id4" title="链接到此标题。"></a></h2>
 <ul class="simple">
 <li><p>第一个终端</p></li>
 </ul>
@@ -473,9 +473,9 @@ rviz2
 </section>
 </section>
 <section id="id5">
-<h1><span class="section-number">2. </span>使用方法<a class="headerlink" href="#id5" title="Link to this heading"></a></h1>
+<h1><span class="section-number">2. </span>使用方法<a class="headerlink" href="#id5" title="链接到此标题。"></a></h1>
 <section id="id6">
-<h2><span class="section-number">2.1. </span>运行驱动<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<h2><span class="section-number">2.1. </span>运行驱动<a class="headerlink" href="#id6" title="链接到此标题。"></a></h2>
 <p>要启动驱动，请启动提供的ROS2启动文件：</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>install/setup.bash
 <span class="c1"># 启动带有点云数据的驱动</span>
@@ -493,20 +493,20 @@ ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span cla
 <p>此命令将启动与奥比中光激光雷达设备接口的节点。请确保在运行此命令之前正确连接激光雷达硬件。</p>
 </section>
 <section id="id7">
-<h2><span class="section-number">2.2. </span>获取已连接激光雷达的设备信息<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<h2><span class="section-number">2.2. </span>获取已连接激光雷达的设备信息<a class="headerlink" href="#id7" title="链接到此标题。"></a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>orbbec_camera<span class="w"> </span>list_devices_node
 </pre></div>
 </div>
 <p>此命令将列出已连接的激光雷达设备并显示其各自的IP地址和端口。您可以使用此信息配置驱动以连接到特定设备。</p>
 </section>
 <section id="id8">
-<h2><span class="section-number">2.3. </span>检查激光雷达支持的配置<a class="headerlink" href="#id8" title="Link to this heading"></a></h2>
+<h2><span class="section-number">2.3. </span>检查激光雷达支持的配置<a class="headerlink" href="#id8" title="链接到此标题。"></a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>orbbec_camera<span class="w"> </span>list_camera_profile_mode_node
 </pre></div>
 </div>
 </section>
 <section id="id9">
-<h2><span class="section-number">2.4. </span>2.4 参数和配置<a class="headerlink" href="#id9" title="Link to this heading"></a></h2>
+<h2><span class="section-number">2.4. </span>2.4 参数和配置<a class="headerlink" href="#id9" title="链接到此标题。"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">lidar.launch.py</span></code>文件包含驱动的默认参数。您可以通过修改启动文件或创建自定义配置文件来自定义这些设置。关键参数包括：</p>
 <ul class="simple">
 <li><p><strong>device_type</strong>: 要启动的设备类型。可选值：<code class="docutils literal notranslate"><span class="pre">lidar</span></code>、<code class="docutils literal notranslate"><span class="pre">camera</span></code>。将此参数设置为 <code class="docutils literal notranslate"><span class="pre">lidar</span></code>启动激光雷达设备，设置为 <code class="docutils literal notranslate"><span class="pre">camera</span></code>启动摄像头设备。</p></li>
@@ -546,9 +546,9 @@ ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span cla
 </section>
 </section>
 <section id="id10">
-<h1><span class="section-number">3. </span>点云数据详细说明<a class="headerlink" href="#id10" title="Link to this heading"></a></h1>
+<h1><span class="section-number">3. </span>点云数据详细说明<a class="headerlink" href="#id10" title="链接到此标题。"></a></h1>
 <section id="id11">
-<h2><span class="section-number">3.1. </span>点云格式<a class="headerlink" href="#id11" title="Link to this heading"></a></h2>
+<h2><span class="section-number">3.1. </span>点云格式<a class="headerlink" href="#id11" title="链接到此标题。"></a></h2>
 <p>PointCloud2 (PointXYZITO) 点云格式如下：</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">float32</span> <span class="n">x</span>               <span class="c1"># X轴，单位：米</span>
 <span class="n">float32</span> <span class="n">y</span>               <span class="c1"># Y轴，单位：米</span>
@@ -560,10 +560,10 @@ ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span cla
 </div>
 </section>
 <section id="id12">
-<h2><span class="section-number">3.2. </span>点云聚合功能<a class="headerlink" href="#id12" title="Link to this heading"></a></h2>
+<h2><span class="section-number">3.2. </span>点云聚合功能<a class="headerlink" href="#id12" title="链接到此标题。"></a></h2>
 <p>通过 <code class="docutils literal notranslate"><span class="pre">publish_n_pkts</span></code> 参数可以开启点云聚合功能，该功能允许激光雷达在发布数据前累积指定数量的帧，然后将这些帧合并为一个更大的点云数据包进行发布。</p>
 <section id="id13">
-<h3><span class="section-number">3.2.1. </span>功能特点：<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<h3><span class="section-number">3.2.1. </span>功能特点：<a class="headerlink" href="#id13" title="链接到此标题。"></a></h3>
 <ul class="simple">
 <li><p><strong>参数范围</strong>: 1-12000 帧</p></li>
 <li><p><strong>适用格式</strong>: 仅在激光雷达格式为 <code class="docutils literal notranslate"><span class="pre">LIDAR_POINT</span></code> 或 <code class="docutils literal notranslate"><span class="pre">LIDAR_SPHERE_POINT</span></code> 时有效</p></li>
@@ -572,7 +572,7 @@ ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span cla
 </ul>
 </section>
 <section id="id14">
-<h3><span class="section-number">3.2.2. </span>使用示例：<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<h3><span class="section-number">3.2.2. </span>使用示例：<a class="headerlink" href="#id14" title="链接到此标题。"></a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 聚合10帧数据后发布</span>
 ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>lidar.launch.py<span class="w"> </span>lidar_format:<span class="o">=</span>LIDAR_POINT<span class="w"> </span>publish_n_pkts:<span class="o">=</span><span class="m">10</span>
 
@@ -585,9 +585,9 @@ ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span cla
 </section>
 </section>
 <section id="imu">
-<h1><span class="section-number">4. </span>IMU数据<a class="headerlink" href="#imu" title="Link to this heading"></a></h1>
+<h1><span class="section-number">4. </span>IMU数据<a class="headerlink" href="#imu" title="链接到此标题。"></a></h1>
 <section id="id15">
-<h2><span class="section-number">4.1. </span>IMU话题<a class="headerlink" href="#id15" title="Link to this heading"></a></h2>
+<h2><span class="section-number">4.1. </span>IMU话题<a class="headerlink" href="#id15" title="链接到此标题。"></a></h2>
 <p>启用IMU时，将发布以下话题：</p>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">/lidar/imu/sample</span></code></strong>: 统一的IMU话题，包含 <code class="docutils literal notranslate"><span class="pre">sensor_msgs/Imu</span></code>格式的同步加速度计和陀螺仪数据。</p></li>
@@ -595,7 +595,7 @@ ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span cla
 </ul>
 </section>
 <section id="id16">
-<h2><span class="section-number">4.2. </span>使用IMU数据<a class="headerlink" href="#id16" title="Link to this heading"></a></h2>
+<h2><span class="section-number">4.2. </span>使用IMU数据<a class="headerlink" href="#id16" title="链接到此标题。"></a></h2>
 <p>要启用IMU数据采集：</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 启动并启用IMU</span>
 ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>lidar.launch.py<span class="w"> </span>enable_imu:<span class="o">=</span><span class="nb">true</span><span class="w"> </span>imu_rate:<span class="o">=</span>50hz
@@ -627,7 +627,7 @@ ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2026年01月07日 06:53:11.
+      <span class="lastupdated">最后更新于 2026年01月13日 02:41:42.
       </span></p>
   </div>
 

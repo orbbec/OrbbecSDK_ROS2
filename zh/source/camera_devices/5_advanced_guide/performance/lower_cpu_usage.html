@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>5.1.1. 使用Orbbec ROS包降低CPU使用率 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=63de077d" />
 
   
@@ -16,9 +16,9 @@
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../../_static/documentation_options.js?v=7d86a446"></script>
-      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script src="../../../../_static/translations.js?v=beaddf03"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../../_static/translations.js?v=540d3cec"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="索引" href="../../../../genindex.html" />
     <link rel="search" title="搜索" href="../../../../search.html" />
@@ -132,7 +132,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../4_application_guide/launch_parameters.html#id18">4.1.6. 深度滤波器</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../4_application_guide/services.html">4.2. 所有可用的相机控制服务</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../4_application_guide/services.html">4.2. 可用服务</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../4_application_guide/services.html#id2">4.2.1. 数据流控制</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../4_application_guide/services.html#id3">4.2.1.1. 彩色流</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../4_application_guide/services.html#id4">4.2.1.2. 深度流</a></li>
@@ -402,11 +402,11 @@
            <div itemprop="articleBody">
              
   <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="orbbec-roscpu">
-<h1><span class="section-number">5.1.1. </span>使用Orbbec ROS包降低CPU使用率<a class="headerlink" href="#orbbec-roscpu" title="Link to this heading"></a></h1>
+<h1><span class="section-number">5.1.1. </span>使用Orbbec ROS包降低CPU使用率<a class="headerlink" href="#orbbec-roscpu" title="链接到此标题。"></a></h1>
 <p>您可以在 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples">示例</a> 中找到使用示例代码。</p>
 <p>本文档概述了在使用 <strong>Gemini 330系列相机</strong> 的 <strong>OrbbecSDK_ROS2 v2</strong> 环境中最小化CPU使用率的策略。固件版本必须 <strong>不低于1.4.10</strong>，且 <code class="docutils literal notranslate"><span class="pre">device</span></code> 应设置为 <strong>Default</strong>。</p>
 <section id="cpu">
-<h2><span class="section-number">5.1.1.1. </span>降低CPU使用率的推荐设置<a class="headerlink" href="#cpu" title="Link to this heading"></a></h2>
+<h2><span class="section-number">5.1.1.1. </span>降低CPU使用率的推荐设置<a class="headerlink" href="#cpu" title="链接到此标题。"></a></h2>
 <p>要在OrbbecSDK_ROS2中实现最低的CPU使用率，建议配置以下参数。</p>
 <table border="1" class="docutils">
 <thead>
@@ -435,14 +435,14 @@
 </tbody>
 </table></section>
 <section id="id1">
-<h2><span class="section-number">5.1.1.2. </span>用于测试的启动文件<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<h2><span class="section-number">5.1.1.2. </span>用于测试的启动文件<a class="headerlink" href="#id1" title="链接到此标题。"></a></h2>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">gemini_330_series_lower_cpu_usage.launch.py</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">multi_camera_lower_cpu_usage.launch.py</span></code></p></li>
 </ul>
 </section>
 <section id="id2">
-<h2><span class="section-number">5.1.1.3. </span>测试环境<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<h2><span class="section-number">5.1.1.3. </span>测试环境<a class="headerlink" href="#id2" title="链接到此标题。"></a></h2>
 <p><strong>硬件配置</strong></p>
 <ul class="simple">
 <li><p><strong>CPU</strong>: Intel i7-8700 &#64; 3.20GHz</p></li>
@@ -463,7 +463,7 @@
 </ul>
 </section>
 <section id="id3">
-<h2><span class="section-number">5.1.1.4. </span>测试设置<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<h2><span class="section-number">5.1.1.4. </span>测试设置<a class="headerlink" href="#id3" title="链接到此标题。"></a></h2>
 <p><strong>数据流设置：</strong></p>
 <ul class="simple">
 <li><p>深度/左IR/右IR: 848×480 &#64; 30fps</p></li>
@@ -472,7 +472,7 @@
 <p>注意：以下CPU使用率数据重点关注 <code class="docutils literal notranslate"><span class="pre">uvc_backend</span></code>、<code class="docutils literal notranslate"><span class="pre">color_format</span></code> 和各种滤波器组合。</p>
 </section>
 <section id="id4">
-<h2><span class="section-number">5.1.1.5. </span>测试结果<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<h2><span class="section-number">5.1.1.5. </span>测试结果<a class="headerlink" href="#id4" title="链接到此标题。"></a></h2>
 <p><strong><code class="docutils literal notranslate"><span class="pre">uvc_backend</span></code> 对比（RGB格式）</strong></p>
 <table border="1" class="docutils">
 <thead>
@@ -566,7 +566,7 @@
 </table><p>根据测试结果，仅使用 <code class="docutils literal notranslate"><span class="pre">hardware_noise_removal_filter</span></code> 相比无滤波器基准，对 <code class="docutils literal notranslate"><span class="pre">libuvc</span></code>（+3.5%）和 <code class="docutils literal notranslate"><span class="pre">v4l2</span></code>（-3.4%）的CPU使用率变化可以忽略不计，因为此滤波器在相机硬件内部运行。相比之下，其他滤波器在主机系统上执行。将 <code class="docutils literal notranslate"><span class="pre">spatial_filter</span></code> 添加到硬件滤波器会导致CPU使用率适度增加，而应用基于软件的 <code class="docutils literal notranslate"><span class="pre">noise_removal_filter</span></code>——无论是单独使用还是与 <code class="docutils literal notranslate"><span class="pre">spatial_filter</span></code> 结合——都会显著增加CPU负载。为保持较低的CPU使用率，建议避免使用基于软件的滤波器，仅依赖 <code class="docutils literal notranslate"><span class="pre">hardware_noise_removal_filter</span></code>。</p>
 </section>
 <section id="id5">
-<h2><span class="section-number">5.1.1.6. </span>进一步优化<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<h2><span class="section-number">5.1.1.6. </span>进一步优化<a class="headerlink" href="#id5" title="链接到此标题。"></a></h2>
 <table border="1" class="docutils">
 <thead>
 <tr>
@@ -607,7 +607,7 @@
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2026年01月07日 06:53:11.
+      <span class="lastupdated">最后更新于 2026年01月13日 02:41:42.
       </span></p>
   </div>
 

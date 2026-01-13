@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>4.1. 启动参数 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=63de077d" />
 
   
@@ -16,13 +16,13 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=7d86a446"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script src="../../../_static/translations.js?v=beaddf03"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../_static/translations.js?v=540d3cec"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="索引" href="../../../genindex.html" />
     <link rel="search" title="搜索" href="../../../search.html" />
-    <link rel="next" title="4.2. 所有可用的相机控制服务" href="services.html" />
+    <link rel="next" title="4.2. 可用服务" href="services.html" />
     <link rel="prev" title="4. 应用指南" href="application_guide.html" /> 
 </head>
 
@@ -132,7 +132,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#id18">4.1.6. 深度滤波器</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="services.html">4.2. 所有可用的相机控制服务</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="services.html">4.2. 可用服务</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="services.html#id2">4.2.1. 数据流控制</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="services.html#id3">4.2.1.1. 彩色流</a></li>
 <li class="toctree-l5"><a class="reference internal" href="services.html#id4">4.2.1.2. 深度流</a></li>
@@ -402,13 +402,13 @@
            <div itemprop="articleBody">
              
   <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="id1">
-<h1><span class="section-number">4.1. </span>启动参数<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<h1><span class="section-number">4.1. </span>启动参数<a class="headerlink" href="#id1" title="链接到此标题。"></a></h1>
 <blockquote>
 <div><p>如果您不确定如何设置参数，可以连接orbbec相机并打开 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK/releases">OrbbecViewer</a>。</p>
 </div></blockquote>
 <p>以下是可用的启动参数：</p>
 <section id="id2">
-<h2><span class="section-number">4.1.1. </span>核心与数据流配置<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<h2><span class="section-number">4.1.1. </span>核心与数据流配置<a class="headerlink" href="#id2" title="链接到此标题。"></a></h2>
 <ul>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">camera_name</span></code></strong></p>
 <ul class="simple">
@@ -512,9 +512,9 @@
 </ul>
 </section>
 <section id="id3">
-<h2><span class="section-number">4.1.2. </span>传感器控制<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<h2><span class="section-number">4.1.2. </span>传感器控制<a class="headerlink" href="#id3" title="链接到此标题。"></a></h2>
 <section id="id4">
-<h3><span class="section-number">4.1.2.1. </span>彩色流<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.1.2.1. </span>彩色流<a class="headerlink" href="#id4" title="链接到此标题。"></a></h3>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_color_auto_exposure</span></code></strong></p>
 <ul>
@@ -584,7 +584,7 @@
 </ul>
 </section>
 <section id="id5">
-<h3><span class="section-number">4.1.2.2. </span>深度流<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.1.2.2. </span>深度流<a class="headerlink" href="#id5" title="链接到此标题。"></a></h3>
 <ul>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_depth_auto_exposure_priority</span></code></strong></p>
 <ul class="simple">
@@ -593,7 +593,7 @@
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">mean_intensity_set_point</span></code></strong></p>
 <ul class="simple">
-<li><p>设置深度图像的目标平均强度。例如：<code class="docutils literal notranslate"><span class="pre">mean_intensity_set_point:=100</span></code>。</p></li>
+<li><p>设置开启自动曝光时深度图像的目标平均强度。例如：<code class="docutils literal notranslate"><span class="pre">mean_intensity_set_point:=100</span></code>。</p></li>
 </ul>
 <blockquote>
 <div><p><strong>注意：</strong> 这取代了已弃用的 <code class="docutils literal notranslate"><span class="pre">depth_brightness</span></code>，后者仍支持以保持向后兼容性。</p>
@@ -617,7 +617,7 @@
 </ul>
 </section>
 <section id="id6">
-<h3><span class="section-number">4.1.2.3. </span>红外流<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.1.2.3. </span>红外流<a class="headerlink" href="#id6" title="链接到此标题。"></a></h3>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_ir_auto_exposure</span></code></strong></p>
 <ul>
@@ -636,13 +636,13 @@
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">ir_brightness</span></code></strong></p>
 <ul>
-<li><p>设置红外亮度。</p></li>
+<li><p>设置开启自动曝光时ir图像的目标平均强度。</p></li>
 </ul>
 </li>
 </ul>
 </section>
 <section id="ldp">
-<h3><span class="section-number">4.1.2.4. </span>激光 / LDP<a class="headerlink" href="#ldp" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.1.2.4. </span>激光 / LDP<a class="headerlink" href="#ldp" title="链接到此标题。"></a></h3>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_laser</span></code></strong></p>
 <ul>
@@ -663,9 +663,9 @@
 </section>
 </section>
 <section id="id7">
-<h2><span class="section-number">4.1.3. </span>设备、同步与高级功能<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<h2><span class="section-number">4.1.3. </span>设备、同步与高级功能<a class="headerlink" href="#id7" title="链接到此标题。"></a></h2>
 <section id="id8">
-<h3><span class="section-number">4.1.3.1. </span>多相机同步<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.1.3.1. </span>多相机同步<a class="headerlink" href="#id8" title="链接到此标题。"></a></h3>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">sync_mode</span></code></strong></p>
 <ul>
@@ -708,7 +708,7 @@
 </div></blockquote>
 </section>
 <section id="id9">
-<h3><span class="section-number">4.1.3.2. </span>网络相机<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.1.3.2. </span>网络相机<a class="headerlink" href="#id9" title="链接到此标题。"></a></h3>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">enumerate_net_device</span></code></strong></p>
 <ul>
@@ -751,22 +751,54 @@
 </div></blockquote>
 </section>
 <section id="id10">
-<h3><span class="section-number">4.1.3.3. </span>设备特定<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
-<ul class="simple">
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_gmsl_trigger</span></code></strong> / <strong><code class="docutils literal notranslate"><span class="pre">gmsl_trigger_fps</span></code></strong></p>
+<h3><span class="section-number">4.1.3.3. </span>设备特定<a class="headerlink" href="#id10" title="链接到此标题。"></a></h3>
 <ul>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_gmsl_trigger</span></code></strong> / <strong><code class="docutils literal notranslate"><span class="pre">gmsl_trigger_fps</span></code></strong></p>
+<ul class="simple">
 <li><p>启用gmsl触发输出信号 / 设置gmsl触发fps。用于 <a class="reference internal" href="../5_advanced_guide/multi_camera/gmsl_camera.html"><span class="doc">gmsl相机</span></a>。</p></li>
 </ul>
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">preset_resolution_config</span></code></strong></p>
-<ul>
+<ul class="simple">
 <li><p>摄像头设备的预设分辨率配置。格式: &quot;width,height,ir_decimation_factor,depth_decimation_factor&quot;. Example: &quot;1280,720,4,4&quot;. 仅在 Gemini435Le 设备上受支持。留空禁用。</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">ae_mode</span></code></strong></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">colorbased</span></code>：自动曝光基于彩色流。<code class="docutils literal notranslate"><span class="pre">depthbased</span></code>：自动曝光基于深度流。<strong>默认值：</strong> <code class="docutils literal notranslate"><span class="pre">depthbased</span></code></p>
+<blockquote>
+<div><p>仅支持Gemini 305。</p>
+</div></blockquote>
+</li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enalbe_sports_mode</span></code></strong></p>
+<ul>
+<li><p>是否开启运动模式。<strong>默认值：</strong> <code class="docutils literal notranslate"><span class="pre">false</span></code></p>
+<blockquote>
+<div><p>仅支持Gemini 305。</p>
+</div></blockquote>
+</li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">depth_downscale</span></code></strong> / <strong><code class="docutils literal notranslate"><span class="pre">left_ir_downscale</span></code></strong> /<strong><code class="docutils literal notranslate"><span class="pre">right_ir_downscale</span></code></strong></p>
+<ul>
+<li><p>设置下采样倍数。可用<code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">run</span> <span class="pre">orbbec_camera</span> <span class="pre">list_camera_profile_mode_node</span></code>查看可设置分辨率。<strong>默认值：</strong> <code class="docutils literal notranslate"><span class="pre">1</span></code></p>
+<blockquote>
+<div><p>仅支持Gemini 305。</p>
+</div></blockquote>
+</li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_ptp_config</span></code></strong></p>
+<ul class="simple">
+<li><p>启用PTP时间同步。仅适用于Gemini 335Le。需要 <code class="docutils literal notranslate"><span class="pre">enable_sync_host_time</span></code> 设置为 <code class="docutils literal notranslate"><span class="pre">false</span></code>。</p></li>
 </ul>
 </li>
 </ul>
 </section>
 <section id="id11">
-<h3><span class="section-number">4.1.3.4. </span>视差<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.1.3.4. </span>视差<a class="headerlink" href="#id11" title="链接到此标题。"></a></h3>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">disparity_to_depth_mode</span></code></strong></p>
 <ul>
@@ -781,7 +813,7 @@
 </ul>
 </section>
 <section id="ae">
-<h3><span class="section-number">4.1.3.5. </span>交错AE模式<a class="headerlink" href="#ae" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.1.3.5. </span>交错AE模式<a class="headerlink" href="#ae" title="链接到此标题。"></a></h3>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">interleave_ae_mode</span></code></strong></p>
 <ul>
@@ -802,7 +834,7 @@
 </ul>
 </section>
 <section id="id12">
-<h3><span class="section-number">4.1.3.6. </span>相机内同步<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.1.3.6. </span>相机内同步<a class="headerlink" href="#id12" title="链接到此标题。"></a></h3>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">depth_registration</span></code></strong></p>
 <ul>
@@ -831,9 +863,9 @@
 </section>
 </section>
 <section id="id13">
-<h2><span class="section-number">4.1.4. </span>基础与通用参数<a class="headerlink" href="#id13" title="Link to this heading"></a></h2>
+<h2><span class="section-number">4.1.4. </span>基础与通用参数<a class="headerlink" href="#id13" title="链接到此标题。"></a></h2>
 <section id="id14">
-<h3><span class="section-number">4.1.4.1. </span>固件与后端<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.1.4.1. </span>固件与后端<a class="headerlink" href="#id14" title="链接到此标题。"></a></h3>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">upgrade_firmware</span></code></strong></p>
 <ul>
@@ -863,7 +895,7 @@
 </ul>
 </section>
 <section id="tf">
-<h3><span class="section-number">4.1.4.2. </span>TF、外参与校准<a class="headerlink" href="#tf" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.1.4.2. </span>TF、外参与校准<a class="headerlink" href="#tf" title="链接到此标题。"></a></h3>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">publish_tf</span></code></strong> / <strong><code class="docutils literal notranslate"><span class="pre">tf_publish_rate</span></code></strong></p>
 <ul>
@@ -888,7 +920,7 @@
 </ul>
 </section>
 <section id="id15">
-<h3><span class="section-number">4.1.4.3. </span>时间同步<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.1.4.3. </span>时间同步<a class="headerlink" href="#id15" title="链接到此标题。"></a></h3>
 <ul>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_sync_host_time</span></code></strong></p>
 <ul class="simple">
@@ -908,11 +940,6 @@
 <div><p><strong>注意</strong>：仅当 <strong><code class="docutils literal notranslate"><span class="pre">enable_sync_host_time</span> <span class="pre">=</span> <span class="pre">true</span></code></strong> 且 <strong><code class="docutils literal notranslate"><span class="pre">time_domain</span> <span class="pre">=</span> <span class="pre">device</span></code></strong> 时需要设置此参数。</p>
 </div></blockquote>
 </li>
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_ptp_config</span></code></strong></p>
-<ul class="simple">
-<li><p>启用PTP时间同步。仅适用于Gemini 335Le。需要 <code class="docutils literal notranslate"><span class="pre">enable_sync_host_time</span></code> 设置为 <code class="docutils literal notranslate"><span class="pre">false</span></code>。</p></li>
-</ul>
-</li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_frame_sync</span></code></strong></p>
 <ul class="simple">
 <li><p>启用帧同步。</p></li>
@@ -921,7 +948,7 @@
 </ul>
 </section>
 <section id="id16">
-<h3><span class="section-number">4.1.4.4. </span>日志与诊断<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.1.4.4. </span>日志与诊断<a class="headerlink" href="#id16" title="链接到此标题。"></a></h3>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">log_level</span></code></strong></p>
 <ul>
@@ -946,7 +973,7 @@
 </ul>
 </section>
 <section id="id17">
-<h3><span class="section-number">4.1.4.5. </span>其他<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<h3><span class="section-number">4.1.4.5. </span>其他<a class="headerlink" href="#id17" title="链接到此标题。"></a></h3>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">config_file_path</span></code></strong></p>
 <ul>
@@ -967,7 +994,7 @@
 </section>
 </section>
 <section id="imu">
-<h2><span class="section-number">4.1.5. </span>IMU<a class="headerlink" href="#imu" title="Link to this heading"></a></h2>
+<h2><span class="section-number">4.1.5. </span>IMU<a class="headerlink" href="#imu" title="链接到此标题。"></a></h2>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_accel</span></code></strong> / <strong><code class="docutils literal notranslate"><span class="pre">enable_gyro</span></code></strong></p>
 <ul>
@@ -1002,7 +1029,7 @@
 </ul>
 </section>
 <section id="id18">
-<h2><span class="section-number">4.1.6. </span>深度滤波器<a class="headerlink" href="#id18" title="Link to this heading"></a></h2>
+<h2><span class="section-number">4.1.6. </span>深度滤波器<a class="headerlink" href="#id18" title="链接到此标题。"></a></h2>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">enable_decimation_filter</span></code></strong></p>
 <ul>
@@ -1072,14 +1099,14 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
         <a href="application_guide.html" class="btn btn-neutral float-left" title="4. 应用指南" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
-        <a href="services.html" class="btn btn-neutral float-right" title="4.2. 所有可用的相机控制服务" accesskey="n" rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="services.html" class="btn btn-neutral float-right" title="4.2. 可用服务" accesskey="n" rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2026年01月07日 06:53:11.
+      <span class="lastupdated">最后更新于 2026年01月13日 02:41:42.
       </span></p>
   </div>
 

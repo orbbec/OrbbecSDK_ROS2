@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>1.1. 引言 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=63de077d" />
 
   
@@ -16,9 +16,9 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=7d86a446"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script src="../../../_static/translations.js?v=beaddf03"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../_static/translations.js?v=540d3cec"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="索引" href="../../../genindex.html" />
     <link rel="search" title="搜索" href="../../../search.html" />
@@ -132,7 +132,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../4_application_guide/launch_parameters.html#id18">4.1.6. 深度滤波器</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/services.html">4.2. 所有可用的相机控制服务</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../4_application_guide/services.html">4.2. 可用服务</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../4_application_guide/services.html#id2">4.2.1. 数据流控制</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../4_application_guide/services.html#id3">4.2.1.1. 彩色流</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../4_application_guide/services.html#id4">4.2.1.2. 深度流</a></li>
@@ -402,7 +402,7 @@
            <div itemprop="articleBody">
              
   <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="id1">
-<h1><span class="section-number">1.1. </span>引言<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<h1><span class="section-number">1.1. </span>引言<a class="headerlink" href="#id1" title="链接到此标题。"></a></h1>
 <p>OrbbecSDK ROS2 封装为 Orbbec 相机与 ROS 2 环境提供无缝集成。它支持 ROS2 Foxy、Humble 和 Jazzy 发行版。</p>
 <p>默认推荐使用 <strong>v2-main</strong> 分支。对于 v2-main 尚不支持的旧 OpenNI 设备，请使用 <strong>main</strong> 分支。仅由 main 分支支持的设备型号列在下表中。</p>
 <p>如果您是中国用户，推荐使用 <a class="reference external" href="https://gitee.com/orbbecdeveloper/OrbbecSDK_ROS2">gitee 仓库</a>。</p>
@@ -417,6 +417,17 @@
     </tr>
   </thead>
   <tbody>
+      <tr>
+      <td rowspan="2" style="text-align: center; font-weight: bold;">Gemini 340</td>
+      <td>Gemini 345</td>
+      <td>not supported</td>
+      <td>recommended for new designs</td>
+    </tr>
+    <tr>
+      <td>Gemini 345Lg</td>
+      <td>not supported</td>
+      <td>recommended for new designs</td>
+    </tr>
       <tr>
       <td style="text-align: center; font-weight: bold;">Gemini 435Le</td>
       <td>Gemini 435Le</td>
@@ -550,7 +561,7 @@
 <li><p>即将支持：近期将添加支持。</p></li>
 </ol>
 <section id="id2">
-<h2><span class="section-number">1.1.1. </span>支持的硬件产品<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<h2><span class="section-number">1.1.1. </span>支持的硬件产品<a class="headerlink" href="#id2" title="链接到此标题。"></a></h2>
 <p>以下设备由 OrbbecSDK ROS2 封装 v2-main 分支支持。后续将增加更多设备支持。如果您在下表中未找到设备，请尝试 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2">main</a> 分支。</p>
 <p>为获得最佳性能，强烈建议升级到最新固件版本，以确保获得最新的改进与缺陷修复。</p>
 <p>关于如何获取与升级最新固件，<a class="reference internal" href="../3_quickstarts/orbbecviewer.html"><span class="doc">请点击这里</span></a>。</p>
@@ -637,7 +648,7 @@
 </table><p>所有启动文件本质上是类似的，主要区别在于同系列不同型号设置的参数默认值。USB 标准差异（如 USB 2.0 与 USB 3.0）可能需要调整这些参数。如果遇到启动失败，请仔细查看规格说明书，特别关注启动文件中的分辨率设置以及其他参数，以确保兼容与最佳性能。</p>
 </section>
 <section id="orbbec">
-<h2><span class="section-number">1.1.2. </span>Orbbec 相机规格书<a class="headerlink" href="#orbbec" title="Link to this heading"></a></h2>
+<h2><span class="section-number">1.1.2. </span>Orbbec 相机规格书<a class="headerlink" href="#orbbec" title="链接到此标题。"></a></h2>
 <p>更多信息请参考相机规格书。</p>
 <style>
 table {
@@ -726,7 +737,7 @@ thead th {
 </table></section>
 <hr class="docutils" />
 <section id="id3">
-<h2><span class="section-number">1.1.3. </span>支持的平台<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<h2><span class="section-number">1.1.3. </span>支持的平台<a class="headerlink" href="#id3" title="链接到此标题。"></a></h2>
 <ul class="simple">
 <li><p>Linux x64：已在 Ubuntu 22.04 上测试</p></li>
 <li><p>Linux ARM64：已在 NVIDIA Jetson AGX Orin、NVIDIA Jetson Orin NX、NVIDIA Jetson Orin Nano、NVIDIA Jetson AGX Xavier、NVIDIA Jetson Xavier NX 上测试</p></li>
@@ -746,7 +757,7 @@ thead th {
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2026年01月07日 06:53:11.
+      <span class="lastupdated">最后更新于 2026年01月13日 02:41:42.
       </span></p>
   </div>
 

@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>5.3.4. 视差搜索偏移 &mdash; OrbbecSDK V2 ROS2 封装  文档</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=63de077d" />
 
   
@@ -16,9 +16,9 @@
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../../_static/documentation_options.js?v=7d86a446"></script>
-      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script src="../../../../_static/translations.js?v=beaddf03"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../../_static/translations.js?v=540d3cec"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="索引" href="../../../../genindex.html" />
     <link rel="search" title="搜索" href="../../../../search.html" />
@@ -132,7 +132,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../4_application_guide/launch_parameters.html#id18">4.1.6. 深度滤波器</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../4_application_guide/services.html">4.2. 所有可用的相机控制服务</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../4_application_guide/services.html">4.2. 可用服务</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../4_application_guide/services.html#id2">4.2.1. 数据流控制</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../4_application_guide/services.html#id3">4.2.1.1. 彩色流</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../4_application_guide/services.html#id4">4.2.1.2. 深度流</a></li>
@@ -402,17 +402,17 @@
            <div itemprop="articleBody">
              
   <div class="lang-switch" style="margin:0 0 1em 0; font-size:0.9em;"><a class="lang-other" href="#">English</a> | <a class="lang-current" href="#">中文</a></div><script>(function(){var p=window.location.pathname;var isEn=p.indexOf('/en/')!==-1 && p.indexOf('/zh/')===-1;if(p.indexOf('/zh/')!==-1) isEn=false;var other = isEn ? p.replace(/\/en\//, '/zh/') : p.replace(/\/zh\//, '/en/');var current=p;var sw=document.querySelector('.lang-switch'); if(!sw) return;var o=sw.querySelector('.lang-other'); var c=sw.querySelector('.lang-current');if(isEn){ o.textContent='中文'; c.textContent='English'; } else { o.textContent='English'; c.textContent='中文'; }o.setAttribute('href', other); c.setAttribute('href', current);})();</script><section id="id1">
-<h1><span class="section-number">5.3.4. </span>视差搜索偏移<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<h1><span class="section-number">5.3.4. </span>视差搜索偏移<a class="headerlink" href="#id1" title="链接到此标题。"></a></h1>
 <blockquote>
 <div><p>本节介绍如何在 Gemini330 系列相机中使用 disparity_search_offset 功能（相机固件最低版本 <a class="reference external" href="https://www.orbbec.com/docs/g330-firmware-release/">1.4.60</a>）。Disparity_search_offset 仅对深度流的 1280×720、1280×800 和 640×400 分辨率有效。</p>
 </div></blockquote>
 <section id="id2">
-<h2><span class="section-number">5.3.4.1. </span>功能介绍<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<h2><span class="section-number">5.3.4.1. </span>功能介绍<a class="headerlink" href="#id2" title="链接到此标题。"></a></h2>
 <p>视差搜索范围的定义：对于左图像中的任何像素 <em>(u_l, v)</em>，默认情况下，右图像中对应的视差搜索范围为 <em>[ (u_l - 255, v)</em>, <em>(u_l, v) ]</em>，其中视差搜索长度为 256，最大整数视差为 255。如果将搜索的起点调整为 <em>[ (u_l - 255 - offset, v)</em>, <em>(u_l - offset, v) ]</em>，则偏移量定义为视差偏移。因此，我们的视差搜索范围配置包括视差搜索长度和搜索位置偏移（也可称为视差偏移）。</p>
 <p><img alt="深度点云可视化" src="../../../../_images/search_offset0.png" /></p>
 </section>
 <section id="id3">
-<h2><span class="section-number">5.3.4.2. </span>参数介绍<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<h2><span class="section-number">5.3.4.2. </span>参数介绍<a class="headerlink" href="#id3" title="链接到此标题。"></a></h2>
 <p>disparity_search_offset 相关参数在 <a class="reference external" href="https://github.com/orbbec/OrbbecSDK_ROS2/blob/v2-main/orbbec_camera/launch/gemini_330_series.launch.py">gemini_330_series.launch.py</a> 中设置</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">disparity_range_mode</span></code>：视差搜索长度，只能设置为 64、128 和 256。</p></li>
@@ -488,7 +488,7 @@
 </tbody>
 </table></section>
 <section id="id4">
-<h2><span class="section-number">5.3.4.3. </span>运行启动文件<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<h2><span class="section-number">5.3.4.3. </span>运行启动文件<a class="headerlink" href="#id4" title="链接到此标题。"></a></h2>
 <p>设置 disparity_search_offset 参数，重新 <code class="docutils literal notranslate"><span class="pre">colcon</span> <span class="pre">build</span></code> 并运行启动文件</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>orbbec_camera<span class="w"> </span>gemini_330_series.launch.py
 </pre></div>
@@ -508,7 +508,7 @@
 
   <div role="contentinfo">
     <p>&#169; 版权所有 2025, 奥比中光科技集团股份有限公司 www.orbbec.com.。
-      <span class="lastupdated">最后更新于 2026年01月07日 06:53:11.
+      <span class="lastupdated">最后更新于 2026年01月13日 02:41:42.
       </span></p>
   </div>
 

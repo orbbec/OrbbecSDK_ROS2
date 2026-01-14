@@ -43,10 +43,28 @@ def load_parameters(context, args):
         yaml_params = load_yaml(config_file_path)
         default_params = merge_params(default_params, yaml_params)
     skip_convert = {'config_file_path', 'usb_port', 'serial_number'}
-    return {
-        key: (value if key in skip_convert else convert_value(value))
-        for key, value in default_params.items()
-    }
+
+    result = {}
+    for key, value in default_params.items():
+        if key in skip_convert:
+            result[key] = value
+        elif 'enable_pub_plugins' in key:
+            if isinstance(value, str):
+                if value.startswith('[') and value.endswith(']'):
+                    try:
+                        result[key] = yaml.safe_load(value)
+                    except:
+                        result[key] = [value]
+                else:
+                    result[key] = [value]
+            elif isinstance(value, list):
+                result[key] = value
+            else:
+                result[key] = [str(value)]
+        else:
+            result[key] = convert_value(value)
+
+    return result
 
 
 def generate_launch_description():
@@ -195,6 +213,15 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_hardware_reset', default_value='false'),
 
         DeclareLaunchArgument('frame_aggregate_mode', default_value='ANY'), # full_frame、color_frame、ANY or disable
+
+        #color image transport plugins
+        DeclareLaunchArgument('color.image_raw.enable_pub_plugins',default_value='["image_transport/compressed", "image_transport/raw", "image_transport/theora"]'),
+        #depth image transport plugins
+        DeclareLaunchArgument('depth.image_raw.enable_pub_plugins',default_value='["image_transport/compressedDepth", "image_transport/raw"]'),
+        #infra1
+        DeclareLaunchArgument('left_ir.image_raw.enable_pub_plugins',default_value='["image_transport/compressed", "image_transport/raw", "image_transport/theora"]'),
+        #infra2
+        DeclareLaunchArgument('right_ir.image_raw.enable_pub_plugins',default_value='["image_transport/compressed", "image_transport/raw", "image_transport/theora"]'),
     ]
 
     def get_params(context, args):

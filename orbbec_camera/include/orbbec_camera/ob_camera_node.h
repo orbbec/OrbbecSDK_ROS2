@@ -21,6 +21,7 @@
 #include <cstddef>
 #include <memory>
 #include <optional>
+#include <queue>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <unordered_map>

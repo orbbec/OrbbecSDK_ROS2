@@ -374,17 +374,25 @@ void OBCameraNode::setupDevices() {
     roi.y1_bottom = depth_ae_roi_bottom_;
     device_->setStructuredData(OB_STRUCT_DEPTH_AE_ROI, &roi, sizeof(AE_ROI));
   }
-  if (color_rotation_ != -1 &&
-      device_->isPropertySupported(OB_PROP_COLOR_ROTATE_INT, OB_PERMISSION_READ_WRITE)) {
-    device_->setIntProperty(OB_PROP_COLOR_ROTATE_INT, color_rotation_);
-    RCLCPP_INFO_STREAM(
-        logger_, "set color rotation  to " << device_->getIntProperty(OB_PROP_COLOR_ROTATE_INT));
+  if (color_rotation_ != -1) {
+    if (device_->isPropertySupported(OB_PROP_COLOR_ROTATE_INT, OB_PERMISSION_READ_WRITE)) {
+      device_->setIntProperty(OB_PROP_COLOR_ROTATE_INT, color_rotation_);
+      RCLCPP_INFO_STREAM(
+          logger_, "set color rotation  to " << device_->getIntProperty(OB_PROP_COLOR_ROTATE_INT));
+    } else {
+      // Firmware has no hardware color rotate (e.g. DaBai DCW); fall back to software.
+      color_rotation_sw_ = color_rotation_;
+    }
   }
-  if (depth_rotation_ != -1 &&
-      device_->isPropertySupported(OB_PROP_DEPTH_ROTATE_INT, OB_PERMISSION_READ_WRITE)) {
-    device_->setIntProperty(OB_PROP_DEPTH_ROTATE_INT, depth_rotation_);
-    RCLCPP_INFO_STREAM(
-        logger_, "set depth rotation  to " << device_->getIntProperty(OB_PROP_DEPTH_ROTATE_INT));
+  if (depth_rotation_ != -1) {
+    if (device_->isPropertySupported(OB_PROP_DEPTH_ROTATE_INT, OB_PERMISSION_READ_WRITE)) {
+      device_->setIntProperty(OB_PROP_DEPTH_ROTATE_INT, depth_rotation_);
+      RCLCPP_INFO_STREAM(
+          logger_, "set depth rotation  to " << device_->getIntProperty(OB_PROP_DEPTH_ROTATE_INT));
+    } else {
+      // Firmware has no hardware depth rotate (e.g. DaBai DCW); fall back to software.
+      depth_rotation_sw_ = depth_rotation_;
+    }
   }
   if (left_ir_rotation_ != -1 &&
       device_->isPropertySupported(OB_PROP_IR_ROTATE_INT, OB_PERMISSION_READ_WRITE)) {
@@ -2271,6 +2279,16 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   if (flip_stream_[stream_index]) {
     // flip image
     cv::flip(image, image, 1);
+  }
+  // Software rotation fallback for devices whose firmware does not support hardware
+  // rotate (e.g. DaBai DCW). color_rotation_sw_/depth_rotation_sw_ are only set in
+  // setupDevices() when the hardware rotate property was unavailable. Only 180 is done
+  // in software since it preserves image dimensions (step / camera_info stay valid).
+  int rotation_deg = (stream_index == COLOR)  ? color_rotation_sw_
+                     : (stream_index == DEPTH) ? depth_rotation_sw_
+                                               : -1;
+  if (rotation_deg == 180) {
+    cv::rotate(image, image, cv::ROTATE_180);
   }
   sensor_msgs::msg::Image::UniquePtr image_msg(new sensor_msgs::msg::Image());
 

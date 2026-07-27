@@ -483,6 +483,10 @@ class OBCameraNode {
   int depth_rotation_ = -1;
   int left_ir_rotation_ = -1;
   int right_ir_rotation_ = -1;
+  // Software-rotation fallback values (degrees), set in setupDevices() only when the
+  // device firmware does not support hardware rotate (e.g. DaBai DCW). -1 = disabled.
+  int color_rotation_sw_ = -1;
+  int depth_rotation_sw_ = -1;
   int color_exposure_ = -1;
   int color_gain_ = -1;
   int color_white_balance_ = -1;

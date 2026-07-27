@@ -1591,10 +1591,19 @@ void OBCameraNode::setupDevices() {
     int set_enable_depth_auto_exposure_priority = enable_depth_auto_exposure_priority_ ? 1 : 0;
     TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_DEPTH_AUTO_EXPOSURE_PRIORITY_INT,
                         set_enable_depth_auto_exposure_priority);
-    RCLCPP_INFO_STREAM(
-        logger_,
-        "Current depth auto exposure priority: "
-            << (device_->getIntProperty(OB_PROP_DEPTH_AUTO_EXPOSURE_PRIORITY_INT) ? "ON" : "OFF"));
+    // Guard the readback: firmware older than the property (e.g. G330 series
+    // < 1.6.00, see issue #190) rejects it with errorCode 2 / status 1005,
+    // which would otherwise throw out of setupDevices and abort device init.
+    try {
+      RCLCPP_INFO_STREAM(
+          logger_,
+          "Current depth auto exposure priority: "
+              << (device_->getIntProperty(OB_PROP_DEPTH_AUTO_EXPOSURE_PRIORITY_INT) ? "ON"
+                                                                                    : "OFF"));
+    } catch (const std::exception &e) {
+      RCLCPP_WARN_STREAM(
+          logger_, "Failed to read depth auto exposure priority, skipping: " << e.what());
+    }
   }
   if (should_apply_launch_config("enable_ir_auto_exposure") &&
       device_->isPropertySupported(OB_PROP_IR_AUTO_EXPOSURE_BOOL, OB_PERMISSION_WRITE)) {

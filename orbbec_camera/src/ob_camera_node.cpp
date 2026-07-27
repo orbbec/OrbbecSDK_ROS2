@@ -1600,6 +1600,9 @@ void OBCameraNode::setupDevices() {
           "Current depth auto exposure priority: "
               << (device_->getIntProperty(OB_PROP_DEPTH_AUTO_EXPOSURE_PRIORITY_INT) ? "ON"
                                                                                     : "OFF"));
+    } catch (const ob::Error &e) {
+      RCLCPP_WARN_STREAM(logger_, "Failed to read depth auto exposure priority, skipping: "
+                                      << orbbec_camera::formatObErrorWithStatus(e));
     } catch (const std::exception &e) {
       RCLCPP_WARN_STREAM(
           logger_, "Failed to read depth auto exposure priority, skipping: " << e.what());

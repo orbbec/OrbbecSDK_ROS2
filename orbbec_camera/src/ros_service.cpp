@@ -1940,9 +1940,9 @@ bool OBCameraNode::toggleSensor(const stream_index_pair& stream_index, bool enab
                                 std::string& msg) {
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
   try {
-    // Must join the color frame worker and drain its queue before setupProfiles() below
-    // reassigns images_/encoding_, or the worker can read/write them mid-teardown (UAF).
+    const bool interleave_frame_enable = interleave_frame_enable_;
     stopStreams();
+    interleave_frame_enable_ = interleave_frame_enable;
     stopColorFrameThreads();
     clearColorFrameQueues();
     enable_stream_[stream_index] = enabled;

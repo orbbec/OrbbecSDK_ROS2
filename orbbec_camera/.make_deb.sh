@@ -11,8 +11,11 @@ sed -i '/^override_dh_shlibdeps:/,/^$/d' debian/rules
 
 cat >> debian/rules << 'EOF'
 
+ORBBEC_PACKAGE := ros-$(ROS_DISTRO)-orbbec-camera
+ORBBEC_LIB_DIR := $(CURDIR)/debian/$(ORBBEC_PACKAGE)/opt/ros/$(ROS_DISTRO)/lib
+
 override_dh_shlibdeps:
-	dh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info
+	dh_shlibdeps -Xlibengine_infer_encry.so -l$(ORBBEC_LIB_DIR) -- --ignore-missing-info
 EOF
 
 PARALLEL=$(nproc)

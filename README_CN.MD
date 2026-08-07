@@ -21,9 +21,16 @@
   <a href="https://docs.ros.org/en/jazzy/">
     <img src="https://img.shields.io/badge/ROS-Jazzy-f5792a?style=flat-square&amp;logo=ros&amp;logoColor=white" height="20" alt="ROS Jazzy">
   </a>
+  <a href="https://docs.ros.org/en/lyrical/">
+    <img src="https://img.shields.io/badge/ROS-Lyrical-f5792a?style=flat-square&amp;logo=ros&amp;logoColor=white" height="20" alt="ROS Lyrical">
+  </a>
+  <a href="https://docs.ros.org/en/rolling/">
+    <img src="https://img.shields.io/badge/ROS-Rolling%20(experimental)-e5c07b?style=flat-square&amp;logo=ros&amp;logoColor=white" height="20" alt="ROS Rolling (experimental)">
+  </a>
   <img src="https://img.shields.io/badge/Ubuntu-20.04-0078d4?style=flat-square&amp;logo=ubuntu&amp;logoColor=white" height="20" alt="Ubuntu 20.04">
   <img src="https://img.shields.io/badge/Ubuntu-22.04-0078d4?style=flat-square&amp;logo=ubuntu&amp;logoColor=white" height="20" alt="Ubuntu 22.04">
   <img src="https://img.shields.io/badge/Ubuntu-24.04-0078d4?style=flat-square&amp;logo=ubuntu&amp;logoColor=white" height="20" alt="Ubuntu 24.04">
+  <img src="https://img.shields.io/badge/Ubuntu-26.04-0078d4?style=flat-square&amp;logo=ubuntu&amp;logoColor=white" height="20" alt="Ubuntu 26.04">
 
   <!-- Second row: -->
   <br>
@@ -40,7 +47,7 @@
 
 ## 简介
 
-OrbbecSDK ROS2 Wrapper 提供 Orbbec 相机与 ROS 2 环境的无缝集成，支持 **ROS2 Foxy、Humble 和 Jazzy** 发行版。
+OrbbecSDK ROS2 Wrapper 提供 Orbbec 相机与 ROS 2 环境的无缝集成，支持 **ROS2 Foxy、Humble、Jazzy 和 Lyrical** 发行版，并提供对 **Rolling** 的实验性支持。
 
 - 默认推荐使用 **v2-main** 分支。
 - 对于旧的 **OpenNI** 设备（v2-main 不支持），请使用 **main** 分支。

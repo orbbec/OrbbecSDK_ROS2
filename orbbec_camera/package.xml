@@ -8,16 +8,19 @@
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>pkg-config</buildtool_depend>
+
   <depend>ament_lint_auto</depend>
   <depend>ament_lint_common</depend>
   <depend>ament_index_cpp</depend>
   <depend>backward_ros</depend>
   <depend>image_transport</depend>
   <depend>image_publisher</depend>
+  <depend>message_filters</depend>
   <depend>rclcpp_components</depend>
   <depend>cv_bridge</depend>
   <depend>camera_info_manager</depend>
-  <depend>orbbec_camera_msgs</depend>
+  <depend version_gte="2.9.3">orbbec_camera_msgs</depend>
   <depend>builtin_interfaces</depend>
   <depend>rclcpp</depend>
   <depend>sensor_msgs</depend>
@@ -35,6 +38,21 @@
   <depend>libgoogle-glog-dev</depend>
   <depend>libssl-dev</depend>
   <depend>opengl</depend>
+
+  <depend>eigen</depend>
+  <depend>geometry_msgs</depend>
+  <depend>libopencv-dev</depend>
+  <depend>rcl_interfaces</depend>
+  <depend>rmw</depend>
+  <depend>yaml-cpp</depend>
+
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>python3-psutil</exec_depend>
+  <exec_depend>python3-tabulate</exec_depend>
+  <exec_depend>python3-yaml</exec_depend>
+  <exec_depend>rclpy</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

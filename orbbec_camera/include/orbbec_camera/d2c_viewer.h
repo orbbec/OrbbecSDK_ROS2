@@ -14,12 +14,20 @@
  * limitations under the License.
  *******************************************************************************/
 #pragma once
+#include <sensor_msgs/msg/image.hpp>
+#include <rclcpp/rclcpp.hpp>
+
+#if __has_include(<message_filters/subscriber.hpp>)
+#include <message_filters/subscriber.hpp>
+#include <message_filters/sync_policies/approximate_time.hpp>
+#include <message_filters/synchronizer.hpp>
+#elif __has_include(<message_filters/subscriber.h>)
 #include <message_filters/subscriber.h>
 #include <message_filters/sync_policies/approximate_time.h>
 #include <message_filters/synchronizer.h>
-#include <message_filters/time_synchronizer.h>
-#include <sensor_msgs/msg/image.hpp>
-#include <rclcpp/rclcpp.hpp>
+#else
+#error "No compatible message_filters headers found"
+#endif
 
 #include "utils.h"
 

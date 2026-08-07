@@ -3,9 +3,6 @@
 #include <orbbec_camera/ob_camera_node_driver.h>
 #include <orbbec_camera/utils.h>
 #include "orbbec_camera_msgs/msg/metadata.hpp"
-#include <message_filters/subscriber.h>
-#include <message_filters/sync_policies/approximate_time.h>
-#include <message_filters/synchronizer.h>
 #include <filesystem>
 
 namespace orbbec_camera {

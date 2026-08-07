@@ -27,6 +27,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <magic_enum/magic_enum.hpp>
 
 #include "orbbec_camera/utils.h"
 #include <filesystem>
@@ -451,8 +452,7 @@ void OBCameraNode::publishDepthFiltersStatus() {
     depth_filters_snapshot = depth_filter_list_;
   }
 
-  auto find_depth_filter = [&depth_filters_snapshot,
-                            this](const std::string &filter_name) -> std::shared_ptr<ob::Filter> {
+  auto find_depth_filter = [&depth_filters_snapshot](const std::string &filter_name) -> std::shared_ptr<ob::Filter> {
     const auto normalized_name = normalizeDepthFilterName(filter_name);
     auto it = std::find_if(depth_filters_snapshot.begin(), depth_filters_snapshot.end(),
                            [&normalized_name](const auto &filter) {
@@ -5311,15 +5311,32 @@ void OBCameraNode::publishConfidenceFrame(const std::shared_ptr<ob::Frame> &conf
 }
 
 void OBCameraNode::setupCameraInfo() {
-  std::string color_camera_name = camera_name_ + "_color";
+  const auto create_camera_info_manager = [this](const std::string &camera_name,
+                                                 const std::string &camera_info_url) {
+#ifdef ORBBEC_CAMERA_INFO_MANAGER_USES_NODE_INTERFACES
+#ifdef ORBBEC_CAMERA_INFO_MANAGER_USES_RCLCPP_QOS
+    return std::make_unique<camera_info_manager::CameraInfoManager>(
+        node_->get_node_base_interface(), node_->get_node_services_interface(),
+        node_->get_node_logging_interface(), camera_name, camera_info_url,
+        rclcpp::SystemDefaultsQoS());
+#else
+    return std::make_unique<camera_info_manager::CameraInfoManager>(
+        node_->get_node_base_interface(), node_->get_node_services_interface(),
+        node_->get_node_logging_interface(), camera_name, camera_info_url, rmw_qos_profile_default);
+#endif
+#else
+    return std::make_unique<camera_info_manager::CameraInfoManager>(node_, camera_name,
+                                                                    camera_info_url);
+#endif
+  };
+
+  const std::string color_camera_name = camera_name_ + "_color";
   if (!color_info_url_.empty()) {
-    color_info_manager_ = std::make_unique<camera_info_manager::CameraInfoManager>(
-        node_, color_camera_name, color_info_url_);
+    color_info_manager_ = create_camera_info_manager(color_camera_name, color_info_url_);
   }
-  std::string ir_camera_name = camera_name_ + "_ir";
+  const std::string ir_camera_name = camera_name_ + "_ir";
   if (!ir_info_url_.empty()) {
-    ir_info_manager_ = std::make_unique<camera_info_manager::CameraInfoManager>(
-        node_, ir_camera_name, ir_info_url_);
+    ir_info_manager_ = create_camera_info_manager(ir_camera_name, ir_info_url_);
   }
 }
 
@@ -7287,8 +7304,8 @@ void OBCameraNode::publishStaticTransforms() {
   if (!publish_tf_) {
     return;
   }
-  static_tf_broadcaster_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(node_);
-  dynamic_tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(node_);
+  static_tf_broadcaster_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(*node_);
+  dynamic_tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(*node_);
   calcAndPublishStaticTransform();
   if (tf_publish_rate_ > 0) {
     tf_thread_ = std::make_shared<std::thread>([this]() { publishDynamicTransforms(); });

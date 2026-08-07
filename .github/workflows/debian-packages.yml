@@ -1,0 +1,222 @@
+name: Build Debian packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      ros_distro:
+        description: ROS 2 distribution to package
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - humble
+          - jazzy
+          - lyrical
+      architecture:
+        description: CPU architecture to package
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - amd64
+          - arm64
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    name: Prepare build matrix
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+
+    steps:
+      - name: Generate selected build matrix
+        id: matrix
+        shell: bash
+        env:
+          SELECTED_ROS_DISTRO: ${{ inputs.ros_distro }}
+          SELECTED_ARCHITECTURE: ${{ inputs.architecture }}
+        run: |
+          set -euo pipefail
+
+          architectures=(amd64 arm64)
+          if [[ "${SELECTED_ARCHITECTURE}" != "all" ]]; then
+            architectures=("${SELECTED_ARCHITECTURE}")
+          fi
+
+          entries=()
+          while IFS='|' read -r ros_distro ubuntu_codename ubuntu_version; do
+            if [[ "${SELECTED_ROS_DISTRO}" != "all" &&
+                  "${SELECTED_ROS_DISTRO}" != "${ros_distro}" ]]; then
+              continue
+            fi
+
+            for architecture in "${architectures[@]}"; do
+              runner="ubuntu-${ubuntu_version}"
+              if [[ "${architecture}" == "arm64" ]]; then
+                runner="${runner}-arm"
+              fi
+
+              printf -v entry \
+                '{"ros":"%s","arch":"%s","runner":"%s","image":"ros:%s-ros-core-%s"}' \
+                "${ros_distro}" \
+                "${architecture}" \
+                "${runner}" \
+                "${ros_distro}" \
+                "${ubuntu_codename}"
+              entries+=("${entry}")
+            done
+          done <<'EOF'
+          humble|jammy|22.04
+          jazzy|noble|24.04
+          lyrical|resolute|26.04
+          EOF
+
+          matrix=$(IFS=,; printf '{"include":[%s]}' "${entries[*]}")
+          echo "matrix=${matrix}" >> "${GITHUB_OUTPUT}"
+
+  build:
+    name: ROS 2 ${{ matrix.ros }} (${{ matrix.arch }})
+    needs: prepare
+    runs-on: ${{ matrix.runner }}
+    container:
+      image: ${{ matrix.image }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      ROS_DISTRO: ${{ matrix.ros }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install packaging tools and dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          apt-get update
+          apt-get install --no-install-recommends --yes \
+            build-essential \
+            cmake \
+            debhelper \
+            fakeroot \
+            git \
+            python3-bloom \
+            python3-rosdep
+
+          rosdep init || true
+
+          local_rosdep_dir="${RUNNER_TEMP}/orbbec-rosdep"
+          mkdir -p "${local_rosdep_dir}"
+          printf 'yaml file://%s/.github/rosdep/orbbec-camera-msgs.yaml\n' \
+            "${GITHUB_WORKSPACE}" \
+            > "${local_rosdep_dir}/10-orbbec-camera-msgs.list"
+          export ROSDEP_SOURCE_PATH="${local_rosdep_dir}:/etc/ros/rosdep/sources.list.d"
+          echo "ROSDEP_SOURCE_PATH=${ROSDEP_SOURCE_PATH}" >> "${GITHUB_ENV}"
+
+          rosdep update --rosdistro "${ROS_DISTRO}"
+
+          set +u
+          source "/opt/ros/${ROS_DISTRO}/setup.bash"
+          set -u
+          rosdep install \
+            --from-paths orbbec_camera_msgs orbbec_camera \
+            --ignore-src \
+            --rosdistro "${ROS_DISTRO}" \
+            -y
+
+      - name: Build and install message package
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +u
+          source "/opt/ros/${ROS_DISTRO}/setup.bash"
+          set -u
+
+          (
+            cd orbbec_camera_msgs
+            bash .make_deb.sh
+          )
+
+          mapfile -t message_packages < <(
+            find . -maxdepth 1 -type f \
+              -name "ros-${ROS_DISTRO}-orbbec-camera-msgs_*.deb" \
+              -print
+          )
+          if [[ "${#message_packages[@]}" -ne 1 ]]; then
+            echo "Expected one orbbec_camera_msgs Debian package, found ${#message_packages[@]}" >&2
+            exit 1
+          fi
+
+          apt-get install --yes "${message_packages[0]}"
+
+      - name: Build camera package
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +u
+          source "/opt/ros/${ROS_DISTRO}/setup.bash"
+          set -u
+
+          (
+            cd orbbec_camera
+            bash .make_deb.sh
+          )
+
+      - name: Validate and install generated packages
+        shell: bash
+        env:
+          EXPECTED_ARCHITECTURE: ${{ matrix.arch }}
+        run: |
+          set -euo pipefail
+
+          mapfile -t camera_packages < <(
+            find . -maxdepth 1 -type f \
+              -name "ros-${ROS_DISTRO}-orbbec-camera_*.deb" \
+              -print
+          )
+          if [[ "${#camera_packages[@]}" -ne 1 ]]; then
+            echo "Expected one orbbec_camera Debian package, found ${#camera_packages[@]}" >&2
+            exit 1
+          fi
+
+          actual_architecture=$(dpkg --print-architecture)
+          if [[ "${actual_architecture}" != "${EXPECTED_ARCHITECTURE}" ]]; then
+            echo "Runner architecture ${actual_architecture} does not match ${EXPECTED_ARCHITECTURE}" >&2
+            exit 1
+          fi
+
+          for package in ./*.deb ./*.ddeb; do
+            [[ -e "${package}" ]] || continue
+            package_architecture=$(dpkg-deb --field "${package}" Architecture)
+            if [[ "${package_architecture}" != "${EXPECTED_ARCHITECTURE}" &&
+                  "${package_architecture}" != "all" ]]; then
+              echo "Package ${package} has unexpected architecture ${package_architecture}" >&2
+              exit 1
+            fi
+          done
+
+          apt-get install --yes "${camera_packages[0]}"
+
+      - name: Collect packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          find . -maxdepth 1 -type f \
+            \( -name '*.deb' -o -name '*.ddeb' \) \
+            -exec cp --target-directory artifacts {} +
+
+      - name: Upload Debian packages
+        uses: actions/upload-artifact@v7
+        with:
+          name: orbbec-ros2-debs-${{ matrix.ros }}-${{ matrix.arch }}
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0

@@ -139,9 +139,9 @@ class CameraExampleNode : public rclcpp::Node {
         "/camera/device_status", 10,
         std::bind(&CameraExampleNode::deviceStatusCallback, this, std::placeholders::_1));
 
-    while (rclcpp::ok()) {
-      rclcpp::spin_some(shared_from_this());
-    }
+    rclcpp::executors::SingleThreadedExecutor executor;
+    executor.add_node(shared_from_this());
+    executor.spin();
   }
 
   // Feature 7: Set Color AE ROI

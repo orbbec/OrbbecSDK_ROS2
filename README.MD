@@ -21,9 +21,16 @@
   <a href="https://docs.ros.org/en/jazzy/">
     <img src="https://img.shields.io/badge/ROS-Jazzy-f5792a?style=flat-square&amp;logo=ros&amp;logoColor=white" height="20" alt="ROS Jazzy">
   </a>
+  <a href="https://docs.ros.org/en/lyrical/">
+    <img src="https://img.shields.io/badge/ROS-Lyrical-f5792a?style=flat-square&amp;logo=ros&amp;logoColor=white" height="20" alt="ROS Lyrical">
+  </a>
+  <a href="https://docs.ros.org/en/rolling/">
+    <img src="https://img.shields.io/badge/ROS-Rolling%20(experimental)-e5c07b?style=flat-square&amp;logo=ros&amp;logoColor=white" height="20" alt="ROS Rolling (experimental)">
+  </a>
   <img src="https://img.shields.io/badge/Ubuntu-20.04-0078d4?style=flat-square&amp;logo=ubuntu&amp;logoColor=white" height="20" alt="Ubuntu 20.04">
   <img src="https://img.shields.io/badge/Ubuntu-22.04-0078d4?style=flat-square&amp;logo=ubuntu&amp;logoColor=white" height="20" alt="Ubuntu 22.04">
   <img src="https://img.shields.io/badge/Ubuntu-24.04-0078d4?style=flat-square&amp;logo=ubuntu&amp;logoColor=white" height="20" alt="Ubuntu 24.04">
+  <img src="https://img.shields.io/badge/Ubuntu-26.04-0078d4?style=flat-square&amp;logo=ubuntu&amp;logoColor=white" height="20" alt="Ubuntu 26.04">
 
   <!-- Second row: -->
   <br>
@@ -40,8 +47,7 @@
 
 ## Introduction
 
-The **OrbbecSDK ROS2 Wrapper** provides seamless integration of Orbbec cameras with the ROS 2 ecosystem.
- It supports ROS2 **Foxy**, **Humble**, and **Jazzy** distributions.
+The **OrbbecSDK ROS2 Wrapper** provides seamless integration of Orbbec cameras with the ROS 2 ecosystem and supports the **ROS2 Foxy**, **Humble**, **Jazzy**, and **Lyrical** distributions, with experimental support for **Rolling**.
 
 - Default branch: **v2-main**
 - For legacy **OpenNI** devices: use the **main** branch

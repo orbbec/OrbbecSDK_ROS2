@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.13)
 project(orbbec_camera)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -13,6 +13,8 @@ option(INSTALL_UDEV_RULES "Install udev rule for Orbbec cameras" ON)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_compile_options(-Wall -Wextra -Werror -Wno-pedantic -Wno-array-bounds)
+    add_compile_options(-Wno-error=deprecated-declarations)
+    add_link_options("-Wl,-z,relro,-z,now,-z,defs")
 endif()
 
 # find dependencies
@@ -24,12 +26,16 @@ set(dependencies
     cv_bridge
     backward_ros
     camera_info_manager
+    geometry_msgs
     image_transport
     image_publisher
+    message_filters
     OpenCV
     orbbec_camera_msgs
+    rcl_interfaces
     rclcpp
     rclcpp_components
+    rmw
     sensor_msgs
     std_msgs
     std_srvs
@@ -51,6 +57,49 @@ endforeach()
 
 find_package(PkgConfig REQUIRED)
 find_package(OpenSSL REQUIRED)
+
+set(ORBBEC_MESSAGE_FILTERS_USES_RCLCPP_QOS OFF)
+if(DEFINED message_filters_VERSION AND message_filters_VERSION VERSION_GREATER_EQUAL 5.0)
+    set(ORBBEC_MESSAGE_FILTERS_USES_RCLCPP_QOS ON)
+endif()
+
+set(ORBBEC_IMAGE_TRANSPORT_USES_REQUIRED_INTERFACES OFF)
+if(DEFINED image_transport_VERSION AND image_transport_VERSION VERSION_GREATER_EQUAL 6.4)
+    set(ORBBEC_IMAGE_TRANSPORT_USES_REQUIRED_INTERFACES ON)
+endif()
+
+set(ORBBEC_CAMERA_INFO_MANAGER_USES_NODE_INTERFACES OFF)
+if(DEFINED camera_info_manager_VERSION AND
+   camera_info_manager_VERSION VERSION_GREATER_EQUAL 4.1.0)
+    set(ORBBEC_CAMERA_INFO_MANAGER_USES_NODE_INTERFACES ON)
+endif()
+
+set(ORBBEC_CAMERA_INFO_MANAGER_USES_RCLCPP_QOS OFF)
+if(DEFINED camera_info_manager_VERSION AND
+   camera_info_manager_VERSION VERSION_GREATER_EQUAL 7.0.0)
+    set(ORBBEC_CAMERA_INFO_MANAGER_USES_RCLCPP_QOS ON)
+endif()
+
+function(orbbec_target_dependencies target)
+    if(COMMAND ament_target_dependencies)
+        ament_target_dependencies(${target} ${ARGN})
+        return()
+    endif()
+
+    set(dependency_targets)
+    foreach(dependency IN LISTS ARGN)
+        if(dependency STREQUAL "rclcpp_components")
+            list(APPEND dependency_targets rclcpp_components::component)
+        elseif(dependency STREQUAL "sensor_msgs")
+            list(APPEND dependency_targets sensor_msgs::sensor_msgs_library)
+        elseif(TARGET "${dependency}::${dependency}")
+            list(APPEND dependency_targets "${dependency}::${dependency}")
+        else()
+            message(FATAL_ERROR "No CMake target exported by ${dependency}")
+        endif()
+    endforeach()
+    target_link_libraries(${target} ${dependency_targets})
+endfunction()
 
 if(USE_RK_HW_DECODER)
     pkg_search_module(RK_MPP REQUIRED rockchip_mpp)
@@ -97,29 +146,11 @@ endif()
 
 set(COMMON_INCLUDE_DIRS
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include> ${ORBBEC_INCLUDE_DIR} ${OpenCV_INCLUDED_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/tools
+    $<INSTALL_INTERFACE:include> ${ORBBEC_INCLUDE_DIR} ${OpenCV_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/tools
 )
 
-set(COMMON_LIBRARIES
-    ${ORBBEC_SDK_LIBRARIES}
-    ${OpenCV_LIBS}
-    Eigen3::Eigen
-    -lOrbbecSDK
-    -L${ORBBEC_LIBS_DIR}
-    Threads::Threads
-    -lrt
-    -ldw
-    yaml-cpp
-    OpenSSL::Crypto
+set(EXTRA_TARGETS
 )
-if(USE_RK_HW_DECODER)
-    list(APPEND COMMON_LIBRARIES ${RK_MPP_LIBRARIES} ${RGA_LIBRARIES})
-
-endif()
-
-if(USE_NV_HW_DECODER)
-    list(APPEND COMMON_LIBRARIES ${NV_LIBRARIES})
-endif()
 
 set(SOURCE_FILES
   src/d2c_viewer.cpp
@@ -140,15 +171,16 @@ if(USE_RK_HW_DECODER)
     add_definitions(-DUSE_RK_HW_DECODER)
     list(APPEND SOURCE_FILES src/rk_mpp_decoder.cpp)
     list(APPEND COMMON_INCLUDE_DIRS ${RK_MPP_INCLUDE_DIRS} ${RGA_INCLUDE_DIRS})
-    list(APPEND COMMON_LIBRARIES ${RGA_LIBRARIES} ${RK_MPP_LIBRARIES})
+    list(APPEND EXTRA_TARGETS ${RGA_LIBRARIES} ${RK_MPP_LIBRARIES})
     if(NOT RGA_FOUND)
-        list(APPEND COMMON_LIBRARIES -lyuv)
+        list(APPEND EXTRA_TARGETS yuv)
     endif()
 endif()
 
 if(USE_NV_HW_DECODER)
     list(APPEND SOURCE_FILES src/jetson_nv_decoder.cpp)
     list(APPEND COMMON_INCLUDE_DIRS ${JETSON_MULTI_MEDIA_API_INCLUDE_DIR} ${LIBJPEG8B_INCLUDE_DIR})
+    list(APPEND EXTRA_TARGETS ${NV_LIBRARIES})
     # append jetson_multimedia_api source files
     list(
         APPEND
@@ -171,16 +203,64 @@ endif()
 macro(add_orbbec_executable TARGET SOURCE)
     add_executable(${TARGET} ${SOURCE})
     target_include_directories(${TARGET} PUBLIC ${COMMON_INCLUDE_DIRS})
-    target_link_libraries(${TARGET} ${COMMON_LIBRARIES} ${PROJECT_NAME})
-    ament_target_dependencies(${TARGET} ${dependencies})
+    target_link_directories(${TARGET} PRIVATE
+        ${ORBBEC_LIBS_DIR}
+    )
+    target_link_libraries(${TARGET}
+        ${OpenCV_LIBS}
+        ${PROJECT_NAME}
+        OrbbecSDK
+        yaml-cpp
+    )
 endmacro()
 
 # Define library and nodes
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+if(ORBBEC_MESSAGE_FILTERS_USES_RCLCPP_QOS)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE ORBBEC_MESSAGE_FILTERS_USES_RCLCPP_QOS)
+endif()
+if(ORBBEC_IMAGE_TRANSPORT_USES_REQUIRED_INTERFACES)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE ORBBEC_IMAGE_TRANSPORT_USES_REQUIRED_INTERFACES)
+endif()
+if(ORBBEC_CAMERA_INFO_MANAGER_USES_NODE_INTERFACES)
+    target_compile_definitions(${PROJECT_NAME}
+        PRIVATE ORBBEC_CAMERA_INFO_MANAGER_USES_NODE_INTERFACES)
+endif()
+if(ORBBEC_CAMERA_INFO_MANAGER_USES_RCLCPP_QOS)
+    target_compile_definitions(${PROJECT_NAME}
+        PRIVATE ORBBEC_CAMERA_INFO_MANAGER_USES_RCLCPP_QOS)
+endif()
 
-ament_target_dependencies(${PROJECT_NAME} ${dependencies})
-target_include_directories(${PROJECT_NAME} PUBLIC ${COMMON_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} ${COMMON_LIBRARIES})
+target_include_directories(${PROJECT_NAME} PUBLIC ${COMMON_INCLUDE_DIRS} ${image_publisher_INCLUDE_DIRS})
+target_link_directories(${PROJECT_NAME} PRIVATE ${ORBBEC_LIBS_DIR})
+target_link_libraries(${PROJECT_NAME}
+    ${OpenCV_LIBS}
+    ${orbbec_camera_msgs_TARGETS}
+    ${std_srvs_TARGETS}
+    ament_index_cpp::ament_index_cpp
+    Eigen3::Eigen
+    OpenSSL::Crypto
+    OrbbecSDK
+    Threads::Threads
+    ${BACKWARD_LIBRARIES}
+    rclcpp::rclcpp
+    rt
+    tf2::tf2
+    tf2_ros::tf2_ros
+    ${EXTRA_TARGETS}
+)
+orbbec_target_dependencies(${PROJECT_NAME}
+    camera_info_manager
+    cv_bridge
+    diagnostic_updater
+    geometry_msgs
+    image_transport
+    message_filters
+    rcl_interfaces
+    rclcpp_components
+    rmw
+    sensor_msgs
+)
 
 rclcpp_components_register_node(
     ${PROJECT_NAME} PLUGIN "orbbec_camera::OBCameraNodeDriver" EXECUTABLE orbbec_camera_node
@@ -197,6 +277,10 @@ add_orbbec_executable(ob_benchmark_node tools/ob_benchmark.cpp)
 add_orbbec_executable(435le_example_node examples/Gemini_435Le_example_node/camera_example_node.cpp)
 add_orbbec_executable(service_benchmark_node scripts/service_benchmark_node.cpp)
 add_orbbec_executable(image_sync_example_node examples/multi_camera_time_sync/image_sync_example_node.cpp)
+orbbec_target_dependencies(topic_statistics_node statistics_msgs)
+if(ORBBEC_MESSAGE_FILTERS_USES_RCLCPP_QOS)
+    target_compile_definitions(image_sync_example_node PRIVATE ORBBEC_MESSAGE_FILTERS_USES_RCLCPP_QOS)
+endif()
 
 install(
   PROGRAMS
@@ -207,24 +291,64 @@ install(
 
 add_library(frame_latency SHARED tools/frame_latency.cpp)
 target_include_directories(frame_latency PUBLIC ${COMMON_INCLUDE_DIRS})
-target_link_libraries(frame_latency ${COMMON_LIBRARIES})
-ament_target_dependencies(frame_latency ${dependencies})
+target_link_libraries(frame_latency
+    ${orbbec_camera_msgs_TARGETS}
+    ${tf2_msgs_TARGETS}
+    rclcpp::rclcpp
+)
+orbbec_target_dependencies(frame_latency
+    diagnostic_updater
+    geometry_msgs
+    rclcpp_components
+    sensor_msgs
+)
 
 rclcpp_components_register_node(frame_latency PLUGIN "orbbec_camera::FrameLatencyNode" EXECUTABLE frame_latency_node)
 
 add_library(start_benchmark SHARED tools/start_benchmark.cpp)
-target_include_directories(start_benchmark PUBLIC ${COMMON_INCLUDE_DIRS})
-target_link_libraries(start_benchmark ${COMMON_LIBRARIES})
-ament_target_dependencies(start_benchmark ${dependencies})
+target_include_directories(start_benchmark PUBLIC ${COMMON_INCLUDE_DIRS} ${image_publisher_INCLUDE_DIRS})
+target_link_libraries(start_benchmark
+    ${OpenCV_LIBS}
+    ${orbbec_camera_msgs_TARGETS}
+    ${std_srvs_TARGETS}
+    Eigen3::Eigen
+    rclcpp::rclcpp
+    tf2_ros::tf2_ros
+)
+orbbec_target_dependencies(start_benchmark
+    camera_info_manager
+    diagnostic_updater
+    image_transport
+    rclcpp_components
+    sensor_msgs
+)
 
 rclcpp_components_register_node(
     start_benchmark PLUGIN "orbbec_camera::tools::StartBenchmark" EXECUTABLE start_benchmark_node
 )
 
 add_library(multi_save_rgbir SHARED tools/multi_save_rgbir.cpp src/utils.cpp)
-target_include_directories(multi_save_rgbir PUBLIC ${COMMON_INCLUDE_DIRS})
-target_link_libraries(multi_save_rgbir ${COMMON_LIBRARIES})
-ament_target_dependencies(multi_save_rgbir ${dependencies})
+target_include_directories(multi_save_rgbir PUBLIC ${COMMON_INCLUDE_DIRS} ${image_publisher_INCLUDE_DIRS})
+target_link_directories(multi_save_rgbir PRIVATE ${ORBBEC_LIBS_DIR})
+target_link_libraries(multi_save_rgbir
+    ${OpenCV_LIBS}
+    ${orbbec_camera_msgs_TARGETS}
+    ${std_srvs_TARGETS}
+    Eigen3::Eigen
+    OpenSSL::Crypto
+    OrbbecSDK
+    rclcpp::rclcpp
+    tf2::tf2
+    tf2_ros::tf2_ros
+)
+orbbec_target_dependencies(multi_save_rgbir
+    camera_info_manager
+    cv_bridge
+    diagnostic_updater
+    image_transport
+    rclcpp_components
+    sensor_msgs
+)
 
 rclcpp_components_register_node(
     multi_save_rgbir PLUGIN "orbbec_camera::tools::MultiCameraSubscriber" EXECUTABLE multi_save_rgbir_node
@@ -235,7 +359,7 @@ install(TARGETS ${PROJECT_NAME} frame_latency start_benchmark multi_save_rgbir A
         LIBRARY DESTINATION lib RUNTIME DESTINATION bin
 )
 
-install(DIRECTORY include/ DESTINATION include)
+install(DIRECTORY include/orbbec_camera DESTINATION include)
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY examples DESTINATION share/${PROJECT_NAME}/)

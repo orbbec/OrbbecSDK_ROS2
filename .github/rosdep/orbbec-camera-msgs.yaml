@@ -1,0 +1,5 @@
+orbbec_camera_msgs:
+  ubuntu:
+    jammy: [ros-humble-orbbec-camera-msgs]
+    noble: [ros-jazzy-orbbec-camera-msgs]
+    resolute: [ros-lyrical-orbbec-camera-msgs]

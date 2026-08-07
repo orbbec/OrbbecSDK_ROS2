@@ -12,8 +12,8 @@ assignees: ''
   - CPU model (e.g., `13th Gen Intel® Core™ i7-13700 × 24`, `NVIDIA Jetson Orin`)
   - Memory size (e.g., `16GB`, `32GB`)
   - GPU model if available (e.g., `NVIDIA RTX 3060`, `Integrated GPU`)
-- **Ubuntu Version**: Please provide the ubuntu version you are using (e.g., `ubuntu20.04`, `ubuntu22.04`, etc.)
-- **ROS Version**: Please provide the version of ROS you are using (e.g., `ROS Noetic`, `ROS 2 Foxy`, etc.)
+- **Ubuntu Version**: Please provide the ubuntu version you are using (e.g., `ubuntu22.04`, `ubuntu24.04`, etc.)
+- **ROS Version**: Please provide the version of ROS you are using (e.g., `ROS 2 Humble`, etc.)
 - **Camera Model**: Please provide the model of camera you are using (e.g., `Femto Bolt`, `Gemini 335`, etc.)
 - **Firmware Version**: Please provide the firmware version you are using.
 - **Branch**: Please provide the branch you are using (e.g., `main`, `v2-main`)

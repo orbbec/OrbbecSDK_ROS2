@@ -35,8 +35,20 @@ size_t image_rcl_publisher::get_subscription_count() const {
 image_transport_publisher::image_transport_publisher(rclcpp::Node& node,
                                                      const std::string& topic_name,
                                                      const rmw_qos_profile_t& qos) {
-  image_publisher_impl = std::make_shared<image_transport::Publisher>(
-      image_transport::create_publisher(&node, topic_name, qos));
+  image_publisher_impl =
+      std::make_shared<image_transport::Publisher>(image_transport::create_publisher(
+#ifdef ORBBEC_IMAGE_TRANSPORT_USES_REQUIRED_INTERFACES
+          image_transport::RequiredInterfaces{node},
+#else
+          &node,
+#endif
+          topic_name,
+#ifdef ORBBEC_IMAGE_TRANSPORT_USES_REQUIRED_INTERFACES
+          rclcpp::QoS{rclcpp::QoSInitialization::from_rmw(qos), qos}
+#else
+          qos
+#endif
+          ));
 }
 void image_transport_publisher::publish(sensor_msgs::msg::Image::UniquePtr image_ptr) {
   image_publisher_impl->publish(*image_ptr);

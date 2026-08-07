@@ -35,7 +35,8 @@ def generate_launch_description():
 
     rviz_config_dir = os.path.join(get_package_share_directory('orbbec_description'), 'rviz', 'urdf.rviz')
     xacro_path = os.path.join(get_package_share_directory('orbbec_description'), 'urdf', params['model'])
-    urdf = to_urdf(xacro_path, {'use_nominal_extrinsics': 'true', 'add_plug': 'true'})
+    robot_description = to_urdf(
+        xacro_path, {'use_nominal_extrinsics': 'true', 'add_plug': 'true'})
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
@@ -50,6 +51,6 @@ def generate_launch_description():
         executable='robot_state_publisher',
         namespace='',
         output='screen',
-        arguments=[urdf]
+        parameters=[{'robot_description': robot_description}]
         )
     return launch.LaunchDescription([rviz_node, model_node])

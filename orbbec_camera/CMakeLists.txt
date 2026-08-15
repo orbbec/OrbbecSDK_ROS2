@@ -64,18 +64,20 @@ if(USE_RK_HW_DECODER)
     endif()
 endif()
 
-execute_process(COMMAND uname -m OUTPUT_VARIABLE MACHINES)
-execute_process(COMMAND getconf LONG_BIT OUTPUT_VARIABLE MACHINES_BIT)
-message(STATUS "ORRBEC Machine : ${MACHINES}")
-message(STATUS "ORRBEC Machine Bits : ${MACHINES_BIT}")
+string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" TARGET_PROCESSOR)
+message(STATUS "ORBBEC Target processor: ${TARGET_PROCESSOR}")
 
-if((${MACHINES} MATCHES "x86_64") AND (${MACHINES_BIT} MATCHES "64"))
+# Select the SDK for the CMake target, not the machine running CMake. Using
+# uname here selects the x64 SDK during genuine ARM64 cross-compilation.
+if(TARGET_PROCESSOR MATCHES "^(x86_64|amd64)$")
     set(HOST_PLATFORM "x64")
-elseif(${MACHINES} MATCHES "arm" OR (${MACHINES} MATCHES "aarch64" AND ${MACHINES_BIT} MATCHES "32"))
-    message(FATAL_ERROR "ORBBEC SDK does not support arm32")
-    set(HOST_PLATFORM "arm32")
-elseif((${MACHINES} MATCHES "aarch64") AND (${MACHINES_BIT} MATCHES "64"))
+elseif(TARGET_PROCESSOR MATCHES "^(aarch64|arm64)$")
     set(HOST_PLATFORM "arm64")
+elseif(TARGET_PROCESSOR MATCHES "^(arm|armv[5-8].*)$")
+    message(FATAL_ERROR "ORBBEC SDK does not support arm32")
+else()
+    message(FATAL_ERROR
+        "Unsupported Orbbec target architecture: ${CMAKE_SYSTEM_PROCESSOR}")
 endif()
 
 set(ORBBEC_LIBS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/SDK/lib/${HOST_PLATFORM})

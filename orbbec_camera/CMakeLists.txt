@@ -122,6 +122,7 @@ if(USE_NV_HW_DECODER)
 endif()
 
 set(SOURCE_FILES
+  src/color_conversion.cpp
   src/d2c_viewer.cpp
   src/dynamic_params.cpp
   src/image_publisher.cpp
@@ -263,6 +264,18 @@ install(TARGETS list_devices_node list_depth_work_mode_node list_camera_profile_
 if(BUILD_TESTING)
     find_package(ament_lint_auto REQUIRED)
     ament_lint_auto_find_test_dependencies()
+    add_executable(dynamic_params_test
+                   test/dynamic_params_test.cpp src/dynamic_params.cpp src/ros_param_backend.cpp)
+    target_include_directories(dynamic_params_test PRIVATE ${COMMON_INCLUDE_DIRS})
+    ament_target_dependencies(dynamic_params_test rclcpp)
+    add_test(NAME dynamic_params_test COMMAND dynamic_params_test)
+    add_executable(color_conversion_test
+                   test/color_conversion_test.cpp src/color_conversion.cpp)
+    target_include_directories(color_conversion_test PRIVATE ${COMMON_INCLUDE_DIRS})
+    add_test(NAME color_conversion_test COMMAND color_conversion_test)
+    add_executable(property_transaction_test test/property_transaction_test.cpp)
+    target_include_directories(property_transaction_test PRIVATE ${COMMON_INCLUDE_DIRS})
+    add_test(NAME property_transaction_test COMMAND property_transaction_test)
 endif()
 
 ament_export_include_directories(include)

@@ -21,6 +21,17 @@ Parameters::Parameters(rclcpp::Node *node)
     : node_(node), logger_(node_->get_logger()), params_backend_(node) {
   params_backend_.addOnSetParametersCallback(
       [this](const std::vector<rclcpp::Parameter> &parameters) {
+        if (parameters.size() > 1) {
+          for (const auto &parameter : parameters) {
+            const auto functions = param_functions_.find(parameter.get_name());
+            if (functions != param_functions_.end() && !functions->second.empty()) {
+              rcl_interfaces::msg::SetParametersResult result;
+              result.successful = false;
+              result.reason = "runtime hardware parameters must be changed one at a time";
+              return result;
+            }
+          }
+        }
         for (const auto &parameter : parameters) {
           if (param_functions_.find(parameter.get_name()) != param_functions_.end()) {
             auto functions = param_functions_[parameter.get_name()];
@@ -29,7 +40,19 @@ Parameters::Parameters(rclcpp::Node *node)
                                                        << " can not be changed in runtime.");
             } else {
               for (const auto &func : param_functions_[parameter.get_name()]) {
-                func(parameter);
+                try {
+                  func(parameter);
+                } catch (const std::exception &e) {
+                  rcl_interfaces::msg::SetParametersResult result;
+                  result.successful = false;
+                  result.reason = parameter.get_name() + ": " + e.what();
+                  return result;
+                } catch (...) {
+                  rcl_interfaces::msg::SetParametersResult result;
+                  result.successful = false;
+                  result.reason = parameter.get_name() + ": unknown error";
+                  return result;
+                }
               }
             }
           }

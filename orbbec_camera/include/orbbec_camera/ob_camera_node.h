@@ -255,6 +255,8 @@ class OBCameraNode {
 
   void setupDevices();
 
+  void setupRuntimeColorControls();
+
   void loadConfigJson();
 
   void captureInitialRosParameters();

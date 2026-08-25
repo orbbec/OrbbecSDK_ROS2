@@ -878,10 +878,13 @@ void OBCameraNode::setExposureCallback(const std::shared_ptr<SetInt32::Request>&
         break;
       case OB_STREAM_COLOR:
       case OB_STREAM_COLOR_LEFT:
-      case OB_STREAM_COLOR_RIGHT:
-        device_->setIntProperty(OB_PROP_COLOR_EXPOSURE_INT, request->data);
-        color_exposure_ = device_->getIntProperty(OB_PROP_COLOR_EXPOSURE_INT);
-        break;
+      case OB_STREAM_COLOR_RIGHT: {
+        const auto result =
+            node_->set_parameter(rclcpp::Parameter("color_exposure", request->data));
+        response->success = result.successful;
+        response->message = result.reason;
+        return;
+      }
       default:
         RCLCPP_ERROR(logger_, "%s NOT a video stream", __FUNCTION__);
         break;
@@ -943,6 +946,13 @@ void OBCameraNode::setGainCallback(const std::shared_ptr<SetInt32 ::Request>& re
   auto stream = stream_index.first;
   OBPropertyID prop_id = OB_PROP_IR_GAIN_INT;
   try {
+    if (stream == OB_STREAM_COLOR || stream == OB_STREAM_COLOR_LEFT ||
+        stream == OB_STREAM_COLOR_RIGHT) {
+      const auto result = node_->set_parameter(rclcpp::Parameter("color_gain", request->data));
+      response->success = result.successful;
+      response->message = result.reason;
+      return;
+    }
     switch (stream) {
       case OB_STREAM_IR_LEFT:
       case OB_STREAM_IR_RIGHT:
@@ -1205,6 +1215,14 @@ void OBCameraNode::setAutoExposureCallback(
   auto stream = stream_index.first;
   OBPropertyID prop_id = OB_PROP_IR_AUTO_EXPOSURE_BOOL;
   try {
+    if (stream == OB_STREAM_COLOR || stream == OB_STREAM_COLOR_LEFT ||
+        stream == OB_STREAM_COLOR_RIGHT) {
+      const auto result =
+          node_->set_parameter(rclcpp::Parameter("enable_color_auto_exposure", request->data));
+      response->success = result.successful;
+      response->message = result.reason;
+      return;
+    }
     switch (stream) {
       case OB_STREAM_IR_LEFT:
       case OB_STREAM_IR_RIGHT:

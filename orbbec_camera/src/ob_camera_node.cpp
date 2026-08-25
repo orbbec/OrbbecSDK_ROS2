@@ -15,6 +15,8 @@
  *******************************************************************************/
 
 #include "orbbec_camera/ob_camera_node.h"
+#include "orbbec_camera/color_conversion.h"
+#include "orbbec_camera/property_transaction.h"
 #include <rclcpp/rclcpp.hpp>
 #include <thread>
 #include <geometry_msgs/msg/transform_stamped.hpp>
@@ -915,6 +917,54 @@ void OBCameraNode::clean() noexcept {
 
   RCLCPP_DEBUG_STREAM(logger_, "OBCameraNode cleanup complete");
   cleaning_.store(false);
+}
+
+void OBCameraNode::setupRuntimeColorControls() {
+  auto register_int_control = [this](const std::string &name, int &cached, OBPropertyID property) {
+    int *cached_value = &cached;
+    parameters_->setParam(name, rclcpp::ParameterValue(cached),
+                          [this, name, cached_value, property](const rclcpp::Parameter &parameter) {
+                            if (!device_->isPropertySupported(property, OB_PERMISSION_READ_WRITE)) {
+                              throw std::runtime_error(name + " is not supported by this device");
+                            }
+                            const int requested = static_cast<int>(parameter.as_int());
+                            const auto range = device_->getIntPropertyRange(property);
+                            if (requested < range.min || requested > range.max) {
+                              throw std::runtime_error("value " + std::to_string(requested) +
+                                                       " is outside [" + std::to_string(range.min) +
+                                                       ", " + std::to_string(range.max) + "]");
+                            }
+                            std::lock_guard<decltype(device_lock_)> lock(device_lock_);
+                            *cached_value = setPropertyWithVerifiedRollback<int>(
+                                requested, [this, property]() {
+                                  return device_->getIntProperty(property);
+                                },
+                                [this, property](int value) {
+                                  device_->setIntProperty(property, value);
+                                });
+                          });
+  };
+
+  parameters_->setParam(
+      "enable_color_auto_exposure", rclcpp::ParameterValue(enable_color_auto_exposure_),
+      [this](const rclcpp::Parameter &parameter) {
+        if (!device_->isPropertySupported(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL,
+                                          OB_PERMISSION_READ_WRITE)) {
+          throw std::runtime_error("color auto exposure is not supported by this device");
+        }
+        const bool requested = parameter.as_bool();
+        std::lock_guard<decltype(device_lock_)> lock(device_lock_);
+        enable_color_auto_exposure_ = setPropertyWithVerifiedRollback<bool>(
+            requested,
+            [this]() {
+              return device_->getBoolProperty(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL);
+            },
+            [this](bool value) {
+              device_->setBoolProperty(OB_PROP_COLOR_AUTO_EXPOSURE_BOOL, value);
+            });
+      });
+  register_int_control("color_exposure", color_exposure_, OB_PROP_COLOR_EXPOSURE_INT);
+  register_int_control("color_gain", color_gain_, OB_PROP_COLOR_GAIN_INT);
 }
 
 void OBCameraNode::setupDevices() {
@@ -4798,6 +4848,7 @@ void OBCameraNode::setupTopics() {
     loadConfigJson();
     syncConfigJsonApplicationConfig();
     setupDevices();
+    setupRuntimeColorControls();
     setupDepthPostProcessFilter();
     setupColorPostProcessFilter();
     setupIrPostProcessFilter();
@@ -6478,6 +6529,25 @@ bool OBCameraNode::decodeColorFrameToBuffer(const std::shared_ptr<ob::Frame> &fr
 
   if (!has_subscriber) {
     return false;
+  }
+
+  if (pid_ == FEMTO_BOLT_PID && frame->getFormat() == OB_FORMAT_YUYV) {
+    auto video_frame = frame->as<ob::ColorFrame>();
+    if (!video_frame) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to access Femto Bolt YUYV color frame");
+      return false;
+    }
+    const size_t buffer_capacity = stream_index == COLOR_LEFT    ? rgb_buffer_left_size_
+                                   : stream_index == COLOR_RIGHT ? rgb_buffer_right_size_
+                                                                 : rgb_buffer_size_;
+    if (!yuyvFullRangeToRgb(static_cast<const uint8_t *>(video_frame->getData()),
+                            video_frame->getDataSize(), buffer, buffer_capacity,
+                            video_frame->getWidth(), video_frame->getHeight())) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to convert Femto Bolt full-range YUYV frame");
+      return false;
+    }
+    RCLCPP_DEBUG_ONCE(logger_, "Using full-range YUYV conversion for Femto Bolt color");
+    return true;
   }
 
   std::shared_ptr<JPEGDecoder> decoder;

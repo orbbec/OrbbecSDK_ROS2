@@ -4736,7 +4736,11 @@ void OBCameraNode::getParameters() {
   validate_queue_capacity("right_color_frame_queue_max_frames",
                           right_color_frame_queue_max_frames_);
   camera_link_frame_id_ = camera_name_ + "_link";
-  for (auto stream_index : IMAGE_STREAMS) {
+  for (const auto &stream_index : IMAGE_STREAMS) {
+    if (!stream_name_.count(stream_index)) {
+      continue;
+    }
+
     std::string param_name = stream_name_[stream_index] + "_width";
     setAndGetNodeParameter(width_[stream_index], param_name, 0);
     param_name = stream_name_[stream_index] + "_height";
@@ -4788,7 +4792,7 @@ void OBCameraNode::getParameters() {
     setAndGetNodeParameter<bool>(enable_undistortion_[stream_index], param_name, false);
   }
 
-  for (auto stream_index : IMAGE_STREAMS) {
+  for (const auto &stream_index : IMAGE_STREAMS) {
     depth_aligned_frame_id_[stream_index] = optical_frame_id_[COLOR];
   }
 
@@ -4797,6 +4801,10 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<bool>(enable_sync_output_accel_gyro_, "enable_sync_output_accel_gyro",
                                false);
   for (const auto &stream_index : HID_STREAMS) {
+    if (!stream_name_.count(stream_index)) {
+      continue;
+    }
+
     std::string param_name = stream_name_[stream_index] + "_qos";
     setAndGetNodeParameter<std::string>(imu_qos_[stream_index], param_name, "default");
     param_name = "enable_" + stream_name_[stream_index];

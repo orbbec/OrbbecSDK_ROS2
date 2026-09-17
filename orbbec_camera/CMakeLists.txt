@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 3.8)
 project(orbbec_camera)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -O3")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -fPIC -g3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O3")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fPIC -g3")
+set(CMAKE_BUILD_TYPE "Release")
 option(USE_RK_HW_DECODER "Use Rockchip hardware decoder" OFF)
 option(USE_NV_HW_DECODER "Use Nvidia hardware decoder" OFF)
 option(INSTALL_UDEV_RULES "Install udev rule for Orbbec cameras" ON)
@@ -134,6 +136,8 @@ set(SOURCE_FILES
   src/synced_imu_publisher.cpp
   src/utils.cpp
   src/jpeg_decoder.cpp
+  src/camera_state_publisher.cpp
+  src/stats_helper.cpp
 )
 
 if(USE_RK_HW_DECODER)

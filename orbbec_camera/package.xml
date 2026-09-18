@@ -36,6 +36,8 @@
   <depend>libssl-dev</depend>
   <depend>opengl</depend>
   <depend>shm_bridge</depend>
+  <test_depend>ament_cmake_gtest</test_depend>
+  <test_depend>ament_cmake_ros</test_depend>
   <export>
     <build_type>ament_cmake</build_type>
   </export>

@@ -274,6 +274,17 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/list_devices_node
 if (BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
+
+  find_package(ament_cmake_gtest REQUIRED)
+  find_package(ament_cmake_ros REQUIRED)
+
+  ament_add_gtest(test_stats_helper test/test_stats_helper.cpp)
+  target_link_libraries(test_stats_helper ${PROJECT_NAME})
+
+  ament_add_ros_isolated_gtest(test_camera_state_publisher
+    test/test_camera_state_publisher.cpp
+  )
+  target_link_libraries(test_camera_state_publisher ${PROJECT_NAME})
 endif ()
 
 ament_export_include_directories(include)

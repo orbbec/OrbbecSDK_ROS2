@@ -68,8 +68,6 @@ v2-main 分支提供全功能支持，包括新功能开发、性能优化和错
 
 | **参数名称**                           | **main** | **v2-main** | **描述**                                       |
 | -------------------------------------- | -------- | ----------- | ---------------------------------------------- |
-| upgrade_firmware                       | -        | 已添加      | 固件升级路径                                   |
-| preset_firmware_path                   | -        | 已添加      | 预设固件文件路径                               |
 | load_config_json_file_path             | -        | 已添加      | 加载 JSON 配置                                 |
 | export_config_json_file_path           | -        | 已添加      | 导出 JSON 配置                                 |
 | uvc_backend                            | -        | 已添加      | libuvc / v4l2 后端选择                         |

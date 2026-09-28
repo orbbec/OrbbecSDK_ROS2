@@ -68,8 +68,6 @@ With an open-source SDK, developers can directly submit issues and pull requests
 
 | **Parameter Name**                     | **main** | **v2-main** | **Description**                                   |
 | -------------------------------------- | -------- | ----------- | ------------------------------------------------- |
-| upgrade_firmware                       | -        | Added       | Firmware upgrade path                             |
-| preset_firmware_path                   | -        | Added       | Preset firmware file path                         |
 | load_config_json_file_path             | -        | Added       | Load JSON configuration                           |
 | export_config_json_file_path           | -        | Added       | Export JSON configuration                         |
 | uvc_backend                            | -        | Added       | libuvc / v4l2 backend selection                   |

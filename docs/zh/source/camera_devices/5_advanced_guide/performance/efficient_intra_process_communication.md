@@ -30,9 +30,13 @@
 
 [multi_camera_shared_container](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/multi_camera_shared_container) 示例创建一个多线程组件容器，并将两个 Gemini 330 系列相机组件加载到该容器中。修改 `multi_camera_shared_container.launch.py` 中两台相机的 `usb_port` 后，运行：
 
+默认端口为 `2-1` 和 `2-2`。可通过 `ros2 run orbbec_camera list_devices_node` 查询本机端口，并为每台相机设置不同的 `camera_name`。
+
 ```bash
 ros2 launch orbbec_camera multi_camera_shared_container.launch.py
 ```
+
+顶层启动文件先创建 `shared_orbbec_container`，再为两台相机分别包含示例专用的 `gemini_330_series_shared_container.launch.py`；第二台相机延迟两秒启动。两个相机必须指定相同的容器名称，并在加载组件前确保容器已经运行。
 
 该示例向两个相机 include 传递以下参数：
 

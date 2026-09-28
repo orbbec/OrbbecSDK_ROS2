@@ -26,6 +26,7 @@
     multi_camera/multi_camera_synced.md
     multi_camera/multi_camera_synced_verification_tool.md
     multi_camera/gmsl_camera.md
+    multi_camera/gige_action_command.md
 
 
 配置与模式

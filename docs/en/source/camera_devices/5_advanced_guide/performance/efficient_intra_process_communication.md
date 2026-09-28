@@ -30,11 +30,15 @@ Further details on efficient intra-process communication can be found [here](htt
 
 The [multi_camera_shared_container](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/multi_camera_shared_container) example creates one multithreaded component container and loads two Gemini 330 Series camera components into it. Update the two `usb_port` values in `multi_camera_shared_container.launch.py`, then run:
 
+The default ports are `2-1` and `2-2`. Use `ros2 run orbbec_camera list_devices_node` to find the ports on your system. Give each camera a unique `camera_name`.
+
 ```bash
 ros2 launch orbbec_camera multi_camera_shared_container.launch.py
 ```
 
 The example passes the following arguments to both camera includes:
+
+The top-level launch file starts `shared_orbbec_container` first, then includes the example-specific `gemini_330_series_shared_container.launch.py` for each camera. The second camera starts two seconds after the first. Both includes must use the same container name, and the container must be running before components are loaded.
 
 * `attach_to_shared_component_container=true`: Loads the camera component into an existing container instead of creating another container.
 * `component_container_name=shared_orbbec_container`: Selects the target container. The value must match the name of the container created by the parent launch file.

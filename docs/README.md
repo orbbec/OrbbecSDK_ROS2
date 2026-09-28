@@ -60,6 +60,12 @@ docs/
 2. Translate and adapt for the Chinese version (`docs/zh/`)
 3. Ensure both versions build successfully
 
+## Example Documentation
+
+For examples documented on Pages, the current-version guide is the source of truth for complete usage, configuration, and troubleshooting. Keep their READMEs in the code repository to a short purpose, prerequisites or local settings, run command, and links to the English and Chinese guides. Add new guides to both language navigation trees before shortening an existing README. Keep the example index linked to the source directory and guides.
+
+The Gemini 435Le example is documented in its source-directory README only; keep its full instructions there and link directly to that README from the example index.
+
 ## Dependencies
 
 - Sphinx

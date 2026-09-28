@@ -12,3 +12,4 @@
     coordinate_and_tf.md
     compressed_image.md
     point_cloud.md
+    examples/ae_awb_lock.md

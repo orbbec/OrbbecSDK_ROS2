@@ -190,7 +190,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_temporal_filter', default_value='false'),
         DeclareLaunchArgument('enable_disparity_to_depth', default_value='true'),
         DeclareLaunchArgument('enable_hole_filling_filter', default_value='false'),
-        DeclareLaunchArgument('enable_false_positive_filter', default_value='false'),
+        DeclareLaunchArgument('enable_false_positive_filter', default_value='true'),
         DeclareLaunchArgument('enable_enhanced_depth', default_value='false'),
         DeclareLaunchArgument('enhanced_depth_model_path', default_value=''),
         DeclareLaunchArgument('enhanced_depth_confidence_threshold', default_value='51'),
@@ -218,7 +218,7 @@ def generate_launch_description():
         DeclareLaunchArgument('diagnostic_period', default_value='1.0'),
         DeclareLaunchArgument('enable_laser', default_value='true'),
         DeclareLaunchArgument('depth_precision', default_value=''),
-        DeclareLaunchArgument('device_preset', default_value='Standard'),
+        DeclareLaunchArgument('device_preset', default_value=''),
         DeclareLaunchArgument('retry_on_usb3_detection_failure', default_value='false'),
         DeclareLaunchArgument('laser_energy_level', default_value='-1'),
         DeclareLaunchArgument('enable_sync_host_time', default_value='false'),
@@ -235,6 +235,8 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_heartbeat', default_value='false'),
         DeclareLaunchArgument('enable_firmware_log', default_value='false'),
         DeclareLaunchArgument('monitor_poll_interval_sec', default_value='-1'),
+        DeclareLaunchArgument('gmsl_trigger_fps', default_value='3000'),
+        DeclareLaunchArgument('enable_gmsl_trigger', default_value='false'),
 
         #color image transport plugins
         DeclareLaunchArgument('color.image_raw.enable_pub_plugins',default_value='["image_transport/compressed", "image_transport/raw", "image_transport/theora"]'),

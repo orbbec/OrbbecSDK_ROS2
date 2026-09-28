@@ -67,7 +67,6 @@ def load_parameters(context, args):
 
     return result
 
-
 def generate_launch_description():
     args = [
         DeclareLaunchArgument('camera_name', default_value='camera'),
@@ -190,7 +189,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_temporal_filter', default_value='false'),
         DeclareLaunchArgument('enable_disparity_to_depth', default_value='true'),
         DeclareLaunchArgument('enable_hole_filling_filter', default_value='false'),
-        DeclareLaunchArgument('enable_false_positive_filter', default_value='false'),
+        DeclareLaunchArgument('enable_false_positive_filter', default_value='true'),
         DeclareLaunchArgument('enable_enhanced_depth', default_value='false'),
         DeclareLaunchArgument('enhanced_depth_model_path', default_value=''),
         DeclareLaunchArgument('enhanced_depth_confidence_threshold', default_value='51'),
@@ -217,7 +216,7 @@ def generate_launch_description():
         DeclareLaunchArgument('frame_aggregate_mode', default_value='ANY'), # full_frame, color_frame, ANY or disable
         DeclareLaunchArgument('diagnostic_period', default_value='1.0'),
         DeclareLaunchArgument('depth_precision', default_value=''),
-        DeclareLaunchArgument('device_preset', default_value='Standard'),
+        DeclareLaunchArgument('device_preset', default_value=''),
         DeclareLaunchArgument('retry_on_usb3_detection_failure', default_value='false'),
         DeclareLaunchArgument('enable_sync_host_time', default_value='false'),
         DeclareLaunchArgument('time_sync_period', default_value='6.0'), # seconds

@@ -1493,8 +1493,8 @@ void OBCameraNode::setupDevices() {
       auto range = device_->getIntPropertyRange(OB_PROP_MJPEG_QUALITY_INT);
       if (color_mjpeg_quality_ < range.min || color_mjpeg_quality_ > range.max) {
         RCLCPP_ERROR(logger_,
-                     "color MJPEG quality value is out of range[%d,%d], please check the value",
-                     range.min, range.max);
+                     "color MJPEG quality value %d is out of range[%d,%d], please check the value",
+                     color_mjpeg_quality_, range.min, range.max);
       } else {
         TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_MJPEG_QUALITY_INT, color_mjpeg_quality_);
         TRY_EXECUTE_BLOCK(RCLCPP_INFO_STREAM(

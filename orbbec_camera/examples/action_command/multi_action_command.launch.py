@@ -41,8 +41,8 @@ def generate_launch_description():
 
     action_command_node = Node(
         package="orbbec_camera",
-        executable="gige_action_command_node",
-        name="gige_action_command_node",
+        executable="action_command_node",
+        name="action_command_node",
         output="screen",
     )
 

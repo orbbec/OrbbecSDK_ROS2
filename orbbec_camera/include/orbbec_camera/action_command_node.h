@@ -25,9 +25,9 @@
 
 namespace orbbec_camera {
 
-class GigEActionCommandNode : public rclcpp::Node {
+class ActionCommandNode : public rclcpp::Node {
  public:
-  explicit GigEActionCommandNode(const rclcpp::NodeOptions& node_options = rclcpp::NodeOptions());
+  explicit ActionCommandNode(const rclcpp::NodeOptions& node_options = rclcpp::NodeOptions());
 
  private:
   void sendActionCommandCallback(

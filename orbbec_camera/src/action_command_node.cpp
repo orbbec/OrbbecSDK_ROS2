@@ -14,7 +14,7 @@
  * limitations under the License.
  *******************************************************************************/
 
-#include "orbbec_camera/gige_action_command_node.h"
+#include "orbbec_camera/action_command_node.h"
 
 #include <chrono>
 #include <cstdint>
@@ -54,16 +54,16 @@ bool getSystemTimeMilliseconds(uint64_t* milliseconds, std::string* error_messag
 
 }  // namespace
 
-GigEActionCommandNode::GigEActionCommandNode(const rclcpp::NodeOptions& node_options)
-    : Node("gige_action_command_node", node_options), context_(std::make_unique<ob::Context>()) {
+ActionCommandNode::ActionCommandNode(const rclcpp::NodeOptions& node_options)
+    : Node("action_command_node", node_options), context_(std::make_unique<ob::Context>()) {
   context_->enableNetDeviceEnumeration(true);
   send_action_command_service_ = create_service<orbbec_camera_msgs::srv::SendActionCommand>(
-      "~/send_action_command", std::bind(&GigEActionCommandNode::sendActionCommandCallback, this,
+      "~/send_action_command", std::bind(&ActionCommandNode::sendActionCommandCallback, this,
                                          std::placeholders::_1, std::placeholders::_2));
-  RCLCPP_INFO(get_logger(), "GigE Action Command service is ready");
+  RCLCPP_INFO(get_logger(), "Action Command service is ready");
 }
 
-void GigEActionCommandNode::sendActionCommandCallback(
+void ActionCommandNode::sendActionCommandCallback(
     const std::shared_ptr<orbbec_camera_msgs::srv::SendActionCommand::Request> request,
     std::shared_ptr<orbbec_camera_msgs::srv::SendActionCommand::Response> response) {
   if (!request) {
@@ -169,4 +169,4 @@ void GigEActionCommandNode::sendActionCommandCallback(
 
 }  // namespace orbbec_camera
 
-RCLCPP_COMPONENTS_REGISTER_NODE(orbbec_camera::GigEActionCommandNode)
+RCLCPP_COMPONENTS_REGISTER_NODE(orbbec_camera::ActionCommandNode)

@@ -302,19 +302,19 @@ rclcpp_components_register_node(
     ${PROJECT_NAME} PLUGIN "orbbec_camera::OBCameraNodeDriver" EXECUTABLE orbbec_camera_node
 )
 
-add_library(gige_action_command_component SHARED src/gige_action_command_node.cpp)
-target_include_directories(gige_action_command_component PUBLIC ${COMMON_INCLUDE_DIRS})
-target_link_directories(gige_action_command_component PRIVATE ${ORBBEC_LIBS_DIR})
-target_link_libraries(gige_action_command_component
+add_library(action_command_component SHARED src/action_command_node.cpp)
+target_include_directories(action_command_component PUBLIC ${COMMON_INCLUDE_DIRS})
+target_link_directories(action_command_component PRIVATE ${ORBBEC_LIBS_DIR})
+target_link_libraries(action_command_component
     ${orbbec_camera_msgs_TARGETS}
     OrbbecSDK
     rclcpp::rclcpp
 )
-orbbec_target_dependencies(gige_action_command_component rclcpp_components)
+orbbec_target_dependencies(action_command_component rclcpp_components)
 rclcpp_components_register_node(
-    gige_action_command_component
-    PLUGIN "orbbec_camera::GigEActionCommandNode"
-    EXECUTABLE gige_action_command_node
+    action_command_component
+    PLUGIN "orbbec_camera::ActionCommandNode"
+    EXECUTABLE action_command_node
 )
 
 # Add nodes using the macro
@@ -408,7 +408,7 @@ rclcpp_components_register_node(
 )
 
 # Install rules
-install(TARGETS ${PROJECT_NAME} gige_action_command_component frame_latency start_benchmark
+install(TARGETS ${PROJECT_NAME} action_command_component frame_latency start_benchmark
         multi_save_rgbir ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib RUNTIME DESTINATION bin
 )

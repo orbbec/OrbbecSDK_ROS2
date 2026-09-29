@@ -1,6 +1,6 @@
-# GigE Action Command
+# Action Command
 
-The source files are in [gige_action_command](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/gige_action_command).
+The source files are in [action_command](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/action_command).
 
 This example starts two Gemini 335Le cameras in Group Actions synchronization mode and one
 host-side Action Command sender. The sender is intentionally created once at the top level because
@@ -13,12 +13,12 @@ a GVCP Action Command can trigger multiple cameras.
 - Both cameras and the host on the same network
 
 Before running the example, change the two `net_device_ip` values in
-`multi_gige_action_command.launch.py` to match the cameras.
+`multi_action_command.launch.py` to match the cameras.
 
 ## Start the cameras and sender
 
 ```bash
-ros2 launch orbbec_camera multi_gige_action_command.launch.py
+ros2 launch orbbec_camera multi_action_command.launch.py
 ```
 
 The launch file creates these device-scoped configuration services and one network-scoped sender:
@@ -28,7 +28,7 @@ The launch file creates these device-scoped configuration services and one netwo
 /camera_01/set_action_config
 /camera_02/get_action_config
 /camera_02/set_action_config
-/gige_action_command_node/send_action_command
+/action_command_node/send_action_command
 ```
 
 ## Configure the cameras
@@ -63,7 +63,7 @@ match the request will be triggered.
 Set `trigger_mode` to `0`. The delay and scheduled time fields must be zero:
 
 ```bash
-ros2 service call /gige_action_command_node/send_action_command \
+ros2 service call /action_command_node/send_action_command \
   orbbec_camera_msgs/srv/SendActionCommand \
   "{device_key: 1, group_key: 1, group_mask: 1, broadcast_ip: '255.255.255.255', trigger_mode: 0, delay_ms: 0, scheduled_time: 0}"
 ```
@@ -75,7 +75,7 @@ system clock, adds the delay, and converts the result to the absolute GVCP/PTP t
 the SDK. This example schedules the command one second in the future:
 
 ```bash
-ros2 service call /gige_action_command_node/send_action_command \
+ros2 service call /action_command_node/send_action_command \
   orbbec_camera_msgs/srv/SendActionCommand \
   "{device_key: 1, group_key: 1, group_mask: 1, broadcast_ip: '255.255.255.255', trigger_mode: 1, delay_ms: 1000, scheduled_time: 0}"
 ```
@@ -91,7 +91,7 @@ Set `trigger_mode` to `2`, leave `delay_ms` at zero, and provide a future encode
 upper 32 bits contain seconds and the lower 32 bits contain nanoseconds:
 
 ```bash
-ros2 service call /gige_action_command_node/send_action_command \
+ros2 service call /action_command_node/send_action_command \
   orbbec_camera_msgs/srv/SendActionCommand \
   "{device_key: 1, group_key: 1, group_mask: 1, broadcast_ip: '255.255.255.255', trigger_mode: 2, delay_ms: 0, scheduled_time: <PTP_TIMESTAMP>}"
 ```

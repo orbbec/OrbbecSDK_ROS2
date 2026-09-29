@@ -1,6 +1,6 @@
-# GigE Action Command
+# Action Command
 
-本示例通过 Group Actions 同步模式启动两台 Gemini 335Le 相机，并启动一个主机侧 Action Command 发送节点。一个 GVCP Action Command 可以触发多台相机，因此发送节点只在顶层启动一次。[查看示例源码](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/gige_action_command)。
+本示例通过 Group Actions 同步模式启动两台 Gemini 335Le 相机，并启动一个主机侧 Action Command 发送节点。一个 GVCP Action Command 可以触发多台相机，因此发送节点只在顶层启动一次。[查看示例源码](https://github.com/orbbec/OrbbecSDK_ROS2/tree/v2-main/orbbec_camera/examples/action_command)。
 
 ## 运行条件
 
@@ -8,12 +8,12 @@
 - Orbbec SDK 2.10.2 或更高版本
 - 两台相机与主机位于同一网络
 
-运行前，修改 `multi_gige_action_command.launch.py` 中两处 `net_device_ip`，使其与相机 IP 一致。
+运行前，修改 `multi_action_command.launch.py` 中两处 `net_device_ip`，使其与相机 IP 一致。
 
 ## 启动相机和发送节点
 
 ```bash
-ros2 launch orbbec_camera multi_gige_action_command.launch.py
+ros2 launch orbbec_camera multi_action_command.launch.py
 ```
 
 启动文件为每台相机提供配置服务，并启动一个发送服务：
@@ -23,7 +23,7 @@ ros2 launch orbbec_camera multi_gige_action_command.launch.py
 /camera_01/set_action_config
 /camera_02/get_action_config
 /camera_02/set_action_config
-/gige_action_command_node/send_action_command
+/action_command_node/send_action_command
 ```
 
 ## 配置相机
@@ -57,7 +57,7 @@ ros2 service call /camera_01/get_action_config \
 将 `trigger_mode` 设为 `0`，延迟和指定时间均设为零：
 
 ```bash
-ros2 service call /gige_action_command_node/send_action_command \
+ros2 service call /action_command_node/send_action_command \
   orbbec_camera_msgs/srv/SendActionCommand \
   "{device_key: 1, group_key: 1, group_mask: 1, broadcast_ip: '255.255.255.255', trigger_mode: 0, delay_ms: 0, scheduled_time: 0}"
 ```
@@ -67,7 +67,7 @@ ros2 service call /gige_action_command_node/send_action_command \
 将 `trigger_mode` 设为 `1`，并提供正数毫秒延迟。节点读取主机系统时钟，加上延迟后转换为 SDK 所需的绝对 GVCP/PTP 时间戳。以下示例延迟一秒：
 
 ```bash
-ros2 service call /gige_action_command_node/send_action_command \
+ros2 service call /action_command_node/send_action_command \
   orbbec_camera_msgs/srv/SendActionCommand \
   "{device_key: 1, group_key: 1, group_mask: 1, broadcast_ip: '255.255.255.255', trigger_mode: 1, delay_ms: 1000, scheduled_time: 0}"
 ```
@@ -79,7 +79,7 @@ ros2 service call /gige_action_command_node/send_action_command \
 将 `trigger_mode` 设为 `2`，`delay_ms` 设为零，并提供未来的编码 PTP 时间戳。高 32 位为秒，低 32 位为纳秒：
 
 ```bash
-ros2 service call /gige_action_command_node/send_action_command \
+ros2 service call /action_command_node/send_action_command \
   orbbec_camera_msgs/srv/SendActionCommand \
   "{device_key: 1, group_key: 1, group_mask: 1, broadcast_ip: '255.255.255.255', trigger_mode: 2, delay_ms: 0, scheduled_time: <PTP_TIMESTAMP>}"
 ```

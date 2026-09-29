@@ -1495,6 +1495,9 @@ void OBCameraNode::setupDevices() {
         RCLCPP_ERROR(logger_,
                      "color MJPEG quality value %d is out of range[%d,%d], please check the value",
                      color_mjpeg_quality_, range.min, range.max);
+        TRY_EXECUTE_BLOCK(RCLCPP_INFO_STREAM(
+            logger_,
+            "Current color MJPEG quality: " << device_->getIntProperty(OB_PROP_MJPEG_QUALITY_INT)));
       } else {
         TRY_TO_SET_PROPERTY(setIntProperty, OB_PROP_MJPEG_QUALITY_INT, color_mjpeg_quality_);
         TRY_EXECUTE_BLOCK(RCLCPP_INFO_STREAM(
@@ -7245,7 +7248,7 @@ bool OBCameraNode::decodeColorFrameToBuffer(const std::shared_ptr<ob::Frame> &fr
       target_buffer_size = &rgb_buffer_size_;
     }
     if (video_frame->getDataSize() > *target_buffer_size) {
-      delete[] (*target_buffer);
+      delete[](*target_buffer);
       *target_buffer_size = video_frame->getDataSize();
       *target_buffer = new uint8_t[*target_buffer_size];
       buffer = *target_buffer;
@@ -8928,9 +8931,9 @@ void OBCameraNode::setFilterCallback(const std::shared_ptr<SetFilter ::Request> 
         if (request->filter_param.size() > 1) {
           temporal_filter->setDiffScale(request->filter_param[0]);
           temporal_filter->setWeight(request->filter_param[1]);
-          RCLCPP_INFO_STREAM(
-              logger_, "Set TemporalFilter params: " << "\ndiff_scale:" << request->filter_param[0]
-                                                     << "\nweight:" << request->filter_param[1]);
+          RCLCPP_INFO_STREAM(logger_, "Set TemporalFilter params: "
+                                          << "\ndiff_scale:" << request->filter_param[0]
+                                          << "\nweight:" << request->filter_param[1]);
           temporal_filter_diff_threshold_ = request->filter_param[0];
           temporal_filter_weight_ = request->filter_param[1];
         } else {

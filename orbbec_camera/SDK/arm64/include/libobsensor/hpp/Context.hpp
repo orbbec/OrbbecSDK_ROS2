@@ -158,7 +158,7 @@ public:
     }
 
     /**
-     * @brief Send a GigE Vision Action Command via GVCP.
+     * @brief Send an Action Command to GVCP devices.
      *
      * @param deviceKey     Device key to match.
      * @param groupKey      Group key to match.

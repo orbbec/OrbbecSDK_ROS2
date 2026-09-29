@@ -81,7 +81,7 @@ OB_EXPORT void ob_enable_net_device_enumeration(ob_context *context, bool enable
 OB_EXPORT bool ob_force_ip_config(const char *macAddress, ob_net_ip_config config, ob_error **error);
 
 /**
- * @brief Send a GigE Vision Action Command via GVCP.
+ * @brief Send an Action Command to GVCP devices.
  *
  * @param[in] deviceKey     Device key to match.
  * @param[in] groupKey      Group key to match against the camera's Action blocks.

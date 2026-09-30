@@ -16,11 +16,13 @@ config_backup_file=""
 usage() {
   cat <<EOF
 Usage:
-  $(basename "$0") [--dry-run] <arm64-or-x86_64-sdk-directory>
+  $(basename "$0") [--dry-run] <arm64-or-x86_64-sdk-directory-or.tar.gz>
 
 Replace the bundled Orbbec SDK for both supported ROS package architectures.
-The other SDK directory is inferred by swapping the input path suffix between
-"_arm64" and "_x86_64".
+The other SDK directory or archive is inferred by swapping the architecture
+suffix between "_arm64" and "_x86_64" (before .tar.gz for archives).
+Both architectures must be present in the same input format.
+Archives are extracted into temporary directories and cleaned up on exit.
 
 Only the files used or distributed by orbbec_camera are copied:
   - include/libobsensor/
@@ -35,7 +37,7 @@ SDK/licenses/ is left unchanged.
 
 Example:
   $(basename "$0") \\
-    /home/user/Downloads/SDK/OrbbecSDK_v2.10.2_linux_arm64
+    /home/user/Downloads/SDK/OrbbecSDK_v2.10.2_linux_arm64.tar.gz
 EOF
 }
 
@@ -132,8 +134,17 @@ done
 [[ -f "${ROS_CONFIG_FILE}" && ! -L "${ROS_CONFIG_FILE}" ]] ||
   die "ROS SDK configuration must be a real file: ${ROS_CONFIG_FILE}"
 
-[[ -d "$1" ]] || die "SDK directory not found: $1"
+archive_suffix=""
+if [[ -d "$1" ]]; then
+  :
+elif [[ -f "$1" && "$1" == *.tar.gz ]]; then
+  archive_suffix=".tar.gz"
+  command -v tar >/dev/null 2>&1 || die "required command not found: tar"
+else
+  die "SDK directory or .tar.gz archive not found: $1"
+fi
 input_source="$(readlink -f -- "$1")"
+input_source="${input_source%"${archive_suffix}"}"
 
 case "${input_source}" in
   *_arm64)
@@ -145,12 +156,19 @@ case "${input_source}" in
     arm64_source="${input_source%_x86_64}_arm64"
     ;;
   *)
-    die "SDK directory name must end with _arm64 or _x86_64: ${input_source}"
+    die "SDK name must end with _arm64 or _x86_64 (before .tar.gz): ${input_source}"
     ;;
 esac
 
-[[ -d "${arm64_source}" ]] || die "paired ARM64 SDK directory not found: ${arm64_source}"
-[[ -d "${x64_source}" ]] || die "paired x86-64 SDK directory not found: ${x64_source}"
+if [[ -n "${archive_suffix}" ]]; then
+  [[ -f "${arm64_source}${archive_suffix}" ]] ||
+    die "paired ARM64 SDK archive not found: ${arm64_source}${archive_suffix}"
+  [[ -f "${x64_source}${archive_suffix}" ]] ||
+    die "paired x86-64 SDK archive not found: ${x64_source}${archive_suffix}"
+else
+  [[ -d "${arm64_source}" ]] || die "paired ARM64 SDK directory not found: ${arm64_source}"
+  [[ -d "${x64_source}" ]] || die "paired x86-64 SDK directory not found: ${x64_source}"
+fi
 case "${arm64_source}" in
   "${SDK_ROOT}" | "${SDK_ROOT}"/*) die "the ARM64 source cannot be inside ${SDK_ROOT}" ;;
 esac
@@ -267,6 +285,31 @@ copy_architecture() {
   cp -a -- "${source_dir}/lib/extensions" "${destination_dir}/lib/"
 }
 
+extract_sdk_archive() {
+  local archive=$1
+  local destination=$2
+  local expected_root=${archive##*/}
+  expected_root=${expected_root%.tar.gz}
+
+  mkdir -p -- "${destination}" || return 1
+  tar --extract --gzip --file="${archive}" --directory="${destination}" --no-same-owner || return 1
+  # Official archives contain a directory named after the archive. Also accept
+  # archives with include/ and lib/ directly at the root.
+  if [[ -d "${destination}/${expected_root}" ]]; then
+    printf '%s\n' "${destination}/${expected_root}"
+  else
+    printf '%s\n' "${destination}"
+  fi
+}
+
+work_dir="$(mktemp -d -- "${PACKAGE_DIR}/.sdk-update.XXXXXX")"
+if [[ -n "${archive_suffix}" ]]; then
+  arm64_source="$(extract_sdk_archive "${arm64_source}${archive_suffix}" "${work_dir}/source-arm64")" ||
+    die "failed to extract ARM64 SDK archive"
+  x64_source="$(extract_sdk_archive "${x64_source}${archive_suffix}" "${work_dir}/source-x64")" ||
+    die "failed to extract x86-64 SDK archive"
+fi
+
 verify_source_layout "${arm64_source}" arm64
 verify_source_layout "${x64_source}" x64
 cmp -s -- "${arm64_source}/lib/OrbbecSDKConfig.xml" \
@@ -278,7 +321,6 @@ x64_version="$(sdk_version "${x64_source}")"
 [[ "${arm64_version}" == "${x64_version}" ]] ||
   die "SDK versions do not match: ARM64=${arm64_version}, x86-64=${x64_version}"
 
-work_dir="$(mktemp -d -- "${PACKAGE_DIR}/.sdk-update.XXXXXX")"
 staged_sdk="${work_dir}/SDK.new"
 staged_config="${work_dir}/OrbbecSDKConfig_v2.0.xml.new"
 mkdir -p -- "${staged_sdk}"

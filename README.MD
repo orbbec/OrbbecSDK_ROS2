@@ -25,7 +25,7 @@
     <img src="https://img.shields.io/badge/ROS-Lyrical-f5792a?style=flat-square&amp;logo=ros&amp;logoColor=white" height="20" alt="ROS Lyrical">
   </a>
   <a href="https://docs.ros.org/en/rolling/">
-    <img src="https://img.shields.io/badge/ROS-Rolling%20(experimental)-e5c07b?style=flat-square&amp;logo=ros&amp;logoColor=white" height="20" alt="ROS Rolling (experimental)">
+    <img src="https://img.shields.io/badge/ROS-Rolling-f5792a?style=flat-square&amp;logo=ros&amp;logoColor=white" height="20" alt="ROS Rolling">
   </a>
   <img src="https://img.shields.io/badge/Ubuntu-20.04-0078d4?style=flat-square&amp;logo=ubuntu&amp;logoColor=white" height="20" alt="Ubuntu 20.04">
   <img src="https://img.shields.io/badge/Ubuntu-22.04-0078d4?style=flat-square&amp;logo=ubuntu&amp;logoColor=white" height="20" alt="Ubuntu 22.04">
@@ -47,7 +47,7 @@
 
 ## Introduction
 
-The **OrbbecSDK ROS2 Wrapper** provides seamless integration of Orbbec cameras with the ROS 2 ecosystem and supports the **ROS2 Foxy**, **Humble**, **Jazzy**, and **Lyrical** distributions, with experimental support for **Rolling**.
+The **OrbbecSDK ROS2 Wrapper** provides seamless integration of Orbbec cameras with the ROS 2 ecosystem and supports the **ROS2 Foxy**, **Humble**, **Jazzy**, **Lyrical**, and **Rolling** distributions.
 
 - Default branch: **v2-main**
 - For legacy **OpenNI** devices: use the **main** branch

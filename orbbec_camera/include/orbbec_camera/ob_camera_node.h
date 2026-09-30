@@ -1009,7 +1009,7 @@ class OBCameraNode {
   // For color
   ColorFrameQueue color_frame_queue_;
   ColorQueueStats color_frame_queue_stats_;
-  int color_frame_queue_max_frames_ = 10;
+  int color_frame_queue_max_frames_ = 1;
   std::shared_ptr<std::thread> colorFrameThread_ = nullptr;
   std::atomic_bool stop_color_frame_threads_{false};
   std::mutex color_frame_queue_lock_;
@@ -1018,7 +1018,7 @@ class OBCameraNode {
   // For left color
   ColorFrameQueue left_color_frame_queue_;
   ColorQueueStats left_color_frame_queue_stats_;
-  int left_color_frame_queue_max_frames_ = 10;
+  int left_color_frame_queue_max_frames_ = 1;
   std::shared_ptr<std::thread> leftColorFrameThread_ = nullptr;
   std::mutex left_color_frame_queue_lock_;
   std::condition_variable left_color_frame_queue_cv_;
@@ -1026,7 +1026,7 @@ class OBCameraNode {
   // For right color
   ColorFrameQueue right_color_frame_queue_;
   ColorQueueStats right_color_frame_queue_stats_;
-  int right_color_frame_queue_max_frames_ = 10;
+  int right_color_frame_queue_max_frames_ = 1;
   std::shared_ptr<std::thread> rightColorFrameThread_ = nullptr;
   std::mutex right_color_frame_queue_lock_;
   std::condition_variable right_color_frame_queue_cv_;

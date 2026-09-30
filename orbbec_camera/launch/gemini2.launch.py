@@ -27,7 +27,7 @@ def generate_launch_description():
         DeclareLaunchArgument("enable_colored_point_cloud", default_value="false"),
         DeclareLaunchArgument("point_cloud_qos", default_value="default"),
         DeclareLaunchArgument("connection_delay", default_value="100"),
-        DeclareLaunchArgument("color_frame_queue_max_frames", default_value="10"),
+        DeclareLaunchArgument("color_frame_queue_max_frames", default_value="1"),
         DeclareLaunchArgument("color_width", default_value="0"),
         DeclareLaunchArgument("color_height", default_value="0"),
         DeclareLaunchArgument("color_fps", default_value="0"),

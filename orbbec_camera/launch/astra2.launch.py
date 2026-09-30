@@ -27,7 +27,7 @@ def generate_launch_description():
         DeclareLaunchArgument("cloud_frame_id", default_value=""),
         DeclareLaunchArgument("point_cloud_qos", default_value="default"),
         DeclareLaunchArgument("connection_delay", default_value="100"),
-        DeclareLaunchArgument("color_frame_queue_max_frames", default_value="10"),
+        DeclareLaunchArgument("color_frame_queue_max_frames", default_value="1"),
         DeclareLaunchArgument("color_width", default_value="1280"),
         DeclareLaunchArgument("color_height", default_value="720"),
         DeclareLaunchArgument("color_fps", default_value="30"),

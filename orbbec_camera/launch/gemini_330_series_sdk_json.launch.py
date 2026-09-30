@@ -81,7 +81,7 @@ def generate_launch_description():
         DeclareLaunchArgument('load_config_json_file_path', default_value=''),
         DeclareLaunchArgument('export_config_json_file_path', default_value=''),
 
-        DeclareLaunchArgument('color_frame_queue_max_frames', default_value='10'),
+        DeclareLaunchArgument('color_frame_queue_max_frames', default_value='1'),
 
         DeclareLaunchArgument('color_qos', default_value='default'),
 

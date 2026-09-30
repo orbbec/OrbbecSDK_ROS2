@@ -4721,11 +4721,11 @@ void OBCameraNode::setupDefaultImageFormat() {
 
 void OBCameraNode::getParameters() {
   setAndGetNodeParameter<std::string>(camera_name_, "camera_name", "camera");
-  setAndGetNodeParameter<int>(color_frame_queue_max_frames_, "color_frame_queue_max_frames", 10);
+  setAndGetNodeParameter<int>(color_frame_queue_max_frames_, "color_frame_queue_max_frames", 1);
   setAndGetNodeParameter<int>(left_color_frame_queue_max_frames_,
-                              "left_color_frame_queue_max_frames", 10);
+                              "left_color_frame_queue_max_frames", 1);
   setAndGetNodeParameter<int>(right_color_frame_queue_max_frames_,
-                              "right_color_frame_queue_max_frames", 10);
+                              "right_color_frame_queue_max_frames", 1);
   const auto validate_queue_capacity = [](const char *name, int capacity) {
     if (capacity < 1) {
       throw StreamConfigurationError(std::string(name) + " must be greater than zero");

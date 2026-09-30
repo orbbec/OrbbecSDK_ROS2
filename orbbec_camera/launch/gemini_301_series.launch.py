@@ -110,9 +110,9 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_colored_point_cloud', default_value='false'),
         DeclareLaunchArgument('cloud_frame_id', default_value=''),
         DeclareLaunchArgument('connection_delay', default_value='10'),
-        DeclareLaunchArgument('color_frame_queue_max_frames', default_value='10'),
-        DeclareLaunchArgument('left_color_frame_queue_max_frames', default_value='10'),
-        DeclareLaunchArgument('right_color_frame_queue_max_frames', default_value='10'),
+        DeclareLaunchArgument('color_frame_queue_max_frames', default_value='1'),
+        DeclareLaunchArgument('left_color_frame_queue_max_frames', default_value='1'),
+        DeclareLaunchArgument('right_color_frame_queue_max_frames', default_value='1'),
         DeclareLaunchArgument('ae_reference_stream', default_value='depth'), # depth or color
         DeclareLaunchArgument('ae_strategy', default_value='default'), # default or motion
         DeclareLaunchArgument('color_width', default_value='0'),

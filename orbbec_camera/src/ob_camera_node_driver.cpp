@@ -1434,23 +1434,32 @@ void OBCameraNodeDriver::connectNetDevice(const std::string &net_device_ip, int 
                                         [this](int *) { device_connecting_.store(false); });
 
   std::this_thread::sleep_for(std::chrono::milliseconds(connection_delay_));
-  auto device = ctx_->createNetDevice(net_device_ip.c_str(), net_device_port, device_access_mode_);
-  if (device == nullptr) {
-    RCLCPP_ERROR_STREAM(logger_, "Failed to connect to net device " << net_device_ip);
-    return;
-  }
   try {
+    // The device may still be rebooting; let queryDevice retry connection failures.
+    auto device =
+        ctx_->createNetDevice(net_device_ip.c_str(), net_device_port, device_access_mode_);
+    if (device == nullptr) {
+      RCLCPP_ERROR_STREAM(logger_, "Failed to connect to net device " << net_device_ip);
+      return;
+    }
     initializeDevice(device);
     if (!device_connected_) {
       RCLCPP_ERROR_STREAM(logger_, "Failed to initialize net device " << net_device_ip);
     }
   } catch (const StreamConfigurationError &) {
     device_connected_ = false;
+  } catch (const ob::Error &e) {
+    RCLCPP_ERROR_STREAM(logger_, "Failed to connect or initialize net device "
+                                     << net_device_ip << ": "
+                                     << orbbec_camera::formatObErrorWithStatus(e));
+    device_connected_ = false;
   } catch (const std::exception &e) {
-    RCLCPP_ERROR_STREAM(logger_, "Exception during net device initialization: " << e.what());
+    RCLCPP_ERROR_STREAM(logger_,
+                        "Exception during net device connection or initialization: " << e.what());
     device_connected_ = false;
   } catch (...) {
-    RCLCPP_ERROR_STREAM(logger_, "Unknown exception during net device initialization");
+    RCLCPP_ERROR_STREAM(logger_,
+                        "Unknown exception during net device connection or initialization");
     device_connected_ = false;
   }
 }

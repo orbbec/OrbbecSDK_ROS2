@@ -154,35 +154,6 @@ ros2 service call /camera/get_color_queue_stats std_srvs/srv/SetBool '{data: tru
     ros2 service call /camera/set_white_balance orbbec_camera_msgs/srv/SetInt32 '{data: 2800}'
     ros2 service call /camera/get_white_balance orbbec_camera_msgs/srv/GetInt32 '{}'
     ```
-
-#### Gemini 330 AE/AWB 调试
-
-Gemini 330 系列设备使用固件 `1.8.21` 及以上版本时，如果设备支持对应 SDK 属性，节点会提供以下服务：
-
-*   `/camera/get_color_ae_awb_status`
-
-    获取设备 AE/AWB 状态值。
-
-    ```bash
-    ros2 service call /camera/get_color_ae_awb_status orbbec_camera_msgs/srv/GetInt32 '{}'
-    ```
-
-*   `/camera/get_color_awb_gain`
-
-    获取原始 Q8.8 格式的 `r_gain`、`b_gain` 和 `g_gain`。
-
-    ```bash
-    ros2 service call /camera/get_color_awb_gain orbbec_camera_msgs/srv/GetAwbGain '{}'
-    ```
-
-*   `/camera/set_color_awb_gain`
-
-    设置原始 Q8.8 格式的 RGB 通道增益。设置前必须关闭彩色自动白平衡。
-
-    ```bash
-    ros2 service call /camera/set_color_awb_gain orbbec_camera_msgs/srv/SetAwbGain "{r_gain: 512, b_gain: 512, g_gain: 512}"
-    ```
-
 *   `/camera/set_laser_enable`
     ```bash
     ros2 service call /camera/set_laser_enable std_srvs/srv/SetBool '{data: true}'

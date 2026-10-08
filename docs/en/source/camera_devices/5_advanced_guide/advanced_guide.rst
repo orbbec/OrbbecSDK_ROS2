@@ -26,7 +26,6 @@ Multi-Camera
     multi_camera/multi_camera_synced.md
     multi_camera/multi_camera_synced_verification_tool.md
     multi_camera/gmsl_camera.md
-    multi_camera/action_command.md
 
 
 Configuration & Modes

@@ -154,35 +154,6 @@ ros2 service call /camera/get_color_queue_stats std_srvs/srv/SetBool '{data: tru
     ros2 service call /camera/set_white_balance orbbec_camera_msgs/srv/SetInt32 '{data: 2800}'
     ros2 service call /camera/get_white_balance orbbec_camera_msgs/srv/GetInt32 '{}'
     ```
-
-#### Gemini 330 AE/AWB Debugging
-
-On Gemini 330 series devices with firmware `1.8.21` or later, the following services are advertised when the corresponding SDK properties are supported:
-
-*   `/camera/get_color_ae_awb_status`
-
-    Returns the device AE/AWB status value.
-
-    ```bash
-    ros2 service call /camera/get_color_ae_awb_status orbbec_camera_msgs/srv/GetInt32 '{}'
-    ```
-
-*   `/camera/get_color_awb_gain`
-
-    Returns the raw Q8.8 `r_gain`, `b_gain`, and `g_gain` values.
-
-    ```bash
-    ros2 service call /camera/get_color_awb_gain orbbec_camera_msgs/srv/GetAwbGain '{}'
-    ```
-
-*   `/camera/set_color_awb_gain`
-
-    Sets raw Q8.8 RGB channel gains. Color auto white balance must be disabled before setting the gains.
-
-    ```bash
-    ros2 service call /camera/set_color_awb_gain orbbec_camera_msgs/srv/SetAwbGain "{r_gain: 512, b_gain: 512, g_gain: 512}"
-    ```
-
 *   `/camera/set_laser_enable`
     ```bash
     ros2 service call /camera/set_laser_enable std_srvs/srv/SetBool '{data: true}'

@@ -47,7 +47,7 @@ Stephen Brawner (brawner@gmail.com)
     </collision>
   </link>
     <link
-    name="camera_botton_screw_frame">
+    name="camera_bottom_screw_frame">
     <inertial>
       <origin
         xyz="0.0129595808229284 -0.00178367771212325 0.0132673694649094"
@@ -68,7 +68,7 @@ Stephen Brawner (brawner@gmail.com)
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="${mesh_path}camera_botton_screw_frame.STL" />
+          filename="${mesh_path}camera_bottom_screw_frame.STL" />
       </geometry>
       <material
         name="">
@@ -82,7 +82,7 @@ Stephen Brawner (brawner@gmail.com)
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="${mesh_path}camera_botton_screw_frame.STL" />
+          filename="${mesh_path}camera_bottom_screw_frame.STL" />
       </geometry>
     </collision>
   </link>
@@ -125,7 +125,7 @@ Stephen Brawner (brawner@gmail.com)
     <parent
       link="camera_link" />
     <child
-      link="camera_botton_screw_frame" />
+      link="camera_bottom_screw_frame" />
     <axis
       xyz="0 0 0" />
   </joint>

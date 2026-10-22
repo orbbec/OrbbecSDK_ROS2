@@ -71,9 +71,24 @@ size_t image_rcl_publisher::get_subscription_count() const {
 }
 
 // --- image_transport_publisher implementation ---
-image_transport_publisher::image_transport_publisher(rclcpp::Node& node,
-                                                     const std::string& topic_name,
-                                                     const rmw_qos_profile_t& qos) {
+#include <algorithm>
+#include <string>
+
+image_transport_publisher::image_transport_publisher(
+    rclcpp::Node& node,
+    const std::string& topic_name,
+    const rmw_qos_profile_t& qos,
+    const std::string& format)
+{
+  std::string param_name = topic_name;
+
+  // convert topic separators to parameter-name separators.
+  std::replace(param_name.begin(), param_name.end(), '/', '.');
+
+  // declare the "format" parameter with our defaults for the image_transport::Publisher
+  param_name = "." + param_name + ".compressed.format";
+  node.declare_parameter(param_name, format);
+
   image_publisher_impl =
       std::make_shared<image_transport::Publisher>(image_transport::create_publisher(
 #ifdef ORBBEC_IMAGE_TRANSPORT_USES_REQUIRED_INTERFACES
@@ -89,6 +104,7 @@ image_transport_publisher::image_transport_publisher(rclcpp::Node& node,
 #endif
           ));
 }
+
 void image_transport_publisher::publish(sensor_msgs::msg::Image::UniquePtr image_ptr) {
   image_publisher_impl->publish(*image_ptr);
 }
@@ -99,7 +115,8 @@ size_t image_transport_publisher::get_subscription_count() const {
 
 std::shared_ptr<image_publisher> getGlobalImageTransportPublisher(rclcpp::Node& node,
                                                                   const std::string& topic_name,
-                                                                  const rmw_qos_profile_t& qos) {
+                                                                  const rmw_qos_profile_t& qos,
+                                                                  const std::string& format) {
   const ImageTransportPublisherCacheKey key{node.get_fully_qualified_name(), topic_name};
   std::lock_guard<std::mutex> lock(imageTransportPublisherCacheMutex());
   auto& cache = imageTransportPublisherCache();
@@ -108,7 +125,7 @@ std::shared_ptr<image_publisher> getGlobalImageTransportPublisher(rclcpp::Node& 
     return cached->second.publisher;
   }
 
-  auto publisher = std::make_shared<image_transport_publisher>(node, topic_name, qos);
+  auto publisher = std::make_shared<image_transport_publisher>(node, topic_name, qos, format);
   cache[key] = CachedImageTransportPublisher{qos, publisher};
   return publisher;
 }

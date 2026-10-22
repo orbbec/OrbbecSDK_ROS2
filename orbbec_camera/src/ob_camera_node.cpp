@@ -5828,8 +5828,9 @@ void OBCameraNode::setupImagePublisher(const stream_index_pair &stream_index) {
     image_publishers_[stream_index] =
         std::make_shared<image_rcl_publisher>(*node_, topic, image_qos_profile);
   } else {
+    const std::string format = (stream_index == DEPTH) ? "png" : "jpeg";
     image_publishers_[stream_index] =
-        getGlobalImageTransportPublisher(*node_, topic, image_qos_profile);
+        getGlobalImageTransportPublisher(*node_, topic, image_qos_profile, format);
   }
   RCLCPP_INFO_STREAM(logger_, topic << " QoS: " << getRMWQosProfileDescription(image_qos_profile));
 
@@ -6061,7 +6062,7 @@ void OBCameraNode::syncSoftwareAlignment() {
             *node_, "depth/image_unaligned", depth_image_qos_profile);
       } else {
         depth_unaligned_publisher_ = getGlobalImageTransportPublisher(
-            *node_, "depth/image_unaligned", depth_image_qos_profile);
+            *node_, "depth/image_unaligned", depth_image_qos_profile, "png");
       }
     }
     return;

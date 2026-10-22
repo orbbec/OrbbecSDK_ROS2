@@ -42,7 +42,7 @@ class image_rcl_publisher : public image_publisher {
 class image_transport_publisher : public image_publisher {
  public:
   image_transport_publisher(rclcpp::Node& node, const std::string& topic_name,
-                            const rmw_qos_profile_t& qos);
+                            const rmw_qos_profile_t& qos, const std::string& format);
   void publish(sensor_msgs::msg::Image::UniquePtr image_ptr) override;
   size_t get_subscription_count() const override;
 
@@ -53,7 +53,8 @@ class image_transport_publisher : public image_publisher {
 // Keep image_transport plugins and their DDS endpoints alive across camera reconnects.
 std::shared_ptr<image_publisher> getGlobalImageTransportPublisher(rclcpp::Node& node,
                                                                   const std::string& topic_name,
-                                                                  const rmw_qos_profile_t& qos);
+                                                                  const rmw_qos_profile_t& qos,
+                                                                  const std::string& format);
 void releaseGlobalImageTransportPublisher(rclcpp::Node& node, const std::string& topic_name);
 void clearGlobalImageTransportPublishers(rclcpp::Node& node);
 }  // namespace orbbec_camera

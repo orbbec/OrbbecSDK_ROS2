@@ -7311,11 +7311,8 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   const bool has_explicit_compressed_publisher =
       compressed_image_publishers_.count(stream_index) > 0 &&
       compressed_image_publishers_.at(stream_index);
-  bool has_raw_image_subscriber = image_publishers_[stream_index]->get_subscription_count() > 0;
-  if (!use_intra_process_ && !has_explicit_compressed_publisher) {
-    has_raw_image_subscriber =
-        node_->count_subscribers(stream_name_[stream_index] + "/image_raw") > 0;
-  }
+  const bool has_raw_image_subscriber =
+      image_publishers_[stream_index]->get_subscription_count() > 0;
   const bool has_compressed_image_subscriber = hasCompressedImageSubscriber(stream_index);
   const bool has_image_transport_compressed_subscriber =
       has_compressed_image_subscriber && !has_explicit_compressed_publisher;
@@ -7542,7 +7539,8 @@ bool OBCameraNode::hasCompressedImageSubscriber(const stream_index_pair &stream_
   if (use_intra_process_) {
     return false;
   }
-  return node_->count_subscribers(compressedStreamStatusTopic(stream_index)) > 0;
+  return node_->count_subscribers(
+             resolveStreamStatusTopic(compressedStreamStatusTopic(stream_index))) > 0;
 }
 
 void OBCameraNode::publishCompressedColorImage(const std::shared_ptr<ob::Frame> &frame,

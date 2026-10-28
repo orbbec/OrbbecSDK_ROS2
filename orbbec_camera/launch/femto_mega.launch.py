@@ -144,6 +144,8 @@ def generate_launch_description():
         DeclareLaunchArgument("force_ip_subnet_mask", default_value="255.255.255.0"),  # Subnet mask used for static IP
         DeclareLaunchArgument("force_ip_gateway", default_value="192.168.1.1"),  # Gateway address used for static IP
 
+        #depth image transport plugins
+        DeclareLaunchArgument('depth.image_raw.enable_pub_plugins', default_value='["image_transport/compressedDepth", "image_transport/raw"]'),
     ]
 
     # Node configuration

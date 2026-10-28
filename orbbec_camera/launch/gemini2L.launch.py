@@ -53,6 +53,14 @@ def convert_value(value):
             return True
         if value.lower() == "false":
             return False
+        # string array parameters such as image_raw.enable_pub_plugins are
+        # passed as a YAML/JSON list and must stay a list, not a string
+        stripped = value.strip()
+        if stripped.startswith("[") and stripped.endswith("]"):
+            try:
+                return yaml.safe_load(stripped)
+            except Exception:
+                pass
     return value
 
 
@@ -204,6 +212,8 @@ def generate_launch_description():
         DeclareLaunchArgument("enable_depth_undistortion", default_value="false"),
         DeclareLaunchArgument("enable_ir_undistortion", default_value="false"),
         DeclareLaunchArgument("config_file_path", default_value=""),
+        #depth image transport plugins
+        DeclareLaunchArgument('depth.image_raw.enable_pub_plugins', default_value='["image_transport/compressedDepth", "image_transport/raw"]'),
     ]
 
     def get_params(context, args):

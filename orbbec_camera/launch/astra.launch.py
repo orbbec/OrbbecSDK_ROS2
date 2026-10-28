@@ -122,6 +122,8 @@ def generate_launch_description():
         DeclareLaunchArgument('hole_filling_filter_mode', default_value=''),
         DeclareLaunchArgument('enable_mgc_noise_removal_filter', default_value='false'),
         DeclareLaunchArgument('enable_lut_noise_removal_filter', default_value='false'),
+        #depth image transport plugins
+        DeclareLaunchArgument('depth.image_raw.enable_pub_plugins', default_value='["image_transport/compressedDepth", "image_transport/raw"]'),
     ]
 
     # Node configuration

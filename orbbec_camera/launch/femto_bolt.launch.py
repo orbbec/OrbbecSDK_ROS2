@@ -130,6 +130,8 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_depth_undistortion', default_value='false'),
         DeclareLaunchArgument('enable_ir_undistortion', default_value='false'),
         DeclareLaunchArgument('device_preset', default_value='Custom'),
+        #depth image transport plugins
+        DeclareLaunchArgument('depth.image_raw.enable_pub_plugins', default_value='["image_transport/compressedDepth", "image_transport/raw"]'),
     ]
 
     # Node configuration

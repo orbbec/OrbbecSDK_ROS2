@@ -106,8 +106,12 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_firmware_log', default_value='false'),
         DeclareLaunchArgument('monitor_poll_interval_sec', default_value='-1'),
         DeclareLaunchArgument('industry_mode', default_value=''),
+        #color image transport plugins
+        DeclareLaunchArgument('color.image_raw.enable_pub_plugins', default_value='["image_transport/compressed", "image_transport/raw", "image_transport/theora"]'),
         #depth image transport plugins
         DeclareLaunchArgument('depth.image_raw.enable_pub_plugins', default_value='["image_transport/compressedDepth", "image_transport/raw"]'),
+        #ir image transport plugins
+        DeclareLaunchArgument('ir.image_raw.enable_pub_plugins', default_value='["image_transport/compressed", "image_transport/raw", "image_transport/theora"]'),
     ]
 
     # Node configuration

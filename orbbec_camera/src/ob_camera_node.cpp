@@ -7460,8 +7460,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   if (image.empty() || image.cols != width || image.rows != height) {
     image.create(height, width, image_format_[stream_index]);
   }
-  if (isColorFrameDecodeRequired(frame) &&
-      (has_raw_image_subscriber || save_images_[stream_index])) {
+  if (isColorFrameDecodeRequired(frame) && (has_image_subscriber || save_images_[stream_index])) {
     if (frame->getType() == OB_FRAME_COLOR && !is_color_frame_decoded_) {
       RCLCPP_ERROR(logger_, "color frame is not decoded");
       record_image_publish_skipped();
@@ -7500,7 +7499,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
     auto depth_scale = video_frame->as<ob::DepthFrame>()->getValueScale();
     image = image * depth_scale;
     image_to_publish = image;
-    if (colorizer_mode_ != "none" && (has_raw_image_subscriber || save_images_[stream_index])) {
+    if (colorizer_mode_ != "none" && (has_image_subscriber || save_images_[stream_index])) {
       auto colorized_image = colorizeDepthImage(image, colorizer_mode_);
       if (!colorized_image.empty()) {
         image_to_publish = std::move(colorized_image);

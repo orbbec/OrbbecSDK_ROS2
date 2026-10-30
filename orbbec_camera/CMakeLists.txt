@@ -446,6 +446,10 @@ if(BUILD_TESTING)
     ament_add_gtest(camera_info_distortion_test test/camera_info_distortion_test.cpp)
     target_link_directories(camera_info_distortion_test PRIVATE ${ORBBEC_LIBS_DIR})
     target_link_libraries(camera_info_distortion_test ${PROJECT_NAME})
+
+    ament_add_gtest(stream_status_test test/stream_status_test.cpp)
+    target_link_directories(stream_status_test PRIVATE ${ORBBEC_LIBS_DIR})
+    target_link_libraries(stream_status_test ${PROJECT_NAME})
 endif()
 
 ament_export_include_directories(include)

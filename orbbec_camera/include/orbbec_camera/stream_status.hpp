@@ -33,10 +33,13 @@ namespace orbbec_camera {
 class StreamStatusTracker {
  public:
   using SubscriberCountFn = std::function<size_t()>;
+  using AvailableFn = std::function<bool()>;
 
-  StreamStatusTracker(std::string topic_name, SubscriberCountFn subscriber_count)
+  StreamStatusTracker(std::string topic_name, SubscriberCountFn subscriber_count,
+                      AvailableFn available = {})
       : topic_name_(std::move(topic_name)),
         subscriber_count_(std::move(subscriber_count)),
+        available_(std::move(available)),
         window_start_(std::chrono::steady_clock::now()) {}
 
   void record(const builtin_interfaces::msg::Time& stamp) {
@@ -50,7 +53,8 @@ class StreamStatusTracker {
     delay_sum_ms_ += now_ms - stamp_ms;
   }
 
-  void fill(orbbec_camera_msgs::msg::StreamStatus& status) {
+  bool fill(orbbec_camera_msgs::msg::StreamStatus& status) {
+    const bool available = !available_ || available_();
     const bool has_subscribers = subscriber_count_ && subscriber_count_() > 0;
     const auto now = std::chrono::steady_clock::now();
 
@@ -66,11 +70,13 @@ class StreamStatusTracker {
     published_count_ = 0;
     delay_sum_ms_ = 0.0;
     window_start_ = now;
+    return available;
   }
 
  private:
   std::string topic_name_;
   SubscriberCountFn subscriber_count_;
+  AvailableFn available_;
   std::chrono::steady_clock::time_point window_start_;
   std::mutex mutex_;
   uint32_t published_count_{0};

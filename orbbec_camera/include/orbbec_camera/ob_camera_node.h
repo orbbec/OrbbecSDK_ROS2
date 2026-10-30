@@ -361,7 +361,8 @@ class OBCameraNode {
   void setupPublishers();
 
   void registerStreamStatus(const std::string& topic_name,
-                            StreamStatusTracker::SubscriberCountFn subscriber_count);
+                            StreamStatusTracker::SubscriberCountFn subscriber_count,
+                            StreamStatusTracker::AvailableFn available = {});
   void removeStreamStatus(const std::string& topic_name);
   void recordStreamStatus(const std::string& topic_name,
                           const builtin_interfaces::msg::Time& stamp);

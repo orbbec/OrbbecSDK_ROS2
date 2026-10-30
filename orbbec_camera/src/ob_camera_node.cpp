@@ -5764,10 +5764,11 @@ std::vector<std::string> OBCameraNode::compressedStreamStatusTopics(
 }
 
 void OBCameraNode::registerStreamStatus(const std::string &topic_name,
-                                        StreamStatusTracker::SubscriberCountFn subscriber_count) {
+                                        StreamStatusTracker::SubscriberCountFn subscriber_count,
+                                        StreamStatusTracker::AvailableFn available) {
   const auto resolved_topic_name = resolveStreamStatusTopic(topic_name);
-  auto tracker =
-      std::make_shared<StreamStatusTracker>(resolved_topic_name, std::move(subscriber_count));
+  auto tracker = std::make_shared<StreamStatusTracker>(
+      resolved_topic_name, std::move(subscriber_count), std::move(available));
   std::lock_guard<std::mutex> lock(stream_status_mutex_);
   stream_status_trackers_[topic_name] = std::move(tracker);
 }
@@ -5806,7 +5807,9 @@ void OBCameraNode::fillStreamStatus(orbbec_camera_msgs::msg::DeviceStatus &statu
   status_msg.streams.reserve(trackers.size());
   for (const auto &tracker : trackers) {
     status_msg.streams.emplace_back();
-    tracker->fill(status_msg.streams.back());
+    if (!tracker->fill(status_msg.streams.back())) {
+      status_msg.streams.pop_back();
+    }
   }
 }
 
@@ -5866,9 +5869,18 @@ void OBCameraNode::setupImagePublisher(const stream_index_pair &stream_index) {
     if (uses_image_transport) {
       for (const auto &compressed_topic : compressedStreamStatusTopics(stream_index)) {
         const auto resolved_topic = resolveStreamStatusTopic(compressed_topic);
-        registerStreamStatus(compressed_topic, [this, resolved_topic]() {
-          return node_->count_subscribers(resolved_topic);
-        });
+        registerStreamStatus(
+            compressed_topic,
+            [this, resolved_topic]() { return node_->count_subscribers(resolved_topic); },
+            [this, resolved_topic]() {
+              for (const auto &publisher : node_->get_publishers_info_by_topic(resolved_topic)) {
+                if (publisher.node_name() == node_->get_name() &&
+                    publisher.node_namespace() == node_->get_namespace()) {
+                  return true;
+                }
+              }
+              return false;
+            });
       }
     }
   }

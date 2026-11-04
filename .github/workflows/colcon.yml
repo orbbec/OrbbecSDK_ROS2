@@ -37,6 +37,10 @@ jobs:
         run: |
           set -euo pipefail
           apt-get update
+          if [[ "${ROS_DISTRO}" == "rolling" ]]; then
+            # Keep preinstalled ROS libraries in sync with newly installed dependencies.
+            apt-get upgrade --yes
+          fi
           apt-get install --no-install-recommends --yes \
             build-essential \
             cmake \

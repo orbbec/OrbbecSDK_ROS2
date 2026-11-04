@@ -14,6 +14,9 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
 
@@ -51,9 +54,9 @@ class image_transport_publisher : public image_publisher {
 };
 
 // Keep image_transport plugins and their DDS endpoints alive across camera reconnects.
-std::shared_ptr<image_publisher> getGlobalImageTransportPublisher(rclcpp::Node& node,
-                                                                  const std::string& topic_name,
-                                                                  const rmw_qos_profile_t& qos);
+std::shared_ptr<image_publisher> getGlobalImageTransportPublisher(
+    rclcpp::Node& node, const std::string& topic_name, const rmw_qos_profile_t& qos,
+    const std::vector<std::string>& excluded_plugins = {});
 void releaseGlobalImageTransportPublisher(rclcpp::Node& node, const std::string& topic_name);
 void clearGlobalImageTransportPublishers(rclcpp::Node& node);
 }  // namespace orbbec_camera

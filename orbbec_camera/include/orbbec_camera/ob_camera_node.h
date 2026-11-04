@@ -673,7 +673,7 @@ class OBCameraNode {
 
   bool setupFormatConvertType(OBFormat format);
   bool setupFormatConvertType(OBFormat format, ob::FormatConvertFilter& filter);
-  bool hasCompressedImageSubscriber(const stream_index_pair& stream_index) const;
+  bool hasPassthroughCompressedImageSubscriber(const stream_index_pair& stream_index) const;
   void publishCompressedColorImage(const std::shared_ptr<ob::Frame>& frame,
                                    const stream_index_pair& stream_index,
                                    const rclcpp::Time& timestamp, const std::string& frame_id);

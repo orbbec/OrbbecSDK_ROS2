@@ -5815,14 +5815,15 @@ void OBCameraNode::fillStreamStatus(orbbec_camera_msgs::msg::DeviceStatus &statu
 
 void OBCameraNode::setupImagePublisher(const stream_index_pair &stream_index) {
   const std::string topic = stream_name_[stream_index] + "/image_raw";
+  removeStreamStatus(topic);
+  for (const auto &transport_topic : compressedStreamStatusTopics(stream_index)) {
+    removeStreamStatus(transport_topic);
+  }
+  // Drop node references before replacing cached endpoints or the passthrough policy.
+  image_publishers_.erase(stream_index);
+  compressed_image_publishers_.erase(stream_index);
   if (!enable_stream_[stream_index]) {
     releaseGlobalImageTransportPublisher(*node_, topic);
-    image_publishers_.erase(stream_index);
-    compressed_image_publishers_.erase(stream_index);
-    removeStreamStatus(topic);
-    for (const auto &compressed_topic : compressedStreamStatusTopics(stream_index)) {
-      removeStreamStatus(compressed_topic);
-    }
     return;
   }
 
@@ -5830,23 +5831,39 @@ void OBCameraNode::setupImagePublisher(const stream_index_pair &stream_index) {
   const bool is_mjpg_color_stream =
       (stream_index == COLOR || stream_index == COLOR_LEFT || stream_index == COLOR_RIGHT) &&
       format_[stream_index] == OB_FORMAT_MJPG;
-  const bool uses_image_transport = !use_intra_process_ && !is_mjpg_color_stream;
-  if (use_intra_process_ || is_mjpg_color_stream) {
+  const bool uses_image_transport = !use_intra_process_;
+  if (use_intra_process_) {
     releaseGlobalImageTransportPublisher(*node_, topic);
     image_publishers_[stream_index] =
         std::make_shared<image_rcl_publisher>(*node_, topic, image_qos_profile);
   } else {
+    const std::vector<std::string> excluded_plugins =
+        is_mjpg_color_stream ? std::vector<std::string>{"image_transport/compressed"}
+                             : std::vector<std::string>{};
     image_publishers_[stream_index] =
-        getGlobalImageTransportPublisher(*node_, topic, image_qos_profile);
+        getGlobalImageTransportPublisher(*node_, topic, image_qos_profile, excluded_plugins);
   }
   RCLCPP_INFO_STREAM(logger_, topic << " QoS: " << getRMWQosProfileDescription(image_qos_profile));
 
-  const auto image_publisher = image_publishers_.at(stream_index);
-  if (uses_image_transport) {
-    const auto resolved_topic = resolveStreamStatusTopic(topic);
+  const auto owns_publisher = [this](const std::string &resolved_topic) {
+    for (const auto &publisher : node_->get_publishers_info_by_topic(resolved_topic)) {
+      if (publisher.node_name() == node_->get_name() &&
+          publisher.node_namespace() == node_->get_namespace()) {
+        return true;
+      }
+    }
+    return false;
+  };
+  const auto register_transport_status = [this, owns_publisher](const std::string &name) {
+    const auto resolved_topic = resolveStreamStatusTopic(name);
     registerStreamStatus(
-        topic, [this, resolved_topic]() { return node_->count_subscribers(resolved_topic); });
+        name, [this, resolved_topic]() { return node_->count_subscribers(resolved_topic); },
+        [owns_publisher, resolved_topic]() { return owns_publisher(resolved_topic); });
+  };
+  if (uses_image_transport) {
+    register_transport_status(topic);
   } else {
+    const auto image_publisher = image_publishers_.at(stream_index);
     registerStreamStatus(topic, [image_publisher]() {
       return image_publisher ? image_publisher->get_subscription_count() : 0;
     });
@@ -5861,27 +5878,13 @@ void OBCameraNode::setupImagePublisher(const stream_index_pair &stream_index) {
     registerStreamStatus(topic + "/compressed", [compressed_publisher]() {
       return compressed_publisher ? compressed_publisher->get_subscription_count() : 0;
     });
-  } else {
-    compressed_image_publishers_.erase(stream_index);
-    for (const auto &compressed_topic : compressedStreamStatusTopics(stream_index)) {
-      removeStreamStatus(compressed_topic);
-    }
-    if (uses_image_transport) {
-      for (const auto &compressed_topic : compressedStreamStatusTopics(stream_index)) {
-        const auto resolved_topic = resolveStreamStatusTopic(compressed_topic);
-        registerStreamStatus(
-            compressed_topic,
-            [this, resolved_topic]() { return node_->count_subscribers(resolved_topic); },
-            [this, resolved_topic]() {
-              for (const auto &publisher : node_->get_publishers_info_by_topic(resolved_topic)) {
-                if (publisher.node_name() == node_->get_name() &&
-                    publisher.node_namespace() == node_->get_namespace()) {
-                  return true;
-                }
-              }
-              return false;
-            });
+  }
+  if (uses_image_transport) {
+    for (const auto &transport_topic : compressedStreamStatusTopics(stream_index)) {
+      if (is_mjpg_color_stream && transport_topic == topic + "/compressed") {
+        continue;
       }
+      register_transport_status(transport_topic);
     }
   }
 }
@@ -7335,12 +7338,13 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
       compressed_image_publishers_.count(stream_index) > 0 &&
       compressed_image_publishers_.at(stream_index);
   const bool has_image_subscriber = image_publishers_[stream_index]->get_subscription_count() > 0;
-  const bool uses_image_transport = !use_intra_process_ && !has_explicit_compressed_publisher;
+  const bool uses_image_transport = !use_intra_process_;
   const bool has_raw_image_subscriber = uses_image_transport
                                             ? node_->count_subscribers(resolveStreamStatusTopic(
                                                   stream_name_[stream_index] + "/image_raw")) > 0
                                             : has_image_subscriber;
-  const bool has_compressed_image_subscriber = hasCompressedImageSubscriber(stream_index);
+  const bool has_compressed_image_subscriber =
+      hasPassthroughCompressedImageSubscriber(stream_index);
   const bool has_image_transport_subscriber = uses_image_transport && has_image_subscriber;
   bool has_subscriber =
       has_image_subscriber || has_compressed_image_subscriber || save_images_[stream_index];
@@ -7453,7 +7457,7 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   }
   if ((stream_index == COLOR || stream_index == COLOR_LEFT || stream_index == COLOR_RIGHT) &&
       frame->getFormat() == OB_FORMAT_MJPG && has_compressed_image_subscriber) {
-    if (!has_raw_image_subscriber && log_image_timestamps) {
+    if (!has_image_subscriber && log_image_timestamps) {
       timestamp_csv_logger_->recordImagePrePublish(stream_index.first, frame, getSystemNowUs(),
                                                    getSteadyNowUs());
     }
@@ -7557,20 +7561,11 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   }
 }
 
-bool OBCameraNode::hasCompressedImageSubscriber(const stream_index_pair &stream_index) const {
-  auto it = compressed_image_publishers_.find(stream_index);
-  if (it != compressed_image_publishers_.end() && it->second) {
-    return it->second->get_subscription_count() > 0;
-  }
-  if (use_intra_process_) {
-    return false;
-  }
-  for (const auto &topic : compressedStreamStatusTopics(stream_index)) {
-    if (node_->count_subscribers(resolveStreamStatusTopic(topic)) > 0) {
-      return true;
-    }
-  }
-  return false;
+bool OBCameraNode::hasPassthroughCompressedImageSubscriber(
+    const stream_index_pair &stream_index) const {
+  const auto publisher = compressed_image_publishers_.find(stream_index);
+  return publisher != compressed_image_publishers_.end() && publisher->second &&
+         publisher->second->get_subscription_count() > 0;
 }
 
 void OBCameraNode::publishCompressedColorImage(const std::shared_ptr<ob::Frame> &frame,

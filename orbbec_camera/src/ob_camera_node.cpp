@@ -7552,6 +7552,10 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
     }
     if (has_image_transport_subscriber) {
       for (const auto &topic : compressedStreamStatusTopics(stream_index)) {
+        if (has_explicit_compressed_publisher &&
+            topic == stream_name_[stream_index] + "/image_raw/compressed") {
+          continue;
+        }
         if (node_->count_subscribers(resolveStreamStatusTopic(topic)) > 0) {
           recordStreamStatus(topic, image_msg->header.stamp);
         }

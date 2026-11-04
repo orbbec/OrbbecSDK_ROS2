@@ -293,6 +293,7 @@ orbbec_target_dependencies(${PROJECT_NAME}
     geometry_msgs
     image_transport
     message_filters
+    pluginlib
     rcl_interfaces
     rclcpp_components
     rmw

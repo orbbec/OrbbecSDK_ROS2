@@ -5757,10 +5757,7 @@ std::string OBCameraNode::resolveStreamStatusTopic(const std::string &topic_name
 std::vector<std::string> OBCameraNode::compressedStreamStatusTopics(
     const stream_index_pair &stream_index) const {
   const std::string topic = stream_name_.at(stream_index) + "/image_raw";
-  if (stream_index == DEPTH) {
-    return {topic + "/compressed", topic + "/compressedDepth", topic + "/theora"};
-  }
-  return {topic + "/compressed", topic + "/theora"};
+  return {topic + "/compressed", topic + "/compressedDepth", topic + "/theora"};
 }
 
 void OBCameraNode::registerStreamStatus(const std::string &topic_name,

@@ -134,6 +134,17 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_heartbeat', default_value='false'),
         DeclareLaunchArgument('enable_firmware_log', default_value='false'),
         DeclareLaunchArgument('monitor_poll_interval_sec', default_value='-1'),
+        #color image transport plugins
+        DeclareLaunchArgument('color.image_raw.enable_pub_plugins', default_value='["image_transport/compressed", "image_transport/raw", "image_transport/theora"]'),
+        #depth image transport plugins
+        # Keep both names to default depth compression to PNG across plugin versions:
+        # legacy plugins use .depth.image_raw.format; compressed_image_transport >= 6.0.0
+        # uses depth.image_raw.compressed.format after removing the legacy name.
+        DeclareLaunchArgument('.depth.image_raw.format', default_value='png'),
+        DeclareLaunchArgument('depth.image_raw.compressed.format', default_value='png'),
+        DeclareLaunchArgument('depth.image_raw.enable_pub_plugins', default_value='["image_transport/compressed", "image_transport/compressedDepth", "image_transport/raw"]'),
+        #ir image transport plugins
+        DeclareLaunchArgument('ir.image_raw.enable_pub_plugins', default_value='["image_transport/compressed", "image_transport/raw", "image_transport/theora"]'),
     ]
 
     # Node configuration

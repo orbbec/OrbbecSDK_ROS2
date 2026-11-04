@@ -14,9 +14,15 @@
 
 #include "orbbec_camera/image_publisher.h"
 
+#include <algorithm>
 #include <map>
 #include <mutex>
+#include <stdexcept>
 #include <utility>
+
+#include <image_transport/publisher_plugin.hpp>
+#include <pluginlib/class_loader.hpp>
+#include <rclcpp/expand_topic_or_service_name.hpp>
 
 namespace orbbec_camera {
 
@@ -25,7 +31,99 @@ using ImageTransportPublisherCacheKey = std::pair<std::string, std::string>;
 
 struct CachedImageTransportPublisher {
   rmw_qos_profile_t qos;
+  std::vector<std::string> excluded_plugins;
   std::shared_ptr<image_publisher> publisher;
+};
+
+// Use the standard PublisherPlugin API when one transport is supplied separately.
+// The node's configured allowlist remains intact; only this publisher excludes it.
+class FilteredImageTransportPublisher : public image_publisher {
+ public:
+  FilteredImageTransportPublisher(rclcpp::Node& node, const std::string& topic_name,
+                                  const rmw_qos_profile_t& qos,
+                                  const std::vector<std::string>& excluded_plugins)
+      : loader_(std::make_shared<pluginlib::ClassLoader<image_transport::PublisherPlugin>>(
+            "image_transport", "image_transport::PublisherPlugin")) {
+#ifdef ORBBEC_IMAGE_TRANSPORT_USES_REQUIRED_INTERFACES
+    const auto topic = node.get_node_topics_interface()->resolve_topic_name(topic_name);
+#else
+    const auto topic =
+        rclcpp::expand_topic_or_service_name(topic_name, node.get_name(), node.get_namespace());
+#endif
+    std::string parameter_base = topic.substr(std::string(node.get_effective_namespace()).size());
+    std::replace(parameter_base.begin(), parameter_base.end(), '/', '.');
+    if (!parameter_base.empty() && parameter_base.front() == '.') {
+      parameter_base.erase(0, 1);
+    }
+    const auto parameter_name = parameter_base + ".enable_pub_plugins";
+    std::vector<std::string> plugins;
+    for (const auto& lookup_name : loader_->getDeclaredClasses()) {
+      const auto suffix = lookup_name.rfind("_pub");
+      plugins.push_back(suffix == std::string::npos ? lookup_name : lookup_name.substr(0, suffix));
+    }
+    if (node.has_parameter(parameter_name)) {
+      plugins = node.get_parameter(parameter_name).as_string_array();
+    } else {
+      plugins = node.declare_parameter<std::vector<std::string>>(parameter_name, plugins);
+    }
+    // Match image_transport's deduplication of the allowlist.
+    std::sort(plugins.begin(), plugins.end());
+    plugins.erase(std::unique(plugins.begin(), plugins.end()), plugins.end());
+    const bool exclude_compressed =
+        std::find(excluded_plugins.begin(), excluded_plugins.end(), "image_transport/compressed") !=
+        excluded_plugins.end();
+    for (const auto& name : plugins) {
+      if (std::find(excluded_plugins.begin(), excluded_plugins.end(), name) !=
+          excluded_plugins.end()) {
+        continue;
+      }
+      try {
+        auto plugin = loader_->createSharedInstance(name + "_pub");
+        // Also exclude aliases that advertise the reserved passthrough topic.
+        if (exclude_compressed && plugin->getTransportName() == "compressed") {
+          continue;
+        }
+#ifdef ORBBEC_IMAGE_TRANSPORT_USES_REQUIRED_INTERFACES
+        plugin->advertise(image_transport::RequiredInterfaces{node}, topic,
+                          rclcpp::QoS{rclcpp::QoSInitialization::from_rmw(qos), qos});
+#else
+        plugin->advertise(&node, topic, qos);
+#endif
+        plugins_.push_back(std::move(plugin));
+      } catch (const std::runtime_error& error) {
+        RCLCPP_ERROR(node.get_logger(), "Failed to load image transport plugin %s: %s",
+                     name.c_str(), error.what());
+      }
+    }
+    // An empty decoded path is valid when only JPEG passthrough was requested.
+  }
+
+  ~FilteredImageTransportPublisher() override {
+    for (const auto& plugin : plugins_) {
+      plugin->shutdown();
+    }
+  }
+
+  void publish(sensor_msgs::msg::Image::UniquePtr image) override {
+    for (const auto& plugin : plugins_) {
+      if (plugin->getNumSubscribers() > 0) {
+        plugin->publish(*image);
+      }
+    }
+  }
+
+  size_t get_subscription_count() const override {
+    size_t count = 0;
+    for (const auto& plugin : plugins_) {
+      count += plugin->getNumSubscribers();
+    }
+    return count;
+  }
+
+ private:
+  // Plugins must be destroyed before the loader that owns their libraries.
+  std::shared_ptr<pluginlib::ClassLoader<image_transport::PublisherPlugin>> loader_;
+  std::vector<std::shared_ptr<image_transport::PublisherPlugin>> plugins_;
 };
 
 using ImageTransportPublisherCache =
@@ -97,19 +195,28 @@ size_t image_transport_publisher::get_subscription_count() const {
   return image_publisher_impl->getNumSubscribers();
 }
 
-std::shared_ptr<image_publisher> getGlobalImageTransportPublisher(rclcpp::Node& node,
-                                                                  const std::string& topic_name,
-                                                                  const rmw_qos_profile_t& qos) {
+std::shared_ptr<image_publisher> getGlobalImageTransportPublisher(
+    rclcpp::Node& node, const std::string& topic_name, const rmw_qos_profile_t& qos,
+    const std::vector<std::string>& excluded_plugins) {
   const ImageTransportPublisherCacheKey key{node.get_fully_qualified_name(), topic_name};
   std::lock_guard<std::mutex> lock(imageTransportPublisherCacheMutex());
   auto& cache = imageTransportPublisherCache();
   auto cached = cache.find(key);
-  if (cached != cache.end() && qosProfilesEqual(cached->second.qos, qos)) {
+  if (cached != cache.end() && qosProfilesEqual(cached->second.qos, qos) &&
+      cached->second.excluded_plugins == excluded_plugins) {
     return cached->second.publisher;
   }
 
-  auto publisher = std::make_shared<image_transport_publisher>(node, topic_name, qos);
-  cache[key] = CachedImageTransportPublisher{qos, publisher};
+  // Release the previous plugin endpoints before changing transport policy.
+  cache.erase(key);
+  std::shared_ptr<image_publisher> publisher;
+  if (excluded_plugins.empty()) {
+    publisher = std::make_shared<image_transport_publisher>(node, topic_name, qos);
+  } else {
+    publisher =
+        std::make_shared<FilteredImageTransportPublisher>(node, topic_name, qos, excluded_plugins);
+  }
+  cache[key] = CachedImageTransportPublisher{qos, excluded_plugins, publisher};
   return publisher;
 }
 

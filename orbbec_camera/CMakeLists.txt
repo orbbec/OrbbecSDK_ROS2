@@ -29,6 +29,7 @@ set(dependencies
     geometry_msgs
     image_transport
     image_publisher
+    pluginlib
     message_filters
     OpenCV
     orbbec_camera_msgs
@@ -292,6 +293,7 @@ orbbec_target_dependencies(${PROJECT_NAME}
     geometry_msgs
     image_transport
     message_filters
+    pluginlib
     rcl_interfaces
     rclcpp_components
     rmw
@@ -446,6 +448,14 @@ if(BUILD_TESTING)
     ament_add_gtest(camera_info_distortion_test test/camera_info_distortion_test.cpp)
     target_link_directories(camera_info_distortion_test PRIVATE ${ORBBEC_LIBS_DIR})
     target_link_libraries(camera_info_distortion_test ${PROJECT_NAME})
+
+    ament_add_gtest(image_publisher_passthrough_test test/image_publisher_passthrough_test.cpp)
+    target_link_directories(image_publisher_passthrough_test PRIVATE ${ORBBEC_LIBS_DIR})
+    target_link_libraries(image_publisher_passthrough_test ${PROJECT_NAME})
+
+    ament_add_gtest(stream_status_test test/stream_status_test.cpp)
+    target_link_directories(stream_status_test PRIVATE ${ORBBEC_LIBS_DIR})
+    target_link_libraries(stream_status_test ${PROJECT_NAME})
 endif()
 
 ament_export_include_directories(include)

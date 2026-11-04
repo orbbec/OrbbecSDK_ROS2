@@ -361,12 +361,14 @@ class OBCameraNode {
   void setupPublishers();
 
   void registerStreamStatus(const std::string& topic_name,
-                            StreamStatusTracker::SubscriberCountFn subscriber_count);
+                            StreamStatusTracker::SubscriberCountFn subscriber_count,
+                            StreamStatusTracker::AvailableFn available = {});
   void removeStreamStatus(const std::string& topic_name);
   void recordStreamStatus(const std::string& topic_name,
                           const builtin_interfaces::msg::Time& stamp);
   std::string resolveStreamStatusTopic(const std::string& topic_name) const;
-  std::string compressedStreamStatusTopic(const stream_index_pair& stream_index) const;
+  std::vector<std::string> compressedStreamStatusTopics(
+      const stream_index_pair& stream_index) const;
 
   void syncSoftwareAlignment();
 
@@ -671,7 +673,7 @@ class OBCameraNode {
 
   bool setupFormatConvertType(OBFormat format);
   bool setupFormatConvertType(OBFormat format, ob::FormatConvertFilter& filter);
-  bool hasCompressedImageSubscriber(const stream_index_pair& stream_index) const;
+  bool hasPassthroughCompressedImageSubscriber(const stream_index_pair& stream_index) const;
   void publishCompressedColorImage(const std::shared_ptr<ob::Frame>& frame,
                                    const stream_index_pair& stream_index,
                                    const rclcpp::Time& timestamp, const std::string& frame_id);

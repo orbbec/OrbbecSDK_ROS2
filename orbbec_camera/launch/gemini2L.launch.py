@@ -53,6 +53,14 @@ def convert_value(value):
             return True
         if value.lower() == "false":
             return False
+        # string array parameters such as image_raw.enable_pub_plugins are
+        # passed as a YAML/JSON list and must stay a list, not a string
+        stripped = value.strip()
+        if stripped.startswith("[") and stripped.endswith("]"):
+            try:
+                return yaml.safe_load(stripped)
+            except Exception:
+                pass
     return value
 
 
@@ -204,6 +212,17 @@ def generate_launch_description():
         DeclareLaunchArgument("enable_depth_undistortion", default_value="false"),
         DeclareLaunchArgument("enable_ir_undistortion", default_value="false"),
         DeclareLaunchArgument("config_file_path", default_value=""),
+        #color image transport plugins
+        DeclareLaunchArgument('color.image_raw.enable_pub_plugins', default_value='["image_transport/compressed", "image_transport/raw", "image_transport/theora"]'),
+        #depth image transport plugins
+        # Keep both names to default depth compression to PNG across plugin versions:
+        # legacy plugins use .depth.image_raw.format; compressed_image_transport >= 6.0.0
+        # uses depth.image_raw.compressed.format after removing the legacy name.
+        DeclareLaunchArgument('.depth.image_raw.format', default_value='png'),
+        DeclareLaunchArgument('depth.image_raw.compressed.format', default_value='png'),
+        DeclareLaunchArgument('depth.image_raw.enable_pub_plugins', default_value='["image_transport/compressed", "image_transport/compressedDepth", "image_transport/raw"]'),
+        #ir image transport plugins
+        DeclareLaunchArgument('ir.image_raw.enable_pub_plugins', default_value='["image_transport/compressed", "image_transport/raw", "image_transport/theora"]'),
     ]
 
     def get_params(context, args):

@@ -10,6 +10,8 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>pkg-config</buildtool_depend>
 
+  <build_depend condition="$ROS_DISTRO == 'foxy'">boost</build_depend>
+
   <depend>ament_lint_auto</depend>
   <depend>ament_lint_common</depend>
   <depend>ament_index_cpp</depend>

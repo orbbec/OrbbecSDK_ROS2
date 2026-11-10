@@ -5,6 +5,14 @@ Changelog for package orbbec_description
 Forthcoming
 -----------
 
+2.10.7 (2026-11-10)
+-------------------
+* Rename the Gemini 335Le URDF frame ``camera_botton_screw_frame`` to ``camera_bottom_screw_frame`` and update model references. Update downstream references to the old frame name.
+
+2.10.6 (2026-09-30)
+-------------------
+* Add the Gemini 435Le URDF model and mesh.
+
 2.9.3 (2026-07-17)
 ------------------
 * Add URDF models for the Gemini 301 and Gemini 340 series.

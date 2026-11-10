@@ -5,6 +5,26 @@ Changelog for package orbbec_camera
 Forthcoming
 -----------
 
+2.10.7 (2026-11-10)
+-------------------
+* Fix empty depth ``/compressed`` data by defaulting to PNG compression.
+* Fix compressed depth topics requiring a raw image subscription before publishing.
+* Fix incomplete image transport topic statistics in device status and remove invalid entries for disabled plugins.
+* Improve exception handling and runtime state checks in image processing threads.
+* Fix MJPG color streams bypassing image_transport plugins, restoring output through configured plugins such as Theora.
+* Fix missing Foxy dependencies and build compatibility with newer ``rclcpp`` versions.
+
+2.10.6 (2026-09-30)
+-------------------
+* Update the bundled OrbbecSDK to v2.10.6 and add source build support for ROS 2 Lyrical and Rolling.
+* Add depth image colorization, image QoS history/depth controls, and bounded color frame queues with overflow statistics.
+* Extend device status with per-stream subscription, publishing frame rate, and average latency statistics for image, compressed image, point cloud, and IMU topics.
+* Add Gemini 305 FPS Boost support, benchmark topic selection, and preset-aware device profile queries.
+* Extend timestamp CSV recording and raw image, PNG, and metadata saving.
+* Improve stream switching, start/stop, camera reconnection, network initialization, SDK bag playback, and Jetson MJPEG decoding.
+* Fix CameraInfo distortion models, standalone IMU time domains, and potential crashes in the toggle_color/toggle_depth services.
+* Rename ``set_floor_enable`` to ``set_flood_enable``; downstream service clients must be updated.
+
 2.9.3 (2026-07-17)
 ------------------
 * Update the bundled OrbbecSDK to v2.9.3 and add third-party license files.

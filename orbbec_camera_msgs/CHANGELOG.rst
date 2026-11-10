@@ -5,6 +5,15 @@ Changelog for package orbbec_camera_msgs
 Forthcoming
 -----------
 
+2.10.7 (2026-11-10)
+-------------------
+* Update package version to 2.10.7.
+
+2.10.6 (2026-09-30)
+-------------------
+* Add ``StreamStatus`` and replace individual stream fields in ``DeviceStatus`` with a ``streams`` array; downstream message consumers must be updated.
+* Extend ``SendActionCommand`` with trigger modes, relative delays, and the encoded timestamp response; rename ``destination_ip`` to ``broadcast_ip``.
+
 2.9.3 (2026-07-17)
 ------------------
 * Add interfaces for device configuration, SDK bag recording, and runtime stream profile control.
